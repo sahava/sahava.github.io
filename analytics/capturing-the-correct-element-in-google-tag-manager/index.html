@@ -1,0 +1,749 @@
+
+
+  
+    
+  
+
+
+  
+
+
+
+
+
+  
+
+
+  
+
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Hugo 0.31 with theme Tranquilpeak 0.4.3-BETA">
+    <title>Capturing The Correct Element In Google Tag Manager | Simo Ahava's blog</title>
+    
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-PZ7GMV9');</script>
+    
+    <script src="//simoahava.disqus.com/count.js" id="dsq-count-scr" async></script>
+    <meta name="author" content="Simo Ahava">
+    <meta name="keywords" content="">
+
+    <link rel="icon" href="https://www.simoahava.com/images/favicon.ico">
+    
+    <link rel="amphtml" href="https://www.simoahava.com/amp/analytics/capturing-the-correct-element-in-google-tag-manager/">
+    
+    <meta name="description" content="A simple DOM traversal method to find the correct element when some other element is clicked using Google Tag Manager.">
+    <meta property="og:description" content="A simple DOM traversal method to find the correct element when some other element is clicked using Google Tag Manager.">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="Capturing The Correct Element In Google Tag Manager">
+    <meta property="og:url" content="/analytics/capturing-the-correct-element-in-google-tag-manager/">
+    <meta property="og:site_name" content="Simo Ahava&#39;s blog">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Capturing The Correct Element In Google Tag Manager">
+    <meta name="twitter:description" content="A simple DOM traversal method to find the correct element when some other element is clicked using Google Tag Manager.">
+    
+      <meta name="twitter:creator" content="@SimoAhava">
+      
+    
+
+    
+    
+
+    
+      <meta property="og:image" content="https://www.simoahava.com/images/simo.png">
+    
+
+    
+      <meta name="twitter:image" content="https://www.simoahava.com/images/2017/02/auto-event-triggers.png">  
+      <meta property="og:image" content="https://www.simoahava.com/images/2017/02/auto-event-triggers.png">
+    
+    
+    
+
+    
+
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/jquery.fancybox.min.css" integrity="sha256-vuXZ9LGmmwtjqFX1F+EKin1ThZMub58gKULUyf0qECk=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/helpers/jquery.fancybox-thumbs.min.css" integrity="sha256-SEa4XYAHihTcEP1f5gARTB2K26Uk8PsndQYHQC1f4jU=" crossorigin="anonymous" />
+    
+    
+    <link rel="stylesheet" href="https://www.simoahava.com/css/style.css" />
+    
+    
+
+    
+      
+    
+    
+  </head>
+
+  <body>
+    <div id="blog">
+      <header id="header" data-behavior="4">
+  <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+  <div class="header-title">
+    <a class="header-title-link" href="https://www.simoahava.com/">Simo Ahava&#39;s blog</a>
+  </div>
+  
+</header>
+
+      <nav id="sidebar" data-behavior="4">
+  <div class="sidebar-container">
+    
+      <div class="sidebar-profile">
+        <a href="https://www.simoahava.com/">
+          <img class="sidebar-profile-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+        </a>
+        <h4 class="sidebar-profile-name">Simo Ahava</h4>
+        
+          <h5 class="sidebar-profile-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</h5>
+        
+      </div>
+    
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+      
+      <span class="sidebar-button-desc">Home</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+      
+      <span class="sidebar-button-desc">Categories</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tags/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Tags</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/gtm-tips/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-magic"></i>
+      
+      <span class="sidebar-button-desc">GTM Tips</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/about-simo-ahava/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+      
+      <span class="sidebar-button-desc">About</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tools/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-wrench"></i>
+      
+      <span class="sidebar-button-desc">Tools</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/blog-statistics/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bar-chart"></i>
+      
+      <span class="sidebar-button-desc">Blog statistics</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://github.com/sahava" target="_blank" rel="noopener">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+      
+      <span class="sidebar-button-desc">GitHub</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/upcoming-talks/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bullhorn"></i>
+      
+      <span class="sidebar-button-desc">Upcoming talks</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
+
+    </ul>
+  </div>
+</nav>
+
+      
+
+      <div id="main" data-behavior="4"
+        class="
+               hasCoverMetaIn
+               ">
+        <article class="post" itemscope itemType="http://schema.org/BlogPosting">
+	  <form id="search" action="/search/">
+  <input name="q" type="text" class="form-control input--xlarge" placeholder="Search blog..." autocomplete="off">
+  </form>
+
+          
+          
+            <div class="post-header main-content-wrap text-left">
+
+  
+
+    <h1 itemprop="headline">
+      Capturing The Correct Element In Google Tag Manager
+    </h1>
+  
+  
+  <div class="postShorten-meta post-meta">
+    
+      <time itemprop="datePublished" datetime="2017-02-08T16:14:44Z">
+        
+  February 8, 2017
+
+      </time>
+    
+      
+  
+  
+    <span>in</span>
+    
+      <a class="category-link" href="https://www.simoahava.com/categories/analytics">Analytics</a>
+    
+  
+
+
+       | <a href="https://www.simoahava.com/analytics/capturing-the-correct-element-in-google-tag-manager/#disqus_thread">Comments</a> <span id="linkedincount"></span>
+  </div>
+
+
+</div>
+
+          
+          <div class="post-content markdown" itemprop="articleBody">
+            <div class="main-content-wrap">
+              
+
+<p><a href="https://tagmanager.google.com/">Google Tag Manager</a> provides us with a bunch of handy triggers, designed to make capturing user interactions on the website much easier. These triggers are part of a paradigm called <a href="https://www.simoahava.com/analytics/auto-event-tracking-gtm-2-0/">auto-event tracking</a>, which comprises the <strong>Click</strong>, <strong>Form</strong>, <strong>History</strong>, and <strong>JavaScript Error</strong> trigger types.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2017/02/auto-event-triggers.png" title="Auto-event triggers">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2017/02/auto-event-triggers.png#ZgotmplZ" alt="Auto-event triggers">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>Now, I&rsquo;ve covered GTM&rsquo;s triggers many, many times before. If you need a refresher, take a look at the following articles:</p>
+
+<ul>
+<li><a href="https://www.simoahava.com/analytics/trigger-guide-google-tag-manager/">Trigger Guide For Google Tag Manager</a><br /></li>
+<li><a href="https://www.simoahava.com/analytics/auto-event-tracking-gtm-2-0/">Auto-Event Tracking In GTM 2.0</a><br /></li>
+<li><a href="https://www.simoahava.com/gtm-tips/fix-problems-with-gtm-listeners/">Fix Problems With GTM Listeners</a><br /></li>
+<li><a href="https://www.simoahava.com/analytics/dont-gtm-listeners-work/">Why Don&rsquo;t My GTM Listeners Work?</a></li>
+</ul>
+
+<p>In this article, I want to tackle a specific aspect of <strong>Click triggers</strong>. If you&rsquo;ve used them before, you&rsquo;ll know (at least) two things:</p>
+
+<p>1) The <strong>Just Links</strong> trigger captures the link element (<code>&lt;a/&gt;</code>) that is the nearest wrapping link of the clicked element.</p>
+
+<p>2) The <strong>All Elements</strong> trigger captures the clicked element itself.</p>
+
+<p>In other words, the Just Links trigger actually climbs up the document until it finds a link element, and returns that for GTM to process. The All Elements acts more like a regular handler: it simply returns the element that was clicked.</p>
+
+<p>In this article, I want to show you how to leverage especially the All Elements trigger more effectively. Basically, you might want to use the All Elements trigger, but then mimic the Just Links trigger to find some nearest wrapping element, and return that for GTM to use.</p>
+
+<h2 id="why-use-all-elements">Why use All Elements?</h2>
+
+<p>Well, there&rsquo;s one obvious reason: <strong>There are all sorts of elements on the page you might want to track</strong>. Even though links are a very popular tracking item, there are many elements that have nothing to do with links.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2017/02/all-elements.png" title="All Elements">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2017/02/all-elements.png#ZgotmplZ" alt="All Elements">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>Perhaps you want to track a button, or a form field, or an image. In these cases, you will need the All Elements trigger.</p>
+
+<p>Another reason you might not be aware of is very significant: <strong>The All Elements trigger uses the <em>capture</em> phase of the event path</strong>. The Just Links trigger, as well as pretty much all other GTM triggers, utilize the <em>bubble</em> phase.</p>
+
+<p>And why is this significant? Because event propagation is <a href="https://www.simoahava.com/gtm-tips/fix-problems-with-gtm-listeners/">most often cancelled</a> in the <em>bubble</em> phase! Many people have come across forms and links that simply refuse to fire their respective triggers in Google Tag Manager. The reason is that other JavaScript on the site can prevent the event from climbing up the document to where Google Tag Manager&rsquo;s listeners are waiting.</p>
+
+<p>But when you use the All Elements trigger, you are using the <em>capture</em> phase, which is cancelled far less often.</p>
+
+<p>In other words, you can actually use the All Elements trigger to apply link tracking for links that do not create a GTM event when using the Just Links trigger!</p>
+
+<p>The only problem with this approach is that the All Elements trigger returns the actual element that was clicked. For example, let&rsquo;s say you have HTML like this on the site:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">div</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;contact-us&#34;</span>&gt;
+  &lt;<span style="color:#f92672">a</span> <span style="color:#a6e22e">href</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;mailto:simo@example.com&#34;</span>&gt;
+    &lt;<span style="color:#f92672">span</span>&gt;Send me mail&lt;/<span style="color:#f92672">span</span>&gt;
+  &lt;/<span style="color:#f92672">a</span>&gt;
+&lt;/<span style="color:#f92672">div</span>&gt;</code></pre></div>
+
+<p>If you used a <strong>Just Links</strong> trigger, and event propagation wasn&rsquo;t stopped, clicking the link will pass the <code>&lt;a href=&quot;mailto:simo@example.com&quot;/&gt;</code> to Google Tag Manager as the target element of the event. But if you&rsquo;re using the <strong>All Elements</strong> trigger, GTM captures the <code>&lt;span/&gt;</code>, because it&rsquo;s what the click actually landed on!</p>
+
+<p>So how do we get the benefit of All Elements with its <em>capture</em> phase handler, but still be able to capture any element up the DOM tree?</p>
+
+<p>With some Custom HTML Tag and Custom JavaScript variable magic, of course!</p>
+
+<h2 id="the-solution">The solution</h2>
+
+<p>The solution comes in two parts. First, we need to create a Custom HTML Tag that introduces a <strong>polyfill</strong> (read: workaround) for older browsers which might not support the method we&rsquo;re going to use.</p>
+
+<p>Next, we&rsquo;ll use a Custom JavaScript variable to create a generic function to which we can pass a <a href="https://www.simoahava.com/gtm-tips/10-useful-css-selectors/">CSS selector</a>. This function, in turn, climbs up the document tree and returns the element that matches the selector.</p>
+
+<p>Note that you can achieve most of this easily with <a href="https://jquery.com">jQuery</a> or something similar. However, I want to show the native JavaScript way of doing it, since it&rsquo;s not actually that complex.</p>
+
+<h3 id="the-custom-html-tag">The Custom HTML Tag</h3>
+
+<p>The Custom HTML Tag should fire as early as possible on the page, so you can use the All Pages trigger, if you wish. This is what it holds:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#f92672">&lt;</span><span style="color:#a6e22e">script</span><span style="color:#f92672">&gt;</span>
+  <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">Element</span>.<span style="color:#a6e22e">prototype</span>.<span style="color:#a6e22e">matches</span>) {
+    <span style="color:#a6e22e">Element</span>.<span style="color:#a6e22e">prototype</span>.<span style="color:#a6e22e">matches</span> <span style="color:#f92672">=</span> 
+        <span style="color:#a6e22e">Element</span>.<span style="color:#a6e22e">prototype</span>.<span style="color:#a6e22e">matchesSelector</span> <span style="color:#f92672">||</span> 
+        <span style="color:#a6e22e">Element</span>.<span style="color:#a6e22e">prototype</span>.<span style="color:#a6e22e">mozMatchesSelector</span> <span style="color:#f92672">||</span>
+        <span style="color:#a6e22e">Element</span>.<span style="color:#a6e22e">prototype</span>.<span style="color:#a6e22e">msMatchesSelector</span> <span style="color:#f92672">||</span> 
+        <span style="color:#a6e22e">Element</span>.<span style="color:#a6e22e">prototype</span>.<span style="color:#a6e22e">oMatchesSelector</span> <span style="color:#f92672">||</span> 
+        <span style="color:#a6e22e">Element</span>.<span style="color:#a6e22e">prototype</span>.<span style="color:#a6e22e">webkitMatchesSelector</span> <span style="color:#f92672">||</span>
+        <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">s</span>) {
+            <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">matches</span> <span style="color:#f92672">=</span> (<span style="color:#66d9ef">this</span>.document <span style="color:#f92672">||</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">ownerDocument</span>).<span style="color:#a6e22e">querySelectorAll</span>(<span style="color:#a6e22e">s</span>),
+                <span style="color:#a6e22e">i</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">matches</span>.<span style="color:#a6e22e">length</span>;
+            <span style="color:#66d9ef">while</span> (<span style="color:#f92672">--</span><span style="color:#a6e22e">i</span> <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">matches</span>.<span style="color:#a6e22e">item</span>(<span style="color:#a6e22e">i</span>) <span style="color:#f92672">!==</span> <span style="color:#66d9ef">this</span>) {}
+            <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">&gt;</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>;            
+        };
+  }
+<span style="color:#f92672">&lt;</span><span style="color:#960050;background-color:#1e0010">/script&gt;</span></code></pre></div>
+
+<p>This is a good addition to the site code in general, so if possible to add it to the regular JavaScript of the site, I recommend you do!</p>
+
+<p>The polyfill is gratefully copied from the <a href="https://developer.mozilla.org/en/docs/Web/API/Element/matches">Mozilla Developer Network pages</a>.</p>
+
+<p>The script checks if the browser supports the method <code>Element.matches()</code> or any of its alternatives. If no match is found, then it&rsquo;s fixed with a custom method that scrolls through the document elements and checks if any of them matches the given CSS selector.</p>
+
+<p>Once this is running, you can start using it!</p>
+
+<h3 id="the-custom-javascript-variable">The Custom JavaScript variable</h3>
+
+<p>To make things work, we need a little utility Custom JavaScript variable. So create a new Custom JavaScript Variable, and name it <strong>{{Find closest}}</strong>. This is the code you need to put within:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
+  <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">target</span>, <span style="color:#a6e22e">selector</span>) {
+    <span style="color:#66d9ef">while</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">target</span>.<span style="color:#a6e22e">matches</span>(<span style="color:#a6e22e">selector</span>) <span style="color:#f92672">&amp;&amp;</span> <span style="color:#f92672">!</span><span style="color:#a6e22e">target</span>.<span style="color:#a6e22e">matches</span>(<span style="color:#e6db74">&#39;body&#39;</span>)) {
+      <span style="color:#a6e22e">target</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">target</span>.<span style="color:#a6e22e">parentElement</span>;
+    }
+    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">target</span>.<span style="color:#a6e22e">matches</span>(<span style="color:#a6e22e">selector</span>) <span style="color:#f92672">?</span> <span style="color:#a6e22e">target</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">undefined</span>;
+  }
+}</code></pre></div>
+
+<p>This function takes two parameters: <code>target</code> and <code>selector</code>. The first is an HTML element such as the <strong>{{Click Element}}</strong> <a href="https://www.simoahava.com/analytics/variable-guide-google-tag-manager/">built-in variable</a>. The latter is a <a href="https://www.simoahava.com/gtm-tips/10-useful-css-selectors/">CSS selector</a> string. The CSS selector is what you use to tell GTM the following:</p>
+
+<blockquote>
+<p>Starting from <code>target</code>, start climbing up the wrapping DOM structure until you find an element that matches <code>selector</code>. If such an element is found, return it. If such an element is NOT found, return the original event target.</p>
+</blockquote>
+
+<p>The idea here is that even though the click landed on the element you wanted to target, <strong>you might actually want to access some other element relative to the original event target</strong>. For this, the <code>matches()</code> workaround is invaluable, as it lets you traverse element-relative paths.</p>
+
+<h2 id="how-to-use-it">How to use it</h2>
+
+<p>Once you&rsquo;ve set up the polyfill and the Custom JavaScript Variable, you can leverage the variable in all your Google Tag Manager JavaScript with the following syntax:</p>
+
+<p><code>var elementFound = {{Find closest}}(someHTMLElement, 'someCSSselector');</code></p>
+
+<p>For example, let&rsquo;s say you have an HTML structure that looks like this:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">div</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;product_12345&#34;</span>&gt;
+  &lt;<span style="color:#f92672">div</span> <span style="color:#a6e22e">class</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;details&#34;</span>&gt;
+    &lt;<span style="color:#f92672">h2</span>&gt;Product 1&lt;/<span style="color:#f92672">h2</span>&gt;
+  &lt;/<span style="color:#f92672">div</span>&gt;
+  &lt;<span style="color:#f92672">div</span> <span style="color:#a6e22e">class</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;link&#34;</span>&gt;
+    &lt;<span style="color:#f92672">a</span> <span style="color:#a6e22e">href</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;product1.html&#34;</span>&gt;
+      Product 1
+    &lt;/<span style="color:#f92672">a</span>&gt;
+  &lt;/<span style="color:#f92672">div</span>&gt;
+&lt;/<span style="color:#f92672">div</span>&gt;</code></pre></div>
+
+<p>Now, you&rsquo;ve set up a <strong>Click - Just Links</strong> or <strong>Click - All Elements</strong> trigger to capture clicks on the <code>&lt;a/&gt;</code> element. Now, however, you also want to grab the value of the <code>id</code> attribute from the very top-most <code>div</code> (&ldquo;product_12345&rdquo;). To get that, you could use a Custom JavaScript Variable like this:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">el</span> <span style="color:#f92672">=</span> {{<span style="color:#a6e22e">Find</span> <span style="color:#a6e22e">closest</span>}}({{<span style="color:#a6e22e">Click</span> <span style="color:#a6e22e">Element</span>}}, <span style="color:#e6db74">&#39;div[id^=&#34;product&#34;]&#39;</span>);
+  <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">typeof</span> <span style="color:#a6e22e">el</span> <span style="color:#f92672">!==</span> <span style="color:#e6db74">&#39;undefined&#39;</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">el</span>.<span style="color:#a6e22e">id</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">undefined</span>;
+}</code></pre></div>
+
+<p>This Custom JavaScript Variable takes {{Click Element}} (the element that was originally clicked), and then starts walking up the DOM until it finds a <code>div</code> whose <code>id</code> attribute begins with the string &ldquo;product&rdquo;. If such an element is found, it returns the value of the <code>id</code> attribute in question. If the element isn&rsquo;t found, it simply returns <code>undefined</code>.</p>
+
+<h2 id="summary">Summary</h2>
+
+<p>Traversing the Document Object Model with CSS selectors can be a very good friend to you, indeed. Click handlers are usually <em>too</em> accurate, as they return elements we didn&rsquo;t expect them to return, or they return elements too deep in the DOM to matter.</p>
+
+<p>That&rsquo;s why it&rsquo;s good to have a tool that lets you access the DOM structure more deliberately. Traversing the DOM with the {{Find closest}} workaround is a nice way to achieve the type of freedom using native JavaScript that is typically found only within frameworks like jQuery.</p>
+
+              
+            </div>
+          </div>
+          <div id="post-footer" class="post-footer main-content-wrap">
+            
+              
+                
+                
+                  <div class="post-footer-tags">
+                    <span class="text-color-light text-small">TAGGED IN</span><br/>
+                    
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/css/">css</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/custom-javascript/">custom javascript</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/dom/">dom</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/google-tag-manager/">Google Tag Manager</a>
+
+                  </div>
+                
+              
+            
+            
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/gtm-tips/gtmtips-test-multiple-urls-triggers/">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/automated-tests-for-google-tag-managers-datalayer/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/capturing-the-correct-element-in-google-tag-manager/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Capturing%20The%20Correct%20Element%20In%20Google%20Tag%20Manager%20https://www.simoahava.com/analytics/capturing-the-correct-element-in-google-tag-manager/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://www.simoahava.com/analytics/capturing-the-correct-element-in-google-tag-manager/">
+              <i class="fa fa-google-plus"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/capturing-the-correct-element-in-google-tag-manager/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#disqus">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+            
+              
+                <span id="disqus"></span>
+<div id="disqus_thread">
+  <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+
+              
+            
+          </div>
+        </article>
+        <footer id="footer" class="main-content-wrap">
+  <span class="copyrights">
+    &copy; 2018 Simo Ahava. All Rights Reserved
+  </span>
+</footer>
+
+      </div>
+      
+      <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+        
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/gtm-tips/gtmtips-test-multiple-urls-triggers/">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/automated-tests-for-google-tag-managers-datalayer/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/capturing-the-correct-element-in-google-tag-manager/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Capturing%20The%20Correct%20Element%20In%20Google%20Tag%20Manager%20https://www.simoahava.com/analytics/capturing-the-correct-element-in-google-tag-manager/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://www.simoahava.com/analytics/capturing-the-correct-element-in-google-tag-manager/">
+              <i class="fa fa-google-plus"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/capturing-the-correct-element-in-google-tag-manager/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#disqus">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+      </div>
+      
+      <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+  <i id="btn-close-shareoptions" class="fa fa-close"></i>
+  <ul class="share-options">
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=%25!s%28BADINDEX%29">
+          <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https%3A%2F%2Fwww.simoahava.com%2Fanalytics%2Fcapturing-the-correct-element-in-google-tag-manager%2F%20%25!s%28BADINDEX%29%20via%20@SimoAhava">
+          <i class="fa fa-twitter"></i><span>Share on Twitter</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=%25!s%28BADINDEX%29">
+          <i class="fa fa-google-plus"></i><span>Share on Google&#43;</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.linkedin.com/cws/share?url=%25!s%28BADINDEX%29">
+          <i class="fa fa-linkedin"></i><span>Share on LinkedIn</span>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+<div id="share-options-mask" class="share-options-mask"></div>
+    </div>
+    
+    <div id="about">
+  <div id="about-card">
+    <div id="about-btn-close">
+      <i class="fa fa-remove"></i>
+    </div>
+    
+      <img id="about-card-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+    
+    <h4 id="about-card-name">Simo Ahava</h4>
+    
+      <div id="about-card-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</div>
+    
+    
+      <div id="about-card-job">
+        <i class="fa fa-briefcase"></i>
+        <br/>
+        Senior Data Advocate at Reaktor
+      </div>
+    
+    
+      <div id="about-card-location">
+        <i class="fa fa-map-marker"></i>
+        <br/>
+        Finland
+      </div>
+    
+  </div>
+</div>
+
+    
+  
+    
+    <div id="cover" style="background-image:url('https://www.simoahava.com/images/maisema.jpg');"></div>
+  
+
+
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.7/js/jquery.fancybox.min.js" integrity="sha256-GEAnjcTqVP+vBp3SSc8bEDQqvWAZMiHyUSIorrWwH50=" crossorigin="anonymous"></script>
+
+
+<script src="https://www.simoahava.com/js/script.js"></script>
+
+
+
+
+  
+    
+      <script>
+        
+
+
+
+
+
+        (function() {
+          
+          
+          if (window.location.hostname == "localhost") {
+            return;
+          }
+          var d = document, s = d.createElement('script');
+          var disqus_shortname = 'simoahava';
+          s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      </script>
+    
+  
+
+
+
+    
+  </body>
+</html>
+

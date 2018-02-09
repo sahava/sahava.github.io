@@ -1,0 +1,861 @@
+
+
+  
+    
+  
+
+
+  
+
+
+
+
+
+  
+
+
+  
+
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Hugo 0.31 with theme Tranquilpeak 0.4.3-BETA">
+    <title>Custom Event Listeners For GTM | Simo Ahava's blog</title>
+    
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-PZ7GMV9');</script>
+    
+    <script src="//simoahava.disqus.com/count.js" id="dsq-count-scr" async></script>
+    <meta name="author" content="Simo Ahava">
+    <meta name="keywords" content="">
+
+    <link rel="icon" href="https://www.simoahava.com/images/favicon.ico">
+    
+    <link rel="amphtml" href="https://www.simoahava.com/amp/analytics/custom-event-listeners-gtm/">
+    
+    <meta name="description" content="How to create custom event listeners in Google Tag Manager. This is arguably one of the best ways to enhance Google Tag Manager tracking on your website.">
+    <meta property="og:description" content="How to create custom event listeners in Google Tag Manager. This is arguably one of the best ways to enhance Google Tag Manager tracking on your website.">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="Custom Event Listeners For GTM">
+    <meta property="og:url" content="/analytics/custom-event-listeners-gtm/">
+    <meta property="og:site_name" content="Simo Ahava&#39;s blog">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Custom Event Listeners For GTM">
+    <meta name="twitter:description" content="How to create custom event listeners in Google Tag Manager. This is arguably one of the best ways to enhance Google Tag Manager tracking on your website.">
+    
+      <meta name="twitter:creator" content="@SimoAhava">
+      
+    
+
+    
+    
+
+    
+      <meta property="og:image" content="https://www.simoahava.com/images/simo.png">
+    
+
+    
+      <meta name="twitter:image" content="https://www.simoahava.com/images/2014/08/custom-listeners.png">  
+      <meta property="og:image" content="https://www.simoahava.com/images/2014/08/custom-listeners.png">
+    
+    
+    
+
+    
+
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/jquery.fancybox.min.css" integrity="sha256-vuXZ9LGmmwtjqFX1F+EKin1ThZMub58gKULUyf0qECk=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/helpers/jquery.fancybox-thumbs.min.css" integrity="sha256-SEa4XYAHihTcEP1f5gARTB2K26Uk8PsndQYHQC1f4jU=" crossorigin="anonymous" />
+    
+    
+    <link rel="stylesheet" href="https://www.simoahava.com/css/style.css" />
+    
+    
+
+    
+      
+    
+    
+  </head>
+
+  <body>
+    <div id="blog">
+      <header id="header" data-behavior="4">
+  <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+  <div class="header-title">
+    <a class="header-title-link" href="https://www.simoahava.com/">Simo Ahava&#39;s blog</a>
+  </div>
+  
+</header>
+
+      <nav id="sidebar" data-behavior="4">
+  <div class="sidebar-container">
+    
+      <div class="sidebar-profile">
+        <a href="https://www.simoahava.com/">
+          <img class="sidebar-profile-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+        </a>
+        <h4 class="sidebar-profile-name">Simo Ahava</h4>
+        
+          <h5 class="sidebar-profile-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</h5>
+        
+      </div>
+    
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+      
+      <span class="sidebar-button-desc">Home</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+      
+      <span class="sidebar-button-desc">Categories</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tags/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Tags</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/gtm-tips/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-magic"></i>
+      
+      <span class="sidebar-button-desc">GTM Tips</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/about-simo-ahava/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+      
+      <span class="sidebar-button-desc">About</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tools/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-wrench"></i>
+      
+      <span class="sidebar-button-desc">Tools</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/blog-statistics/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bar-chart"></i>
+      
+      <span class="sidebar-button-desc">Blog statistics</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://github.com/sahava" target="_blank" rel="noopener">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+      
+      <span class="sidebar-button-desc">GitHub</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/upcoming-talks/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bullhorn"></i>
+      
+      <span class="sidebar-button-desc">Upcoming talks</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
+
+    </ul>
+  </div>
+</nav>
+
+      
+
+      <div id="main" data-behavior="4"
+        class="
+               hasCoverMetaIn
+               ">
+        <article class="post" itemscope itemType="http://schema.org/BlogPosting">
+	  <form id="search" action="/search/">
+  <input name="q" type="text" class="form-control input--xlarge" placeholder="Search blog..." autocomplete="off">
+  </form>
+
+          
+          
+            <div class="post-header main-content-wrap text-left">
+
+  
+
+    <h1 itemprop="headline">
+      Custom Event Listeners For GTM
+    </h1>
+  
+  
+  <div class="postShorten-meta post-meta">
+    
+      <time itemprop="datePublished" datetime="2014-08-25T17:36:22Z">
+        
+  August 25, 2014
+
+      </time>
+    
+      
+  
+  
+    <span>in</span>
+    
+      <a class="category-link" href="https://www.simoahava.com/categories/analytics">Analytics</a>
+    
+  
+
+
+       | <a href="https://www.simoahava.com/analytics/custom-event-listeners-gtm/#disqus_thread">Comments</a> <span id="linkedincount"></span>
+  </div>
+
+
+</div>
+
+          
+          <div class="post-content markdown" itemprop="articleBody">
+            <div class="main-content-wrap">
+              
+
+<p>(<strong>UPDATE 1 Oct 2014</strong> Due to a change in how macros work in Debug Mode, the {{generic event handler}} macro no longer works when testing in Debug Mode. That means that you&rsquo;ll have to test your custom listener in a live container (I know, ouch!). If you want to test in Debug Mode, you&rsquo;ll have to skip using the {{generic event handler}} as a macro, and instead copy the inner function into the Custom HTML Tag, give the function a name, and use that as the callback in <code>addEventListener</code> or <code>attachEvent</code>.</p>
+
+<p>Also, to preserve the &lsquo;gtm.&rsquo; namespace for native GTM features only, I have changed the prefix of the custom event name from &lsquo;gtm.&rsquo; to &lsquo;event.&rsquo;)</p>
+
+<p>When the good folks at Mountain View introduced <a href="https://www.simoahava.com/analytics/auto-event-tracking-google-tag-manager/">auto-event tracking</a> for <a href="http://www.google.com/tagmanager">Google Tag Manager</a>, a collective sigh was heard around the world (I&rsquo;m just slightly exaggerating).</p>
+
+<p>Finally, the true power of GTM was unleashed.</p>
+
+<p>With auto-event tracking, one of the more difficult aspects of web analytics, tracking user interactions beyond the page load, was greatly simplified.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2014/08/custom-listeners.png" title="Custom Event Listener for GTM">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2014/08/custom-listeners.png#ZgotmplZ" alt="Custom Event Listener for GTM">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>However, as a species we are in a perpetual state of dissatisfaction.</p>
+
+<p>When we got the Click, the Link Click and the Form Submit, we wanted more. So then we got the <a href="https://www.simoahava.com/analytics/google-tag-manager-history-listener/">History listener</a>. Again, we wanted more. And we got the <a href="https://www.simoahava.com/analytics/fun-with-google-tag-manager-part-1/">Error listener</a>. And then we wanted more again.</p>
+
+<p>To satisfy this undying thirst for more listeners, the community has been very helpful. In fact, before you read on, I want you to familiarize yourself with Doug Hall&rsquo;s excellent post on <a href="http://www.conversionworks.co.uk/blog/2013/12/13/extending-auto-event-tracking-in-google-tag-manager/">extending GTM&rsquo;s auto-event listeners</a>. The following guide will expand upon the ideas put forth by Doug, while striving to approach the elegance of his prose and wisdom.</p>
+
+<p>I&rsquo;ve also written many posts on GTM&rsquo;s listeners. I&rsquo;ll link to them at the end of this article.</p>
+
+<p>What follows is a step-by-step guide to creating a generic listener for all the various events you want to capture that are <em>not yet</em> captured by GTM&rsquo;s own listeners. Once GTM introduces a proprietary listener for whatever event you want to handle, it would be best to start using that.</p>
+
+<h2 id="the-listener-prototype">The listener prototype</h2>
+
+<p>The prototype of the custom event listener will require two components:</p>
+
+<ol>
+<li><p>A Custom HTML Tag for each listener type you want to activate (e.g. <em>change</em>, <em>blur</em>, <em>copy</em>)</p></li>
+
+<li><p>A generic Custom JavaScript Macro, which returns the handler function that pushes the event into the dataLayer</p></li>
+</ol>
+
+<p>As you can see, it looks pretty simple. And it is. As long as you observe proper design patterns and best practices, these two components will get you far.</p>
+
+<h2 id="the-generic-event-handler-macro">The generic event handler macro</h2>
+
+<p>Let&rsquo;s start with the macro, since it&rsquo;s the truly generic component here.</p>
+
+<p>The macro <em>returns a function</em>, which serves as the handler for the listener you&rsquo;ll create in the next step. For this function to be as generic as possible, it will be agnostic as to what the event was. It will do this by accepting the <a href="https://developer.mozilla.org/en/docs/Web/API/Event">Event object</a> as its parameter, and parsing that for all the data it needs.</p>
+
+<p>Showing is easier than telling, so here&rsquo;s the code for you to copy-paste:</p>
+
+<p><strong>Macro Name</strong>: {{generic event handler}}<br />
+<strong>Macro Type</strong>: Custom JavaScript</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
+  <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e</span>) {
+    <span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
+      <span style="color:#e6db74">&#39;event&#39;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;event.&#39;</span><span style="color:#f92672">+</span><span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">type</span>,
+      <span style="color:#e6db74">&#39;gtm.element&#39;</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">target</span>,
+      <span style="color:#e6db74">&#39;gtm.elementClasses&#39;</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">target</span>.<span style="color:#a6e22e">className</span> <span style="color:#f92672">||</span> <span style="color:#e6db74">&#39;&#39;</span>,
+      <span style="color:#e6db74">&#39;gtm.elementId&#39;</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">target</span>.<span style="color:#a6e22e">id</span> <span style="color:#f92672">||</span> <span style="color:#e6db74">&#39;&#39;</span>,
+      <span style="color:#e6db74">&#39;gtm.elementTarget&#39;</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">target</span>.<span style="color:#a6e22e">target</span> <span style="color:#f92672">||</span> <span style="color:#e6db74">&#39;&#39;</span>,
+      <span style="color:#e6db74">&#39;gtm.elementUrl&#39;</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">target</span>.<span style="color:#a6e22e">href</span> <span style="color:#f92672">||</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">target</span>.<span style="color:#a6e22e">action</span> <span style="color:#f92672">||</span> <span style="color:#e6db74">&#39;&#39;</span>,
+      <span style="color:#e6db74">&#39;gtm.originalEvent&#39;</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">e</span>
+    });
+  }
+}</code></pre></div>
+
+<p>This, in my opinion, is a pretty close emulation of how GTM&rsquo;s listeners work. What&rsquo;s important is that the object pushed into dataLayer does its best to mimic the design pattern of GTM&rsquo;s own listeners.</p>
+
+<p>Let&rsquo;s go over the code line-by-line.</p>
+
+<p><code>return function(e) { ... }</code> is the wrapper. The point here is that this macro must <em>return a function</em>, since the listener we&rsquo;ll create in the following chapter requires a function or object as a parameter. If the macro wouldn&rsquo;t return a function but rather run the code itself, you&rsquo;d be sending some weird empty events every time the listener tag is written to the page template.</p>
+
+<p><code>dataLayer.push({ ... });</code> is where the magic happens. Here the triggered event is pushed into dataLayer by observing the design patterns of GTM&rsquo;s own listeners. Now, you can observe these patterns if you want, or you can use your own syntax. I&rsquo;m a big fan of symmetry, which is why I prefer to follow GTM&rsquo;s syntax. This might result in some conflicts if GTM introduces a similar event listener out-of-the-box, but in that case it would be a good idea to migrate to this proprietary listener anyway.</p>
+
+<p><code>'event': 'event.'+e.type,</code> pushes a value into the &lsquo;event&rsquo; data layer variable. It takes the <code>type</code> property from the event object, which is a string representing what type of listener was fired, e.g. &ldquo;change&rdquo;, &ldquo;blur&rdquo;, &ldquo;copy&rdquo;. So if the event was of type <em>change</em>, this push would actually look like: <code>'event': 'event.change'</code>. (By the way, remember <a href="http://www.youtube.com/watch?v=ULjNjzY7Ei0">E-Type</a>?)</p>
+
+<p><code>'gtm.element': e.target,</code> pushes the element the event occurred on into the dataLayer variable &lsquo;gtm.element&rsquo;. This is a design pattern, and if you look at your click listeners and link click listeners, a similar object is always found in those as well. The idea here is that you can then use your Data Layer Variable Macro to explore properties of this &lsquo;gtm.element&rsquo; object if you want to dig deeper into the DOM.</p>
+
+<p><code>'gtm.elementClasses': e.target.className || '',</code> pushes the class of the event target into the variable &lsquo;gtm.elementClasses&rsquo;. If there is no class on the HTML object, an empty string is pushed instead.</p>
+
+<p><code>'gtm.elementId': e.target.id || '',</code> pushes the ID of the event target into the variable &lsquo;gtm.elementId&rsquo;. If there is no ID on the HTML object, an empty string is pushed instead.</p>
+
+<p><code>'gtm.elementTarget': e.target.target || '',</code> pushes the target of the event target (sounds weird) into the variable &lsquo;gtm.elementTarget&rsquo;. If there is no target attribute on the HTML object, an empty string is pushed instead.</p>
+
+<p><code>'gtm.elementUrl': e.target.href || e.target.action || '',</code> pushes either the href or the action attribute of the event target into the variable &lsquo;gtm.elementUrl&rsquo;. If there are no such attributes on the HTML object, an empty string is pushed instead.</p>
+
+<p><code>'gtm.originalEvent': e</code> is my own addition to this design pattern. Every now and then you might want to access the original event, exposed by the listeners. With GTM&rsquo;s out-of-the-box listeners, this is currently not possible, since they only expose the <code>e.target</code> property of this event object. However, especially if you want to do stuff like identify clicks created by code and not by the user, access to the event object is a must. I hope this will be a standard feature in GTM&rsquo;s own listeners as well.</p>
+
+<p>So that&rsquo;s what the macro looks like. It&rsquo;s possible some of the patterns need more work, and nothing is stopping you from extending the number of variables that are pushed into the dataLayer. I consider these variables to be the <em>minimum</em> set you&rsquo;ll need in order to provide enough information for your tags while still remaining economical and conscious of best practices.</p>
+
+<h2 id="the-listener-tag">The listener tag</h2>
+
+<p>Now that we have our generic event handler, the next step is to create a tag which sets up the listener. The key here is recognizing just which listener you want to set up. Also, for symmetry&rsquo;s sake I will only show how to prime the event listener on the <code>document</code> node, because that&rsquo;s the generic way AND the way GTM&rsquo;s own proprietary listeners work. If you want, you can attach the listeners to specific DOM nodes, which reduces the risk of <a href="https://www.simoahava.com/analytics/dont-gtm-listeners-work/">propagation problems</a>, but as a solution it won&rsquo;t be as generic any more.</p>
+
+<p>First, here&rsquo;s the listener code itself. Put this in a Custom HTML Tag, and add a firing rule which uses either <strong>{{event}} equals gtm.js</strong> if you&rsquo;re attaching the listener on the <code>document</code> node, or <strong>{{event}} equals gtm.dom</strong> if you&rsquo;re listening on specific HTML elements.</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
+  (<span style="color:#66d9ef">function</span>() {
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">eventType</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;change&#34;</span>; <span style="color:#75715e">// Modify this to reflect the event type you want to listen for
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">if</span> (document.<span style="color:#a6e22e">addEventListener</span>) { 
+      document.<span style="color:#a6e22e">addEventListener</span>(<span style="color:#a6e22e">eventType</span>, {{<span style="color:#a6e22e">generic</span> <span style="color:#a6e22e">event</span> <span style="color:#a6e22e">handler</span>}}, <span style="color:#66d9ef">false</span>); 
+    } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (document.<span style="color:#a6e22e">attachEvent</span>) { 
+      document.<span style="color:#a6e22e">attachEvent</span>(<span style="color:#e6db74">&#39;on&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">eventType</span>, {{<span style="color:#a6e22e">generic</span> <span style="color:#a6e22e">event</span> <span style="color:#a6e22e">handler</span>}}); 
+    }
+  })();
+&lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
+
+<p>On the first line, you specify just what type of event you want to listen for. For the full list of supported types, <a href="https://developer.mozilla.org/en-US/docs/Web/Events">follow this link</a>. Remember, you can also dispatch and listen to your own custom events, which makes this solution even more flexible. Here&rsquo;s MDN&rsquo;s excellent guide on <a href="https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Creating_and_triggering_events">creating and triggering events</a>.</p>
+
+<p>Anyway, here&rsquo;s a list of some of the most popular event types:</p>
+
+<ul>
+<li><p><em>beforeunload</em> - Fire a listener when the window, the document, and all resources are about to be unloaded (e.g. when someone is closing the browser window).</p></li>
+
+<li><p><em>blur</em> - An element has lost focus (e.g. the user has left a form field). Note, this doesn&rsquo;t bubble by default, meaning a listener on the <code>document</code> node won&rsquo;t be able to catch it. To activate event delegation, you&rsquo;ll need to set the last parameter in the <code>document.addEventListener()</code> call to <strong>true</strong> instead of <strong>false</strong>.</p></li>
+
+<li><p><em>change</em> - The value of an element changes between receiving and losing focus (e.g. the user enters a form field, types something in, and leaves the field).</p></li>
+
+<li><p><em>click</em> - A click is registered on an element (use GTM&rsquo;s Click Listener instead).</p></li>
+
+<li><p><em>contextmenu</em> - The right mouse button is clicked.</p></li>
+
+<li><p><em>copy</em> - Text is copied to the clipboard.</p></li>
+
+<li><p><em>cut</em> - Text is cut to the clipboard.</p></li>
+
+<li><p><em>dblclick</em> - A double-click is registered on an element.</p></li>
+
+<li><p><em>focus</em> - An element has received focus (e.g. the user has left a form field). Note, this doesn&rsquo;t bubble by default, meaning a listener on the <code>document</code> node won&rsquo;t be able to catch it. To activate event delegation, you&rsquo;ll need to set the last parameter in the <code>document.addEventListener()</code> call to <strong>true</strong> instead of <strong>false</strong>.</p></li>
+
+<li><p><em>keydown</em> - A key is pressed down.</p></li>
+
+<li><p><em>keyup</em> - A pressed down key is released.</p></li>
+
+<li><p><em>mousedown</em> - The mouse button is pressed down.</p></li>
+
+<li><p><em>mouseenter</em> - The mouse pointer is moved over the element where the listener is attached. Won&rsquo;t really work if the listener is on the <code>document</code> node.</p></li>
+
+<li><p><em>mouseleave</em> - The mouse pointer is moved off the element where the listener is attached. Won&rsquo;t really work if the listener is on the <code>document</code> node.</p></li>
+
+<li><p><em>mouseout</em> - The mouse pointer is moved off the element where the listener is attached or one of its children.</p></li>
+
+<li><p><em>mouseover</em> - The mouse pointer is moved over the element where the listener is attached or one of its children.</p></li>
+
+<li><p><em>mouseup</em> - The pressed down mouse button is released.</p></li>
+
+<li><p><em>orientationchange</em> - The orientation (portrait / landscape) of the screen changes.</p></li>
+
+<li><p><em>reset</em> - A form is reset.</p></li>
+
+<li><p><em>scroll</em> - A document view or element is scrolled.</p></li>
+
+<li><p><em>submit</em> - A form submit is registered (use GTM&rsquo;s Form Submit Listener instead).</p></li>
+</ul>
+
+<p>When the Custom HTML Tag is written on the page, it attaches the listener of your choice on the document node. The event handler is the generic event handler function you created in the previous chapter. Then, when the event occurs, the function is executed with the event object as its parameter. This event object is then parsed and pushed into dataLayer with a bunch of properties that you can access with the Data Layer Variable Macro.</p>
+
+<h2 id="example-with-the-change-listener">Example with the Change Listener</h2>
+
+<p>Here&rsquo;s a simple example. I have some form fields on a web page. Whenever a value of a form field changes, i.e. a user writes / edits / deletes text in it, I want to push a virtual pageview with the URL path <strong>/form/(field-name)-(field-value)</strong>. So if the form field&rsquo;s name is &ldquo;search&rdquo; and value is &ldquo;GTM&rdquo;, I want to send the virtual pageview with the path <strong>/form/search-GTM</strong>.</p>
+
+<p>So let&rsquo;s get started. I have my <strong>{{generic event handler}}</strong> macro which I created earlier, and I have my Change Listener Tag firing on <strong>{{event}} equals gtm.js</strong> as you can see:</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2014/08/change-listener.png" title="Change Listener">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2014/08/change-listener.png#ZgotmplZ" alt="Change Listener">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>Next, I&rsquo;ll need to create two new Data Layer Variable Macros to capture the field name and field value, respectively. First, here&rsquo;s the Data Layer Variable Macro <strong>{{field name}}</strong>:</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2014/08/data-layer-macro-field-name.png" title="Data Layer Macro field name">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2014/08/data-layer-macro-field-name.png#ZgotmplZ" alt="Data Layer Macro field name">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>As you can see, I use &ldquo;(not set)&rdquo; as the placeholder if the field has no name attribute.</p>
+
+<p>And here&rsquo;s the Data Layer Variable Macro <strong>{{field value}}</strong> for the field value:</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2014/08/data-layer-macro-field-value.png" title="Data Layer Macro field value">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2014/08/data-layer-macro-field-value.png#ZgotmplZ" alt="Data Layer Macro field value">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>Again, I use &ldquo;(not set)&rdquo; if the field has no value.</p>
+
+<p>Finally, I&rsquo;ll need my virtual pageview tag. It&rsquo;s just a normal Universal Analytics pageview tag, but it uses the <strong>Document Path</strong> field. Also, the firing rule for this tag needs to be <strong>{{event}} equals event.change</strong>, so that the tag fires only when a &lsquo;change&rsquo; event is registered by the custom listener.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2014/08/virtual-pageview-tag.png" title="Virtual Pageview Tag">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2014/08/virtual-pageview-tag.png#ZgotmplZ" alt="Virtual Pageview Tag">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>I concatenate the string &ldquo;/form/{{field name}}-{{field value}}&rdquo;, since the macros are resolved at runtime, and I&rsquo;ll end up with a nice, clean URL path.</p>
+
+<p>I manage to test this live by typing text into the search field and leaving the field. The event.change listener fires, and my debug panel shows that the Document Path has been processed correctly:</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2014/08/change-test.png" title="Testing the change listener">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2014/08/change-test.png#ZgotmplZ" alt="Testing the change listener">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>Naturally, don&rsquo;t forget to check GA&rsquo;s Real Time report to verify the data is flowing in correctly.</p>
+
+<h2 id="conclusions">Conclusions</h2>
+
+<p>This post was about creating a generic event handler for all your custom listener needs. I urge you to explore beyond the out-of-the-box setups that GTM provides. However, once there&rsquo;s overlap with GTM&rsquo;s features, I strongly suggest you leverage the tag manager&rsquo;s own listeners, since that will ensure that they&rsquo;ll stay up-to-date with possible changes under the hood. I also recommend that you try to observe best practices, and that you emulate GTM&rsquo;s design patterns to your best ability.</p>
+
+<p>Like I said, I&rsquo;ve written a lot about GTM&rsquo;s listeners in various posts. Here are some guides you might enjoy reading as well:</p>
+
+<p><a href="https://www.simoahava.com/analytics/dont-gtm-listeners-work/">Why Don&rsquo;t My GTM Listeners Work?</a>
+This is still one of the most asked questions I get. Please, read this post. You&rsquo;ll learn about event delegation, and why so often interfering code prevents events from bubbling up to GTM&rsquo;s listeners. Here&rsquo;s a more recent rant on the topic: <a href="https://plus.google.com/109635181158374226872/posts/23Qh9dvSar9">My Google+ rant</a>.</p>
+
+<p><a href="https://www.simoahava.com/analytics/google-tag-manager-dom-listener/">Google Tag Manager: The DOM Listener</a>
+You can use MutationObserver to listen for changes on the page that occur without an actual event firing or page refreshing.</p>
+
+<p><a href="https://www.simoahava.com/analytics/google-tag-manager-history-listener/">Google Tag Manager: The History Listener</a>
+A review of GTM&rsquo;s History Listener.</p>
+
+<p>Also, I allude to listeners in most of my Google Tag Manager posts, so be sure to <a href="https://www.simoahava.com/tags/google-tag-manager">read the rest of them</a> if you have time.</p>
+
+<p>This was a long and rather advanced guide. Go and eat an ice cream, you&rsquo;ve earned it!</p>
+
+              
+            </div>
+          </div>
+          <div id="post-footer" class="post-footer main-content-wrap">
+            
+              
+                
+                
+                  <div class="post-footer-tags">
+                    <span class="text-color-light text-small">TAGGED IN</span><br/>
+                    
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/google-tag-manager/">Google Tag Manager</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/guide/">Guide</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/javascript/">JavaScript</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/listeners/">listeners</a>
+
+                  </div>
+                
+              
+            
+            
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/node-relationships-gtm/">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/javascript-101-gtm-part-2/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/custom-event-listeners-gtm/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Custom%20Event%20Listeners%20For%20GTM%20https://www.simoahava.com/analytics/custom-event-listeners-gtm/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://www.simoahava.com/analytics/custom-event-listeners-gtm/">
+              <i class="fa fa-google-plus"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/custom-event-listeners-gtm/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#disqus">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+            
+              
+                <span id="disqus"></span>
+<div id="disqus_thread">
+  <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+
+              
+            
+          </div>
+        </article>
+        <footer id="footer" class="main-content-wrap">
+  <span class="copyrights">
+    &copy; 2018 Simo Ahava. All Rights Reserved
+  </span>
+</footer>
+
+      </div>
+      
+      <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+        
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/node-relationships-gtm/">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/javascript-101-gtm-part-2/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/custom-event-listeners-gtm/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Custom%20Event%20Listeners%20For%20GTM%20https://www.simoahava.com/analytics/custom-event-listeners-gtm/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://www.simoahava.com/analytics/custom-event-listeners-gtm/">
+              <i class="fa fa-google-plus"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/custom-event-listeners-gtm/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#disqus">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+      </div>
+      
+      <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+  <i id="btn-close-shareoptions" class="fa fa-close"></i>
+  <ul class="share-options">
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=%25!s%28BADINDEX%29">
+          <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https%3A%2F%2Fwww.simoahava.com%2Fanalytics%2Fcustom-event-listeners-gtm%2F%20%25!s%28BADINDEX%29%20via%20@SimoAhava">
+          <i class="fa fa-twitter"></i><span>Share on Twitter</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=%25!s%28BADINDEX%29">
+          <i class="fa fa-google-plus"></i><span>Share on Google&#43;</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.linkedin.com/cws/share?url=%25!s%28BADINDEX%29">
+          <i class="fa fa-linkedin"></i><span>Share on LinkedIn</span>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+<div id="share-options-mask" class="share-options-mask"></div>
+    </div>
+    
+    <div id="about">
+  <div id="about-card">
+    <div id="about-btn-close">
+      <i class="fa fa-remove"></i>
+    </div>
+    
+      <img id="about-card-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+    
+    <h4 id="about-card-name">Simo Ahava</h4>
+    
+      <div id="about-card-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</div>
+    
+    
+      <div id="about-card-job">
+        <i class="fa fa-briefcase"></i>
+        <br/>
+        Senior Data Advocate at Reaktor
+      </div>
+    
+    
+      <div id="about-card-location">
+        <i class="fa fa-map-marker"></i>
+        <br/>
+        Finland
+      </div>
+    
+  </div>
+</div>
+
+    
+  
+    
+    <div id="cover" style="background-image:url('https://www.simoahava.com/images/maisema.jpg');"></div>
+  
+
+
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.7/js/jquery.fancybox.min.js" integrity="sha256-GEAnjcTqVP+vBp3SSc8bEDQqvWAZMiHyUSIorrWwH50=" crossorigin="anonymous"></script>
+
+
+<script src="https://www.simoahava.com/js/script.js"></script>
+
+
+
+
+  
+    
+      <script>
+        
+
+
+
+
+
+        (function() {
+          
+          
+          if (window.location.hostname == "localhost") {
+            return;
+          }
+          var d = document, s = d.createElement('script');
+          var disqus_shortname = 'simoahava';
+          s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      </script>
+    
+  
+
+
+
+    
+  </body>
+</html>
+

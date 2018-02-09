@@ -1,0 +1,876 @@
+
+
+  
+    
+  
+
+
+  
+
+
+
+
+
+  
+
+
+  
+
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Hugo 0.31 with theme Tranquilpeak 0.4.3-BETA">
+    <title>Simple Split Test With Google Tag Manager | Simo Ahava's blog</title>
+    
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-PZ7GMV9');</script>
+    
+    <script src="//simoahava.disqus.com/count.js" id="dsq-count-scr" async></script>
+    <meta name="author" content="Simo Ahava">
+    <meta name="keywords" content="">
+
+    <link rel="icon" href="https://www.simoahava.com/images/favicon.ico">
+    
+    <link rel="amphtml" href="https://www.simoahava.com/amp/analytics/simple-split-test-google-tag-manager/">
+    
+    <meta name="description" content="How to write a simple split A/B test using only Google Tag Manager for handling the test, and automatically collecting the data to Google Analytics.">
+    <meta property="og:description" content="How to write a simple split A/B test using only Google Tag Manager for handling the test, and automatically collecting the data to Google Analytics.">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="Simple Split Test With Google Tag Manager">
+    <meta property="og:url" content="/analytics/simple-split-test-google-tag-manager/">
+    <meta property="og:site_name" content="Simo Ahava&#39;s blog">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Simple Split Test With Google Tag Manager">
+    <meta name="twitter:description" content="How to write a simple split A/B test using only Google Tag Manager for handling the test, and automatically collecting the data to Google Analytics.">
+    
+      <meta name="twitter:creator" content="@SimoAhava">
+      
+    
+
+    
+    
+
+    
+      <meta property="og:image" content="https://www.simoahava.com/images/simo.png">
+    
+
+    
+      <meta name="twitter:image" content="https://www.simoahava.com/images/2014/05/click-here-dollars.jpg">  
+      <meta property="og:image" content="https://www.simoahava.com/images/2014/05/click-here-dollars.jpg">
+    
+    
+    
+
+    
+
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/jquery.fancybox.min.css" integrity="sha256-vuXZ9LGmmwtjqFX1F+EKin1ThZMub58gKULUyf0qECk=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/helpers/jquery.fancybox-thumbs.min.css" integrity="sha256-SEa4XYAHihTcEP1f5gARTB2K26Uk8PsndQYHQC1f4jU=" crossorigin="anonymous" />
+    
+    
+    <link rel="stylesheet" href="https://www.simoahava.com/css/style.css" />
+    
+    
+
+    
+      
+    
+    
+  </head>
+
+  <body>
+    <div id="blog">
+      <header id="header" data-behavior="4">
+  <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+  <div class="header-title">
+    <a class="header-title-link" href="https://www.simoahava.com/">Simo Ahava&#39;s blog</a>
+  </div>
+  
+</header>
+
+      <nav id="sidebar" data-behavior="4">
+  <div class="sidebar-container">
+    
+      <div class="sidebar-profile">
+        <a href="https://www.simoahava.com/">
+          <img class="sidebar-profile-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+        </a>
+        <h4 class="sidebar-profile-name">Simo Ahava</h4>
+        
+          <h5 class="sidebar-profile-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</h5>
+        
+      </div>
+    
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+      
+      <span class="sidebar-button-desc">Home</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+      
+      <span class="sidebar-button-desc">Categories</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tags/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Tags</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/gtm-tips/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-magic"></i>
+      
+      <span class="sidebar-button-desc">GTM Tips</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/about-simo-ahava/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+      
+      <span class="sidebar-button-desc">About</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tools/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-wrench"></i>
+      
+      <span class="sidebar-button-desc">Tools</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/blog-statistics/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bar-chart"></i>
+      
+      <span class="sidebar-button-desc">Blog statistics</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://github.com/sahava" target="_blank" rel="noopener">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+      
+      <span class="sidebar-button-desc">GitHub</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/upcoming-talks/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bullhorn"></i>
+      
+      <span class="sidebar-button-desc">Upcoming talks</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
+
+    </ul>
+  </div>
+</nav>
+
+      
+
+      <div id="main" data-behavior="4"
+        class="
+               hasCoverMetaIn
+               ">
+        <article class="post" itemscope itemType="http://schema.org/BlogPosting">
+	  <form id="search" action="/search/">
+  <input name="q" type="text" class="form-control input--xlarge" placeholder="Search blog..." autocomplete="off">
+  </form>
+
+          
+          
+            <div class="post-header main-content-wrap text-left">
+
+  
+
+    <h1 itemprop="headline">
+      Simple Split Test With Google Tag Manager
+    </h1>
+  
+  
+  <div class="postShorten-meta post-meta">
+    
+      <time itemprop="datePublished" datetime="2014-05-05T11:36:26Z">
+        
+  May 5, 2014
+
+      </time>
+    
+      
+  
+  
+    <span>in</span>
+    
+      <a class="category-link" href="https://www.simoahava.com/categories/analytics">Analytics</a>
+    
+  
+
+
+       | <a href="https://www.simoahava.com/analytics/simple-split-test-google-tag-manager/#disqus_thread">Comments</a> <span id="linkedincount"></span>
+  </div>
+
+
+</div>
+
+          
+          <div class="post-content markdown" itemprop="articleBody">
+            <div class="main-content-wrap">
+              
+
+<p>Over the last couple of posts I&rsquo;ve <a href="https://www.simoahava.com/analytics/send-mail-upon-google-tag-manager-event/">mainly</a> <a href="https://www.simoahava.com/analytics/google-tag-manager-dom-listener/">been</a> <a href="https://www.simoahava.com/analytics/form-tracking-google-tag-manager/">doing</a> proof-of-concept (POC) tests with <a href="http://www.google.com/tagmanager">Google Tag Manager</a>. The great thing about a POC is that you don&rsquo;t really need to have any viable results or insight-driving technological innovations. The point is to showcase some feature of the platform on which the experiment was conducted.</p>
+
+<p>In this post, I&rsquo;ll take a care-free step into the world of POCs again. My goal is to do a simple split test in order to identify which variant of a landing page (or key element thereof) produces the most conversions.</p>
+
+<p>This isn&rsquo;t a replacement for any of the <a href="http://www.conversion-rate-experts.com/split-testing-software/">REAL A/B testing tools</a> out there. Rather, this is a way for me to showcase yet another way to utilize the wonderful complexity of GTM&rsquo;s JavaScript wizardry.</p>
+
+<p>Anyway, this is what you&rsquo;ll (hopefully) take with you after reading this post:</p>
+
+<ul>
+<li><p>How to modify a DOM element</p></li>
+
+<li><p>How to set a cookie</p></li>
+
+<li><p>How to show a different variation to 50 % of users</p></li>
+</ul>
+
+<p>Combine these and you have a split test in the making!</p>
+
+<h2 id="the-end-result">The end result</h2>
+
+<p>This is how it&rsquo;s going to go down. Exactly 50% of people viewing the experiment page will see the following button:</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2014/05/click-here-dollars.jpg" title="Click here to make dollars">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2014/05/click-here-dollars.jpg#ZgotmplZ" alt="Click here to make dollars">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>This is also the control variant. It&rsquo;s the one I&rsquo;ve used for years and years to make millions upon millions to my faithful followers (just kidding). However, I want to see if a more nonchalant approach to click baiting would work (and I want to appeal to the younger, less critical demographic), so this is the test variant shown to the other 50%:</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2014/05/click-here-whatever.jpg" title="Click here, whatever">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2014/05/click-here-whatever.jpg#ZgotmplZ" alt="Click here, whatever">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>So I&rsquo;ll be measuring just how many clicks each of these buttons collect. In the end, I should see it in my reports both as events and as a Custom Dimension. Here&rsquo;s what a goal conversion report would look like for the two variations.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2014/05/report-ga.png" title="Split Test Report in Google Analytics">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2014/05/report-ga.png#ZgotmplZ" alt="Split Test Report in Google Analytics">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>It&rsquo;s not exactly hard science, but it got the job done. Surprisingly, the control variant was stronger, producing more conversions (who would&rsquo;ve guessed?!).</p>
+
+<h2 id="setting-up-gtm">Setting up GTM</h2>
+
+<p>For this experiment, you&rsquo;ll need the following:</p>
+
+<ol>
+<li><p>1st Party Cookie Macro {{Split Variation Cookie}}</p></li>
+
+<li><p>Random Number Macro {{Random Number}}</p></li>
+
+<li><p>Custom HTML Tag</p></li>
+
+<li><p>Custom Dimension</p></li>
+
+<li><p>Universal Analytics Event Tag</p></li>
+</ol>
+
+<h3 id="1st-party-cookie-macro">1st Party Cookie Macro</h3>
+
+<p>You&rsquo;ll need a 1st party cookie to make sure the same user sees the same variant every time s/he visits the page. So when the variant is first assigned to the user, this cookie is also written. The cookie will return the value of the variant, which is important for the Event Tag and Custom Dimension as well.</p>
+
+<ol>
+<li><p>Create a new 1st Party Cookie Macro</p></li>
+
+<li><p>Name it <strong>Split Variation Cookie</strong></p></li>
+
+<li><p>Set <em>Cookie Name</em> to <strong>splitVar</strong></p></li>
+</ol>
+
+<p>So something like this:</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2014/05/split-cookie.png" title="Split Variation cookie">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2014/05/split-cookie.png#ZgotmplZ" alt="Split Variation cookie">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>This macro will return the value of cookie <strong>splitVar</strong> which, as we will soon learn, stores the variant the user should see during the experiment.</p>
+
+<h3 id="random-number-macro">Random Number Macro</h3>
+
+<p>I&rsquo;ll use the Random Number Macro to sample 50 % of my visitors. It&rsquo;s a nice trick, and I first saw it on <a href="http://dan-russell.com/2013/03/sampling-a-percentage-of-your-users-with-google-tag-manager/">Dan Russell&rsquo;s blog</a>.</p>
+
+<ol>
+<li><p>Create a new Random Number Macro</p></li>
+
+<li><p>Name it <strong>Random Number</strong></p></li>
+</ol>
+
+<p>Here we go:</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2014/05/random-number.png" title="Random Number Macro">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2014/05/random-number.png#ZgotmplZ" alt="Random Number Macro">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>So every time this macro is called, it returns a value between 0 and 2147483647. Can you see how useful this is for sampling? If I check if {{Random Number}} &lt; 0.5*2147483647, it should return true 50 % of the time.</p>
+
+<h3 id="custom-html-tag">Custom HTML Tag</h3>
+
+<p>This is where the magic happens. You&rsquo;ll need a Custom HTML Tag to perform a wide variety of things: modify the DOM element, identify the user&rsquo;s preferred variant, set and read a cookie, etc&hellip;</p>
+
+<p>Let&rsquo;s start with the code itself. This is what the tag should have. Remember to have it fire on all pages on which the experiment is run.</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
+  <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">testVariant</span>() {
+    <span style="color:#a6e22e">controlElement</span>.<span style="color:#a6e22e">style</span>.<span style="color:#a6e22e">backgroundColor</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;#000099&#34;</span>;
+    <span style="color:#a6e22e">controlElement</span>.<span style="color:#a6e22e">innerHTML</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;**Click here if you want, whatever**&#34;</span>;
+    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">variantTwo</span>;
+  }
+  
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">controlElement</span> <span style="color:#f92672">=</span> document.<span style="color:#a6e22e">getElementById</span>(<span style="color:#e6db74">&#34;call-to-action&#34;</span>), <span style="color:#75715e">// Set ID of control element
+</span><span style="color:#75715e"></span>      <span style="color:#a6e22e">variantOne</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;clickDollars&#34;</span>, <span style="color:#75715e">// Variation 1 name
+</span><span style="color:#75715e"></span>      <span style="color:#a6e22e">variantTwo</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;clickWhatever&#34;</span>, <span style="color:#75715e">// Variation 2 name
+</span><span style="color:#75715e"></span>      <span style="color:#a6e22e">variant</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">variantOne</span>, 
+      <span style="color:#a6e22e">randomNumSample</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1073741824</span>;
+
+  <span style="color:#66d9ef">if</span>(<span style="color:#f92672">!</span>{{<span style="color:#a6e22e">Split</span> <span style="color:#a6e22e">Variation</span> <span style="color:#a6e22e">Cookie</span>}} <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">controlElement</span>) { <span style="color:#75715e">// If cookie isn&#39;t set run code
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">if</span>({{<span style="color:#a6e22e">Random</span> Number}} <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">randomNumSample</span>) {
+      <span style="color:#a6e22e">variant</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">testVariant</span>(); <span style="color:#75715e">// For 50 % of hits, fire Variation 2
+</span><span style="color:#75715e"></span>    }
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">d</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Date(); <span style="color:#75715e">// Create cookie
+</span><span style="color:#75715e"></span>    <span style="color:#a6e22e">d</span>.<span style="color:#a6e22e">setTime</span>(<span style="color:#a6e22e">d</span>.<span style="color:#a6e22e">getTime</span>()<span style="color:#f92672">+</span><span style="color:#ae81ff">1000</span><span style="color:#f92672">*</span><span style="color:#ae81ff">60</span><span style="color:#f92672">*</span><span style="color:#ae81ff">60</span><span style="color:#f92672">*</span><span style="color:#ae81ff">24</span><span style="color:#f92672">*</span><span style="color:#ae81ff">730</span>);
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">expires</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;expires=&#34;</span><span style="color:#f92672">+</span><span style="color:#a6e22e">d</span>.<span style="color:#a6e22e">toGMTString</span>();
+    document.<span style="color:#a6e22e">cookie</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;splitVar=&#34;</span><span style="color:#f92672">+</span><span style="color:#a6e22e">variant</span><span style="color:#f92672">+</span><span style="color:#e6db74">&#34;; &#34;</span><span style="color:#f92672">+</span><span style="color:#a6e22e">expires</span><span style="color:#f92672">+</span><span style="color:#e6db74">&#34;; path=/&#34;</span>;
+  } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span>({{<span style="color:#a6e22e">Split</span> <span style="color:#a6e22e">Variation</span> <span style="color:#a6e22e">Cookie</span>}} <span style="color:#f92672">==</span> <span style="color:#a6e22e">variantTwo</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">controlElement</span>) { <span style="color:#75715e">// If user has only seen Variation 2
+</span><span style="color:#75715e"></span>    <span style="color:#a6e22e">variant</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">testVariant</span>();
+  }
+&lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
+
+<p>Let&rsquo;s go over this code.</p>
+
+<p><strong>Lines 2–6</strong> contain the code which modifies a pre-set DOM element. Thus this function operates the actual split test, showing a different variation of the landing page for 50 % of users. This function returns the name of variation 2.</p>
+
+<p><strong>Lines 8–12</strong> set up some variables for this script to work. Change <strong>call-to-action</strong> in <em>getElementById(&ldquo;call-to-action&rdquo;);</em> to match the ID attribute of the HTML element you want to dabble with on the page. Change string values for <strong>variationOne</strong> and <strong>variationTwo</strong> to match how you want to name or two variants. These values will be used in your GA reports. Finally, the variable <strong>randomNumSample</strong> contains a numerical value exactly 50 % of the maximum the Random Number Macro can return.</p>
+
+<p><strong>Lines 14–21</strong> first test if you&rsquo;ve already been assigned a variation by checking your cookies. If no cookie is found, you&rsquo;re a new user, and a variation must be assigned to you. In this case, the script randomly assigns you either the control variant (the default, &ldquo;clickDollars&rdquo;) or the test variation (&ldquo;clickWhatever&rdquo;). Next, it writes this information in a cookie which will stay with you for a long time.</p>
+
+<p><strong>Lines 22–24</strong> are executed if the cookie <strong>is</strong> found. In this case, if the variant that was assigned to you was the test variation, the DOM altering function from the beginning (see lines 2–6) is run again to make sure you always see the same variation of the landing page. If the variant that was assigned to you was the control variation, nothing happens, since that&rsquo;s the default version of the landing page.</p>
+
+<p>Some things to note. First of all, the cookie is set for two years, so it mimics the _ga cookie. The point is that the user should always see the same variation (provided they&rsquo;re using the same browser). For some split tests this isn&rsquo;t necessary, so you can change the code to forgo the cookie check. Also, all the functions test for undefined values (both of the cookie and the control element), so I didn&rsquo;t see the need to add unnecessary try&hellip;catch blocks or anything else.</p>
+
+<p><strong>Pro tip</strong> - Make use of the rarely utilized custom firing schedule for this tag to make sure your experiment only runs a certain time:</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2014/05/tag-firing-schedule.png" title="Custom firing schedule for tag">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2014/05/tag-firing-schedule.png#ZgotmplZ" alt="Custom firing schedule for tag">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<h3 id="custom-dimension">Custom Dimension</h3>
+
+<p>You&rsquo;ll need to create a new user-scope Custom Dimension, so that you&rsquo;ll have one additional segment to play around with in your data.</p>
+
+<ol>
+<li><p>Go to Google Analytics admin, and choose the property you&rsquo;ll be tracking these hits to</p></li>
+
+<li><p>Choose Custom Definitions &gt; Custom Dimensions, and create a new user-scope CD</p></li>
+
+<li><p>Give it a descriptive name (I named mine just <strong>Test variation</strong>)</p></li>
+
+<li><p>Make note of dimension index</p></li>
+</ol>
+
+<p>So something like this:</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2014/05/custom-dimension.png" title="Custom Dimension for test variation">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2014/05/custom-dimension.png#ZgotmplZ" alt="Custom Dimension for test variation">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>You could also use a session-scope or even a hit-scope dimension, depending on the scope of your test. However, even though I&rsquo;m not a professional CRO practitioner (far from it!), I see the benefit of observing interactions on a multi-visit, <em>user</em>-level rather than the relatively tiny realm of a single visit or hit. However, some web design questions can probably be answered on a more limited scope, I guess.</p>
+
+<h3 id="universal-analytics-event-tag">Universal Analytics Event Tag</h3>
+
+<p>The last bit you&rsquo;ll need is some event that&rsquo;s firing and sending your data to Google Analytics. Because I&rsquo;m observing a button (that I&rsquo;ve encased in an <code>&lt;a href...&gt;</code> element), I&rsquo;m also using a Link Click Listener. If that says nothing to you, be sure to check out my <a href="https://www.simoahava.com/analytics/auto-event-tracking-google-tag-manager/">guide on auto-event tracking</a>.</p>
+
+<p>So anyway, I&rsquo;ve got a Link Click Listener firing on the test page. What I want to know is just what variant the user was seeing when they clicked the button. This is how I&rsquo;ll count my conversions and determine which variant was the winner. I&rsquo;ll also send the Custom Dimension with the event, so that the user is properly annotated with the variant name. I&rsquo;m sending the CD with the event simply because it&rsquo;s convenient for the scope of this article. You should definitely send it with the pageview, so that you can segment your visitors properly (e.g. out of people who saw the control variant, how many clicked the button; out of people who saw the test variant, how many clicked the button).</p>
+
+<p>My Event Tag looks like this:</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2014/05/event-tag.png" title="Event Tag for split test">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2014/05/event-tag.png#ZgotmplZ" alt="Event Tag for split test">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>As you can see, I&rsquo;m using the cookie value (&ldquo;clickDollars&rdquo; or &ldquo;clickWhatever&rdquo;) to annotate the event and the Custom Dimension! What a nice way of saving time and resources. So when someone clicks on the default variation, for example, the Event Tag will send something like this to GA servers:</p>
+
+<p><strong>Event Category</strong>: Call-to-action<br />
+<strong>Event Action</strong>: clickDollars<br />
+<strong>Event Label</strong>: /call-to-action-page/subscribe/<br />
+<strong>Dimension 1</strong>: clickDollars</p>
+
+<p>Remember to change the index number of the dimension to match the CD you created in the previous chapter!</p>
+
+<p>The firing rule I&rsquo;m using is simply:</p>
+
+<p><strong>{{event}} equals gtm.linkClick</strong><br />
+<strong>{{element id}} equals call-to-action-link</strong></p>
+
+<p>This rule will thus only fire when a click occurs on an element with ID &ldquo;call-to-action-link&rdquo;. Conveniently, this just happens to be my control element.</p>
+
+<h2 id="conclusions">Conclusions</h2>
+
+<p>Well here it is. A simple split test done solely with GTM and some JavaScript magic. Now let me reiterate: this is hardly the best way to do split testing (we&rsquo;re still waiting for Content Experiments to make their way to GTM + Universal Analytics..) but it does showcase the power and might of a tag management system. I am, after all, <em>directly manipulating</em> an on-page element without touching server-side or front-end code! That&rsquo;s amazing&hellip;and scary.</p>
+
+<p>Before you start fiddling with your DOM (wow, that sounded dirty), make sure you know just what you&rsquo;re doing and to which element. This is crucial, because you don&rsquo;t want to accidentally set off a full-scale website redesign without actually, you know, intending to.</p>
+
+<p>Note also that because you&rsquo;re changing the element in an asynchronously loading tag, it&rsquo;s more than possible that the user will see the control variant before the script overwrites it with the test variant. This isn&rsquo;t a good thing, as if the control group realizes they&rsquo;re participating in an experiment, it will hurt the reliability of the results.</p>
+
+<p>There are a couple of nice things to snag from this to your other scripts. Make use of the set-cookie function I wrote in the Custom HTML tag. It&rsquo;s a versatile solution, and I&rsquo;ve actually <a href="https://www.simoahava.com/analytics/universal-analytics-fire-script-just-per-session/">used it before as well</a>. The random number sampling is simply genius, and I love how easy it is to operate!</p>
+
+              
+            </div>
+          </div>
+          <div id="post-footer" class="post-footer main-content-wrap">
+            
+              
+                
+                
+                  <div class="post-footer-tags">
+                    <span class="text-color-light text-small">TAGGED IN</span><br/>
+                    
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/custom-html/">custom html</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/google-tag-manager/">Google Tag Manager</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/guide/">Guide</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/macros/">macros</a>
+
+                  </div>
+                
+              
+            
+            
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/personal/year-in-review-2013-2014/">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/send-mail-upon-google-tag-manager-event/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/simple-split-test-google-tag-manager/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Simple%20Split%20Test%20With%20Google%20Tag%20Manager%20https://www.simoahava.com/analytics/simple-split-test-google-tag-manager/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://www.simoahava.com/analytics/simple-split-test-google-tag-manager/">
+              <i class="fa fa-google-plus"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/simple-split-test-google-tag-manager/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#disqus">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+            
+              
+                <span id="disqus"></span>
+<div id="disqus_thread">
+  <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+
+              
+            
+          </div>
+        </article>
+        <footer id="footer" class="main-content-wrap">
+  <span class="copyrights">
+    &copy; 2018 Simo Ahava. All Rights Reserved
+  </span>
+</footer>
+
+      </div>
+      
+      <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+        
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/personal/year-in-review-2013-2014/">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/send-mail-upon-google-tag-manager-event/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/simple-split-test-google-tag-manager/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Simple%20Split%20Test%20With%20Google%20Tag%20Manager%20https://www.simoahava.com/analytics/simple-split-test-google-tag-manager/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://www.simoahava.com/analytics/simple-split-test-google-tag-manager/">
+              <i class="fa fa-google-plus"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/simple-split-test-google-tag-manager/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#disqus">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+      </div>
+      
+      <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+  <i id="btn-close-shareoptions" class="fa fa-close"></i>
+  <ul class="share-options">
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=%25!s%28BADINDEX%29">
+          <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https%3A%2F%2Fwww.simoahava.com%2Fanalytics%2Fsimple-split-test-google-tag-manager%2F%20%25!s%28BADINDEX%29%20via%20@SimoAhava">
+          <i class="fa fa-twitter"></i><span>Share on Twitter</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=%25!s%28BADINDEX%29">
+          <i class="fa fa-google-plus"></i><span>Share on Google&#43;</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.linkedin.com/cws/share?url=%25!s%28BADINDEX%29">
+          <i class="fa fa-linkedin"></i><span>Share on LinkedIn</span>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+<div id="share-options-mask" class="share-options-mask"></div>
+    </div>
+    
+    <div id="about">
+  <div id="about-card">
+    <div id="about-btn-close">
+      <i class="fa fa-remove"></i>
+    </div>
+    
+      <img id="about-card-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+    
+    <h4 id="about-card-name">Simo Ahava</h4>
+    
+      <div id="about-card-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</div>
+    
+    
+      <div id="about-card-job">
+        <i class="fa fa-briefcase"></i>
+        <br/>
+        Senior Data Advocate at Reaktor
+      </div>
+    
+    
+      <div id="about-card-location">
+        <i class="fa fa-map-marker"></i>
+        <br/>
+        Finland
+      </div>
+    
+  </div>
+</div>
+
+    
+  
+    
+    <div id="cover" style="background-image:url('https://www.simoahava.com/images/maisema.jpg');"></div>
+  
+
+
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.7/js/jquery.fancybox.min.js" integrity="sha256-GEAnjcTqVP+vBp3SSc8bEDQqvWAZMiHyUSIorrWwH50=" crossorigin="anonymous"></script>
+
+
+<script src="https://www.simoahava.com/js/script.js"></script>
+
+
+
+
+  
+    
+      <script>
+        
+
+
+
+
+
+        (function() {
+          
+          
+          if (window.location.hostname == "localhost") {
+            return;
+          }
+          var d = document, s = d.createElement('script');
+          var disqus_shortname = 'simoahava';
+          s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      </script>
+    
+  
+
+
+
+    
+  </body>
+</html>
+

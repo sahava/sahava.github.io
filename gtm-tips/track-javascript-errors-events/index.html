@@ -1,0 +1,790 @@
+
+
+  
+    
+  
+
+
+  
+
+
+
+
+
+  
+
+
+  
+
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Hugo 0.31 with theme Tranquilpeak 0.4.3-BETA">
+    <title>#GTMTips: Track JavaScript Errors As Events | Simo Ahava's blog</title>
+    
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-PZ7GMV9');</script>
+    
+    <script src="//simoahava.disqus.com/count.js" id="dsq-count-scr" async></script>
+    <meta name="author" content="Simo Ahava">
+    <meta name="keywords" content="">
+
+    <link rel="icon" href="https://www.simoahava.com/images/favicon.ico">
+    
+    <link rel="amphtml" href="https://www.simoahava.com/amp/gtm-tips/track-javascript-errors-events/">
+    
+    <meta name="description" content="Guide for tracking unchecked JavaScript errors to Google Analytics as Google Tag Manager events.">
+    <meta property="og:description" content="Guide for tracking unchecked JavaScript errors to Google Analytics as Google Tag Manager events.">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="#GTMTips: Track JavaScript Errors As Events">
+    <meta property="og:url" content="/gtm-tips/track-javascript-errors-events/">
+    <meta property="og:site_name" content="Simo Ahava&#39;s blog">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="#GTMTips: Track JavaScript Errors As Events">
+    <meta name="twitter:description" content="Guide for tracking unchecked JavaScript errors to Google Analytics as Google Tag Manager events.">
+    
+      <meta name="twitter:creator" content="@SimoAhava">
+      
+    
+
+    
+    
+
+    
+      <meta property="og:image" content="https://www.simoahava.com/images/simo.png">
+    
+
+    
+      <meta name="twitter:image" content="https://www.simoahava.com/images/2016/03/javascript-error-tags.png">  
+      <meta property="og:image" content="https://www.simoahava.com/images/2016/03/javascript-error-tags.png">
+    
+    
+    
+
+    
+
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/jquery.fancybox.min.css" integrity="sha256-vuXZ9LGmmwtjqFX1F+EKin1ThZMub58gKULUyf0qECk=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/helpers/jquery.fancybox-thumbs.min.css" integrity="sha256-SEa4XYAHihTcEP1f5gARTB2K26Uk8PsndQYHQC1f4jU=" crossorigin="anonymous" />
+    
+    
+    <link rel="stylesheet" href="https://www.simoahava.com/css/style.css" />
+    
+    
+
+    
+      
+    
+    
+  </head>
+
+  <body>
+    <div id="blog">
+      <header id="header" data-behavior="4">
+  <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+  <div class="header-title">
+    <a class="header-title-link" href="https://www.simoahava.com/">Simo Ahava&#39;s blog</a>
+  </div>
+  
+</header>
+
+      <nav id="sidebar" data-behavior="4">
+  <div class="sidebar-container">
+    
+      <div class="sidebar-profile">
+        <a href="https://www.simoahava.com/">
+          <img class="sidebar-profile-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+        </a>
+        <h4 class="sidebar-profile-name">Simo Ahava</h4>
+        
+          <h5 class="sidebar-profile-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</h5>
+        
+      </div>
+    
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+      
+      <span class="sidebar-button-desc">Home</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+      
+      <span class="sidebar-button-desc">Categories</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tags/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Tags</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/gtm-tips/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-magic"></i>
+      
+      <span class="sidebar-button-desc">GTM Tips</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/about-simo-ahava/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+      
+      <span class="sidebar-button-desc">About</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tools/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-wrench"></i>
+      
+      <span class="sidebar-button-desc">Tools</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/blog-statistics/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bar-chart"></i>
+      
+      <span class="sidebar-button-desc">Blog statistics</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://github.com/sahava" target="_blank" rel="noopener">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+      
+      <span class="sidebar-button-desc">GitHub</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/upcoming-talks/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bullhorn"></i>
+      
+      <span class="sidebar-button-desc">Upcoming talks</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
+
+    </ul>
+  </div>
+</nav>
+
+      
+
+      <div id="main" data-behavior="4"
+        class="
+               hasCoverMetaIn
+               ">
+        <article class="post" itemscope itemType="http://schema.org/BlogPosting">
+	  <form id="search" action="/search/">
+  <input name="q" type="text" class="form-control input--xlarge" placeholder="Search blog..." autocomplete="off">
+  </form>
+
+          
+          
+            <div class="post-header main-content-wrap text-left">
+
+  
+
+    <h1 itemprop="headline">
+      #GTMTips: Track JavaScript Errors As Events
+    </h1>
+  
+  
+  <div class="postShorten-meta post-meta">
+    
+      <time itemprop="datePublished" datetime="2016-03-24T07:11:53Z">
+        
+  March 24, 2016
+
+      </time>
+    
+      
+  
+  
+    <span>in</span>
+    
+      <a class="category-link" href="https://www.simoahava.com/categories/gtm-tips">GTM tips</a>
+    
+  
+
+
+       | <a href="https://www.simoahava.com/gtm-tips/track-javascript-errors-events/#disqus_thread">Comments</a> <span id="linkedincount"></span>
+  </div>
+
+
+</div>
+
+          
+          <div class="post-content markdown" itemprop="articleBody">
+            <div class="main-content-wrap">
+              
+
+<p>Back back to the friggin&rsquo; basics. Almost two years ago, I wrote a two-parter on how to have fun with <a href="https://tagmanager.google.com/">Google Tag Manager</a>: <a href="https://www.simoahava.com/analytics/fun-with-google-tag-manager-part-1/">Part 1</a>, and <a href="https://www.simoahava.com/analytics/fun-google-tag-manager-part-2/">Part 2</a>. The first part had a nice exercise for tracking JavaScript Errors as Google Analytics Events, using the recently published &ldquo;JavaScript Error Listener&rdquo; Tag.</p>
+
+<p>Well, that was in GTM V1. Now we&rsquo;ve been smoothly sailing with the wonderful new interface for well over a year, and it&rsquo;s time to update some of these nifty tricks. In this <a href="https://www.simoahava.com/categories/gtm-tips/">#GTMTips</a> post, I&rsquo;ll show you how to track uncaught JavaScript errors in the new interface, plus give you some tips on the overall process.</p>
+
+<h2 id="tip-43-track-javascript-errors-as-events">Tip 43: Track JavaScript Errors As Events</h2>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2016/03/javascript-error-tags.png" title="Track JavaScript Errors As Events In Google Tag Manager">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2016/03/javascript-error-tags.png#ZgotmplZ" alt="Track JavaScript Errors As Events In Google Tag Manager">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>The process is actually really simple. Much easier than it was in the previous Google Tag Manager interface.</p>
+
+<p>By the way, <em>uncaught</em> refers to an error which hasn&rsquo;t been captured and handled by any of the scripts on the page. The most common way to catch an error is to use <code>try...catch</code> blocks around your code, which capture any errors which bubble up to the context where you have the block. If an error makes its way through without having been caught in any way, it will trigger the JavaScript Error Trigger. Thus it&rsquo;s a good way to audit your current error detection methods, too!</p>
+
+<p>Anyway, you start by making sure the Built-In Variables are activated.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2016/03/built-in-errors.png" title="Built-In Error Variables">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2016/03/built-in-errors.png#ZgotmplZ" alt="Built-In Error Variables">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>If you&rsquo;re curious about these Built-In Variables, check the relevant section of my <a href="https://www.simoahava.com/analytics/variable-guide-google-tag-manager/">Variable Guide For Google Tag Manager</a>.</p>
+
+<p>Next, head on over to <strong>Triggers</strong>, and create a new one:</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2016/03/javascript-error-trigger.png" title="JavaScript Error Trigger">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2016/03/javascript-error-trigger.png#ZgotmplZ" alt="JavaScript Error Trigger">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>I&rsquo;m going to let the Trigger fire on &ldquo;All JavaScript Errors&rdquo;, but be sure to read to the end of this post for tips regarding this selection.</p>
+
+<p>Finally, you need a Google Analytics Event Tag, which collects and concatenates all this information. Here&rsquo;s what I use:</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2016/03/google-analytics-error-tag.png" title="Google Analytics Error Tag">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2016/03/google-analytics-error-tag.png#ZgotmplZ" alt="Google Analytics Error Tag">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>An example result using these settings would be something like:</p>
+
+<p><strong>Event Category</strong>: JavaScript Error<br />
+<strong>Event Action</strong>: Uncaught ReferenceError: appear is not defined<br />
+<strong>Event Label</strong>: 1255: <code>https://www.simoahava.com/scripts/bundle.js</code></p>
+
+<p>I&rsquo;m sending the event as <a href="https://support.google.com/analytics/answer/1033068#NonInteractionEvents">Non-Interaction: True</a>, because it&rsquo;s not a user interaction, and I don&rsquo;t want it to be counted as such.</p>
+
+<p>And that&rsquo;s it for the implementation!</p>
+
+<p>Now, there are some things you might want to consider when implementing this on your own website. The next chapter will tackle these issues.</p>
+
+<h2 id="tips">Tips</h2>
+
+<p>Tracking JavaScript Errors can be quite the bipolar experience. On the one hand, it&rsquo;s just a good, solid developer attitude to want to know about what&rsquo;s breaking up or already broken on your site. On the other hand, it can cause a deluge of Events in your Google Analytics profile, leading to sessions reaching their hit limits and severe sampling issues. So here are a couple of tips to manage it all.</p>
+
+<h3 id="1-track-errors-as-google-analytics-goals">1. Track errors as Google Analytics Goals</h3>
+
+<p>&ldquo;Track ERRORS as GOALS, what has he been smoking?!&rdquo; I hear you exclaim. Yeah, it&rsquo;s not a <em>business</em> goal, but goals can also be <strong>negative</strong> goals. The reason I&rsquo;m interested in this particular negative goal, is because I want to see a  <strong>Conversion Rate</strong> for sessions with JavaScript Errors. This will allow me to do all sorts of cool analyses on how the error rates are fluctuating over time. To set up the goal, you can use the following settings:</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2016/03/javascript-error-as-goal.png" title="JavaScript Error As GA Goal">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2016/03/javascript-error-as-goal.png#ZgotmplZ" alt="JavaScript Error As GA Goal">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>Next, you can create an <strong>Alert</strong>, which sends you an email every time the number of JavaScript Errors has gone up significantly on your site:</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2016/03/javascript-error-alert.png" title="JavaScript Error Google Analytics Alert">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2016/03/javascript-error-alert.png#ZgotmplZ" alt="JavaScript Error Google Analytics Alert">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>Now you&rsquo;ll get an email every time there&rsquo;s a significant increase in the number of JavaScript Errors recorded on your site.</p>
+
+<h3 id="2-use-environments-or-the-debug-mode">2. Use Environments or the Debug Mode</h3>
+
+<p>Tracking <em>every single uncaught JavaScript error</em> can lead to a deluge of hits. The modern website is best known for the number of errors it dispatches, not the fancy UI or the awesome new framework it utilizes. To keep the number of errors down, you might want to delimit them to only fire in a <a href="https://www.simoahava.com/analytics/better-qa-with-google-tag-manager-environments/">specific environment</a>, or when in the Debug Mode. You could, for example, allow the Error Trigger to work only in the staging environment.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2016/03/error-trigger-environment-debug.png" title="JavaScript Error in Environments or Debug Mode">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2016/03/error-trigger-environment-debug.png#ZgotmplZ" alt="JavaScript Error in Environments or Debug Mode">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>This way only errors triggered by your testers and developers will be recorded. The downside, of course, is that it&rsquo;s not an authentic setting, and no matter how much you test and debug, you will always miss some things.</p>
+
+<h3 id="3-add-manual-sampling">3. Add manual sampling</h3>
+
+<p>Another way to prevent every single error from dispatching is to manually sample the hits that are sent to Google Analytics. You could, for example, only let the Trigger fire for 50% of recorded errors. You can use the Random Number Built-In Variable here:</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2016/03/random-number-sample-javascript-error.png" title="Random Number sampling for Error Trigger">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2016/03/random-number-sample-javascript-error.png#ZgotmplZ" alt="Random Number sampling for Error Trigger">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>The trick is to only fire the Trigger when the Random Number Variable returns a number that ends in 0, 1, 2, 3 or 4. That&rsquo;s 50% of the possible numbers it can end in.</p>
+
+<p>Naturally, the downside here is that you might miss some outlier errors, which only pop up every now and then. But you should still catch most of the significant ones.</p>
+
+<h3 id="4-script-error">4. Script Error</h3>
+
+<p>If your site is using JavaScript files loaded from external content distribution networks, the messages and line numbers of the errors dispatched in these external scripts are not exposed in the browser. This is a reality you&rsquo;ll have to work with. There&rsquo;s no way to identify where and what error took place, as the browser will only dispatch the nondescript &ldquo;Script Error.&rdquo; message with a line number of 0. The URL of the script is still exposed, though, and you can use that to narrow down the possible errors.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2016/03/script-error.png" title="Script Error ">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2016/03/script-error.png#ZgotmplZ" alt="Script Error ">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>It&rsquo;s a good idea to host as many scripts as possible on your own website. Not only will you know more about the errors that are thrown, but also being subservient to an external CDN can introduce security issues, if the third party decides to add some malicious or dangerous code to the library you&rsquo;re using (or if they&rsquo;re hacked).</p>
+
+<h2 id="summary">Summary</h2>
+
+<p>I hope this tip has been useful. Tracking errors is one of the ways to make sure that your website is catering an optimized experience for your visitors. Google Analytics provides a great tool for tracking these errors, because it also lets you create session- and user-scoped segments around error events. With those segments, you can start analyzing the actual business impact of errors thrown on the site.</p>
+
+<p>An error in the eCommerce checkout funnel can be destructive to your business, and using Google Analytics for detection can help you get on top of things before you&rsquo;ve lost too much money.</p>
+
+              
+            </div>
+          </div>
+          <div id="post-footer" class="post-footer main-content-wrap">
+            
+              
+                
+                
+                  <div class="post-footer-tags">
+                    <span class="text-color-light text-small">TAGGED IN</span><br/>
+                    
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/errors/">errors</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/google-tag-manager/">Google Tag Manager</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/gtmtips/">gtmtips</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/javascript/">JavaScript</a>
+
+                  </div>
+                
+              
+            
+            
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/gtm-tips/gtmtips-10-blogs-10-articles-10-people-follow/">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/debug-google-analytics-on-your-mobile-browser/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/gtm-tips/track-javascript-errors-events/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=%23GTMTips:%20Track%20JavaScript%20Errors%20As%20Events%20https://www.simoahava.com/gtm-tips/track-javascript-errors-events/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://www.simoahava.com/gtm-tips/track-javascript-errors-events/">
+              <i class="fa fa-google-plus"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/gtm-tips/track-javascript-errors-events/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#disqus">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+            
+              
+                <span id="disqus"></span>
+<div id="disqus_thread">
+  <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+
+              
+            
+          </div>
+        </article>
+        <footer id="footer" class="main-content-wrap">
+  <span class="copyrights">
+    &copy; 2018 Simo Ahava. All Rights Reserved
+  </span>
+</footer>
+
+      </div>
+      
+      <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+        
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/gtm-tips/gtmtips-10-blogs-10-articles-10-people-follow/">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/debug-google-analytics-on-your-mobile-browser/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/gtm-tips/track-javascript-errors-events/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=%23GTMTips:%20Track%20JavaScript%20Errors%20As%20Events%20https://www.simoahava.com/gtm-tips/track-javascript-errors-events/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://www.simoahava.com/gtm-tips/track-javascript-errors-events/">
+              <i class="fa fa-google-plus"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/gtm-tips/track-javascript-errors-events/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#disqus">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+      </div>
+      
+      <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+  <i id="btn-close-shareoptions" class="fa fa-close"></i>
+  <ul class="share-options">
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=%25!s%28BADINDEX%29">
+          <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https%3A%2F%2Fwww.simoahava.com%2Fgtm-tips%2Ftrack-javascript-errors-events%2F%20%25!s%28BADINDEX%29%20via%20@SimoAhava">
+          <i class="fa fa-twitter"></i><span>Share on Twitter</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=%25!s%28BADINDEX%29">
+          <i class="fa fa-google-plus"></i><span>Share on Google&#43;</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.linkedin.com/cws/share?url=%25!s%28BADINDEX%29">
+          <i class="fa fa-linkedin"></i><span>Share on LinkedIn</span>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+<div id="share-options-mask" class="share-options-mask"></div>
+    </div>
+    
+    <div id="about">
+  <div id="about-card">
+    <div id="about-btn-close">
+      <i class="fa fa-remove"></i>
+    </div>
+    
+      <img id="about-card-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+    
+    <h4 id="about-card-name">Simo Ahava</h4>
+    
+      <div id="about-card-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</div>
+    
+    
+      <div id="about-card-job">
+        <i class="fa fa-briefcase"></i>
+        <br/>
+        Senior Data Advocate at Reaktor
+      </div>
+    
+    
+      <div id="about-card-location">
+        <i class="fa fa-map-marker"></i>
+        <br/>
+        Finland
+      </div>
+    
+  </div>
+</div>
+
+    
+  
+    
+    <div id="cover" style="background-image:url('https://www.simoahava.com/images/maisema.jpg');"></div>
+  
+
+
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.7/js/jquery.fancybox.min.js" integrity="sha256-GEAnjcTqVP+vBp3SSc8bEDQqvWAZMiHyUSIorrWwH50=" crossorigin="anonymous"></script>
+
+
+<script src="https://www.simoahava.com/js/script.js"></script>
+
+
+
+
+  
+    
+      <script>
+        
+
+
+
+
+
+        (function() {
+          
+          
+          if (window.location.hostname == "localhost") {
+            return;
+          }
+          var d = document, s = d.createElement('script');
+          var disqus_shortname = 'simoahava';
+          s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      </script>
+    
+  
+
+
+
+    
+  </body>
+</html>
+

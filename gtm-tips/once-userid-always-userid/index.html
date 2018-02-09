@@ -1,0 +1,698 @@
+
+
+  
+    
+  
+
+
+  
+
+
+
+
+
+  
+
+
+  
+
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Hugo 0.31 with theme Tranquilpeak 0.4.3-BETA">
+    <title>#GTMtips: Once userId, Always userId | Simo Ahava's blog</title>
+    
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-PZ7GMV9');</script>
+    
+    <script src="//simoahava.disqus.com/count.js" id="dsq-count-scr" async></script>
+    <meta name="author" content="Simo Ahava">
+    <meta name="keywords" content="">
+
+    <link rel="icon" href="https://www.simoahava.com/images/favicon.ico">
+    
+    <link rel="amphtml" href="https://www.simoahava.com/amp/gtm-tips/once-userid-always-userid/">
+    
+    <meta name="description" content="How to persist the User ID across sessions, even if the user is not logged in. Implement with Google Tag Manager.">
+    <meta property="og:description" content="How to persist the User ID across sessions, even if the user is not logged in. Implement with Google Tag Manager.">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="#GTMtips: Once userId, Always userId">
+    <meta property="og:url" content="/gtm-tips/once-userid-always-userid/">
+    <meta property="og:site_name" content="Simo Ahava&#39;s blog">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="#GTMtips: Once userId, Always userId">
+    <meta name="twitter:description" content="How to persist the User ID across sessions, even if the user is not logged in. Implement with Google Tag Manager.">
+    
+      <meta name="twitter:creator" content="@SimoAhava">
+      
+    
+
+    
+    
+
+    
+      <meta property="og:image" content="https://www.simoahava.com/images/simo.png">
+    
+
+    
+      <meta name="twitter:image" content="https://www.simoahava.com/images/2014/10/userid-cookie.png">  
+      <meta property="og:image" content="https://www.simoahava.com/images/2014/10/userid-cookie.png">
+    
+    
+    
+
+    
+
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/jquery.fancybox.min.css" integrity="sha256-vuXZ9LGmmwtjqFX1F+EKin1ThZMub58gKULUyf0qECk=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/helpers/jquery.fancybox-thumbs.min.css" integrity="sha256-SEa4XYAHihTcEP1f5gARTB2K26Uk8PsndQYHQC1f4jU=" crossorigin="anonymous" />
+    
+    
+    <link rel="stylesheet" href="https://www.simoahava.com/css/style.css" />
+    
+    
+
+    
+      
+    
+    
+  </head>
+
+  <body>
+    <div id="blog">
+      <header id="header" data-behavior="4">
+  <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+  <div class="header-title">
+    <a class="header-title-link" href="https://www.simoahava.com/">Simo Ahava&#39;s blog</a>
+  </div>
+  
+</header>
+
+      <nav id="sidebar" data-behavior="4">
+  <div class="sidebar-container">
+    
+      <div class="sidebar-profile">
+        <a href="https://www.simoahava.com/">
+          <img class="sidebar-profile-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+        </a>
+        <h4 class="sidebar-profile-name">Simo Ahava</h4>
+        
+          <h5 class="sidebar-profile-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</h5>
+        
+      </div>
+    
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+      
+      <span class="sidebar-button-desc">Home</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+      
+      <span class="sidebar-button-desc">Categories</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tags/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Tags</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/gtm-tips/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-magic"></i>
+      
+      <span class="sidebar-button-desc">GTM Tips</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/about-simo-ahava/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+      
+      <span class="sidebar-button-desc">About</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tools/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-wrench"></i>
+      
+      <span class="sidebar-button-desc">Tools</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/blog-statistics/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bar-chart"></i>
+      
+      <span class="sidebar-button-desc">Blog statistics</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://github.com/sahava" target="_blank" rel="noopener">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+      
+      <span class="sidebar-button-desc">GitHub</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/upcoming-talks/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bullhorn"></i>
+      
+      <span class="sidebar-button-desc">Upcoming talks</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
+
+    </ul>
+  </div>
+</nav>
+
+      
+
+      <div id="main" data-behavior="4"
+        class="
+               hasCoverMetaIn
+               ">
+        <article class="post" itemscope itemType="http://schema.org/BlogPosting">
+	  <form id="search" action="/search/">
+  <input name="q" type="text" class="form-control input--xlarge" placeholder="Search blog..." autocomplete="off">
+  </form>
+
+          
+          
+            <div class="post-header main-content-wrap text-left">
+
+  
+
+    <h1 itemprop="headline">
+      #GTMtips: Once userId, Always userId
+    </h1>
+  
+  
+  <div class="postShorten-meta post-meta">
+    
+      <time itemprop="datePublished" datetime="2014-10-22T18:15:00Z">
+        
+  October 22, 2014
+
+      </time>
+    
+      
+  
+  
+    <span>in</span>
+    
+      <a class="category-link" href="https://www.simoahava.com/categories/gtm-tips">GTM tips</a>
+    
+  
+
+
+       | <a href="https://www.simoahava.com/gtm-tips/once-userid-always-userid/#disqus_thread">Comments</a> <span id="linkedincount"></span>
+  </div>
+
+
+</div>
+
+          
+          <div class="post-content markdown" itemprop="articleBody">
+            <div class="main-content-wrap">
+              
+
+<p>The <a href="https://support.google.com/analytics/answer/3123663">User ID</a> is definitely one of the coolest things about Universal Analytics, <em>if used correctly</em>. It might reveal some surprising insights about your visitors, since now you&rsquo;re not restricted to analysing visitors as just browser or device instances as before, but rather you can build your stories around all the touch points the user might have had on their journey to and through your web properties.</p>
+
+<p>With this simple tip, you can extend User ID tracking to return users without them needing to authenticate. This is done with a cookie.</p>
+
+<p><strong>Note!</strong> This means that the User ID will often persist on public computers, so the person you&rsquo;re tracking might not actually be the same <em>human</em> (it might also be a llama with some tech skills).</p>
+
+<p>This idea was inspired by the comments in Annie Cushing&rsquo;s blog post: <a href="http://www.annielytics.com/blog/analytics/google-analytics-user-metrics-bs-sites/">Why Google Analytics User Metrics Are BS (For Most Sites)</a>. Especially the comments by John Mitchell and Christopher Mason were particularly insightful.</p>
+
+<h2 id="tip-8-user-id-for-non-authenticated-return-users">Tip 8: User ID for non-authenticated return users</h2>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2014/10/userid-cookie.png" title="User ID in Cookie">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2014/10/userid-cookie.png#ZgotmplZ" alt="User ID in Cookie">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>The process is pretty much this:</p>
+
+<ol>
+<li><p>When users authenticate, the user ID should be stored in dataLayer</p></li>
+
+<li><p>When subsequent Universal Analytics tags are fired, the <code>&amp;uid;</code> key should first check if the User ID is in <code>dataLayer</code></p></li>
+
+<li><p>If it is, then a cookie is written in the user&rsquo;s browser with this User ID, and finally the value is returned to the tag</p></li>
+
+<li><p>If the User ID is not in <code>dataLayer</code>, GTM checks if it&rsquo;s stored in a cookie, and if it is, the cookie value is returned</p></li>
+
+<li><p>If there is no such cookie, nothing is returned and the User ID parameter will not get sent</p></li>
+</ol>
+
+<p>So, for this to work you&rsquo;ll need three variables. First one is <strong>{{uid in datalayer}}</strong>, and it&rsquo;s a simple Data Layer Variable where the variable name it points to is whatever you have configured by your website. I&rsquo;ll user <code>userId</code> in this example.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2014/10/uid-in-datalayer.png" title="userId in dataLayer">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2014/10/uid-in-datalayer.png#ZgotmplZ" alt="userId in dataLayer">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>So when a user logs in, the website should push their User ID into <code>dataLayer</code> like so:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
+  <span style="color:#e6db74">&#39;userId&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;AAA-123&#39;</span>,
+  <span style="color:#e6db74">&#39;event&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;authentication&#39;</span>
+});</code></pre></div>
+
+<p>This shouldn&rsquo;t come as a surprise, right? That&rsquo;s how you should do it in any case. The &lsquo;event&rsquo; push fires the Event Tag which sends the user ID to Google Analytics. Nothing ground-breaking here, yet.</p>
+
+<p>Next, you&rsquo;ll need two other variables. The first one is a <strong>1st Party Cookie</strong> variable, which looks for whatever cookie name you&rsquo;ve decided to store the user ID in. I&rsquo;ll use <code>userId</code> again for consistency, but note that it&rsquo;s a pretty common name, and you don&rsquo;t want to overwrite other cookies written by your scripts.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2014/10/uid-in-cookie.png" title="User ID in cookie">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2014/10/uid-in-cookie.png#ZgotmplZ" alt="User ID in cookie">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>Finally, you&rsquo;ll need a <strong>Custom JavaScript Variable</strong>, which we&rsquo;ll call <strong>{{user id}}</strong>. Its task is to perform the algorithm described in the beginning of this chapter.</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
+    <span style="color:#66d9ef">if</span> ({{<span style="color:#a6e22e">uid</span> <span style="color:#66d9ef">in</span> <span style="color:#a6e22e">datalayer</span>}}) {
+        <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">d</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Date();
+        <span style="color:#a6e22e">d</span>.<span style="color:#a6e22e">setTime</span>(<span style="color:#a6e22e">d</span>.<span style="color:#a6e22e">getTime</span>()<span style="color:#f92672">+</span><span style="color:#ae81ff">1000</span><span style="color:#f92672">*</span><span style="color:#ae81ff">60</span><span style="color:#f92672">*</span><span style="color:#ae81ff">60</span><span style="color:#f92672">*</span><span style="color:#ae81ff">24</span><span style="color:#f92672">*</span><span style="color:#ae81ff">365</span><span style="color:#f92672">*</span><span style="color:#ae81ff">2</span>);
+        <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">expires</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;expires=&#39;</span><span style="color:#f92672">+</span><span style="color:#a6e22e">d</span>.<span style="color:#a6e22e">toGMTString</span>();
+        document.<span style="color:#a6e22e">cookie</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;userId=&#39;</span> <span style="color:#f92672">+</span> {{<span style="color:#a6e22e">uid</span> <span style="color:#66d9ef">in</span> <span style="color:#a6e22e">datalayer</span>}} <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;; &#39;</span><span style="color:#f92672">+</span><span style="color:#a6e22e">expires</span><span style="color:#f92672">+</span><span style="color:#e6db74">&#39;; path=/&#39;</span>;
+        <span style="color:#66d9ef">return</span> {{<span style="color:#a6e22e">uid</span> <span style="color:#66d9ef">in</span> <span style="color:#a6e22e">datalayer</span>}};
+    } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> ({{<span style="color:#a6e22e">uid</span> <span style="color:#66d9ef">in</span> <span style="color:#a6e22e">cookie</span>}}) {
+        <span style="color:#66d9ef">return</span> {{<span style="color:#a6e22e">uid</span> <span style="color:#66d9ef">in</span> <span style="color:#a6e22e">cookie</span>}};
+    }
+    <span style="color:#66d9ef">return</span>;
+}</code></pre></div>
+
+<p>And, finally (phew! this was supposed to be a simple tip), you need to edit your Universal Analytics tags to fetch the <strong>{{user id}}</strong> for the <code>&amp;uid;</code>:</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2014/10/user-id-field.png" title="user-id-field">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2014/10/user-id-field.png#ZgotmplZ" alt="user-id-field">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>And that will do it.</p>
+
+<p>Remember, this isn&rsquo;t for everyone. There&rsquo;s no inherent benefit of always tracking return users unless it&rsquo;s something you consider necessary for you to achieve your business goals. Sometimes it&rsquo;s a business requirement itself to track return users who <em>don&rsquo;t</em> authenticate. And don&rsquo;t forget the warning about public computers. You might want to edit this script to only work for mobile phones and tablets, since it&rsquo;s less likely that they have as many users as a library computer might.</p>
+
+              
+            </div>
+          </div>
+          <div id="post-footer" class="post-footer main-content-wrap">
+            
+              
+                
+                
+                  <div class="post-footer-tags">
+                    <span class="text-color-light text-small">TAGGED IN</span><br/>
+                    
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/google-tag-manager/">Google Tag Manager</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/gtmtips/">gtmtips</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/universal-analytics/">universal analytics</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/user-id/">user id</a>
+
+                  </div>
+                
+              
+            
+            
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/auto-event-tracking-gtm-2-0/">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/introducing-gtm-tools/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/gtm-tips/once-userid-always-userid/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=%23GTMtips:%20Once%20userId,%20Always%20userId%20https://www.simoahava.com/gtm-tips/once-userid-always-userid/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://www.simoahava.com/gtm-tips/once-userid-always-userid/">
+              <i class="fa fa-google-plus"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/gtm-tips/once-userid-always-userid/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#disqus">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+            
+              
+                <span id="disqus"></span>
+<div id="disqus_thread">
+  <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+
+              
+            
+          </div>
+        </article>
+        <footer id="footer" class="main-content-wrap">
+  <span class="copyrights">
+    &copy; 2018 Simo Ahava. All Rights Reserved
+  </span>
+</footer>
+
+      </div>
+      
+      <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+        
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/auto-event-tracking-gtm-2-0/">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/introducing-gtm-tools/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/gtm-tips/once-userid-always-userid/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=%23GTMtips:%20Once%20userId,%20Always%20userId%20https://www.simoahava.com/gtm-tips/once-userid-always-userid/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://www.simoahava.com/gtm-tips/once-userid-always-userid/">
+              <i class="fa fa-google-plus"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/gtm-tips/once-userid-always-userid/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#disqus">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+      </div>
+      
+      <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+  <i id="btn-close-shareoptions" class="fa fa-close"></i>
+  <ul class="share-options">
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=%25!s%28BADINDEX%29">
+          <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https%3A%2F%2Fwww.simoahava.com%2Fgtm-tips%2Fonce-userid-always-userid%2F%20%25!s%28BADINDEX%29%20via%20@SimoAhava">
+          <i class="fa fa-twitter"></i><span>Share on Twitter</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=%25!s%28BADINDEX%29">
+          <i class="fa fa-google-plus"></i><span>Share on Google&#43;</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.linkedin.com/cws/share?url=%25!s%28BADINDEX%29">
+          <i class="fa fa-linkedin"></i><span>Share on LinkedIn</span>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+<div id="share-options-mask" class="share-options-mask"></div>
+    </div>
+    
+    <div id="about">
+  <div id="about-card">
+    <div id="about-btn-close">
+      <i class="fa fa-remove"></i>
+    </div>
+    
+      <img id="about-card-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+    
+    <h4 id="about-card-name">Simo Ahava</h4>
+    
+      <div id="about-card-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</div>
+    
+    
+      <div id="about-card-job">
+        <i class="fa fa-briefcase"></i>
+        <br/>
+        Senior Data Advocate at Reaktor
+      </div>
+    
+    
+      <div id="about-card-location">
+        <i class="fa fa-map-marker"></i>
+        <br/>
+        Finland
+      </div>
+    
+  </div>
+</div>
+
+    
+  
+    
+    <div id="cover" style="background-image:url('https://www.simoahava.com/images/maisema.jpg');"></div>
+  
+
+
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.7/js/jquery.fancybox.min.js" integrity="sha256-GEAnjcTqVP+vBp3SSc8bEDQqvWAZMiHyUSIorrWwH50=" crossorigin="anonymous"></script>
+
+
+<script src="https://www.simoahava.com/js/script.js"></script>
+
+
+
+
+  
+    
+      <script>
+        
+
+
+
+
+
+        (function() {
+          
+          
+          if (window.location.hostname == "localhost") {
+            return;
+          }
+          var d = document, s = d.createElement('script');
+          var disqus_shortname = 'simoahava';
+          s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      </script>
+    
+  
+
+
+
+    
+  </body>
+</html>
+

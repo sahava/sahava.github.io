@@ -1,0 +1,688 @@
+
+
+  
+    
+  
+
+
+  
+
+
+
+
+
+  
+
+
+  
+
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Hugo 0.31 with theme Tranquilpeak 0.4.3-BETA">
+    <title>Cross-domain Tracking Across Subdomains | Simo Ahava's blog</title>
+    
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-PZ7GMV9');</script>
+    
+    <script src="//simoahava.disqus.com/count.js" id="dsq-count-scr" async></script>
+    <meta name="author" content="Simo Ahava">
+    <meta name="keywords" content="">
+
+    <link rel="icon" href="https://www.simoahava.com/images/favicon.ico">
+    
+    <link rel="amphtml" href="https://www.simoahava.com/amp/analytics/cross-domain-tracking-across-subdomains/">
+    
+    <meta name="description" content="Quick tip how cross-domain tracking to Google Analytics works across subdomains.">
+    <meta property="og:description" content="Quick tip how cross-domain tracking to Google Analytics works across subdomains.">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="Cross-domain Tracking Across Subdomains">
+    <meta property="og:url" content="/analytics/cross-domain-tracking-across-subdomains/">
+    <meta property="og:site_name" content="Simo Ahava&#39;s blog">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Cross-domain Tracking Across Subdomains">
+    <meta name="twitter:description" content="Quick tip how cross-domain tracking to Google Analytics works across subdomains.">
+    
+      <meta name="twitter:creator" content="@SimoAhava">
+      
+    
+
+    
+    
+
+    
+      <meta property="og:image" content="https://www.simoahava.com/images/simo.png">
+    
+
+    
+      <meta name="twitter:image" content="https://www.simoahava.com/images/2015/07/developer-guide.png">  
+      <meta property="og:image" content="https://www.simoahava.com/images/2015/07/developer-guide.png">
+    
+    
+    
+
+    
+
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/jquery.fancybox.min.css" integrity="sha256-vuXZ9LGmmwtjqFX1F+EKin1ThZMub58gKULUyf0qECk=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/helpers/jquery.fancybox-thumbs.min.css" integrity="sha256-SEa4XYAHihTcEP1f5gARTB2K26Uk8PsndQYHQC1f4jU=" crossorigin="anonymous" />
+    
+    
+    <link rel="stylesheet" href="https://www.simoahava.com/css/style.css" />
+    
+    
+
+    
+      
+    
+    
+  </head>
+
+  <body>
+    <div id="blog">
+      <header id="header" data-behavior="4">
+  <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+  <div class="header-title">
+    <a class="header-title-link" href="https://www.simoahava.com/">Simo Ahava&#39;s blog</a>
+  </div>
+  
+</header>
+
+      <nav id="sidebar" data-behavior="4">
+  <div class="sidebar-container">
+    
+      <div class="sidebar-profile">
+        <a href="https://www.simoahava.com/">
+          <img class="sidebar-profile-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+        </a>
+        <h4 class="sidebar-profile-name">Simo Ahava</h4>
+        
+          <h5 class="sidebar-profile-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</h5>
+        
+      </div>
+    
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+      
+      <span class="sidebar-button-desc">Home</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+      
+      <span class="sidebar-button-desc">Categories</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tags/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Tags</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/gtm-tips/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-magic"></i>
+      
+      <span class="sidebar-button-desc">GTM Tips</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/about-simo-ahava/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+      
+      <span class="sidebar-button-desc">About</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tools/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-wrench"></i>
+      
+      <span class="sidebar-button-desc">Tools</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/blog-statistics/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bar-chart"></i>
+      
+      <span class="sidebar-button-desc">Blog statistics</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://github.com/sahava" target="_blank" rel="noopener">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+      
+      <span class="sidebar-button-desc">GitHub</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/upcoming-talks/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bullhorn"></i>
+      
+      <span class="sidebar-button-desc">Upcoming talks</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
+
+    </ul>
+  </div>
+</nav>
+
+      
+
+      <div id="main" data-behavior="4"
+        class="
+               hasCoverMetaIn
+               ">
+        <article class="post" itemscope itemType="http://schema.org/BlogPosting">
+	  <form id="search" action="/search/">
+  <input name="q" type="text" class="form-control input--xlarge" placeholder="Search blog..." autocomplete="off">
+  </form>
+
+          
+          
+            <div class="post-header main-content-wrap text-left">
+
+  
+
+    <h1 itemprop="headline">
+      Cross-domain Tracking Across Subdomains
+    </h1>
+  
+  
+  <div class="postShorten-meta post-meta">
+    
+      <time itemprop="datePublished" datetime="2015-07-04T07:11:23Z">
+        
+  July 4, 2015
+
+      </time>
+    
+      
+  
+  
+    <span>in</span>
+    
+      <a class="category-link" href="https://www.simoahava.com/categories/analytics">Analytics</a>
+    
+  
+
+
+       | <a href="https://www.simoahava.com/analytics/cross-domain-tracking-across-subdomains/#disqus_thread">Comments</a> <span id="linkedincount"></span>
+  </div>
+
+
+</div>
+
+          
+          <div class="post-content markdown" itemprop="articleBody">
+            <div class="main-content-wrap">
+              
+
+<p>Wait. What? Why write an article about something that should work by default in <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/cross-domain">Universal Analytics</a>? I mean, here&rsquo;s a screenshot from the guide I just linked to in the previous sentence:</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2015/07/developer-guide.png" title="Developer Guide for Cross-domain tracking">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2015/07/developer-guide.png#ZgotmplZ" alt="Developer Guide for Cross-domain tracking">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>There it is. Clear as day: &ldquo;Tracking users across subdomains does not require any additional configuration.&rdquo; Also, some of the recent, <strong>excellent</strong> guides to cross-domain tracking, written by <a href="https://www.e-nor.com/blog/google-analytics/cross-domain-and-roll-up-reporting">E-Nor</a> and <a href="http://www.lunametrics.com/blog/2015/06/16/cross-domain-tracking-with-google-tag-manager/">Lunametrics</a> enforce the same: you just need a default Universal Analytics Tag in <a href="https://tagmanager.google.com">Google Tag Manager</a>.</p>
+
+<p>Well, unfortunately, that&rsquo;s not true. You do need a configuration setting, but it&rsquo;s thankfully very simple.</p>
+
+<p><strong>TL;DR:</strong> In the <strong>Fields to Set</strong> of your Universal Analytics (Page View) Tag, add the following setting:</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2015/07/cookiedomain-auto.png" title="set cookieDomain auto for subdomain tracking">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2015/07/cookiedomain-auto.png#ZgotmplZ" alt="set cookieDomain auto for subdomain tracking">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>But since you&rsquo;re awesome, you didn&rsquo;t come here for the dirty truth, you want to know <em>why</em> this is necessary. So read on!</p>
+
+<h2 id="how-universal-analytics-writes-cookies">How Universal Analytics writes cookies</h2>
+
+<p>To track the same user and session across any two pages, these pages require the following:</p>
+
+<ol>
+<li><p>A tracker object that tracks to the same Google Analytics Property ID (UA-XXXXXX-Y)</p></li>
+
+<li><p>A <code>_ga</code> cookie that has the same Client ID</p></li>
+</ol>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2015/07/ga-cookie.png" title="_ga cookie">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2015/07/ga-cookie.png#ZgotmplZ" alt="_ga cookie">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>Client ID is what is used to stitch the hits in the session together, and also to stitch sessions the same user has had into a common level of aggregation (the GA concept of a <em>user</em>).</p>
+
+<p>Now, if you <strong>don&rsquo;t</strong> have any customizations in your Universal Analytics Tag, here&rsquo;s the logic with which cookies are written:</p>
+
+<ol>
+<li><p>If the hostname of the page (<a href="http://this">http://this</a> is the hostname/home/) starts with <strong>www.</strong>, the &ldquo;www&rdquo; is stripped, and the cookie is written on what remains. So, in the case of <strong>www.simoahava.com</strong>, the cookie is written on <strong>.simoahava.com</strong>.</p></li>
+
+<li><p>On all other hostnames, the cookie is written on the hostname itself, prefixed with a period. So, <strong>test.simoahava.com</strong> would retrieve a <code>_ga</code> cookie written on <strong>.test.simoahava.com</strong></p></li>
+</ol>
+
+<p>If prefixed with a period, like the <code>_ga</code> cookie is, the cookie can be used on all hostnames that <strong>contain this string</strong>. So the <em>.simoahava.com</em> cookie can be used by <strong>test.simoahava.com</strong>, <strong>www.simoahava.com</strong>, <strong>simoahava.com</strong>, and <strong>immortal.genius.simoahava.com</strong>, for example.</p>
+
+<p>The <em>.test.simoahava.com</em> cookie, on the other hand, can be used by <strong>www.test.simoahava.com</strong>, but not by <strong>www.simoahava.com</strong>, as the latter does not contain the string &ldquo;test.simoahava.com&rdquo;.</p>
+
+<p>Can you see where I&rsquo;m going with this?</p>
+
+<p><strong>If</strong> traffic is from www.simoahava.com to test.simoahava.com, the <code>_ga</code> cookie is shared, and all is well. Right?</p>
+
+<p>However, <strong>if</strong> the visitor first visits test.simoahava.com, and <em>then</em> moves to www.simoahava.com, these two domains will have <strong>different</strong> <code>_ga</code> cookies, and thus different Client IDs, and thus the user will be a different user with a new session!</p>
+
+<p>So clearly, in many, many cases, this will lead to problems. We need to somehow ensure that the <code>_ga</code> cookie is <strong>always</strong> written on <strong>.simoahava.com</strong>, so that it can be used by all subdomains, regardless of if they have &ldquo;www.&rdquo; or something else as a prefix.</p>
+
+<h2 id="cookiedomain-auto">cookieDomain : auto</h2>
+
+<p>The answer is in the <strong>cookieDomain</strong> setting. When you set cookieDomain to <strong>auto</strong>, the following will happen with a (fictional) domain like <em>www.simoahava.co.uk</em>:</p>
+
+<ol>
+<li><p>GA tries to write the cookie on <strong>.co.uk</strong>, which is the first possible root domain candidate. This fails because the browser is not authorized to write a cookie on a top-level domain like that.</p></li>
+
+<li><p>Next, GA tries to write the cookie on <strong>.simoahava.co.uk</strong>, which is the next possible root domain candidate. This works because that&rsquo;s a valid domain to write the cookie on.</p></li>
+</ol>
+
+<p>So there&rsquo;s a recursive algorithm, which tries to write the cookie, starting from the most generic domain-level (the top-level domain), and stopping once it succeeds. What should be left is the <em>root domain</em>, and thus the cookie will be available to all subdomains.</p>
+
+<p>Yay!</p>
+
+<h2 id="the-new-and-improved-recommendation">The new and improved recommendation</h2>
+
+<p>Here&rsquo;s the improved recommendation for <strong>cross-domain tracking across subdomains</strong>:</p>
+
+<p><strong>Always</strong> default to having <strong>cookieDomain : auto</strong> in your tracker settings. In GTM, I&rsquo;ve shown an example in the beginning of the post.</p>
+
+<p>In the Universal Analytics tracking code, the snippet would look like this:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
+  (<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">i</span>,<span style="color:#a6e22e">s</span>,<span style="color:#a6e22e">o</span>,<span style="color:#a6e22e">g</span>,<span style="color:#a6e22e">r</span>,<span style="color:#a6e22e">a</span>,<span style="color:#a6e22e">m</span>){<span style="color:#a6e22e">i</span>[<span style="color:#e6db74">&#39;GoogleAnalyticsObject&#39;</span>]<span style="color:#f92672">=</span><span style="color:#a6e22e">r</span>;<span style="color:#a6e22e">i</span>[<span style="color:#a6e22e">r</span>]<span style="color:#f92672">=</span><span style="color:#a6e22e">i</span>[<span style="color:#a6e22e">r</span>]<span style="color:#f92672">||</span><span style="color:#66d9ef">function</span>(){
+  (<span style="color:#a6e22e">i</span>[<span style="color:#a6e22e">r</span>].<span style="color:#a6e22e">q</span><span style="color:#f92672">=</span><span style="color:#a6e22e">i</span>[<span style="color:#a6e22e">r</span>].<span style="color:#a6e22e">q</span><span style="color:#f92672">||</span>[]).<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">arguments</span>)},<span style="color:#a6e22e">i</span>[<span style="color:#a6e22e">r</span>].<span style="color:#a6e22e">l</span><span style="color:#f92672">=</span><span style="color:#ae81ff">1</span><span style="color:#f92672">*</span><span style="color:#66d9ef">new</span> Date();<span style="color:#a6e22e">a</span><span style="color:#f92672">=</span><span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">createElement</span>(<span style="color:#a6e22e">o</span>),
+  <span style="color:#a6e22e">m</span><span style="color:#f92672">=</span><span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">getElementsByTagName</span>(<span style="color:#a6e22e">o</span>)[<span style="color:#ae81ff">0</span>];<span style="color:#a6e22e">a</span>.<span style="color:#66d9ef">async</span><span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>;<span style="color:#a6e22e">a</span>.<span style="color:#a6e22e">src</span><span style="color:#f92672">=</span><span style="color:#a6e22e">g</span>;<span style="color:#a6e22e">m</span>.<span style="color:#a6e22e">parentNode</span>.<span style="color:#a6e22e">insertBefore</span>(<span style="color:#a6e22e">a</span>,<span style="color:#a6e22e">m</span>)
+  })(window,document,<span style="color:#e6db74">&#39;script&#39;</span>,<span style="color:#e6db74">&#39;//www.google-analytics.com/analytics.js&#39;</span>,<span style="color:#e6db74">&#39;ga&#39;</span>);
+
+  <span style="color:#a6e22e">ga</span>(<span style="color:#e6db74">&#39;create&#39;</span>, <span style="color:#e6db74">&#39;UA-40669554-1&#39;</span>, <span style="color:#e6db74">&#39;auto&#39;</span>);
+  <span style="color:#a6e22e">ga</span>(<span style="color:#e6db74">&#39;send&#39;</span>, <span style="color:#e6db74">&#39;pageview&#39;</span>);
+&lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
+
+<p>This is, actually, what the Google Analytics Tracking Code, if copy-pasted from the Property settings, offers by default, so all is well if you use this.</p>
+
+<p>Personally, I think the setting should <strong>always</strong> default to &ldquo;auto&rdquo; unless explicitly changed to some other value.</p>
+
+<p>Here&rsquo;s <a href="https://plus.google.com/+SimoAhava/posts/SRyGbcaK4hF">a thread in Google+</a> which inspired me to write this post.</p>
+
+              
+            </div>
+          </div>
+          <div id="post-footer" class="post-footer main-content-wrap">
+            
+              
+            
+            
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/enhanced-ecommerce-with-a-custom-javascript-variable/">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/gtm-tips/remember-to-flush-unused-data-layer-variables/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/cross-domain-tracking-across-subdomains/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Cross-domain%20Tracking%20Across%20Subdomains%20https://www.simoahava.com/analytics/cross-domain-tracking-across-subdomains/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://www.simoahava.com/analytics/cross-domain-tracking-across-subdomains/">
+              <i class="fa fa-google-plus"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/cross-domain-tracking-across-subdomains/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#disqus">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+            
+              
+                <span id="disqus"></span>
+<div id="disqus_thread">
+  <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+
+              
+            
+          </div>
+        </article>
+        <footer id="footer" class="main-content-wrap">
+  <span class="copyrights">
+    &copy; 2018 Simo Ahava. All Rights Reserved
+  </span>
+</footer>
+
+      </div>
+      
+      <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+        
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/enhanced-ecommerce-with-a-custom-javascript-variable/">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/gtm-tips/remember-to-flush-unused-data-layer-variables/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/cross-domain-tracking-across-subdomains/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Cross-domain%20Tracking%20Across%20Subdomains%20https://www.simoahava.com/analytics/cross-domain-tracking-across-subdomains/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://www.simoahava.com/analytics/cross-domain-tracking-across-subdomains/">
+              <i class="fa fa-google-plus"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/cross-domain-tracking-across-subdomains/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#disqus">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+      </div>
+      
+      <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+  <i id="btn-close-shareoptions" class="fa fa-close"></i>
+  <ul class="share-options">
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=%25!s%28BADINDEX%29">
+          <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https%3A%2F%2Fwww.simoahava.com%2Fanalytics%2Fcross-domain-tracking-across-subdomains%2F%20%25!s%28BADINDEX%29%20via%20@SimoAhava">
+          <i class="fa fa-twitter"></i><span>Share on Twitter</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=%25!s%28BADINDEX%29">
+          <i class="fa fa-google-plus"></i><span>Share on Google&#43;</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.linkedin.com/cws/share?url=%25!s%28BADINDEX%29">
+          <i class="fa fa-linkedin"></i><span>Share on LinkedIn</span>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+<div id="share-options-mask" class="share-options-mask"></div>
+    </div>
+    
+    <div id="about">
+  <div id="about-card">
+    <div id="about-btn-close">
+      <i class="fa fa-remove"></i>
+    </div>
+    
+      <img id="about-card-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+    
+    <h4 id="about-card-name">Simo Ahava</h4>
+    
+      <div id="about-card-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</div>
+    
+    
+      <div id="about-card-job">
+        <i class="fa fa-briefcase"></i>
+        <br/>
+        Senior Data Advocate at Reaktor
+      </div>
+    
+    
+      <div id="about-card-location">
+        <i class="fa fa-map-marker"></i>
+        <br/>
+        Finland
+      </div>
+    
+  </div>
+</div>
+
+    
+  
+    
+    <div id="cover" style="background-image:url('https://www.simoahava.com/images/maisema.jpg');"></div>
+  
+
+
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.7/js/jquery.fancybox.min.js" integrity="sha256-GEAnjcTqVP+vBp3SSc8bEDQqvWAZMiHyUSIorrWwH50=" crossorigin="anonymous"></script>
+
+
+<script src="https://www.simoahava.com/js/script.js"></script>
+
+
+
+
+  
+    
+      <script>
+        
+
+
+
+
+
+        (function() {
+          
+          
+          if (window.location.hostname == "localhost") {
+            return;
+          }
+          var d = document, s = d.createElement('script');
+          var disqus_shortname = 'simoahava';
+          s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      </script>
+    
+  
+
+
+
+    
+  </body>
+</html>
+

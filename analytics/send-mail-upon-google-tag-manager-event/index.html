@@ -1,0 +1,820 @@
+
+
+  
+    
+  
+
+
+  
+
+
+
+
+
+  
+
+
+  
+
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Hugo 0.31 with theme Tranquilpeak 0.4.3-BETA">
+    <title>Send Mail Upon Google Tag Manager Event | Simo Ahava's blog</title>
+    
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-PZ7GMV9');</script>
+    
+    <script src="//simoahava.disqus.com/count.js" id="dsq-count-scr" async></script>
+    <meta name="author" content="Simo Ahava">
+    <meta name="keywords" content="">
+
+    <link rel="icon" href="https://www.simoahava.com/images/favicon.ico">
+    
+    <link rel="amphtml" href="https://www.simoahava.com/amp/analytics/send-mail-upon-google-tag-manager-event/">
+    
+    <meta name="description" content="Add a simple send mail PHP script to your Google Tag Manager tags, sending email whenever an event occurs.">
+    <meta property="og:description" content="Add a simple send mail PHP script to your Google Tag Manager tags, sending email whenever an event occurs.">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="Send Mail Upon Google Tag Manager Event">
+    <meta property="og:url" content="/analytics/send-mail-upon-google-tag-manager-event/">
+    <meta property="og:site_name" content="Simo Ahava&#39;s blog">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Send Mail Upon Google Tag Manager Event">
+    <meta name="twitter:description" content="Add a simple send mail PHP script to your Google Tag Manager tags, sending email whenever an event occurs.">
+    
+      <meta name="twitter:creator" content="@SimoAhava">
+      
+    
+
+    
+    
+
+    
+      <meta property="og:image" content="https://www.simoahava.com/images/simo.png">
+    
+
+    
+      <meta name="twitter:image" content="https://www.simoahava.com/images/2014/04/error-listener.png">  
+      <meta property="og:image" content="https://www.simoahava.com/images/2014/04/error-listener.png">
+    
+    
+    
+
+    
+
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/jquery.fancybox.min.css" integrity="sha256-vuXZ9LGmmwtjqFX1F+EKin1ThZMub58gKULUyf0qECk=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/helpers/jquery.fancybox-thumbs.min.css" integrity="sha256-SEa4XYAHihTcEP1f5gARTB2K26Uk8PsndQYHQC1f4jU=" crossorigin="anonymous" />
+    
+    
+    <link rel="stylesheet" href="https://www.simoahava.com/css/style.css" />
+    
+    
+
+    
+      
+    
+    
+  </head>
+
+  <body>
+    <div id="blog">
+      <header id="header" data-behavior="4">
+  <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+  <div class="header-title">
+    <a class="header-title-link" href="https://www.simoahava.com/">Simo Ahava&#39;s blog</a>
+  </div>
+  
+</header>
+
+      <nav id="sidebar" data-behavior="4">
+  <div class="sidebar-container">
+    
+      <div class="sidebar-profile">
+        <a href="https://www.simoahava.com/">
+          <img class="sidebar-profile-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+        </a>
+        <h4 class="sidebar-profile-name">Simo Ahava</h4>
+        
+          <h5 class="sidebar-profile-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</h5>
+        
+      </div>
+    
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+      
+      <span class="sidebar-button-desc">Home</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+      
+      <span class="sidebar-button-desc">Categories</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tags/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Tags</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/gtm-tips/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-magic"></i>
+      
+      <span class="sidebar-button-desc">GTM Tips</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/about-simo-ahava/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+      
+      <span class="sidebar-button-desc">About</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tools/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-wrench"></i>
+      
+      <span class="sidebar-button-desc">Tools</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/blog-statistics/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bar-chart"></i>
+      
+      <span class="sidebar-button-desc">Blog statistics</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://github.com/sahava" target="_blank" rel="noopener">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+      
+      <span class="sidebar-button-desc">GitHub</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/upcoming-talks/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bullhorn"></i>
+      
+      <span class="sidebar-button-desc">Upcoming talks</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
+
+    </ul>
+  </div>
+</nav>
+
+      
+
+      <div id="main" data-behavior="4"
+        class="
+               hasCoverMetaIn
+               ">
+        <article class="post" itemscope itemType="http://schema.org/BlogPosting">
+	  <form id="search" action="/search/">
+  <input name="q" type="text" class="form-control input--xlarge" placeholder="Search blog..." autocomplete="off">
+  </form>
+
+          
+          
+            <div class="post-header main-content-wrap text-left">
+
+  
+
+    <h1 itemprop="headline">
+      Send Mail Upon Google Tag Manager Event
+    </h1>
+  
+  
+  <div class="postShorten-meta post-meta">
+    
+      <time itemprop="datePublished" datetime="2014-04-28T04:49:52Z">
+        
+  April 28, 2014
+
+      </time>
+    
+      
+  
+  
+    <span>in</span>
+    
+      <a class="category-link" href="https://www.simoahava.com/categories/analytics">Analytics</a>
+    
+  
+
+
+       | <a href="https://www.simoahava.com/analytics/send-mail-upon-google-tag-manager-event/#disqus_thread">Comments</a> <span id="linkedincount"></span>
+  </div>
+
+
+</div>
+
+          
+          <div class="post-content markdown" itemprop="articleBody">
+            <div class="main-content-wrap">
+              
+
+<p>Let&rsquo;s say you want to set up a rudimentary email alert system in your <a href="http://www.google.com/tagmanager">Google Tag Manager</a> implementation. Say, for example, you want to receive an email every time an uncaught error occurs on your website. It&rsquo;s not a very good use case, since a large website can spawn hundreds of uncaught exceptions in a short period of time, but let&rsquo;s just pretend for now.</p>
+
+<p>If you know your JavaScript, you&rsquo;ll know that you can&rsquo;t send mail using client-side code. That&rsquo;s a browser security thing, and I completely understand it. However, a vast majority of websites are created using a CMS which might provide some mail function or hook for you to use. And even if you don&rsquo;t have a cooperative web server (or there&rsquo;s no way you can persuade your developers to help), you could use any one of the <a href="http://www.programmableweb.com/apis/directory/1?apicat=email">online email APIs</a> that are out there.</p>
+
+<p>In this post, I&rsquo;ll show two easy ways of getting your mail sent: using the <strong>mail()</strong> function in PHP, and using <a href="http://www.mandrill.com">Mandrill</a>&rsquo;s API. My use case will be simple: every time an uncaught exception occurs on the website, an email is sent to my address with details about the error. I&rsquo;ll be using the <a href="https://support.google.com/tagmanager/answer/3415369?hl=en#JSErrorListener">JavaScript Error Listener</a> to catch the error and push it into the mailer.</p>
+
+<p><strong>Word of warning</strong>: The examples in this post are very rudimentary and serve simply to show you what the basics are of sending your emails using GTM. Before you start coding a mailer system of your own, make sure you familiarize yourself with the documentation so that you don&rsquo;t accidentally or unintentionally open a door for mail spammers.</p>
+
+<h2 id="before-you-start">Before you start</h2>
+
+<p>For this to work, you&rsquo;ll need the GTM JavaScript Error Listener up and running, with a couple of macros ready to collect data on the uncaught errors.</p>
+
+<p>So first, set up the error listener with a firing rule of your choice. I have it running on all pages, but if you want to monitor just a specific page, feel free to change the rule.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2014/04/error-listener.png" title="JavaScript Error Listener">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2014/04/error-listener.png#ZgotmplZ" alt="JavaScript Error Listener">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>Next, you&rsquo;ll need three macros: one for the error message, one for the faulty URL, and one for the line number where the faulty code was found.</p>
+
+<p>{{Error - MSG}}<br />
+Macro Type: Data Layer Variable<br />
+Data Layer Variable Name: gtm.errorMessage</p>
+
+<p>{{Error - URL}}<br />
+Macro Type: Data Layer Variable<br />
+Data Layer Variable Name: gtm.errorUrl</p>
+
+<p>(<strong>NOTE</strong>: At the time of writing, this macro will return an empty string. However, I&rsquo;m sure it will be fixed soon. Until then, you can use the default {{url}} macro instead.)</p>
+
+<p>{{Error - LINE}}<br />
+Macro Type: Data Layer Variable<br />
+Data Layer Variable Name: gtm.errorLineNumber</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2014/04/error-macros.png" title="Error Listener Macros">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2014/04/error-macros.png#ZgotmplZ" alt="Error Listener Macros">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>And then you&rsquo;re good to go.</p>
+
+<h2 id="send-mail-with-php">Send mail with PHP</h2>
+
+<p>If your site has been built with PHP, you can use the built-in <strong><a href="http://www.w3schools.com/php/php_mail.asp">mail()</a></strong> function to send your emails. (If your site runs on WordPress, you should also take a look at the <a href="http://codex.wordpress.org/Function_Reference/wp_mail">wp_mail()</a> function which is a bit more robust!)</p>
+
+<p>For this method to work, you&rsquo;ll need two things:</p>
+
+<ol>
+<li><p>A Custom HTML Tag in your GTM setup to send the data payload to the PHP script</p></li>
+
+<li><p>A PHP script which processes the data and sends it</p></li>
+</ol>
+
+<p>The Custom HTML Tag below uses <a href="http://www.jquery.com">jQuery</a> to send the POST request, so you&rsquo;ll need to make sure that jQuery is loaded <strong>before</strong> the Custom HTML is run. I&rsquo;m not a huge fan of jQuery or really any JS framework stacked on top of GTM, but for making POST requests using AJAX, it&rsquo;s a huge help.</p>
+
+<p>So anyway, here&rsquo;s what the Custom HTML Tag looks like:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">data</span> <span style="color:#f92672">=</span> {
+    <span style="color:#a6e22e">errorUrl</span><span style="color:#f92672">:</span> {{Error <span style="color:#f92672">-</span> <span style="color:#a6e22e">URL</span>}},
+    <span style="color:#a6e22e">errorLine</span><span style="color:#f92672">:</span> {{Error <span style="color:#f92672">-</span> <span style="color:#a6e22e">LINE</span>}},
+    <span style="color:#a6e22e">errorMsg</span><span style="color:#f92672">:</span> {{Error <span style="color:#f92672">-</span> <span style="color:#a6e22e">MSG</span>}}
+  };
+  <span style="color:#a6e22e">jQuery</span>.<span style="color:#a6e22e">ajax</span>({
+    <span style="color:#a6e22e">type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;POST&#34;</span>,
+    <span style="color:#a6e22e">url</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;/wp-content/uploads/email.php&#34;</span>,
+    <span style="color:#a6e22e">data</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">data</span>
+  });
+&lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
+
+<p>Like I said, it&rsquo;s really bare-bones. You should add some validation code, maybe utilize the <em>success</em>, <em>error</em> and <em>complete</em> callbacks and so forth.</p>
+
+<p>The first bit is about building the payload. I&rsquo;m doing that by creating an object literal, which is populated by the values retrieved by the error macros created earlier. So when an error occurs, the object <strong>data</strong> might have the following key-value pairs:</p>
+
+<p>errorUrl: <code>https://www.simoahava.com/</code><br />
+errorLine: &ldquo;3&rdquo;<br />
+errorMsg: &ldquo;Uncaught ReferenceError: myFunction is not defined&rdquo;</p>
+
+<p>The next bit is about using jQuery&rsquo;s ajax() function to send the data with a POST request to the custom PHP script. You&rsquo;ll need to specify the location of the script for this to work.</p>
+
+<p>I wrote a <em>very</em> simple mail script, which you can find below. Save this as <strong>email.php</strong> and store it in a location you can refer to in the POST request.</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-php" data-lang="php"><span style="color:#75715e">&lt;?php</span>
+<span style="color:#66d9ef">if</span>($_POST){
+  $message <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Uncaught exception on page &#39;</span> <span style="color:#f92672">.</span> $_POST[<span style="color:#e6db74">&#39;errorUrl&#39;</span>] <span style="color:#f92672">.</span> 
+             <span style="color:#e6db74">&#39;, line &#39;</span> <span style="color:#f92672">.</span> $_POST[<span style="color:#e6db74">&#39;errorLine&#39;</span>] <span style="color:#f92672">.</span> 
+             <span style="color:#e6db74">&#39;: &#39;</span> <span style="color:#f92672">.</span> $_POST[<span style="color:#e6db74">&#39;errorMsg&#39;</span>];
+  <span style="color:#a6e22e">mail</span>(<span style="color:#e6db74">&#34;XYZ@XYZ.com&#34;</span>, <span style="color:#e6db74">&#34;[GTM simoahava.com] Uncaught error&#34;</span>, $message);
+}
+<span style="color:#75715e">?&gt;</span></code></pre></div>
+
+<p>Again, very simple. The PHP basically waits for a POST request, after which it populates a variable $message with the payload data. Next, it utilizes the mail() function to send mail to my email with the subject <code>[GTM simoahava.com] Uncaught error</code>, and the error data in the message body.</p>
+
+<p>Ta-da! You&rsquo;ve just created your email alert system using some simple jQuery and PHP. Here&rsquo;s what a sample email looks like:</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2014/04/error-mail.png" title="Error mail">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2014/04/error-mail.png#ZgotmplZ" alt="Error mail">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<h2 id="send-mail-with-the-mandrill-api">Send mail with the Mandrill API</h2>
+
+<p>Mandrill is an online mailing system, which provides a pretty flexible framework for sending mail using their JSON API. I chose it simply because it&rsquo;s free (you have to pay if you send more than 12,000 mails per month using Mandrill), and because it looks pretty simple to set up.</p>
+
+<p>To get things up and running, you&rsquo;ll need two things:</p>
+
+<ol>
+<li><p>Mandrill API key</p></li>
+
+<li><p>A Custom HTML Tag to send the payload data to the API</p></li>
+</ol>
+
+<p>To get the API key, browse to <a href="http://mandrill.com/signup/">http://mandrill.com/signup/</a>, and sign up for access. Once you log in for the first time, you should click on the &ldquo;Get API Keys&rdquo; button.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2014/04/mandrill-get-keys.png" title="Mandrill get API keys">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2014/04/mandrill-get-keys.png#ZgotmplZ" alt="Mandrill get API keys">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>In the next screen, choose the &ldquo;+ New API Key&rdquo; to generate a new API key for you. You should immediately see your newly generated key in the list below.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2014/04/new-api-key.png" title="New API Key">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2014/04/new-api-key.png#ZgotmplZ" alt="New API Key">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>And that&rsquo;s it for setting up your Mandrill account. What you need to do next is create the Custom HTML Tag which negotiates with the Mandrill API to send your mail. Here&rsquo;s what this tag should look like:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">data</span> <span style="color:#f92672">=</span> {
+    <span style="color:#e6db74">&#34;key&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;IVrVuUMfhLFbY97Rjjp1ug&#34;</span>,
+    <span style="color:#e6db74">&#34;message&#34;</span><span style="color:#f92672">:</span> {
+      <span style="color:#e6db74">&#34;text&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Uncaught exception on page &#34;</span> <span style="color:#f92672">+</span> {{Error <span style="color:#f92672">-</span> <span style="color:#a6e22e">URL</span>}} <span style="color:#f92672">+</span>
+            <span style="color:#e6db74">&#34;, line &#34;</span> <span style="color:#f92672">+</span> {{Error <span style="color:#f92672">-</span> <span style="color:#a6e22e">LINE</span>}} <span style="color:#f92672">+</span>
+            <span style="color:#e6db74">&#34;: &#34;</span> <span style="color:#f92672">+</span> {{Error <span style="color:#f92672">-</span> <span style="color:#a6e22e">MSG</span>}},
+      <span style="color:#e6db74">&#34;subject&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;[GTM simoahava.com] Uncaught error&#34;</span>,
+      <span style="color:#e6db74">&#34;from_email&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;simo@simoahava.com&#34;</span><span style="color:#a6e22e">OB</span>,
+      <span style="color:#e6db74">&#34;from_name&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;GTM Simo&#34;</span>,
+      <span style="color:#e6db74">&#34;to&#34;</span><span style="color:#f92672">:</span> [
+        {
+          <span style="color:#e6db74">&#34;email&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;simo@simoahava.com&#34;</span>,
+          <span style="color:#e6db74">&#34;name&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Simo Ahava&#34;</span>,
+          <span style="color:#e6db74">&#34;type&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;to&#34;</span>
+        }
+      ]
+    },
+    <span style="color:#e6db74">&#34;async&#34;</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span>
+  };
+  <span style="color:#a6e22e">jQuery</span>.<span style="color:#a6e22e">ajax</span>({
+    <span style="color:#a6e22e">type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;POST&#34;</span>,
+    <span style="color:#a6e22e">url</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;https://mandrillapp.com/api/1.0/messages/send.json&#34;</span>,
+    <span style="color:#a6e22e">dataType</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;json&#34;</span>,
+    <span style="color:#a6e22e">data</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">data</span>
+  });
+&lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
+
+<p>As you can see, you need to add a bit more information into the payload object to satisfy the <a href="https://mandrillapp.com/api/docs/messages.JSON.html#method=send">requirements of the Mandrill API</a>.</p>
+
+<p>The code itself is pretty similar to when we sent the POST request to the PHP script, with the notable exception of having to declare the dataType parameter explicitly as &ldquo;json&rdquo;.</p>
+
+<p>When the mail is sent successfully, you should again see a pretty hideous email in your inbox. By the way, take a look at Mandrill&rsquo;s reports. You&rsquo;ll see some pretty interesting data on your API use, so if you want to build this into a whole email-system-thing, you can use Mandrill&rsquo;s powerful features to diagnose your mail traffic.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2014/04/mandrill-features.png" title="Mandrill features">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2014/04/mandrill-features.png#ZgotmplZ" alt="Mandrill features">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<h2 id="conclusions">Conclusions</h2>
+
+<p>Sending mail via Google Tag Manager doesn&rsquo;t happen with just a click of a button. Because browser security prevents you from sending email directly with JavaScript (i.e. GTM), you&rsquo;ll need to access either server-side methods or some external API. This post provided very rudimentary examples of both scenarios.</p>
+
+<p>If you want to build on this idea, be sure to make your code as waterproof as possible. Hijacking someone&rsquo;s mail script is a really easy way to cause a lot of damage in the form of spam. Also, I don&rsquo;t like the fact that you have to provide the Mandrill API key &ldquo;in the open&rdquo;, so you might want to look at Mandrill&rsquo;s PHP client as a way to use Mandrill&rsquo;s API to send the mail server-side.</p>
+
+<p>And before you try anything, the API key I created was just for testing purposes, it no longer exists.</p>
+
+<p>Anyway, perhaps at some point GTM will support sending mail via GTM&rsquo;s own protocols, which will make this post nice and obsolete, but until then: have fun!</p>
+
+              
+            </div>
+          </div>
+          <div id="post-footer" class="post-footer main-content-wrap">
+            
+              
+                
+                
+                  <div class="post-footer-tags">
+                    <span class="text-color-light text-small">TAGGED IN</span><br/>
+                    
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/google-tag-manager/">Google Tag Manager</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/guide/">Guide</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/javascript/">JavaScript</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/php/">php</a>
+
+                  </div>
+                
+              
+            
+            
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/simple-split-test-google-tag-manager/">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/google-tag-manager-dom-listener/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/send-mail-upon-google-tag-manager-event/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Send%20Mail%20Upon%20Google%20Tag%20Manager%20Event%20https://www.simoahava.com/analytics/send-mail-upon-google-tag-manager-event/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://www.simoahava.com/analytics/send-mail-upon-google-tag-manager-event/">
+              <i class="fa fa-google-plus"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/send-mail-upon-google-tag-manager-event/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#disqus">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+            
+              
+                <span id="disqus"></span>
+<div id="disqus_thread">
+  <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+
+              
+            
+          </div>
+        </article>
+        <footer id="footer" class="main-content-wrap">
+  <span class="copyrights">
+    &copy; 2018 Simo Ahava. All Rights Reserved
+  </span>
+</footer>
+
+      </div>
+      
+      <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+        
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/simple-split-test-google-tag-manager/">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/google-tag-manager-dom-listener/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/send-mail-upon-google-tag-manager-event/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Send%20Mail%20Upon%20Google%20Tag%20Manager%20Event%20https://www.simoahava.com/analytics/send-mail-upon-google-tag-manager-event/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://www.simoahava.com/analytics/send-mail-upon-google-tag-manager-event/">
+              <i class="fa fa-google-plus"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/send-mail-upon-google-tag-manager-event/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#disqus">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+      </div>
+      
+      <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+  <i id="btn-close-shareoptions" class="fa fa-close"></i>
+  <ul class="share-options">
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=%25!s%28BADINDEX%29">
+          <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https%3A%2F%2Fwww.simoahava.com%2Fanalytics%2Fsend-mail-upon-google-tag-manager-event%2F%20%25!s%28BADINDEX%29%20via%20@SimoAhava">
+          <i class="fa fa-twitter"></i><span>Share on Twitter</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=%25!s%28BADINDEX%29">
+          <i class="fa fa-google-plus"></i><span>Share on Google&#43;</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.linkedin.com/cws/share?url=%25!s%28BADINDEX%29">
+          <i class="fa fa-linkedin"></i><span>Share on LinkedIn</span>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+<div id="share-options-mask" class="share-options-mask"></div>
+    </div>
+    
+    <div id="about">
+  <div id="about-card">
+    <div id="about-btn-close">
+      <i class="fa fa-remove"></i>
+    </div>
+    
+      <img id="about-card-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+    
+    <h4 id="about-card-name">Simo Ahava</h4>
+    
+      <div id="about-card-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</div>
+    
+    
+      <div id="about-card-job">
+        <i class="fa fa-briefcase"></i>
+        <br/>
+        Senior Data Advocate at Reaktor
+      </div>
+    
+    
+      <div id="about-card-location">
+        <i class="fa fa-map-marker"></i>
+        <br/>
+        Finland
+      </div>
+    
+  </div>
+</div>
+
+    
+  
+    
+    <div id="cover" style="background-image:url('https://www.simoahava.com/images/maisema.jpg');"></div>
+  
+
+
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.7/js/jquery.fancybox.min.js" integrity="sha256-GEAnjcTqVP+vBp3SSc8bEDQqvWAZMiHyUSIorrWwH50=" crossorigin="anonymous"></script>
+
+
+<script src="https://www.simoahava.com/js/script.js"></script>
+
+
+
+
+  
+    
+      <script>
+        
+
+
+
+
+
+        (function() {
+          
+          
+          if (window.location.hostname == "localhost") {
+            return;
+          }
+          var d = document, s = d.createElement('script');
+          var disqus_shortname = 'simoahava';
+          s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      </script>
+    
+  
+
+
+
+    
+  </body>
+</html>
+

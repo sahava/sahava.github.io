@@ -1,0 +1,1197 @@
+
+
+  
+    
+  
+
+
+  
+
+
+
+
+
+  
+
+
+  
+
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Hugo 0.31 with theme Tranquilpeak 0.4.3-BETA">
+    <title>Automated Tests For Google Tag Manager&#39;s dataLayer | Simo Ahava's blog</title>
+    
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-PZ7GMV9');</script>
+    
+    <script src="//simoahava.disqus.com/count.js" id="dsq-count-scr" async></script>
+    <meta name="author" content="Simo Ahava">
+    <meta name="keywords" content="">
+
+    <link rel="icon" href="https://www.simoahava.com/images/favicon.ico">
+    
+    <link rel="amphtml" href="https://www.simoahava.com/amp/analytics/automated-tests-for-google-tag-managers-datalayer/">
+    
+    <meta name="description" content="An open-source library to help you write automated functional tests against Google Tag Manager&#39;s dataLayer object.">
+    <meta property="og:description" content="An open-source library to help you write automated functional tests against Google Tag Manager&#39;s dataLayer object.">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="Automated Tests For Google Tag Manager&#39;s dataLayer">
+    <meta property="og:url" content="/analytics/automated-tests-for-google-tag-managers-datalayer/">
+    <meta property="og:site_name" content="Simo Ahava&#39;s blog">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Automated Tests For Google Tag Manager&#39;s dataLayer">
+    <meta name="twitter:description" content="An open-source library to help you write automated functional tests against Google Tag Manager&#39;s dataLayer object.">
+    
+      <meta name="twitter:creator" content="@SimoAhava">
+      
+    
+
+    
+    
+
+    
+      <meta property="og:image" content="https://www.simoahava.com/images/simo.png">
+    
+
+    
+      <meta name="twitter:image" content="https://www.simoahava.com/images/2017/01/dataLayer-undefined.png">  
+      <meta property="og:image" content="https://www.simoahava.com/images/2017/01/dataLayer-undefined.png">
+    
+    
+    
+
+    
+
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/jquery.fancybox.min.css" integrity="sha256-vuXZ9LGmmwtjqFX1F+EKin1ThZMub58gKULUyf0qECk=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/helpers/jquery.fancybox-thumbs.min.css" integrity="sha256-SEa4XYAHihTcEP1f5gARTB2K26Uk8PsndQYHQC1f4jU=" crossorigin="anonymous" />
+    
+    
+    <link rel="stylesheet" href="https://www.simoahava.com/css/style.css" />
+    
+    
+
+    
+      
+    
+    
+  </head>
+
+  <body>
+    <div id="blog">
+      <header id="header" data-behavior="4">
+  <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+  <div class="header-title">
+    <a class="header-title-link" href="https://www.simoahava.com/">Simo Ahava&#39;s blog</a>
+  </div>
+  
+</header>
+
+      <nav id="sidebar" data-behavior="4">
+  <div class="sidebar-container">
+    
+      <div class="sidebar-profile">
+        <a href="https://www.simoahava.com/">
+          <img class="sidebar-profile-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+        </a>
+        <h4 class="sidebar-profile-name">Simo Ahava</h4>
+        
+          <h5 class="sidebar-profile-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</h5>
+        
+      </div>
+    
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+      
+      <span class="sidebar-button-desc">Home</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+      
+      <span class="sidebar-button-desc">Categories</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tags/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Tags</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/gtm-tips/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-magic"></i>
+      
+      <span class="sidebar-button-desc">GTM Tips</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/about-simo-ahava/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+      
+      <span class="sidebar-button-desc">About</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tools/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-wrench"></i>
+      
+      <span class="sidebar-button-desc">Tools</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/blog-statistics/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bar-chart"></i>
+      
+      <span class="sidebar-button-desc">Blog statistics</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://github.com/sahava" target="_blank" rel="noopener">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+      
+      <span class="sidebar-button-desc">GitHub</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/upcoming-talks/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bullhorn"></i>
+      
+      <span class="sidebar-button-desc">Upcoming talks</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
+
+    </ul>
+  </div>
+</nav>
+
+      
+
+      <div id="main" data-behavior="4"
+        class="
+               hasCoverMetaIn
+               ">
+        <article class="post" itemscope itemType="http://schema.org/BlogPosting">
+	  <form id="search" action="/search/">
+  <input name="q" type="text" class="form-control input--xlarge" placeholder="Search blog..." autocomplete="off">
+  </form>
+
+          
+          
+            <div class="post-header main-content-wrap text-left">
+
+  
+
+    <h1 itemprop="headline">
+      Automated Tests For Google Tag Manager&#39;s dataLayer
+    </h1>
+  
+  
+  <div class="postShorten-meta post-meta">
+    
+      <time itemprop="datePublished" datetime="2017-01-24T10:37:43Z">
+        
+  January 24, 2017
+
+      </time>
+    
+      
+  
+  
+    <span>in</span>
+    
+      <a class="category-link" href="https://www.simoahava.com/categories/analytics">Analytics</a>
+    
+  
+
+
+       | <a href="https://www.simoahava.com/analytics/automated-tests-for-google-tag-managers-datalayer/#disqus_thread">Comments</a> <span id="linkedincount"></span>
+  </div>
+
+
+</div>
+
+          
+          <div class="post-content markdown" itemprop="articleBody">
+            <div class="main-content-wrap">
+              
+
+<p>One of the biggest fears I have as a <a href="https://tagmanager.google.com/">Google Tag Manager</a> user is a broken release of the website (or app) on which I have deployed GTM. Far too often, lack of proper communication practices within an organization lead to a release being pushed out without thoroughly testing how this release impacts any existing tracking solutions.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2017/01/dataLayer-undefined.png" title="run automated tests against dataLayer">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2017/01/dataLayer-undefined.png#ZgotmplZ" alt="run automated tests against dataLayer">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>Luckily there are ways to mitigate this. The most significant and impactful precautions you can take are all about <a href="https://www.simoahava.com/analytics/from-project-to-process/">process</a>:</p>
+
+<ul>
+<li><p>Be active in the daily development team work.</p></li>
+
+<li><p>Introduce &ldquo;analytics&rdquo; as an item in the <a href="https://www.agilealliance.org/glossary/definition-of-done/">definition of done</a> of each release.</p></li>
+
+<li><p>Educate the developers on what <a href="https://www.simoahava.com/analytics/data-layer/">Data Layer is</a> and how a proper GTM deployment hinges on a stable Data Layer.</p></li>
+</ul>
+
+<p>In addition to these, there are technical measures you can employ to further eliminate the risk of things breaking down when a new release is pushed into the wild.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2017/01/datalayer-assert-example.png" title="Data Layer assertion">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2017/01/datalayer-assert-example.png#ZgotmplZ" alt="Data Layer assertion">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p><strong>Unit tests</strong> should be used to test the code itself, verifying that a given input always produces an expected output. When testing <code>dataLayer</code>, this is especially important for any objects you write into the page template, as they are mostly code-driven and do not depend on user input.</p>
+
+<p>However, if you only ran unit tests it would be difficult to cover the variety of things that can happen in the web browser. That&rsquo;s where <strong>functional tests</strong> come into play, and those will be the focus of this article.</p>
+
+<p>With functional tests, you are actually running tests on a &ldquo;real&rdquo; implementation of the website. Typically this means having a version of the site running on localhost or a staging environment, and then using a &ldquo;virtual&rdquo; browser, typically deployed via a framework such as <a href="http://www.seleniumhq.org/">Selenium</a>, to perform the actual test steps.</p>
+
+<p>To save you time and trouble, I have written an <strong>open-source</strong>, self-contained functional test suite for Google Tag Manager&rsquo;s <code>dataLayer</code> called, imaginatively, <strong>gtm-datalayer-test</strong>.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2017/01/gtm-datalayer-test.png" title="gtm-datalayer-test repo">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2017/01/gtm-datalayer-test.png#ZgotmplZ" alt="gtm-datalayer-test repo">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p><a href="https://github.com/sahava/gtm-datalayer-test/">Visit the GitHub repo for gtm-datalayer-test</a>.</p>
+
+<p>The rest of this guide covers how the solution works.</p>
+
+<h1 id="table-of-contents">Table of Contents</h1><nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#credit">Credit</a></li>
+<li><a href="#elevator-pitch">Elevator pitch</a></li>
+<li><a href="#1-get-it-up-and-running">1. Get it up and running</a></li>
+<li><a href="#2-technology-stack">2. Technology stack</a></li>
+<li><a href="#3-how-it-works">3. How it works</a>
+<ul>
+<li><a href="#3-1-wdio-configuration-file">3.1. wdio configuration file</a></li>
+<li><a href="#3-2-javascript-test-specification">3.2. JavaScript test specification</a></li>
+<li><a href="#3-3-json-configuration-file">3.3. JSON configuration file</a></li>
+</ul></li>
+<li><a href="#4-json-configuration">4. JSON configuration</a>
+<ul>
+<li><a href="#4-1-generic-datalayer">4.1. Generic dataLayer</a></li>
+<li><a href="#4-2-page-specific-configurations">4.2. Page-specific configurations</a></li>
+</ul></li>
+<li><a href="#5-running-your-tests">5. Running your tests</a></li>
+<li><a href="#6-contribute">6. Contribute</a></li>
+</ul></li>
+</ul>
+</nav>
+
+<h2 id="credit">Credit</h2>
+
+<p>First credit where credit is due. The solution proposed in this article isn&rsquo;t ground-breaking in any way, shape or form. Using JSON to control processes is very common in the development world, and there are many test frameworks that directly support JSON validation for tests.</p>
+
+<p>A direct inspiration to this article is <a href="https://webanalyticsfordevelopers.com/2017/01/03/wanna-test-mac-edition/">Jan Exner</a>&rsquo;s work with a TDD setup for Adobe Analytics and DTM. You should take a look at the <a href="https://github.com/janexner/site-infrastructure-tests">related GitHub repo</a>, where you&rsquo;ll find that it has many similarities to gtm-datalayer-test.</p>
+
+<p>As often happens, <a href="https://www.thyngster.com/">David Vallejo&rsquo;s</a> been an important brainstorming partner for building the test suite. I hope he will be a regular contributor to the project!</p>
+
+<h2 id="elevator-pitch">Elevator pitch</h2>
+
+<p>The elevator pitch for this solution is this:</p>
+
+<blockquote>
+<p>gtm-datalayer-test is a functional testing solution for the global <code>window.dataLayer</code> queue used by Google Tag Manager. Tests are defined, executed, and reported using a special JSON configuration file, which validates against the latest draft of the <a href="http://json-schema.org/">JSON Schema</a> standard. The solution can be used to manually or automatically test if <code>window.dataLayer</code> has an expected structure. This is crucial especially when new releases of the website are pushed live.</p>
+</blockquote>
+
+<h2 id="1-get-it-up-and-running">1. Get it up and running</h2>
+
+<p>First, let&rsquo;s get things up and running. Before you start, you will need the following things:</p>
+
+<ol>
+<li><p>NodeJS and NPM installed (<a href="https://nodejs.org/en/download/">here</a>)</p></li>
+
+<li><p>Latest version of Java (<a href="https://www.java.com/en/download/help/index_installing.xml">here</a>)</p></li>
+</ol>
+
+<p>Once you have these installed, you should be able to run the following commands in your terminal and get a valid result for each:</p>
+
+<ul>
+<li><p><code>java -version</code></p></li>
+
+<li><p><code>npm -v</code></p></li>
+
+<li><p><code>node -v</code></p></li>
+</ul>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2017/01/commands.png" title="Commands to run in terminal">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2017/01/commands.png#ZgotmplZ" alt="Commands to run in terminal">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>Once you&rsquo;ve installed these successfully, you can get <strong>gtm-datalayer-test</strong> up and running by executing the following commands. Run the first command (<code>git clone</code>) in a directory where you want the <strong>gtm-datalayer-test</strong> project directory to be established.</p>
+
+<ol>
+<li><p><code>git clone https://github.com/sahava/gtm-datalayer-test.git</code></p></li>
+
+<li><p><code>cd gtm-datalayer-test</code></p></li>
+
+<li><p><code>npm install</code></p></li>
+
+<li><p><code>npm test</code></p></li>
+</ol>
+
+<p>When running the final command, you should see something like this:</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2017/01/npm-test.png" title="after the npm test command">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2017/01/npm-test.png#ZgotmplZ" alt="after the npm test command">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>With <code>git clone ...</code>, you pulled the source code from <a href="https://github.com/sahava/gtm-datalayer-test/">my GitHub repo</a> into a directory named <strong>gtm-datalayer-test</strong>, which is where you then navigated to in the second step.</p>
+
+<p>Next, by running <code>npm install</code>, <strong>npm</strong> (package manager for Node) runs through all the dependencies listed in the <strong>package.json</strong> file, and installs them locally to the project. This is very important, as without these dependencies the code itself is useless.</p>
+
+<p>Finally, by running <code>npm test</code>, you are executing an <em>npm script</em> specifically written for this project. It first starts a simple web server, after which it runs the automated <code>dataLayer</code> tests against a mock index.html file on that server. Finally, it outputs the results of the test into the console.</p>
+
+<p>The following chapters explore each of these steps in more detail.</p>
+
+<h2 id="2-technology-stack">2. Technology stack</h2>
+
+<p>Node.js and npm give you a wealth of pre-built modules to work with when building your web application. I mean, you <em>could</em> write everything from scratch, but you&rsquo;ll end up spending more time, energy, and hair trying to do the stuff that existing npm packages already perform much more efficiently.</p>
+
+<p>This project uses the following technologies / dependencies / packages:</p>
+
+<ul>
+<li><p><a href="https://nodejs.org/en/">Node.js and npm</a> as the server tech and package manager, respectively.</p></li>
+
+<li><p><a href="https://www.java.com/en/download/help/index_installing.xml">Java</a> to run Selenium.</p></li>
+
+<li><p><a href="https://www.npmjs.com/package/ajv">ajv</a> for validating the custom test JSON Schemas.</p></li>
+
+<li><p><a href="https://www.npmjs.com/package/chai">chai</a> as the test assertion library.</p></li>
+
+<li><p><a href="https://www.npmjs.com/package/chai-json-schema">chai-json-schema</a> to provide custom assertions for JSON Schema validation.</p></li>
+
+<li><p><a href="https://www.npmjs.com/package/chai-subset">chai-subset</a> for performing subset checks against <code>window.dataLayer</code>.</p></li>
+
+<li><p><a href="https://www.npmjs.com/package/http-server">http-server</a> to act as a light-weight HTTP server for testing purposes.</p></li>
+
+<li><p><a href="https://www.npmjs.com/package/wdio">wdio</a> as a test runner, built on webdriverio.</p></li>
+
+<li><p><a href="https://www.npmjs.com/package/wdio-mocha-framework">wdio-mocha-framework</a> to enable Mocha as a test framework.</p></li>
+
+<li><p><a href="https://www.npmjs.com/package/wdio-phantomjs-service">wdio-phantomjs-service</a> for installing and running the PhantomJS headless browser.</p></li>
+
+<li><p><a href="https://www.npmjs.com/package/wdio-selenium-standalone-service">wdio-selenium-standalone-service</a> for installing and running the Selenium framework.</p></li>
+
+<li><p><a href="https://github.com/sahava/wdio-spec-reporter">wdio-spec-reporter</a> (forked from the original) as a custom spec test reporter.</p></li>
+
+<li><p><a href="https://www.npmjs.com/package/webdriverio">webdriverio</a> for running Selenium via Node.js.</p></li>
+</ul>
+
+<p>You don&rsquo;t have to know what these modules do, but by looking at the list, one thing should jump out: I&rsquo;m gunning for a self-contained solution here. I&rsquo;m sacrificing customization for ease of use, but even in doing so the modularity of <strong>gtm-datalayer-test</strong> hasn&rsquo;t been compromised. All the packages above contribute to the framework I have built, but nothing&rsquo;s stopping you from extracting just some components and integrating them into your own test suite. In fact, I strongly recommend you do so if you already have a functional testing framework set up!</p>
+
+<p>As you might have gathered, the whole thing runs on JavaScript. There&rsquo;s not much you need to customize, but if you do wish to get your hands dirty, some knowledge of JavaScript, especially <a href="http://es6-features.org/#Constants">ECMAScript 6</a> and <a href="https://nodejs.org/en/">Node.js</a>, is required.</p>
+
+<h2 id="3-how-it-works">3. How it works</h2>
+
+<p>Each test setup comprises some moving parts. There&rsquo;s the <strong>wdio configuration file</strong> you feed to <strong>wdio</strong>, there&rsquo;s the <strong>JavaScript test spec</strong> itself, and then there&rsquo;s a <strong>configuration JSON</strong> you use to define your expectations for each test.</p>
+
+<h3 id="3-1-wdio-configuration-file">3.1. wdio configuration file</h3>
+
+<p>This solution uses <a href="http://webdriver.io/">WebdriverIO</a> to manage much of the legwork. WebdriverIO offers a bunch of <em>bindings</em> we can use together with the virtual browsers operated by Selenium. Together with Selenium, WebdriverIO gives us all the tools we need to define, execute, and report on tests we want to run on any given application or web property.</p>
+
+<p>To make running WebdriverIO as smooth as possible, we use a module called <strong>wdio</strong> to run the tests. The great thing about <strong>wdio</strong> is that it&rsquo;s very extendable, and there are already lots of great modules and plugins we can use with it to make our setup purr.</p>
+
+<p>The <strong>wdio configuration JavaScript</strong> is basically what runs this whole show. The JavaScript exports a <code>config</code> object, which holds all the settings you want to define for the test. This includes what browser drivers you want to use, in which directories to look for spec files, what test runner to use, etc.</p>
+
+<p>You can find the example configuration, used when running <code>npm test</code>, in the <strong>./examples</strong> directory, with the name <strong>examples.conf.js</strong>. Here&rsquo;s what it looks like:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">enhancedEcommerceSchema</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;../lib/enhancedEcommerceSchema.json&#39;</span>)
+<span style="color:#a6e22e">exports</span>.<span style="color:#a6e22e">config</span> <span style="color:#f92672">=</span> {
+    <span style="color:#a6e22e">specs</span><span style="color:#f92672">:</span> [
+        <span style="color:#e6db74">&#39;./examples/spec/basic_example.js&#39;</span>
+    ],
+    <span style="color:#a6e22e">maxInstances</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">10</span>,
+    <span style="color:#a6e22e">capabilities</span><span style="color:#f92672">:</span> [{
+        <span style="color:#a6e22e">maxInstances</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">5</span>,
+        <span style="color:#a6e22e">browserName</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;phantomjs&#39;</span>,
+        <span style="color:#e6db74">&#39;phantomjs.binary.path&#39;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;./node_modules/phantomjs-prebuilt/bin/phantomjs&#39;</span>
+    }],
+    <span style="color:#a6e22e">sync</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span>,
+    <span style="color:#a6e22e">logLevel</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;silent&#39;</span>,
+    <span style="color:#a6e22e">coloredLogs</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span>,
+    <span style="color:#a6e22e">bail</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">0</span>,
+    <span style="color:#a6e22e">waitforTimeout</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">10000</span>,
+    <span style="color:#a6e22e">connectionRetryTimeout</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">90000</span>,
+    <span style="color:#a6e22e">connectionRetryCount</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">3</span>,
+    <span style="color:#a6e22e">services</span><span style="color:#f92672">:</span> [<span style="color:#e6db74">&#39;selenium-standalone&#39;</span>],
+    <span style="color:#a6e22e">seleniumInstallArgs</span><span style="color:#f92672">:</span> {
+        <span style="color:#a6e22e">version</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;3.0.1&#39;</span>
+    },
+    <span style="color:#a6e22e">seleniumArgs</span><span style="color:#f92672">:</span> {
+        <span style="color:#a6e22e">version</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;3.0.1&#39;</span>
+    },
+    <span style="color:#a6e22e">framework</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;mocha&#39;</span>,
+    <span style="color:#a6e22e">reporters</span><span style="color:#f92672">:</span> [<span style="color:#e6db74">&#39;spec&#39;</span>],
+    <span style="color:#a6e22e">mochaOpts</span><span style="color:#f92672">:</span> {
+        <span style="color:#a6e22e">ui</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;bdd&#39;</span>
+    },
+    <span style="color:#a6e22e">before</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">function</span>() {
+        <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">chai</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;chai&#39;</span>);
+        <span style="color:#a6e22e">chai</span>.<span style="color:#a6e22e">use</span>(<span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;chai-json-schema&#39;</span>))
+        <span style="color:#a6e22e">chai</span>.<span style="color:#a6e22e">use</span>(<span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;chai-subset&#39;</span>))
+        <span style="color:#a6e22e">chai</span>.<span style="color:#a6e22e">tv4</span>.<span style="color:#a6e22e">addSchema</span>(<span style="color:#e6db74">&#39;/enhancedEcommerceSchema.json&#39;</span>, <span style="color:#a6e22e">enhancedEcommerceSchema</span>)
+        <span style="color:#a6e22e">global</span>.<span style="color:#a6e22e">expect</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">chai</span>.<span style="color:#a6e22e">expect</span>
+        <span style="color:#a6e22e">global</span>.<span style="color:#a6e22e">assert</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">chai</span>.<span style="color:#a6e22e">assert</span>
+    }
+}</code></pre></div>
+
+<p>First, be sure to check <a href="http://webdriver.io/guide/testrunner/configurationfile.html">here</a> for the full range of options you can set in the configuration file. It&rsquo;s a good idea to familiarize yourself with the available options, since you&rsquo;ll definitely need to modify some of them when extending these examples to your actual use cases.</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">enhancedEcommerceSchema</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;../lib/enhancedEcommerceSchema.json&#39;</span>)</code></pre></div>
+
+<p>This command loads a custom <a href="https://developers.google.com/tag-manager/enhanced-ecommerce">Enhanced Ecommerce</a> JSON Schema which you can refer to when you want to test if your <code>dataLayer</code> has valid Enhanced Ecommerce objects within. There&rsquo;s more on this in a later chapter.</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">specs</span><span style="color:#f92672">:</span> [
+    <span style="color:#e6db74">&#39;./examples/spec/basic_example.js&#39;</span>
+]</code></pre></div>
+
+<p>Use the <code>specs</code> keyword to list the locations with test files you want <strong>wdio</strong> to run through. Whenever you run <strong>wdio</strong> without the <code>--spec</code> command-line parameter, it will run through all the tests listed in this array.</p>
+
+<p>You can use wildcards, too. For example, all my tests are stored in various places within a directory named <strong>/spec/</strong>. To get <strong>wdio</strong> to run through all tests within, regardless of directory or file name, my <code>specs</code> configuration looks like this:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">specs</span><span style="color:#f92672">:</span> [
+    <span style="color:#e6db74">&#39;./spec/**/*.js&#39;</span>
+]</code></pre></div>
+
+<p>This means that in the director /spec/, look through all the files and directories for any items that have the <strong>.js</strong> extension, and use them as test specifications.</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">capabilities</span><span style="color:#f92672">:</span> [{
+    <span style="color:#a6e22e">browserName</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;phantomjs&#39;</span>
+},{
+    <span style="color:#a6e22e">browserName</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;chrome&#39;</span>
+}]</code></pre></div>
+
+<p>This is where you define the browser instances you want to fire with each test. Basically, any browser you list here will be launched when the test runner starts, and the tests will be run through each respective browser. Chrome, Firefox and PhantomJS have support out of the box in gtm-datalayer-test.</p>
+
+<p>By the way, <strong>PhantomJS</strong> is a very popular <em>headless browser</em>. Basically, it&rsquo;s a browser without a graphical user interface. It&rsquo;s thus a very lightweight, quick solution for running your tests on. However, with every major release you should probably run the tests through &ldquo;real&rdquo; browsers, too.</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">framework</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;mocha&#39;</span>,
+<span style="color:#a6e22e">reporters</span><span style="color:#f92672">:</span> [<span style="color:#e6db74">&#39;spec&#39;</span>]</code></pre></div>
+
+<p>Here you define that you want to use <strong>Mocha</strong> as the test framework, and <strong>spec</strong> as the reporter. With <strong>wdio</strong>, you can also use <strong>Jasmine</strong> or <strong>Cucumber</strong> instead of Mocha. You also have a bunch of reporters to choose from, or you can build your own (quite simple, actually). For more details, see here for <a href="http://webdriver.io/guide/testrunner/frameworks.html">test frameworks</a> and here for <a href="http://webdriver.io/guide/reporters/spec.html">reporters</a>.</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">before</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">function</span>() {
+    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">chai</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;chai&#39;</span>);
+    <span style="color:#a6e22e">chai</span>.<span style="color:#a6e22e">use</span>(<span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;chai-json-schema&#39;</span>))
+    <span style="color:#a6e22e">chai</span>.<span style="color:#a6e22e">use</span>(<span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;chai-subset&#39;</span>))
+    <span style="color:#a6e22e">chai</span>.<span style="color:#a6e22e">tv4</span>.<span style="color:#a6e22e">addSchema</span>(<span style="color:#e6db74">&#39;/enhancedEcommerceSchema.json&#39;</span>, <span style="color:#a6e22e">enhancedEcommerceSchema</span>)
+    <span style="color:#a6e22e">global</span>.<span style="color:#a6e22e">expect</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">chai</span>.<span style="color:#a6e22e">expect</span>
+    <span style="color:#a6e22e">global</span>.<span style="color:#a6e22e">assert</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">chai</span>.<span style="color:#a6e22e">assert</span>
+}</code></pre></div>
+
+<p>The <code>before</code> hook is executed before any test specs are run. In this hook, I basically tell <strong>wdio</strong> to use <strong>Chai</strong> as the <em>assertion</em> library of choice. <a href="http://chaijs.com/">Chai</a> is a very popular assertion library, and it&rsquo;s often used together with Mocha to provide a more expressive language for describing your tests. You can use any assertion library you want, or you can use the <a href="https://nodejs.org/api/assert.html">default Node.js assertion library</a>, if you wish.</p>
+
+<p>Again, remember to read through the <a href="http://webdriver.io/guide/testrunner/gettingstarted.html"><strong>wdio</strong> documentation</a>. It&rsquo;s very important to understand what you can customize and how. I hope to add more examples to the GitHub repo in the future, but I still recommend you take a look at the documentation.</p>
+
+<h3 id="3-2-javascript-test-specification">3.2. JavaScript test specification</h3>
+
+<p>Because this is a self-contained solution (or so I hope), you don&rsquo;t really need to touch the JavaScript test spec at all. The whole thing is orchestrated with the <strong>wdio</strong> configuration file and the JSON configuration file.</p>
+
+<p>Each JavaScript test specification executes its respective configuration JSON, running a bunch of tests against the <code>window.dataLayer</code> object on any page it visits.</p>
+
+<p>If you want to run multiple specifications, you will need to copy both the test specification JavaScript (e.g. <strong>basic_example.js</strong>) as well as the configuration JSON (e.g. <strong>basic_example.conf.json</strong>) to the spec directory. You can also have all your spec files in a single directory, if you wish. The <strong>wdio</strong> configuration file simply looks through the <strong>/examples/spec</strong> directory for any JavaScript test files.</p>
+
+<p>I&rsquo;m not going to walk you through the entire file, but there are some things you should know about.</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#75715e">// Set the file in require() to point to this test&#39;s configuration JSON
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">dataLayerConf</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;./basic_example.conf.json&#39;</span>)</code></pre></div>
+
+<p>If you create a new test specification, the JSON file name you point to in the <code>require()</code> method should refer to the configuration JSON you&rsquo;ve created for this test.</p>
+
+<p>The test specification runs through two main suites of tests:</p>
+
+<ol>
+<li><p>&ldquo;Generic&rdquo; tests for <code>window.dataLayer</code>, where certain keys should be found on every page the test visits.</p></li>
+
+<li><p>&ldquo;Page-specific&rdquo; configurations, where you test <code>window.dataLayer</code> on each given page for page-specific key-value pairs.</p></li>
+</ol>
+
+<p>All the reports are generated automatically based on certain values in the configuration JSON. Before the test runs, however, the configuration JSON itself is validated against what I&rsquo;ve defined as a valid JSON Schema for this particular project (you can find this in <strong>/lib/validTestConfSchema.json</strong>). If anything is missing or incorrectly encoded, the test reporter will stop with an error.</p>
+
+<h3 id="3-3-json-configuration-file">3.3. JSON configuration file</h3>
+
+<p>The JSON configuration is what the whole test hinges on. All the parameters you provide govern not only which pages the test loads in the virtual browser, but also what you expect to find in <code>window.dataLayer</code> on any given page.</p>
+
+<p>This is what a fully loaded JSON configuration might look like:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">{
+    <span style="color:#e6db74">&#34;baseUrl&#34;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;https://www.simoahava.com&#34;</span>,
+    <span style="color:#e6db74">&#34;dataLayerName&#34;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;dataLayer&#34;</span>,
+    <span style="color:#e6db74">&#34;multipleContainers&#34;</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span>,
+    <span style="color:#e6db74">&#34;dataLayer&#34;</span> <span style="color:#f92672">:</span> [{
+        <span style="color:#e6db74">&#34;@json&#34;</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">false</span>,
+        <span style="color:#e6db74">&#34;visitorLoginState&#34;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;logged-out&#34;</span>
+    },{
+        <span style="color:#e6db74">&#34;event&#34;</span> <span style="color:#f92672">:</span> {
+            <span style="color:#e6db74">&#34;pattern&#34;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;^gtm.dom$&#34;</span>
+        }
+    },{
+        <span style="color:#e6db74">&#34;event&#34;</span> <span style="color:#f92672">:</span> {
+            <span style="color:#e6db74">&#34;pattern&#34;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;^gtm.load$&#34;</span>
+        }
+    }],
+    <span style="color:#e6db74">&#34;page&#34;</span> <span style="color:#f92672">:</span> [{
+        <span style="color:#e6db74">&#34;path&#34;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;/gtm-tips/10-useful-css-selectors/&#34;</span>,
+        <span style="color:#e6db74">&#34;dataLayer&#34;</span> <span style="color:#f92672">:</span> [{
+            <span style="color:#e6db74">&#34;@expect&#34;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;dataLayer to have basic article variables&#34;</span>,
+            <span style="color:#e6db74">&#34;pageAttributes&#34;</span> <span style="color:#f92672">:</span> {
+                <span style="color:#e6db74">&#34;enum&#34;</span> <span style="color:#f92672">:</span> [[<span style="color:#e6db74">&#34;css-selectors&#34;</span>, <span style="color:#e6db74">&#34;google-tag-manager&#34;</span>, <span style="color:#e6db74">&#34;gtmtips&#34;</span>]]
+            },
+            <span style="color:#e6db74">&#34;pageCategory&#34;</span> <span style="color:#f92672">:</span> {
+                <span style="color:#e6db74">&#34;enum&#34;</span><span style="color:#f92672">:</span> [[<span style="color:#e6db74">&#34;gtm-tips&#34;</span>]]
+            },
+            <span style="color:#e6db74">&#34;pagePostType&#34;</span> <span style="color:#f92672">:</span> {
+                <span style="color:#e6db74">&#34;pattern&#34;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;^post$&#34;</span>
+            },
+            <span style="color:#e6db74">&#34;pagePostType2&#34;</span> <span style="color:#f92672">:</span> {
+                <span style="color:#e6db74">&#34;pattern&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;^single-post$&#34;</span>
+            },
+            <span style="color:#e6db74">&#34;postCountOnPage&#34;</span> <span style="color:#f92672">:</span> {
+                <span style="color:#e6db74">&#34;type&#34;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;number&#34;</span>
+            },
+            <span style="color:#e6db74">&#34;postCountTotal&#34;</span> <span style="color:#f92672">:</span> {
+                <span style="color:#e6db74">&#34;type&#34;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;number&#34;</span>
+            }
+        },{
+            <span style="color:#e6db74">&#34;@expect&#34;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;dataLayer to have article impressions&#34;</span>,
+            <span style="color:#e6db74">&#34;event&#34;</span> <span style="color:#f92672">:</span> {
+                <span style="color:#e6db74">&#34;pattern&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;^impressionsPushed$&#34;</span>
+            },
+            <span style="color:#e6db74">&#34;ecommerce&#34;</span> <span style="color:#f92672">:</span> {
+                <span style="color:#e6db74">&#34;type&#34;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;object&#34;</span>,
+                <span style="color:#e6db74">&#34;properties&#34;</span> <span style="color:#f92672">:</span> {
+                    <span style="color:#e6db74">&#34;impressions&#34;</span><span style="color:#f92672">:</span> {
+                        <span style="color:#e6db74">&#34;$ref&#34;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;/enhancedEcommerceSchema.json#/definitions/impressions&#34;</span>
+                    }
+                },
+                <span style="color:#e6db74">&#34;required&#34;</span> <span style="color:#f92672">:</span> [<span style="color:#e6db74">&#34;impressions&#34;</span>]
+            }
+        },{
+            <span style="color:#e6db74">&#34;@expect&#34;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;dataLayer to have clientId&#34;</span>,
+            <span style="color:#e6db74">&#34;event&#34;</span> <span style="color:#f92672">:</span> {
+                <span style="color:#e6db74">&#34;pattern&#34;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;^trackerReady$&#34;</span>
+            },
+            <span style="color:#e6db74">&#34;cid&#34;</span> <span style="color:#f92672">:</span> {
+                <span style="color:#e6db74">&#34;type&#34;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;string&#34;</span>,
+                <span style="color:#e6db74">&#34;pattern&#34;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;[0-9]+\\.[0-9]+&#34;</span>
+            }
+        },{
+            <span style="color:#e6db74">&#34;@expect&#34;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;dataLayer to have product detail view&#34;</span>,
+            <span style="color:#e6db74">&#34;ecommerce&#34;</span> <span style="color:#f92672">:</span> {
+                <span style="color:#e6db74">&#34;type&#34;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;object&#34;</span>,
+                <span style="color:#e6db74">&#34;properties&#34;</span> <span style="color:#f92672">:</span> {
+                    <span style="color:#e6db74">&#34;detail&#34;</span> <span style="color:#f92672">:</span> {
+                        <span style="color:#e6db74">&#34;$ref&#34;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;/enhancedEcommerceSchema.json#/definitions/detail&#34;</span>
+                    }
+                },
+                <span style="color:#e6db74">&#34;required&#34;</span> <span style="color:#f92672">:</span> [<span style="color:#e6db74">&#34;detail&#34;</span>]
+            }
+        }]
+    }]
+}</code></pre></div>
+
+<p>Here are the main keys you can work with:</p>
+
+<ul>
+<li><p><strong>baseUrl</strong> (required) - a string containing the full protocol, domain, and port of the site where all the tests are run in this specification. Note! Leave the trailing slash out (<code>https://www.simoahava.com</code>, NOT <code>https://www.simoahava.com/</code>).</p></li>
+
+<li><p><strong>dataLayerName</strong> - if you&rsquo;re using some other name for the global <code>dataLayer</code> object than &ldquo;dataLayer&rdquo;, remember to specify it here. You can leave this out otherwise (the test defaults to <code>dataLayer</code>).</p></li>
+
+<li><p><strong>multipleContainers</strong> - set this to <code>true</code> if you have multiple containers on the page. Otherwise leave this out.</p></li>
+</ul>
+
+<p>In addition to this, there&rsquo;s <strong>dataLayer</strong>, which is an array of objects you expect to find on every single page the test visits (generic configuration).</p>
+
+<p>There&rsquo;s also <strong>page</strong>, which is where you specify each page you want the test to visit, with any page-specific dataLayer configurations defined within.</p>
+
+<p>There&rsquo;s more on the configuration file in the following chapter.</p>
+
+<h2 id="4-json-configuration">4. JSON configuration</h2>
+
+<p>Picking up where we left off in the previous chapter, let&rsquo;s focus on the two important configuration arrays we haven&rsquo;t covered yet: <code>dataLayer[]</code> and <code>page[]</code>.</p>
+
+<h3 id="4-1-generic-datalayer">4.1. Generic dataLayer</h3>
+
+<p>The <strong>dataLayer</strong> key in the root of the JSON configuration is where you list objects you expect to find on every single page the test visits. These are so called &ldquo;generic&rdquo; keys. So, let&rsquo;s say you expect to find an object that contains the key-value pair <code>&quot;event&quot; : &quot;gtm.dom&quot;</code>, as well as an optional object where they key is <code>&quot;visitorLoginState&quot;</code> whose value is any string, this is what the generic object might look like:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">{
+    <span style="color:#960050;background-color:#1e0010">...</span>
+    <span style="color:#960050;background-color:#1e0010">dataLayer</span> <span style="color:#960050;background-color:#1e0010">:</span> <span style="color:#960050;background-color:#1e0010">[{</span>
+        <span style="color:#f92672">&#34;@json&#34;</span> : <span style="color:#66d9ef">false</span>,
+        <span style="color:#f92672">&#34;event&#34;</span> : <span style="color:#e6db74">&#34;gtm.dom&#34;</span>
+    }<span style="color:#960050;background-color:#1e0010">,</span>{
+        <span style="color:#f92672">&#34;visitorLoginState&#34;</span> : {
+            <span style="color:#f92672">&#34;@rootRequired&#34;</span> : <span style="color:#66d9ef">false</span>,
+            <span style="color:#f92672">&#34;type&#34;</span> : <span style="color:#e6db74">&#34;string&#34;</span>
+        }
+    }<span style="color:#960050;background-color:#1e0010">]</span>
+    <span style="color:#960050;background-color:#1e0010">...</span>
+<span style="color:#960050;background-color:#1e0010">}</span></code></pre></div>
+
+<p>Let&rsquo;s see what these keys mean.</p>
+
+<p><strong>@json</strong> is a special configuration that can only have the <code>false</code> value. Any other value and the schema will not validate. If a <strong>dataLayer</strong> object has this key in the configuration, it means that any key-value pairs within that object will be looked for <em>verbatim</em> within the global <code>window.dataLayer</code> object. In other words, if <code>window.dataLayer</code> doesn&rsquo;t have at least one object with the <strong>exact</strong> key-value pair <code>&quot;event&quot; : &quot;gtm.dom&quot;</code>, the test will fail.</p>
+
+<p>You can thus use the <code>&quot;@json&quot; : false</code> setting to run simple <strong>subset checks</strong>. You can define complex objects, arrays, or any available data types, but they need to be found in that exact format within <code>window.dataLayer</code>. This <strong>subset check</strong> is a great way to test key-value pairs which you expect to be immutable across releases.</p>
+
+<p>If you <em>don&rsquo;t</em> provide the <strong>@json</strong> key, the test will be validated against <a href="http://json-schema.org/">JSON Schema</a> logic. JSON Schema is a (draft) standard used to describe JSON documents. The <code>window.dataLayer</code> object can be stringified into an imperfect JSON representation, though it&rsquo;s typically good enough to run JSON validation tests against.</p>
+
+<p>JSON Schema gives you a lot of tools to work with when describing the complexity of <code>window.dataLayer</code>. You can create tests where you expect keys to have a certain range of values, a certain data type, optional or required parameters, et cetera.</p>
+
+<p>In the example above, <code>&quot;visitorLoginState&quot;</code> is simply defined as an optional string. You don&rsquo;t require <code>window.dataLayer</code> to have it, but if it is found, you expect it to be a string. Thus the test would fail if <code>window.dataLayer</code> had an object with <code>&quot;visitorLoginState&quot; : false</code>.</p>
+
+<p>The special <strong>@rootRequired</strong> key is used only for keys in the root of the <strong>dataLayer</strong> object. If you add this key with value <code>false</code>, it means that the parameter it&rsquo;s attached to is <strong>optional</strong>. You don&rsquo;t require <code>window.dataLayer</code> to have that key in the root of any object. The default is that each key you define in the root of the <strong>dataLayer</strong> object is required, so using <code>&quot;@rootRequired&quot; : false</code> is the only way to impact this. For keys deeper in the structure you can use regular JSON Schema syntax (e.g. <code>&quot;required&quot; : [&quot;someProperty&quot;, &quot;someOtherProperty&quot;]</code>).</p>
+
+<h3 id="4-2-page-specific-configurations">4.2. Page-specific configurations</h3>
+
+<p>The page-specific configurations contain one extra configuration level, after which you define their own <strong>dataLayer</strong> objects using the methods you read about in the previous chapter.</p>
+
+<p>The first page-specific key you need to define is <strong>path</strong>. This should be in the root of each object in the <strong>page</strong> array. The value should be a proper URL path, starting with &ldquo;/&rdquo;. For example, to visit three different pages in the test, you would configure the <strong>page</strong> object like this:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">{
+    <span style="color:#960050;background-color:#1e0010">...</span>
+    <span style="color:#f92672">&#34;dataLayer&#34;</span> : [{
+        <span style="color:#960050;background-color:#1e0010">....</span>
+    }],
+    <span style="color:#f92672">&#34;page&#34;</span> : [{
+        <span style="color:#f92672">&#34;path&#34;</span> : <span style="color:#e6db74">&#34;/first-page-to-test/&#34;</span>,
+        <span style="color:#f92672">&#34;dataLayer&#34;</span> : [{
+            <span style="color:#960050;background-color:#1e0010">...</span>
+        }]
+    },{
+        <span style="color:#f92672">&#34;path&#34;</span> : <span style="color:#e6db74">&#34;/second-page-to-test/&#34;</span>,
+        <span style="color:#f92672">&#34;dataLayer&#34;</span> : [{
+            <span style="color:#960050;background-color:#1e0010">...</span>
+        }]
+    },{
+        <span style="color:#f92672">&#34;path&#34;</span> : <span style="color:#e6db74">&#34;/third-page-to-test/&#34;</span>,
+        <span style="color:#f92672">&#34;dataLayer&#34;</span> : [{
+            <span style="color:#960050;background-color:#1e0010">...</span>
+        }]
+    }
+<span style="color:#960050;background-color:#1e0010">}</span></code></pre></div>
+
+<p>For each given <strong>page</strong> object, you can define the <strong>dataLayer</strong> composition you expect to find on that particular page. The configuration of each <strong>dataLayer</strong> object is exactly the same as explored in the previous chapter with one important addition.</p>
+
+<p>In the root of each <strong>dataLayer</strong> object, you need to define the key <strong>@expect</strong> with a textual description of this test. In other words, use this key to describe <em>why</em> you are expecting this particular <strong>dataLayer</strong> object to be found in the global <code>window.dataLayer</code>.</p>
+
+<p>Whatever you type in this string will be prefixed with the verb &ldquo;expect&rdquo;, so you can thus use a partial sentence. This is what your configuration might look like:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">{
+    <span style="color:#960050;background-color:#1e0010">...</span>
+    <span style="color:#f92672">&#34;dataLayer&#34;</span> : [{
+        <span style="color:#960050;background-color:#1e0010">....</span>
+    }],
+    <span style="color:#f92672">&#34;page&#34;</span> : [{
+        <span style="color:#f92672">&#34;path&#34;</span> : <span style="color:#e6db74">&#34;/first-page-to-test/&#34;</span>,
+        <span style="color:#f92672">&#34;dataLayer&#34;</span> : [{
+            <span style="color:#f92672">&#34;@expect&#34;</span> : <span style="color:#e6db74">&#34;dataLayer to have the userState key&#34;</span>,
+            <span style="color:#f92672">&#34;userState&#34;</span> : {
+                <span style="color:#f92672">&#34;type&#34;</span> : <span style="color:#e6db74">&#34;string&#34;</span>
+            }
+        }]
+    },{
+        <span style="color:#f92672">&#34;path&#34;</span> : <span style="color:#e6db74">&#34;/second-page-to-test/&#34;</span>,
+        <span style="color:#f92672">&#34;dataLayer&#34;</span> : [{
+            <span style="color:#f92672">&#34;@expect&#34;</span> : <span style="color:#e6db74">&#34;dataLayer to optionally contain userCount&#34;</span>,
+            <span style="color:#f92672">&#34;userCount&#34;</span> : {
+                <span style="color:#f92672">&#34;type&#34;</span> : <span style="color:#e6db74">&#34;number&#34;</span>,
+                <span style="color:#f92672">&#34;@rootRequired&#34;</span> : <span style="color:#66d9ef">false</span>
+            }
+        }]
+    },{
+        <span style="color:#f92672">&#34;path&#34;</span> : <span style="color:#e6db74">&#34;/third-page-to-test/&#34;</span>,
+        <span style="color:#f92672">&#34;dataLayer&#34;</span> : [{
+            <span style="color:#f92672">&#34;@expect&#34;</span> : <span style="color:#e6db74">&#34;dataLayer to have the Enhanced Ecommerce detail object&#34;</span>,
+            <span style="color:#f92672">&#34;ecommerce&#34;</span> : {
+                <span style="color:#f92672">&#34;type&#34;</span> : <span style="color:#e6db74">&#34;object&#34;</span>,
+                <span style="color:#f92672">&#34;properties&#34;</span> : {
+                    <span style="color:#f92672">&#34;detail&#34;</span> : {
+                        <span style="color:#f92672">&#34;$ref&#34;</span> : <span style="color:#e6db74">&#34;/enhancedEcommerceSchema.json#/definitions/detail&#34;</span>
+                    }
+                },
+                <span style="color:#f92672">&#34;required&#34;</span> : [<span style="color:#e6db74">&#34;detail&#34;</span>]
+        }<span style="color:#960050;background-color:#1e0010">]</span>
+    }
+<span style="color:#960050;background-color:#1e0010">}</span></code></pre></div>
+
+<p>See the last object? Interesting, eh? First, you expect the global <code>window.dataLayer</code> structure to contain an object named <strong>ecommerce</strong> with one required property: <strong>detail</strong>. Next, you&rsquo;re using the <strong>$ref</strong> JSON Schema keyword to link to an external definition. In fact, in the directory <strong>/lib/</strong> you can find the schema named <strong>enhancedEcommerceSchema.json</strong>, which I created to make it easier to describe a valid Enhanced Ecommerce object.</p>
+
+<p>You can link to the definitions within from your test configuration JSON files. Hopefully we&rsquo;ll have more schemas for other complex objects soon, and nothing&rsquo;s stopping you from creating and linking your own custom JSON for schemas you expect to use over and over again!</p>
+
+<h2 id="5-running-your-tests">5. Running your tests</h2>
+
+<p>If you&rsquo;ve been modifying the <strong>basic_example.conf.json</strong>, you can use the predefined npm script <code>npm test</code> to run your setup. When you execute that command, the following things happen:</p>
+
+<ol>
+<li><p>The script fires up an <strong>http-server</strong> instance on <a href="http://localhost:8080">http://localhost:8080</a>, which loads the <strong>index.html</strong> file from ./examples/.</p></li>
+
+<li><p>The script runs <code>./node_modules/.bin/wdio ./examples/examples.conf.js</code></p></li>
+
+<li><p>The test runner automatically starts an instance of the Selenium server, which then proceeds to fire up a <strong>phantomjs</strong> browser driver.</p></li>
+
+<li><p>The test runner starts reading your <strong>basic_example.js</strong> test specification, and opens the test browser on URL <a href="http://localhost:8080/index.html">http://localhost:8080/index.html</a>.</p></li>
+
+<li><p>The test runner proceeds to run through all the tests on this URL, keeping tabs on which tests passed and which failed.</p></li>
+
+<li><p>The test runner then reports the results of the test, using green checkmarks for passed tests and red numbers for failed tests.</p></li>
+
+<li><p>If any tests failed, they are reported as AssertionErrors with each error associated with its respective test number.</p></li>
+
+<li><p>Finally, <strong>wdio</strong> automatically shuts down the Selenium instance, and <strong>http-server</strong> is killed, too.</p></li>
+</ol>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2017/01/failed-npm-test.png" title="Failed npm-test">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2017/01/failed-npm-test.png#ZgotmplZ" alt="Failed npm-test">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>Once you&rsquo;ve graduated beyond the <strong>basic_example.js</strong> file, you might want to create your own tests, store them in their own folders, and create new <strong>wdio</strong> configuration files for each.</p>
+
+<p>The command for running <strong>wdio</strong> against your own <strong>wdio configuration files</strong> is this (executed in the root of your project):</p>
+
+<p><code>./node_modules/.bin/wdio &lt;wdio configuration file&gt;</code></p>
+
+<p>This runs the <strong>wdio</strong> executable against your configuration file, which in turn passes each specification defined in the configuration for the test runner. The test runner, then, starts the browser instances you have selected, running the tests, and channeling the output to the test reporter.</p>
+
+<p>You might want to start using a task / workflow runner such as <a href="http://gruntjs.com/">Grunt</a> or <a href="http://gulpjs.com/">Gulp</a> to manage your test suites. It will make it easier to run arbitrary tests, as you can specify things like custom parameters, and you can chain multiple tests together, if you wish.</p>
+
+<h2 id="6-contribute">6. Contribute</h2>
+
+<p>This is an <strong>open-source</strong> project. I don&rsquo;t expect you to contribute, but if you do I am very grateful indeed.</p>
+
+<p>To contribute, head on over to the <a href="https://github.com/sahava/gtm-datalayer-test/">GitHub repo</a>. You can fork the repo, make modifications, and then submit those modifications as Pull Requests. It would be best, however, if you first introduce the thing you want to change as an Issue to make sure we all agree that it&rsquo;s a good feature to focus on.</p>
+
+<p>Alternatively, you can add your ideas, questions, or bugs in the comments below. I&rsquo;m fully aware this isn&rsquo;t a &ldquo;plug-and-play&rdquo; solution for testing GTM, since I never intended it to be one. Thus I expect there to be issues that I haven&rsquo;t considered (I should write tests for this, too!), and I would be very grateful if you&rsquo;d let me know about any trouble you&rsquo;ve come across with this solution.</p>
+
+<p>Finally, the latest version of this solution AND the documentation is only maintained in <a href="https://github.com/sahava/gtm-datalayer-test/">the GitHub repo</a>. It&rsquo;s possible that this article is already outdated as you&rsquo;re reading this, so I hope you head on over to the repo to see the latest changes.</p>
+
+              
+            </div>
+          </div>
+          <div id="post-footer" class="post-footer main-content-wrap">
+            
+              
+                
+                
+                  <div class="post-footer-tags">
+                    <span class="text-color-light text-small">TAGGED IN</span><br/>
+                    
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/google-tag-manager/">Google Tag Manager</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/javascript/">JavaScript</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/testing/">testing</a>
+
+                  </div>
+                
+              
+            
+            
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/capturing-the-correct-element-in-google-tag-manager/">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/gtm-tips/10-useful-custom-javascript-tricks/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/automated-tests-for-google-tag-managers-datalayer/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Automated%20Tests%20For%20Google%20Tag%20Manager%27s%20dataLayer%20https://www.simoahava.com/analytics/automated-tests-for-google-tag-managers-datalayer/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://www.simoahava.com/analytics/automated-tests-for-google-tag-managers-datalayer/">
+              <i class="fa fa-google-plus"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/automated-tests-for-google-tag-managers-datalayer/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#disqus">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+            
+              
+                <span id="disqus"></span>
+<div id="disqus_thread">
+  <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+
+              
+            
+          </div>
+        </article>
+        <footer id="footer" class="main-content-wrap">
+  <span class="copyrights">
+    &copy; 2018 Simo Ahava. All Rights Reserved
+  </span>
+</footer>
+
+      </div>
+      
+      <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+        
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/capturing-the-correct-element-in-google-tag-manager/">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/gtm-tips/10-useful-custom-javascript-tricks/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/automated-tests-for-google-tag-managers-datalayer/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Automated%20Tests%20For%20Google%20Tag%20Manager%27s%20dataLayer%20https://www.simoahava.com/analytics/automated-tests-for-google-tag-managers-datalayer/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://www.simoahava.com/analytics/automated-tests-for-google-tag-managers-datalayer/">
+              <i class="fa fa-google-plus"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/automated-tests-for-google-tag-managers-datalayer/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#disqus">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+      </div>
+      
+      <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+  <i id="btn-close-shareoptions" class="fa fa-close"></i>
+  <ul class="share-options">
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=%25!s%28BADINDEX%29">
+          <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https%3A%2F%2Fwww.simoahava.com%2Fanalytics%2Fautomated-tests-for-google-tag-managers-datalayer%2F%20%25!s%28BADINDEX%29%20via%20@SimoAhava">
+          <i class="fa fa-twitter"></i><span>Share on Twitter</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=%25!s%28BADINDEX%29">
+          <i class="fa fa-google-plus"></i><span>Share on Google&#43;</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.linkedin.com/cws/share?url=%25!s%28BADINDEX%29">
+          <i class="fa fa-linkedin"></i><span>Share on LinkedIn</span>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+<div id="share-options-mask" class="share-options-mask"></div>
+    </div>
+    
+    <div id="about">
+  <div id="about-card">
+    <div id="about-btn-close">
+      <i class="fa fa-remove"></i>
+    </div>
+    
+      <img id="about-card-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+    
+    <h4 id="about-card-name">Simo Ahava</h4>
+    
+      <div id="about-card-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</div>
+    
+    
+      <div id="about-card-job">
+        <i class="fa fa-briefcase"></i>
+        <br/>
+        Senior Data Advocate at Reaktor
+      </div>
+    
+    
+      <div id="about-card-location">
+        <i class="fa fa-map-marker"></i>
+        <br/>
+        Finland
+      </div>
+    
+  </div>
+</div>
+
+    
+  
+    
+    <div id="cover" style="background-image:url('https://www.simoahava.com/images/maisema.jpg');"></div>
+  
+
+
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.7/js/jquery.fancybox.min.js" integrity="sha256-GEAnjcTqVP+vBp3SSc8bEDQqvWAZMiHyUSIorrWwH50=" crossorigin="anonymous"></script>
+
+
+<script src="https://www.simoahava.com/js/script.js"></script>
+
+
+
+
+  
+    
+      <script>
+        
+
+
+
+
+
+        (function() {
+          
+          
+          if (window.location.hostname == "localhost") {
+            return;
+          }
+          var d = document, s = d.createElement('script');
+          var disqus_shortname = 'simoahava';
+          s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      </script>
+    
+  
+
+
+
+    
+  </body>
+</html>
+

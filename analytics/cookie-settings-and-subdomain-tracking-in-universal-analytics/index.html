@@ -1,0 +1,850 @@
+
+
+  
+    
+  
+
+
+  
+
+
+
+
+
+  
+
+
+  
+
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Hugo 0.31 with theme Tranquilpeak 0.4.3-BETA">
+    <title>Cookie Settings And Subdomain Tracking In Universal Analytics | Simo Ahava's blog</title>
+    
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-PZ7GMV9');</script>
+    
+    <script src="//simoahava.disqus.com/count.js" id="dsq-count-scr" async></script>
+    <meta name="author" content="Simo Ahava">
+    <meta name="keywords" content="">
+
+    <link rel="icon" href="https://www.simoahava.com/images/favicon.ico">
+    
+    <link rel="amphtml" href="https://www.simoahava.com/amp/analytics/cookie-settings-and-subdomain-tracking-in-universal-analytics/">
+    
+    <meta name="description" content="How the cookieDomain settings works in your Google Analytics tags, and what happens if you don&#39;t set it.">
+    <meta property="og:description" content="How the cookieDomain settings works in your Google Analytics tags, and what happens if you don&#39;t set it.">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="Cookie Settings And Subdomain Tracking In Universal Analytics">
+    <meta property="og:url" content="/analytics/cookie-settings-and-subdomain-tracking-in-universal-analytics/">
+    <meta property="og:site_name" content="Simo Ahava&#39;s blog">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Cookie Settings And Subdomain Tracking In Universal Analytics">
+    <meta name="twitter:description" content="How the cookieDomain settings works in your Google Analytics tags, and what happens if you don&#39;t set it.">
+    
+      <meta name="twitter:creator" content="@SimoAhava">
+      
+    
+
+    
+    
+
+    
+      <meta property="og:image" content="https://www.simoahava.com/images/simo.png">
+    
+
+    
+      <meta name="twitter:image" content="https://www.simoahava.com/images/2016/01/simo.jpg">  
+      <meta property="og:image" content="https://www.simoahava.com/images/2016/01/simo.jpg">
+    
+    
+    
+
+    
+
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/jquery.fancybox.min.css" integrity="sha256-vuXZ9LGmmwtjqFX1F+EKin1ThZMub58gKULUyf0qECk=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/helpers/jquery.fancybox-thumbs.min.css" integrity="sha256-SEa4XYAHihTcEP1f5gARTB2K26Uk8PsndQYHQC1f4jU=" crossorigin="anonymous" />
+    
+    
+    <link rel="stylesheet" href="https://www.simoahava.com/css/style.css" />
+    
+    
+
+    
+      
+    
+    
+  </head>
+
+  <body>
+    <div id="blog">
+      <header id="header" data-behavior="4">
+  <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+  <div class="header-title">
+    <a class="header-title-link" href="https://www.simoahava.com/">Simo Ahava&#39;s blog</a>
+  </div>
+  
+</header>
+
+      <nav id="sidebar" data-behavior="4">
+  <div class="sidebar-container">
+    
+      <div class="sidebar-profile">
+        <a href="https://www.simoahava.com/">
+          <img class="sidebar-profile-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+        </a>
+        <h4 class="sidebar-profile-name">Simo Ahava</h4>
+        
+          <h5 class="sidebar-profile-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</h5>
+        
+      </div>
+    
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+      
+      <span class="sidebar-button-desc">Home</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+      
+      <span class="sidebar-button-desc">Categories</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tags/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Tags</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/gtm-tips/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-magic"></i>
+      
+      <span class="sidebar-button-desc">GTM Tips</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/about-simo-ahava/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+      
+      <span class="sidebar-button-desc">About</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tools/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-wrench"></i>
+      
+      <span class="sidebar-button-desc">Tools</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/blog-statistics/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bar-chart"></i>
+      
+      <span class="sidebar-button-desc">Blog statistics</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://github.com/sahava" target="_blank" rel="noopener">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+      
+      <span class="sidebar-button-desc">GitHub</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/upcoming-talks/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bullhorn"></i>
+      
+      <span class="sidebar-button-desc">Upcoming talks</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
+
+    </ul>
+  </div>
+</nav>
+
+      
+
+      <div id="main" data-behavior="4"
+        class="
+               hasCoverMetaIn
+               ">
+        <article class="post" itemscope itemType="http://schema.org/BlogPosting">
+	  <form id="search" action="/search/">
+  <input name="q" type="text" class="form-control input--xlarge" placeholder="Search blog..." autocomplete="off">
+  </form>
+
+          
+          
+            <div class="post-header main-content-wrap text-left">
+
+  
+
+    <h1 itemprop="headline">
+      Cookie Settings And Subdomain Tracking In Universal Analytics
+    </h1>
+  
+  
+  <div class="postShorten-meta post-meta">
+    
+      <time itemprop="datePublished" datetime="2016-01-14T11:49:50Z">
+        
+  January 14, 2016
+
+      </time>
+    
+      
+  
+  
+    <span>in</span>
+    
+      <a class="category-link" href="https://www.simoahava.com/categories/analytics">Analytics</a>
+    
+  
+
+
+       | <a href="https://www.simoahava.com/analytics/cookie-settings-and-subdomain-tracking-in-universal-analytics/#disqus_thread">Comments</a> <span id="linkedincount"></span>
+  </div>
+
+
+</div>
+
+          
+          <div class="post-content markdown" itemprop="articleBody">
+            <div class="main-content-wrap">
+              
+
+<p>Welcome back my friends (to the show that never ends)! It&rsquo;s been a couple of weeks since my last barrage of articles, and I think the time is ripe to do some <strong>testing</strong>!</p>
+
+<p>First things first, here&rsquo;s a picture of me shovelling snow:</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2016/01/simo.jpg" title="Shovelling snow">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2016/01/simo.jpg#ZgotmplZ" alt="Shovelling snow">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>And now back to the topic at hand.</p>
+
+<p>One of the things that seems to be a hot topic in Universal Analytics is cross-domain tracking. I&rsquo;ve never really tackled the beast head-on, since there&rsquo;s such a wealth of <a href="http://www.lunametrics.com/search_gcse/?q=cross-domain">excellent articles</a> about it out there. However, I have taken a plunge into the deep end with some specific stuff, such as <a href="https://www.simoahava.com/analytics/iframe-cross-domain-tracking-in-google-tag-manager/">iframe</a> and <a href="https://www.simoahava.com/analytics/cross-domain-tracking-across-subdomains/">subdomain</a> tracking.</p>
+
+<p>I want to pick up where I left off in the subdomain article, and focus on something really cool but complicated: <strong>cookie settings</strong>.</p>
+
+<p>First, take a look at the <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/cookies-user-id?hl=en">official developer guide</a> for Universal Analytics&rsquo; cookie stuff. It&rsquo;s an excellent resource to get started with.</p>
+
+<p>What I want to talk about is what are the implications of <strong>inconsistent</strong> field settings as well as leaving the <strong>cookieDomain</strong> field out entirely from your tracker settings.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2016/01/cookie-settings-flow-chart.png" title="Unhelpful flow chart">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2016/01/cookie-settings-flow-chart.png#ZgotmplZ" alt="Unhelpful flow chart">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>I give you&hellip;<em>drumroll</em>&hellip;my epic, sugar-rush, pigeon-army, mudslide, Iron Man, lollapalooza, Han-shot-first, cookie-testing-extravaganza-MIND-EXPLOSION!</p>
+
+<p>Sorry.</p>
+
+<h2 id="what-we-know">What we know</h2>
+
+<p>Let&rsquo;s start at the beginning (always a good idea). This is what we, most likely, know about Universal Analytics&rsquo; cookies.</p>
+
+<ol>
+<li><p>Universal Analytics uses a single <strong>_ga</strong> cookie to establish the <strong>user</strong> dimension.</p></li>
+
+<li><p>This cookie stores a unique <strong>Client ID</strong> in its last two segments (GA1.2.<strong>12345.23456</strong>).</p></li>
+
+<li><p>By default, i.e. without any settings, the cookie is written on the <strong>current subdomain</strong> and all even more nested subdomains thereof (.sub.domain.com, .www.sub.domain.com, .simo.rules.ok.sub.domain.com would all share the cookie written on .sub.domain.com, but www.domain.com or domain.com would not).</p></li>
+
+<li><p>By setting <strong>cookieDomain</strong> to <strong>auto</strong>, or manually setting it to the topmost possible domain name (i.e. .domain.com), <strong>all</strong> subdomains can use the cookie.</p></li>
+</ol>
+
+<p>I hope that&rsquo;s all clear.</p>
+
+<p>This is why the &ldquo;tracking snippet&rdquo; for Universal Analytics <strong>always</strong> has the recommendation of including <code>'auto'</code> as the third parameter of the <code>'create'</code> command. That&rsquo;s the equivalent of adding the field <code>cookieDomain : 'auto'</code> into the tracker object:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">ga</span>(<span style="color:#e6db74">&#39;create&#39;</span>, <span style="color:#e6db74">&#39;UA-12345-1&#39;</span>, <span style="color:#e6db74">&#39;auto&#39;</span>);
+<span style="color:#75715e">// is the same as
+</span><span style="color:#75715e"></span><span style="color:#a6e22e">ga</span>(<span style="color:#e6db74">&#39;create&#39;</span>, <span style="color:#e6db74">&#39;UA-12345-1&#39;</span>, {<span style="color:#e6db74">&#39;cookieDomain&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;auto&#39;</span>});</code></pre></div>
+
+<p><strong>NOTE!</strong> The Universal Analytics Tag in Google Tag Manager <strong>does not</strong> add this field by default! The implications of leaving this field out are the focus of this test, so bear with me.</p>
+
+<h2 id="the-test">The test</h2>
+
+<p>I want to test the following:</p>
+
+<ol>
+<li><p>What happens if <code>'cookieDomain' : 'auto'</code> is missing from your tracker, and you move across subdomains?</p></li>
+
+<li><p>What happens if there are multiple <strong>_ga</strong> cookies, each written on different domains</p></li>
+
+<li><p>What is the air-speed velocity of an unladen swallow?</p></li>
+</ol>
+
+<p>Let&rsquo;s start with the first one.</p>
+
+<h3 id="1-no-cookiedomain-auto-set">1. No <code>'cookieDomain' : 'auto'</code> set</h3>
+
+<p>I&rsquo;ll browse to <strong>test.simoahava.com</strong>, make sure there are no pre-existing <strong>_ga</strong> cookies, and type in the following command:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">ga</span>(<span style="color:#e6db74">&#39;create&#39;</span>, <span style="color:#e6db74">&#39;UA-12345-1&#39;</span>, {<span style="color:#e6db74">&#39;name&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;test1&#39;</span>});</code></pre></div>
+
+<p>So, no <strong>cookieDomain</strong> anywhere. This results in a new <strong>_ga</strong> cookie, written on <strong>.test.simoahava.com</strong>:</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2016/01/ga-test1.png" title="no cookiedomain, new tracker">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2016/01/ga-test1.png#ZgotmplZ" alt="no cookiedomain, new tracker">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>You can also see where the cookie is written on:</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2016/01/ga-cookie-no-cookiedomain.png" title="ga cookie, no cookiedomain">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2016/01/ga-cookie-no-cookiedomain.png#ZgotmplZ" alt="ga cookie, no cookiedomain">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>That&rsquo;s all clear, right?</p>
+
+<p>Next, I browse to <strong>www.simoahava.com</strong>, and run the same command:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">ga</span>(<span style="color:#e6db74">&#39;create&#39;</span>, <span style="color:#e6db74">&#39;UA-12345-1&#39;</span>, {<span style="color:#e6db74">&#39;name&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;test1&#39;</span>});</code></pre></div>
+
+<p>And this is what I&rsquo;ll see:</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2016/01/main-domain-ga-cookie.png" title="ga cookie on the main domain">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2016/01/main-domain-ga-cookie.png#ZgotmplZ" alt="ga cookie on the main domain">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>The cookie itself is set on the parent domain (without <em>www.</em>):</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2016/01/ga-cookie-main-domain-set.png" title="_ga cookie set on the parent domain">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2016/01/ga-cookie-main-domain-set.png#ZgotmplZ" alt="_ga cookie set on the parent domain">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>Now, let&rsquo;s go back to <strong>test.simoahava.com</strong> and see what happens:</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2016/01/both-ga-cookies-subdomain.png" title="Both _ga cookies on the subdomain">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2016/01/both-ga-cookies-subdomain.png#ZgotmplZ" alt="Both _ga cookies on the subdomain">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>This is expected, of course. We see both the cookie written on the subdomain in the first step, as well as the cookie written on the main domain in the second step. The latter cookie is available here as well, as since the cookie was written on the parent domain, it can be used by all subdomains as well.</p>
+
+<p><strong>This has one very important implication.</strong> If you don&rsquo;t have <code>'cookieDomain' : 'auto'</code>, and the traffic is from the parent domain to subdomains, there&rsquo;s no issue here. Two different <strong>_ga</strong> cookies will still exist on the subdomain, as they have different domain settings, but they will share the same Client ID, thanks to one of the core features of the Universal Analytics library, which copies the Client ID from both pre-existing <strong>_ga</strong> cookies as well as legacy <strong>__utma</strong> cookies. Here&rsquo;s an example where I first landed on the parent domain and then entered the subdomain:</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2016/01/same-client-id.png" title="Same clientId across domains">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2016/01/same-client-id.png#ZgotmplZ" alt="Same clientId across domains">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>However, if the traffic lands on the subdomain <strong>first</strong>, and then moves to the parent domain, you will end up with <strong>different _ga cookies</strong> and <strong>different Client IDs</strong> on both domains, and thus the user will be different as well!</p>
+
+<p>This is quite significant. I&rsquo;ll return to the implications later.</p>
+
+<h3 id="2-what-happens-if-there-are-multiple-ga-cookies">2. What happens if there ARE multiple _ga cookies?</h3>
+
+<p>Now, if you DO end up with multiple <strong>_ga</strong> cookies, two things can happen:</p>
+
+<ol>
+<li><p>They share the same Client ID, i.e. the movement was from higher-level-domain to subdomain, and all is fine.</p></li>
+
+<li><p>They have different Client IDs, i.e. the traffic was from the subdomain to a higher-level (or same-level) domain.</p></li>
+</ol>
+
+<p>The first case is just fine. All your Tags will share the same Client ID, you won&rsquo;t have problems with some Tags firing starting new sessions or creating new users, and you can sleep soundly at night.</p>
+
+<p>The second case is problematic. Let&rsquo;s say you DO end up with two different <strong>_ga</strong> cookies, and that it&rsquo;s, at least you claim it is, intentional. How do you choose which cookie you&rsquo;ll interact with your trackers?</p>
+
+<p>Well, actually, it&rsquo;s pretty straight-forward. When you create a tracker, it will use which ever <strong>_ga</strong> cookie shares the <code>cookieDomain</code> setting of the tracker.</p>
+
+<p>Allow me to explain.</p>
+
+<p>Let&rsquo;s say you now have two different <strong>_ga</strong> cookies, one written on .simoahava.com, and one written on .test.simoahava.com. You are now on <strong>test.simoahava.com</strong>, and you want to use the Client ID of the cookie written on this subdomain. You need to create a tracker, <em>which would write the cookie on .test.simoahava.com</em> if you want to interact with the cookie. In other words:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">ga</span>(<span style="color:#e6db74">&#39;create&#39;</span>, <span style="color:#e6db74">&#39;UA-12345-1&#39;</span>, {<span style="color:#e6db74">&#39;name&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;test1&#39;</span>});</code></pre></div>
+
+<p>This would work, because without <code>'cookieDomain' : 'auto'</code>, the cookie would be written on .test.simoahava.com. Now, since a <strong>_ga</strong> cookie already exists on .test.simoahava.com, it is used in all interactions with tracker named <strong>test1</strong>.</p>
+
+<p>If you want to interact with the cookie written on .simoahava.com, then you need to add the <code>cookieDomain</code> parameter, and make sure it would write the cookie on the top-most possible domain:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">ga</span>(<span style="color:#e6db74">&#39;create&#39;</span>, <span style="color:#e6db74">&#39;UA-12345-1&#39;</span>, {<span style="color:#e6db74">&#39;name&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;test2&#39;</span>, <span style="color:#e6db74">&#39;cookieDomain&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;auto&#39;</span>});
+<span style="color:#75715e">// OR
+</span><span style="color:#75715e"></span><span style="color:#a6e22e">ga</span>(<span style="color:#e6db74">&#39;create&#39;</span>, <span style="color:#e6db74">&#39;UA-12345-1&#39;</span>, {<span style="color:#e6db74">&#39;name&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;test2&#39;</span>, <span style="color:#e6db74">&#39;cookieDomain&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;.simoahava.com&#39;</span>});</code></pre></div>
+
+<p>Both would do the same thing: attempt to write the <strong>_ga</strong> cookie on .simoahava.com. However, since that cookie already exists, the tracker named <strong>test2</strong> can now be used to interact with that particular cookie.</p>
+
+<p>Phew! So much talk about cookies it makes my stomach growl.</p>
+
+<h2 id="implications">Implications</h2>
+
+<p>Now, let&rsquo;s talk about what this all means. I&rsquo;ll split this up into a little Q&amp;A, which might help interpret the results.</p>
+
+<p><strong>Q: Should I set <code>'cookieDomain' : 'auto'</code> on in all my Tags and trackers?</strong></p>
+
+<p>A: I would say that, by default, <strong>yes</strong>. Having the setting on in all Tags ensures that the same Client ID is used everywhere across your subdomains. Even if you have Tags collecting data to different UA-XXXXX-Y properties, it doesn&rsquo;t matter that they share the Client ID, since it&rsquo;s just a label each property uses to assign hits to the same user.</p>
+
+<p><strong>Q: What would happen if only one of my Tags has <code>'cookieDomain' : 'auto'</code>, but the others don&rsquo;t?</strong></p>
+
+<p>A: You should still be fine, as long as that one Tag fires on every single page. Basically, when a Tag fires on the page, it first checks for a pre-existing <strong>_ga</strong> cookie. If one is found, it then checks the domain on which the cookie is written, and whether or not this matches the tracker settings. If the settings match, then the Tag simply uses this cookie. If the settings don&rsquo;t match, a new <strong>_ga</strong> is written on the current domain, but the Client ID is still copied from the first cookie.</p>
+
+<p>Thus, as long as <strong>one</strong> Tag on the page is fired with <code>'cookieDomain' : 'auto'</code>, the Client ID copying mechanism ensures that the same Client ID is accessible across your domains.</p>
+
+<p><strong>Q: What happens if I don&rsquo;t have the <code>'cookieDomain' : 'auto'</code> setting anywhere?</strong></p>
+
+<p>A: In the best case scenario, nothing. This would require that traffic is always from a higher-level-domain to its subdomain. This way the subdomain can copy the Client ID from the higher-level-domain cookie.</p>
+
+<p>However, if traffic can be the other way around, so starting from deeper in the domain structure and moving up (or parallel), you&rsquo;re in trouble. You&rsquo;ll end up with different Client IDs since the cookies are not shared across the domains.</p>
+
+<p>I hate doling out &ldquo;best practices&rdquo; since I don&rsquo;t believe they exist, but in this case we&rsquo;re talking about a <strong>technological reality</strong>. I strongly recommend that you always add the <code>'cookieDomain' : 'auto'</code> field to all your Tags and trackers. If that&rsquo;s a stretch, then make sure that <strong>at least one Tag</strong> which is <em>guaranteed</em> to fire on all pages has that setting. This way the Client ID will be copied and passed across the domains.</p>
+
+<p>Next time I&rsquo;ll write something lighter, I promise!</p>
+
+              
+            </div>
+          </div>
+          <div id="post-footer" class="post-footer main-content-wrap">
+            
+              
+                
+                
+                  <div class="post-footer-tags">
+                    <span class="text-color-light text-small">TAGGED IN</span><br/>
+                    
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/cookiedomain/">cookiedomain</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/cookies/">cookies</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/google-analytics/">google analytics</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/google-tag-manager/">Google Tag Manager</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/universal-analytics/">universal analytics</a>
+
+                  </div>
+                
+              
+            
+            
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/gtm-tips/data-layer-variable-versions-explained/">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/track-dynamically-loaded-youtube-videos-in-google-tag-manager/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/cookie-settings-and-subdomain-tracking-in-universal-analytics/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Cookie%20Settings%20And%20Subdomain%20Tracking%20In%20Universal%20Analytics%20https://www.simoahava.com/analytics/cookie-settings-and-subdomain-tracking-in-universal-analytics/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://www.simoahava.com/analytics/cookie-settings-and-subdomain-tracking-in-universal-analytics/">
+              <i class="fa fa-google-plus"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/cookie-settings-and-subdomain-tracking-in-universal-analytics/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#disqus">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+            
+              
+                <span id="disqus"></span>
+<div id="disqus_thread">
+  <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+
+              
+            
+          </div>
+        </article>
+        <footer id="footer" class="main-content-wrap">
+  <span class="copyrights">
+    &copy; 2018 Simo Ahava. All Rights Reserved
+  </span>
+</footer>
+
+      </div>
+      
+      <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+        
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/gtm-tips/data-layer-variable-versions-explained/">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/track-dynamically-loaded-youtube-videos-in-google-tag-manager/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/cookie-settings-and-subdomain-tracking-in-universal-analytics/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Cookie%20Settings%20And%20Subdomain%20Tracking%20In%20Universal%20Analytics%20https://www.simoahava.com/analytics/cookie-settings-and-subdomain-tracking-in-universal-analytics/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://www.simoahava.com/analytics/cookie-settings-and-subdomain-tracking-in-universal-analytics/">
+              <i class="fa fa-google-plus"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/cookie-settings-and-subdomain-tracking-in-universal-analytics/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#disqus">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+      </div>
+      
+      <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+  <i id="btn-close-shareoptions" class="fa fa-close"></i>
+  <ul class="share-options">
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=%25!s%28BADINDEX%29">
+          <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https%3A%2F%2Fwww.simoahava.com%2Fanalytics%2Fcookie-settings-and-subdomain-tracking-in-universal-analytics%2F%20%25!s%28BADINDEX%29%20via%20@SimoAhava">
+          <i class="fa fa-twitter"></i><span>Share on Twitter</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=%25!s%28BADINDEX%29">
+          <i class="fa fa-google-plus"></i><span>Share on Google&#43;</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.linkedin.com/cws/share?url=%25!s%28BADINDEX%29">
+          <i class="fa fa-linkedin"></i><span>Share on LinkedIn</span>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+<div id="share-options-mask" class="share-options-mask"></div>
+    </div>
+    
+    <div id="about">
+  <div id="about-card">
+    <div id="about-btn-close">
+      <i class="fa fa-remove"></i>
+    </div>
+    
+      <img id="about-card-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+    
+    <h4 id="about-card-name">Simo Ahava</h4>
+    
+      <div id="about-card-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</div>
+    
+    
+      <div id="about-card-job">
+        <i class="fa fa-briefcase"></i>
+        <br/>
+        Senior Data Advocate at Reaktor
+      </div>
+    
+    
+      <div id="about-card-location">
+        <i class="fa fa-map-marker"></i>
+        <br/>
+        Finland
+      </div>
+    
+  </div>
+</div>
+
+    
+  
+    
+    <div id="cover" style="background-image:url('https://www.simoahava.com/images/maisema.jpg');"></div>
+  
+
+
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.7/js/jquery.fancybox.min.js" integrity="sha256-GEAnjcTqVP+vBp3SSc8bEDQqvWAZMiHyUSIorrWwH50=" crossorigin="anonymous"></script>
+
+
+<script src="https://www.simoahava.com/js/script.js"></script>
+
+
+
+
+  
+    
+      <script>
+        
+
+
+
+
+
+        (function() {
+          
+          
+          if (window.location.hostname == "localhost") {
+            return;
+          }
+          var d = document, s = d.createElement('script');
+          var disqus_shortname = 'simoahava';
+          s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      </script>
+    
+  
+
+
+
+    
+  </body>
+</html>
+

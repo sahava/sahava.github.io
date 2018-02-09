@@ -1,0 +1,735 @@
+
+
+  
+    
+  
+
+
+  
+
+
+
+
+
+  
+
+
+  
+
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Hugo 0.31 with theme Tranquilpeak 0.4.3-BETA">
+    <title>Iframe Cross-Domain Tracking In Google Tag Manager | Simo Ahava's blog</title>
+    
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-PZ7GMV9');</script>
+    
+    <script src="//simoahava.disqus.com/count.js" id="dsq-count-scr" async></script>
+    <meta name="author" content="Simo Ahava">
+    <meta name="keywords" content="">
+
+    <link rel="icon" href="https://www.simoahava.com/images/favicon.ico">
+    
+    <link rel="amphtml" href="https://www.simoahava.com/amp/analytics/iframe-cross-domain-tracking-in-google-tag-manager/">
+    
+    <meta name="description" content="How to track iframes with cross-domain parameters using Google Tag Manager and Google Analytics.">
+    <meta property="og:description" content="How to track iframes with cross-domain parameters using Google Tag Manager and Google Analytics.">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="Iframe Cross-Domain Tracking In Google Tag Manager">
+    <meta property="og:url" content="/analytics/iframe-cross-domain-tracking-in-google-tag-manager/">
+    <meta property="og:site_name" content="Simo Ahava&#39;s blog">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Iframe Cross-Domain Tracking In Google Tag Manager">
+    <meta name="twitter:description" content="How to track iframes with cross-domain parameters using Google Tag Manager and Google Analytics.">
+    
+      <meta name="twitter:creator" content="@SimoAhava">
+      
+    
+
+    
+    
+
+    
+      <meta property="og:image" content="https://www.simoahava.com/images/simo.png">
+    
+
+    
+      <meta name="twitter:image" content="https://www.simoahava.com/images/2015/11/iframe-tracking-cross-domain-gtm.png">  
+      <meta property="og:image" content="https://www.simoahava.com/images/2015/11/iframe-tracking-cross-domain-gtm.png">
+    
+    
+    
+
+    
+
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/jquery.fancybox.min.css" integrity="sha256-vuXZ9LGmmwtjqFX1F+EKin1ThZMub58gKULUyf0qECk=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/helpers/jquery.fancybox-thumbs.min.css" integrity="sha256-SEa4XYAHihTcEP1f5gARTB2K26Uk8PsndQYHQC1f4jU=" crossorigin="anonymous" />
+    
+    
+    <link rel="stylesheet" href="https://www.simoahava.com/css/style.css" />
+    
+    
+
+    
+      
+    
+    
+  </head>
+
+  <body>
+    <div id="blog">
+      <header id="header" data-behavior="4">
+  <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+  <div class="header-title">
+    <a class="header-title-link" href="https://www.simoahava.com/">Simo Ahava&#39;s blog</a>
+  </div>
+  
+</header>
+
+      <nav id="sidebar" data-behavior="4">
+  <div class="sidebar-container">
+    
+      <div class="sidebar-profile">
+        <a href="https://www.simoahava.com/">
+          <img class="sidebar-profile-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+        </a>
+        <h4 class="sidebar-profile-name">Simo Ahava</h4>
+        
+          <h5 class="sidebar-profile-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</h5>
+        
+      </div>
+    
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+      
+      <span class="sidebar-button-desc">Home</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+      
+      <span class="sidebar-button-desc">Categories</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tags/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Tags</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/gtm-tips/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-magic"></i>
+      
+      <span class="sidebar-button-desc">GTM Tips</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/about-simo-ahava/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+      
+      <span class="sidebar-button-desc">About</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tools/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-wrench"></i>
+      
+      <span class="sidebar-button-desc">Tools</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/blog-statistics/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bar-chart"></i>
+      
+      <span class="sidebar-button-desc">Blog statistics</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://github.com/sahava" target="_blank" rel="noopener">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+      
+      <span class="sidebar-button-desc">GitHub</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/upcoming-talks/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bullhorn"></i>
+      
+      <span class="sidebar-button-desc">Upcoming talks</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
+
+    </ul>
+  </div>
+</nav>
+
+      
+
+      <div id="main" data-behavior="4"
+        class="
+               hasCoverMetaIn
+               ">
+        <article class="post" itemscope itemType="http://schema.org/BlogPosting">
+	  <form id="search" action="/search/">
+  <input name="q" type="text" class="form-control input--xlarge" placeholder="Search blog..." autocomplete="off">
+  </form>
+
+          
+          
+            <div class="post-header main-content-wrap text-left">
+
+  
+
+    <h1 itemprop="headline">
+      Iframe Cross-Domain Tracking In Google Tag Manager
+    </h1>
+  
+  
+  <div class="postShorten-meta post-meta">
+    
+      <time itemprop="datePublished" datetime="2015-11-04T10:16:04Z">
+        
+  November 4, 2015
+
+      </time>
+    
+      
+  
+  
+    <span>in</span>
+    
+      <a class="category-link" href="https://www.simoahava.com/categories/analytics">Analytics</a>
+    
+  
+
+
+       | <a href="https://www.simoahava.com/analytics/iframe-cross-domain-tracking-in-google-tag-manager/#disqus_thread">Comments</a> <span id="linkedincount"></span>
+  </div>
+
+
+</div>
+
+          
+          <div class="post-content markdown" itemprop="articleBody">
+            <div class="main-content-wrap">
+              
+
+<p>If you&rsquo;re unfamiliar with the lingo, <a href="https://support.google.com/analytics/answer/1034342?hl=en">cross-domain tracking</a> is a hack used by <a href="https://analytics.google.com/">Google Analytics</a> to circumvent the web browser&rsquo;s <a href="https://developer.mozilla.org/en-US/docs/Web/Security/Same-origin_policy">same-origin policy</a>. Essentially, the policy dictates that browser cookies can only be shared with a parent domain and all its sub-domains. In other words, <strong>domainA.com</strong> and <strong>domainB.com</strong> do not share cookies.</p>
+
+<p>Since Google Analytics calculates sessions and users by using a cookie, this is problematic. If the user navigates from domainA.com to domainB.com, they will, by default, browse domainB.com in a different session (often a different user as well) from that on domainA.com.</p>
+
+<p>There are some great guides out there for implementing cross-domain tracking, and I want to highlight the <a href="http://www.lunametrics.com/blog/2015/06/16/cross-domain-tracking-with-google-tag-manager/">LunaMetrics</a> article as well as the <a href="http://www.knewledge.com/en/blog/2013/11/cross-domain-tracking-for-iframes-with-gtm/">Knewledge</a> tutorial. Both have excellent coverage of this difficult topic, and Knewledge have devoted a lot of words for <strong>iframe</strong> tracking as well.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2015/11/iframe-tracking-cross-domain-gtm.png" title="Iframe tracking cross-domain with Google Tag Manager">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2015/11/iframe-tracking-cross-domain-gtm.png#ZgotmplZ" alt="Iframe tracking cross-domain with Google Tag Manager">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>In this article, I want to go over iframe tracking once again, and update the method to GTM V2. We&rsquo;ll be using the <a href="https://www.simoahava.com/gtm-tips/hitcallback-eventcallback/"><code>hitCallback</code></a> method to decorate the iframe properly with cross-domain tracking parameters, to ensure that any tracking that takes place within is attributed to the original session (and user).</p>
+
+<h2 id="quick-note-on-sub-domain-tracking">Quick note on SUB-domain tracking</h2>
+
+<p>Remember, cross-domain tracking applies <strong>only to separate parent domains</strong>. If you want to track traffic across sub-domains, you <em>don&rsquo;t need cross-domain tracking</em>. Instead, you just need the <code>cookieDomain</code> field set in your Tags and you&rsquo;re good to go. Luckily some visionary has already written a <a href="https://www.simoahava.com/analytics/cross-domain-tracking-across-subdomains/">simple guide</a> about this.</p>
+
+<h2 id="custom-javascript-variable">Custom JavaScript Variable</h2>
+
+<p>To make it all work, all you&rsquo;ll need is a Custom JavaScript Variable. Well, and a simple tweak to your Page View Tag. And some testing. And good luck. But anyway, the Custom JavaScript Variable is what patches everything together.</p>
+
+<p>We&rsquo;ll use the Variable in the <code>hitCallback</code> field of the very first Tag that fires on your site (should be the Page View Tag). This callback function will reload any iframe of your choice with linker parameters, meaning the Tags in the iframe will run nicely as part of the ongoing session.</p>
+
+<p><strong>Linker parameter</strong> is basically your browser&rsquo;s unique client ID (with some other stuff), attached as a query parameter to the iframe <code>src</code> value. This is then picked up by the tracker in the iframe and used to recreate the <strong>_ga</strong> cookie in the iframe. That&rsquo;s how Google Analytics&rsquo; cross-domain hack works!</p>
+
+<p>So, to get started, create a new Custom JavaScript Variable, and name it intelligently. I&rsquo;ve used <strong>{{JS - hitCallback for X-Dom iframe}}</strong>, but you can use something less poetic if you wish. Here&rsquo;s what it looks like:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
+  <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">function</span>() {
+    <span style="color:#66d9ef">try</span> { 
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">gobj</span> <span style="color:#f92672">=</span> window[window.<span style="color:#a6e22e">GoogleAnalyticsObject</span>];
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">iframe</span> <span style="color:#f92672">=</span> document.<span style="color:#a6e22e">querySelector</span>(<span style="color:#e6db74">&#39;#myIframe&#39;</span>);
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">tracker</span>, <span style="color:#a6e22e">linker</span>;
+      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">gobj</span>) {
+        <span style="color:#a6e22e">tracker</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">gobj</span>.<span style="color:#a6e22e">getAll</span>()[<span style="color:#ae81ff">0</span>];
+        <span style="color:#a6e22e">linker</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> window.<span style="color:#a6e22e">gaplugins</span>.<span style="color:#a6e22e">Linker</span>(<span style="color:#a6e22e">tracker</span>);
+        <span style="color:#a6e22e">iframe</span>.<span style="color:#a6e22e">src</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">linker</span>.<span style="color:#a6e22e">decorate</span>(<span style="color:#a6e22e">iframe</span>.<span style="color:#a6e22e">src</span>);
+      }
+    } <span style="color:#66d9ef">catch</span>(<span style="color:#a6e22e">e</span>) {}
+  }
+}</code></pre></div>
+
+<p>So, time for a line-by-line walkthrough.</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() { ... }</code></pre></div>
+
+<p>On the first line, you&rsquo;re declaring a basic GTM JavaScript function, which needs to be an anonymous function. Nothing special here, moving on.</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">return</span> <span style="color:#66d9ef">function</span>() { ... }</code></pre></div>
+
+<p>Next, you&rsquo;re <em>returning</em> another function, as <code>hitCallback</code> requires a function as a parameter for it to work correctly. Also, by returning a function, we&rsquo;re avoiding unsolicited side effects which would result if you just executed global DOM methods in the outer function. Since we&rsquo;re operating in a closure, we&rsquo;re restricting the execution of this function to only the single time it&rsquo;s called, which is when the <code>hitCallback</code> is executed at the end of the Google Analytics payload dispatch process.</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">try</span> { ... } <span style="color:#66d9ef">catch</span>(<span style="color:#a6e22e">e</span>) {}</code></pre></div>
+
+<p>We&rsquo;re wrapping the code with a <code>try...catch</code> because that&rsquo;s simply a good practice. You can add some debugging code into the <code>catch(e) {}</code> block if you wish, but I usually just let it sizzle down silently.</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">gobj</span> <span style="color:#f92672">=</span> window[window.<span style="color:#a6e22e">GoogleAnalyticsObject</span>];
+<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">iframe</span> <span style="color:#f92672">=</span> document.<span style="color:#a6e22e">querySelector</span>(<span style="color:#e6db74">&#39;#myIframe&#39;</span>);
+<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">tracker</span>, <span style="color:#a6e22e">linker</span>;</code></pre></div>
+
+<p>The following three lines setup some variables. First, we&rsquo;re setting <code>gobj</code> to the global Google Analytics function name. This is again just a good practice, since there are cases where you want to change the function name from <code>ga</code> to something else. With this one-liner, we&rsquo;re making sure we&rsquo;re always referring to the correct object.</p>
+
+<p>The next line is important. This is where you&rsquo;ll <strong>retrieve the iframe element you want to modify</strong>. I&rsquo;m using a simple CSS selector to find my iframe (an element with the ID <code>myIframe</code>), so remember to change it to reflect whatever you want to target. You can run this code on multiple iframes if you wish. You just need to loop through each iframe, and run the <code>linker.decorate()</code> method on each.</p>
+
+<p>We&rsquo;re also declaring <code>tracker</code> and <code>linker</code> as utility variables, which we&rsquo;ll use in a bit.</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">gobj</span>) {
+  <span style="color:#a6e22e">tracker</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">gobj</span>.<span style="color:#a6e22e">getAll</span>()[<span style="color:#ae81ff">0</span>];
+  <span style="color:#a6e22e">linker</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> window.<span style="color:#a6e22e">gaplugins</span>.<span style="color:#a6e22e">Linker</span>(<span style="color:#a6e22e">tracker</span>);
+  <span style="color:#a6e22e">iframe</span>.<span style="color:#a6e22e">src</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">linker</span>.<span style="color:#a6e22e">decorate</span>(<span style="color:#a6e22e">iframe</span>.<span style="color:#a6e22e">src</span>);
+}</code></pre></div>
+
+<p>The final part of the code is where the magic happens. Checking for the existence of the global Google Analytics object is just another good practice you might want to employ.</p>
+
+<p>Next, we initialize <code>tracker</code> with the <strong>first Google Analytics tracker created on the page</strong>. As I mentioned before, this should optimally be the tracker created by your Page View Tag. We use the <code>getAll()</code> function call to retrieve all the trackers created on the page, and then pick the first one with <code>[0]</code>.</p>
+
+<p>On the following line we use the Google Analytics <code>Linker</code> plugin, initializing it with the retrieved tracker. This plugin is what we&rsquo;ll use to decorate the iframe <code>src</code> with the correct cross-domain parameters. The plugin has a utility method <code>decorate</code>, which takes a URL string as its parameter.</p>
+
+<p>In other words, you&rsquo;re updating the iframe&rsquo;s <code>src</code> value with a <em>decorated</em> URL, and this decoration actually adds the correct cross-domain parameters to the URL.</p>
+
+<p>Once you&rsquo;ve written all this code, remember to save the Variable.</p>
+
+<p>Finally, you need to add this new Variable into the <strong>hitCallback</strong> field of your Page View Tag.</p>
+
+<p>So, open the Tag, browse to <strong>More Settings</strong> -&gt; <strong>Fields to set</strong>, and add a new field:</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2015/11/fields-to-set-hitcallback.png" title="hitCallback in fields to set">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2015/11/fields-to-set-hitcallback.png#ZgotmplZ" alt="hitCallback in fields to set">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>There we go! We have now successfully set the stage for one of nature&rsquo;s most spectacular ev&hellip; Sorry, been watching too much Planet Earth.</p>
+
+<h2 id="what-will-happen">What will happen</h2>
+
+<p>Here&rsquo;s the process of what happens when you next browse the site:</p>
+
+<ol>
+<li><p>The Page View Tag fires, and after it has completed, its <strong>hitCallback</strong> field is executed</p></li>
+
+<li><p>Since this field had our custom function returned, the code within is run</p></li>
+
+<li><p>This code takes the tracker that was just created, and decorates the iframe(s) of your choice with cross-domain tracking parameters</p></li>
+
+<li><p>The iframe will reload (because its <code>src</code> value changed) with the cross-domain tracking parameters</p></li>
+</ol>
+
+<h2 id="what-else-you-ll-need">What else you&rsquo;ll need</h2>
+
+<p>Now, any Tags firing in the iframe should have the <strong>allowLinker : true</strong> field set. You can find instructions for this in the <a href="http://www.lunametrics.com/blog/2015/06/16/cross-domain-tracking-with-google-tag-manager/">LunaMetrics guide</a>, for example. This simple little field will ensure that the Universal Analytics library looks for cross-domain tracking parameters in the URL, and uses them to set up the tracker in the iframe.</p>
+
+<p>In other words, we&rsquo;ve circumvented the crippling effect of same-origin policy on cookie sharing by, well, sharing a cookie <em>value</em> as a URL parameter. The wonderfully robust Universal Analytics library takes care of the rest.</p>
+
+<p>Also, you will want to <strong>defer</strong> the Page View Tag from firing on the landing page of the iframe. Why? Because if you didn&rsquo;t, the iframe might send a Page View when it&rsquo;s first loaded, and then again when the iframe is reloaded with the hack. By preventing the iframe from firing on any page whose referrer is <em>not</em> the iframe URL <strong>and</strong> <a href="https://www.simoahava.com/gtm-tips/prevent-tag-from-firing-in-iframe/">when the page is in an iframe</a>, you&rsquo;ll prevent double- or triple-counting your page views in the iframe. For subsequent page views you&rsquo;d want to fire the Tag, because it reflects actual browsing behavior.</p>
+
+<p>Also, if you look at the <a href="http://www.knewledge.com/en/blog/2013/11/cross-domain-tracking-for-iframes-with-gtm/">Knewledge</a> tutorial, they have a nice solution for actually not loading the iframe in the first place, and only loading it when the <code>hitCallback</code> is executed (or if there&rsquo;s some problem with loading the JavaScript).</p>
+
+<p>It&rsquo;s all up to you, of course. Double- or triple-counting isn&rsquo;t always a problem.</p>
+
+<p>If you have a situation where the iframe isn&rsquo;t in the DOM in time, you might also need to add a <code>setTimeout</code> in the <code>hitCallback</code> to allow time for the DOM to complete. However, this is very rare in my experience.</p>
+
+<p>Anyway, working with iframes is quite difficult, as you can probably guess. Lots of things to pay attention to.</p>
+
+<p>That was a perfect segue to the final chapter and a well-deserved rant.</p>
+
+<h2 id="summary">Summary</h2>
+
+<p>This was a rather simple guide for setting up iframe tracking with cross-domain parameters. Let me be clear and on-the-record about something:</p>
+
+<p><strong>IFRAMES SUCK!</strong></p>
+
+<p>They are horrible, Lovecraftian subterranean beings of horror that crawl from the nether pits of darkness after the tolling of the midnight bell. They are playground bullies; entitled little brats that wreak havoc on innocent markup. They are artefacts of human laziness, true examples of <a href="https://en.wikipedia.org/wiki/Conway%27s_law">Conway&rsquo;s Law</a> in motion. They are, in essence, untrackable little shit-monsters that exist in the void between websites, accountable to none and hazardous to all.</p>
+
+<p>I can personally attribute some 45% of my hair loss to working with iframes, and they have ruined my day far too many times to call it coincidence.</p>
+
+<p>If you are forced to work with iframes, cross-domain tracking might be the least of your worries.</p>
+
+              
+            </div>
+          </div>
+          <div id="post-footer" class="post-footer main-content-wrap">
+            
+              
+                
+                
+                  <div class="post-footer-tags">
+                    <span class="text-color-light text-small">TAGGED IN</span><br/>
+                    
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/google-analytics/">google analytics</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/google-tag-manager/">Google Tag Manager</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/guide/">Guide</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/iframe/">iframe</a>
+
+                  </div>
+                
+              
+            
+            
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/from-project-to-process/">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/setup-google-tag-manager-ios-with-swift/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/iframe-cross-domain-tracking-in-google-tag-manager/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Iframe%20Cross-Domain%20Tracking%20In%20Google%20Tag%20Manager%20https://www.simoahava.com/analytics/iframe-cross-domain-tracking-in-google-tag-manager/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://www.simoahava.com/analytics/iframe-cross-domain-tracking-in-google-tag-manager/">
+              <i class="fa fa-google-plus"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/iframe-cross-domain-tracking-in-google-tag-manager/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#disqus">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+            
+              
+                <span id="disqus"></span>
+<div id="disqus_thread">
+  <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+
+              
+            
+          </div>
+        </article>
+        <footer id="footer" class="main-content-wrap">
+  <span class="copyrights">
+    &copy; 2018 Simo Ahava. All Rights Reserved
+  </span>
+</footer>
+
+      </div>
+      
+      <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+        
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/from-project-to-process/">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/setup-google-tag-manager-ios-with-swift/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/iframe-cross-domain-tracking-in-google-tag-manager/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Iframe%20Cross-Domain%20Tracking%20In%20Google%20Tag%20Manager%20https://www.simoahava.com/analytics/iframe-cross-domain-tracking-in-google-tag-manager/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://www.simoahava.com/analytics/iframe-cross-domain-tracking-in-google-tag-manager/">
+              <i class="fa fa-google-plus"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/iframe-cross-domain-tracking-in-google-tag-manager/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#disqus">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+      </div>
+      
+      <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+  <i id="btn-close-shareoptions" class="fa fa-close"></i>
+  <ul class="share-options">
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=%25!s%28BADINDEX%29">
+          <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https%3A%2F%2Fwww.simoahava.com%2Fanalytics%2Fiframe-cross-domain-tracking-in-google-tag-manager%2F%20%25!s%28BADINDEX%29%20via%20@SimoAhava">
+          <i class="fa fa-twitter"></i><span>Share on Twitter</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=%25!s%28BADINDEX%29">
+          <i class="fa fa-google-plus"></i><span>Share on Google&#43;</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.linkedin.com/cws/share?url=%25!s%28BADINDEX%29">
+          <i class="fa fa-linkedin"></i><span>Share on LinkedIn</span>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+<div id="share-options-mask" class="share-options-mask"></div>
+    </div>
+    
+    <div id="about">
+  <div id="about-card">
+    <div id="about-btn-close">
+      <i class="fa fa-remove"></i>
+    </div>
+    
+      <img id="about-card-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+    
+    <h4 id="about-card-name">Simo Ahava</h4>
+    
+      <div id="about-card-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</div>
+    
+    
+      <div id="about-card-job">
+        <i class="fa fa-briefcase"></i>
+        <br/>
+        Senior Data Advocate at Reaktor
+      </div>
+    
+    
+      <div id="about-card-location">
+        <i class="fa fa-map-marker"></i>
+        <br/>
+        Finland
+      </div>
+    
+  </div>
+</div>
+
+    
+  
+    
+    <div id="cover" style="background-image:url('https://www.simoahava.com/images/maisema.jpg');"></div>
+  
+
+
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.7/js/jquery.fancybox.min.js" integrity="sha256-GEAnjcTqVP+vBp3SSc8bEDQqvWAZMiHyUSIorrWwH50=" crossorigin="anonymous"></script>
+
+
+<script src="https://www.simoahava.com/js/script.js"></script>
+
+
+
+
+  
+    
+      <script>
+        
+
+
+
+
+
+        (function() {
+          
+          
+          if (window.location.hostname == "localhost") {
+            return;
+          }
+          var d = document, s = d.createElement('script');
+          var disqus_shortname = 'simoahava';
+          s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      </script>
+    
+  
+
+
+
+    
+  </body>
+</html>
+

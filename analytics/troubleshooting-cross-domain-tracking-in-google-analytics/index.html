@@ -1,0 +1,814 @@
+
+
+  
+    
+  
+
+
+  
+
+
+
+
+
+  
+
+
+  
+
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Hugo 0.31 with theme Tranquilpeak 0.4.3-BETA">
+    <title>Troubleshooting Cross-Domain Tracking In Google Analytics | Simo Ahava's blog</title>
+    
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-PZ7GMV9');</script>
+    
+    <script src="//simoahava.disqus.com/count.js" id="dsq-count-scr" async></script>
+    <meta name="author" content="Simo Ahava">
+    <meta name="keywords" content="">
+
+    <link rel="icon" href="https://www.simoahava.com/images/favicon.ico">
+    
+    <link rel="amphtml" href="https://www.simoahava.com/amp/analytics/troubleshooting-cross-domain-tracking-in-google-analytics/">
+    
+    <meta name="description" content="A troubleshooting checklist for Google Analytics cross-domain problems.">
+    <meta property="og:description" content="A troubleshooting checklist for Google Analytics cross-domain problems.">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="Troubleshooting Cross-Domain Tracking In Google Analytics">
+    <meta property="og:url" content="/analytics/troubleshooting-cross-domain-tracking-in-google-analytics/">
+    <meta property="og:site_name" content="Simo Ahava&#39;s blog">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Troubleshooting Cross-Domain Tracking In Google Analytics">
+    <meta name="twitter:description" content="A troubleshooting checklist for Google Analytics cross-domain problems.">
+    
+      <meta name="twitter:creator" content="@SimoAhava">
+      
+    
+
+    
+    
+
+    
+      <meta property="og:image" content="https://www.simoahava.com/images/simo.png">
+    
+
+    
+      <meta name="twitter:image" content="https://www.simoahava.com/images/2016/08/cross-domain-tracking-checklist.png">  
+      <meta property="og:image" content="https://www.simoahava.com/images/2016/08/cross-domain-tracking-checklist.png">
+    
+    
+    
+
+    
+
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/jquery.fancybox.min.css" integrity="sha256-vuXZ9LGmmwtjqFX1F+EKin1ThZMub58gKULUyf0qECk=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/helpers/jquery.fancybox-thumbs.min.css" integrity="sha256-SEa4XYAHihTcEP1f5gARTB2K26Uk8PsndQYHQC1f4jU=" crossorigin="anonymous" />
+    
+    
+    <link rel="stylesheet" href="https://www.simoahava.com/css/style.css" />
+    
+    
+
+    
+      
+    
+    
+  </head>
+
+  <body>
+    <div id="blog">
+      <header id="header" data-behavior="4">
+  <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+  <div class="header-title">
+    <a class="header-title-link" href="https://www.simoahava.com/">Simo Ahava&#39;s blog</a>
+  </div>
+  
+</header>
+
+      <nav id="sidebar" data-behavior="4">
+  <div class="sidebar-container">
+    
+      <div class="sidebar-profile">
+        <a href="https://www.simoahava.com/">
+          <img class="sidebar-profile-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+        </a>
+        <h4 class="sidebar-profile-name">Simo Ahava</h4>
+        
+          <h5 class="sidebar-profile-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</h5>
+        
+      </div>
+    
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+      
+      <span class="sidebar-button-desc">Home</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+      
+      <span class="sidebar-button-desc">Categories</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tags/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Tags</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/gtm-tips/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-magic"></i>
+      
+      <span class="sidebar-button-desc">GTM Tips</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/about-simo-ahava/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+      
+      <span class="sidebar-button-desc">About</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tools/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-wrench"></i>
+      
+      <span class="sidebar-button-desc">Tools</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/blog-statistics/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bar-chart"></i>
+      
+      <span class="sidebar-button-desc">Blog statistics</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://github.com/sahava" target="_blank" rel="noopener">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+      
+      <span class="sidebar-button-desc">GitHub</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/upcoming-talks/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bullhorn"></i>
+      
+      <span class="sidebar-button-desc">Upcoming talks</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
+
+    </ul>
+  </div>
+</nav>
+
+      
+
+      <div id="main" data-behavior="4"
+        class="
+               hasCoverMetaIn
+               ">
+        <article class="post" itemscope itemType="http://schema.org/BlogPosting">
+	  <form id="search" action="/search/">
+  <input name="q" type="text" class="form-control input--xlarge" placeholder="Search blog..." autocomplete="off">
+  </form>
+
+          
+          
+            <div class="post-header main-content-wrap text-left">
+
+  
+
+    <h1 itemprop="headline">
+      Troubleshooting Cross-Domain Tracking In Google Analytics
+    </h1>
+  
+  
+  <div class="postShorten-meta post-meta">
+    
+      <time itemprop="datePublished" datetime="2016-08-17T08:23:06Z">
+        
+  August 17, 2016
+
+      </time>
+    
+      
+  
+  
+    <span>in</span>
+    
+      <a class="category-link" href="https://www.simoahava.com/categories/analytics">Analytics</a>
+    
+  
+
+
+       | <a href="https://www.simoahava.com/analytics/troubleshooting-cross-domain-tracking-in-google-analytics/#disqus_thread">Comments</a> <span id="linkedincount"></span>
+  </div>
+
+
+</div>
+
+          
+          <div class="post-content markdown" itemprop="articleBody">
+            <div class="main-content-wrap">
+              
+
+<p><a href="https://support.google.com/analytics/answer/1034342?hl=en">Cross-domain tracking</a>, in <a href="https://analytics.google.com/">Google Analytics</a>, is the process of passing information stored in browser cookies from one domain to another. Due to web browsers&rsquo; <a href="https://en.wikipedia.org/wiki/Same-origin_policy">same-origin policy</a>, a browser cookie is only available to the domain it is written on and all its subdomains (by default). Since Google Analytics uses cookies to persist the <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/cookies-user-id">Client ID</a>, once the user moves from domain to domain it&rsquo;s important to somehow pass this Client ID, too.</p>
+
+<p>Cross-domain tracking isn&rsquo;t the easiest thing to implement, though. At its easiest, especially if you use <a href="https://tagmanager.google.com/">Google Tag Manager</a>, it&rsquo;s a question of configuring a couple of fields in your Google Analytics trackers and snippets. However, issues typically arise when your website uses unconventional link redirects, or when you want to <a href="https://www.simoahava.com/analytics/iframe-cross-domain-tracking-in-google-tag-manager/">persist the Client ID in an iframe</a> loaded from another domain.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2016/08/cross-domain-tracking-checklist.png" title="cross domain tracking checklist google analytics">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2016/08/cross-domain-tracking-checklist.png#ZgotmplZ" alt="cross domain tracking checklist google analytics">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>In this article, I thought I&rsquo;d provide a short <strong>checklist</strong> to go through when issues with cross-domain tracking arise.</p>
+
+<h2 id="how-to-test-if-cross-domain-tracking-is-working">How to test if cross-domain tracking is working</h2>
+
+<p>If cross-domain tracking <strong>is working</strong>, all traffic from one domain to another should be part of the same session, and thus attributed to the same <strong>Source / Medium</strong> dimensions.</p>
+
+<p><strong>You should not use Google Analytics&rsquo; Real Time Reports to analyze the cross-domain pattern!</strong> Real Time Reports show each hit only with the dimensions and parameters carried by the hit itself. This means that you won&rsquo;t be able to debug session-scoped stuff like Source and Medium using only what you see in the Real Time Reports.</p>
+
+<p>In other words, you&rsquo;ll need to wait for the hits to populate in the standard reports.</p>
+
+<p>The easiest way to verify if cross-domain tracking is working in Google Analytics, is to browse to the first domain using custom <a href="https://support.google.com/analytics/answer/1033867">UTM parameters</a>, for example:</p>
+
+<p><strong>www.domainA.com/?utm_source=xdom_test&amp;utm_medium=xdom_test&amp;utm_campaign=xdom_test</strong></p>
+
+<p>Then, while still browsing the first domain, click a link or open a page with the iframe to the second domain.</p>
+
+<p>After this is done, in the Google Analytics View which shows data from both domains, you can apply a segment to only include your custom campaign traffic:</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2016/08/custom-segment.png" title="Cross-domain tracking test segment">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2016/08/custom-segment.png#ZgotmplZ" alt="Cross-domain tracking test segment">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>Once the data hits the Google Analytics reports, you should find your single session when applying the segment. After that, go to the <strong>Behavior &gt; Site Content &gt; All Pages</strong> report. If cross-domain tracking is working properly, you should see both the pageview(s) from the source domain and the pageview(s) from the target domain in the report.</p>
+
+<p>If cross-domain tracking isn&rsquo;t working, you&rsquo;ll only see the pageview(s) from the source domain. The following checklist should help in this case.</p>
+
+<h2 id="the-checklist">The Checklist</h2>
+
+<p>For cross-domain tracking to work on your website and Google Analytics Property, the following things need to all be in place.</p>
+
+<ol>
+<li><p>All domains included in cross-domain tracking must collect data to the <strong>same Google Analytics Property</strong> - Jump to details</p></li>
+
+<li><p>All domains that are the <em>source</em> of cross-domain traffic, i.e. the traffic departs <em>from</em> these domains, need to be in the <strong>Referral Exclusion List</strong> of the Google Analytics Property settings - Jump to details</p></li>
+
+<li><p>When entering the target domain via a link in the source domain or an iframe, the URL of the page loaded in the web browser must have the <strong>_ga=1.234567.234567.234567</strong> URL query parameter in place - Jump to details</p></li>
+
+<li><p>Any Google Analytics trackers or tags firing on the target domain need to have the <strong>allowLinker</strong> field set to <strong>true</strong> - Jump to details</p></li>
+</ol>
+
+<p>These are the four basic steps you need to make cross-domain tracking work on your site. Note that steps (3) and (4) have complicated workarounds for when query parameters or the <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/linker">linker plugin</a> won&rsquo;t work, but in the majority of cases these four steps are enough.</p>
+
+<p>In the following chapters, I&rsquo;ll examine each step in more detail.</p>
+
+<h2 id="1-collect-all-data-to-the-same-google-analytics-property">1. Collect all data to the same Google Analytics Property</h2>
+
+<p>A <a href="https://support.google.com/analytics/answer/2649554?hl=en">Property</a> in Google Analytics is a tracking configuration that collects data from your digital applications such as your website. Each Property in Google Analytics has a unique identifier, known as the Tracking ID:</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2016/08/tracking-id.png" title="Google Analytics tracking ID">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2016/08/tracking-id.png#ZgotmplZ" alt="Google Analytics tracking ID">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>Every Property has its own table of data, which comprises all the hits that are sent to that particular Property. Thus, each Property has its own users, sessions, and aggregation buckets, and these data sets are unique to each Property.</p>
+
+<p>Because of this, it&rsquo;s important that when you collect cross-domain traffic across two separate domains, both domains <strong>will need to collect data to the same Google Analytics Property</strong>. There is no such thing as <em>cross-domain traffic across Google Analytics properties</em>, and the only way to even approach something like that would be to utilize the <a href="https://support.google.com/analytics/answer/6033415">Roll-up Reporting</a> feature of Google Analytics Premium.</p>
+
+<h2 id="2-domains-in-the-referral-exclusion-list">2. Domains in the Referral Exclusion List</h2>
+
+<p>Universal Analytics starts a new session whenever a new referral is detected as a traffic source. Thus, if you first enter a site via Google&rsquo;s organic search (<strong>google / organic</strong>), and then follow a cross-domain link from the source domain to the target domain, the target domain hit would be recorded as having originated from <strong>sourceDomain.com / referral</strong>, marking the start of a new session. And this is even if you have cross-domain tracking otherwise in place!</p>
+
+<p>By utilizing the Referral Exclusion List, you&rsquo;re telling Google Analytics to disregard referral traffic from the source domain, and to treat it as Direct traffic instead. Universal Analytics relies on Direct traffic for campaign attribution as well as session stitching. Each hit in the session, after the initial acquisition, is actually a &ldquo;Direct&rdquo; hit, and this is how Google Analytics knows that the session should still be kept alive.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2016/08/referral-exclusion-list.png" title="Referral Exclusion List">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2016/08/referral-exclusion-list.png#ZgotmplZ" alt="Referral Exclusion List">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>So, Referral Exclusion List keeps the traffic from the source domain to the target domain part of the same session, which is crucial for you to make sense of cross-domain traffic. Thus make sure that you have all the possible source domains, i.e. domains that send traffic to other domains, in the Referral Exclusion List of your Google Analytics property settings.</p>
+
+<h2 id="3-linker-parameter-in-the-url">3. Linker parameter in the URL</h2>
+
+<p>As I said in the very beginning of this article, Google Analytics relies on the Client ID to assign hits to specific sessions and users. The Client ID is stored in a browser cookie named <strong>_ga</strong>, which is, by default, written on the highest possible domain name the website has access to. On my website, for example, the <strong>_ga</strong> cookie would be written on <strong>simoahava.com</strong>, and thus it is available to simoahava.com and all its possible subdomains.</p>
+
+<p>When you move from domain to domain, this Client ID needs to somehow travel with the user, but due to the restrictions of the web browsers&rsquo; same-origin policy, the target domain cannot simply fetch the cookie written on the source domain.</p>
+
+<p>For this reason, Google Analytics has introduced the <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/linker">linker</a> plugin. When you invoke the plugin, it returns a URL query parameter which includes the Client ID as well as a <strong>signature</strong> which is valid for <strong>2 minutes</strong>. So, if you visit a different domain URL with the query parameter within the two minute window, cross-domain traffic could be setup between the two domains.</p>
+
+<p>The two minute window exists to prevent linker parameters from persisting in shared links and browser history entries. Otherwise every time someone would follow a link with the linker parameter in place, they would be considered the original user who created the link. This would lead into a horrible mess, as it would be almost impossible to distinguish users from each other.</p>
+
+<p>A typical way of loading the linker plugin is by using the <strong><a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/linker#autolink">autoLink</a></strong> feature of the plugin. When you use autoLink, you provide it with domain names that you want to automatically decorate with the linker parameters. Then when the user clicks a link or invokes a form redirection that has the given domain name as its target, autoLink automatically decorates the URL with the linker parameters.</p>
+
+<p>In Google Tag Manager, you&rsquo;d edit the Auto Link Domains field:</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2016/08/gtm-auto-link-domains.png" title="Auto Link Domains google tag manager">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2016/08/gtm-auto-link-domains.png#ZgotmplZ" alt="Auto Link Domains google tag manager">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>You&rsquo;ll know its working when you see the <strong>_ga=1.234567.234567.234567</strong> query parameter in the URL.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2016/08/url-parameter.png" title="linker parameter in url">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2016/08/url-parameter.png#ZgotmplZ" alt="linker parameter in url">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>If you don&rsquo;t see the parameter in the URL, it means that for some reason the autoLink plugin failed. Instead, you&rsquo;ll need to manually decorate the URLs. This is particularly the case when working with <strong>iframes</strong>, as the <a href="https://www.simoahava.com/analytics/iframe-cross-domain-tracking-in-google-tag-manager/">iframe must be loaded with the linker parameters</a> in its <code>src</code> attribute, if you want cross-domain traffic to work between the parent page and the framed document.</p>
+
+<p>To manually decorate the URLs, you or your web developer needs to write a piece of code which <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/linker#manually_adding_linker_parameters">takes the linker parameter and appends it to the URL</a> of the link or the iframe just before the document is loaded.</p>
+
+<p>So, remember that for a basic cross-domain setup to work, the URL of the target page, whether opened by a link, redirected by a form, or loaded in an iframe, needs to have the linker parameter <strong>_ga=1.234567.234567.234567</strong> in the URL.</p>
+
+<h2 id="4-allowlinker-in-the-target-domain">4. allowLinker in the target domain</h2>
+
+<p>Now you&rsquo;ve got the URL query parameters in place, the Referral Exclusion List has all the necessary source domains, and you&rsquo;re collecting data from both the source and target domain to the same Google Analytics Property.</p>
+
+<p>Just one thing missing.</p>
+
+<p>For the trackers in the target domain to respect the <strong>_ga=1.234567.234567.234567</strong> linker parameter in the URL, you need to tell the trackers to allow the linker parameter to reset the Client ID on the target domain.</p>
+
+<p>You do this by configuring the <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/linker#configuring_a_site_to_accept_linker_parameters">allowLinker field in the tracker object</a>. In GTM, you&rsquo;d simply add a new field:</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2016/08/allowlinker.png" title="allowLinker field in GTM">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2016/08/allowlinker.png#ZgotmplZ" alt="allowLinker field in GTM">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>This setting tells the tracker to use the Client ID embedded in the linker parameter rather than the one created by the tracker on the target domain.</p>
+
+<p>You can verify that it&rsquo;s working by opening the <strong>Network</strong> Tab in your web browser&rsquo;s developer tools, and loading a page both on the source domain as well as on the target domain after following a cross-domain link, for example. All requests to <strong>/collect</strong> should have the parameter <strong>&cid;</strong> use the same value. This tells you that the Client ID is the same across the domains.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2016/08/network-debugger.png" title="Network debugger">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2016/08/network-debugger.png#ZgotmplZ" alt="Network debugger">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<h2 id="summary">Summary</h2>
+
+<p>There are many ways in which cross-domain tracking can malfunction, but there are actually only four moving parts to it:</p>
+
+<ol>
+<li><p>All domains need to collect data to the same Google Analytics Property</p></li>
+
+<li><p>All source domains need to be listed in the Referral Exclusion List of the Google Analytics Property</p></li>
+
+<li><p>The target domain URLs opened via the source domain need to be decorated with linker parameters</p></li>
+
+<li><p>The target domain Google Analytics trackers need to have the allowLinker field configured</p></li>
+</ol>
+
+<p>Once all four of these pass inspection, cross-domain tracking should work without a hitch.</p>
+
+              
+            </div>
+          </div>
+          <div id="post-footer" class="post-footer main-content-wrap">
+            
+              
+                
+                
+                  <div class="post-footer-tags">
+                    <span class="text-color-light text-small">TAGGED IN</span><br/>
+                    
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/cross-domain-tracking/">cross-domain tracking</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/google-analytics/">google analytics</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/google-tag-manager/">Google Tag Manager</a>
+
+                  </div>
+                
+              
+            
+            
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/google-tag-manager-workspaces/">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/run-google-tag-manager-google-analytics-local-files/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/troubleshooting-cross-domain-tracking-in-google-analytics/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Troubleshooting%20Cross-Domain%20Tracking%20In%20Google%20Analytics%20https://www.simoahava.com/analytics/troubleshooting-cross-domain-tracking-in-google-analytics/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://www.simoahava.com/analytics/troubleshooting-cross-domain-tracking-in-google-analytics/">
+              <i class="fa fa-google-plus"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/troubleshooting-cross-domain-tracking-in-google-analytics/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#disqus">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+            
+              
+                <span id="disqus"></span>
+<div id="disqus_thread">
+  <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+
+              
+            
+          </div>
+        </article>
+        <footer id="footer" class="main-content-wrap">
+  <span class="copyrights">
+    &copy; 2018 Simo Ahava. All Rights Reserved
+  </span>
+</footer>
+
+      </div>
+      
+      <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+        
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/google-tag-manager-workspaces/">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/run-google-tag-manager-google-analytics-local-files/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/troubleshooting-cross-domain-tracking-in-google-analytics/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Troubleshooting%20Cross-Domain%20Tracking%20In%20Google%20Analytics%20https://www.simoahava.com/analytics/troubleshooting-cross-domain-tracking-in-google-analytics/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://www.simoahava.com/analytics/troubleshooting-cross-domain-tracking-in-google-analytics/">
+              <i class="fa fa-google-plus"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/troubleshooting-cross-domain-tracking-in-google-analytics/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#disqus">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+      </div>
+      
+      <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+  <i id="btn-close-shareoptions" class="fa fa-close"></i>
+  <ul class="share-options">
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=%25!s%28BADINDEX%29">
+          <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https%3A%2F%2Fwww.simoahava.com%2Fanalytics%2Ftroubleshooting-cross-domain-tracking-in-google-analytics%2F%20%25!s%28BADINDEX%29%20via%20@SimoAhava">
+          <i class="fa fa-twitter"></i><span>Share on Twitter</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=%25!s%28BADINDEX%29">
+          <i class="fa fa-google-plus"></i><span>Share on Google&#43;</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.linkedin.com/cws/share?url=%25!s%28BADINDEX%29">
+          <i class="fa fa-linkedin"></i><span>Share on LinkedIn</span>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+<div id="share-options-mask" class="share-options-mask"></div>
+    </div>
+    
+    <div id="about">
+  <div id="about-card">
+    <div id="about-btn-close">
+      <i class="fa fa-remove"></i>
+    </div>
+    
+      <img id="about-card-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+    
+    <h4 id="about-card-name">Simo Ahava</h4>
+    
+      <div id="about-card-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</div>
+    
+    
+      <div id="about-card-job">
+        <i class="fa fa-briefcase"></i>
+        <br/>
+        Senior Data Advocate at Reaktor
+      </div>
+    
+    
+      <div id="about-card-location">
+        <i class="fa fa-map-marker"></i>
+        <br/>
+        Finland
+      </div>
+    
+  </div>
+</div>
+
+    
+  
+    
+    <div id="cover" style="background-image:url('https://www.simoahava.com/images/maisema.jpg');"></div>
+  
+
+
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.7/js/jquery.fancybox.min.js" integrity="sha256-GEAnjcTqVP+vBp3SSc8bEDQqvWAZMiHyUSIorrWwH50=" crossorigin="anonymous"></script>
+
+
+<script src="https://www.simoahava.com/js/script.js"></script>
+
+
+
+
+  
+    
+      <script>
+        
+
+
+
+
+
+        (function() {
+          
+          
+          if (window.location.hostname == "localhost") {
+            return;
+          }
+          var d = document, s = d.createElement('script');
+          var disqus_shortname = 'simoahava';
+          s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      </script>
+    
+  
+
+
+
+    
+  </body>
+</html>
+

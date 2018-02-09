@@ -1,0 +1,972 @@
+
+
+  
+    
+  
+
+
+  
+
+
+
+
+
+  
+
+
+  
+
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Hugo 0.31 with theme Tranquilpeak 0.4.3-BETA">
+    <title>Google Tag Manager&#39;s Data Model | Simo Ahava's blog</title>
+    
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-PZ7GMV9');</script>
+    
+    <script src="//simoahava.disqus.com/count.js" id="dsq-count-scr" async></script>
+    <meta name="author" content="Simo Ahava">
+    <meta name="keywords" content="">
+
+    <link rel="icon" href="https://www.simoahava.com/images/favicon.ico">
+    
+    <link rel="amphtml" href="https://www.simoahava.com/amp/analytics/google-tag-manager-data-model/">
+    
+    <meta name="description" content="A detailed description and walkthrough of Google Tag Manager&#39;s internal data model and how it interacts with the on-page dataLayer structure.">
+    <meta property="og:description" content="A detailed description and walkthrough of Google Tag Manager&#39;s internal data model and how it interacts with the on-page dataLayer structure.">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="Google Tag Manager&#39;s Data Model">
+    <meta property="og:url" content="/analytics/google-tag-manager-data-model/">
+    <meta property="og:site_name" content="Simo Ahava&#39;s blog">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Google Tag Manager&#39;s Data Model">
+    <meta name="twitter:description" content="A detailed description and walkthrough of Google Tag Manager&#39;s internal data model and how it interacts with the on-page dataLayer structure.">
+    
+      <meta name="twitter:creator" content="@SimoAhava">
+      
+    
+
+    
+    
+
+    
+      <meta property="og:image" content="https://www.simoahava.com/images/simo.png">
+    
+
+    
+      <meta name="twitter:image" content="https://www.simoahava.com/images/2014/09/data-model.png">  
+      <meta property="og:image" content="https://www.simoahava.com/images/2014/09/data-model.png">
+    
+    
+    
+
+    
+
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/jquery.fancybox.min.css" integrity="sha256-vuXZ9LGmmwtjqFX1F+EKin1ThZMub58gKULUyf0qECk=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/helpers/jquery.fancybox-thumbs.min.css" integrity="sha256-SEa4XYAHihTcEP1f5gARTB2K26Uk8PsndQYHQC1f4jU=" crossorigin="anonymous" />
+    
+    
+    <link rel="stylesheet" href="https://www.simoahava.com/css/style.css" />
+    
+    
+
+    
+      
+    
+    
+  </head>
+
+  <body>
+    <div id="blog">
+      <header id="header" data-behavior="4">
+  <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+  <div class="header-title">
+    <a class="header-title-link" href="https://www.simoahava.com/">Simo Ahava&#39;s blog</a>
+  </div>
+  
+</header>
+
+      <nav id="sidebar" data-behavior="4">
+  <div class="sidebar-container">
+    
+      <div class="sidebar-profile">
+        <a href="https://www.simoahava.com/">
+          <img class="sidebar-profile-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+        </a>
+        <h4 class="sidebar-profile-name">Simo Ahava</h4>
+        
+          <h5 class="sidebar-profile-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</h5>
+        
+      </div>
+    
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+      
+      <span class="sidebar-button-desc">Home</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+      
+      <span class="sidebar-button-desc">Categories</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tags/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Tags</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/gtm-tips/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-magic"></i>
+      
+      <span class="sidebar-button-desc">GTM Tips</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/about-simo-ahava/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+      
+      <span class="sidebar-button-desc">About</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tools/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-wrench"></i>
+      
+      <span class="sidebar-button-desc">Tools</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/blog-statistics/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bar-chart"></i>
+      
+      <span class="sidebar-button-desc">Blog statistics</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://github.com/sahava" target="_blank" rel="noopener">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+      
+      <span class="sidebar-button-desc">GitHub</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/upcoming-talks/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bullhorn"></i>
+      
+      <span class="sidebar-button-desc">Upcoming talks</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
+
+    </ul>
+  </div>
+</nav>
+
+      
+
+      <div id="main" data-behavior="4"
+        class="
+               hasCoverMetaIn
+               ">
+        <article class="post" itemscope itemType="http://schema.org/BlogPosting">
+	  <form id="search" action="/search/">
+  <input name="q" type="text" class="form-control input--xlarge" placeholder="Search blog..." autocomplete="off">
+  </form>
+
+          
+          
+            <div class="post-header main-content-wrap text-left">
+
+  
+
+    <h1 itemprop="headline">
+      Google Tag Manager&#39;s Data Model
+    </h1>
+  
+  
+  <div class="postShorten-meta post-meta">
+    
+      <time itemprop="datePublished" datetime="2014-09-20T10:40:55Z">
+        
+  September 20, 2014
+
+      </time>
+    
+      
+  
+  
+    <span>in</span>
+    
+      <a class="category-link" href="https://www.simoahava.com/categories/analytics">Analytics</a>
+    
+  
+
+
+       | <a href="https://www.simoahava.com/analytics/google-tag-manager-data-model/#disqus_thread">Comments</a> <span id="linkedincount"></span>
+  </div>
+
+
+</div>
+
+          
+          <div class="post-content markdown" itemprop="articleBody">
+            <div class="main-content-wrap">
+              
+
+<p>It&rsquo;s time for <a href="http://www.measurecamp.org/">MeasureCamp</a> again! As <a href="https://www.simoahava.com/analytics/macro-magic-google-tag-manager/">before</a>, I want to write an accompanying post for my session, since there&rsquo;s always so much more to say than the time slot allows for. So, the topic of this article is the data model used by <a href="http://www.google.com/tagmanager">Google Tag Manager</a> to process digital data in your data layer.</p>
+
+<p>This post also picks up where I left in my previous foray into the <a href="https://www.simoahava.com/analytics/data-layer/">data layer</a>. However, where the first article aimed to be generic (since the data layer should be generic), this post will look at how GTM uses the information in the generic data layer, and how it processes this information to work with the proprietary features of the tool.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2014/09/data-model.png" title="Data Model for Google Tag Manager">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2014/09/data-model.png#ZgotmplZ" alt="Data Model for Google Tag Manager">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>The diagram above should elucidate my point (fear my PowerPoint-to-image skills).</p>
+
+<p>We have data passing through your backend systems to your website. Some of this data is used to build the website with its visuals and functionalities, and some of this data is stored in the data layer to be used by other tools and applications connected to the website.</p>
+
+<p>Google Tag Manager doesn&rsquo;t access the data layer&rsquo;s structure directly, since that would compromise the data layer&rsquo;s generic and tool-agnostic purpose. Rather, it pulls data from the data layer, stores it in its internal, abstract data model, and uses <em>that</em> to process the digital data.</p>
+
+<p>Since we live in a multi-vendor world, where web tools and applications are popping up like mushrooms after rain, it&rsquo;s important to respect the generic data layer. It&rsquo;s up to the sophistication of the tool itself to use this data, but it must be done in a non-invasive manner - using pull methods rather than push.</p>
+
+<table>
+<thead>
+<tr>
+<th><strong>dataLayer</strong></th>
+<th><strong>Data Model</strong></th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>Tool-agnostic</td>
+<td>Tool-specific</td>
+</tr>
+
+<tr>
+<td>Generic</td>
+<td>Unique</td>
+</tr>
+
+<tr>
+<td>Accessed directly</td>
+<td>Accessed via helper</td>
+</tr>
+
+<tr>
+<td>Structured</td>
+<td>Abstract</td>
+</tr>
+</tbody>
+</table>
+
+<p>There&rsquo;s a difference between data layer and data model. To some it might seem very subtle, but in reality it&rsquo;s what ensures that the data layer remains a free-for-all, standardized container for data. The data model, on the other hand, is built according to each platform&rsquo;s own specifications, but the way it communicates with the data layer must be clean and perhaps even standardized, since only that way can we ensure that a single tool doesn&rsquo;t ruin the data layer for all.</p>
+
+<h2 id="setting-up-the-test">Setting up the test</h2>
+
+<p>The most familiar way of accessing GTM&rsquo;s data model is through the Data Layer Variable Macro. When you call this macro type, the following happens:</p>
+
+<ul>
+<li><p>The macro polls the data model through an interface method</p></li>
+
+<li><p>If a key with the given variable name is found, its value is returned</p></li>
+
+<li><p>If no key is found, <code>undefined</code> is returned instead</p></li>
+</ul>
+
+<p>For the purposes of this article, I&rsquo;ll now create a tester, which shows you how the data model works. The tester is a Custom HTML Tag which fires upon a certain event (&lsquo;dlTest&rsquo;). When it fires, it prints the content of the Data Layer Variable Macro into the JavaScript console.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2014/09/data-layer-tester.png" title="Data Layer Tester">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2014/09/data-layer-tester.png#ZgotmplZ" alt="Data Layer Tester">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>The macro itself is just a Data Layer Macro which refers to variable name <strong>testKey</strong>:</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2014/09/data-layer-macro.png" title="Data Layer Variable Macro">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2014/09/data-layer-macro.png#ZgotmplZ" alt="Data Layer Variable Macro">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>So now, whenever I want to see what the key <strong>testKey</strong> contains in the data model, I only have to type the following in the console:</p>
+
+<p><code>dataLayer.push({'event' : 'dlTest'});</code></p>
+
+<p>Next, I&rsquo;ll publish my container, and try this out. This is what the console looks like now if I run the event:</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2014/09/test-macro.png" title="Test Data Layer Macro">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2014/09/test-macro.png#ZgotmplZ" alt="Test Data Layer Macro">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>The <code>undefined</code> is what the macro actually returns. <strong>false</strong> is returned because the event push triggered a tag.</p>
+
+<h2 id="add-and-modify-the-key">Add and modify the key</h2>
+
+<p>Let&rsquo;s start simple. I&rsquo;ll add some values to the key, and see how the macro reacts:</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2014/09/test-add-values.png" title="Test Adding Values To Data Model">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2014/09/test-add-values.png#ZgotmplZ" alt="Test Adding Values To Data Model">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>Here are the pushes in order:</p>
+
+<ol>
+<li><p><code>'string'</code> - <em>string</em></p></li>
+
+<li><p><code>1</code> - <em>number</em></p></li>
+
+<li><p><code>[1, 2, 3</code>] - <em>Array</em></p></li>
+
+<li><p><code>{'key' : 'value'}</code> - <em>object</em></p></li>
+
+<li><p><code>true</code> - <em>boolean</em></p></li>
+
+<li><p><code>function() { return undefined; }</code> - <em>function</em></p></li>
+</ol>
+
+<p>As you can see, the interface <code>get()</code> function only returns the latest value. <code>dataLayer</code>, however, holds all the values:</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2014/09/datalayer-after-push.png" title="dataLayer after push">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2014/09/datalayer-after-push.png#ZgotmplZ" alt="dataLayer after push">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>Here are the key takeaways:</p>
+
+<ul>
+<li><p>The data model is not the same thing as data layer. All the values I pushed above can be found in the data layer, but only the most recent value is stored in the data model</p></li>
+
+<li><p>When pushing a value of different type, the previous value is completely overwritten in the data model</p></li>
+</ul>
+
+<p>That&rsquo;s pretty simple, right? Well, let&rsquo;s try updating the value with another value of the <em>same type</em> next.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2014/09/push-same-value.png" title="Push the same type">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2014/09/push-same-value.png#ZgotmplZ" alt="Push the same type">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>Here are the pushes in order:</p>
+
+<ol>
+<li><p><code>'string'</code> + <code>'newString'</code> =&gt; <code>'newString'</code></p></li>
+
+<li><p><code>1</code> + <code>5</code> =&gt; <code>5</code></p></li>
+
+<li><p><code>[1, 2, 3]</code> + <code>[4, 5]</code> =&gt; <code>[4, 5, 3]</code> *<strong>HUH?</strong></p></li>
+
+<li><p><code>{'key' : 'value'}</code> + <code>{'newKey' : 'value'}</code> =&gt; <code>{'key' : 'value', 'newKey' : 'value'}</code> *<strong>WTF?</strong></p></li>
+</ol>
+
+<p>The primitive values work as expected. Pushing another value of the same type just overwrites the previous value. However, the Array and the plain object behave very strangely.</p>
+
+<p>This is because when you&rsquo;re pushing an Array on top of an Array or a plain object on top of a plain object, the interface performs a <em>recursive merge</em>. That is, it checks whether the keys within the object or Array that are being pushed already exist. If they do, their values are updated, but all the other keys are left alone.</p>
+
+<p>It&rsquo;s easy to understand if you look at how the plain object behaves.</p>
+
+<p>First, you push an object with the key <strong>&lsquo;key&rsquo;</strong> with the value <strong>&lsquo;value&rsquo;</strong>. Next, you push an object with the key <strong>&lsquo;newKey&rsquo;</strong> with the value <strong>&lsquo;value&rsquo;</strong>. Now, <strong>&lsquo;key&rsquo;</strong> is not the same thing as <strong>&lsquo;newKey&rsquo;</strong>, so the plain object is <em>updated</em>, not replaced.</p>
+
+<p>But what about the Array? I&rsquo;m pushing <code>[4, 5]</code>, which have nothing in common with <code>[1, 2, 3]</code>. Shouldn&rsquo;t the end result be</p>
+
+<p><code>[4, 5]</code>, or
+<code>[1, 2, 3, 4, 5]</code>, or even
+<code>[[1, 2, 3], [4, 5]]</code>?</p>
+
+<p>Surely <code>[4, 5, 3]</code> is a bug?</p>
+
+<p>Nope, if you know your JavaScript. An Array is a type of an object. It, too, has keys with which you can access the values within. The keys start from 0 and go up until there are no more members in the Array. So, the first Array looks actually something like this:</p>
+
+<p><code>[1, 2, 3]</code>
+Key 0 : Value 1
+Key 1 : Value 2
+Key 2 : Value 3</p>
+
+<p>The second Array looks like this:</p>
+
+<p><code>[4, 5]</code>
+Key 0 : Value 4
+Key 1 : Value 5</p>
+
+<p>Now, the recursive merge spots these shared keys (0 and 1), and updates their values accordingly. The third key (2) is not touched, since the Array that was pushed second had no value for it.</p>
+
+<p>We&rsquo;ll explore how to add data to existing Arrays soon enough.</p>
+
+<h2 id="removing-a-key-from-the-data-model">Removing a key from the data model</h2>
+
+<p>If you have a single page app, and the data layer persist throughout the session, you might want to delete some variables from the data model every now and then. Just removing the key from <code>dataLayer</code> won&rsquo;t be enough:</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2014/09/remove-key.png" title="Delete Key from Data Layer">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2014/09/remove-key.png#ZgotmplZ" alt="Delete Key from Data Layer">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>Here&rsquo;s what happens:</p>
+
+<ol>
+<li><p>I push &lsquo;simoahava&rsquo; as the value of &lsquo;testKey&rsquo;, this is registered by the macro</p></li>
+
+<li><p>I delete this entire object from <code>dataLayer</code></p></li>
+
+<li><p>I verify this by looking at the contents of <code>dataLayer</code></p></li>
+
+<li><p>However, the data model still holds the latest value</p></li>
+</ol>
+
+<p>This is actually an important feature of the data model. The data model treats <code>dataLayer</code> as a <em>queue</em> or a message bus, if you will. It operates on a first in, first out principle, meaning that as soon as something is pushed into <code>dataLayer</code>, it is processed and its values are stored into the data model.</p>
+
+<p>It wouldn&rsquo;t work if the data model should remove a key if it is dropped from <code>dataLayer</code>. You might have multiple pushes of the same key with different values (take &lsquo;event&rsquo;, for example). How would the data model know if you&rsquo;re just cleaning up objects from the global Array structure rather than asking for them to be removed from the data model?</p>
+
+<p>A remove method in the interface might be a good idea, but it&rsquo;s just as easy to take the generic approach and push <code>undefined</code> as the value of the key. This will store <code>undefined</code> into the data model as well, meaning it will be, for all intents and purposes, as if the key no longer exists.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2014/09/push-undefined.png" title="Push undefined to remove key">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2014/09/push-undefined.png#ZgotmplZ" alt="Push undefined to remove key">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>That&rsquo;s how simple it is.</p>
+
+<h2 id="the-command-array">The command array</h2>
+
+<p>This is where I left you hanging earlier. Say you want to update an Array by adding members to the end or into the middle. It&rsquo;s very difficult to do in a generic way, since you first need to retrieve the Array from the data model, add members to the end or to the middle, and then push it back. And all has to happen within the data layer, because you don&rsquo;t want all the other tools and platforms that use the data layer to be left outside.</p>
+
+<p>The way to do this is to use a special <em>command array</em>. It enables you to access methods of the value type you have stored in the data model.</p>
+
+<p>Here&rsquo;s how it works. I&rsquo;m going to update an Array <code>[1, 3]</code> first with two new members using <code>push()</code>, so that it becomes <code>[1, 3, 4, 5]</code>. Next I&rsquo;ll do a <code>splice()</code>, where I add the number 2 to its rightful place. Observe closely.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2014/09/command-array.png" title="Command Array">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2014/09/command-array.png#ZgotmplZ" alt="Command Array">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>As you can see, the command array has its special syntax. First of all, you need to push an Array into the data layer, <strong>not</strong> an object as you normally would.</p>
+
+<p>Next, the first member of the Array needs to be a string which holds the actual command. All the rest of the members in the command array are arguments to this command.</p>
+
+<p>Thus, <code>testKey.push(4,5)</code> becomes <code>['testKey.push', 4, 5]</code>, and <code>testKey.splice(1,0,2)</code> becomes <code>['testKey.splice', 1, 0, 2]</code>.</p>
+
+<p>This way you can do some cool things with the values stored in the data model without having to access them directly. Using the data layer ensures that other tools and applications can benefit from your modifications as well.</p>
+
+<h2 id="custom-methods">Custom methods</h2>
+
+<p>The last thing I&rsquo;ll show you is how to perform some custom transformations on the values stored in the data model.</p>
+
+<p>Let&rsquo;s say I&rsquo;m storing a bunch of products and stores in the data layer. This data is provided by the backend system. As it turns out, one of the store names is misspelled, and this needs to be fixed in the data model. Performing a series of gets and sets would be cumbersome and very ineffective. Instead, I can just push a function which does this whole thing in a simple for-loop.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2014/09/custom-method.png" title="Push a custom method">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2014/09/custom-method.png#ZgotmplZ" alt="Push a custom method">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>When you push a function into the data layer, <code>this</code> will be the interface of the data model on the page. It exposes two methods: <code>get(key)</code> and <code>set(key, value)</code>.</p>
+
+<p>First, I use <code>get()</code> to retrieve the value of <code>'testKey'</code>. Then, I do a for-loop which goes over each member in the <code>'testKey'</code> Array, looking for the typo. If a typo is found, then it&rsquo;s corrected there and then. Because I&rsquo;m dealing with objects, you don&rsquo;t have to push anything back into the data model, since you&rsquo;ve actually copied an object reference, not the object itself.</p>
+
+<p>Don&rsquo;t worry about that object mumbo-jumbo. The key here is that I performed a transformation on the data in the data model by using the data layer. This way other vendors and tools can benefit from the change as well. I could have just as well directly accessed the public method of the interface, but that would not be the generic way to do things.</p>
+
+<h2 id="summary">Summary</h2>
+
+<p>This has been a complicated post, I know, but here are the things you should have learned.</p>
+
+<ul>
+<li><p>The data layer on the page and the data model used by the tag manager are not the same thing</p></li>
+
+<li><p>The data layer is generic, tool-agnostic, and can be accessed by all applications that can tap into the global namespace</p></li>
+
+<li><p>The data model is internal to the tag manager, it&rsquo;s abstract (no Arrays here), and it has a public interface with just two methods</p></li>
+
+<li><p>Certain values (Arrays, plain objects) behave erratically when you try to update them with a regular push</p></li>
+
+<li><p>You should always do all additions, removals, and transformations by using the data layer, and not by accessing the interface of the data model directly</p></li>
+</ul>
+
+<p>If you want to geek it up a little, take a look at the <a href="https://github.com/google/data-layer-helper">Data Layer Helper</a> specification in GitHub, written by GTM&rsquo;s own Brian Kuhn. That&rsquo;s where most of the lessons here were picked up.</p>
+
+<p>It&rsquo;s so important to understand the subtleties of the data layer and the data model. The one is (or should be) tool-independent, the other is a proprietary feature of the tool. One can be standardized to serve multiple vendors and platforms, the other should cater to the idiosyncrasies of each tool separately.</p>
+
+<p><a href="http://www.slideshare.net/mobile/SimoAhava/google-tag-manager-for-nerds">My presentation &ldquo;Google Tag Manager For Nerds&rdquo; from MeasureCamp V</a></p>
+
+              
+            </div>
+          </div>
+          <div id="post-footer" class="post-footer main-content-wrap">
+            
+              
+                
+                
+                  <div class="post-footer-tags">
+                    <span class="text-color-light text-small">TAGGED IN</span><br/>
+                    
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/data-layer/">data layer</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/data-model/">data model</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/google-tag-manager/">Google Tag Manager</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/guide/">Guide</a>
+
+                  </div>
+                
+              
+            
+            
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/gtm-tips/chain-macros-lookup-tables/">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/use-page-visibility-api-google-tag-manager/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/google-tag-manager-data-model/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Google%20Tag%20Manager%27s%20Data%20Model%20https://www.simoahava.com/analytics/google-tag-manager-data-model/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://www.simoahava.com/analytics/google-tag-manager-data-model/">
+              <i class="fa fa-google-plus"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/google-tag-manager-data-model/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#disqus">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+            
+              
+                <span id="disqus"></span>
+<div id="disqus_thread">
+  <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+
+              
+            
+          </div>
+        </article>
+        <footer id="footer" class="main-content-wrap">
+  <span class="copyrights">
+    &copy; 2018 Simo Ahava. All Rights Reserved
+  </span>
+</footer>
+
+      </div>
+      
+      <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+        
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/gtm-tips/chain-macros-lookup-tables/">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/use-page-visibility-api-google-tag-manager/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/google-tag-manager-data-model/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Google%20Tag%20Manager%27s%20Data%20Model%20https://www.simoahava.com/analytics/google-tag-manager-data-model/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://www.simoahava.com/analytics/google-tag-manager-data-model/">
+              <i class="fa fa-google-plus"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/google-tag-manager-data-model/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#disqus">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+      </div>
+      
+      <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+  <i id="btn-close-shareoptions" class="fa fa-close"></i>
+  <ul class="share-options">
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=%25!s%28BADINDEX%29">
+          <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=https%3A%2F%2Fwww.simoahava.com%2Fanalytics%2Fgoogle-tag-manager-data-model%2F%20%25!s%28BADINDEX%29%20via%20@SimoAhava">
+          <i class="fa fa-twitter"></i><span>Share on Twitter</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=%25!s%28BADINDEX%29">
+          <i class="fa fa-google-plus"></i><span>Share on Google&#43;</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.linkedin.com/cws/share?url=%25!s%28BADINDEX%29">
+          <i class="fa fa-linkedin"></i><span>Share on LinkedIn</span>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+<div id="share-options-mask" class="share-options-mask"></div>
+    </div>
+    
+    <div id="about">
+  <div id="about-card">
+    <div id="about-btn-close">
+      <i class="fa fa-remove"></i>
+    </div>
+    
+      <img id="about-card-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+    
+    <h4 id="about-card-name">Simo Ahava</h4>
+    
+      <div id="about-card-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</div>
+    
+    
+      <div id="about-card-job">
+        <i class="fa fa-briefcase"></i>
+        <br/>
+        Senior Data Advocate at Reaktor
+      </div>
+    
+    
+      <div id="about-card-location">
+        <i class="fa fa-map-marker"></i>
+        <br/>
+        Finland
+      </div>
+    
+  </div>
+</div>
+
+    
+  
+    
+    <div id="cover" style="background-image:url('https://www.simoahava.com/images/maisema.jpg');"></div>
+  
+
+
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.7/js/jquery.fancybox.min.js" integrity="sha256-GEAnjcTqVP+vBp3SSc8bEDQqvWAZMiHyUSIorrWwH50=" crossorigin="anonymous"></script>
+
+
+<script src="https://www.simoahava.com/js/script.js"></script>
+
+
+
+
+  
+    
+      <script>
+        
+
+
+
+
+
+        (function() {
+          
+          
+          if (window.location.hostname == "localhost") {
+            return;
+          }
+          var d = document, s = d.createElement('script');
+          var disqus_shortname = 'simoahava';
+          s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      </script>
+    
+  
+
+
+
+    
+  </body>
+</html>
+
