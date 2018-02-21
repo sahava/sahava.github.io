@@ -51,7 +51,7 @@
 {
 	"uri": "https://www.simoahava.com/gtm-tips/opt-out-of-google-analytics-tracking/",
 	"title": "#GTMTips: Opt-out Of Google Analytics Tracking",
-	"tags": ["googletagmanager", "gtmtips", "opt-out", "google analytics", "tag sequencing"],
+	"tags": ["googletagmanager", "gtmtips", "opt-out", "google analytics", "tag sequencing", "customtask"],
 	"description": "You can have your site visitors easily opt-out of Google Analytics tracking by setting a specific global variable before the first Google Analytics tag fires on the page.",
 	"content": " A while ago I posted a #GTMTips post where I detailed the steps you can take to opt-out of all Google Analytics tracking and the DoubleClick redirects that often follow. It was a fun exercise, but because it relies on preventing requests on a tag-by-tag basis (using the ubiquituous customTask), it can be a chore to handle in large containers.\nIn this article, we\u0026rsquo;ll continue with the theme of opting out from Google Analytics tracking by leveraging a solution provided by the tool itself. To make it work, we\u0026rsquo;ll use a Custom HTML tag together with some tag sequencing.\nTip 68: Opt-out of Google Analytics tracking with a global variable   The trick is to set a global variable before the first GA tag fires on the page. This is crucial, because the global variable needs to be created before the tracker object is created. So, unfortunately, customTask will not work this time (I know, HUGE disappointment!).\nThe variable itself is very simple to create. It needs to look like this:\nwindow['ga-disable-UA-XXXXXX-Y'] = true\nHere, UA-XXXXXX-Y is the tracking ID you want to block for all subsequent GA requests sent on the page. You can create multiple global variables like this, one for each tracking ID you want to block.\nSo, if I wanted to block GA tracking to UA-12345-1 when the user has a specific cookie in their browser, I could use something like this in a Custom HTML tag:\n\u0026lt;script\u0026gt; if ({{Cookie - _ga_opt_out}} === \u0026#39;true\u0026#39;) { window[\u0026#39;ga-disable-{{GA ID}}\u0026#39;] = true; } \u0026lt;/script\u0026gt; Here, {{Cookie - _ga_opt_out}} is an (imaginary) first party cookie, which stores the value true if the user has opted out of tracking on my (imaginary) site. {{GA ID}} is a constant variable that returns the Google Analytics tracking ID the user is opting-out from.\nOr, if I want to use the doNotTrack feature that most browsers let you set in their settings:\n\u0026lt;script\u0026gt; if (navigator.doNotTrack \u0026amp;\u0026amp; navigator.doNotTrack === 1) { window[\u0026#39;ga-disable-{{GA ID}}\u0026#39;] = true; } \u0026lt;/script\u0026gt; Note that you should not add any triggers to this Custom HTML tag, as it will only fire when in a tag sequence.\nFinally, you need to find the first Universal Analytics tag that fires on the page with that tracking ID. Typically this would be a Page View tag which fires on the All Pages trigger.\nThen, scroll down to its Advanced Settings, and make sure the Tag Sequencing setting is setup as follows:\n  This setting ensures that before the Page View tag fires, your opt-out script has time to complete, and set the browser to opt-out of Google Analytics tracking to the tracking ID established in the global variable.\nThat\u0026rsquo;s all there is to it, really. The obvious downside is that if you are tracking to more than one GA property, you\u0026rsquo;ll need to exclude all of them. You\u0026rsquo;ll also need to modify the conditional statement in the script to match whatever opt-out scheme your website offers.\n"
 },
@@ -275,7 +275,7 @@
 {
 	"uri": "https://www.simoahava.com/gtm-tips/use-customtask-access-tracker-values-google-tag-manager/",
 	"title": "#GTMTips: Use customTask To Access Tracker Values In Google Tag Manager",
-	"tags": ["client id", "Google Tag Manager", "gtmtips", "tasks", "universal analytics"],
+	"tags": ["client id", "Google Tag Manager", "gtmtips", "tasks", "universal analytics", "customtask"],
 	"description": "Set the Client ID, for example, in all your Google Analytics hits as a Custom Dimension. You can do this with Google Tag Manager and customTask.",
 	"content": " One of the things I\u0026rsquo;ve recommended from the get-go is to always send the Client ID to Google Analytics with your users\u0026rsquo; hits. This is very useful for adding a level of granularity to your tracking. At first, I recommended using an Event tag to do this. Then I modified my approach a little so that you could send it with your initial Page View (thus not inflating your hit counts).\nHowever, Universal Analytics recently released a new task API, customTask, which lets you access the model object mid-tag, thus letting you modify the payload that is dispatched to Google Analytics. In this article, I\u0026rsquo;ll show you how this works by using the classic example of sending the Client ID to Google Analytics.\nTip 59: Access the model object mid-tag in Google Tag Manager The setup is really simple. You need a Custom Dimension setup in Universal Analytics, and then you simply need to add a new Field to set in your Page View tag (or whatever you want to use to send the data to GA). Remember to read my article on sending this type of metadata to Google Analytics, if you\u0026rsquo;re unsure why you would want to do this in the first place.\nThe tag setup would look like this:\n  Field name should be set to customTask, and as its value you need to use a Custom JavaScript Variable. The variable looks like this:\nfunction() { // Modify customDimensionIndex to match the index number you want to send the data to  var customDimensionIndex = 5; return function(model) { model.set(\u0026#39;dimension\u0026#39; + customDimensionIndex, model.get(\u0026#39;clientId\u0026#39;)); } } What happens is that once Google Tag Manager starts executing the tag code, it first encounters the customTask field. It resolves the variable to a closure, which is basically a function that automatically receives a model object as a parameter. The model object can be manipulated using the get and set methods.\nNext, we set the Custom Dimension at index 5 (as determined by the value of customDimensionIndex) to the Client ID, which we retrieve with the get method of the model object.\nThis little trick means that we can tell the GA tag to fetch the Client ID from the tracker object and send it in a Custom Dimension without any extra hacks or workarounds that we had to employ previously. The fact that customTask has no other function in Universal Analytics means that we don\u0026rsquo;t have to mind the fact that we\u0026rsquo;re overwriting a task method with this tag.\nYou can use this for any fields in the model/tracker object if you wish.\n"
 },
@@ -1652,14 +1652,14 @@
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/tags/analytics/",
+	"uri": "https://www.simoahava.com/categories/analytics/",
 	"title": "Analytics",
 	"tags": [],
 	"description": "",
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/categories/analytics/",
+	"uri": "https://www.simoahava.com/tags/analytics/",
 	"title": "Analytics",
 	"tags": [],
 	"description": "",
@@ -1911,14 +1911,14 @@
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/tags/content-management/",
+	"uri": "https://www.simoahava.com/categories/content-management/",
 	"title": "Content Management",
 	"tags": [],
 	"description": "",
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/categories/content-management/",
+	"uri": "https://www.simoahava.com/tags/content-management/",
 	"title": "Content Management",
 	"tags": [],
 	"description": "",
@@ -2128,14 +2128,14 @@
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/tags/digital-marketing/",
+	"uri": "https://www.simoahava.com/categories/digital-marketing/",
 	"title": "Digital Marketing",
 	"tags": [],
 	"description": "",
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/categories/digital-marketing/",
+	"uri": "https://www.simoahava.com/tags/digital-marketing/",
 	"title": "Digital Marketing",
 	"tags": [],
 	"description": "",
@@ -2723,14 +2723,14 @@
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/tags/personal/",
+	"uri": "https://www.simoahava.com/categories/personal/",
 	"title": "Personal",
 	"tags": [],
 	"description": "",
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/categories/personal/",
+	"uri": "https://www.simoahava.com/tags/personal/",
 	"title": "Personal",
 	"tags": [],
 	"description": "",
@@ -3248,13 +3248,6 @@
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/tags/web-design/",
-	"title": "Web Design",
-	"tags": [],
-	"description": "",
-	"content": ""
-},
-{
 	"uri": "https://www.simoahava.com/categories/web-design/",
 	"title": "Web Design",
 	"tags": [],
@@ -3262,14 +3255,21 @@
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/tags/web-development/",
-	"title": "Web Development",
+	"uri": "https://www.simoahava.com/tags/web-design/",
+	"title": "Web Design",
 	"tags": [],
 	"description": "",
 	"content": ""
 },
 {
 	"uri": "https://www.simoahava.com/categories/web-development/",
+	"title": "Web Development",
+	"tags": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "https://www.simoahava.com/tags/web-development/",
 	"title": "Web Development",
 	"tags": [],
 	"description": "",
