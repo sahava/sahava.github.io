@@ -1,5 +1,12 @@
 [
 {
+	"uri": "https://www.simoahava.com/analytics/customtask-the-guide/",
+	"title": "customTask - The Guide",
+	"tags": ["google tag manager", "customtask", "tasks", "google analytics"],
+	"description": "Guide to the customTask feature in Universal Analytics. Includes instructions how to use customTask, and how to combine multiple customTask solutions.",
+	"content": " If you have been reading my blog articles over the past year, you might have noticed a disturbing trend. I\u0026rsquo;ve published 9 articles on customTask since the API was released. It might not sound like much, but I can\u0026rsquo;t think of a single feature in Google Analytics or Google Tag Manager that has so completely convinced me of its usefulness in such a short time.\nThe customTask API is a feature of the Universal Analytics library (used by Google Tag Manager\u0026rsquo;s tags, too). It lets you get and set values from and to the (Measurement Protocol) hit as it\u0026rsquo;s being generated. This is really useful for a couple of reasons, which I\u0026rsquo;ve covered in the previous articles, but I\u0026rsquo;ll go over them briefly in the beginning of this guide, too.\n  Suffice to say that especially for Google Tag Manager, customTask adds a lot of value. With GTM, it\u0026rsquo;s always been quite difficult to access the hit-building process when using tag templates. Luckily, customTask offers a solution to this problem, and at least for this particular developer it\u0026rsquo;s opened a whole new world of Google Analytics customization.\nHowever, in spite of writing all those articles on customTask, I recently realized that I never actually took the time to explain more thoroughly how it works. Also, I haven\u0026rsquo;t yet shared solutions for combining multiple customTask tricks in a single tag. This guide seeks to address these points.\nHow Tasks work When you run the ga('send', 'pageview') command either directly in your site JavaScript or indirectly via Google Tag Manager\u0026rsquo;s Google Analytics tags, you actually request that the Universal Analytics JavaScript library (analytics.js) compile an HTTP request to the Google Analytics servers.\nThe endpoint to which the hits are sent is typically /collect on the Google Analytics collector domain. The process of building and sending hits to the GA servers is also known as Measurement Protocol (MP). In fact, MP is the underlying process used by all GA tracking mechanisms, be they the ga('send'...) JavaScript SDK, Google Tag Manager\u0026rsquo;s GA tags, native SDKs for Android and iOS, and custom-built HTTP requests from point-of-sales systems, for example.\n  When you use the JavaScript SDK, either via ga('send', 'pageview') or the Google Analytics tags in GTM, you are thus initiating a sequence of processes, where the final product is the actual MP request to Google Analytics. This sequence comprises a number of tasks, of which customTask is the first one that is executed.\nHere\u0026rsquo;s a quick recap of what each task does, listed in the order they are applied to the hit.\n   Task Description     customTask No functionality of its own, but can be used to manipulate the model object before it is processed by the other tasks.   previewTask If the request is generated from the pageview of a \u0026ldquo;Top Sites\u0026rdquo; thumbnail in Safari, abort the hit.   checkProtocolTask Aborts the request if the page protocol is not valid (http or https).   validationTask Checks if the fields in the request have valid and expected values. Aborts the request if this is not the case (e.g. trying to send a string as the Event Value).   historyImportTask If there is still legacy tracking running on the site, this task imports information from the old GA library cookies into Universal Analytics. Very useful if the site is migrating to Universal Analytics.   samplerTask If you\u0026rsquo;ve decided to manually sample the users to stay within Google Analytics\u0026rsquo; processing limits, this task aborts the request if the user is sampled out of data collection.   buildHitTask Generates the hitPayload string, which is essentially the list of query parameters and their values passed to the Measurement Protocol request.   sendHitTask Sends the hitPayload in a Measurement Protocol request to the GA servers.   timingTask If you are automatically sampling pages for page speed measurements, this task sends the timing hit to Google Analytics.   displayFeaturesTask If you have enabled display features in GA settings, this task compiles the request to the DoubleClick servers.    Each tasks receives the model object as a parameter. The model object contains all the fields that have been set in the tracker, as well as any enhancements applied in the tasks themselves.\nThe beauty of customTask is that because it runs before any of the other tasks, you can use it to overwrite behavior of these other tasks. For example, if you want to run Google Analytics locally or in a Chrome Extension, you\u0026rsquo;ll need to make sure checkProtocolTask is never run, because it aborts the hit builder if the page protocol is not http or https. The customTask would look like this:\nvar customTask = function(model) { // Prevent checkProtocolTask from running  model.set(\u0026#39;checkProtocolTask\u0026#39;, null); }; As you can see, the task is actually a field in the model object that you can manipulate just as you can manipulate any other field in the model. For example, if you want to grab the tracking ID (UA-XXXXXX-Y) and send it in the Custom Dimension with index 15, you can use the following customTask:\nvar customTask = function(model) { // Get the tracking ID from the model object  var trackingId = model.get(\u0026#39;trackingId\u0026#39;); // Set the tracking ID to Custom Dimension 15  model.set(\u0026#39;dimension15\u0026#39;, trackingId); }; To see what fields are available in the model object, check this developer documentation. Note that it\u0026rsquo;s not complete, since it\u0026rsquo;s missing all the tasks.\nBy running these model interactions with customTask, you have a lot of control over how the task sequence is run. Especially with Google Tag Manager, it would be difficult to run any complicated logic for when and how to manipulate sendHitTask, if you applied it directly to the tag as a field.\nThings you can do with customTask As written above, customTask is special for two reasons.\n It has no special functionality of its own. A task queue can and will run perfectly without customTask defined.\n It runs before any other task, meaning you have full control over how the queue is processed.\n  With these two things in mind, here\u0026rsquo;s the list of all the customTask tricks I\u0026rsquo;ve written about, with a description of what makes them special.\n1. Set Client ID as a Custom Dimension Link to article: #GTMTips: Use customTask To Access Tracker Values In Google Tag Manager.\nThis is one of the simpler tricks. It doesn\u0026rsquo;t manipulate the task queue itself at all, it simply gets the Client ID from the model object, and then sets it as the value of the specified Custom Dimension.\nIt\u0026rsquo;s an elegant solution to a difficult problem. Without customTask, getting and setting the Client ID in a Google Analytics tag was difficult. If the tag is run for a first-time visitor who hasn\u0026rsquo;t received a Client ID yet, the actual clientId field is not available when the regular tag fields are resolved. A typical hack for this solution was to fetch the Client ID by creating a dummy tracker or by sending the Client ID with an Event tag that fired after the Pageview.\nBut with customTask, there\u0026rsquo;s no need for such unorthodox methods.\n2. Duplicate Google Analytics tags to more than one property Link to article: #GTMTips: Send Google Analytics Tag To Multiple Properties.\nThis is customTask at its purest. The customTask function first stores a reference to sendHitTask in a global variable, after which it overwrites sendHitTask in the current model object with the duplicator code.\nThe duplicator first lets the original hit fire to GA, after which it replaces the Tracking ID in the hitPayload with the Tracking ID of the second property. Then, the global sendHitTask is invoked again, and the hit is sent to the second property with an identical payload.\nNote! The reason the reference to sendHitTask is stored in a global variable is to avoid issues with field multiplication. Let\u0026rsquo;s say you always use this to get the original sendHitTask reference:\nvar originalSendTask = model.get('sendHitTask');\nEach time this customTask code is run, it will get a reference to what is stored in the model object\u0026rsquo;s sendHitTask. Unfortunately, when building standard Ecommerce hits, or when automatically sampling timing hits, the tag is automatically sent more than once. Thus the reference to the original sendHitTask is recursively augmented with each iteration of model.set('sendHitTask');, resulting in code being executed erratically.\nBy having a global variable store the reference to the original sendHitTask, this recursive problem is avoided.\n3. Track offline users in Google Analytics Link to article: Track Users Who Are Offline In Google Analytics.\nThis is all David Vallejo. His solution tackles the problem of lost internet connectivity and hits that are aborted because of this. It uses customTask to check if the user is offline, and if they are, the hits are stored in a batch queue. Once connectivity is restored, the queue is processed, and the hits are finally sent to GA.\n4. Remove PII from GA payloads Link to article: #GTMTips: Remove PII From Google Analytics Hits.\nWith GDPR coming soon, covering all your bases with regard to private data is a good idea. Fixing potential PII leaks before they hit Google Analytics servers is a good method as any to make sure you\u0026rsquo;re complying with Google Analytics\u0026rsquo; Terms of Service as well as the increasingly stricter regulations for sending and collecting personal data.\n  Here, customTask takes the hit payload before it is sent to GA, and purges it of all matches against any given regular expressions. These regular expressions can be built to match things like email addresses and social security numbers.\n5. Fix site speed sampling messing with your Custom Metrics Link to article: Prevent Site Speed Sampling Rate From Skewing Custom Dimensions And Custom Metrics.\nThis is a fairly simple trick, but it fixes a potential issue with Custom Metric data being skewed by the automatically collected page timing hits. The issue is that the timing hit copies all parameters from the Page View tag that is being sampled, and thus any Custom Dimensions and Custom Metrics are sent more than once, too.\nHere, customTask is attached to the Page View tag, where it checks if the hit type is timing (due to the automatically generated timing hit), and if it is, it removes all references to Custom Dimensions and Metrics from the request.\n6. Respect opt-out Link to article: #GTMTips: Respect Opt-Out From Advertising And Analytics.\nA simple trick, again. This time customTask checks if the user has specific opt-out settings in the browser, and if they do, it aborts the requests to Google Analytics and DoubleClick. You\u0026rsquo;ll need to manually create the setting itself, be it a pop-up that stores the opt-out in a browser cookie or something, but once you\u0026rsquo;ve done it, this solution makes it easy to enact the opt-out programmatically.\n7. Send details about Optimize experiments to Google Analytics Link to article: Send Event And Custom Dimension If Google Optimize Experiment Is Running.\nThis trick tackles an issue with how Google Optimize data is being reported in Google Analytics. Basically, the Experiment Name and Experiment ID dimensions are scoped to the user for the duration of the experiment. Thus it\u0026rsquo;s not possible to get a segment of the actual sessions when the user was actively participating in an experiment page.\nThe customTask checks for certain features of the Page View tag it is attached to, and if these features are found, it updates a Custom Dimension in the hit payload with details about the experiment. You can then segment your GA data with these Custom Dimensions to see sessions where the user was actually active on an experiment page.\n8. Auto-link domains with regular expressions Link to article: #GTMTips: Auto Link Domains With Regex.\nWith this trick, customTask brings Google Tag Manager to feature parity with analytics.js. Regular, on-page Google Analytics tracking lets you use regular expressions with the Auto-Link Domains plugin. Google Tag Manager only accepts string values.\nHere, customTask actually applies the Auto-Link plugin to the tracker object itself, passing the array of regular expressions to the plugin. This way, domains can be automatically linked with cross-domain parameters based on a regular expression match, rather than an exhaustive list of strings.\n9. Send Google Analytics payloads to Snowplow Link to article: #GTMTips: Automatically Duplicate Google Analytics Hits To Snowplow.\nI\u0026rsquo;m a huge fan of Snowplow, mainly because it\u0026rsquo;s open-source and tackles many difficult issues having to do with sessionization and tracking schemas. This trick uses customTask to replicate what the \u0026ldquo;official\u0026rdquo; Snowplow Google Analytics plugin does.\n  Google Tag Manager doesn\u0026rsquo;t support adding plugins to tags, so using customTask to replicate plugin features is as good a solution as any.\nPutting it all together (literally) If you like customTask as much as I do, chances are you\u0026rsquo;ll want to use more than one trick listed above (and elsewhere) in your tags. There\u0026rsquo;s a catch though. You need to respect the basic features of JavaScript, mainly:\n You can only set a single field once per tag, so you can only set one customTask field per tag.\n You can only set a single model parameter once per tag, so you can only set one sendHitTask attribute per tag, for example.\n  So, let\u0026rsquo;s say you want to do both tricks (2) (Send GA hit to more than one property) and (4) (Remove PII from GA hits). You might be tempted to try this:\nfunction() { return function(model) { // Specify the PII regular expressions  var piiRegEx = [{ name: \u0026#39;EMAIL\u0026#39;, regex: /.{4}@.{4}/g }]; var globalSendTaskName = \u0026#39;_\u0026#39; + model.get(\u0026#39;trackingId\u0026#39;) + \u0026#39;_originalSendTask\u0026#39;; var originalSendTask = window[globalSendTaskName] = window[globalSendTaskName] || model.get(\u0026#39;sendHitTask\u0026#39;); // Clear the payload from PII:  model.set(\u0026#39;sendHitTask\u0026#39;, function(sendModel) { ... }); // Duplicate the hit to another tracking ID:  model.set(\u0026#39;sendHitTask\u0026#39;, function(sendModel) { ... }); }; } Unfortunately, this would not work. You are setting the sendHitTask field twice, meaning the second one is the only one that counts (since it overwrites the first set).\nInstead, you need to apply some JavaScript chops and combine both of these solutions in the same sendHitTask. It\u0026rsquo;s not exactly trivial, and there\u0026rsquo;s no textbook method for doing it. You\u0026rsquo;ll need to figure out the order in which the code should be processed.\nIn this example, we want the PII purge to happen before any hits are sent or duplicated. So the final code would look something like this:\nfunction() { return function(model) { // Specify the PII regular expressions  var piiRegEx = [{ name: \u0026#39;EMAIL\u0026#39;, regex: /.{4}@.{4}/g }]; // Specify the GA tracking ID of the property to which you want to duplicate the hits  var newTrackingId = \u0026#39;UA-12345-2\u0026#39;; var globalSendTaskName = \u0026#39;_\u0026#39; + model.get(\u0026#39;trackingId\u0026#39;) + \u0026#39;_originalSendTask\u0026#39;; var originalSendTask = window[globalSendTaskName] = window[globalSendTaskName] || model.get(\u0026#39;sendHitTask\u0026#39;); var i, hitpayload, parts, val, oldTrackingId; model.set(\u0026#39;sendHitTask\u0026#39;, function(sendModel) { // Clear the payload of PII:  hitPayload = sendModel.get(\u0026#39;hitPayload\u0026#39;).split(\u0026#39;\u0026amp;\u0026#39;); for (i = 0; i \u0026lt; hitPayload.length; i++) { parts = hitPayload[i].split(\u0026#39;=\u0026#39;); // Double-decode, to account for web server encode + analytics.js encode  val = decodeURIComponent(decodeURIComponent(parts[1])); piiRegex.forEach(function(pii) { val = val.replace(pii.regex, \u0026#39;[REDACTED \u0026#39; + pii.name + \u0026#39;]\u0026#39;); }); parts[1] = encodeURIComponent(val); hitPayload[i] = parts.join(\u0026#39;=\u0026#39;); } sendModel.set(\u0026#39;hitPayload\u0026#39;, hitPayload.join(\u0026#39;\u0026amp;\u0026#39;), true); originalSendTask(sendModel); // Rewrite the tracking ID  hitPayload = sendModel.get(\u0026#39;hitPayload\u0026#39;); oldTrackingId = new RegExp(sendModel.get(\u0026#39;trackingId\u0026#39;), \u0026#39;gi\u0026#39;); sendModel.set(\u0026#39;hitPayload\u0026#39;, hitPayload.replace(oldTrackingId, newTrackingId), true); originalSendTask(sendModel); }); } The code is fairly complex, and complexity increases with each distinct trick you want to run. This is an unfortunate consequence of the limitations of JavaScript and the fact that there is only one customTask to manipulate.\nIn the end, it\u0026rsquo;s really up to your JavaScript skills. You\u0026rsquo;ll need to be aware of how the browser runs the code line-by-line, and thus you\u0026rsquo;ll need to make sure that whatever you want to run first is also executed first by the browser. That\u0026rsquo;s why in the example above I have the PII purge running before the hit duplication. If the PII purge happened AFTER the hit is duplicated, it would be redundant, since it would still allow PII to potentially flow to Google Analytics.\nSummary As I wrote in the beginning, customTask is one of the nicest features to emerge in Google Analytics in a long time. With Google Tag Manager, it\u0026rsquo;s a real powerhouse of customization.\nIt\u0026rsquo;s a good idea to read about the Task queue in general. Understanding how tasks work will give you great insight into how analytics.js compiles and dispatches hits to Google Analytics. Once you have a good grasp on all the different moving parts of the Tasks queue, you should be able to come up with cool customTask solutions of your own, which you can then share in the comments of this article, for example!\n"
+},
+{
 	"uri": "https://www.simoahava.com/analytics/edit-google-analytics-tag-settings/",
 	"title": "#GTMTips: Edit Google Analytics Tag Settings",
 	"tags": ["google tag manager", "gtmtips", "google analytics", "google analytics settings"],
@@ -1652,14 +1659,14 @@
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/categories/analytics/",
+	"uri": "https://www.simoahava.com/tags/analytics/",
 	"title": "Analytics",
 	"tags": [],
 	"description": "",
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/tags/analytics/",
+	"uri": "https://www.simoahava.com/categories/analytics/",
 	"title": "Analytics",
 	"tags": [],
 	"description": "",
@@ -1911,14 +1918,14 @@
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/categories/content-management/",
+	"uri": "https://www.simoahava.com/tags/content-management/",
 	"title": "Content Management",
 	"tags": [],
 	"description": "",
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/tags/content-management/",
+	"uri": "https://www.simoahava.com/categories/content-management/",
 	"title": "Content Management",
 	"tags": [],
 	"description": "",
@@ -2128,14 +2135,14 @@
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/categories/digital-marketing/",
+	"uri": "https://www.simoahava.com/tags/digital-marketing/",
 	"title": "Digital Marketing",
 	"tags": [],
 	"description": "",
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/tags/digital-marketing/",
+	"uri": "https://www.simoahava.com/categories/digital-marketing/",
 	"title": "Digital Marketing",
 	"tags": [],
 	"description": "",
@@ -2723,14 +2730,14 @@
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/categories/personal/",
+	"uri": "https://www.simoahava.com/tags/personal/",
 	"title": "Personal",
 	"tags": [],
 	"description": "",
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/tags/personal/",
+	"uri": "https://www.simoahava.com/categories/personal/",
 	"title": "Personal",
 	"tags": [],
 	"description": "",
@@ -3248,13 +3255,6 @@
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/categories/web-design/",
-	"title": "Web Design",
-	"tags": [],
-	"description": "",
-	"content": ""
-},
-{
 	"uri": "https://www.simoahava.com/tags/web-design/",
 	"title": "Web Design",
 	"tags": [],
@@ -3262,14 +3262,21 @@
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/categories/web-development/",
-	"title": "Web Development",
+	"uri": "https://www.simoahava.com/categories/web-design/",
+	"title": "Web Design",
 	"tags": [],
 	"description": "",
 	"content": ""
 },
 {
 	"uri": "https://www.simoahava.com/tags/web-development/",
+	"title": "Web Development",
+	"tags": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "https://www.simoahava.com/categories/web-development/",
 	"title": "Web Development",
 	"tags": [],
 	"description": "",
