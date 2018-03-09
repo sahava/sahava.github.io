@@ -128,7 +128,7 @@
 
 <meta itemprop="datePublished" content="2018-03-08T09:44:33&#43;02:00" />
 <meta itemprop="dateModified" content="2018-03-08T09:44:33&#43;02:00" />
-<meta itemprop="wordCount" content="1671">
+<meta itemprop="wordCount" content="2517">
 
 
 
@@ -804,6 +804,8 @@ on
     <section class="post-content">
       
 
+<p><em>Last updated 9 March 2018 with some new tips.</em></p>
+
 <p>The <a href="https://www.simoahava.com/amp/analytics/scroll-depth-trigger-google-tag-manager/">Scroll Depth trigger</a> in <a href="https://tagmanager.google.com/">Google Tag Manager</a> has a lot going for it. Tracking how far users scroll down a given page has <a href="http://cutroni.com/blog/2014/02/12/advanced-content-tracking-with-universal-analytics/">long since</a> been recognized as an important cog in the <em>engagement tracking</em> machine, and there have been <a href="http://scrolldepth.parsnip.io/">really</a> <a href="https://www.lunametrics.com/labs/recipes/scroll-tracking/">great</a> solutions for implementing scroll depth tracking for web analytics over the years.</p>
 
 <p>With Google Tag Manager&rsquo;s native Scroll Depth trigger, it&rsquo;s tempting to think we now have a be-all end-all solution that covers all the bases. However, as with everything else in analytics, the native scroll depth trigger does require customization to provide you with relevant information about your content and the visitors interacting with it.</p>
@@ -877,6 +879,20 @@ on
 
 
 <p>A very simple modification but helps you collect only meaningful data.</p>
+
+<h3 id="2-1-prevent-the-scroll-depth-trigger-from-activating">2.1. Prevent the Scroll Depth trigger from activating</h3>
+
+<p>As you can see, there&rsquo;s no <a href="https://www.simoahava.com/gtm-tips/enable-fire-triggers-google-tag-manager/">&ldquo;Enable when&hellip;&rdquo;</a> option on the Scroll Depth trigger, similar to what you might see with a Just Links trigger, for example. Thus you might be tempted to think that there&rsquo;s no way to prevent those pesky <code>gtm.scrollDepth</code> events from populating the <code>dataLayer</code> on pages where you are not interested in tracking scroll depths.</p>
+
+<p>However, there&rsquo;s a very easy hack to make sure the trigger doesn&rsquo;t push anything to <code>dataLayer</code>. Just set the percentage threshold to <code>101</code>. It&rsquo;s impossible to scroll to 101% length of the page, so by setting the threshold to this you&rsquo;ll deactivate the trigger, effectively.</p>
+
+<p>Thus you could modify #2 above by putting the following Custom JavaScript variable into the <strong>Percentages</strong> field of the trigger:</p>
+
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="p">{{</span><span class="nx">Page</span> <span class="nx">Path</span><span class="p">}}.</span><span class="nx">indexOf</span><span class="p">(</span><span class="s1">&#39;/analytics/&#39;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span> <span class="o">?</span> <span class="s1">&#39;25,50,75,100&#39;</span> <span class="o">:</span> <span class="s1">&#39;101&#39;</span><span class="p">;</span>
+<span class="p">}</span></code></pre></div>
+
+<p>This sets the thresholds to &lsquo;25,50,75,100&rsquo; on pages where the URL contains <strong>/analytics/</strong>, and &lsquo;101&rsquo; elsewhere.</p>
 
 <h2 id="3-only-fire-tags-on-pages-where-thresholds-are-not-auto-collected">3. Only fire tags on pages where thresholds are not auto-collected</h2>
 
@@ -991,6 +1007,92 @@ on
 
 <p>With this workaround, you can get more meaningful measurements on pages which have lots of different content areas filling up the real estate of the document itself.</p>
 
+<h3 id="4-1-return-the-scroll-depth-percentage-of-element-scrolling">4.1. Return the scroll depth percentage of element scrolling</h3>
+
+<p>One thing missing from #4 is the option to report on the <em>percentages</em> the user scrolled down the element. Because the trigger is setup using pixel depths rather than percentages, the {{Scroll Depth Threshold}} built-in variable will always return the pixel depth the user scrolled past, rather than the respective percentage of scrolling.</p>
+
+<p>Getting the percentage is actually a bit of a hack. The problem with the Scroll Depth trigger is that it&rsquo;s initialized fairly early in the page load, often before DOM Ready and any dynamically injected content is added to the page. This means that the thresholds of scrolling might be smaller than what the percentages <em>actually</em> would reflect.</p>
+
+<p>This is, unfortunately, unavoidable right now. The Scroll Depth trigger has no options to delay its initialization until such a time as the content is completely loaded.</p>
+
+<p>What this also means is that any variables you use to determine the height of the content and, subsequently, what the respective percentages actually reflect, can change from one trigger event to the next. Thus, in order to get the <em>actual</em> percentages used by the Scroll Depth trigger, we&rsquo;ll need to do something that I&rsquo;ve <a href="https://www.simoahava.com/analytics/100-google-tag-manager-learnings/#76-should-avoid-side-effects">repeatedly</a> instructed to avoid at all costs: implement a side effect in the Custom JavaScript variable.</p>
+
+<p>Basically, we&rsquo;ll need to store the scroll thresholds in a <strong>global</strong> variable when the Custom JavaScript variable is first run. After the initial run, we&rsquo;ll always pull whatever was stored in the global variable instead of generating a new set each time the variable is invoked. This way, any triggers and tags that use the thresholds will always access the same values, even if they might be off a bit from what the content thresholds <em>actually</em> are.</p>
+
+<p>The modification looks like this:</p>
+
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+  
+  <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nb">window</span><span class="p">.</span><span class="nx">_gtm_scroll_set</span> <span class="o">===</span> <span class="s1">&#39;undefined&#39;</span><span class="p">)</span> <span class="p">{</span>
+    
+    <span class="c1">// Change the contents of this array to reflect the percentages of scroll depth you want to track
+</span><span class="c1"></span>    <span class="kd">var</span> <span class="nx">verticalPercentages</span> <span class="o">=</span> <span class="p">[</span><span class="mi">25</span><span class="p">,</span><span class="mi">50</span><span class="p">,</span><span class="mi">75</span><span class="p">,</span><span class="mi">100</span><span class="p">];</span>
+  
+    <span class="c1">// Change this to fetch the element you want to track scrolling in
+</span><span class="c1"></span>    <span class="kd">var</span> <span class="nx">targetElement</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">&#39;div.post-content .main-content-wrap&#39;</span><span class="p">);</span>
+  
+    <span class="kd">var</span> <span class="nx">elementHeight</span> <span class="o">=</span> <span class="nx">targetElement</span><span class="p">.</span><span class="nx">offsetHeight</span><span class="p">;</span>
+  
+    <span class="kd">var</span> <span class="nx">totalOffsetTop</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  
+    <span class="k">while</span> <span class="p">(</span><span class="nx">targetElement</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">totalOffsetTop</span> <span class="o">+=</span> <span class="p">(</span><span class="nx">targetElement</span><span class="p">.</span><span class="nx">offsetTop</span> <span class="o">-</span> <span class="nx">targetElement</span><span class="p">.</span><span class="nx">scrollTop</span> <span class="o">+</span> <span class="nx">targetElement</span><span class="p">.</span><span class="nx">clientTop</span><span class="p">);</span>
+      <span class="nx">targetElement</span> <span class="o">=</span> <span class="nx">targetElement</span><span class="p">.</span><span class="nx">offsetParent</span><span class="p">;</span>
+    <span class="p">}</span>
+    
+    <span class="nb">window</span><span class="p">.</span><span class="nx">_gtm_scroll_set</span> <span class="o">=</span> <span class="p">{</span>
+      <span class="nx">thresholds</span><span class="o">:</span> <span class="nx">verticalPercentages</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">percentage</span><span class="p">)</span> <span class="p">{</span>
+          <span class="k">return</span> <span class="nb">parseInt</span><span class="p">(</span><span class="nx">elementHeight</span> <span class="o">*</span> <span class="p">(</span><span class="nx">percentage</span> <span class="o">*</span> <span class="mf">0.01</span><span class="p">)</span> <span class="o">+</span> <span class="nx">totalOffsetTop</span><span class="p">);</span>
+        <span class="p">}).</span><span class="nx">join</span><span class="p">(),</span>
+      <span class="nx">percentages</span><span class="o">:</span> <span class="nx">verticalPercentages</span>
+    <span class="p">};</span>
+    
+  <span class="p">}</span>
+  
+  <span class="k">return</span> <span class="nb">window</span><span class="p">.</span><span class="nx">_gtm_scroll_set</span><span class="p">.</span><span class="nx">thresholds</span><span class="p">;</span>
+<span class="p">}</span></code></pre></div>
+
+<p>As you can see, we populate a global variable <code>window._gtm_scroll_set</code> with an object that contains two properties:</p>
+
+<ul>
+<li><p><code>thresholds</code>: the array of scroll thresholds used by the Scroll Depth trigger.</p></li>
+
+<li><p><code>percentages</code>: the array of vertical percentages you defined in the same variable.</p></li>
+</ul>
+
+<p>Now that we know what the thresholds are, what the percentages are, and we can trust that the same thresholds are returned whenever this Custom JavaScript variable is invoked, we can create <strong>another</strong> Custom JavaScript variable whose only job is to return which percentage the user scrolled past when the trigger fired. This is what that variable looks like:</p>
+
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nb">window</span><span class="p">.</span><span class="nx">_gtm_scroll_set</span> <span class="o">!==</span> <span class="s1">&#39;undefined&#39;</span><span class="p">)</span> <span class="p">{</span>
+    
+    <span class="kd">var</span> <span class="nx">percentages</span> <span class="o">=</span> <span class="nb">window</span><span class="p">.</span><span class="nx">_gtm_scroll_set</span><span class="p">.</span><span class="nx">percentages</span><span class="p">;</span>
+  
+    <span class="kd">var</span> <span class="nx">thresholds</span> <span class="o">=</span> <span class="nb">window</span><span class="p">.</span><span class="nx">_gtm_scroll_set</span><span class="p">.</span><span class="nx">thresholds</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">).</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">t</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nb">parseInt</span><span class="p">(</span><span class="nx">t</span><span class="p">);</span>
+    <span class="p">});</span>
+    
+    <span class="kd">var</span> <span class="nx">crossedIndex</span> <span class="o">=</span> <span class="nx">thresholds</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">({{</span><span class="nx">Scroll</span> <span class="nx">Depth</span> <span class="nx">Threshold</span><span class="p">}});</span>
+
+    <span class="k">return</span> <span class="nx">percentages</span><span class="p">[</span><span class="nx">crossedIndex</span><span class="p">];</span>
+  
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="p">{{</span><span class="nx">Scroll</span> <span class="nx">Depth</span> <span class="nx">Threshold</span><span class="p">}};</span>
+<span class="p">}</span></code></pre></div>
+
+<p>This Custom JavaScript variable checks which threshold was returned by {{Scroll Depth Threshold}}, and returns the respective percentage value.</p>
+
+<p>The order of things is thus:</p>
+
+<ol>
+<li><p>Use the first Custom JavaScript variable in the Scroll Depth trigger&rsquo;s Pixel Depths field.</p></li>
+
+<li><p>Use the second Custom JavaScript variable wherever you want to get the percentage value for the scroll depth reached when the trigger fires.</p></li>
+</ol>
+
+<p>Note that even though I am introducing a side effect in the Custom JavaScript variable, it is mitigated by checking if the global variable has already been set. Thus the typical downside of side effects (constantly and unpredictably updating global state) is mitigated.</p>
+
+<p>It&rsquo;s not perfect - nothing that impacts global state ever is. There&rsquo;s always the risk that some other JavaScript accesses and modifies <code>window._gtm_scroll_set</code>, which would break your setup.</p>
+
 <h2 id="summary">Summary</h2>
 
 <p>These four tips ranged from the really simple to the moderately complex.</p>
@@ -1000,6 +1102,8 @@ on
 <p>For example, I would like to see the following features in the trigger:</p>
 
 <ul>
+<li><p>Option to establish <strong>when</strong> the trigger is initialized (e.g. after DOM Ready, with a Data Layer event, etc.).</p></li>
+
 <li><p>Option to prevent the trigger from auto-firing if the thresholds have been crossed when the page loads.</p></li>
 
 <li><p>Option to reset the trigger manually, which is useful especially on single-page apps.</p></li>
