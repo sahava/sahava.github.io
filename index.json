@@ -1,7 +1,7 @@
 [
 {
 	"uri": "https://www.simoahava.com/analytics/check-container-id-with-eventcallback/",
-	"title": "#GTMTips: Check Container ID With eventcallback",
+	"title": "#GTMTips: Check Container ID With eventCallback",
 	"tags": ["google tag manager", "gtmtips", "eventcallback"],
 	"description": "When using eventCallback with dataLayer.push(), Google Tag Manager automatically passes the container ID which invoked the callback as an argument. Use this to run code against the correct container.",
 	"content": " When you use the dataLayer.push() command on a page with a Google Tag Manager container, you pass information to GTM\u0026rsquo;s internal data model and potentially fire tags (if the push() contained an event key). You can also add the eventCallback key to these pushes. The value of this key should be a function, and this function is then executed once the container finishes processing any tags that might have fired on that dataLayer.push().\nThis is useful if you want to give Google Tag Manager time to complete its operations before proceeding with other actions on the page, for example.\nThere\u0026rsquo;s a wrinkle, though. Because Google Tag Manager supports adding multiple containers to the page, the eventCallback is called once for every single container on the page.\n\u0026ldquo;But I don\u0026rsquo;t use multiple containers on the page\u0026rdquo;, I hear you exclaim. Good for you! However, if you are running an Optimize experiment on the page, or if you are also loading gtag.js, eventCallback will be invoked once per each implementation thereof, too. Why? Because they use Google Tag Manager as the underlying tech.\nIn this tip, we\u0026rsquo;ll learn how to detect which Google Tag Manager container invoked the callback and use that to effectively deduplicate the execution of our code.\nTip 74: eventCallback automatically receives the Container ID as the method argument   The tip is simple (as these things usually tend to be). The Google Tag Manager container ID (e.g. GTM-12345) which invoked the eventCallback method will be automatically passed as a parameter to the function you have set up as the eventCallback.\nIf you have multiple containers on the page, eventCallback will fire once for each container, once they finish firing whatever tags the dataLayer.push() triggered. Each time a container invokes the eventCallback method, its container ID will be the argument.\nAs an example, let\u0026rsquo;s say I have three Google Tag Manager containers running on the site.\n Google Tag Manager container with ID GTM-12345\n Google Optimize container with ID GTM-23456\n gtag.js library collecting to UA-12345-1\n  Next, I\u0026rsquo;ll run the following code in the JavaScript console:\nwindow.dataLayer = window.dataLayer || []; window.dataLayer.push({ event: \u0026#39;GTMEvent\u0026#39;, eventCallback: function(containerId) { console.log(\u0026#39;Container ID: \u0026#39; + containerId); } }); The output in the console looks something like this:\nContainer ID: GTM-12345 Container ID: GTM-23456 Container ID: UA-12345-1 As you can see, with each iteration of the callback, the container ID was automatically assigned as an argument to the function. With this information, it\u0026rsquo;s easy to deduplicate your eventCallback method so that it only reacts to the \u0026ldquo;correct\u0026rdquo; container.\nFor example, here I want to execute some code only when GTM-12345 invokes the callback:\nwindow.dataLayer = window.dataLayer || []; window.dataLayer.push({ event: \u0026#39;GTMEvent\u0026#39;, eventCallback: function(containerId) { if (containerId === \u0026#39;GTM-12345\u0026#39;) { // Run some code  } // Ignore if not GTM-12345  } }); By simply checking what the container ID passed as an argument was, it\u0026rsquo;s trivial to make sure your eventCallback code isn\u0026rsquo;t executed over and over again with each additional container on the page.\n"
@@ -1687,14 +1687,14 @@
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/categories/analytics/",
+	"uri": "https://www.simoahava.com/tags/analytics/",
 	"title": "Analytics",
 	"tags": [],
 	"description": "",
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/tags/analytics/",
+	"uri": "https://www.simoahava.com/categories/analytics/",
 	"title": "Analytics",
 	"tags": [],
 	"description": "",
@@ -1946,14 +1946,14 @@
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/categories/content-management/",
+	"uri": "https://www.simoahava.com/tags/content-management/",
 	"title": "Content Management",
 	"tags": [],
 	"description": "",
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/tags/content-management/",
+	"uri": "https://www.simoahava.com/categories/content-management/",
 	"title": "Content Management",
 	"tags": [],
 	"description": "",
@@ -2170,14 +2170,14 @@
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/categories/digital-marketing/",
+	"uri": "https://www.simoahava.com/tags/digital-marketing/",
 	"title": "Digital Marketing",
 	"tags": [],
 	"description": "",
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/tags/digital-marketing/",
+	"uri": "https://www.simoahava.com/categories/digital-marketing/",
 	"title": "Digital Marketing",
 	"tags": [],
 	"description": "",
@@ -2765,14 +2765,14 @@
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/categories/personal/",
+	"uri": "https://www.simoahava.com/tags/personal/",
 	"title": "Personal",
 	"tags": [],
 	"description": "",
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/tags/personal/",
+	"uri": "https://www.simoahava.com/categories/personal/",
 	"title": "Personal",
 	"tags": [],
 	"description": "",
@@ -3290,13 +3290,6 @@
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/categories/web-design/",
-	"title": "Web Design",
-	"tags": [],
-	"description": "",
-	"content": ""
-},
-{
 	"uri": "https://www.simoahava.com/tags/web-design/",
 	"title": "Web Design",
 	"tags": [],
@@ -3304,14 +3297,21 @@
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/categories/web-development/",
-	"title": "Web Development",
+	"uri": "https://www.simoahava.com/categories/web-design/",
+	"title": "Web Design",
 	"tags": [],
 	"description": "",
 	"content": ""
 },
 {
 	"uri": "https://www.simoahava.com/tags/web-development/",
+	"title": "Web Development",
+	"tags": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "https://www.simoahava.com/categories/web-development/",
 	"title": "Web Development",
 	"tags": [],
 	"description": "",
