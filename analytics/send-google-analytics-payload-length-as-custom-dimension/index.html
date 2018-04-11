@@ -1,0 +1,781 @@
+
+
+  
+    
+  
+
+
+  
+
+
+
+
+
+  
+
+
+  
+
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta name="google-site-verification" content="xQwWI2KUfP9LbFKhw2CVLFtrMY6Czrla7L3PD2aBolA" />
+
+
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org", 
+  "@type": "BlogPosting",
+  "headline": "Send Google Analytics Payload Length As Custom Dimension | Simo Ahava's blog",
+  "image": "https://www.simoahava.com/images/2018/04/ga-maximum-payload-size.png",
+  "editor": "Simo Ahava",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Simo Ahava's blog",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://www.simoahava.com/images/simo.png",
+      "height": "393",
+      "width": "407"
+    }
+  },
+  "url": "https://www.simoahava.com/analytics/send-google-analytics-payload-length-as-custom-dimension/",
+  "datePublished": "2018-04-11T10:02:51+03:00",
+  "dateModified": "2018-04-11T10:02:51+03:00",
+  "description": "Send the Google Analytics request payload length as a Custom Dimension of the hit. This way you can monitor if you are approaching the maximum size of the payload.",
+  "author": {
+    "@type": "Person",
+    "name": "Simo Ahava"
+  }
+}
+</script>
+
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Hugo 0.31 with theme Tranquilpeak 0.4.3-BETA">
+    <title>Send Google Analytics Payload Length As Custom Dimension | Simo Ahava's blog</title>
+    
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-PZ7GMV9');</script>
+    
+    <script src="//simoahava.disqus.com/count.js" id="dsq-count-scr" async></script>
+    <meta name="author" content="Simo Ahava">
+    <meta name="keywords" content="">
+
+    <link rel="icon" href="https://www.simoahava.com/images/favicon.ico">
+    
+    <link rel="amphtml" href="https://www.simoahava.com/amp/analytics/send-google-analytics-payload-length-as-custom-dimension/">
+    
+    <meta name="description" content="Send the Google Analytics request payload length as a Custom Dimension of the hit. This way you can monitor if you are approaching the maximum size of the payload.">
+    <meta property="og:description" content="Send the Google Analytics request payload length as a Custom Dimension of the hit. This way you can monitor if you are approaching the maximum size of the payload.">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="Send Google Analytics Payload Length As Custom Dimension">
+    <meta property="og:url" content="/analytics/send-google-analytics-payload-length-as-custom-dimension/">
+    <meta property="og:site_name" content="Simo Ahava&#39;s blog">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Send Google Analytics Payload Length As Custom Dimension">
+    <meta name="twitter:description" content="Send the Google Analytics request payload length as a Custom Dimension of the hit. This way you can monitor if you are approaching the maximum size of the payload.">
+    
+      <meta name="twitter:creator" content="@SimoAhava">
+      
+    
+
+    
+    
+
+    
+      <meta property="og:image" content="https://www.simoahava.com/images/simo.png">
+    
+
+    
+      <meta name="twitter:image" content="https://www.simoahava.com/images/2018/04/ga-maximum-payload-size.png">  
+      <meta property="og:image" content="https://www.simoahava.com/images/2018/04/ga-maximum-payload-size.png">
+    
+    
+    
+
+    
+
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/jquery.fancybox.min.css" integrity="sha256-vuXZ9LGmmwtjqFX1F+EKin1ThZMub58gKULUyf0qECk=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/helpers/jquery.fancybox-thumbs.min.css" integrity="sha256-SEa4XYAHihTcEP1f5gARTB2K26Uk8PsndQYHQC1f4jU=" crossorigin="anonymous" />
+    
+    
+    <link rel="stylesheet" href="https://www.simoahava.com/css/style.css" />
+    
+    
+
+    
+      
+    
+    
+  </head>
+
+  <body>
+    <div id="blog">
+      <header id="header" data-behavior="4">
+  <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+  <div class="header-title">
+    <a class="header-title-link" href="https://www.simoahava.com/">Simo Ahava&#39;s blog</a>
+  </div>
+  
+</header>
+
+      <nav id="sidebar" data-behavior="4">
+  <div class="sidebar-container">
+    
+      <div class="sidebar-profile">
+        <a href="https://www.simoahava.com/">
+          <img class="sidebar-profile-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+        </a>
+        <h4 class="sidebar-profile-name">Simo Ahava</h4>
+        
+          <h5 class="sidebar-profile-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</h5>
+        
+      </div>
+    
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+      
+      <span class="sidebar-button-desc">Home</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+      
+      <span class="sidebar-button-desc">Categories</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tags/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Tags</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/gtm-tips/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-magic"></i>
+      
+      <span class="sidebar-button-desc">GTM Tips</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/about-simo-ahava/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+      
+      <span class="sidebar-button-desc">About</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tools/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-wrench"></i>
+      
+      <span class="sidebar-button-desc">Tools</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/blog-statistics/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bar-chart"></i>
+      
+      <span class="sidebar-button-desc">Blog statistics</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://github.com/sahava" target="_blank" rel="noopener">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+      
+      <span class="sidebar-button-desc">GitHub</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/upcoming-talks/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bullhorn"></i>
+      
+      <span class="sidebar-button-desc">Upcoming talks</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
+
+    </ul>
+  </div>
+</nav>
+
+      
+
+      <div id="main" data-behavior="4"
+        class="
+               hasCoverMetaIn
+               ">
+        <article class="post">
+	  <form id="search" action="/search/">
+  <input name="q" type="text" class="form-control input--xlarge" placeholder="Search blog..." autocomplete="off">
+  </form>
+
+          
+          
+            <div class="post-header main-content-wrap text-left">
+
+  
+
+    <h1>
+      Send Google Analytics Payload Length As Custom Dimension
+    </h1>
+  
+  
+  <div class="postShorten-meta post-meta">
+    
+      <time datetime="2018-04-11T10:02:51&#43;03:00">
+        
+  April 11, 2018
+
+      </time>
+    
+      
+  
+  
+    <span>in</span>
+    
+      <a class="category-link" href="https://www.simoahava.com/categories/analytics">Analytics</a>
+    
+  
+
+
+       | <a href="https://www.simoahava.com/analytics/send-google-analytics-payload-length-as-custom-dimension/#disqus_thread">Comments</a>
+  </div>
+
+
+</div>
+
+          
+          <div class="post-content markdown">
+            <div class="main-content-wrap">
+              
+
+<p>Maybe you knew this, maybe you didn&rsquo;t, but requests sent from your website (or app) to <a href="https://analytics.google.com/">Google Analytics</a> have a maximum size. Or, more specifically, the <em>payload</em> size (meaning the actual content body of the request) has a maximum.</p>
+
+<p>This maximum size of the payload is <strong>8192 bytes</strong>. This means, basically, that the entire parameter string sent to Google Analytics servers can be no longer than 8192 characters in length. The thing is, if the payload exceeds this, <strong>Google Analytics simply drops the hit</strong>. There&rsquo;s no warning, no error, nothing. The hit just doesn&rsquo;t get sent. If you are running the <a href="https://chrome.google.com/webstore/detail/google-analytics-debugger/jnkmfdileelhofjcijamephohjechhna?hl=en">Google Analytics debugger</a> browser extension, you <em>can</em> actually see a warning when the payload size is exceeded:</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2018/04/ga-maximum-payload-size.png" title="Maximum Payload Size">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2018/04/ga-maximum-payload-size.png#ZgotmplZ" alt="Maximum Payload Size">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>If you see this warning, it means that the hit was aborted due to exceeding the 8192 length of the payload.</p>
+
+<blockquote>
+<p>Note that if you are using <strong>Measurement Protocol</strong> to directly send data to Google Analytics, this size limitation applies to the <strong>POST request body</strong>. If you are sending the data with a GET request, the maximum size of the <strong>entire /collect URL</strong> is <strong>8000 bytes</strong>.</p>
+</blockquote>
+
+<p>Anyway, in this article I&rsquo;ll show you how to send the payload size (or at least a very close approximation thereof) as a Custom Dimension to Google Analytics with each hit. That way you&rsquo;ll be able to check if you are approaching this limitation, and thus you can take precautions to avoid exceeding the maximum size. We&rsquo;ll get things done with <a href="https://www.simoahava.com/analytics/customtask-the-guide/"><code>customTask</code></a> (what else?) and <a href="https://tagmanager.google.com/">Google Tag Manager</a>.</p>
+
+<h2 id="important-request">IMPORTANT REQUEST</h2>
+
+<p>Before I get started, I have a request to make. Some time ago, I was contacted by someone (Googler, I think), who shared with me a similar solution. For the life of me, I can&rsquo;t find this communication anywhere, because I don&rsquo;t even remember what medium I was contacted over (I&rsquo;ve gone through my mailbox to no avail).</p>
+
+<p>This solution was definitely inspired by this person&rsquo;s idea, so I want to give credit where credit is due. So, if you remember approaching me with a solution you used to work on that did something similar, please be in touch and I will update this article with my thanks for your inspirational example.</p>
+
+<h2 id="send-the-hit-payload-length-using-customtask">Send the hit payload length using <code>customTask</code></h2>
+
+<p>If you don&rsquo;t know what <code>customTask</code> is, please check out my <a href="https://www.simoahava.com/analytics/customtask-the-guide/">guide</a> on the topic. In a nutshell, <code>customTask</code> lets you modify, among other things, the request sent to Google Analytics <em>before</em> it is sent, adding information dynamically to the payload. This information could be anything from a <a href="https://www.simoahava.com/gtm-tips/remove-pii-google-analytics-hits/">PII-purged payload</a> to the <a href="https://www.simoahava.com/gtm-tips/use-customtask-access-tracker-values-google-tag-manager/">Client ID</a>.</p>
+
+<p><code>customTask</code> works with a <strong>Custom JavaScript variable</strong>. To send the hit payload length as a Custom Dimension, you&rsquo;ll first need to <a href="https://support.google.com/analytics/answer/2709829">create a new <strong>hit-scoped</strong> Custom Dimension</a> in Google Analytics admin. Once you&rsquo;ve created it, make note of the <strong>index</strong> assigned to the new dimension.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2018/04/new-custom-dimension.png" title="Custom dimension">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2018/04/new-custom-dimension.png#ZgotmplZ" alt="Custom dimension">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>Then, in Google Tag Manager, create a new <strong>Custom JavaScript variable</strong>. Name it something descriptive, e.g. <strong>customTask - hit payload length</strong>. This is what you should add within:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
+  <span style="color:#75715e">// Change this index to match that of the Custom Dimension you created in GA
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">customDimensionIndex</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">10</span>;
+  
+  <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">model</span>) {
+    
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">globalSendTaskName</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;_&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">model</span>.<span style="color:#a6e22e">get</span>(<span style="color:#e6db74">&#39;trackingId&#39;</span>) <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;_sendHitTask&#39;</span>;
+    
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">originalSendHitTask</span> <span style="color:#f92672">=</span> window[<span style="color:#a6e22e">globalSendTaskName</span>] <span style="color:#f92672">=</span> window[<span style="color:#a6e22e">globalSendTaskName</span>] <span style="color:#f92672">||</span> <span style="color:#a6e22e">model</span>.<span style="color:#a6e22e">get</span>(<span style="color:#e6db74">&#39;sendHitTask&#39;</span>);
+    
+    <span style="color:#a6e22e">model</span>.<span style="color:#a6e22e">set</span>(<span style="color:#e6db74">&#39;sendHitTask&#39;</span>, <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">sendModel</span>) {
+      
+      <span style="color:#66d9ef">try</span> {
+        
+        <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">originalHitPayload</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sendModel</span>.<span style="color:#a6e22e">get</span>(<span style="color:#e6db74">&#39;hitPayload&#39;</span>);
+        
+        <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">hitPayload</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sendModel</span>.<span style="color:#a6e22e">get</span>(<span style="color:#e6db74">&#39;hitPayload&#39;</span>);
+        <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">customDimensionParameter</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;&amp;cd&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">customDimensionIndex</span>;
+      
+        <span style="color:#75715e">// If hitPayload already has that Custom Dimension, note this in the console and do not overwrite the existing dimension
+</span><span style="color:#75715e"></span>      
+        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">hitPayload</span>.<span style="color:#a6e22e">indexOf</span>(<span style="color:#a6e22e">customDimensionParameter</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;=&#39;</span>) <span style="color:#f92672">&gt;</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>) {
+          
+          <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#39;Google Analytics error: tried to send hit payload length in an already assigned Custom Dimension&#39;</span>);
+          <span style="color:#a6e22e">originalSendHitTask</span>(<span style="color:#a6e22e">sendModel</span>);
+        
+        } <span style="color:#66d9ef">else</span> {
+      
+        <span style="color:#75715e">// Otherwise add the Custom Dimension to the string
+</span><span style="color:#75715e"></span>        <span style="color:#75715e">// together with the complete length of the payload
+</span><span style="color:#75715e"></span>          <span style="color:#a6e22e">hitPayload</span> <span style="color:#f92672">+=</span> <span style="color:#a6e22e">customDimensionParameter</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;=&#39;</span>;
+          <span style="color:#a6e22e">hitPayload</span> <span style="color:#f92672">+=</span> (<span style="color:#a6e22e">hitPayload</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">hitPayload</span>.<span style="color:#a6e22e">length</span>.<span style="color:#a6e22e">toString</span>().<span style="color:#a6e22e">length</span>);
+        
+          <span style="color:#a6e22e">sendModel</span>.<span style="color:#a6e22e">set</span>(<span style="color:#e6db74">&#39;hitPayload&#39;</span>, <span style="color:#a6e22e">hitPayload</span>, <span style="color:#66d9ef">true</span>);
+          <span style="color:#a6e22e">originalSendHitTask</span>(<span style="color:#a6e22e">sendModel</span>);
+        
+        }
+      } <span style="color:#66d9ef">catch</span>(<span style="color:#a6e22e">e</span>) {
+       
+        <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">error</span>(<span style="color:#e6db74">&#39;Error sending hit payload length to Google Analytics&#39;</span>);
+        <span style="color:#a6e22e">sendModel</span>.<span style="color:#a6e22e">set</span>(<span style="color:#e6db74">&#39;hitPayload&#39;</span>, <span style="color:#a6e22e">originalHitPayload</span>, <span style="color:#66d9ef">true</span>);
+        <span style="color:#a6e22e">originalSendHitTask</span>(<span style="color:#a6e22e">sendModel</span>);
+        
+      }
+    });
+  };
+}</code></pre></div>
+
+<p>To configure this <code>customTask</code>, you just need to update the <code>customDimensionIndex</code> variable with the index number of your Custom Dimension (in my example, the index is <code>10</code>).</p>
+
+<p>This function interrupts <code>sendHitTask</code>, which is the task used to actually send the request to Google Analytics. The payload sent to Google Analytics is appended with the Custom Dimension you have created, and the value of that Custom Dimension is set to the entire length of the payload. Thus, when a tag that uses this <code>customTask</code> fires, the request to Google Analytics will contain the length of the payload as the value of the Custom Dimension you assigned for it.</p>
+
+<p>To add it to your tag(s), either use a <a href="https://www.simoahava.com/analytics/google-analytics-settings-variable-in-gtm/">Google Analytics Settings variable</a> or <a href="https://www.simoahava.com/analytics/edit-google-analytics-tag-settings/">override the settings of any tag</a>. Scroll down to <strong>More Settings</strong> &gt; <strong>Fields to set</strong>, and add a new field.</p>
+
+<p><strong>Field name</strong>: customTask<br />
+<strong>Value</strong>: {{customTask - hit payload length}}</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2018/04/fields-to-set.png" title="Fields to set">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2018/04/fields-to-set.png#ZgotmplZ" alt="Fields to set">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>Now any tag that has this field set will add the hit payload length as a Custom Dimension to the request.</p>
+
+<p>You can verify this by opening the <strong>Network</strong> tab of your browser&rsquo;s developer tools. The tag is represented by a request to <code>/collect</code>, and by clicking this request you can see that the Custom Dimension parameter is included with the length of the payload:</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2018/04/payload-length-custom-dimension.png" title="Payload length in network requests">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2018/04/payload-length-custom-dimension.png#ZgotmplZ" alt="Payload length in network requests">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<h2 id="other-ideas">Other ideas</h2>
+
+<p>You could actually rewrite the <code>customTask</code> to add some further logic if you are nearing the <strong>8192</strong> byte maximum size. For example, it doesn&rsquo;t really help you to add the payload length as a Custom Dimension, if the payload is never sent due to exceeding the size requirement.</p>
+
+<p>By adding some custom code, you could do things like:</p>
+
+<ol>
+<li><p>When payload length is at or over 8192 bytes, drop unnecessary fields from the payload until the length is under the limit.</p></li>
+
+<li><p>When payload length is at or over 8192 bytes, send a new hit to Google Analytics which contains some key information from the &ldquo;broken&rdquo; payload, just so that you&rsquo;ll get an idea of the scope of the problem.</p></li>
+</ol>
+
+<p>A typical reason for exceeding payload length is if you are sending <a href="https://www.savio.no/analytics/easier-enhanced-ecommerce-product-promo-tracking">Enhanced Ecommerce</a> impression data, or just very large shopping carts. It only takes something like 50-60 products for you to be approaching the limit of 8192 bytes. Unless you can decrease the size of the product payload using regular means, you could do something like drop all non-critical fields from the product objects (e.g. <code>brand</code>, <code>category</code>, <code>variant</code>), and just include the <code>id</code>, <code>name</code>, <code>price</code>, and <code>quantity</code>.</p>
+
+<p>Or you could drop all product data except for <code>id</code> in these cases, and then use <a href="https://support.google.com/analytics/answer/6066852?hl=en&amp;ref_topic=6231233">Data Import</a> to refresh the additional data.</p>
+
+<h2 id="summary">Summary</h2>
+
+<p>Well, it looks like <code>customTask</code> to the rescue again. It&rsquo;s such a powerful feature, and I just love the fact that you can get all <em>meta</em> with your Google Analytics data.</p>
+
+<p>Peppering the payload with details that are otherwise obfuscated is a great way to add a whole new level of debugging opportunities to your data collection.</p>
+
+<p>Hit payload size limit is nasty in that you won&rsquo;t be alerted if a problem surfaces. The Google Analytics UI won&rsquo;t be able to inform you about this problem because the requests are never sent to GA in the first place. With this Custom Dimension, you can add this information to the payload as a Custom Dimension, and then prepare in advance for the eventuality that you might be hitting the payload maximum size sometime soon.</p>
+
+              
+
+            </div>
+          </div>
+          <div id="post-footer" class="post-footer main-content-wrap">
+            
+              
+                
+                
+                  <div class="post-footer-tags">
+                    <span class="text-color-light text-small">TAGGED IN</span><br/>
+                    
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/google-tag-manager/">google tag manager</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/google-analytics/">google analytics</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/customtask/">customtask</a>
+
+                  </div>
+                
+              
+            
+            
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--disabled">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/use-wildcard-css-selectors-with-all-elements-triggers/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/send-google-analytics-payload-length-as-custom-dimension/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Send%20Google%20Analytics%20Payload%20Length%20As%20Custom%20Dimension%20https://www.simoahava.com/analytics/send-google-analytics-payload-length-as-custom-dimension/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://www.simoahava.com/analytics/send-google-analytics-payload-length-as-custom-dimension/">
+              <i class="fa fa-google-plus"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/send-google-analytics-payload-length-as-custom-dimension/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#disqus">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+            
+              
+                <span id="disqus"></span>
+<div id="disqus_thread">
+  <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+
+              
+            
+          </div>
+        </article>
+        <footer id="footer" class="main-content-wrap">
+  <span class="copyrights">
+    &copy; 2018 Simo Ahava. All Rights Reserved
+  </span>
+</footer>
+
+      </div>
+      
+      <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+        
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--disabled">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/use-wildcard-css-selectors-with-all-elements-triggers/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/send-google-analytics-payload-length-as-custom-dimension/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Send%20Google%20Analytics%20Payload%20Length%20As%20Custom%20Dimension%20https://www.simoahava.com/analytics/send-google-analytics-payload-length-as-custom-dimension/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://www.simoahava.com/analytics/send-google-analytics-payload-length-as-custom-dimension/">
+              <i class="fa fa-google-plus"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/send-google-analytics-payload-length-as-custom-dimension/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#disqus">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+      </div>
+      
+      <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+  <i id="btn-close-shareoptions" class="fa fa-close"></i>
+  <ul class="share-options">
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/send-google-analytics-payload-length-as-custom-dimension/">
+          <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=Send%20Google%20Analytics%20Payload%20Length%20As%20Custom%20Dimension%20https://www.simoahava.com/analytics/send-google-analytics-payload-length-as-custom-dimension/%20via%20@SimoAhava">
+          <i class="fa fa-twitter"></i><span>Share on Twitter</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://www.simoahava.com/analytics/send-google-analytics-payload-length-as-custom-dimension/">
+          <i class="fa fa-google-plus"></i><span>Share on Google&#43;</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/send-google-analytics-payload-length-as-custom-dimension/">
+          <i class="fa fa-linkedin"></i><span>Share on LinkedIn</span>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+<div id="share-options-mask" class="share-options-mask"></div>
+
+    </div>
+    
+    <div id="about">
+  <div id="about-card">
+    <div id="about-btn-close">
+      <i class="fa fa-remove"></i>
+    </div>
+    
+      <img id="about-card-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+    
+    <h4 id="about-card-name">Simo Ahava</h4>
+    
+      <div id="about-card-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</div>
+    
+    
+      <div id="about-card-job">
+        <i class="fa fa-briefcase"></i>
+        <br/>
+        Senior Data Advocate at Reaktor
+      </div>
+    
+    
+      <div id="about-card-location">
+        <i class="fa fa-map-marker"></i>
+        <br/>
+        Finland
+      </div>
+    
+  </div>
+</div>
+
+    
+  
+    
+    <div id="cover" style="background-image:url('https://www.simoahava.com/images/maisema.jpg');"></div>
+  
+
+
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.7/js/jquery.fancybox.min.js" integrity="sha256-GEAnjcTqVP+vBp3SSc8bEDQqvWAZMiHyUSIorrWwH50=" crossorigin="anonymous"></script>
+
+
+<script src="https://www.simoahava.com/js/script.js"></script>
+
+
+
+
+  
+    
+      <script>
+        
+
+
+
+
+
+        (function() {
+          
+          
+          if (window.location.hostname == "localhost") {
+            return;
+          }
+          var d = document, s = d.createElement('script');
+          var disqus_shortname = 'simoahava';
+          s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      </script>
+    
+  
+
+
+
+    
+  </body>
+</html>
+
