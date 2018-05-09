@@ -1,5 +1,12 @@
 [
 {
+	"uri": "https://www.simoahava.com/analytics/delay-the-history-change-trigger/",
+	"title": "#GTMTips: Delay The History Change Trigger",
+	"tags": ["google tag manager", "gtmtips", "history", "spa"],
+	"description": "Use a Custom HTML tag to delay the History Change trigger in order to accommodate for single-page frameworks that load the content after the history change event has been pushed.",
+	"content": " When working with the analytics of single-page applications (SPA), there are a number of things to pay attention to. For example, you need to make sure that Google Analytics doesn\u0026rsquo;t break your session attribution, and that you are not inadvertently inflating your page speed timing metrics. Actually, there are so many \u0026ldquo;gotchas\u0026rdquo; when it comes to SPA tracking in tools like Google Analytics that you just can\u0026rsquo;t get by with a plug-and-play implementation.\nSee Dan Wilkerson\u0026rsquo;s excellent article, which sums nicely the can of worms involved with tracking an SPA.\nOne of the problems with frameworks that load their content dynamically using JavaScript (e.g. React) is when the history event is dispatched before the content has been loaded or the URL has actually changed.\nThis is problematic, since you might actually want to refer to elements loaded in this dynamic state change in your tags, but because the History Change trigger fires as soon as the event is dispatched, the content might not be there yet when your tags fire.\nSo in this article I\u0026rsquo;ll show a quick and dirty way to delay the trigger, so that your tags don\u0026rsquo;t fire until the page has had time to load the content.\nTip 79: Delay The History Change Trigger   The easy way to do it is to fire a Custom HTML tag with the History Change trigger that is causing problems on your site.\nFirst, make sure you have all the history-related Built-in variables enabled in the container.\nThen, in the Custom HTML tag, add the following code:\n\u0026lt;script\u0026gt; (function() { var timeout = 500; // Milliseconds - change to what you want the timeout to be.  window.setTimeout(function() { window.dataLayer.push({ event: \u0026#39;custom.historyChange\u0026#39;, custom: { historyChangeSource: {{History Source}}, newHistoryState: {{New History State}}, oldHistoryState: {{Old History State}}, newHistoryFragment: {{New History Fragment}}, oldHistoryFragment: {{Old History Fragment}} } }); }, timeout); })(); \u0026lt;/script\u0026gt; As said above, make sure this tag fires on the History Change trigger you want to delay.\nThe Custom HTML tag adds a 500 millisecond delay, after which it pushes a custom event named custom.historyChange into the dataLayer. With this event, five new Data Layer variables are pushed, each with the values from the original History event that triggered the Custom HTML tag in the first place. These new variables are:\n custom.historyChangeSource - the history event that triggered the delay (e.g. pushState or replaceState).\n custom.newHistoryState - the state object set in the history event.\n custom.oldHistoryState - the state object that was overwritten with the new state object.\n custom.newHistoryFragment - the hash fragment set in the history event (e.g. #contactus).\n custom.oldHistoryFragment - the hash fragment that was overwritten with the new hash.\n  Now, create a new Custom Event trigger for event name custom.historyChange, and create Data Layer variables for all of the new custom variables listed above (or at least the ones that make sense in your case). Here\u0026rsquo;s what the trigger and a sample variable would look like:\n  Add the Custom Event trigger to whatever tag you want to fire with the history event, and use the new Data Layer variables where necessary.\nYou might be wondering why rewrite the original Built-in variables into custom Data Layer variables. This is just a precaution. If your site dispatches more than one history event before the 500 millisecond delay is over, then the Built-in variables will always refer to the latest history state, and not the one that was delayed.\nProblem with this approach There\u0026rsquo;s one, potentially big issue with this approach. By firing a Custom HTML tag with every single history event, you are clogging up the document object model of the page, because that gets unloaded when the user navigates away from the page, and not when new content is pulled in. For example, after ten history events, this is what the DOM can end up looking like:\n  The problem with rewriting the DOM so many times is that each new element added forces a re-evaluation of the document object model, and the more items in the DOM, the longer this re-evaluation takes. So the more Custom HTML tags that fire without a page reload or refresh, the more the page performance will suffer.\nPotential solution One potential solution is to use only a single Custom HTML tag, where you overwrite the window.history.pushState and window.history.replaceState methods. The overwritten code should include the delayed dataLayer.push(), and you must pass the arguments to the original window.history.pushState using apply(), unless you want to destroy your site navigation. See here for inspiration.\nBasically, you\u0026rsquo;re writing a custom event listener, but instead of listening for user interactions, you\u0026rsquo;ll be listening for pushState and replaceState events.\nI\u0026rsquo;m not going to write the solution here - it\u0026rsquo;s difficult to write a generic history listener that works with your particular use case. But the Stack Overflow article should help you get started. Just remember to test thoroughly if overwriting basic browser interfaces like the Window History API.\nSummary The trick outlined in this article should really be a temporary solution (as all hacks should). You really ought to talk to your developers and ask them to implement the custom event push directly into whatever JavaScript is handling the route / state changes on the site.\nBy delegating the work to your developers, they can ensure that the dataLayer event is dispatched at the exact right time. Using a delay like the 500 milliseconds of this article is sub-optimal for two reasons:\n It can be too short, meaning the delay goes off, the custom event is pushed, but the transition is still not complete.\n It can be too long, meaning you are wasting time with the trigger, and tracking the page view of each dynamic transition can lag behind the events dispatched with each new bit of content.\n  Regardless, it\u0026rsquo;s a way to make things work, which I guess is a good justification as any for using hacks.\n"
+},
+{
 	"uri": "https://www.simoahava.com/analytics/track-browsing-behavior-in-google-analytics/",
 	"title": "Track Browsing Behavior In Google Analytics",
 	"tags": ["google tag manager", "custom dimensions", "google analytics", "navigation"],
@@ -1750,14 +1757,14 @@
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/tags/analytics/",
+	"uri": "https://www.simoahava.com/categories/analytics/",
 	"title": "Analytics",
 	"tags": [],
 	"description": "",
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/categories/analytics/",
+	"uri": "https://www.simoahava.com/tags/analytics/",
 	"title": "Analytics",
 	"tags": [],
 	"description": "",
@@ -2009,14 +2016,14 @@
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/tags/content-management/",
+	"uri": "https://www.simoahava.com/categories/content-management/",
 	"title": "Content Management",
 	"tags": [],
 	"description": "",
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/categories/content-management/",
+	"uri": "https://www.simoahava.com/tags/content-management/",
 	"title": "Content Management",
 	"tags": [],
 	"description": "",
@@ -2240,14 +2247,14 @@
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/tags/digital-marketing/",
+	"uri": "https://www.simoahava.com/categories/digital-marketing/",
 	"title": "Digital Marketing",
 	"tags": [],
 	"description": "",
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/categories/digital-marketing/",
+	"uri": "https://www.simoahava.com/tags/digital-marketing/",
 	"title": "Digital Marketing",
 	"tags": [],
 	"description": "",
@@ -2562,6 +2569,13 @@
 	"content": ""
 },
 {
+	"uri": "https://www.simoahava.com/tags/history/",
+	"title": "History",
+	"tags": [],
+	"description": "",
+	"content": ""
+},
+{
 	"uri": "https://www.simoahava.com/tags/history-change-trigger/",
 	"title": "History Change Trigger",
 	"tags": [],
@@ -2856,14 +2870,14 @@
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/tags/personal/",
+	"uri": "https://www.simoahava.com/categories/personal/",
 	"title": "Personal",
 	"tags": [],
 	"description": "",
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/categories/personal/",
+	"uri": "https://www.simoahava.com/tags/personal/",
 	"title": "Personal",
 	"tags": [],
 	"description": "",
@@ -3117,6 +3131,13 @@
 {
 	"uri": "https://www.simoahava.com/tags/soundcloud/",
 	"title": "Soundcloud",
+	"tags": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "https://www.simoahava.com/tags/spa/",
+	"title": "Spa",
 	"tags": [],
 	"description": "",
 	"content": ""
@@ -3381,13 +3402,6 @@
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/tags/web-design/",
-	"title": "Web Design",
-	"tags": [],
-	"description": "",
-	"content": ""
-},
-{
 	"uri": "https://www.simoahava.com/categories/web-design/",
 	"title": "Web Design",
 	"tags": [],
@@ -3395,14 +3409,21 @@
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/tags/web-development/",
-	"title": "Web Development",
+	"uri": "https://www.simoahava.com/tags/web-design/",
+	"title": "Web Design",
 	"tags": [],
 	"description": "",
 	"content": ""
 },
 {
 	"uri": "https://www.simoahava.com/categories/web-development/",
+	"title": "Web Development",
+	"tags": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "https://www.simoahava.com/tags/web-development/",
 	"title": "Web Development",
 	"tags": [],
 	"description": "",
