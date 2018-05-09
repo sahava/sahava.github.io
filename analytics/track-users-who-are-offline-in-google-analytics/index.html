@@ -336,7 +336,7 @@
 
 <li><p>The browser&rsquo;s <a href="https://www.w3schools.com/html/html5_webstorage.asp">Storage API</a></p></li>
 
-<li><p>Sending Google Analytics hits with a delay (the <code>&amp;qt;</code> parameter)</p></li>
+<li><p>Sending Google Analytics hits with a delay (the <code>&amp;qt</code> parameter)</p></li>
 
 <li><p>Sending custom POST and HEAD requests (HTTP protocol)</p></li>
 
@@ -352,7 +352,7 @@
 <li><a href="#1-universal-analytics-tasks-api">1. Universal Analytics Tasks API</a></li>
 <li><a href="#2-the-offline-tracker">2. The offline tracker</a>
 <ul>
-<li><a href="#2-1-the-qt-parameter">2.1. The &qt; parameter</a></li>
+<li><a href="#2-1-the-qt-parameter">2.1. The &amp;qt parameter</a></li>
 </ul></li>
 <li><a href="#3-the-http-head-request">3. The HTTP HEAD request</a></li>
 <li><a href="#4-the-javascript-code">4. The JavaScript code</a>
@@ -412,13 +412,13 @@
 
 <p>This solution picks up the Universal Analytics hit payload from <code>sendHitTask</code>, and if there is no internet connection, this hit is stored in <code>localStorage</code> with the timestamp of the request. Thus, when we later do manage to send the stored hit, we can send it <em>at its original timestamp</em> to Universal Analytics.</p>
 
-<h3 id="2-1-the-qt-parameter">2.1. The &qt; parameter</h3>
+<h3 id="2-1-the-qt-parameter">2.1. The &amp;qt parameter</h3>
 
-<p>The <code>&amp;qt;</code> Measurement Protocol stands for <strong>queue time</strong>. Basically, you can set a number in milliseconds in that parameter, and the hit will be sent with a timestamp that many milliseconds in the past. For example, if I know that the hit I want to send actually happened 45 minutes ago, I can set the parameter to:</p>
+<p>The <code>&amp;qt</code> Measurement Protocol stands for <strong>queue time</strong>. Basically, you can set a number in milliseconds in that parameter, and the hit will be sent with a timestamp that many milliseconds in the past. For example, if I know that the hit I want to send actually happened 45 minutes ago, I can set the parameter to:</p>
 
-<p><code>&amp;qt;=2700000</code></p>
+<p><code>&amp;qt=2700000</code></p>
 
-<p>There&rsquo;s just an odd little quirk you need to know about <code>&amp;qt;</code>. The latest you can send the displaced hit is at 03:59:59 the following day (in the timezone of the Google Analytics view the hit is being sent to). Thus, the maximum value for <code>&amp;qt;</code> is 27 hours, 59 minutes, and 59 seconds (in milliseconds), if the hit occurred at exactly midnight, and you then send it the following morning, just before 4 AM.</p>
+<p>There&rsquo;s just an odd little quirk you need to know about <code>&amp;qt</code>. The latest you can send the displaced hit is at 03:59:59 the following day (in the timezone of the Google Analytics view the hit is being sent to). Thus, the maximum value for <code>&amp;qt</code> is 27 hours, 59 minutes, and 59 seconds (in milliseconds), if the hit occurred at exactly midnight, and you then send it the following morning, just before 4 AM.</p>
 
 <p>Yes, it might be difficult to grasp, so we&rsquo;ll go with the official recommendation: <strong>avoid sending hits more than 4 hours in the past</strong>, since there&rsquo;s no guarantee they will get sent.</p>
 
@@ -504,7 +504,7 @@
     <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">onreadystatechange</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>() {
       <span style="color:#75715e">// Google Analytics endpoint is not reachable, let&#39;s save the hit                
 </span><span style="color:#75715e"></span>      <span style="color:#66d9ef">if</span> (<span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">readyState</span> <span style="color:#f92672">===</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">DONE</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">status</span> <span style="color:#f92672">!==</span> <span style="color:#ae81ff">200</span>) {
-        <span style="color:#a6e22e">Lockr</span>.<span style="color:#a6e22e">sadd</span>(<span style="color:#e6db74">&#39;hits&#39;</span>, <span style="color:#a6e22e">payload_lz</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&amp;qt;=&#34;</span> <span style="color:#f92672">+</span> (<span style="color:#66d9ef">new</span> Date() <span style="color:#f92672">*</span> <span style="color:#ae81ff">1</span>));
+        <span style="color:#a6e22e">Lockr</span>.<span style="color:#a6e22e">sadd</span>(<span style="color:#e6db74">&#39;hits&#39;</span>, <span style="color:#a6e22e">payload_lz</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&amp;qt=&#34;</span> <span style="color:#f92672">+</span> (<span style="color:#66d9ef">new</span> Date() <span style="color:#f92672">*</span> <span style="color:#ae81ff">1</span>));
       } <span style="color:#66d9ef">else</span> {
         <span style="color:#75715e">// Google Analytics endpoint is available, let&#39;s check if there are any unsent hits
 </span><span style="color:#75715e"></span>        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">Lockr</span>.<span style="color:#a6e22e">smembers</span>(<span style="color:#e6db74">&#34;hits&#34;</span>).<span style="color:#a6e22e">length</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {                        
@@ -525,7 +525,7 @@
             <span style="color:#a6e22e">xhr</span>.<span style="color:#a6e22e">open</span>(<span style="color:#e6db74">&#39;POST&#39;</span>, <span style="color:#e6db74">&#39;https://www.google-analytics.com/batch&#39;</span>, <span style="color:#66d9ef">true</span>);
             <span style="color:#75715e">// Build the Batch Payload and Take care of calculating the Queue Time 
 </span><span style="color:#75715e"></span>            <span style="color:#a6e22e">xhr</span>.<span style="color:#a6e22e">send</span>(<span style="color:#a6e22e">chunked_hits</span>[<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">map</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">x</span>) {
-              <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">x</span>.<span style="color:#a6e22e">indexOf</span>(<span style="color:#e6db74">&#34;&amp;qt;=&#34;</span>) <span style="color:#f92672">&gt;</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>) {
+              <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">x</span>.<span style="color:#a6e22e">indexOf</span>(<span style="color:#e6db74">&#34;&amp;qt=&#34;</span>) <span style="color:#f92672">&gt;</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>) {
                 <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">x</span>.<span style="color:#a6e22e">replace</span>(<span style="color:#e6db74">/qt=([^&amp;]*)/</span>, <span style="color:#e6db74">&#34;qt=&#34;</span> <span style="color:#f92672">+</span> Math.<span style="color:#a6e22e">round</span>(<span style="color:#a6e22e">current_ts</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">x</span>.<span style="color:#a6e22e">match</span>(<span style="color:#e6db74">/qt=([^&amp;]*)/</span>)[<span style="color:#ae81ff">1</span>] <span style="color:#960050;background-color:#1e0010">/ 1000) * 1000);</span>
               } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">x</span>;
             }).<span style="color:#a6e22e">join</span>(<span style="color:#e6db74">&#34;\n&#34;</span>));
@@ -565,7 +565,7 @@
       <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">onreadystatechange</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>() {
         <span style="color:#75715e">// Google Analytics endpoint is not reachable, let&#39;s save the hit                
 </span><span style="color:#75715e"></span>        <span style="color:#66d9ef">if</span> (<span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">readyState</span> <span style="color:#f92672">===</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">DONE</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">status</span> <span style="color:#f92672">!==</span> <span style="color:#ae81ff">200</span>) {
-          <span style="color:#a6e22e">Lockr</span>.<span style="color:#a6e22e">sadd</span>(<span style="color:#e6db74">&#39;hits&#39;</span>, <span style="color:#a6e22e">payload_lz</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&amp;qt;=&#34;</span> <span style="color:#f92672">+</span> (<span style="color:#66d9ef">new</span> Date() <span style="color:#f92672">*</span> <span style="color:#ae81ff">1</span>));
+          <span style="color:#a6e22e">Lockr</span>.<span style="color:#a6e22e">sadd</span>(<span style="color:#e6db74">&#39;hits&#39;</span>, <span style="color:#a6e22e">payload_lz</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&amp;qt=&#34;</span> <span style="color:#f92672">+</span> (<span style="color:#66d9ef">new</span> Date() <span style="color:#f92672">*</span> <span style="color:#ae81ff">1</span>));
         } <span style="color:#66d9ef">else</span> {
           <span style="color:#75715e">// Google Analytics endpoint is available, let&#39;s check if there are any unsent hits
 </span><span style="color:#75715e"></span>          <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">Lockr</span>.<span style="color:#a6e22e">smembers</span>(<span style="color:#e6db74">&#34;hits&#34;</span>).<span style="color:#a6e22e">length</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {                        
@@ -586,7 +586,7 @@
               <span style="color:#a6e22e">xhr</span>.<span style="color:#a6e22e">open</span>(<span style="color:#e6db74">&#39;POST&#39;</span>, <span style="color:#e6db74">&#39;https://www.google-analytics.com/batch&#39;</span>, <span style="color:#66d9ef">true</span>);
               <span style="color:#75715e">// Build the Batch Payload and Take care of calculating the Queue Time 
 </span><span style="color:#75715e"></span>              <span style="color:#a6e22e">xhr</span>.<span style="color:#a6e22e">send</span>(<span style="color:#a6e22e">chunked_hits</span>[<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">map</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">x</span>) {
-                <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">x</span>.<span style="color:#a6e22e">indexOf</span>(<span style="color:#e6db74">&#34;&amp;qt;=&#34;</span>) <span style="color:#f92672">&gt;</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>) {
+                <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">x</span>.<span style="color:#a6e22e">indexOf</span>(<span style="color:#e6db74">&#34;&amp;qt=&#34;</span>) <span style="color:#f92672">&gt;</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>) {
                   <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">x</span>.<span style="color:#a6e22e">replace</span>(<span style="color:#e6db74">/qt=([^&amp;]*)/</span>, <span style="color:#e6db74">&#34;qt=&#34;</span> <span style="color:#f92672">+</span> Math.<span style="color:#a6e22e">round</span>(<span style="color:#a6e22e">current_ts</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">x</span>.<span style="color:#a6e22e">match</span>(<span style="color:#e6db74">/qt=([^&amp;]*)/</span>)[<span style="color:#ae81ff">1</span>] <span style="color:#960050;background-color:#1e0010">/ 1000) * 1000);</span>
                 } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">x</span>;
               }).<span style="color:#a6e22e">join</span>(<span style="color:#e6db74">&#34;\n&#34;</span>));
