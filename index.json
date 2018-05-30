@@ -1,5 +1,12 @@
 [
 {
+	"uri": "https://www.simoahava.com/analytics/13-useful-custom-dimensions-for-google-analytics/",
+	"title": "13 Useful Custom Dimensions For Google Analytics",
+	"tags": ["google tag manager", "google analytics", "custom dimensions"],
+	"description": "Implementation guide for useful Google Analytics Custom Dimensions, such as Hit Type, Session ID, Payload Length, and many more. The guide is for Google Tag Manager.",
+	"content": " One of my favorite (and most popular) articles in my blog is Improve Data Collection With Four Custom Dimensions. In that article, I show how you can improve the quality and granularity of your Google Analytics data set with just four Custom Dimensions. The reason I chose the four dimensions (Hit Timestamp, Session ID, Client ID, and User ID) is because I firmly believe that they should be in Google Analytics\u0026rsquo; standard set of dimensions, but for some inexplicable reason they aren\u0026rsquo;t.\n  Since publishing that article three years ago, I have naturally uncovered more of these \u0026ldquo;need-to-have\u0026rdquo; Custom Dimensions, and I\u0026rsquo;ve written a bunch of guides on how to implement them. In this article, I want to pull all of these together into one reference guide, which you can then use to find the relevant information with ease. All of the implementation guides are for Google Tag Manager, but nothing\u0026rsquo;s stopping you from modifying the JavaScript to work with analytics.js or gtag.js.\n1. Improve granularity The first four Custom Dimensions are those introduced in my earlier article. You can follow the link to see more details about the implementation, but some of the solutions below have been updated, so make sure you follow these guides rather than those in the original article.\nThe purpose of these four dimensions is to add more information to Google Analytics data sets about the user journeys that take place on your site. Being able to segment and chop the data on a hit-by-hit basis (Hit Timestamp), group them into sessions (Session ID), sort by GA user (Client ID), and finally analyze cross-device paths (User ID), makes so much sense from an analytics point-of-view. It\u0026rsquo;s amazing that these dimensions are not readily available in Google Analytics\u0026rsquo; data sets. They are available in the BigQuery export\u0026hellip;\n  1.1. Hit Timestamp Original source: Link\nCustom Dimension scope: Hit\nHit Timestamp outputs the local time (i.e. visitor\u0026rsquo;s browser time) of the hit in standardized format. An example would be 2018-05-29T15:04:51.361+03:00 (year-month-dayThour:minutes:seconds.milliseconds timezone_offset). Since it\u0026rsquo;s hit timestamp, it\u0026rsquo;s important that you add this Custom Dimensions to every single Google Analytics tag that fires on your site. Easiest way to do it is to add it to a Google Analytics Settings variable.\nCustom JavaScript variable: {{Hit timestamp}}\nContents:\nfunction() { // Get local time as ISO string with offset at the end  var now = new Date(); var tzo = -now.getTimezoneOffset(); var dif = tzo \u0026gt;= 0 ? \u0026#39;+\u0026#39; : \u0026#39;-\u0026#39;; var pad = function(num) { var norm = Math.abs(Math.floor(num)); return (norm \u0026lt; 10 ? \u0026#39;0\u0026#39; : \u0026#39;\u0026#39;) + norm; }; return now.getFullYear() + \u0026#39;-\u0026#39; + pad(now.getMonth()+1) + \u0026#39;-\u0026#39; + pad(now.getDate()) + \u0026#39;T\u0026#39; + pad(now.getHours()) + \u0026#39;:\u0026#39; + pad(now.getMinutes()) + \u0026#39;:\u0026#39; + pad(now.getSeconds()) + \u0026#39;.\u0026#39; + pad(now.getMilliseconds()) + dif + pad(tzo / 60)  + \u0026#39;:\u0026#39; + pad(tzo % 60); }   1.2. Session ID Original source: Link\nCustom Dimension scope: Session\nSession ID is a random, unique string (GUID) which is scoped to the entire session. This means that all hits of the same session can be queried with the same ID. This, in turn, means that you have a way of aggregating all related hits directly in the data reports, rather than having to infer them using segments, for example.\nYou can add Session ID only to your Page View tag, but there\u0026rsquo;s no harm in including it in every single one of your GA tags. In fact, I actually recommend just adding it to the Google Analytics Settings variable you use for all your tags, because it\u0026rsquo;s possible that not all of your sessions will have a pageview in them (if the session breaks, and a new one starts without reloading a page).\nCustom JavaScript variable: {{Random GUID}}\nContents:\nfunction () { // Public Domain/MIT  var d = new Date().getTime(); if (typeof performance !== \u0026#39;undefined\u0026#39; \u0026amp;\u0026amp; typeof performance.now === \u0026#39;function\u0026#39;){ d += performance.now(); //use high-precision timer if available  } return \u0026#39;xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx\u0026#39;.replace(/[xy]/g, function (c) { var r = (d + Math.random() * 16) % 16 | 0; d = Math.floor(d / 16); return (c === \u0026#39;x\u0026#39; ? r : (r \u0026amp; 0x3 | 0x8)).toString(16); }); }   1.3. Client ID Original source: Link\nCustom Dimension scope: User\nClient ID is the anonymous cookie identifier that Google Analytics assigns to every single browser instance of any given web visitor. It\u0026rsquo;s how GA calculates the Users metric in views which don\u0026rsquo;t have the User ID feature enabled (more on this in the next chapter).\nSending the Client ID as a Custom Dimension to Google Analytics is absolutely necessary. It\u0026rsquo;s the only way to get row-by-row reports split by user, and it\u0026rsquo;s the only way to query for data collected from any anonymous user.\nThe Client ID is collected using customTask (guide here), so you do not add it to tags using the Custom Dimensions settings. Instead, you add it to Fields to set -\u0026gt; customTask (see screenshot below). Be sure to read my guide on customTask to understand how this mechanism works.\nCustom JavaScript variable: {{customTask - Client ID}}\nContents:\nfunction() { var clientIdIndex = 3; // Change this number to the actual Custom Dimension index number  return function(model) { model.set(\u0026#39;dimension\u0026#39; + clientIdIndex, model.get(\u0026#39;clientId\u0026#39;)); }; }   1.4. User ID Original source: Link\nCustom Dimension scope: User\nUser ID is an identifier that you have somehow linked to the logged in user. Typically it\u0026rsquo;s a pseudonymized key written into dataLayer using an identifier attached to the user in your CRM or some other server-side user registry.\nBecause there are so many ways to implement User ID, depending on how your backend produces the identifier, I do not have a generic guide on how to generate the value. Thus the instructions below apply only to a very specific use case, where the User ID is written to the dataLayer when the page is loaded. But you could just as well have your web server write the User ID in some other global variable, or even in a browser cookie.\nAlso, because you are collecting data from logged in users, make sure whatever solution you implement is compliant with the privacy legislation and regulations of your region.\nData Layer variable: {{DLV - userId}}\nContents: Data Layer Variable Name - userId\n  2. Good all-around Custom Dimensions The next set of Custom Dimensions are just smart things to add to your data collection. Since they are included in this guide, they aren\u0026rsquo;t queriable by default in GA\u0026rsquo;s reporting interface.\n  2.1. Hit Type Original source: Link\nCustom Dimension scope: Hit\nHit Type tells you explicitly what the type of hit collected in Google Analytics was. So it would be event for Events, pageview for Pageviews, timing for Timing hits, etc. You can use this to build segments (e.g. sessions where the first hit was an event), or to add more granularity to path analysis.\nYou should add the variable to every single Google Analytics tag in your container. The variable needs to be added using customTask. Be sure to read my guide on customTask to understand how this mechanism works.\nCustom JavaScript variable: {{customTask - Hit type}}\nContents:\nfunction() { var hitTypeIndex = 5; // Change this number to the actual Custom Dimension index number  return function(model) { model.set(\u0026#39;dimension\u0026#39; + hitTypeIndex, model.get(\u0026#39;hitType\u0026#39;)); }; }   2.2. Full Referrer Custom Dimension scope: Hit\nFull Referrer is simply the value of document.referrer added as a hit-scoped Custom Dimension to every single Google Analytics tag in your container. This will let you analyze what the previous page of any given hit was. This makes a lot of sense for pageview tracking, and it makes a lot of sense for hits that start sessions, since you can now analyze the referral information for sessions that came via some other source than a referral hit.\nJavaScript variable: {{document.referrer}}\nContents: Global Variable Name - document.referrer\n  2.3. Payload Length Original source: Link\nCustom Dimension scope: Hit\nYou can send the payload length of every single Google Analytics hit by adding this hit-scoped Custom Dimension to every single tag in your container. The idea is that you can monitor if you are approaching the 8192 byte limit, since hits that equal or surpass that limit will not get sent to Google Analytics.\nThe solution is added using customTask. Be sure to read my guide on customTask to understand how this mechanism works.\nCustom JavaScript variable: {{customTask - Hit payload length}}\nContents:\nfunction() { // Change this index to match that of the Custom Dimension you created in GA  var customDimensionIndex = 7; return function(model) { var globalSendTaskName = \u0026#39;_\u0026#39; + model.get(\u0026#39;trackingId\u0026#39;) + \u0026#39;_sendHitTask\u0026#39;; var originalSendHitTask = window[globalSendTaskName] = window[globalSendTaskName] || model.get(\u0026#39;sendHitTask\u0026#39;); model.set(\u0026#39;sendHitTask\u0026#39;, function(sendModel) { try { var originalHitPayload = sendModel.get(\u0026#39;hitPayload\u0026#39;); var hitPayload = sendModel.get(\u0026#39;hitPayload\u0026#39;); var customDimensionParameter = \u0026#39;\u0026amp;cd\u0026#39; + customDimensionIndex; // If hitPayload already has that Custom Dimension, note this in the console and do not overwrite the existing dimension  if (hitPayload.indexOf(customDimensionParameter + \u0026#39;=\u0026#39;) \u0026gt; -1) { console.log(\u0026#39;Google Analytics error: tried to send hit payload length in an already assigned Custom Dimension\u0026#39;); originalSendHitTask(sendModel); } else { // Otherwise add the Custom Dimension to the string  // together with the complete length of the payload  hitPayload += customDimensionParameter + \u0026#39;=\u0026#39;; hitPayload += (hitPayload.length + hitPayload.length.toString().length); sendModel.set(\u0026#39;hitPayload\u0026#39;, hitPayload, true); originalSendHitTask(sendModel); } } catch(e) { console.error(\u0026#39;Error sending hit payload length to Google Analytics\u0026#39;); sendModel.set(\u0026#39;hitPayload\u0026#39;, originalHitPayload, true); originalSendHitTask(sendModel); } }); }; }   2.4. GTM Container ID Custom Dimension scope: Hit\nThis is another of those no-brainer Custom Dimensions. Sending the Container ID serves multiple purposes: It helps you identify valid hits from spam (particularly spam sent from outside your site), it helps you debug data in a situation where you have more than one container running on the site, and it makes it easy to run parallel installations of Universal Analytics (or Global Site Tag) and Google Tag Manager.\nYou need to activate the Container ID Built-in variable for this. Add the variable to your Google Analytics Settings variable, so that it\u0026rsquo;s added to every single Google Analytics tag in your container.\n  3. Browsing behavior The final set of Custom Dimensions is all about tracking browsing behavior. Follow the link in the previous sentence to read a thorough guide on how and why to track browsing behavior in Google Analytics.\nSuffice to say that by adding these dimensions to your data collection, you can make more sense out of how users navigate to, navigate on, and navigate away from your site. It\u0026rsquo;s finally possible to segment your data based on how your visitors open pages in browser tabs, do they navigate with the browser\u0026rsquo;s Back and Forward buttons, and how many tabs they have open at any given time!\nInstead of adding solution-specific implementation information, please follow the steps in the original guide.\n  3.1. Redirect Count Custom Dimension scope: Hit\nRedirect count is the number of times the initial document request was redirected when the user loaded the current page. There are some inconsistencies here, and I haven\u0026rsquo;t been able to deduce a consistent description of redirectCount behavior. However, if it works as it should, it offers interesting data about how your site responds to requests, especially when combined with organic search traffic, for example.\nData Layer variable: {{DLV - browsingBehavior.redirectCount}}\nContents: Data Layer Variable Name - browsingBehavior.redirectCount\n  3.2. Navigation Type Custom Dimension scope: Hit\nNavigation type means the method of navigating to the current page. This includes values such as NAVIGATE (user wrote the address in the address bar or clicked a link to the current page), RELOAD (user reloaded the page), BACK / FORWARD (user clicked the browser\u0026rsquo;s back or forward buttons) and OTHER (some other way of navigating to the page.\nData Layer variable: {{DLV - browsingBehavior.navigationType}}\nContents: Data Layer Variable Name - browsingBehavior.navigationType\n  3.3. Tab Type Custom Dimension scope: Hit\nTab type indicates whether the page load occurred in a newly open tab, or whether the tab already existed. This is done by storing the current tabId into sessionStorage. If the storage doesn\u0026rsquo;t have the current tab ID, we can deduce that the tab is a new one, since sessionStorage is purged when the tab is closed.\nData Layer variable: {{DLV - browsingBehavior.newTab}}\nContents: Data Layer Variable Name - browsingBehavior.newTab\n  3.4. Tabs Open Custom Dimension scope: Hit\nTabs open returns the number of tabs currently open in the browser. This is based on a count of currently active tab IDs stored in localStorage. This counter isn\u0026rsquo;t 100% reliable, because it relies on a number of moving parts which might not always be in sync. But as an indicator it\u0026rsquo;s very useful, since it tells you how your content is typically being digested.\nData Layer variable: {{DLV - browsingBehavior.tabCount}}\nContents: Data Layer Variable Name - browsingBehavior.tabCount\n  3.5. Tab ID Custom Dimension scope: Hit\nThe final cog in the machine is the ID of the current tab. This is useful in case you want to group hits together by the tab in which they occurred.\nData Layer variable: {{DLV - browsingBehavior.tabId}}\nContents: Data Layer Variable Name - browsingBehavior.tabId\n  4. The customTask variable You might have noticed that a number of the solutions in this guide utilize customTask. I might have recommended you to read my customTask guide, too!\nOne of the things you\u0026rsquo;ll learn in the guide is that you can only have one customTask per tag. That means that if you want to implement all the Custom Dimensions in this article, you will need to combine three different customTask solutions into a single Custom JavaScript variable.\nThis is fairly easy to do, since it\u0026rsquo;s more or less just copy-pasting all the code into one long anonymous function, but I\u0026rsquo;ll show you how to do it nevertheless.\nThis is the Custom JavaScript variable you\u0026rsquo;ll be using:\nfunction() { var clientIdIndex = 3; // Change this number to the index of your Client ID Custom Dimension  var hitTypeIndex = 5; // Change this number to the index of your Hit Type Custom Dimension  var payloadLengthIndex = 7; // Change this number to the index of your Payload Length Custom Dimension  return function(model) { var globalSendTaskName, originalSendHitTask, originalHitPayload, hitPayload, customDimensionParameter; if (typeof clientIdIndex === \u0026#39;number\u0026#39;) { model.set(\u0026#39;dimension\u0026#39; + clientIdIndex, model.get(\u0026#39;clientId\u0026#39;)); } if (typeof hitTypeIndex === \u0026#39;number\u0026#39;) { model.set(\u0026#39;dimension\u0026#39; + hitTypeIndex, model.get(\u0026#39;hitType\u0026#39;)); } if (typeof payloadLengthIndex === \u0026#39;number\u0026#39;) { globalSendTaskName = \u0026#39;_\u0026#39; + model.get(\u0026#39;trackingId\u0026#39;) + \u0026#39;_sendHitTask\u0026#39;; originalSendHitTask = window[globalSendTaskName] = window[globalSendTaskName] || model.get(\u0026#39;sendHitTask\u0026#39;); model.set(\u0026#39;sendHitTask\u0026#39;, function(sendModel) { try { originalHitPayload = sendModel.get(\u0026#39;hitPayload\u0026#39;); hitPayload = sendModel.get(\u0026#39;hitPayload\u0026#39;); customDimensionParameter = \u0026#39;\u0026amp;cd\u0026#39; + payloadLengthIndex; // If hitPayload already has that Custom Dimension, note this in the console and do not overwrite the existing dimension  if (hitPayload.indexOf(customDimensionParameter + \u0026#39;=\u0026#39;) \u0026gt; -1) { console.log(\u0026#39;Google Analytics error: tried to send hit payload length in an already assigned Custom Dimension\u0026#39;); originalSendHitTask(sendModel); } else { // Otherwise add the Custom Dimension to the string  // together with the complete length of the payload  hitPayload += customDimensionParameter + \u0026#39;=\u0026#39;; hitPayload += (hitPayload.length + hitPayload.length.toString().length); sendModel.set(\u0026#39;hitPayload\u0026#39;, hitPayload, true); originalSendHitTask(sendModel); } } catch(e) { console.error(\u0026#39;Error sending hit payload length to Google Analytics\u0026#39;); sendModel.set(\u0026#39;hitPayload\u0026#39;, originalHitPayload, true); originalSendHitTask(sendModel); } }); } }; } If you want to drop any of the three solutions from this customTask, simply remove or comment out the respective var ...Index = N; line. For example, if you don\u0026rsquo;t need to collect the payload length, change the code appropriately:\nfunction() { var clientIdIndex = 3; // Change this number to the index of your Client ID Custom Dimension  var hitTypeIndex = 5; // Change this number to the index of your Hit Type Custom Dimension  // var payloadLengthIndex = 7;  return function(model) { ... Summary This list of Custom Dimensions is certainly not exhaustive, and I\u0026rsquo;m sure you have other suggestions to what could be considered \u0026ldquo;useful\u0026rdquo;.\nOne thing to keep in mind is the restriction of just 20 available Custom Dimension slots in the free version of Google Analytics. This is very unfortunate, and one of the main gripes I have with GA. So it\u0026rsquo;s very likely you\u0026rsquo;re forced to prioritize just which dimension you\u0026rsquo;ll need to be adding to your data collection. If push comes to shove, I would personally be fine with ignoring the five Browsing Behavior dimensions, and just focus on the 8 dimensions listed first in this article.\nRegardless, I consider these Custom Dimensions to add much-needed granularity to GA data. Many of these dimensions are available by default only in the BigQuery export, which, in turn, is mainly available for Google Analytics 360 customers. So by adding these dimensions to your data set, you are, in a way, actually saving money.\nDo you have some go-to Custom Dimensions you\u0026rsquo;d recommend others add to their data collection right this instant? Let us know in the comments.\n"
+},
+{
 	"uri": "https://www.simoahava.com/analytics/add-hit-type-custom-dimension/",
 	"title": "#GTMTips: Add Hit Type As A Custom Dimension",
 	"tags": ["google tag manager", "gtmtips", "customtask"],
@@ -1764,14 +1771,14 @@
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/categories/analytics/",
+	"uri": "https://www.simoahava.com/tags/analytics/",
 	"title": "Analytics",
 	"tags": [],
 	"description": "",
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/tags/analytics/",
+	"uri": "https://www.simoahava.com/categories/analytics/",
 	"title": "Analytics",
 	"tags": [],
 	"description": "",
@@ -2023,14 +2030,14 @@
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/categories/content-management/",
+	"uri": "https://www.simoahava.com/tags/content-management/",
 	"title": "Content Management",
 	"tags": [],
 	"description": "",
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/tags/content-management/",
+	"uri": "https://www.simoahava.com/categories/content-management/",
 	"title": "Content Management",
 	"tags": [],
 	"description": "",
@@ -2254,14 +2261,14 @@
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/categories/digital-marketing/",
+	"uri": "https://www.simoahava.com/tags/digital-marketing/",
 	"title": "Digital Marketing",
 	"tags": [],
 	"description": "",
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/tags/digital-marketing/",
+	"uri": "https://www.simoahava.com/categories/digital-marketing/",
 	"title": "Digital Marketing",
 	"tags": [],
 	"description": "",
@@ -2877,14 +2884,14 @@
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/categories/personal/",
+	"uri": "https://www.simoahava.com/tags/personal/",
 	"title": "Personal",
 	"tags": [],
 	"description": "",
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/tags/personal/",
+	"uri": "https://www.simoahava.com/categories/personal/",
 	"title": "Personal",
 	"tags": [],
 	"description": "",
@@ -3409,13 +3416,6 @@
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/categories/web-design/",
-	"title": "Web Design",
-	"tags": [],
-	"description": "",
-	"content": ""
-},
-{
 	"uri": "https://www.simoahava.com/tags/web-design/",
 	"title": "Web Design",
 	"tags": [],
@@ -3423,14 +3423,21 @@
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/categories/web-development/",
-	"title": "Web Development",
+	"uri": "https://www.simoahava.com/categories/web-design/",
+	"title": "Web Design",
 	"tags": [],
 	"description": "",
 	"content": ""
 },
 {
 	"uri": "https://www.simoahava.com/tags/web-development/",
+	"title": "Web Development",
+	"tags": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "https://www.simoahava.com/categories/web-development/",
 	"title": "Web Development",
 	"tags": [],
 	"description": "",
