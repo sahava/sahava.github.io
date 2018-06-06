@@ -848,7 +848,7 @@ on
 
 <h2 id="how-it-works">How it works</h2>
 
-<p>When you land on a page where an Optimize experiment is running (i.e. the page is (one of) the target(s) of the experiment), your Google Analytics hits will contain the <strong>&exp;</strong> parameter with a value consisting of all the experiment IDs and variant IDs the user is participating in:</p>
+<p>When you land on a page where an Optimize experiment is running (i.e. the page is (one of) the target(s) of the experiment), your Google Analytics hits will contain the <strong>&amp;exp</strong> parameter with a value consisting of all the experiment IDs and variant IDs the user is participating in:</p>
 
 
 
@@ -862,7 +862,7 @@ on
 
 <p>This key is what GA then uses to attribute the user to these particular experiments. So once that hit reaches GA, my Client ID will be associated with those two experiment IDs until the experiment is over.</p>
 
-<p>Now, what I actually want to happen is for a Custom Dimension to be added to that Page View hit if it has the <strong>&exp;</strong> key. For this, I need to use <code>customTask</code> so that it can sniff the requests to Google Analytics, and in case they contain this key, dynamically add the Custom Dimension parameter with the experiment string. That way I&rsquo;ll have the experiment data sent to Google Analytics nicely in the Custom Dimension of my choice!</p>
+<p>Now, what I actually want to happen is for a Custom Dimension to be added to that Page View hit if it has the <strong>&amp;exp</strong> key. For this, I need to use <code>customTask</code> so that it can sniff the requests to Google Analytics, and in case they contain this key, dynamically add the Custom Dimension parameter with the experiment string. That way I&rsquo;ll have the experiment data sent to Google Analytics nicely in the Custom Dimension of my choice!</p>
 
 <p>If you&rsquo;re using <strong>Google Tag Manager</strong> to deploy Google Optimize, the same code will apply, but instead of leveraging a Page View hit, the Optimize tag will use a special <code>hitType === 'data'</code> hit, which takes your experiment data to GA.</p>
 
@@ -876,7 +876,7 @@ on
   
 
 
-<p>Unfortunately for us, this <code>data</code> hit type is not exposed in Google Analytics, so we can&rsquo;t use that to segment our visitors, nor does piggy-backing it with a Custom Dimension do anything. So, we need to configure Google Tag Manager to actually send an extra <strong>event</strong> when a <code>data</code> hit is encountered that also has the <strong>&exp;</strong> parameter with it.</p>
+<p>Unfortunately for us, this <code>data</code> hit type is not exposed in Google Analytics, so we can&rsquo;t use that to segment our visitors, nor does piggy-backing it with a Custom Dimension do anything. So, we need to configure Google Tag Manager to actually send an extra <strong>event</strong> when a <code>data</code> hit is encountered that also has the <strong>&amp;exp</strong> parameter with it.</p>
 
 <h2 id="implement-via-analytics-js">Implement via analytics.js</h2>
 
@@ -930,7 +930,7 @@ on
 
 <p>The change to the original Optimize-modified analytics.js snippet is the entire block starting with <code>// NEW:...</code> and ending with <code>// NEW BLOCK ENDS</code>.</p>
 
-<p>This code listens to all GA hits sent with the default tracker, and if they have the <strong>&exp;</strong> parameter, then the Custom Dimension is dynamically added to the hits, along with the experiment ID string the user is associated with. Note that you must change the value of <code>var customDimensionIndex</code> to reflect the Custom Dimension index you&rsquo;ve created in Google Analytics. I prefer to use a <strong>Session-scoped Custom Dimension</strong>, but you could use hit-scoped, too, for increased granularity.</p>
+<p>This code listens to all GA hits sent with the default tracker, and if they have the <strong>&amp;exp</strong> parameter, then the Custom Dimension is dynamically added to the hits, along with the experiment ID string the user is associated with. Note that you must change the value of <code>var customDimensionIndex</code> to reflect the Custom Dimension index you&rsquo;ve created in Google Analytics. I prefer to use a <strong>Session-scoped Custom Dimension</strong>, but you could use hit-scoped, too, for increased granularity.</p>
 
 <p>
 
@@ -972,8 +972,8 @@ on
           <span class="nx">hasNewHitBeenGenerated</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
           <span class="k">return</span><span class="p">;</span>
         <span class="p">}</span>
-        <span class="k">if</span> <span class="p">(</span><span class="nx">hitPayload</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="s1">&#39;&amp;cd;&#39;</span> <span class="o">+</span> <span class="nx">customDimensionIndex</span> <span class="o">+</span> <span class="s1">&#39;=&#39;</span><span class="p">)</span> <span class="o">===</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-          <span class="nx">sendModel</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&#39;hitPayload&#39;</span><span class="p">,</span> <span class="nx">hitPayload</span> <span class="o">+</span> <span class="s1">&#39;&amp;cd;&#39;</span> <span class="o">+</span> <span class="nx">customDimensionIndex</span> <span class="o">+</span> <span class="s1">&#39;=&#39;</span> <span class="o">+</span> <span class="nx">sendModel</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;exp&#39;</span><span class="p">),</span> <span class="kc">true</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">hitPayload</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="s1">&#39;&amp;cd&#39;</span> <span class="o">+</span> <span class="nx">customDimensionIndex</span> <span class="o">+</span> <span class="s1">&#39;=&#39;</span><span class="p">)</span> <span class="o">===</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+          <span class="nx">sendModel</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&#39;hitPayload&#39;</span><span class="p">,</span> <span class="nx">hitPayload</span> <span class="o">+</span> <span class="s1">&#39;&amp;cd&#39;</span> <span class="o">+</span> <span class="nx">customDimensionIndex</span> <span class="o">+</span> <span class="s1">&#39;=&#39;</span> <span class="o">+</span> <span class="nx">sendModel</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;exp&#39;</span><span class="p">),</span> <span class="kc">true</span><span class="p">);</span>
         <span class="p">}</span>
       <span class="p">}</span>
       <span class="nx">originalSendTask</span><span class="p">(</span><span class="nx">sendModel</span><span class="p">);</span>
