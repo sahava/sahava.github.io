@@ -1,0 +1,879 @@
+
+
+  
+    
+  
+
+
+  
+
+
+
+
+
+  
+
+
+  
+
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta name="google-site-verification" content="xQwWI2KUfP9LbFKhw2CVLFtrMY6Czrla7L3PD2aBolA" />
+
+
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org", 
+  "@type": "BlogPosting",
+  "headline": "Automatically Reduce Google Analytics Payload Length | Simo Ahava's blog",
+  "image": "https://www.simoahava.com/images/2018/06/automatically-reduce-payload-length.png",
+  "editor": "Simo Ahava",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Simo Ahava's blog",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://www.simoahava.com/images/simo.png",
+      "height": "393",
+      "width": "407"
+    }
+  },
+  "url": "https://www.simoahava.com/analytics/automatically-reduce-google-analytics-payload-length/",
+  "datePublished": "2018-06-22T11:04:14+03:00",
+  "dateModified": "2018-06-22T11:04:14+03:00",
+  "description": "Use customTask to automatically reduce the Google Analytics payload length, so that it stays below the maximum of 8192. This is very useful for Enhanced Ecommerce tracking, where payload sizes might grow to be very large.",
+  "author": {
+    "@type": "Person",
+    "name": "Simo Ahava"
+  }
+}
+</script>
+
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Hugo 0.31 with theme Tranquilpeak 0.4.3-BETA">
+    <title>Automatically Reduce Google Analytics Payload Length | Simo Ahava's blog</title>
+    
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-PZ7GMV9');</script>
+    
+    <script src="//simoahava.disqus.com/count.js" id="dsq-count-scr" async></script>
+    <meta name="author" content="Simo Ahava">
+    <meta name="keywords" content="">
+
+    <link rel="icon" href="https://www.simoahava.com/images/favicon.ico">
+    
+    <link rel="amphtml" href="https://www.simoahava.com/amp/analytics/automatically-reduce-google-analytics-payload-length/">
+    
+    <meta name="description" content="Use customTask to automatically reduce the Google Analytics payload length, so that it stays below the maximum of 8192. This is very useful for Enhanced Ecommerce tracking, where payload sizes might grow to be very large.">
+    <meta property="og:description" content="Use customTask to automatically reduce the Google Analytics payload length, so that it stays below the maximum of 8192. This is very useful for Enhanced Ecommerce tracking, where payload sizes might grow to be very large.">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="Automatically Reduce Google Analytics Payload Length">
+    <meta property="og:url" content="/analytics/automatically-reduce-google-analytics-payload-length/">
+    <meta property="og:site_name" content="Simo Ahava&#39;s blog">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Automatically Reduce Google Analytics Payload Length">
+    <meta name="twitter:description" content="Use customTask to automatically reduce the Google Analytics payload length, so that it stays below the maximum of 8192. This is very useful for Enhanced Ecommerce tracking, where payload sizes might grow to be very large.">
+    
+      <meta name="twitter:creator" content="@SimoAhava">
+      
+    
+
+    
+    
+
+    
+      <meta property="og:image" content="https://www.simoahava.com/images/simo.png">
+    
+
+    
+      <meta name="twitter:image" content="https://www.simoahava.com/images/2018/06/automatically-reduce-payload-length.png">  
+      <meta property="og:image" content="https://www.simoahava.com/images/2018/06/automatically-reduce-payload-length.png">
+    
+    
+    
+
+    
+
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/jquery.fancybox.min.css" integrity="sha256-vuXZ9LGmmwtjqFX1F+EKin1ThZMub58gKULUyf0qECk=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/helpers/jquery.fancybox-thumbs.min.css" integrity="sha256-SEa4XYAHihTcEP1f5gARTB2K26Uk8PsndQYHQC1f4jU=" crossorigin="anonymous" />
+    
+    
+    <link rel="stylesheet" href="https://www.simoahava.com/css/style.css" />
+    
+    
+
+    
+      
+    
+    
+  </head>
+
+  <body>
+    <div id="blog">
+      <header id="header" data-behavior="4">
+  <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+  <div class="header-title">
+    <a class="header-title-link" href="https://www.simoahava.com/">Simo Ahava&#39;s blog</a>
+  </div>
+  
+</header>
+
+      <nav id="sidebar" data-behavior="4">
+  <div class="sidebar-container">
+    
+      <div class="sidebar-profile">
+        <a href="https://www.simoahava.com/">
+          <img class="sidebar-profile-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+        </a>
+        <h4 class="sidebar-profile-name">Simo Ahava</h4>
+        
+          <h5 class="sidebar-profile-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</h5>
+        
+      </div>
+    
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+      
+      <span class="sidebar-button-desc">Home</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+      
+      <span class="sidebar-button-desc">Categories</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tags/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Tags</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/gtm-tips/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-magic"></i>
+      
+      <span class="sidebar-button-desc">GTM Tips</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/about-simo-ahava/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+      
+      <span class="sidebar-button-desc">About</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tools/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-wrench"></i>
+      
+      <span class="sidebar-button-desc">Tools</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/blog-statistics/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bar-chart"></i>
+      
+      <span class="sidebar-button-desc">Blog statistics</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://github.com/sahava" target="_blank" rel="noopener">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+      
+      <span class="sidebar-button-desc">GitHub</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/upcoming-talks/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bullhorn"></i>
+      
+      <span class="sidebar-button-desc">Upcoming talks</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
+
+    </ul>
+  </div>
+</nav>
+
+      
+
+      <div id="main" data-behavior="4"
+        class="
+               hasCoverMetaIn
+               ">
+        <article class="post">
+	  <form id="search" action="/search/">
+  <input name="q" type="text" class="form-control input--xlarge" placeholder="Search blog..." autocomplete="off">
+  </form>
+
+          
+          
+            <div class="post-header main-content-wrap text-left">
+
+  
+
+    <h1>
+      Automatically Reduce Google Analytics Payload Length
+    </h1>
+  
+  
+  <div class="postShorten-meta post-meta">
+    
+      <time datetime="2018-06-22T11:04:14&#43;03:00">
+        
+  June 22, 2018
+
+      </time>
+    
+      
+  
+  
+    <span>in</span>
+    
+      <a class="category-link" href="https://www.simoahava.com/categories/analytics">Analytics</a>
+    
+  
+
+
+       | <a href="https://www.simoahava.com/analytics/automatically-reduce-google-analytics-payload-length/#disqus_thread">Comments</a>
+  </div>
+
+
+</div>
+
+          
+          <div class="post-content markdown">
+            <div class="main-content-wrap">
+              
+
+<p>Here we are, reunited with <a href="https://www.simoahava.com/analytics/customtask-the-guide/"><code>customTask</code></a>. This time, we&rsquo;ll put this wonderful mechanism to work for a very, very good cause. One of the lesser known &ldquo;features&rdquo; of <a href="https://analytics.google.com/">Google Analytics</a> is that when the payload size (the request body that is actually sent to Google Analytics with each request) goes past a certain limit, specifically <a href="https://developers.google.com/analytics/devguides/collection/protocol/v1/reference#using-post">8192 bytes</a>, the hit is <strong>aborted</strong> without warning. This can come as a surprise, because there&rsquo;s no indication anywhere in Google Analytics that you are missing hits because of this.</p>
+
+<p>The solution? A nice little <code>customTask</code> script, which recursively whittles away parts of the payload until the length is just below the cap.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2018/06/automatically-reduce-payload-length.png" title="Automatically reduce payload length">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2018/06/automatically-reduce-payload-length.png#ZgotmplZ" alt="Automatically reduce payload length">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>The idea is that you will be able to specify a list of payload parameters to be removed one by one from the payload until the size is safely below the maximum of 8192. First things that will go are some of the default dimensions that no one really uses, such as <a href="https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters#je">&lsquo;Java Enabled&rsquo;</a> and <a href="https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters#de">&lsquo;Document Encoding&rsquo;</a>. Next, you can list all the Custom Dimensions you want to get rid of, in order of priority.</p>
+
+<p>Finally, you&rsquo;ll be able to list the Enhanced Ecommerce impression parameters that you want to remove from each impression in the payload. The script will stop as soon as the length is below 8192, so you&rsquo;ll most likely end up with some impressions having more details than others.</p>
+
+<p>Why stop at impressions? Because, from experience, that&rsquo;s where most problems lie. It shouldn&rsquo;t be too difficult to customize the script to also include Promotions and even &ldquo;regular&rdquo; Enhanced Ecommerce product objects.</p>
+
+<p>Once you&rsquo;ve implemented this in your Enhanced Ecommerce tags, you should never see the following error in the console (if you have <a href="https://chrome.google.com/webstore/detail/google-analytics-debugger/jnkmfdileelhofjcijamephohjechhna?hl=en">Google Analytics Debugger</a> activated, or if you have Universal Analytics running in <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/debugging#the_debug_version_of_the_analyticsjs_library">debug mode</a>):</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2018/06/warning.png" title="payload length warning">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2018/06/warning.png#ZgotmplZ" alt="payload length warning">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>I recommend implementing this <code>customTask</code> together with my solution for sending the <a href="https://www.simoahava.com/analytics/send-google-analytics-payload-length-as-custom-dimension/">payload length</a> as a custom dimension. This way you&rsquo;ll be able to detect if you&rsquo;re approaching the maximum length of the payload with your hits, and you can then proceed to implement this payload length limiter when necessary.</p>
+
+<p>For an alternative solution, take a look at <a href="https://www.lunametrics.com/blog/2017/02/16/tracking-large-transactions-w-google-analytics-google-tag-manager/">this excellent article</a> by the awesome Dan Wilkerson from the equally awesome <a href="https://www.lunametrics.com/">LunaMetrics</a> blog.</p>
+
+<h2 id="the-customtask-variable">The <code>customTask</code> variable</h2>
+
+<p>To build the <code>customTask</code>, you need to create a new <strong>Custom JavaScript variable</strong>. Name it something like <strong>{{customTask - reduce payload length}}</strong>.</p>
+
+<blockquote>
+<p><strong>Note!</strong> If you already have a <code>customTask</code> implemented in your Enhanced Ecommerce tags, you&rsquo;ll need to combine the code below with the existing <code>customTask</code> script you already have. For tips on how to do this, consult <a href="https://www.simoahava.com/analytics/customtask-the-guide/#putting-it-all-together-literally">this guide</a>.</p>
+</blockquote>
+
+<p>Add the following code into the <code>customTask</code> variable body:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
+  <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">customModel</span>) {
+    <span style="color:#75715e">// Add any other default parameters you want to strip from the payload
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">// into this array in order of priority. 
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">// For more details, visit: https://bit.ly/2MOhjBD
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">defaultParams</span> <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#39;&amp;je&#39;</span>, <span style="color:#e6db74">&#39;&amp;de&#39;</span>, <span style="color:#e6db74">&#39;&amp;sd&#39;</span>, <span style="color:#e6db74">&#39;&amp;vp&#39;</span>, <span style="color:#e6db74">&#39;&amp;sr&#39;</span>];
+    
+    <span style="color:#75715e">// List the (regular) Custom Dimensions you want to strip from the
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">// payload in order of priority. Leave the array empty if you don&#39;t
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">// want to remove Custom Dimensions. 
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">// For more details, visit: https://bit.ly/2MM6O1O
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">customDims</span> <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#39;&amp;cd198&#39;</span>, <span style="color:#e6db74">&#39;&amp;cd199&#39;</span>, <span style="color:#e6db74">&#39;&amp;cd200&#39;</span>];
+
+    <span style="color:#75715e">// List the impression object parameters you want to strip from the
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">// payload in order of priority. Only list the field specifier, so
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">// instead of &#39;&amp;il1pi2va&#39;, write &#39;va&#39;, and instead of &#39;&amp;il1pi4cd3&#39;, write
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">// &#39;cd3&#39;. For more details, visit: https://bit.ly/2KehCHF
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">impressions</span> <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#39;va&#39;</span>, <span style="color:#e6db74">&#39;br&#39;</span>, <span style="color:#e6db74">&#39;ca&#39;</span>, <span style="color:#e6db74">&#39;ps&#39;</span>, <span style="color:#e6db74">&#39;nm&#39;</span>];
+    
+    <span style="color:#75715e">// Don&#39;t touch the code below.
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">maxLength</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">8192</span>,
+        <span style="color:#a6e22e">globalSendTaskName</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;_&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">customModel</span>.<span style="color:#a6e22e">get</span>(<span style="color:#e6db74">&#39;trackingId&#39;</span>) <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;_sendHitTask&#39;</span>,
+        <span style="color:#a6e22e">originalSendHitTask</span> <span style="color:#f92672">=</span> window[<span style="color:#a6e22e">globalSendTaskName</span>] <span style="color:#f92672">=</span> window[<span style="color:#a6e22e">globalSendTaskName</span>] <span style="color:#f92672">||</span> <span style="color:#a6e22e">customModel</span>.<span style="color:#a6e22e">get</span>(<span style="color:#e6db74">&#39;sendHitTask&#39;</span>);
+  
+    <span style="color:#a6e22e">customModel</span>.<span style="color:#a6e22e">set</span>(<span style="color:#e6db74">&#39;sendHitTask&#39;</span>, <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">sendModel</span>) {
+    
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">ga</span> <span style="color:#f92672">=</span> window[window[<span style="color:#e6db74">&#39;GoogleAnalyticsObject&#39;</span>]];
+    
+      <span style="color:#75715e">// Only log if in analytics debug mode.
+</span><span style="color:#75715e"></span>      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">log</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">msg</span>) {
+        <span style="color:#66d9ef">if</span> (<span style="color:#e6db74">&#39;dump&#39;</span> <span style="color:#66d9ef">in</span> <span style="color:#a6e22e">ga</span>) {
+          window.<span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">apply</span>(window.<span style="color:#a6e22e">console</span>, [<span style="color:#a6e22e">msg</span>]);
+        }
+      };
+    
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">hitPayload</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sendModel</span>.<span style="color:#a6e22e">get</span>(<span style="color:#e6db74">&#39;hitPayload&#39;</span>);
+    
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">removeKeys</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">hitPayload</span>, <span style="color:#a6e22e">keys</span>) {
+        <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">key</span>, <span style="color:#a6e22e">regex</span>;
+        <span style="color:#66d9ef">while</span>(<span style="color:#a6e22e">hitPayload</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">&gt;=</span> <span style="color:#a6e22e">maxLength</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">keys</span>.<span style="color:#a6e22e">length</span>) {
+          <span style="color:#a6e22e">key</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">keys</span>[<span style="color:#ae81ff">0</span>];
+          <span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#39;--&gt; Removing &#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">key</span>);
+          <span style="color:#a6e22e">regex</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> RegExp(<span style="color:#a6e22e">key</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;=[^&amp;]+&#39;</span>, <span style="color:#e6db74">&#39;gi&#39;</span>);
+          <span style="color:#a6e22e">keys</span>.<span style="color:#a6e22e">shift</span>();
+          <span style="color:#a6e22e">hitPayload</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">hitPayload</span>.<span style="color:#a6e22e">replace</span>(<span style="color:#a6e22e">regex</span>, <span style="color:#e6db74">&#39;&#39;</span>);
+          <span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#39;--&gt; New length: &#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">hitPayload</span>.<span style="color:#a6e22e">length</span>);
+        }
+        <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">hitPayload</span>;
+      };
+    
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">removeImpressions</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">hitPayload</span>, <span style="color:#a6e22e">keys</span>) {
+        <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">key</span>, <span style="color:#a6e22e">regex</span>, <span style="color:#a6e22e">oldKey</span>;
+        <span style="color:#66d9ef">while</span>(<span style="color:#a6e22e">hitPayload</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">&gt;=</span> <span style="color:#a6e22e">maxLength</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">keys</span>.<span style="color:#a6e22e">length</span>) {
+          <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">key</span> <span style="color:#f92672">!==</span> <span style="color:#a6e22e">keys</span>[<span style="color:#ae81ff">0</span>]) {
+            <span style="color:#a6e22e">key</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">keys</span>[<span style="color:#ae81ff">0</span>];
+            <span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#39;--&gt; Removing &amp;ilNpiN&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">key</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39; from impression objects&#39;</span>);
+          }
+          <span style="color:#a6e22e">regex</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> RegExp(<span style="color:#e6db74">&#39;&amp;il\\d+pi\\d+&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">key</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;=[^&amp;]+&#39;</span>, <span style="color:#e6db74">&#39;i&#39;</span>);
+          <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">regex</span>.<span style="color:#a6e22e">test</span>(<span style="color:#a6e22e">hitPayload</span>)) {
+            <span style="color:#a6e22e">keys</span>.<span style="color:#a6e22e">shift</span>();
+          }
+          <span style="color:#a6e22e">hitPayload</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">hitPayload</span>.<span style="color:#a6e22e">replace</span>(<span style="color:#a6e22e">regex</span>, <span style="color:#e6db74">&#39;&#39;</span>);
+        }
+        <span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#39;--&gt; New length: &#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">hitPayload</span>.<span style="color:#a6e22e">length</span>);
+        <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">hitPayload</span>;
+      };
+
+      <span style="color:#75715e">// If over payload length, remove default parameters.
+</span><span style="color:#75715e"></span>      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">hitPayload</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">&gt;=</span> <span style="color:#a6e22e">maxLength</span>) {
+        <span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#39;Payload too long (&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">hitPayload</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;), removing default keys...&#39;</span>);
+        <span style="color:#a6e22e">hitPayload</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">removeKeys</span>(<span style="color:#a6e22e">hitPayload</span>, <span style="color:#a6e22e">defaultParams</span>);
+      }
+      <span style="color:#75715e">// If over payload length, remove custom dimensions.
+</span><span style="color:#75715e"></span>      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">hitPayload</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">&gt;=</span> <span style="color:#a6e22e">maxLength</span>) {
+        <span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#39;Payload still too long (&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">hitPayload</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;), removing Custom Dimensions...&#39;</span>);
+        <span style="color:#a6e22e">hitPayload</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">removeKeys</span>(<span style="color:#a6e22e">hitPayload</span>, <span style="color:#a6e22e">customDims</span>);
+      }
+      <span style="color:#75715e">// If over payload length, clean up impression objects.
+</span><span style="color:#75715e"></span>      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">hitPayload</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">&gt;=</span> <span style="color:#a6e22e">maxLength</span>) {
+        <span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#39;Payload still too long (&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">hitPayload</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;), cleaning up Impressions...&#39;</span>);
+        <span style="color:#a6e22e">hitPayload</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">removeImpressions</span>(<span style="color:#a6e22e">hitPayload</span>, <span style="color:#a6e22e">impressions</span>);
+      }
+    
+      <span style="color:#75715e">// Send the modified payload.
+</span><span style="color:#75715e"></span>      <span style="color:#a6e22e">sendModel</span>.<span style="color:#a6e22e">set</span>(<span style="color:#e6db74">&#39;hitPayload&#39;</span>, <span style="color:#a6e22e">hitPayload</span>, <span style="color:#66d9ef">true</span>);
+      <span style="color:#a6e22e">originalSendHitTask</span>(<span style="color:#a6e22e">sendModel</span>);
+    });
+  };
+}</code></pre></div>
+
+<p>Make sure you edit the <code>defaultParams</code>, <code>customDims</code>, and <code>impressions</code> arrays to include the keys you want to purge from the <code>dataLayer</code>. Note that you will need to list the keys using their <a href="https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters">Measurement Protocol parameter names</a> rather than what their <strong>analytics.js</strong> field names are. So instead of <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/field-reference#encoding"><code>'encoding'</code></a>, for example, you need to use <a href="https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters#de"><code>'&amp;de'</code></a>.</p>
+
+<p>The keys I have added to the <code>defaultParams</code> array are:</p>
+
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td><code>&amp;je</code></td>
+<td>Java Enabled</td>
+<td>Whether the browser has enabled Java or not.</td>
+</tr>
+
+<tr>
+<td><code>&amp;de</code></td>
+<td>Document Encoding</td>
+<td>What the character encoding of the current page is (e.g. <code>UTF-8</code>).</td>
+</tr>
+
+<tr>
+<td><code>&amp;sd</code></td>
+<td>Screen Colors</td>
+<td>The screen color depth (e.g. <code>24-bits</code>).</td>
+</tr>
+
+<tr>
+<td><code>&amp;vp</code></td>
+<td>Viewport Size</td>
+<td>The viewable area (in pixels) of the browser or device.</td>
+</tr>
+
+<tr>
+<td><code>&amp;sr</code></td>
+<td>Screen Resolution</td>
+<td>The screen resolution (in pixels) of the browser or device.</td>
+</tr>
+</tbody>
+</table>
+
+<p>Naturally, you might want to preserve some of these, e.g. <code>&amp;vp</code> or <code>&amp;sr</code>. Feel free to edit the <code>defaultParams</code> array as you see fit.</p>
+
+<p>When adding items to the <code>impressions</code> array, the syntax is slightly more complex. You should <strong>only</strong> add the actual parameter specifier, which is the key that comes after <code>&amp;ilNpiN</code>. So if the parameter name for Product Impression Variant is <code>&amp;il2pi1va</code>, you&rsquo;d type just <code>'va'</code> into the array. Or, if you wanted to purge the Product-Scoped Custom Dimension from index 3 from your impression objects, instead of typing <code>'&amp;il1pi1cd3'</code>, you&rsquo;d type <code>'cd3</code> into the array.</p>
+
+<p>Note that for <code>defaultParams</code> and <code>customDims</code> you need to type the full parameter name <strong>with</strong> the leading <code>&amp;</code>.</p>
+
+<h2 id="add-the-variable-to-your-tag">Add the variable to your tag</h2>
+
+<p>This variable should be added to the tag which sends the Enhanced Ecommerce payload with impression objects to Google Analytics. To add it to the tag, either edit the <a href="https://www.simoahava.com/analytics/google-analytics-settings-variable-in-gtm/">Google Analytics Settings variable</a> in the impression tag, or add the field directly to the tag.</p>
+
+<p>Browse to <strong>More Settings</strong> -&gt; <strong>Fields to set</strong>, and add the following field:</p>
+
+<p><strong>Field name</strong>: customTask<br />
+<strong>Value</strong>: {{customTask - reduce payload length}}</p>
+
+<p>Like so:</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2018/06/fields-to-set.png" title="Fields to set">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2018/06/fields-to-set.png#ZgotmplZ" alt="Fields to set">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>And that&rsquo;s it for the setup! Now, if your payload is over 8192, the script will first chop out the parameters specified in the <code>defaultParams</code> array. Then it will gobble up the dimensions in the <code>customDims</code> array. Finally, if the payload is STILL too long, it will proceed to clean up your impressions objects by removing the fields listed in <code>impressions</code> one by one, impression by impression.</p>
+
+<h2 id="how-to-debug">How to debug</h2>
+
+<p>If you walked through the code, as I&rsquo;m sure you did, you might have noticed how I use a custom method named <code>log()</code> to send some debug data to the console. The thing is, I don&rsquo;t want to pollute the JavaScript console with debug messages when Google Analytics is <strong>not</strong> in debug mode, so I do a simple check to see if the debug version of <strong>analytics.js</strong> is loaded:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">if</span> (<span style="color:#e6db74">&#39;dump&#39;</span> <span style="color:#66d9ef">in</span> window[<span style="color:#e6db74">&#39;ga&#39;</span>]) {}</code></pre></div>
+
+<p>Basically, if the global <code>ga</code> object has the method <code>dump</code>, I&rsquo;m assuming the user is using the debug version of <strong>analytics.js</strong>.</p>
+
+<blockquote>
+<p><strong>NOTE!</strong> If someone has figured a more robust way to check for the debug version of analytics.js, please let me know! Thank you.</p>
+</blockquote>
+
+<p>So, if you want to see debug messages, you can set the library to debug mode by browsing to <strong>More Settings</strong> -&gt; <strong>Advanced Configuration</strong> -&gt; <strong>Use Debug Version</strong> in your Google Analytics tag or Google Analytics Settings variable, and setting it to <code>true</code>. Or, you can use the <a href="https://chrome.google.com/webstore/detail/google-analytics-debugger/jnkmfdileelhofjcijamephohjechhna?hl=en">Google Analytics Debugger</a> browser extension.</p>
+
+<p>Once you have the debug library loaded, you can see debug messages such as these <strong>if</strong> the payload exceeds the maximum length of 8192:</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2018/06/debug-messages.png" title="Debug messages">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2018/06/debug-messages.png#ZgotmplZ" alt="Debug messages">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>In these debug messages you can see how the script walks through your payload, stripping out parameters where necessary.</p>
+
+<h2 id="summary">Summary</h2>
+
+<p>I wish <strong>analytics.js</strong> had a more elegant way of handling payloads that are too large. Just dropping them is slightly overkill, in my opinion. analytics.js could, for example, compile a custom hit to GA when the payload maximum size is breached, and this would turn into a warning or notification in the Google Analytics UI. This way you&rsquo;d at least have a clue that something is amiss.</p>
+
+<p>So the <code>customTask</code> solution presented here is, as is typical for scripts that I write, a bandaid for something that will hopefully be remedied natively by the library itself in the future.</p>
+
+<p>Naturally, the &ldquo;best&rdquo; way to avoid payloads that are too large is to only send relevant data to Google Analytics. In the case of impressions, for example, it doesn&rsquo;t really make sense to send <strong>every single impression</strong> on the page in one hit. Rather, you&rsquo;d want to only send impressions that the user has actually <em>viewed</em>. Luckily, I might just have a guide coming up that will show you how to track viewed impressions only.</p>
+
+<p>Let me know in the comments if you find this useful or if you have suggestions for improving the method!</p>
+
+              
+
+            </div>
+          </div>
+          <div id="post-footer" class="post-footer main-content-wrap">
+            
+              
+                
+                
+                  <div class="post-footer-tags">
+                    <span class="text-color-light text-small">TAGGED IN</span><br/>
+                    
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/google-tag-manager/">google tag manager</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/customtask/">customtask</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/google-analytics/">google analytics</a>
+
+                  </div>
+                
+              
+            
+            
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--disabled">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/allow-block-advertising-features-google-analytics/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/automatically-reduce-google-analytics-payload-length/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Automatically%20Reduce%20Google%20Analytics%20Payload%20Length%20https://www.simoahava.com/analytics/automatically-reduce-google-analytics-payload-length/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://www.simoahava.com/analytics/automatically-reduce-google-analytics-payload-length/">
+              <i class="fa fa-google-plus"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/automatically-reduce-google-analytics-payload-length/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#disqus">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+            
+              
+                <span id="disqus"></span>
+<div id="disqus_thread">
+  <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+
+              
+            
+          </div>
+        </article>
+        <footer id="footer" class="main-content-wrap">
+  <span class="copyrights">
+    &copy; 2018 Simo Ahava. All Rights Reserved
+  </span>
+</footer>
+
+      </div>
+      
+      <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+        
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--disabled">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/allow-block-advertising-features-google-analytics/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/automatically-reduce-google-analytics-payload-length/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Automatically%20Reduce%20Google%20Analytics%20Payload%20Length%20https://www.simoahava.com/analytics/automatically-reduce-google-analytics-payload-length/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://www.simoahava.com/analytics/automatically-reduce-google-analytics-payload-length/">
+              <i class="fa fa-google-plus"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/automatically-reduce-google-analytics-payload-length/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#disqus">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+      </div>
+      
+      <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+  <i id="btn-close-shareoptions" class="fa fa-close"></i>
+  <ul class="share-options">
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/automatically-reduce-google-analytics-payload-length/">
+          <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=Automatically%20Reduce%20Google%20Analytics%20Payload%20Length%20https://www.simoahava.com/analytics/automatically-reduce-google-analytics-payload-length/%20via%20@SimoAhava">
+          <i class="fa fa-twitter"></i><span>Share on Twitter</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://www.simoahava.com/analytics/automatically-reduce-google-analytics-payload-length/">
+          <i class="fa fa-google-plus"></i><span>Share on Google&#43;</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/automatically-reduce-google-analytics-payload-length/">
+          <i class="fa fa-linkedin"></i><span>Share on LinkedIn</span>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+<div id="share-options-mask" class="share-options-mask"></div>
+
+    </div>
+    
+    <div id="about">
+  <div id="about-card">
+    <div id="about-btn-close">
+      <i class="fa fa-remove"></i>
+    </div>
+    
+      <img id="about-card-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+    
+    <h4 id="about-card-name">Simo Ahava</h4>
+    
+      <div id="about-card-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</div>
+    
+    
+      <div id="about-card-job">
+        <i class="fa fa-briefcase"></i>
+        <br/>
+        Senior Data Advocate at Reaktor
+      </div>
+    
+    
+      <div id="about-card-location">
+        <i class="fa fa-map-marker"></i>
+        <br/>
+        Finland
+      </div>
+    
+  </div>
+</div>
+
+    
+  
+    
+    <div id="cover" style="background-image:url('https://www.simoahava.com/images/maisema.jpg');"></div>
+  
+
+
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.7/js/jquery.fancybox.min.js" integrity="sha256-GEAnjcTqVP+vBp3SSc8bEDQqvWAZMiHyUSIorrWwH50=" crossorigin="anonymous"></script>
+
+
+<script src="https://www.simoahava.com/js/script.js"></script>
+
+
+
+
+  
+    
+      <script>
+        
+
+
+
+
+
+        (function() {
+          
+          
+          if (window.location.hostname == "localhost") {
+            return;
+          }
+          var d = document, s = d.createElement('script');
+          var disqus_shortname = 'simoahava';
+          s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      </script>
+    
+  
+
+
+
+    
+  </body>
+</html>
+
