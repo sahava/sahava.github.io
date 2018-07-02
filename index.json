@@ -1,5 +1,12 @@
 [
 {
+	"uri": "https://www.simoahava.com/analytics/automatically-reduce-google-analytics-payload-length/",
+	"title": "Automatically Reduce Google Analytics Payload Length",
+	"tags": ["google tag manager", "customtask", "google analytics"],
+	"description": "Use customTask to automatically reduce the Google Analytics payload length, so that it stays below the maximum of 8192. This is very useful for Enhanced Ecommerce tracking, where payload sizes might grow to be very large.",
+	"content": " Here we are, reunited with customTask. This time, we\u0026rsquo;ll put this wonderful mechanism to work for a very, very good cause. One of the lesser known \u0026ldquo;features\u0026rdquo; of Google Analytics is that when the payload size (the request body that is actually sent to Google Analytics with each request) goes past a certain limit, specifically 8192 bytes, the hit is aborted without warning. This can come as a surprise, because there\u0026rsquo;s no indication anywhere in Google Analytics that you are missing hits because of this.\nThe solution? A nice little customTask script, which recursively whittles away parts of the payload until the length is just below the cap.\n  The idea is that you will be able to specify a list of payload parameters to be removed one by one from the payload until the size is safely below the maximum of 8192. First things that will go are some of the default dimensions that no one really uses, such as \u0026lsquo;Java Enabled\u0026rsquo; and \u0026lsquo;Document Encoding\u0026rsquo;. Next, you can list all the Custom Dimensions you want to get rid of, in order of priority.\nFinally, you\u0026rsquo;ll be able to list the Enhanced Ecommerce impression parameters that you want to remove from each impression in the payload. The script will stop as soon as the length is below 8192, so you\u0026rsquo;ll most likely end up with some impressions having more details than others.\nWhy stop at impressions? Because, from experience, that\u0026rsquo;s where most problems lie. It shouldn\u0026rsquo;t be too difficult to customize the script to also include Promotions and even \u0026ldquo;regular\u0026rdquo; Enhanced Ecommerce product objects.\nOnce you\u0026rsquo;ve implemented this in your Enhanced Ecommerce tags, you should never see the following error in the console (if you have Google Analytics Debugger activated, or if you have Universal Analytics running in debug mode):\n  I recommend implementing this customTask together with my solution for sending the payload length as a custom dimension. This way you\u0026rsquo;ll be able to detect if you\u0026rsquo;re approaching the maximum length of the payload with your hits, and you can then proceed to implement this payload length limiter when necessary.\nFor an alternative solution, take a look at this excellent article by the awesome Dan Wilkerson from the equally awesome LunaMetrics blog.\nThe customTask variable To build the customTask, you need to create a new Custom JavaScript variable. Name it something like {{customTask - reduce payload length}}.\n Note! If you already have a customTask implemented in your Enhanced Ecommerce tags, you\u0026rsquo;ll need to combine the code below with the existing customTask script you already have. For tips on how to do this, consult this guide.\n Add the following code into the customTask variable body:\nfunction() { return function(customModel) { // Add any other default parameters you want to strip from the payload  // into this array in order of priority.  // For more details, visit: https://bit.ly/2MOhjBD  var defaultParams = [\u0026#39;\u0026amp;je\u0026#39;, \u0026#39;\u0026amp;de\u0026#39;, \u0026#39;\u0026amp;sd\u0026#39;, \u0026#39;\u0026amp;vp\u0026#39;, \u0026#39;\u0026amp;sr\u0026#39;]; // List the (regular) Custom Dimensions you want to strip from the  // payload in order of priority. Leave the array empty if you don\u0026#39;t  // want to remove Custom Dimensions.  // For more details, visit: https://bit.ly/2MM6O1O  var customDims = [\u0026#39;\u0026amp;cd198\u0026#39;, \u0026#39;\u0026amp;cd199\u0026#39;, \u0026#39;\u0026amp;cd200\u0026#39;]; // List the impression object parameters you want to strip from the  // payload in order of priority. Only list the field specifier, so  // instead of \u0026#39;\u0026amp;il1pi2va\u0026#39;, write \u0026#39;va\u0026#39;, and instead of \u0026#39;\u0026amp;il1pi4cd3\u0026#39;, write  // \u0026#39;cd3\u0026#39;. For more details, visit: https://bit.ly/2KehCHF  var impressions = [\u0026#39;va\u0026#39;, \u0026#39;br\u0026#39;, \u0026#39;ca\u0026#39;, \u0026#39;ps\u0026#39;, \u0026#39;nm\u0026#39;]; // Don\u0026#39;t touch the code below.  var maxLength = 8192, globalSendTaskName = \u0026#39;_\u0026#39; + customModel.get(\u0026#39;trackingId\u0026#39;) + \u0026#39;_sendHitTask\u0026#39;, originalSendHitTask = window[globalSendTaskName] = window[globalSendTaskName] || customModel.get(\u0026#39;sendHitTask\u0026#39;); customModel.set(\u0026#39;sendHitTask\u0026#39;, function(sendModel) { var ga = window[window[\u0026#39;GoogleAnalyticsObject\u0026#39;]]; // Only log if in analytics debug mode.  var log = function(msg) { if (\u0026#39;dump\u0026#39; in ga) { window.console.log.apply(window.console, [msg]); } }; var hitPayload = sendModel.get(\u0026#39;hitPayload\u0026#39;); var removeKeys = function(hitPayload, keys) { var key, regex; while(hitPayload.length \u0026gt;= maxLength \u0026amp;\u0026amp; keys.length) { key = keys[0]; log(\u0026#39;--\u0026gt; Removing \u0026#39; + key); regex = new RegExp(key + \u0026#39;=[^\u0026amp;]+\u0026#39;, \u0026#39;gi\u0026#39;); keys.shift(); hitPayload = hitPayload.replace(regex, \u0026#39;\u0026#39;); log(\u0026#39;--\u0026gt; New length: \u0026#39; + hitPayload.length); } return hitPayload; }; var removeImpressions = function(hitPayload, keys) { var key, regex, oldKey; while(hitPayload.length \u0026gt;= maxLength \u0026amp;\u0026amp; keys.length) { if (key !== keys[0]) { key = keys[0]; log(\u0026#39;--\u0026gt; Removing \u0026amp;ilNpiN\u0026#39; + key + \u0026#39; from impression objects\u0026#39;); } regex = new RegExp(\u0026#39;\u0026amp;il\\\\d+pi\\\\d+\u0026#39; + key + \u0026#39;=[^\u0026amp;]+\u0026#39;, \u0026#39;i\u0026#39;); if (!regex.test(hitPayload)) { keys.shift(); } hitPayload = hitPayload.replace(regex, \u0026#39;\u0026#39;); } log(\u0026#39;--\u0026gt; New length: \u0026#39; + hitPayload.length); return hitPayload; }; // If over payload length, remove default parameters.  if (hitPayload.length \u0026gt;= maxLength) { log(\u0026#39;Payload too long (\u0026#39; + hitPayload.length + \u0026#39;), removing default keys...\u0026#39;); hitPayload = removeKeys(hitPayload, defaultParams); } // If over payload length, remove custom dimensions.  if (hitPayload.length \u0026gt;= maxLength) { log(\u0026#39;Payload still too long (\u0026#39; + hitPayload.length + \u0026#39;), removing Custom Dimensions...\u0026#39;); hitPayload = removeKeys(hitPayload, customDims); } // If over payload length, clean up impression objects.  if (hitPayload.length \u0026gt;= maxLength) { log(\u0026#39;Payload still too long (\u0026#39; + hitPayload.length + \u0026#39;), cleaning up Impressions...\u0026#39;); hitPayload = removeImpressions(hitPayload, impressions); } // Send the modified payload.  sendModel.set(\u0026#39;hitPayload\u0026#39;, hitPayload, true); originalSendHitTask(sendModel); }); }; } Make sure you edit the defaultParams, customDims, and impressions arrays to include the keys you want to purge from the dataLayer. Note that you will need to list the keys using their Measurement Protocol parameter names rather than what their analytics.js field names are. So instead of 'encoding', for example, you need to use '\u0026amp;de'.\nThe keys I have added to the defaultParams array are:\n   Key Name Description     \u0026amp;je Java Enabled Whether the browser has enabled Java or not.   \u0026amp;de Document Encoding What the character encoding of the current page is (e.g. UTF-8).   \u0026amp;sd Screen Colors The screen color depth (e.g. 24-bits).   \u0026amp;vp Viewport Size The viewable area (in pixels) of the browser or device.   \u0026amp;sr Screen Resolution The screen resolution (in pixels) of the browser or device.    Naturally, you might want to preserve some of these, e.g. \u0026amp;vp or \u0026amp;sr. Feel free to edit the defaultParams array as you see fit.\nWhen adding items to the impressions array, the syntax is slightly more complex. You should only add the actual parameter specifier, which is the key that comes after \u0026amp;ilNpiN. So if the parameter name for Product Impression Variant is \u0026amp;il2pi1va, you\u0026rsquo;d type just 'va' into the array. Or, if you wanted to purge the Product-Scoped Custom Dimension from index 3 from your impression objects, instead of typing '\u0026amp;il1pi1cd3', you\u0026rsquo;d type 'cd3 into the array.\nNote that for defaultParams and customDims you need to type the full parameter name with the leading \u0026amp;.\nAdd the variable to your tag This variable should be added to the tag which sends the Enhanced Ecommerce payload with impression objects to Google Analytics. To add it to the tag, either edit the Google Analytics Settings variable in the impression tag, or add the field directly to the tag.\nBrowse to More Settings -\u0026gt; Fields to set, and add the following field:\nField name: customTask\nValue: {{customTask - reduce payload length}}\nLike so:\n  And that\u0026rsquo;s it for the setup! Now, if your payload is over 8192, the script will first chop out the parameters specified in the defaultParams array. Then it will gobble up the dimensions in the customDims array. Finally, if the payload is STILL too long, it will proceed to clean up your impressions objects by removing the fields listed in impressions one by one, impression by impression.\nHow to debug If you walked through the code, as I\u0026rsquo;m sure you did, you might have noticed how I use a custom method named log() to send some debug data to the console. The thing is, I don\u0026rsquo;t want to pollute the JavaScript console with debug messages when Google Analytics is not in debug mode, so I do a simple check to see if the debug version of analytics.js is loaded:\nif (\u0026#39;dump\u0026#39; in window[\u0026#39;ga\u0026#39;]) {} Basically, if the global ga object has the method dump, I\u0026rsquo;m assuming the user is using the debug version of analytics.js.\n NOTE! If someone has figured a more robust way to check for the debug version of analytics.js, please let me know! Thank you.\n So, if you want to see debug messages, you can set the library to debug mode by browsing to More Settings -\u0026gt; Advanced Configuration -\u0026gt; Use Debug Version in your Google Analytics tag or Google Analytics Settings variable, and setting it to true. Or, you can use the Google Analytics Debugger browser extension.\nOnce you have the debug library loaded, you can see debug messages such as these if the payload exceeds the maximum length of 8192:\n  In these debug messages you can see how the script walks through your payload, stripping out parameters where necessary.\nSummary I wish analytics.js had a more elegant way of handling payloads that are too large. Just dropping them is slightly overkill, in my opinion. analytics.js could, for example, compile a custom hit to GA when the payload maximum size is breached, and this would turn into a warning or notification in the Google Analytics UI. This way you\u0026rsquo;d at least have a clue that something is amiss.\nSo the customTask solution presented here is, as is typical for scripts that I write, a bandaid for something that will hopefully be remedied natively by the library itself in the future.\nNaturally, the \u0026ldquo;best\u0026rdquo; way to avoid payloads that are too large is to only send relevant data to Google Analytics. In the case of impressions, for example, it doesn\u0026rsquo;t really make sense to send every single impression on the page in one hit. Rather, you\u0026rsquo;d want to only send impressions that the user has actually viewed. Luckily, I might just have a guide coming up that will show you how to track viewed impressions only.\nLet me know in the comments if you find this useful or if you have suggestions for improving the method!\n"
+},
+{
 	"uri": "https://www.simoahava.com/analytics/allow-block-advertising-features-google-analytics/",
 	"title": "Allow And Block Advertising Features In Google Analytics",
 	"tags": ["google tag manager", "google analytics", "gdpr"],
@@ -1778,14 +1785,14 @@
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/categories/analytics/",
+	"uri": "https://www.simoahava.com/tags/analytics/",
 	"title": "Analytics",
 	"tags": [],
 	"description": "",
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/tags/analytics/",
+	"uri": "https://www.simoahava.com/categories/analytics/",
 	"title": "Analytics",
 	"tags": [],
 	"description": "",
@@ -2037,14 +2044,14 @@
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/categories/content-management/",
+	"uri": "https://www.simoahava.com/tags/content-management/",
 	"title": "Content Management",
 	"tags": [],
 	"description": "",
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/tags/content-management/",
+	"uri": "https://www.simoahava.com/categories/content-management/",
 	"title": "Content Management",
 	"tags": [],
 	"description": "",
@@ -2268,14 +2275,14 @@
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/categories/digital-marketing/",
+	"uri": "https://www.simoahava.com/tags/digital-marketing/",
 	"title": "Digital Marketing",
 	"tags": [],
 	"description": "",
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/tags/digital-marketing/",
+	"uri": "https://www.simoahava.com/categories/digital-marketing/",
 	"title": "Digital Marketing",
 	"tags": [],
 	"description": "",
@@ -2898,14 +2905,14 @@
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/categories/personal/",
+	"uri": "https://www.simoahava.com/tags/personal/",
 	"title": "Personal",
 	"tags": [],
 	"description": "",
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/tags/personal/",
+	"uri": "https://www.simoahava.com/categories/personal/",
 	"title": "Personal",
 	"tags": [],
 	"description": "",
@@ -3430,13 +3437,6 @@
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/categories/web-design/",
-	"title": "Web Design",
-	"tags": [],
-	"description": "",
-	"content": ""
-},
-{
 	"uri": "https://www.simoahava.com/tags/web-design/",
 	"title": "Web Design",
 	"tags": [],
@@ -3444,14 +3444,21 @@
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/categories/web-development/",
-	"title": "Web Development",
+	"uri": "https://www.simoahava.com/categories/web-design/",
+	"title": "Web Design",
 	"tags": [],
 	"description": "",
 	"content": ""
 },
 {
 	"uri": "https://www.simoahava.com/tags/web-development/",
+	"title": "Web Development",
+	"tags": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "https://www.simoahava.com/categories/web-development/",
 	"title": "Web Development",
 	"tags": [],
 	"description": "",
