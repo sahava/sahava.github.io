@@ -350,6 +350,8 @@
                 
                     <li class="nav-opened" role="presentation"><a href="https://www.simoahava.com/amp/tags/content-management-system/">content-management-system</a></li>
                 
+                    <li class="nav-opened" role="presentation"><a href="https://www.simoahava.com/amp/tags/content-security-policy/">content-security-policy</a></li>
+                
                     <li class="nav-opened" role="presentation"><a href="https://www.simoahava.com/amp/tags/content-strategy/">content-strategy</a></li>
                 
                     <li class="nav-opened" role="presentation"><a href="https://www.simoahava.com/amp/tags/context/">context</a></li>
@@ -365,6 +367,8 @@
                     <li class="nav-opened" role="presentation"><a href="https://www.simoahava.com/amp/tags/creative/">creative</a></li>
                 
                     <li class="nav-opened" role="presentation"><a href="https://www.simoahava.com/amp/tags/cross-domain-tracking/">cross-domain-tracking</a></li>
+                
+                    <li class="nav-opened" role="presentation"><a href="https://www.simoahava.com/amp/tags/csp/">csp</a></li>
                 
                     <li class="nav-opened" role="presentation"><a href="https://www.simoahava.com/amp/tags/css/">css</a></li>
                 
@@ -860,7 +864,8 @@ on
 
 <p>To turn <code>dataLayer</code> into an array, you need the following code <em>before the container snippet</em>:</p>
 
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">dataLayer</span> <span class="o">=</span> <span class="p">[];</span></code></pre></div>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">dataLayer</span> <span class="o">=</span> <span class="p">[];</span>
+</code></pre></div>
 
 <p>If you don&rsquo;t declare it with this explicit statement, then <strong><a href="https://www.simoahava.com/amp/analytics/container-snippet-gtm-secrets-revealed/">GTM will declare dataLayer</a> for you</strong>. This is very important, since it ensures that you will always have <code>dataLayer</code> available for your tags.</p>
 
@@ -870,13 +875,15 @@ on
 
 <div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">dataLayer</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;pageCategory&#39;</span><span class="o">:</span> <span class="s1">&#39;home&#39;</span><span class="p">,</span> <span class="s1">&#39;logged-in&#39;</span><span class="o">:</span> <span class="s1">&#39;true&#39;</span><span class="p">}];</span>
 <span class="p">...</span>
-<span class="kd">var</span> <span class="nx">dataLayer</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;event&#39;</span><span class="o">:</span> <span class="s1">&#39;allDone&#39;</span><span class="p">}];</span></code></pre></div>
+<span class="kd">var</span> <span class="nx">dataLayer</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;event&#39;</span><span class="o">:</span> <span class="s1">&#39;allDone&#39;</span><span class="p">}];</span>
+</code></pre></div>
 
 <p>After the first line of code, <code>dataLayer</code> has a single object with two properties: <code>pageCategory</code> and <code>logged-in</code>. A little on further down the code is the second declaration. Now, after this code is run, <code>dataLayer</code> will still only have one object, but with just the <code>event</code> property! Can you see how harmful this is? None of the previous information is recoverable after this.</p>
 
 <p>The safest way to prevent this is to preface the ONLY <code>dataLayer</code> declaration on the page with the following line:</p>
 
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nb">window</span><span class="p">.</span><span class="nx">dataLayer</span> <span class="o">=</span> <span class="nb">window</span><span class="p">.</span><span class="nx">dataLayer</span> <span class="o">||</span> <span class="p">[];</span></code></pre></div>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nb">window</span><span class="p">.</span><span class="nx">dataLayer</span> <span class="o">=</span> <span class="nb">window</span><span class="p">.</span><span class="nx">dataLayer</span> <span class="o">||</span> <span class="p">[];</span>
+</code></pre></div>
 
 <p>And then only use <strong>dataLayer.push()</strong> to add objects to the Array. This line ensures that if <code>dataLayer</code> has already been declared, it won&rsquo;t be overwritten. It&rsquo;s not foolproof, since it doesn&rsquo;t test whether the global variable <code>dataLayer</code> is of type Array or not, but I think it&rsquo;s good enough. If you have another JavaScript library which HAPPENS to use a variable called <code>dataLayer</code> as well, you might be in trouble. But this is what testing and debugging is for.</p>
 
@@ -895,7 +902,8 @@ on
   <span class="s1">&#39;eventCallback&#39;</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
     <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&#34;Event has fired&#34;</span><span class="p">);</span>
   <span class="p">}</span>
-<span class="p">});</span></code></pre></div>
+<span class="p">});</span>
+</code></pre></div>
 
 <p>Well, it&rsquo;s a pretty lousy example, but it does what it&rsquo;s meant to. After all tags that fire upon <strong>{{event}} equals fireEvent</strong> have completed, the eventCallback function will execute and you should see the text in the JavaScript console.</p>
 
@@ -935,7 +943,8 @@ on
 
 <p>After this, whenever you want to halt a timer, all you have to do is have the following line of JavaScript in your Custom HTML tag or your Custom JavaScript macro:</p>
 
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nb">window</span><span class="p">.</span><span class="nx">clearInterval</span><span class="p">({{</span><span class="nx">timer</span> <span class="nx">id</span><span class="p">}});</span></code></pre></div>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nb">window</span><span class="p">.</span><span class="nx">clearInterval</span><span class="p">({{</span><span class="nx">timer</span> <span class="nx">id</span><span class="p">}});</span>
+</code></pre></div>
 
 <p>This will halt the most recently fired timer. So if you have multiple timers, you might have to edit the code somewhat to find the proper timer (easiest way to do this is to use <strong>{{event}} equals your_timer_event</strong> as one of the rule conditions of the tag that stops the timer).</p>
 
@@ -1128,11 +1137,13 @@ URL Hostname</p>
 
 <p><strong>{{true}}</strong></p>
 
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="kc">true</span><span class="p">;</span> <span class="p">}</span></code></pre></div>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="kc">true</span><span class="p">;</span> <span class="p">}</span>
+</code></pre></div>
 
 <p><strong>{{false}}</strong></p>
 
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="kc">false</span><span class="p">;</span> <span class="p">}</span></code></pre></div>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="kc">false</span><span class="p">;</span> <span class="p">}</span>
+</code></pre></div>
 
 <p>Why, you ask? Well, let&rsquo;s say you want to set the Anonymize IP setting to <em>true</em> for one domain and <em>false</em> for two other domains (this idea came from Carmen Mardiros, by the way!). You want to use a Lookup Table Macro to achieve this, but when your Lookup Table aligns domains with the return value of &ldquo;true&rdquo; and &ldquo;false&rdquo;, you notice that things don&rsquo;t work as you&rsquo;d like them to. The problem is that if you add text to a field in GTM, it is always cast to string type. Anonymize IP requires <em>Boolean</em> type, otherwise it fails.</p>
 

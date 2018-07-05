@@ -53,7 +53,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.31 with theme Tranquilpeak 0.4.3-BETA">
+    <meta name="generator" content="Hugo 0.42.2 with theme Tranquilpeak 0.4.3-BETA">
     <title>Google Tag Manager: SoundCloud Integration | Simo Ahava's blog</title>
     
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-PZ7GMV9');</script>
@@ -443,7 +443,8 @@
 <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">iframes</span> <span style="color:#f92672">=</span> document.<span style="color:#a6e22e">querySelectorAll</span>(<span style="color:#e6db74">&#39;iframe[src*=&#34;api.soundcloud.com&#34;]&#39;</span>);
 <span style="color:#66d9ef">for</span> (<span style="color:#a6e22e">i</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>, <span style="color:#a6e22e">len</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">iframes</span>.<span style="color:#a6e22e">length</span>; <span style="color:#a6e22e">i</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">len</span>; <span style="color:#a6e22e">i</span> <span style="color:#f92672">+=</span> <span style="color:#ae81ff">1</span>) {
   <span style="color:#a6e22e">initWidget</span>(<span style="color:#a6e22e">iframes</span>[<span style="color:#a6e22e">i</span>]);
-}</code></pre></div></p>
+}
+</code></pre></div></p>
 
 <p>The code above goes through all the iframes on the page. If it encounters an iframe that loads an embedded SoundCloud Widget, it calls the <code>initWidget</code> method, using the iframe object as a parameter. This is as simple as it gets. The cool thing is that each iframe gets its own bindings, so you can run the script with multiple SoundCloud widgets on the page!</p>
 
@@ -458,7 +459,8 @@
     <span style="color:#75715e">// Get the title of the currently playing sound
 </span><span style="color:#75715e"></span>    <span style="color:#a6e22e">widget</span>.<span style="color:#a6e22e">getCurrentSound</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">cs</span>) { 
       <span style="color:#a6e22e">lab</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">cs</span>[<span style="color:#e6db74">&#39;title&#39;</span>]; 
-    });          </code></pre></div>
+    });          
+</code></pre></div>
 
 <p>The <code>initWidget</code> function is called for all the SoundCloud iframes on the page. First, it declares some utility variables. Next, it uses the Widget API <code>SC.Widget</code> constructor to create a new widget object the API uses for the bindings.</p>
 
@@ -470,7 +472,8 @@
 </span><span style="color:#75715e"></span><span style="color:#a6e22e">widget</span>.<span style="color:#a6e22e">bind</span>(<span style="color:#a6e22e">SC</span>.<span style="color:#a6e22e">Widget</span>.<span style="color:#a6e22e">Events</span>.<span style="color:#a6e22e">PLAY</span>, <span style="color:#66d9ef">function</span>() { 
   <span style="color:#a6e22e">act</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Play&#39;</span>; 
   <span style="color:#a6e22e">sendDl</span>(<span style="color:#a6e22e">cat</span>, <span style="color:#a6e22e">act</span>, <span style="color:#a6e22e">lab</span>); 
-});</code></pre></div>
+});
+</code></pre></div>
 
 <p>The first listener is bound to the <code>SC.Widget.Events.PLAY</code> event, which, surprisingly, is dispatched when a &ldquo;Play&rdquo; event is recorded in the widget. Once that happens, we set the <code>act</code> variable to &ldquo;Play&rdquo;, and invoke the <code>sendDl</code> (see below) method, which does the <code>dataLayer.push()</code>. Parameters are the <code>cat</code> (&ldquo;SoundCloud&rdquo;), <code>act</code> (&ldquo;Play&rdquo;), and <code>lab</code> (Sound title) variables.</p>
 
@@ -482,7 +485,8 @@
     <span style="color:#a6e22e">act</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Pause&#39;</span>; 
     <span style="color:#a6e22e">sendDl</span>(<span style="color:#a6e22e">cat</span>, <span style="color:#a6e22e">act</span>, <span style="color:#a6e22e">lab</span>); 
   }
-});</code></pre></div>
+});
+</code></pre></div>
 
 <p>The next event we&rsquo;ll bind is <code>SC.Widget.Events.PAUSE</code>, which is dispatched when a &ldquo;Pause&rdquo; event is recorded in the widget. It&rsquo;s practically the same as the &ldquo;Play&rdquo; event, but we need to add one extra check there. SoundCloud auto-pauses the sound when it&rsquo;s completed, so GA would receive a number of &ldquo;Pause&rdquo; events that were not initiated by the user. That&rsquo;s why we have the check on the first line of the callback, where we basically see if the &ldquo;Pause&rdquo; event occurred when the position of the sound is at 100%. This would indicate that it&rsquo;s an auto-pause, and we won&rsquo;t invoke <code>sendDl</code> in that case.</p>
 
@@ -508,7 +512,8 @@
   <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">go</span>) {
     <span style="color:#a6e22e">sendDl</span>(<span style="color:#a6e22e">cat</span>, <span style="color:#a6e22e">act</span>, <span style="color:#a6e22e">lab</span>);
   }
-});</code></pre></div>
+});
+</code></pre></div>
 
 <p>The next binding is for the <code>SC.Widget.Events.PLAY_PROGRESS</code>. This event is dispatched every few milliseconds, and the object it returns has the <em>relative position</em> of the sound at the time of the event. This relative position is actually a percentage of how far the user has listened to the track. So, because I&rsquo;ve chosen to send an event at 25%, 50%, 75% and 100%, I need to check if the relative position is at these milestones. I also use a couple of booleans, <code>q1 q2 q3 go</code>, which prevent the same milestone from being sent multiple times. The <code>go</code> variable ensures that the GA Event is only fired when the milestones are reached, and not for every single iteration of the PLAY_PROGRESS event.</p>
 
@@ -517,7 +522,8 @@
   <span style="color:#a6e22e">act</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;100%&#39;</span>; 
   <span style="color:#a6e22e">q1</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">q2</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">q3</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>; 
   <span style="color:#a6e22e">sendDl</span>(<span style="color:#a6e22e">cat</span>, <span style="color:#a6e22e">act</span>, <span style="color:#a6e22e">lab</span>); 
-});</code></pre></div>
+});
+</code></pre></div>
 
 <p>Finally, when the sound finishes, we send the 100% event, and we also reset the utility variables. If we don&rsquo;t reset them, repeated listenings would not be recorded.</p>
 
@@ -531,7 +537,8 @@
     <span style="color:#e6db74">&#39;eventAction&#39;</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">act</span>,
     <span style="color:#e6db74">&#39;eventLabel&#39;</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">lab</span>
   });
-};</code></pre></div>
+};
+</code></pre></div>
 
 <p>And here&rsquo;s the <code>sendDl</code> method. It just takes the parameters, and pushes them into a <code>dataLayer</code> object.</p>
 

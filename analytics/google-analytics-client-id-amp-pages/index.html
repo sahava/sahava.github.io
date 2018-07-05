@@ -53,7 +53,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.31 with theme Tranquilpeak 0.4.3-BETA">
+    <meta name="generator" content="Hugo 0.42.2 with theme Tranquilpeak 0.4.3-BETA">
     <title>Google Analytics Client ID In AMP Pages | Simo Ahava's blog</title>
     
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-PZ7GMV9');</script>
@@ -477,7 +477,8 @@
 
   })
 
-})</code></pre></div>
+})
+</code></pre></div>
 
 <p>Here&rsquo;s another checklist, this time for combining your custom Client ID workaround with the Google Tag Manager AMP container. I&rsquo;ve bolded the new steps.</p>
 
@@ -520,7 +521,7 @@
 <p>In your site code you&rsquo;ll need:</p>
 
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html"><span style="color:#75715e">&lt;!-- Google Tag Manager --&gt;</span>
-&lt;<span style="color:#f92672">amp-analytics</span> <span style="color:#a6e22e">config</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;//www.yourdomain.com/gtm-analytics.config.json?id=GTM-XXXXX&gt;m.url=SOURCE_URL&#34;</span> <span style="color:#a6e22e">data-credentials</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;include&#34;</span>&gt;&lt;/<span style="color:#f92672">amp-analytics</span>&gt;</code></pre></div>
+&lt;<span style="color:#f92672">amp-analytics</span> <span style="color:#a6e22e">config</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;//www.yourdomain.com/gtm-analytics.config.json?id=GTM-XXXXX&amp;gtm.url=SOURCE_URL&#34;</span> <span style="color:#a6e22e">data-credentials</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;include&#34;</span>&gt;&lt;/<span style="color:#f92672">amp-analytics</span>&gt;</code></pre></div>
 
 <p>Congratulations, you have created a web proxy that fetches the Google Tag Manager container from Google&rsquo;s servers and modifies the JSON to leverage the value stored in the <code>_ga</code> cookie.</p>
 
@@ -583,7 +584,7 @@ function retrieve_gtm_json( $data ) {
     $container = file_get_contents(&#34;https://www.googletagmanager.com/amp.json?{$query}&#34;);
     
     // Replace the &amp;cid; parameter value with ${clientId}
-    $container = preg_replace(&#39;/(&amp;cid=)[^&amp;]+/&#39;,&#39;${1}${clientId}&#39;, $container);
+    $container = preg_replace(&#39;/(<span style="color:#960050;background-color:#1e0010">&amp;</span>cid=)[^<span style="color:#960050;background-color:#1e0010">&amp;</span>]+/&#39;,&#39;${1}${clientId}&#39;, $container);
   
     // Add the clientId to the &#34;vars&#34; object in the container JSON.
     $container = json_decode($container);
@@ -609,7 +610,7 @@ function retrieve_gtm_json( $data ) {
 <p>In your site code, you&rsquo;ll need:</p>
 
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html"><span style="color:#75715e">&lt;!-- Google Tag Manager --&gt;</span>
-&lt;<span style="color:#f92672">amp-analytics</span> <span style="color:#a6e22e">config</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;//www.yourdomain.com/wp-json/amp-gtm/amp.json?id=GTM-XXXXX&gt;m.url=SOURCE_URL&#34;</span> <span style="color:#a6e22e">data-credentials</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;include&#34;</span>&gt;&lt;/<span style="color:#f92672">amp-analytics</span>&gt;</code></pre></div>
+&lt;<span style="color:#f92672">amp-analytics</span> <span style="color:#a6e22e">config</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;//www.yourdomain.com/wp-json/amp-gtm/amp.json?id=GTM-XXXXX&amp;gtm.url=SOURCE_URL&#34;</span> <span style="color:#a6e22e">data-credentials</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;include&#34;</span>&gt;&lt;/<span style="color:#f92672">amp-analytics</span>&gt;</code></pre></div>
 
 <p>This request is then passed to your endpoint, and the process described above will take place.</p>
 

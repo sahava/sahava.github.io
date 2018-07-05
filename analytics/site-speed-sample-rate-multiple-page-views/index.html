@@ -53,7 +53,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.31 with theme Tranquilpeak 0.4.3-BETA">
+    <meta name="generator" content="Hugo 0.42.2 with theme Tranquilpeak 0.4.3-BETA">
     <title>Site Speed Sample Rate And Multiple Page Views | Simo Ahava's blog</title>
     
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-PZ7GMV9');</script>
@@ -357,19 +357,22 @@
 
 <p><a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/field-reference#siteSpeedSampleRate">By default</a>, 1% of Page View hits are sampled for page timings. So if you have the following code on the site:</p>
 
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">ga</span>(<span style="color:#e6db74">&#39;send&#39;</span>, <span style="color:#e6db74">&#39;pageview&#39;</span>);</code></pre></div>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">ga</span>(<span style="color:#e6db74">&#39;send&#39;</span>, <span style="color:#e6db74">&#39;pageview&#39;</span>);
+</code></pre></div>
 
 <p>There&rsquo;s a <sup>1</sup>&frasl;<sub>100</sub> chance that upon the first time command is executed, this particular request will grab the available Navigation Timing data and send it to Google Analytics. And, again, this is fine. That&rsquo;s what we want. Now if you have the following code:</p>
 
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">ga</span>(<span style="color:#e6db74">&#39;send&#39;</span>, <span style="color:#e6db74">&#39;pageview&#39;</span>);
-<span style="color:#a6e22e">ga</span>(<span style="color:#e6db74">&#39;send&#39;</span>, <span style="color:#e6db74">&#39;pageview&#39;</span>, {<span style="color:#a6e22e">page</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;/some-custom-page/&#39;</span>});</code></pre></div>
+<span style="color:#a6e22e">ga</span>(<span style="color:#e6db74">&#39;send&#39;</span>, <span style="color:#e6db74">&#39;pageview&#39;</span>, {<span style="color:#a6e22e">page</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;/some-custom-page/&#39;</span>});
+</code></pre></div>
 
 <p>That&rsquo;s two separate Page View hits firing on the same page, you&rsquo;re still fine. Since they use the same tracker object (the <em>default tracker</em>), even if you win the odds and manage to hit the <sup>1</sup>&frasl;<sub>100</sub> twice on the same page, the page timing data is only sent once, since Universal Analytics only sends timing data once per tracker per page.</p>
 
 <p>However, if you have this:</p>
 
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">ga</span>(<span style="color:#e6db74">&#39;send&#39;</span>, <span style="color:#e6db74">&#39;pageview&#39;</span>);
-<span style="color:#a6e22e">ga</span>(<span style="color:#e6db74">&#39;secondTracker.send&#39;</span>, <span style="color:#e6db74">&#39;pageview&#39;</span>, {<span style="color:#a6e22e">page</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;/some-custom-page/&#39;</span>});</code></pre></div>
+<span style="color:#a6e22e">ga</span>(<span style="color:#e6db74">&#39;secondTracker.send&#39;</span>, <span style="color:#e6db74">&#39;pageview&#39;</span>, {<span style="color:#a6e22e">page</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;/some-custom-page/&#39;</span>});
+</code></pre></div>
 
 <p>If both these trackers collect to the same Google Analytics property (UA-XXXXXX-Y), and if both trackers manage to somehow make the <sup>1</sup>&frasl;<sub>100</sub> cut, you will be sending the same page timing data <em>twice</em>, just for different page paths. And that will warp your data!</p>
 
@@ -396,7 +399,8 @@
 <p>This is pretty easy if you&rsquo;re using the Universal Analytics snippet. Set <code>siteSpeedSampleRate</code> to a proper value in only one tracker, and set all other trackers to 0.</p>
 
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">ga</span>(<span style="color:#e6db74">&#39;create&#39;</span>, <span style="color:#e6db74">&#39;UA-12345-1&#39;</span>, {<span style="color:#a6e22e">siteSpeedSampleRate</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">100</span>});
-<span style="color:#a6e22e">ga</span>(<span style="color:#e6db74">&#39;create&#39;</span>, <span style="color:#e6db74">&#39;UA-12345-1&#39;</span>, {<span style="color:#a6e22e">name</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;secondTracker&#39;</span>, <span style="color:#a6e22e">siteSpeedSampleRate</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">0</span>});</code></pre></div>
+<span style="color:#a6e22e">ga</span>(<span style="color:#e6db74">&#39;create&#39;</span>, <span style="color:#e6db74">&#39;UA-12345-1&#39;</span>, {<span style="color:#a6e22e">name</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;secondTracker&#39;</span>, <span style="color:#a6e22e">siteSpeedSampleRate</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">0</span>});
+</code></pre></div>
 
 <p>This would ensure that only a single set of page timings is sent per page.</p>
 
@@ -430,7 +434,8 @@
 
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
   <span style="color:#66d9ef">return</span> {{<span style="color:#a6e22e">Event</span>}} <span style="color:#f92672">===</span> <span style="color:#e6db74">&#39;gtm.js&#39;</span> <span style="color:#f92672">?</span> <span style="color:#ae81ff">100</span> <span style="color:#f92672">:</span> <span style="color:#ae81ff">0</span>;
-}</code></pre></div>
+}
+</code></pre></div>
 
 <p>So your Tag looks like this:</p>
 

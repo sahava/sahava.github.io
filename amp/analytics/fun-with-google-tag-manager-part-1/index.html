@@ -350,6 +350,8 @@
                 
                     <li class="nav-opened" role="presentation"><a href="https://www.simoahava.com/amp/tags/content-management-system/">content-management-system</a></li>
                 
+                    <li class="nav-opened" role="presentation"><a href="https://www.simoahava.com/amp/tags/content-security-policy/">content-security-policy</a></li>
+                
                     <li class="nav-opened" role="presentation"><a href="https://www.simoahava.com/amp/tags/content-strategy/">content-strategy</a></li>
                 
                     <li class="nav-opened" role="presentation"><a href="https://www.simoahava.com/amp/tags/context/">context</a></li>
@@ -365,6 +367,8 @@
                     <li class="nav-opened" role="presentation"><a href="https://www.simoahava.com/amp/tags/creative/">creative</a></li>
                 
                     <li class="nav-opened" role="presentation"><a href="https://www.simoahava.com/amp/tags/cross-domain-tracking/">cross-domain-tracking</a></li>
+                
+                    <li class="nav-opened" role="presentation"><a href="https://www.simoahava.com/amp/tags/csp/">csp</a></li>
                 
                     <li class="nav-opened" role="presentation"><a href="https://www.simoahava.com/amp/tags/css/">css</a></li>
                 
@@ -856,7 +860,8 @@ on
 
 <p>OK, sorry for the rant. Here&rsquo;s what I suggest. Whenever your GTM listener doesn&rsquo;t fire when it should, open the JavaScript console and type the following line of code there&hellip;</p>
 
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">if</span><span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="nx">jQuery</span><span class="p">)</span><span class="o">!==</span><span class="s1">&#39;undefined&#39;</span><span class="p">){</span><span class="nx">jQuery</span><span class="p">(</span><span class="s1">&#39;body&#39;</span><span class="p">).</span><span class="nx">find</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">).</span><span class="nx">off</span><span class="p">();}</span></code></pre></div>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">if</span><span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="nx">jQuery</span><span class="p">)</span><span class="o">!==</span><span class="s1">&#39;undefined&#39;</span><span class="p">){</span><span class="nx">jQuery</span><span class="p">(</span><span class="s1">&#39;body&#39;</span><span class="p">).</span><span class="nx">find</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">).</span><span class="nx">off</span><span class="p">();}</span>
+</code></pre></div>
 
 <p>&hellip;and press enter. Then try clicking or form submitting again.</p>
 
@@ -875,13 +880,14 @@ on
     <span class="nx">scrollTop</span><span class="o">:</span> <span class="mi">0</span>
   <span class="p">},</span> <span class="mi">400</span><span class="p">);</span>
   <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
-<span class="p">});</span></code></pre></div>
+<span class="p">});</span>
+</code></pre></div>
 
 <p>As you can see, the dreaded <code>return false;</code> is there. That&rsquo;s what&rsquo;s stopping the events from climbing up the DOM tree.</p>
 
 <p>To fix this, create a new Custom HTML tag with the following code within:</p>
 
-<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">script</span><span class="p"></span><span class="p">&gt;</span>
+<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
   <span class="nx">jQuery</span><span class="p">(</span><span class="s1">&#39;.top-of-page, a[href=&#34;#top&#34;]&#39;</span><span class="p">).</span><span class="nx">off</span><span class="p">(</span><span class="s1">&#39;click&#39;</span><span class="p">);</span>
   <span class="nx">jQuery</span><span class="p">(</span><span class="s1">&#39;.top-of-page, a[href=&#34;#top&#34;]&#39;</span><span class="p">).</span><span class="nx">click</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">e</span><span class="p">.</span><span class="nx">preventDefault</span><span class="p">();</span>
@@ -889,7 +895,7 @@ on
       <span class="nx">scrollTop</span><span class="o">:</span> <span class="mi">0</span>
     <span class="p">},</span> <span class="mi">400</span><span class="p">);</span>
   <span class="p">});</span>
-<span class="p">&lt;</span><span class="p">/</span><span class="nt">script</span><span class="p">&gt;</span></code></pre></div>
+<span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span></code></pre></div>
 
 <p>If jQuery and the problematic script are loaded in the <code>&lt;head&gt;</code> of your template, you can have this tag fire on <strong>{{url}} matches RegEx .</strong>*. If they&rsquo;re loaded elsewhere (like in the footer of your page), you might need some other event rule such as <strong>{{event}} equals gtm.load</strong>.</p>
 
@@ -928,19 +934,20 @@ on
 </span><span class="c1"></span>  <span class="k">return</span> <span class="kc">false</span><span class="p">;</span> <span class="c1">// returns boolean type
 </span><span class="c1"></span>  <span class="k">return</span> <span class="nx">y</span><span class="p">;</span> <span class="c1">// returns string type
 </span><span class="c1"></span>  <span class="k">return</span> <span class="nx">x</span><span class="p">;</span> <span class="c1">// throws ReferenceError
-</span><span class="c1"></span><span class="p">}</span></code></pre></div>
+</span><span class="c1"></span><span class="p">}</span>
+</code></pre></div>
 
 <p>As you can see, returning <strong>false</strong>, an empty string, or a variable which hasn&rsquo;t been declared will not do.</p>
 
 <p>The cool thing about GTM is that if you have a Data Layer Variable Macro which doesn&rsquo;t resolve, it will be automatically set to <em>undefined type</em>, meaning a Custom Dimension which refers to this macro will not get sent. So the best way to navigate through this particular scenario is to have <strong>blog-author</strong> declared in the dataLayer declaration before the container snippet on the page template. If the page isn&rsquo;t a blog page, then this declaration can just be left out.</p>
 
-<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">script</span><span class="p"></span><span class="p">&gt;</span>
+<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
   <span class="kd">var</span> <span class="nx">dataLayer</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;blog-author&#39;</span><span class="o">:</span> <span class="s1">&#39;Simo Ahava&#39;</span><span class="p">}];</span> <span class="c1">// Blog author declared, dimension will get sent
-</span><span class="c1"></span><span class="p">&lt;</span><span class="p">/</span><span class="nt">script</span><span class="p">&gt;</span>
+</span><span class="c1"></span><span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
 ...
-<span class="p">&lt;</span><span class="nt">script</span><span class="p"></span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
   <span class="kd">var</span> <span class="nx">dataLayer</span> <span class="o">=</span> <span class="p">[];</span> <span class="c1">// Blog author not declared, dimension will not get sent
-</span><span class="c1"></span><span class="p">&lt;</span><span class="p">/</span><span class="nt">script</span><span class="p">&gt;</span></code></pre></div>
+</span><span class="c1"></span><span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span></code></pre></div>
 
 <p>Then, when you create a Data Layer Variable Macro, on pages with <strong>blog-author</strong> in the array, it will fire the Custom Dimension with the blog author&rsquo;s name as the value. On all other pages the dimension will not get sent.</p>
 
@@ -952,14 +959,14 @@ on
 
 <p>Create this simple Custom HTML tag:</p>
 
-<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">script</span><span class="p"></span><span class="p">&gt;</span>
+<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
   <span class="kd">var</span> <span class="nx">c</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s2">&#34;entry-content&#34;</span><span class="p">);</span>
   <span class="k">if</span><span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="nx">c</span><span class="p">)</span><span class="o">!==</span><span class="s1">&#39;undefined&#39;</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">c</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">&#39;copy&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">evt</span><span class="p">)</span> <span class="p">{</span>
       <span class="nx">dataLayer</span><span class="p">.</span><span class="nx">push</span><span class="p">({</span><span class="s1">&#39;event&#39;</span><span class="o">:</span> <span class="s1">&#39;copy&#39;</span><span class="p">});</span>
     <span class="p">});</span>
   <span class="p">}</span>
-<span class="p">&lt;</span><span class="p">/</span><span class="nt">script</span><span class="p">&gt;</span></code></pre></div>
+<span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span></code></pre></div>
 
 <p>This is a very simple script that pushes the dataLayer event &lsquo;copy&rsquo; whenever someone copies something on your page within the HTML element with ID <em>entry-content</em> (e.g. <code>&lt;div id=&quot;entry-content&quot;&gt;&lt;/div&gt;</code>).</p>
 
@@ -969,7 +976,8 @@ on
 
 <div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="p">...</span>
 <span class="nx">dataLayer</span><span class="p">.</span><span class="nx">push</span><span class="p">({</span><span class="s1">&#39;event&#39;</span><span class="o">:</span> <span class="s1">&#39;copy&#39;</span><span class="p">,</span> <span class="s1">&#39;copy-id&#39;</span><span class="o">:</span> <span class="nx">evt</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span> <span class="s1">&#39;copy-content&#39;</span><span class="o">:</span> <span class="nx">evt</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">innerHTML</span><span class="p">});</span>
-<span class="p">...</span></code></pre></div>
+<span class="p">...</span>
+</code></pre></div>
 
 <p>And so on. Note that <code>evt.target</code> stores the element where the copy event started. So if the copy action takes place over multiple paragraphs, headers, or spans, for example, you&rsquo;ll only be able to observe the properties of the first element targeted by the action.</p>
 
@@ -985,7 +993,8 @@ on
   <span class="nx">alert</span><span class="p">(</span><span class="nx">myTxt</span><span class="p">);</span>
 <span class="p">}</span> <span class="k">catch</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
   <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">message</span><span class="p">);</span>
-<span class="p">}</span></code></pre></div>
+<span class="p">}</span>
+</code></pre></div>
 
 <p>With GTM&rsquo;s error listener, you can send each uncaught error as an event to Google Analytics. You can then analyze these events to find problems with your scripts. If you have a huge site, you might get hundreds of these errors, so you&rsquo;ll need to adjust the code to perhaps only listen for certain pages or errors.</p>
 

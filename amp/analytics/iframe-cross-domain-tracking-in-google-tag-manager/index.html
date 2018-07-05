@@ -352,6 +352,8 @@
                 
                     <li class="nav-opened" role="presentation"><a href="https://www.simoahava.com/amp/tags/content-management-system/">content-management-system</a></li>
                 
+                    <li class="nav-opened" role="presentation"><a href="https://www.simoahava.com/amp/tags/content-security-policy/">content-security-policy</a></li>
+                
                     <li class="nav-opened" role="presentation"><a href="https://www.simoahava.com/amp/tags/content-strategy/">content-strategy</a></li>
                 
                     <li class="nav-opened" role="presentation"><a href="https://www.simoahava.com/amp/tags/context/">context</a></li>
@@ -367,6 +369,8 @@
                     <li class="nav-opened" role="presentation"><a href="https://www.simoahava.com/amp/tags/creative/">creative</a></li>
                 
                     <li class="nav-opened" role="presentation"><a href="https://www.simoahava.com/amp/tags/cross-domain-tracking/">cross-domain-tracking</a></li>
+                
+                    <li class="nav-opened" role="presentation"><a href="https://www.simoahava.com/amp/tags/csp/">csp</a></li>
                 
                     <li class="nav-opened" role="presentation"><a href="https://www.simoahava.com/amp/tags/css/">css</a></li>
                 
@@ -865,25 +869,30 @@ on
       <span class="p">}</span>
     <span class="p">}</span> <span class="k">catch</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{}</span>
   <span class="p">}</span>
-<span class="p">}</span></code></pre></div>
+<span class="p">}</span>
+</code></pre></div>
 
 <p>So, time for a line-by-line walkthrough.</p>
 
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="p">...</span> <span class="p">}</span></code></pre></div>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="p">...</span> <span class="p">}</span>
+</code></pre></div>
 
 <p>On the first line, you&rsquo;re declaring a basic GTM JavaScript function, which needs to be an anonymous function. Nothing special here, moving on.</p>
 
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">return</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="p">...</span> <span class="p">}</span></code></pre></div>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">return</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="p">...</span> <span class="p">}</span>
+</code></pre></div>
 
 <p>Next, you&rsquo;re <em>returning</em> another function, as <code>hitCallback</code> requires a function as a parameter for it to work correctly. Also, by returning a function, we&rsquo;re avoiding unsolicited side effects which would result if you just executed global DOM methods in the outer function. Since we&rsquo;re operating in a closure, we&rsquo;re restricting the execution of this function to only the single time it&rsquo;s called, which is when the <code>hitCallback</code> is executed at the end of the Google Analytics payload dispatch process.</p>
 
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">try</span> <span class="p">{</span> <span class="p">...</span> <span class="p">}</span> <span class="k">catch</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{}</span></code></pre></div>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">try</span> <span class="p">{</span> <span class="p">...</span> <span class="p">}</span> <span class="k">catch</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{}</span>
+</code></pre></div>
 
 <p>We&rsquo;re wrapping the code with a <code>try...catch</code> because that&rsquo;s simply a good practice. You can add some debugging code into the <code>catch(e) {}</code> block if you wish, but I usually just let it sizzle down silently.</p>
 
 <div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">gobj</span> <span class="o">=</span> <span class="nb">window</span><span class="p">[</span><span class="nb">window</span><span class="p">.</span><span class="nx">GoogleAnalyticsObject</span><span class="p">];</span>
 <span class="kd">var</span> <span class="nx">iframe</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">&#39;#myIframe&#39;</span><span class="p">);</span>
-<span class="kd">var</span> <span class="nx">tracker</span><span class="p">,</span> <span class="nx">linker</span><span class="p">;</span></code></pre></div>
+<span class="kd">var</span> <span class="nx">tracker</span><span class="p">,</span> <span class="nx">linker</span><span class="p">;</span>
+</code></pre></div>
 
 <p>The following three lines setup some variables. First, we&rsquo;re setting <code>gobj</code> to the global Google Analytics function name. This is again just a good practice, since there are cases where you want to change the function name from <code>ga</code> to something else. With this one-liner, we&rsquo;re making sure we&rsquo;re always referring to the correct object.</p>
 
@@ -895,7 +904,8 @@ on
   <span class="nx">tracker</span> <span class="o">=</span> <span class="nx">gobj</span><span class="p">.</span><span class="nx">getAll</span><span class="p">()[</span><span class="mi">0</span><span class="p">];</span>
   <span class="nx">linker</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">window</span><span class="p">.</span><span class="nx">gaplugins</span><span class="p">.</span><span class="nx">Linker</span><span class="p">(</span><span class="nx">tracker</span><span class="p">);</span>
   <span class="nx">iframe</span><span class="p">.</span><span class="nx">src</span> <span class="o">=</span> <span class="nx">linker</span><span class="p">.</span><span class="nx">decorate</span><span class="p">(</span><span class="nx">iframe</span><span class="p">.</span><span class="nx">src</span><span class="p">);</span>
-<span class="p">}</span></code></pre></div>
+<span class="p">}</span>
+</code></pre></div>
 
 <p>The final part of the code is where the magic happens. Checking for the existence of the global Google Analytics object is just another good practice you might want to employ.</p>
 

@@ -53,7 +53,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.31 with theme Tranquilpeak 0.4.3-BETA">
+    <meta name="generator" content="Hugo 0.42.2 with theme Tranquilpeak 0.4.3-BETA">
     <title>Track Dynamically Loaded YouTube Videos In Google Tag Manager | Simo Ahava's blog</title>
     
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-PZ7GMV9');</script>
@@ -765,7 +765,8 @@
   <span style="color:#a6e22e">youTubeVideo</span>.<span style="color:#a6e22e">setAttribute</span>(<span style="color:#e6db74">&#39;data-gtm-yt&#39;</span>, <span style="color:#e6db74">&#39;true&#39;</span>); <span style="color:#75715e">// &lt;--- NEW
 </span><span style="color:#75715e"></span>
   <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">youTubeVideo</span>;
-}</code></pre></div></p>
+}
+</code></pre></div></p>
 
 <p>The <code>youTubeVideo.setAttribute()</code> command is used to add a data attribute to all iframes which have already been treated by the script. This is because we want to avoid running the initialization methods again and again for videos which have already been configured for tracking. In my testing, if a video was tracked multiple times it led to runtime conflicts.</p>
 
@@ -776,7 +777,8 @@
     <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span>;
   }
   ...
-}</code></pre></div>
+}
+</code></pre></div>
 
 <p>This check just looks for the <strong>data-gtm-yt</strong> attribute we added in the previous step, and if it&rsquo;s found, the initialization is skipped for this particular video.</p>
 
@@ -790,7 +792,8 @@
     <span style="color:#a6e22e">init</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">init</span>,
     <span style="color:#a6e22e">digestPotentialVideos</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">digestPotentialVideos</span>
   }
-})(...);</code></pre></div>
+})(...);
+</code></pre></div>
 
 <p>We <strong>return</strong> an object with two members: <code>init</code> and <code>digestPotentialVideos</code>. So, when we call <code>ytTracker.init()</code>, the script is basically run again, and all newly added, yet untreated YouTube iframe embeds will be processed and decorated with event trackers.</p>
 
@@ -805,7 +808,8 @@
 <p>As said, there&rsquo;s two new methods in town:</p>
 
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">ytTracker</span>.<span style="color:#a6e22e">init</span>(); <span style="color:#75715e">// &lt;-- Decorate all new videos on the page
-</span><span style="color:#75715e"></span><span style="color:#a6e22e">ytTracker</span>.<span style="color:#a6e22e">digestPotentialVideos</span>(<span style="color:#a6e22e">iframe</span>); <span style="color:#960050;background-color:#1e0010">// &lt;-- Only decorate the iframe that was passed as a parameter</span></code></pre></div>
+</span><span style="color:#75715e"></span><span style="color:#a6e22e">ytTracker</span>.<span style="color:#a6e22e">digestPotentialVideos</span>(<span style="color:#a6e22e">iframe</span>); <span style="color:#75715e">// &lt;-- Only decorate the iframe that was passed as a parameter
+</span><span style="color:#75715e"></span></code></pre></div>
 
 <p>Making the solution work will still most likely require developer help. If your developers have added some complex, dynamic content loaders, which add the videos after some awesome jQuery fade-in has finished, you&rsquo;ll need to cooperate with them to add the <code>ytTracker.init()</code> or <code>ytTracker.digestPotentialVideos()</code> command in the right place.</p>
 
@@ -817,7 +821,8 @@
   <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">content</span> <span style="color:#f92672">=</span> document.<span style="color:#a6e22e">querySelector</span>(<span style="color:#e6db74">&#39;#content&#39;</span>);
   <span style="color:#a6e22e">content</span>.<span style="color:#a6e22e">appendChild</span>(<span style="color:#a6e22e">video</span>);
   window.<span style="color:#a6e22e">ytTracker</span>.<span style="color:#a6e22e">digestPotentialVideos</span>(<span style="color:#a6e22e">video</span>);
-}</code></pre></div>
+}
+</code></pre></div>
 
 <p>After the video is injected, you call <code>ytTracker.digestPotentialVideos()</code>. You could use the <code>init()</code> method without any parameters, but since you already have the iframe element at hand, it&rsquo;s better to use the more direct method.</p>
 

@@ -53,7 +53,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.31 with theme Tranquilpeak 0.4.3-BETA">
+    <meta name="generator" content="Hugo 0.42.2 with theme Tranquilpeak 0.4.3-BETA">
     <title>Iframe Cross-Domain Tracking In Google Tag Manager | Simo Ahava's blog</title>
     
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-PZ7GMV9');</script>
@@ -352,25 +352,30 @@
       }
     } <span style="color:#66d9ef">catch</span>(<span style="color:#a6e22e">e</span>) {}
   }
-}</code></pre></div>
+}
+</code></pre></div>
 
 <p>So, time for a line-by-line walkthrough.</p>
 
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() { ... }</code></pre></div>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() { ... }
+</code></pre></div>
 
 <p>On the first line, you&rsquo;re declaring a basic GTM JavaScript function, which needs to be an anonymous function. Nothing special here, moving on.</p>
 
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">return</span> <span style="color:#66d9ef">function</span>() { ... }</code></pre></div>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">return</span> <span style="color:#66d9ef">function</span>() { ... }
+</code></pre></div>
 
 <p>Next, you&rsquo;re <em>returning</em> another function, as <code>hitCallback</code> requires a function as a parameter for it to work correctly. Also, by returning a function, we&rsquo;re avoiding unsolicited side effects which would result if you just executed global DOM methods in the outer function. Since we&rsquo;re operating in a closure, we&rsquo;re restricting the execution of this function to only the single time it&rsquo;s called, which is when the <code>hitCallback</code> is executed at the end of the Google Analytics payload dispatch process.</p>
 
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">try</span> { ... } <span style="color:#66d9ef">catch</span>(<span style="color:#a6e22e">e</span>) {}</code></pre></div>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">try</span> { ... } <span style="color:#66d9ef">catch</span>(<span style="color:#a6e22e">e</span>) {}
+</code></pre></div>
 
 <p>We&rsquo;re wrapping the code with a <code>try...catch</code> because that&rsquo;s simply a good practice. You can add some debugging code into the <code>catch(e) {}</code> block if you wish, but I usually just let it sizzle down silently.</p>
 
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">gobj</span> <span style="color:#f92672">=</span> window[window.<span style="color:#a6e22e">GoogleAnalyticsObject</span>];
 <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">iframe</span> <span style="color:#f92672">=</span> document.<span style="color:#a6e22e">querySelector</span>(<span style="color:#e6db74">&#39;#myIframe&#39;</span>);
-<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">tracker</span>, <span style="color:#a6e22e">linker</span>;</code></pre></div>
+<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">tracker</span>, <span style="color:#a6e22e">linker</span>;
+</code></pre></div>
 
 <p>The following three lines setup some variables. First, we&rsquo;re setting <code>gobj</code> to the global Google Analytics function name. This is again just a good practice, since there are cases where you want to change the function name from <code>ga</code> to something else. With this one-liner, we&rsquo;re making sure we&rsquo;re always referring to the correct object.</p>
 
@@ -382,7 +387,8 @@
   <span style="color:#a6e22e">tracker</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">gobj</span>.<span style="color:#a6e22e">getAll</span>()[<span style="color:#ae81ff">0</span>];
   <span style="color:#a6e22e">linker</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> window.<span style="color:#a6e22e">gaplugins</span>.<span style="color:#a6e22e">Linker</span>(<span style="color:#a6e22e">tracker</span>);
   <span style="color:#a6e22e">iframe</span>.<span style="color:#a6e22e">src</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">linker</span>.<span style="color:#a6e22e">decorate</span>(<span style="color:#a6e22e">iframe</span>.<span style="color:#a6e22e">src</span>);
-}</code></pre></div>
+}
+</code></pre></div>
 
 <p>The final part of the code is where the magic happens. Checking for the existence of the global Google Analytics object is just another good practice you might want to employ.</p>
 

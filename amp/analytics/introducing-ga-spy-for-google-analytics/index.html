@@ -354,6 +354,8 @@
                 
                     <li class="nav-opened" role="presentation"><a href="https://www.simoahava.com/amp/tags/content-management-system/">content-management-system</a></li>
                 
+                    <li class="nav-opened" role="presentation"><a href="https://www.simoahava.com/amp/tags/content-security-policy/">content-security-policy</a></li>
+                
                     <li class="nav-opened" role="presentation"><a href="https://www.simoahava.com/amp/tags/content-strategy/">content-strategy</a></li>
                 
                     <li class="nav-opened" role="presentation"><a href="https://www.simoahava.com/amp/tags/context/">context</a></li>
@@ -369,6 +371,8 @@
                     <li class="nav-opened" role="presentation"><a href="https://www.simoahava.com/amp/tags/creative/">creative</a></li>
                 
                     <li class="nav-opened" role="presentation"><a href="https://www.simoahava.com/amp/tags/cross-domain-tracking/">cross-domain-tracking</a></li>
+                
+                    <li class="nav-opened" role="presentation"><a href="https://www.simoahava.com/amp/tags/csp/">csp</a></li>
                 
                     <li class="nav-opened" role="presentation"><a href="https://www.simoahava.com/amp/tags/css/">css</a></li>
                 
@@ -906,11 +910,13 @@ on
 <div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nb">window</span><span class="p">[</span><span class="nx">gaObjName</span><span class="p">]</span> <span class="o">=</span> <span class="nb">window</span><span class="p">[</span><span class="nx">gaObjName</span><span class="p">]</span> <span class="o">||</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
   <span class="p">(</span> <span class="nb">window</span><span class="p">[</span><span class="nx">gaObjName</span><span class="p">].</span><span class="nx">q</span> <span class="o">=</span> <span class="nb">window</span><span class="p">[</span><span class="nx">gaObjName</span><span class="p">].</span><span class="nx">q</span> <span class="o">||</span> <span class="p">[]</span> <span class="p">).</span><span class="nx">push</span><span class="p">(</span> <span class="nx">arguments</span> <span class="p">)</span>
 <span class="p">},</span>
-<span class="nx">ga</span><span class="p">.</span><span class="nx">l</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">*</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">();</span></code></pre></div>
+<span class="nx">ga</span><span class="p">.</span><span class="nx">l</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">*</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">();</span>
+</code></pre></div>
 
 <p>Aside: Notice any similarities to the <a href="https://www.simoahava.com/amp/gtm-tips/datalayer-declaration-vs-push/">recommended format</a> for data layer pushes?</p>
 
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="p">(</span> <span class="nb">window</span><span class="p">.</span><span class="nx">dataLayer</span> <span class="o">=</span> <span class="nb">window</span><span class="p">.</span><span class="nx">dataLayer</span> <span class="o">||</span> <span class="p">[]</span> <span class="p">).</span><span class="nx">push</span><span class="p">(</span> <span class="p">{</span> <span class="p">}</span> <span class="p">)</span></code></pre></div>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="p">(</span> <span class="nb">window</span><span class="p">.</span><span class="nx">dataLayer</span> <span class="o">=</span> <span class="nb">window</span><span class="p">.</span><span class="nx">dataLayer</span> <span class="o">||</span> <span class="p">[]</span> <span class="p">).</span><span class="nx">push</span><span class="p">(</span> <span class="p">{</span> <span class="p">}</span> <span class="p">)</span>
+</code></pre></div>
 
 <p>Once this queue is established, the snippet creates a <em>script loader</em>, which starts an asynchronous request to download the <strong>analytics.js</strong> library from Google&rsquo;s servers.</p>
 
@@ -929,7 +935,8 @@ on
 </span><span class="c1"></span>  <span class="k">for</span><span class="p">(</span> <span class="nx">k</span> <span class="k">in</span> <span class="nx">gaOrig</span> <span class="p">)</span>
      <span class="k">if</span><span class="p">(</span> <span class="nx">gaOrig</span><span class="p">.</span><span class="nx">hasOwnProperty</span><span class="p">(</span> <span class="nx">k</span> <span class="p">)</span> <span class="p">)</span>
         <span class="nx">proxy</span><span class="p">[</span><span class="nx">k</span><span class="p">]</span> <span class="o">=</span> <span class="nx">gaOrig</span><span class="p">[</span><span class="nx">k</span><span class="p">];</span>
-<span class="p">}</span></code></pre></div>
+<span class="p">}</span>
+</code></pre></div>
 
 <p>The <code>proxy</code> function mimics the data members and methods of the original <code>ga</code> function. Thus it behaves like the original, which we accomplish by passing its arguments back to the <code>ga</code> function (and returning the result). But, only if we so choose. We can reject the message, simply by not sending the message to the original <code>ga</code> function, and thus intercept and block the hardcoded GA from running its requests altogether.</p>
 
@@ -940,14 +947,16 @@ on
 </span><span class="c1"></span>  <span class="k">if</span><span class="p">(</span> <span class="nx">processArgs</span><span class="p">(</span> <span class="nx">args</span> <span class="p">)</span> <span class="p">)</span>
      <span class="c1">// ... pass through to original GA object.
 </span><span class="c1"></span>     <span class="k">return</span> <span class="nx">gaOrig</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span> <span class="nx">gaOrig</span><span class="p">,</span> <span class="nx">args</span> <span class="p">);</span>
-<span class="p">};</span></code></pre></div>
+<span class="p">};</span>
+</code></pre></div>
 
 <p>The <code>processArgs</code> function simply delegates the processing and filtering of all commands to you (via the custom listener function).</p>
 
 <div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">processArgs</span><span class="p">(</span> <span class="nx">a</span> <span class="p">){</span>
   <span class="c1">// Call listener, return false only if listener returns false.
 </span><span class="c1"></span>  <span class="k">return</span> <span class="nx">listener</span><span class="p">(</span> <span class="nx">a</span> <span class="p">)</span> <span class="o">!==</span> <span class="kc">false</span><span class="p">;</span>
-<span class="p">}</span></code></pre></div>
+<span class="p">}</span>
+</code></pre></div>
 
 <h3 id="1-4-time-to-spy">1.4. Time To Spy</h3>
 
@@ -961,7 +970,8 @@ on
   <span class="p">};</span>
   <span class="nx">ga</span><span class="p">.</span><span class="nx">l</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">*</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">();</span>
   <span class="nb">window</span><span class="p">[</span><span class="nx">gaObjName</span><span class="p">]</span> <span class="o">=</span> <span class="nx">ga</span><span class="p">;</span>
-<span class="p">}</span></code></pre></div>
+<span class="p">}</span>
+</code></pre></div>
 
 <p>Note: the above code does the exact same thing as the second line of the GA install snippet function, shown beautified under A Good Spy Starts With Research above.</p>
 
@@ -1017,20 +1027,20 @@ on
 
 <p>If you need to intercept GA commands that run upon page load or shortly thereafter (such as the tracker creation or <code>'pageview'</code> in the base GA install snippet), then you&rsquo;ll need deploy <strong>GA Spy</strong> in an inline script tag or external script (with no <code>async</code> or <code>defer</code> attributes) above the first GA command (usually in the base GA snippet).</p>
 
-<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">html</span><span class="p"></span><span class="p">&gt;</span>
-  <span class="p">&lt;</span><span class="nt">head</span><span class="p"></span><span class="p">&gt;</span>
+<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
   ...
     // GA Spy:
-    <span class="p">&lt;</span><span class="nt">script</span><span class="p"></span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
       <span class="p">;</span><span class="nb">window</span><span class="p">.</span><span class="nx">gaSpy</span> <span class="o">=</span> <span class="nb">window</span><span class="p">.</span><span class="nx">gaSpy</span><span class="p">...</span>
-    <span class="p">&lt;</span><span class="p">/</span><span class="nt">script</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
 
     // Universal Analytics snippet:
-    <span class="p">&lt;</span><span class="nt">script</span><span class="p"></span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
       <span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">i</span><span class="p">,</span><span class="nx">s</span><span class="p">,</span><span class="nx">o</span><span class="p">,</span><span class="nx">g</span><span class="p">,</span><span class="nx">r</span><span class="p">,</span><span class="nx">a</span><span class="p">,</span><span class="nx">m</span><span class="p">)...</span>
-    <span class="p">&lt;</span><span class="p">/</span><span class="nt">script</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
   ...
-  <span class="p">&lt;</span><span class="p">/</span><span class="nt">head</span><span class="p">&gt;</span></code></pre></div>
+  <span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span></code></pre></div>
 
 <p>If the commands you need to intercept are triggered by user action, then this is not an issue and you can deploy <strong>GA Spy</strong> using GTM.</p>
 
@@ -1060,7 +1070,7 @@ on
 
 <p>In many cases, we&rsquo;ll want to push the hit values onto the <code>dataLayer</code> so they can be accessed in GTM.</p>
 
-<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">script</span><span class="p"></span><span class="p">&gt;</span>
+<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
   <span class="nx">gaSpy</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">obj</span><span class="p">)</span> <span class="p">{</span>
     
     <span class="c1">// Do something with the arguments to ga():
@@ -1070,7 +1080,7 @@ on
 </span><span class="c1"></span>    <span class="kd">var</span> <span class="nx">details</span> <span class="o">=</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">the</span><span class="p">;</span>
 
   <span class="p">});</span>
-<span class="p">&lt;</span><span class="p">/</span><span class="nt">script</span><span class="p">&gt;</span></code></pre></div>
+<span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span></code></pre></div>
 
 <p>Naturally, any calls to <code>gaSpy()</code> need to be timed so that they take place <em>after</em> you&rsquo;ve loaded the <strong>GA Spy</strong> code itself.</p>
 
@@ -1090,7 +1100,8 @@ on
   <span class="k">if</span><span class="p">(</span> <span class="nx">ev</span><span class="p">.</span><span class="nx">the</span><span class="p">.</span><span class="nx">trackerName</span> <span class="o">&amp;&amp;</span> <span class="nx">ev</span><span class="p">.</span><span class="nx">the</span><span class="p">.</span><span class="nx">trackerName</span><span class="p">.</span><span class="nx">substr</span><span class="p">(</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">3</span> <span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;gtm&#39;</span> <span class="p">)</span> 
     <span class="k">return</span><span class="p">;</span>
   <span class="c1">// Your code here
-</span><span class="c1"></span><span class="p">});</span></code></pre></div>
+</span><span class="c1"></span><span class="p">});</span>
+</code></pre></div>
 
 <p>This is not foolproof, but it&rsquo;ll work unless hardcoded tracking is using a tracker name starting with &ldquo;gtm&rdquo; (or if the tracker names in GTM are customized, which is probably done as an alternative to this solution). For example, this method will not work for Wistia&rsquo;s built-in tracking, because Wistia&rsquo;s code (erroneously) sends hits through every named tracker on the page.</p>
 
@@ -1104,7 +1115,8 @@ on
 
 <div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">gaSpy</span><span class="p">(</span> <span class="kd">function</span> <span class="nx">gaSpy_cb_</span><span class="p">(</span> <span class="nx">ev</span> <span class="p">){</span>
     <span class="nx">console</span><span class="p">.</span><span class="nx">debug</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span> <span class="nx">console</span><span class="p">,</span> <span class="nx">ev</span><span class="p">.</span><span class="nx">args</span> <span class="p">)</span>
-<span class="p">});</span></code></pre></div>
+<span class="p">});</span>
+</code></pre></div>
 
 <p>Or check out <a href="https://github.com/smhmic/ga-spy/blob/master/examples/ga-spy-log.js">one of the examples on GitHub</a> for something a bit more robust:</p>
 
@@ -1138,7 +1150,8 @@ on
     <span class="p">});</span>
   <span class="p">}</span>
   <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
-<span class="p">});</span></code></pre></div>
+<span class="p">});</span>
+</code></pre></div>
 
 <p><a href="https://github.com/smhmic/ga-spy/blob/master/examples/ga-spy-datalayer.gtm.tag.html">Here&rsquo;s a more robust example</a> that sends all non-GTM commands to <code>dataLayer</code>.</p>
 

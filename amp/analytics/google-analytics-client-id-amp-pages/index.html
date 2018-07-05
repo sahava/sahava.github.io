@@ -356,6 +356,8 @@
                 
                     <li class="nav-opened" role="presentation"><a href="https://www.simoahava.com/amp/tags/content-management-system/">content-management-system</a></li>
                 
+                    <li class="nav-opened" role="presentation"><a href="https://www.simoahava.com/amp/tags/content-security-policy/">content-security-policy</a></li>
+                
                     <li class="nav-opened" role="presentation"><a href="https://www.simoahava.com/amp/tags/content-strategy/">content-strategy</a></li>
                 
                     <li class="nav-opened" role="presentation"><a href="https://www.simoahava.com/amp/tags/context/">context</a></li>
@@ -371,6 +373,8 @@
                     <li class="nav-opened" role="presentation"><a href="https://www.simoahava.com/amp/tags/creative/">creative</a></li>
                 
                     <li class="nav-opened" role="presentation"><a href="https://www.simoahava.com/amp/tags/cross-domain-tracking/">cross-domain-tracking</a></li>
+                
+                    <li class="nav-opened" role="presentation"><a href="https://www.simoahava.com/amp/tags/csp/">csp</a></li>
                 
                     <li class="nav-opened" role="presentation"><a href="https://www.simoahava.com/amp/tags/css/">css</a></li>
                 
@@ -878,7 +882,7 @@ on
 
 <p>For our purposes, let&rsquo;s focus on the <code>config</code> attribute. It&rsquo;s an optional attribute that we can use to tell AMP: <em>&ldquo;Hey, we&rsquo;ve got some additional configurations that we need to you fetch from this location&rdquo;</em>. This attribute should be set to a URL where additional analytics configurations should be retrieved from. In other words, you need to specify an HTTP request endpoint which returns a valid, <a href="https://www.ampproject.org/docs/reference/components/amp-analytics">AMP-compliant JSON</a> configuration file.</p>
 
-<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">amp-analytics</span> <span class="na">config</span><span class="o">=</span><span class="s">&#34;//example.com/analytics.config.json&#34;</span><span class="p"></span><span class="p">&gt;&lt;</span><span class="p">/</span><span class="nt">amp-analytics</span><span class="p">&gt;</span></code></pre></div>
+<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">amp-analytics</span> <span class="na">config</span><span class="o">=</span><span class="s">&#34;//example.com/analytics.config.json&#34;</span><span class="p">&gt;&lt;/</span><span class="nt">amp-analytics</span><span class="p">&gt;</span></code></pre></div>
 
 <p>Once the browser has loaded the AMP page, and the page is visible in the browser window, AMP will fetch this external configuration file and use it to supplement any configurations that might already be established on the page. Unlike other resources in your content, your <code>amp-analytics</code> config will always point to your server and the result isn&rsquo;t automatically cached. When the request to your server comes in, it will include all of the cookies set on the user&rsquo;s browser on your domain.</p>
 
@@ -992,7 +996,8 @@ on
 
   <span class="p">})</span>
 
-<span class="p">})</span></code></pre></div>
+<span class="p">})</span>
+</code></pre></div>
 
 <p>Here&rsquo;s another checklist, this time for combining your custom Client ID workaround with the Google Tag Manager AMP container. I&rsquo;ve bolded the new steps.</p>
 
@@ -1035,7 +1040,7 @@ on
 <p>In your site code you&rsquo;ll need:</p>
 
 <div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="c">&lt;!-- Google Tag Manager --&gt;</span>
-<span class="p">&lt;</span><span class="nt">amp-analytics</span> <span class="na">config</span><span class="o">=</span><span class="s">&#34;//www.yourdomain.com/gtm-analytics.config.json?id=GTM-XXXXX&gt;m.url=SOURCE_URL&#34;</span> <span class="na">data-credentials</span><span class="o">=</span><span class="s">&#34;include&#34;</span><span class="p"></span><span class="p">&gt;&lt;</span><span class="p">/</span><span class="nt">amp-analytics</span><span class="p">&gt;</span></code></pre></div>
+<span class="p">&lt;</span><span class="nt">amp-analytics</span> <span class="na">config</span><span class="o">=</span><span class="s">&#34;//www.yourdomain.com/gtm-analytics.config.json?id=GTM-XXXXX&amp;gtm.url=SOURCE_URL&#34;</span> <span class="na">data-credentials</span><span class="o">=</span><span class="s">&#34;include&#34;</span><span class="p">&gt;&lt;/</span><span class="nt">amp-analytics</span><span class="p">&gt;</span></code></pre></div>
 
 <p>Congratulations, you have created a web proxy that fetches the Google Tag Manager container from Google&rsquo;s servers and modifies the JSON to leverage the value stored in the <code>_ga</code> cookie.</p>
 
@@ -1045,86 +1050,86 @@ on
 
 <p>WordPress provides the <a href="https://developer.wordpress.org/reference/hooks/rest_api_init/"><code>rest_api_init</code></a> hook, which lets you create an HTTP request endpoint on your web server:</p>
 
-<div class="highlight"><pre class="chroma"><code class="language-php" data-lang="php"><span class="x">// REST API for GTM container
-</span><span class="x">add_action( &#39;rest_api_init&#39;, function() {
-</span><span class="x">    register_rest_route( 
-</span><span class="x">        &#39;amp-gtm&#39;,
-</span><span class="x">        &#39;/amp.json&#39;,
-</span><span class="x">        array(
-</span><span class="x">            &#39;methods&#39; =&gt; &#39;GET&#39;,
-</span><span class="x">            &#39;callback&#39; =&gt; &#39;retrieve_gtm_json&#39;,
-</span><span class="x">        )
-</span><span class="x">    );
-</span><span class="x">});</span></code></pre></div>
+<div class="highlight"><pre class="chroma"><code class="language-php" data-lang="php">// REST API for GTM container
+add_action( &#39;rest_api_init&#39;, function() {
+    register_rest_route( 
+        &#39;amp-gtm&#39;,
+        &#39;/amp.json&#39;,
+        array(
+            &#39;methods&#39; =&gt; &#39;GET&#39;,
+            &#39;callback&#39; =&gt; &#39;retrieve_gtm_json&#39;,
+        )
+    );
+});</code></pre></div>
 
 <p>That piece of code in your <strong>functions.php</strong> would create a GET request endpoint in your web domain path <code>/wp-json/amp-gtm/amp.json</code>. If a GET request to this endpoint is recorded, the callback function named <code>retrieve_gtm_json</code> is then invoked:</p>
 
-<div class="highlight"><pre class="chroma"><code class="language-php" data-lang="php"><span class="x">// Generate random Client ID
-</span><span class="x">function generate_ga_client_id() {
-</span><span class="x">    return rand(100000000,999999999) . &#39;.&#39; . time();
-</span><span class="x">}
-</span><span class="x">
-</span><span class="x">// Set cookie to expire in 2 years
-</span><span class="x">function getCookieExpirationDate() {
-</span><span class="x">    return date(&#39;D, j F Y H:i:s&#39;, time() + 60*60*24*365*2);
-</span><span class="x">}
-</span><span class="x">
-</span><span class="x">// Callback for the GET request
-</span><span class="x">function retrieve_gtm_json( $data ) {
-</span><span class="x">    /* Get the hostname of the request origin, and parse it for the
-</span><span class="x">     * pure domain name. */
-</span><span class="x">    $domain = explode(&#39;:&#39;, $data-&gt;get_header(&#39;Host&#39;))[0];
-</span><span class="x">    $domainName = str_replace(&#39;www.&#39;, &#39;&#39;, $domain);
-</span><span class="x">
-</span><span class="x">    // Get the number of parts in the domain name
-</span><span class="x">    $domainLength = count(explode(&#39;.&#39;, $domainName));
-</span><span class="x">
-</span><span class="x">    /* Check if the browser already has the _ga cookie.
-</span><span class="x">     * If not, generate a new cookie. */
-</span><span class="x">    $cid = $_COOKIE[&#39;_ga&#39;];
-</span><span class="x">    if (!isset($cid)) {
-</span><span class="x">        $cid = &#34;GA1.{$domainLength}.&#34; . generate_ga_client_id();
-</span><span class="x">    }
-</span><span class="x">
-</span><span class="x">    /* Store the actual Client ID (last two numbers) of the
-</span><span class="x">     * _ga cookie value in the $cidNumber variable */
-</span><span class="x">    $cidNumber = preg_replace(&#39;/^GA.\.[^.]+\./&#39;,&#39;&#39;,$cid);
-</span><span class="x">  
-</span><span class="x">    // Get all HTTP request parameters
-</span><span class="x">    $query = $_SERVER[&#39;QUERY_STRING&#39;];
-</span><span class="x">    
-</span><span class="x">    /* Fetch the actual GTM container, by passing the valid query parameters from
-</span><span class="x">     * the original request. */
-</span><span class="x">    $container = file_get_contents(&#34;https://www.googletagmanager.com/amp.json?{$query}&#34;);
-</span><span class="x">    
-</span><span class="x">    // Replace the &amp;cid; parameter value with ${clientId}
-</span><span class="x">    $container = preg_replace(&#39;/(&amp;cid=)[^&amp;]+/&#39;,&#39;${1}${clientId}&#39;, $container);
-</span><span class="x">  
-</span><span class="x">    // Add the clientId to the &#34;vars&#34; object in the container JSON.
-</span><span class="x">    $container = json_decode($container);
-</span><span class="x">    $container-&gt;vars-&gt;clientId = $cidNumber;
-</span><span class="x">    
-</span><span class="x">    // Build a new HTTP response from the modified configuration file.
-</span><span class="x">    $response = new WP_REST_RESPONSE( $container );
-</span><span class="x">    
-</span><span class="x">    // Add the required headers (Set-Cookie, most importantly) to the Request
-</span><span class="x">    $response-&gt;header( &#39;Set-Cookie&#39;, &#34;_ga={$cid}; Path=/; Expires=&#34; . getcookieExpirationDate() . &#34; GMT; Domain={$domainName};&#34;);
-</span><span class="x">    $response-&gt;header( &#39;Access-Control-Allow-Origin&#39;, &#39;https://cdn.ampproject.org&#39;);
-</span><span class="x">    
-</span><span class="x">    // Remember to check the protocol and change to http if that&#39;s where your domain is
-</span><span class="x">    $response-&gt;header( &#39;AMP-Access-Control-Allow-Source-Origin&#39;, &#34;https://{$domain}&#34;);
-</span><span class="x">    $response-&gt;header( &#39;Access-Control-Expose-Headers&#39;, &#39;AMP-Access-Control-Allow-Source-Origin&#39;);
-</span><span class="x">    
-</span><span class="x">    // Return the HTTP response.
-</span><span class="x">    return $response;
-</span><span class="x">}</span></code></pre></div>
+<div class="highlight"><pre class="chroma"><code class="language-php" data-lang="php">// Generate random Client ID
+function generate_ga_client_id() {
+    return rand(100000000,999999999) . &#39;.&#39; . time();
+}
+
+// Set cookie to expire in 2 years
+function getCookieExpirationDate() {
+    return date(&#39;D, j F Y H:i:s&#39;, time() + 60*60*24*365*2);
+}
+
+// Callback for the GET request
+function retrieve_gtm_json( $data ) {
+    /* Get the hostname of the request origin, and parse it for the
+     * pure domain name. */
+    $domain = explode(&#39;:&#39;, $data-&gt;get_header(&#39;Host&#39;))[0];
+    $domainName = str_replace(&#39;www.&#39;, &#39;&#39;, $domain);
+
+    // Get the number of parts in the domain name
+    $domainLength = count(explode(&#39;.&#39;, $domainName));
+
+    /* Check if the browser already has the _ga cookie.
+     * If not, generate a new cookie. */
+    $cid = $_COOKIE[&#39;_ga&#39;];
+    if (!isset($cid)) {
+        $cid = &#34;GA1.{$domainLength}.&#34; . generate_ga_client_id();
+    }
+
+    /* Store the actual Client ID (last two numbers) of the
+     * _ga cookie value in the $cidNumber variable */
+    $cidNumber = preg_replace(&#39;/^GA.\.[^.]+\./&#39;,&#39;&#39;,$cid);
+  
+    // Get all HTTP request parameters
+    $query = $_SERVER[&#39;QUERY_STRING&#39;];
+    
+    /* Fetch the actual GTM container, by passing the valid query parameters from
+     * the original request. */
+    $container = file_get_contents(&#34;https://www.googletagmanager.com/amp.json?{$query}&#34;);
+    
+    // Replace the <span class="ni">&amp;cid;</span> parameter value with ${clientId}
+    $container = preg_replace(&#39;/(<span class="err">&amp;</span>cid=)[^<span class="err">&amp;</span>]+/&#39;,&#39;${1}${clientId}&#39;, $container);
+  
+    // Add the clientId to the &#34;vars&#34; object in the container JSON.
+    $container = json_decode($container);
+    $container-&gt;vars-&gt;clientId = $cidNumber;
+    
+    // Build a new HTTP response from the modified configuration file.
+    $response = new WP_REST_RESPONSE( $container );
+    
+    // Add the required headers (Set-Cookie, most importantly) to the Request
+    $response-&gt;header( &#39;Set-Cookie&#39;, &#34;_ga={$cid}; Path=/; Expires=&#34; . getcookieExpirationDate() . &#34; GMT; Domain={$domainName};&#34;);
+    $response-&gt;header( &#39;Access-Control-Allow-Origin&#39;, &#39;https://cdn.ampproject.org&#39;);
+    
+    // Remember to check the protocol and change to http if that&#39;s where your domain is
+    $response-&gt;header( &#39;AMP-Access-Control-Allow-Source-Origin&#39;, &#34;https://{$domain}&#34;);
+    $response-&gt;header( &#39;Access-Control-Expose-Headers&#39;, &#39;AMP-Access-Control-Allow-Source-Origin&#39;);
+    
+    // Return the HTTP response.
+    return $response;
+}</code></pre></div>
 
 <p>This is the API script that handles requests for the Google Tag Manager container. The proxy fetches the GTM container, and replaces the default Client ID with the AMP variable <code>${clientId}</code>. This, in turn, is added to the configuration JSON with the value retrieved from the <code>_ga</code> cookie. If the <code>_ga</code> cookie doesn&rsquo;t exist, a new one is generated.</p>
 
 <p>In your site code, you&rsquo;ll need:</p>
 
 <div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="c">&lt;!-- Google Tag Manager --&gt;</span>
-<span class="p">&lt;</span><span class="nt">amp-analytics</span> <span class="na">config</span><span class="o">=</span><span class="s">&#34;//www.yourdomain.com/wp-json/amp-gtm/amp.json?id=GTM-XXXXX&gt;m.url=SOURCE_URL&#34;</span> <span class="na">data-credentials</span><span class="o">=</span><span class="s">&#34;include&#34;</span><span class="p"></span><span class="p">&gt;&lt;</span><span class="p">/</span><span class="nt">amp-analytics</span><span class="p">&gt;</span></code></pre></div>
+<span class="p">&lt;</span><span class="nt">amp-analytics</span> <span class="na">config</span><span class="o">=</span><span class="s">&#34;//www.yourdomain.com/wp-json/amp-gtm/amp.json?id=GTM-XXXXX&amp;gtm.url=SOURCE_URL&#34;</span> <span class="na">data-credentials</span><span class="o">=</span><span class="s">&#34;include&#34;</span><span class="p">&gt;&lt;/</span><span class="nt">amp-analytics</span><span class="p">&gt;</span></code></pre></div>
 
 <p>This request is then passed to your endpoint, and the process described above will take place.</p>
 

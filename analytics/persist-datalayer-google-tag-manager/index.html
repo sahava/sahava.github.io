@@ -53,7 +53,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.31 with theme Tranquilpeak 0.4.3-BETA">
+    <meta name="generator" content="Hugo 0.42.2 with theme Tranquilpeak 0.4.3-BETA">
     <title>Persist dataLayer In Google Tag Manager | Simo Ahava's blog</title>
     
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-PZ7GMV9');</script>
@@ -453,7 +453,8 @@
 
 <p><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">(<span style="color:#66d9ef">function</span>() {
 ...
-})();</code></pre></div></p>
+})();
+</code></pre></div></p>
 
 <p>The function is wrapped in an IIFE (immediately invoked function expression). This is because I want to avoid using the global scope when utilizing so many different variables. Scoping the variables to this function ensures that I don&rsquo;t mess with global variables of some other library, for example.</p>
 
@@ -463,7 +464,8 @@
 <span style="color:#a6e22e">persistEvent</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">/^persist(Save|Replace)/</span>,
 <span style="color:#a6e22e">timeNow</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Date().<span style="color:#a6e22e">getTime</span>(),
 <span style="color:#a6e22e">timeStorage</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;&#39;</span>,
-<span style="color:#a6e22e">persistTime</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1000</span><span style="color:#f92672">*</span><span style="color:#ae81ff">60</span><span style="color:#f92672">*</span><span style="color:#ae81ff">30</span>; <span style="color:#960050;background-color:#1e0010">// Expiration in milliseconds; set to null to never expire</span></code></pre></div>
+<span style="color:#a6e22e">persistTime</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1000</span><span style="color:#f92672">*</span><span style="color:#ae81ff">60</span><span style="color:#f92672">*</span><span style="color:#ae81ff">30</span>; <span style="color:#75715e">// Expiration in milliseconds; set to null to never expire
+</span><span style="color:#75715e"></span></code></pre></div>
 
 <p>Here I introduce a bunch of utility variables. If you want to have the storage persist for ever and ever, set <code>persistTime = null;</code>.</p>
 
@@ -471,7 +473,8 @@
   <span style="color:#a6e22e">retrievedDL</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">localStorage</span>.<span style="color:#a6e22e">getItem</span>(<span style="color:#e6db74">&#39;persistDL&#39;</span>);
   <span style="color:#a6e22e">timeStorage</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">localStorage</span>.<span style="color:#a6e22e">getItem</span>(<span style="color:#e6db74">&#39;persistTime&#39;</span>);
   ...
-}</code></pre></div>
+}
+</code></pre></div>
 
 <p>Only run the API if the browser supports HTML5 Web Storage. It&rsquo;s basically only a problem with IE versions older than 8. I saw no reason to provide an alternative for them, since if you&rsquo;re still using IE7 or older, you deserve a horrible browsing experience.</p>
 
@@ -492,7 +495,8 @@
       <span style="color:#a6e22e">loadDL</span>();
     }
   }
-  <span style="color:#66d9ef">break</span>;</code></pre></div>
+  <span style="color:#66d9ef">break</span>;
+</code></pre></div>
 
 <p>With every page load, parse the dataLayer variables in <code>localStorage</code> back to their original types, and push them into dataLayer as a single object. If you want to set a trigger event to fire your tags after the variables have been loaded from <code>localStorage</code>, uncomment the line with &lsquo;event&rsquo;: &lsquo;DLLoaded&rsquo;. This way you can have your dependent tags fire on <strong>{{event}} equals DLLoaded</strong> to ensure that they have access to the stored variables.</p>
 
@@ -514,11 +518,13 @@
 ...
 <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#39;persistDelete&#39;</span><span style="color:#f92672">:</span>
   <span style="color:#a6e22e">deleteDL</span>();
-  <span style="color:#66d9ef">break</span>;</code></pre></div>
+  <span style="color:#66d9ef">break</span>;
+</code></pre></div>
 
 <p>If the trigger event was &lsquo;persistDelete&rsquo;, all dataLayer variables in <code>localStorage</code> are deleted.</p>
 
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">localStorage</span>.<span style="color:#a6e22e">setItem</span>(<span style="color:#e6db74">&#39;persistTime&#39;</span>, <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">timeNow</span>));</code></pre></div>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">localStorage</span>.<span style="color:#a6e22e">setItem</span>(<span style="color:#e6db74">&#39;persistTime&#39;</span>, <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">timeNow</span>));
+</code></pre></div>
 
 <p>Finally, every time the script is run, the current time is saved as a timestamp in <code>localStorage</code>.</p>
 

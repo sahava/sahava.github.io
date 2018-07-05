@@ -350,6 +350,8 @@
                 
                     <li class="nav-opened" role="presentation"><a href="https://www.simoahava.com/amp/tags/content-management-system/">content-management-system</a></li>
                 
+                    <li class="nav-opened" role="presentation"><a href="https://www.simoahava.com/amp/tags/content-security-policy/">content-security-policy</a></li>
+                
                     <li class="nav-opened" role="presentation"><a href="https://www.simoahava.com/amp/tags/content-strategy/">content-strategy</a></li>
                 
                     <li class="nav-opened" role="presentation"><a href="https://www.simoahava.com/amp/tags/context/">context</a></li>
@@ -365,6 +367,8 @@
                     <li class="nav-opened" role="presentation"><a href="https://www.simoahava.com/amp/tags/creative/">creative</a></li>
                 
                     <li class="nav-opened" role="presentation"><a href="https://www.simoahava.com/amp/tags/cross-domain-tracking/">cross-domain-tracking</a></li>
+                
+                    <li class="nav-opened" role="presentation"><a href="https://www.simoahava.com/amp/tags/csp/">csp</a></li>
                 
                     <li class="nav-opened" role="presentation"><a href="https://www.simoahava.com/amp/tags/css/">css</a></li>
                 
@@ -924,7 +928,7 @@ on
 
 <p>In the following code example, I&rsquo;m running some custom JavaScript, and once it&rsquo;s done, I&rsquo;m letting the sequence know that <code>onSuccess</code> has been called.</p>
 
-<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">script</span><span class="p"></span><span class="p">&gt;</span>
+<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
   <span class="kd">var</span> <span class="nx">gtm</span> <span class="o">=</span> <span class="nx">google_tag_manager</span><span class="p">[{{</span><span class="nx">Container</span> <span class="nx">ID</span><span class="p">}}];</span>
   <span class="kd">var</span> <span class="nx">el</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">&#39;content-head&#39;</span><span class="p">);</span>
   <span class="k">try</span> <span class="p">{</span>
@@ -933,7 +937,7 @@ on
   <span class="p">}</span> <span class="k">catch</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">gtm</span><span class="p">.</span><span class="nx">onHtmlFailure</span><span class="p">({{</span><span class="nx">HTML</span> <span class="nx">ID</span><span class="p">}});</span>
   <span class="p">}</span>
-<span class="p">&lt;</span><span class="p">/</span><span class="nt">script</span><span class="p">&gt;</span></code></pre></div>
+<span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span></code></pre></div>
 
 <p>In the first line of the script, you copy a reference to the GTM container interface into the <code>gtm</code> variable. You will practically never have to use this elsewhere, so don&rsquo;t worry about it too much. Suffice to say that this reference allows you to pass the <code>onSuccess</code> and <code>onFailure</code> callbacks, which is why it&rsquo;s important here.</p>
 
@@ -1002,14 +1006,16 @@ on
 <p>However, at the time of writing this, <code>dataLayer.set()</code> does not exist. I asked the developers, and this seems to be a mistake in the guide. Instead, you need to use the following command to <em>set</em> values in the Data Layer even during the tag sequence:</p>
 
 <div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="c1">// To set a value, use set() with the key as the first parameter, and value as the second
-</span><span class="c1"></span><span class="nx">google_tag_manager</span><span class="p">[{{</span><span class="nx">Container</span> <span class="nx">ID</span><span class="p">}}].</span><span class="nx">dataLayer</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&#39;someKey&#39;</span><span class="p">,</span> <span class="s1">&#39;someValue&#39;</span><span class="p">);</span></code></pre></div>
+</span><span class="c1"></span><span class="nx">google_tag_manager</span><span class="p">[{{</span><span class="nx">Container</span> <span class="nx">ID</span><span class="p">}}].</span><span class="nx">dataLayer</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&#39;someKey&#39;</span><span class="p">,</span> <span class="s1">&#39;someValue&#39;</span><span class="p">);</span>
+</code></pre></div>
 
 <p>Once you use this, any Tag that fires after this one (in the same sequence), will have its Data Layer Variable reference to <strong>someKey</strong> updated to return <em>someValue</em>.</p>
 
 <p>If you want to retrieve this changed value in the <em>same</em> Tag it was changed in, you can&rsquo;t use a Data Layer Variable, since it&rsquo;s resolved before the Tag is executed (and the <code>set()</code> command is run). You&rsquo;ll need to use this syntax instead:</p>
 
 <div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="c1">// To get a value, use get() with the key as the parameter
-</span><span class="c1"></span><span class="nx">google_tag_manager</span><span class="p">[{{</span><span class="nx">Container</span> <span class="nx">ID</span><span class="p">}}].</span><span class="nx">dataLayer</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;someKey&#39;</span><span class="p">);</span></code></pre></div>
+</span><span class="c1"></span><span class="nx">google_tag_manager</span><span class="p">[{{</span><span class="nx">Container</span> <span class="nx">ID</span><span class="p">}}].</span><span class="nx">dataLayer</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;someKey&#39;</span><span class="p">);</span>
+</code></pre></div>
 
 <p>Remember to enable the <strong>Container ID</strong> Built-in Variable!</p>
 
