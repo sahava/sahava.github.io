@@ -401,7 +401,7 @@
 
 <h2 id="3-the-custom-html-tag">3. The Custom HTML Tag</h2>
 
-<p>The exception is the <strong>Custom HTML Tag</strong>. Since GTM has no way of knowing when your custom code has executed, a workaround is required. If you go to the <strong>Built-in Variables</strong>, you should see a new one: <strong>HTML ID</strong>:</p>
+<p>The exception is the <strong>Custom HTML Tag</strong>. Since you might want to tell Google Tag Manager not to proceed to the next tag until something has happened (e.g. an asynchronous operation has completed), a workaround is required. If you go to the <strong>Built-in Variables</strong>, you should see a new one: <strong>HTML ID</strong>:</p>
 
 
 
@@ -421,7 +421,7 @@
 
 <p>This is used to invoke either the <code>onSuccess</code> or <code>onFailure</code> callback for the Custom HTML Tag.</p>
 
-<p>So, if you want to use a Custom HTML Tag as either the <strong>setup</strong> or the <strong>main tag</strong>, and you want to establish a sequence, you will need the following:</p>
+<p>So, if you want to use a Custom HTML Tag as either the <strong>setup</strong> or the <strong>main tag</strong>, and you want to establish a sequence with success and/or failure conditions, you will need the following:</p>
 
 <ol>
 <li><p>The <strong>HTML ID</strong> Built-In Variable</p></li>
@@ -434,23 +434,29 @@
 <p>In the following code example, I&rsquo;m running some custom JavaScript, and once it&rsquo;s done, I&rsquo;m letting the sequence know that <code>onSuccess</code> has been called.</p>
 
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">gtm</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">google_tag_manager</span>[{{<span style="color:#a6e22e">Container</span> <span style="color:#a6e22e">ID</span>}}];
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">el</span> <span style="color:#f92672">=</span> document.<span style="color:#a6e22e">getElementById</span>(<span style="color:#e6db74">&#39;content-head&#39;</span>);
-  <span style="color:#66d9ef">try</span> {
-    <span style="color:#a6e22e">el</span>.<span style="color:#a6e22e">innerHTML</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;We have taken over your website!&#39;</span>;
-    <span style="color:#a6e22e">gtm</span>.<span style="color:#a6e22e">onHtmlSuccess</span>({{<span style="color:#a6e22e">HTML</span> <span style="color:#a6e22e">ID</span>}});
-  } <span style="color:#66d9ef">catch</span>(<span style="color:#a6e22e">e</span>) {
-    <span style="color:#a6e22e">gtm</span>.<span style="color:#a6e22e">onHtmlFailure</span>({{<span style="color:#a6e22e">HTML</span> <span style="color:#a6e22e">ID</span>}});
-  }
+  (<span style="color:#66d9ef">function</span>() {
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">gtm</span> <span style="color:#f92672">=</span> window.<span style="color:#a6e22e">google_tag_manager</span>[{{<span style="color:#a6e22e">Container</span> <span style="color:#a6e22e">ID</span>}}];
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">el</span> <span style="color:#f92672">=</span> document.<span style="color:#a6e22e">getElementById</span>(<span style="color:#e6db74">&#39;content-head&#39;</span>);
+    <span style="color:#66d9ef">try</span> {
+      <span style="color:#a6e22e">el</span>.<span style="color:#a6e22e">innerHTML</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;We have taken over your website!&#39;</span>;
+      <span style="color:#a6e22e">gtm</span>.<span style="color:#a6e22e">onHtmlSuccess</span>({{<span style="color:#a6e22e">HTML</span> <span style="color:#a6e22e">ID</span>}});
+    } <span style="color:#66d9ef">catch</span>(<span style="color:#a6e22e">e</span>) {
+      <span style="color:#a6e22e">gtm</span>.<span style="color:#a6e22e">onHtmlFailure</span>({{<span style="color:#a6e22e">HTML</span> <span style="color:#a6e22e">ID</span>}});
+    }
+  })();
 &lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
 
-<p>In the first line of the script, you copy a reference to the GTM container interface into the <code>gtm</code> variable. You will practically never have to use this elsewhere, so don&rsquo;t worry about it too much. Suffice to say that this reference allows you to pass the <code>onSuccess</code> and <code>onFailure</code> callbacks, which is why it&rsquo;s important here.</p>
+<p>In the first line of the script, you copy a reference to the GTM container interface into the <code>gtm</code> variable. This is a very specific interface into GTM&rsquo;s mechanisms, so don&rsquo;t worry about it too much. Suffice to say that this reference allows you to pass the <code>onSuccess</code> and <code>onFailure</code> callbacks, which is why it&rsquo;s important here.</p>
 
 <p>Next, there&rsquo;s a <code>try...catch</code> block, where a DOM method is executed. Once it&rsquo;s completed, the <code>onHtmlSuccess()</code> method of the interface is invoked. The parameter to this method is the new <strong>HTML ID</strong> Built-In Variable. This way GTM will be able to communicate to the next member of the sequence that it was precisely <em>this</em> particular Custom HTML Tag that just completed.</p>
 
 <p>If there&rsquo;s an error, then the <code>onHtmlFailure()</code> method is invoked, and information is passed to the sequence that this Tag did not complete successfully.</p>
 
-<p>By now it shouldn&rsquo;t be too complicated anymore to understand what&rsquo;s happening. Each Tag template has an <code>onSuccess</code> and <code>onFailure</code> callback, except for the Custom HTML Tag, where you have to provide them yourself.</p>
+<p>By now it shouldn&rsquo;t be too complicated anymore to understand what&rsquo;s happening. Each Tag template has an <code>onSuccess</code> and <code>onFailure</code> callback, except for the Custom HTML Tag, where you can to provide them yourself.</p>
+
+<blockquote>
+<p><strong>UPDATE 23 July 2018</strong>: Be sure to read my article on <a href="https://www.simoahava.com/analytics/tag-sequencing-custom-html-tags/">Custom HTML tags with tag sequencing</a> for more details on how Custom HTML tags and tag sequencing work together.</p>
+</blockquote>
 
 <h2 id="4-how-to-create-the-sequence">4. How to create the sequence</h2>
 
