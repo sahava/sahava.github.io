@@ -308,7 +308,18 @@
 
 <h2 id="deployment-with-google-tag-manager">Deployment with Google Tag Manager</h2>
 
-<p>If you are using Google Tag Manager, simply copy-paste the code into a Custom JavaScript variable, and save the variable with some descriptive name such as <strong>{{customTask}}</strong>.</p>
+<p>If you are using Google Tag Manager, you need to copy-paste the code into a <strong>Custom JavaScript variable</strong>, and modify the first line by removing the <code>var _customTask =</code> part like this:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#75715e">// OLD, CHANGE THIS:
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">_customTask</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>() {
+
+<span style="color:#75715e">// NEW, TO THIS:
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span>() {
+</code></pre></div>
+
+<p>The second change you need to do is <strong>remove the semi-colon at the very end of the code block</strong>. In other words, remove the very last character of the entire code block, which should be a semi-colon <code>;</code>.</p>
+
+<p>Once you&rsquo;re done modifying the default values, save the variable with the name <strong>{{customTask}}</strong> or something similar and descriptive.</p>
 
 <p>Then, in your <a href="https://www.simoahava.com/analytics/google-analytics-settings-variable-in-gtm/">Google Analytics Settings variable</a>, go to <strong>Fields to set</strong>, and add a new field:</p>
 
@@ -341,13 +352,13 @@
     </thead>
     <tbody>
       <tr>
-        <td data-customtask-id='cid' data-customtask-selected='false'>Client ID as Custom Dimension</td>
+        <td data-customtask-id='cid' data-customtask-selected='false'>Client ID as a Custom Dimension</td>
       </tr>
       <tr>
-        <td data-customtask-id='ht' data-customtask-selected='false'>Hit Type as Custom Dimension</td>
+        <td data-customtask-id='ht' data-customtask-selected='false'>Hit Type as a Custom Dimension</td>
       </tr>
       <tr>
-        <td data-customtask-id='pl' data-customtask-selected='false'>Payload Length as Custom Dimension</td>
+        <td data-customtask-id='pl' data-customtask-selected='false'>Payload Length as a Custom Dimension</td>
       </tr>
       <tr>
         <td data-customtask-id='rcd' data-customtask-selected='false'>Remove Custom Definitions from Page Speed Timing Hits</td>
@@ -413,10 +424,10 @@
       var copyBtn = document.querySelector('#copy');
 
       var rowsInCode = {
-        cid: [7,8,9,10,61,62,63,64,65,66],
-        ht: [11,12,13,14,67,68,69,70,71,72],
+        cid: [7,8,9,10,45,46,47,48,49,50],
+        ht: [11,12,13,14,51,52,53,54,55,56],
         pl: [15,16,17,18,102,103,104,105,106,107,108,109,110],
-        rcd: [19,20,21,22,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60],
+        rcd: [19,20,21,22,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72],
         dh: [23,24,25,26,126,127,128,129,130,131,132,133,134,135,136],
         pr: [27,28,29,30,31,32,33,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101],
         sp: [34,35,36,37,113,114,115,116,117,118,119,120,121,122,123,124,125]
@@ -470,6 +481,18 @@
         "",
         "    window[globalSendHitTaskName] = window[globalSendHitTaskName] || customTaskModel.get('sendHitTask');",
         "",
+        "    // clientIdIndex",
+        "    if (typeof clientIdIndex === 'number') {",
+        "      customTaskModel.set('dimension' + clientIdIndex, customTaskModel.get('clientId'));",
+        "    }",
+        "    // /clientIdIndex",
+        "",
+        "    // hitTypeIndex",
+        "    if (typeof hitTypeIndex === 'number') {",
+        "      customTaskModel.set('dimension' + hitTypeIndex, customTaskModel.get('hitType'));",
+        "    }",
+        "    // /hitTypeIndex",
+        "",
         "    // removeCustomDefinitionsFromTimingHits",
         "    var tempFieldObject = {},",
         "        dimensionIndex  = 1;",
@@ -485,18 +508,6 @@
         "      }",
         "    }",
         "    // /removeCustomDefinitionsFromTimingHits",
-        "",
-        "    // clientIdIndex",
-        "    if (typeof clientIdIndex === 'number') {",
-        "      customTaskModel.set('dimension' + clientIdIndex, customTaskModel.get('clientId'));",
-        "    }",
-        "    // /clientIdIndex",
-        "",
-        "    // hitTypeIndex",
-        "    if (typeof hitTypeIndex === 'number') {",
-        "      customTaskModel.set('dimension' + hitTypeIndex, customTaskModel.get('hitType'));",
-        "    }",
-        "    // /hitTypeIndex",
         "",
         "    customTaskModel.set('sendHitTask', function(sendHitTaskModel) {",
         "",
