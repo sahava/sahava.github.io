@@ -301,6 +301,8 @@
             <div class="main-content-wrap">
               
 
+<p><em>Last updated 23 August 2018</em></p>
+
 <p>If you have been reading my blog articles over the past year, you might have noticed a disturbing trend. I&rsquo;ve published <a href="https://www.simoahava.com/tags/customtask/">9 articles on <code>customTask</code></a> since the API was released. It might not sound like much, but I can&rsquo;t think of a single feature in <a href="https://analytics.google.com/">Google Analytics</a> or <a href="https://tagmanager.google.com/">Google Tag Manager</a> that has so completely convinced me of its usefulness in such a short time.</p>
 
 <p>The <code>customTask</code> API is a feature of the <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/tasks">Universal Analytics library</a> (used by Google Tag Manager&rsquo;s tags, too). It lets you <code>get</code> and <code>set</code> values from and to the (Measurement Protocol) hit as it&rsquo;s being generated. This is really useful for a couple of reasons, which I&rsquo;ve covered in the previous articles, but I&rsquo;ll go over them briefly in the beginning of this guide, too.</p>
@@ -345,6 +347,10 @@
 <li><a href="#7-send-details-about-optimize-experiments-to-google-analytics">7. Send details about Optimize experiments to Google Analytics</a></li>
 <li><a href="#8-auto-link-domains-with-regular-expressions">8. Auto-link domains with regular expressions</a></li>
 <li><a href="#9-send-google-analytics-payloads-to-snowplow">9. Send Google Analytics payloads to Snowplow</a></li>
+<li><a href="#10-send-google-analytics-payload-length-as-a-custom-dimension">10. Send Google Analytics payload length as a Custom Dimension</a></li>
+<li><a href="#11-send-hit-type-as-a-custom-dimension">11. Send Hit Type as a Custom Dimension</a></li>
+<li><a href="#12-automatically-reduce-payload-length">12. Automatically reduce payload length</a></li>
+<li><a href="#13-create-and-update-a-session-cookie">13. Create and update a session cookie</a></li>
 </ul></li>
 <li><a href="#putting-it-all-together-literally">Putting it all together (literally)</a></li>
 <li><a href="#summary">Summary</a></li>
@@ -585,6 +591,46 @@
 
 
 <p>Google Tag Manager doesn&rsquo;t support adding plugins to tags, so using <code>customTask</code> to replicate plugin features is as good a solution as any.</p>
+
+<h3 id="10-send-google-analytics-payload-length-as-a-custom-dimension">10. Send Google Analytics payload length as a Custom Dimension</h3>
+
+<p>Link to article: <a href="https://www.simoahava.com/analytics/send-google-analytics-payload-length-as-custom-dimension/">Send Google Analytics Payload Length As Custom Dimension</a>.</p>
+
+<p>This tip lets you collect the payload length of each Google Analytics request as a Custom Dimension in Google Analytics.</p>
+
+<p>The maximum length of a Google Analytics payload is <a href="https://developers.google.com/analytics/devguides/collection/protocol/v1/reference#using-post">8192 bytes</a>. It&rsquo;s useful to check if you&rsquo;re approaching this value with some of your hits, because if the payload length exceeds this, the hit is never sent to Google Analytics.</p>
+
+<p>Be sure to check my tip below on how to automatically reduce the payload length.</p>
+
+<h3 id="11-send-hit-type-as-a-custom-dimension">11. Send Hit Type as a Custom Dimension</h3>
+
+<p>Link to article: <a href="https://www.simoahava.com/analytics/add-hit-type-custom-dimension/">#GTMTips: Add Hit Type As A Custom Dimension</a>.</p>
+
+<p>With this trick, you can send the hit type (e.g. <code>pageview</code>, <code>event</code>, <code>timing</code>) as a Custom Dimension with every hit to which this <code>customTask</code> is attached.</p>
+
+<p>Very useful for debugging, since you can now build segments where you directly refer to the hit type, which is not available (surprisingly) as a default dimension in Google Analytics.</p>
+
+<h3 id="12-automatically-reduce-payload-length">12. Automatically reduce payload length</h3>
+
+<p>Link to article: <a href="https://www.simoahava.com/analytics/automatically-reduce-google-analytics-payload-length/">Automatically Reduce Google Analytics Payload Length</a>.</p>
+
+<p>With this <code>customTask</code>, the payload sent to Google Analytics is automatically parsed and, if necessary, reduced to go under the maximum payload length of 8192 bytes.</p>
+
+<p>It&rsquo;s very typical especially with Enhanced Ecommerce to send very long payloads to Google Analytics. Unfortunately, if these payloads exceed the maximum length, the hits are never sent and key data will thus be missing from your data set.</p>
+
+<p>You can use this trick to recursively parse the payload and drop unnecessary parameters from it, which only serve to waste valuable space under the length cap.</p>
+
+<h3 id="13-create-and-update-a-session-cookie">13. Create and update a session cookie</h3>
+
+<p>Link to article: <a href="https://www.simoahava.com/analytics/create-and-update-google-analytics-session-timeout-cookie/">Create And Update Google Analytics Session Timeout Cookie</a>.</p>
+
+<p>This trick creates (or updates) a browser cookie which expires after a timeout you have configured (30 minutes by default).</p>
+
+<p>Each hit that uses this <code>customTask</code> will refresh the cookie very time the hit is fired.</p>
+
+<p>Thus, if this cookie exists in the browser, it&rsquo;s an indication that there might well be a Google Analytics session active for the current user.</p>
+
+<p>You can use the cookie to block event hits from being dispatched to Google Analytics if there is no active session, for example.</p>
 
 <h2 id="putting-it-all-together-literally">Putting it all together (literally)</h2>
 
