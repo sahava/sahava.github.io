@@ -1,0 +1,789 @@
+
+
+  
+    
+  
+
+
+  
+
+
+
+
+
+  
+
+
+  
+
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta name="google-site-verification" content="xQwWI2KUfP9LbFKhw2CVLFtrMY6Czrla7L3PD2aBolA" />
+
+
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org", 
+  "@type": "BlogPosting",
+  "headline": "Tracking Cross-domain Iframes - Upgraded Solution | Simo Ahava's blog",
+  "image": "https://www.simoahava.com/images/2018/09/iframe-cross-domain.png",
+  "editor": "Simo Ahava",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Simo Ahava's blog",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://www.simoahava.com/images/simo.png",
+      "height": "393",
+      "width": "407"
+    }
+  },
+  "url": "https://www.simoahava.com/analytics/tracking-cross-domain-iframes-upgraded-solution/",
+  "datePublished": "2018-09-04T10:31:15+03:00",
+  "dateModified": "2018-09-04T10:31:15+03:00",
+  "description": "An upgraded solution (using customTask) to tracking iframes cross-domain when using Google Tag Manager and Google Analytics.",
+  "author": {
+    "@type": "Person",
+    "name": "Simo Ahava"
+  }
+}
+</script>
+
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Hugo 0.42.2 with theme Tranquilpeak 0.4.3-BETA">
+    <title>Tracking Cross-domain Iframes - Upgraded Solution | Simo Ahava's blog</title>
+    
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-PZ7GMV9');</script>
+    
+    <script src="//simoahava.disqus.com/count.js" id="dsq-count-scr" async></script>
+    <meta name="author" content="Simo Ahava">
+    <meta name="keywords" content="">
+
+    <link rel="icon" href="https://www.simoahava.com/images/favicon.ico">
+    
+    <link rel="amphtml" href="https://www.simoahava.com/amp/analytics/tracking-cross-domain-iframes-upgraded-solution/">
+    
+    <meta name="description" content="An upgraded solution (using customTask) to tracking iframes cross-domain when using Google Tag Manager and Google Analytics.">
+    <meta property="og:description" content="An upgraded solution (using customTask) to tracking iframes cross-domain when using Google Tag Manager and Google Analytics.">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="Tracking Cross-domain Iframes - Upgraded Solution">
+    <meta property="og:url" content="/analytics/tracking-cross-domain-iframes-upgraded-solution/">
+    <meta property="og:site_name" content="Simo Ahava&#39;s blog">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Tracking Cross-domain Iframes - Upgraded Solution">
+    <meta name="twitter:description" content="An upgraded solution (using customTask) to tracking iframes cross-domain when using Google Tag Manager and Google Analytics.">
+    
+      <meta name="twitter:creator" content="@SimoAhava">
+      
+    
+
+    
+    
+
+    
+      <meta property="og:image" content="https://www.simoahava.com/images/simo.png">
+    
+
+    
+      <meta name="twitter:image" content="https://www.simoahava.com/images/2018/09/iframe-cross-domain.png">  
+      <meta property="og:image" content="https://www.simoahava.com/images/2018/09/iframe-cross-domain.png">
+    
+    
+    
+
+    
+
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/jquery.fancybox.min.css" integrity="sha256-vuXZ9LGmmwtjqFX1F+EKin1ThZMub58gKULUyf0qECk=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/helpers/jquery.fancybox-thumbs.min.css" integrity="sha256-SEa4XYAHihTcEP1f5gARTB2K26Uk8PsndQYHQC1f4jU=" crossorigin="anonymous" />
+    
+    
+    <link rel="stylesheet" href="https://www.simoahava.com/css/style.css" />
+    
+    
+
+    
+      
+    
+    
+  </head>
+
+  <body>
+    <div id="blog">
+      <header id="header" data-behavior="4">
+  <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+  <div class="header-title">
+    <a class="header-title-link" href="https://www.simoahava.com/">Simo Ahava&#39;s blog</a>
+  </div>
+  
+</header>
+
+      <nav id="sidebar" data-behavior="4">
+  <div class="sidebar-container">
+    
+      <div class="sidebar-profile">
+        <a href="https://www.simoahava.com/">
+          <img class="sidebar-profile-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+        </a>
+        <h4 class="sidebar-profile-name">Simo Ahava</h4>
+        
+          <h5 class="sidebar-profile-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</h5>
+        
+      </div>
+    
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+      
+      <span class="sidebar-button-desc">Home</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+      
+      <span class="sidebar-button-desc">Categories</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tags/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Tags</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/gtm-tips/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-magic"></i>
+      
+      <span class="sidebar-button-desc">GTM Tips</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/about-simo-ahava/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+      
+      <span class="sidebar-button-desc">About</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tools/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-wrench"></i>
+      
+      <span class="sidebar-button-desc">Tools</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/blog-statistics/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bar-chart"></i>
+      
+      <span class="sidebar-button-desc">Blog statistics</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://github.com/sahava" target="_blank" rel="noopener">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+      
+      <span class="sidebar-button-desc">GitHub</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/upcoming-talks/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bullhorn"></i>
+      
+      <span class="sidebar-button-desc">Upcoming talks</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
+
+    </ul>
+  </div>
+</nav>
+
+      
+
+      <div id="main" data-behavior="4"
+        class="
+               hasCoverMetaIn
+               ">
+        <article class="post">
+	  <form id="search" action="/search/">
+  <input name="q" type="text" class="form-control input--xlarge" placeholder="Search blog..." autocomplete="off">
+  </form>
+
+          
+          
+            <div class="post-header main-content-wrap text-left">
+
+  
+
+    <h1>
+      Tracking Cross-domain Iframes - Upgraded Solution
+    </h1>
+  
+  
+  <div class="postShorten-meta post-meta">
+    
+      <time datetime="2018-09-04T10:31:15&#43;03:00">
+        
+  September 4, 2018
+
+      </time>
+    
+      
+  
+  
+    <span>in</span>
+    
+      <a class="category-link" href="https://www.simoahava.com/categories/analytics">Analytics</a>
+    
+  
+
+
+       | <a href="https://www.simoahava.com/analytics/tracking-cross-domain-iframes-upgraded-solution/#disqus_thread">Comments</a>
+  </div>
+
+
+</div>
+
+          
+          <div class="post-content markdown">
+            <div class="main-content-wrap">
+              
+
+<p>Some years ago, I wrote a post on <a href="https://www.simoahava.com/analytics/iframe-cross-domain-tracking-in-google-tag-manager/">how to track cross-domain iframes</a> when using <a href="https://tagmanager.google.com">Google Tag Manager</a> and <a href="https://analytics.google.com">Google Analytics</a>. That solution relied on <a href="https://www.simoahava.com/gtm-tips/hitcallback-eventcallback/"><code>hitCallback</code></a> to decorate the iframe, and now that I look back on it, it has its shortcomings.</p>
+
+<p>For one, the older solution used <code>hitCallback</code> which, while being reliable in that Google Analytics has definitely loaded with the linker plugin when the method is called, doesn&rsquo;t take into account the possible race condition of the script running before the iframe has been loaded.</p>
+
+<p>An additional problem was that the older solution simply grabbed the linker from the first Google Analytics tracker object on the page. But this might not be the one we want to use for the cross-domain tracking.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2018/09/iframe-cross-domain.png" title="Iframe Cross Domain">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2018/09/iframe-cross-domain.png#ZgotmplZ" alt="Iframe Cross Domain">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>In this solution, we&rsquo;ll use the wonderful <a href="https://www.simoahava.com/analytics/customtask-the-guide/"><code>customTask</code></a> to decorate the target iframe. The <code>customTask</code> leverages a <code>setInterval()</code> script which polls the page periodically until the target iframe is found or a timeout is reached.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2018/09/customtask-builder-iframe-decorator.png" title="customTask Builder - iframe decorator">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2018/09/customtask-builder-iframe-decorator.png#ZgotmplZ" alt="customTask Builder - iframe decorator">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>Naturally, this script has been added to my <a href="https://www.simoahava.com/tools/customtask-builder/">customTask Builder tool</a>.</p>
+
+<h2 id="the-customtask-itself">The customTask itself</h2>
+
+<p>This is what the <code>customTask</code> looks like. To deploy it, make sure you read the instructions in the <a href="https://www.simoahava.com/tools/customtask-builder/">customTask Builder tool</a> before copy-pasting the required code into your page JavaScript (if using the <a href="https://www.simoahava.com/tools/customtask-builder/#deployment-with-analytics-js">Universal Analytics on-page snippet</a>) or a Custom JavaScript variable (if using <a href="https://www.simoahava.com/tools/customtask-builder/#deployment-with-google-tag-manager">Google Tag Manager</a>).</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">iframeDecorator</span> <span style="color:#f92672">=</span> {
+    <span style="color:#a6e22e">selector</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;iframe#decorateMe&#39;</span>,
+    <span style="color:#a6e22e">attempts</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">10</span>,
+    <span style="color:#a6e22e">intervalMs</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">1000</span>,
+    <span style="color:#a6e22e">useAnchor</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">false</span>
+  };
+
+  <span style="color:#75715e">// DO NOT EDIT ANYTHING BELOW THIS LINE
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">globalSendHitTaskName</span>   <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;_ga_originalSendHitTask&#39;</span>;
+
+  <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">customTaskModel</span>) {
+
+    window[<span style="color:#a6e22e">globalSendHitTaskName</span>] <span style="color:#f92672">=</span> window[<span style="color:#a6e22e">globalSendHitTaskName</span>] <span style="color:#f92672">||</span> <span style="color:#a6e22e">customTaskModel</span>.<span style="color:#a6e22e">get</span>(<span style="color:#e6db74">&#39;sendHitTask&#39;</span>);
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">tempFieldObject</span>, <span style="color:#a6e22e">dimensionIndex</span>, <span style="color:#a6e22e">count</span>, <span style="color:#a6e22e">ga</span>, <span style="color:#a6e22e">tracker</span>, <span style="color:#a6e22e">decorateTimer</span>, <span style="color:#a6e22e">decorateIframe</span>, <span style="color:#a6e22e">iframe</span>;
+
+    <span style="color:#66d9ef">if</span> (<span style="color:#66d9ef">typeof</span> <span style="color:#a6e22e">iframeDecorator</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#39;object&#39;</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#66d9ef">typeof</span> <span style="color:#a6e22e">iframeDecorator</span>.<span style="color:#a6e22e">selector</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#39;string&#39;</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#66d9ef">typeof</span> <span style="color:#a6e22e">iframeDecorator</span>.<span style="color:#a6e22e">attempts</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#39;number&#39;</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#66d9ef">typeof</span> <span style="color:#a6e22e">iframeDecorator</span>.<span style="color:#a6e22e">intervalMs</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#39;number&#39;</span>) {
+      <span style="color:#a6e22e">count</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+      <span style="color:#a6e22e">ga</span> <span style="color:#f92672">=</span> window[window[<span style="color:#e6db74">&#39;GoogleAnalyticsObject&#39;</span>]];
+      <span style="color:#a6e22e">tracker</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ga</span>.<span style="color:#a6e22e">getByName</span>(<span style="color:#a6e22e">customTaskModel</span>.<span style="color:#a6e22e">get</span>(<span style="color:#e6db74">&#39;name&#39;</span>));
+      <span style="color:#a6e22e">decorateIframe</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>() {
+        <span style="color:#a6e22e">iframe</span> <span style="color:#f92672">=</span> document.<span style="color:#a6e22e">querySelector</span>(<span style="color:#a6e22e">iframeDecorator</span>.<span style="color:#a6e22e">selector</span>);
+        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">iframe</span> <span style="color:#f92672">!==</span> <span style="color:#66d9ef">null</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#e6db74">/[?&amp;]_ga=/</span>.<span style="color:#a6e22e">test</span>(<span style="color:#a6e22e">iframe</span>.<span style="color:#a6e22e">src</span>)) {
+          window.<span style="color:#a6e22e">clearInterval</span>(<span style="color:#a6e22e">decorateTimer</span>);
+          <span style="color:#66d9ef">return</span>;
+        }
+        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">iframe</span> <span style="color:#f92672">===</span> <span style="color:#66d9ef">null</span>) {
+          <span style="color:#a6e22e">count</span> <span style="color:#f92672">+=</span> <span style="color:#ae81ff">1</span>;
+          <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">count</span> <span style="color:#f92672">===</span> <span style="color:#a6e22e">iframeDecorator</span>.<span style="color:#a6e22e">attempts</span>) {
+            window.<span style="color:#a6e22e">clearInterval</span>(<span style="color:#a6e22e">decorateTimer</span>);
+          }
+          <span style="color:#66d9ef">return</span>;
+        }
+        window.<span style="color:#a6e22e">clearInterval</span>(<span style="color:#a6e22e">decorateTimer</span>);
+        <span style="color:#a6e22e">iframe</span>.<span style="color:#a6e22e">src</span> <span style="color:#f92672">=</span> (<span style="color:#66d9ef">new</span> window.<span style="color:#a6e22e">gaplugins</span>.<span style="color:#a6e22e">Linker</span>(<span style="color:#a6e22e">tracker</span>)).<span style="color:#a6e22e">decorate</span>(<span style="color:#a6e22e">iframe</span>.<span style="color:#a6e22e">src</span>, <span style="color:#a6e22e">iframeDecorator</span>.<span style="color:#a6e22e">useAnchor</span>);
+      };
+      <span style="color:#a6e22e">decorateTimer</span> <span style="color:#f92672">=</span> window.<span style="color:#a6e22e">setInterval</span>(<span style="color:#a6e22e">decorateIframe</span>, <span style="color:#a6e22e">iframeDecorator</span>.<span style="color:#a6e22e">intervalMs</span>);
+    }
+
+  };
+}
+</code></pre></div>
+
+<p>To begin with, make sure to edit the configuration object <code>iframeDecorator</code>. Set the parameters to their correct values.</p>
+
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Example value</th>
+<th>Description</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>selector</td>
+<td><code>&quot;#decorateMe&quot;</code></td>
+<td>String with the <a href="https://www.simoahava.com/gtm-tips/10-useful-css-selectors/">CSS selector</a> that matches the iframe you want to decorate.</td>
+</tr>
+
+<tr>
+<td>attempts</td>
+<td><code>10</code></td>
+<td>Number denoting how many times the page is polled for the iframe until the script stops trying.</td>
+</tr>
+
+<tr>
+<td>intervalMs</td>
+<td><code>1000</code></td>
+<td>Milliseconds between each attempt to find the iframe on the page.</td>
+</tr>
+
+<tr>
+<td>useAnchor</td>
+<td><code>false</code></td>
+<td>Whether to use a hash (<code>#</code>) instead of a URL query parameter to append the linker parameter to the iframe src.</td>
+</tr>
+</tbody>
+</table>
+
+<p>Once you&rsquo;ve edited these, you&rsquo;ll need to add this <code>customTask</code> to your trackers or tags.</p>
+
+<p>Make sure to add this <code>customTask</code> to a hit or tag that fires after (or shortly before) the iframe element has been added to the page. The script has a timeout which is <code>attempts * intervalMs</code> milliseconds, so if the script doesn&rsquo;t find the iframe by this timeout, the script will no longer poll the page, and the iframe will remain undecorated.</p>
+
+<p><strong>For example</strong>, if the iframe is in the page HTML template itself, it&rsquo;s typically enough to add this <code>customTask</code> to the Page View hit that fires as soon as the page starts to load (so <strong>All Pages</strong> trigger in GTM, or the on-page snippet if using Universal Analytics).</p>
+
+<p>But if the iframe is added in a modal upon the click of a button, for example, you&rsquo;ll want to fire a Google Analytics hit <em>with</em> that click, and then make sure to include this <code>customTask</code> in the hit.</p>
+
+<h2 id="how-it-works">How it works</h2>
+
+<p>When the hit to Google Analytics is generated, this <code>customTask</code> repeatedly asks the page: &ldquo;Is there an iframe that matches the given CSS selector?&rdquo;. If this iframe is found before the timeout (<code>attempts * intervalMs</code>), then the iframe path is decorated with the <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/linker">cross-domain linker parameter</a>.</p>
+
+<p>This, in turn, means that when the page within the iframe loads, the URL of the page will have the <code>_ga=</code> cross-domain linker parameter, which is then utilized by the first tag that fires in the iframe with the <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/linker#configuring_a_site_to_accept_linker_parameters"><code>allowLinker</code></a> flag set to <code>true</code>.</p>
+
+<h2 id="caveats">Caveats</h2>
+
+<p>Note that this <strong>only decorates the iframe <code>src</code> path</strong>. This is the only thing you can do from the source site, so if it doesn&rsquo;t work, you&rsquo;re out of luck with this solution. Some iframes might introduce a redirect when the original <code>src</code> is loaded, which often eliminates the query parameter from the URL. If this is the case, you can try setting the <code>useAnchor</code> parameter to <code>true</code>, which might be more resilient to redirects.</p>
+
+<blockquote>
+<p>If you&rsquo;re interested in a viable alternative to the linker parameter, take a look at the <code>postMessage API</code> introduced in <a href="https://www.lunametrics.com/blog/2015/11/24/tracking-complex-interactions-in-iframes-embedded-server-side-google-analytics-iframes-pt-4/">this great article</a> by Dan Wilkerson from LunaMetrics.</p>
+</blockquote>
+
+<p>Be wary, also, that this <code>customTask</code> uses the cookie configuration of the hit that the <code>customTask</code> was added to. So if this hit has an exceptional cookie configuration, it&rsquo;s possible the linker is built with the wrong Client ID.</p>
+
+<p>In other words, make sure you are aware of any modifications to the default cookie settings in the tracker, hit or tag to which the <code>customTask</code> is added.</p>
+
+<p>There is no real penalty to adding this <code>customTask</code> directly to the tracker or all your Universal Analytics tags. If the iframe already has a cross-domain parameter in the <code>src</code> value, the script simply stops attempting to decorate the iframe.</p>
+
+<h2 id="summary">Summary</h2>
+
+<p>This is an alternative approach to my <a href="https://www.simoahava.com/analytics/iframe-cross-domain-tracking-in-google-tag-manager/">original solution</a> of using <code>hitCallback</code> to decorate the iframe. In my humble opinion, I think this <code>customTask</code> wipes the floor with my original idea, so I&rsquo;m fully recommending using this instead.</p>
+
+<p>My feelings on iframes haven&rsquo;t really changed since writing the original article, so I&rsquo;ll just include the relevant excerpt here for you to sympathize with.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2018/09/iframes-suck.png" title="iframes suck">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2018/09/iframes-suck.png#ZgotmplZ" alt="iframes suck">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>If you want to vent, please let me know what you think about iframes in the comments of this article.</p>
+
+              
+
+            </div>
+          </div>
+          <div id="post-footer" class="post-footer main-content-wrap">
+            
+              
+                
+                
+                  <div class="post-footer-tags">
+                    <span class="text-color-light text-small">TAGGED IN</span><br/>
+                    
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/google-tag-manager/">google tag manager</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/customtask/">customtask</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/universal-analytics/">universal analytics</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/cross-domain/">cross-domain</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/iframe/">iframe</a>
+
+                  </div>
+                
+              
+            
+            
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--disabled">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/create-and-update-google-analytics-session-timeout-cookie/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/tracking-cross-domain-iframes-upgraded-solution/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Tracking%20Cross-domain%20Iframes%20-%20Upgraded%20Solution%20https://www.simoahava.com/analytics/tracking-cross-domain-iframes-upgraded-solution/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://www.simoahava.com/analytics/tracking-cross-domain-iframes-upgraded-solution/">
+              <i class="fa fa-google-plus"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/tracking-cross-domain-iframes-upgraded-solution/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#disqus">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+            
+              
+                <span id="disqus"></span>
+<div id="disqus_thread">
+  <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+
+              
+            
+          </div>
+        </article>
+        <footer id="footer" class="main-content-wrap">
+  <span class="copyrights">
+    &copy; 2018 Simo Ahava. All Rights Reserved
+  </span>
+</footer>
+
+      </div>
+      
+      <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+        
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--disabled">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/create-and-update-google-analytics-session-timeout-cookie/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/tracking-cross-domain-iframes-upgraded-solution/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Tracking%20Cross-domain%20Iframes%20-%20Upgraded%20Solution%20https://www.simoahava.com/analytics/tracking-cross-domain-iframes-upgraded-solution/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://www.simoahava.com/analytics/tracking-cross-domain-iframes-upgraded-solution/">
+              <i class="fa fa-google-plus"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/tracking-cross-domain-iframes-upgraded-solution/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#disqus">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+      </div>
+      
+      <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+  <i id="btn-close-shareoptions" class="fa fa-close"></i>
+  <ul class="share-options">
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/tracking-cross-domain-iframes-upgraded-solution/">
+          <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=Tracking%20Cross-domain%20Iframes%20-%20Upgraded%20Solution%20https://www.simoahava.com/analytics/tracking-cross-domain-iframes-upgraded-solution/%20via%20@SimoAhava">
+          <i class="fa fa-twitter"></i><span>Share on Twitter</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://www.simoahava.com/analytics/tracking-cross-domain-iframes-upgraded-solution/">
+          <i class="fa fa-google-plus"></i><span>Share on Google&#43;</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/tracking-cross-domain-iframes-upgraded-solution/">
+          <i class="fa fa-linkedin"></i><span>Share on LinkedIn</span>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+<div id="share-options-mask" class="share-options-mask"></div>
+
+    </div>
+    
+    <div id="about">
+  <div id="about-card">
+    <div id="about-btn-close">
+      <i class="fa fa-remove"></i>
+    </div>
+    
+      <img id="about-card-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+    
+    <h4 id="about-card-name">Simo Ahava</h4>
+    
+      <div id="about-card-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</div>
+    
+    
+      <div id="about-card-job">
+        <i class="fa fa-briefcase"></i>
+        <br/>
+        Senior Data Advocate at Reaktor
+      </div>
+    
+    
+      <div id="about-card-location">
+        <i class="fa fa-map-marker"></i>
+        <br/>
+        Finland
+      </div>
+    
+  </div>
+</div>
+
+    
+  
+    
+    <div id="cover" style="background-image:url('https://www.simoahava.com/images/maisema.jpg');"></div>
+  
+
+
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.7/js/jquery.fancybox.min.js" integrity="sha256-GEAnjcTqVP+vBp3SSc8bEDQqvWAZMiHyUSIorrWwH50=" crossorigin="anonymous"></script>
+
+
+<script src="https://www.simoahava.com/js/script.js"></script>
+
+
+
+
+  
+    
+      <script>
+        
+
+
+
+
+
+        (function() {
+          
+          
+          if (window.location.hostname == "localhost") {
+            return;
+          }
+          var d = document, s = d.createElement('script');
+          var disqus_shortname = 'simoahava';
+          s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      </script>
+    
+  
+
+
+
+    
+  </body>
+</html>
+

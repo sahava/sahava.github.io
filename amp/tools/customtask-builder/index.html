@@ -118,7 +118,7 @@
 
 <meta itemprop="datePublished" content="2018-08-15T07:26:32&#43;00:00" />
 <meta itemprop="dateModified" content="2018-08-15T07:26:32&#43;00:00" />
-<meta itemprop="wordCount" content="1224">
+<meta itemprop="wordCount" content="1382">
 
 
 
@@ -331,6 +331,8 @@
                     <li class="nav-opened" role="presentation"><a href="https://www.simoahava.com/amp/tags/cookies/">cookies</a></li>
                 
                     <li class="nav-opened" role="presentation"><a href="https://www.simoahava.com/amp/tags/creative/">creative</a></li>
+                
+                    <li class="nav-opened" role="presentation"><a href="https://www.simoahava.com/amp/tags/cross-domain/">cross-domain</a></li>
                 
                     <li class="nav-opened" role="presentation"><a href="https://www.simoahava.com/amp/tags/cross-domain-tracking/">cross-domain-tracking</a></li>
                 
@@ -874,6 +876,9 @@ Simo Ahava
       <tr>
         <td data-customtask-id='sc' data-customtask-selected='false'>Update Session Cookie</td>
       </tr>
+      <tr>
+        <td data-customtask-id='id' data-customtask-selected='false'>Decorate Cross-domain Iframes</td>
+      </tr>
     </tbody>
   </table>
 
@@ -926,14 +931,15 @@ Simo Ahava
       var copyBtn = document.querySelector('#copy');
 
       var rowsInCode = {
-        cid: [7,8,9,10,52,53,54,55,56,57],
-        ht: [11,12,13,14,58,59,60,61,62,63],
-        pl: [15,16,17,18,108,109,110,111,112,113,114,115,116],
-        rcd: [19,20,21,22,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79],
-        dh: [23,24,25,26,132,133,134,135,136,137,138,139,140,141,142],
-        pr: [27,28,29,30,31,32,33,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107],
-        sp: [34,35,36,37,119,120,121,122,123,124,125,126,127,128,129,130,131],
-        sc: [38,39,40,41,42,43,44,144,145,146,147,149,149,150,151,152,153,154]
+        cid: [7,8,9,10,62,63,64,65,66,67],
+        ht: [11,12,13,14,68,69,70,71,72,73],
+        pl: [15,16,17,18,142,143,144,145,146,147,148,149,150],
+        rcd: [19,20,21,22,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88],
+        dh: [23,24,25,26,166,167,168,169,170,171,172,173,174,175,176],
+        pr: [27,28,29,30,31,32,33,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141],
+        sp: [34,35,36,37,153,154,155,156,157,158,159,160,161,162,163,164,165],
+        sc: [38,39,40,41,42,43,44,177,178,179,180,181,182,183,184,185,186,187,188],
+        id: [45,46,47,48,49,50,51,52,53,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113]
       };
 
       var result = document.querySelector('#result');
@@ -984,12 +990,22 @@ Simo Ahava
         "    domain: 'mydomain.com'",
         "  };",
         "",
+        "  // iframeDecorator: Configuration object for decorating any iframe with cross-domain parameters when this customTask is run.",
+        "  // https://bit.ly/2LUoWFf",
+        "  var iframeDecorator = {",
+        "    selector: 'iframe#decorateMe',",
+        "    attempts: 10,",
+        "    intervalMs: 1000,",
+        "    useAnchor: false",
+        "  };",
+        "",
         "  // DO NOT EDIT ANYTHING BELOW THIS LINE",
         "  var globalSendHitTaskName   = '_ga_originalSendHitTask';",
         "",
         "  return function(customTaskModel) {",
         "",
         "    window[globalSendHitTaskName] = window[globalSendHitTaskName] || customTaskModel.get('sendHitTask');",
+        "    var tempFieldObject, dimensionIndex, count, ga, tracker, decorateTimer, decorateIframe, iframe;",
         "",
         "    // clientIdIndex",
         "    if (typeof clientIdIndex === 'number') {",
@@ -1004,11 +1020,10 @@ Simo Ahava
         "    // /hitTypeIndex",
         "",
         "    // removeCustomDefinitionsFromTimingHits",
-        "    var tempFieldObject = {},",
-        "        dimensionIndex  = 1;",
-        "",
         "    if (typeof removeCustomDefinitionsFromTimingHits === 'boolean' && removeCustomDefinitionsFromTimingHits === true) {",
         "      if (customTaskModel.get('hitType') === 'timing') {",
+        "        tempFieldObject = {};",
+        "        dimensionIndex = 1;",
         "        while (dimensionIndex !== 201) {",
         "          tempFieldObject['dimension' + dimensionIndex] = undefined;",
         "          tempFieldObject['metric' + dimensionIndex] = undefined;",
@@ -1018,6 +1033,31 @@ Simo Ahava
         "      }",
         "    }",
         "    // /removeCustomDefinitionsFromTimingHits",
+        "",
+        "    // iframeDecorator",
+        "    if (typeof iframeDecorator === 'object' && typeof iframeDecorator.selector === 'string' && typeof iframeDecorator.attempts === 'number' && typeof iframeDecorator.intervalMs === 'number') {",
+        "      count = 0;",
+        "      ga = window[window['GoogleAnalyticsObject']];",
+        "      tracker = ga.getByName(customTaskModel.get('name'));",
+        "      decorateIframe = function() {",
+        "        iframe = document.querySelector(iframeDecorator.selector);",
+        "        if (iframe !== null && /[?&]_ga=/.test(iframe.src)) {",
+        "          window.clearInterval(decorateTimer);",
+        "          return;",
+        "        }",
+        "        if (iframe === null) {",
+        "          count += 1;",
+        "          if (count === iframeDecorator.attempts) {",
+        "            window.clearInterval(decorateTimer);",
+        "          }",
+        "          return;",
+        "        }",
+        "        window.clearInterval(decorateTimer);",
+        "        iframe.src = (new window.gaplugins.Linker(tracker)).decorate(iframe.src, iframeDecorator.useAnchor);",
+        "      };",
+        "      decorateTimer = window.setInterval(decorateIframe, iframeDecorator.intervalMs);",
+        "    }",
+        "    // /iframeDecorator",
         "",
         "    customTaskModel.set('sendHitTask', function(sendHitTaskModel) {",
         "",
@@ -1063,7 +1103,7 @@ Simo Ahava
         "          hitPayload = sendHitTaskModel.get('hitPayload');",
         "          snowplowVendor = 'com.google.analytics';",
         "          snowplowVersion = 'v1';",
-        "          snowplowPath = (snowplowEndpoint.substring(-1) !== '/' ? snowplowEndpoint + '/' : snowplowEndpoint) + snowplowVendor + '/' + snowplowVersion;",
+        "          snowplowPath = (snowplowEndpoint.substring(snowplowEndpoint.length-1) !== '/' ? snowplowEndpoint + '/' : snowplowEndpoint) + snowplowVendor + '/' + snowplowVersion;",
         "          request = new XMLHttpRequest();",
         "          request.open('POST', snowplowPath, true);",
         "          request.setRequestHeader('Content-type', 'text/plain; charset=UTF-8');",
