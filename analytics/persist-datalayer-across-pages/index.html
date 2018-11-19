@@ -1,0 +1,978 @@
+
+
+  
+    
+  
+
+
+  
+
+
+
+
+
+  
+
+
+  
+
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta name="google-site-verification" content="xQwWI2KUfP9LbFKhw2CVLFtrMY6Czrla7L3PD2aBolA" />
+
+
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org", 
+  "@type": "BlogPosting",
+  "headline": "Persist Google Tag Manager&#39;s dataLayer Across Pages | Simo Ahava's blog",
+  "image": "https://www.simoahava.com/images/2018/11/persist-datalayer.png",
+  "editor": "Simo Ahava",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Simo Ahava's blog",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://www.simoahava.com/images/simo.png",
+      "height": "393",
+      "width": "407"
+    }
+  },
+  "url": "https://www.simoahava.com/analytics/persist-datalayer-across-pages/",
+  "datePublished": "2018-11-19T12:09:33+02:00",
+  "dateModified": "2018-11-19T12:09:33+02:00",
+  "description": "Use this Custom HTML tag script to persist GTM's dataLayer (and data model) across pages until a given timeout is reached.",
+  "author": {
+    "@type": "Person",
+    "name": "Simo Ahava"
+  }
+}
+</script>
+
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Hugo 0.48 with theme Tranquilpeak 0.4.3-BETA">
+    <title>Persist Google Tag Manager&#39;s dataLayer Across Pages | Simo Ahava's blog</title>
+    
+    <script>
+      window.dataLayer=window.dataLayer||[];window.dataLayer.push({pageType: 'article'});
+    </script>
+    
+
+    <script src="//de.cdn-v3.conductrics.com/ac-GeQBKxGTiA/v3/agent-api/js/f-TNZdDPOknZ/dt-8BnrVvfJuB1PwktQxXXgVK2OikZ9WR?apikey=api-WDrqMnckreSqejZgDAMu" type="text/javascript"></script>
+    
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-PZ7GMV9');</script>
+    
+    <script src="//simoahava.disqus.com/count.js" id="dsq-count-scr" async></script>
+    <meta name="author" content="Simo Ahava">
+    <meta name="keywords" content="">
+
+    <link rel="icon" href="https://www.simoahava.com/images/favicon.ico">
+    
+    <link rel="amphtml" href="https://www.simoahava.com/amp/analytics/persist-datalayer-across-pages/">
+    
+    <meta name="description" content="Use this Custom HTML tag script to persist GTM&#39;s dataLayer (and data model) across pages until a given timeout is reached.">
+    <meta property="og:description" content="Use this Custom HTML tag script to persist GTM&#39;s dataLayer (and data model) across pages until a given timeout is reached.">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="Persist Google Tag Manager&#39;s dataLayer Across Pages">
+    <meta property="og:url" content="/analytics/persist-datalayer-across-pages/">
+    <meta property="og:site_name" content="Simo Ahava&#39;s blog">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Persist Google Tag Manager&#39;s dataLayer Across Pages">
+    <meta name="twitter:description" content="Use this Custom HTML tag script to persist GTM&#39;s dataLayer (and data model) across pages until a given timeout is reached.">
+    
+      <meta name="twitter:creator" content="@SimoAhava">
+      
+    
+
+    
+    
+
+    
+      <meta property="og:image" content="https://www.simoahava.com/images/simo.png">
+    
+
+    
+      <meta name="twitter:image" content="https://www.simoahava.com/images/2018/11/persist-datalayer.png">  
+      <meta property="og:image" content="https://www.simoahava.com/images/2018/11/persist-datalayer.png">
+    
+    
+    
+
+    
+
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/jquery.fancybox.min.css" integrity="sha256-vuXZ9LGmmwtjqFX1F+EKin1ThZMub58gKULUyf0qECk=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/helpers/jquery.fancybox-thumbs.min.css" integrity="sha256-SEa4XYAHihTcEP1f5gARTB2K26Uk8PsndQYHQC1f4jU=" crossorigin="anonymous" />
+    
+    
+    <link rel="stylesheet" href="https://www.simoahava.com/css/style.css" />
+    
+    
+
+    
+      
+    
+    
+  </head>
+
+  <body>
+    <div id="blog">
+      <header id="header" data-behavior="4">
+  <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+  <div class="header-title">
+    <a class="header-title-link" href="https://www.simoahava.com/">Simo Ahava&#39;s blog</a>
+  </div>
+  
+</header>
+
+      <nav id="sidebar" data-behavior="4">
+  <div class="sidebar-container">
+    
+      <div class="sidebar-profile">
+        <a href="https://www.simoahava.com/">
+          <img class="sidebar-profile-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+        </a>
+        <h4 class="sidebar-profile-name">Simo Ahava</h4>
+        
+          <h5 class="sidebar-profile-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</h5>
+        
+      </div>
+    
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+      
+      <span class="sidebar-button-desc">Home</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+      
+      <span class="sidebar-button-desc">Categories</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tags/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Tags</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/gtm-tips/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-magic"></i>
+      
+      <span class="sidebar-button-desc">GTM Tips</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/about-simo-ahava/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+      
+      <span class="sidebar-button-desc">About</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tools/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-wrench"></i>
+      
+      <span class="sidebar-button-desc">Tools</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/blog-statistics/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bar-chart"></i>
+      
+      <span class="sidebar-button-desc">Blog statistics</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://github.com/sahava" target="_blank" rel="noopener">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+      
+      <span class="sidebar-button-desc">GitHub</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/upcoming-talks/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bullhorn"></i>
+      
+      <span class="sidebar-button-desc">Upcoming talks</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
+
+    </ul>
+  </div>
+</nav>
+
+      
+
+      <div id="main" data-behavior="4"
+        class="
+               hasCoverMetaIn
+               ">
+        <article class="post">
+	  <form id="search" action="/search/">
+  <input name="q" type="text" class="form-control input--xlarge" placeholder="Search blog..." autocomplete="off">
+  </form>
+
+          
+          
+            <div class="post-header main-content-wrap text-left">
+
+  
+
+    <h1>
+      Persist Google Tag Manager&#39;s dataLayer Across Pages
+    </h1>
+  
+  
+  <div class="postShorten-meta post-meta">
+    
+      <time datetime="2018-11-19T12:09:33&#43;02:00">
+        
+  November 19, 2018
+
+      </time>
+    
+      
+  
+  
+    <span>in</span>
+    
+      <a class="category-link" href="https://www.simoahava.com/categories/analytics">Analytics</a>
+    
+  
+
+
+       | <a href="https://www.simoahava.com/analytics/persist-datalayer-across-pages/#disqus_thread">Comments</a>
+  </div>
+
+
+</div>
+
+          
+          <div class="post-content markdown">
+            <div class="main-content-wrap">
+              
+
+<p>Four years ago, I wrote an article on <a href="https://www.simoahava.com/analytics/persist-datalayer-google-tag-manager/">how to persist GTM&rsquo;s <code>dataLayer</code> from page to page</a>. Unfortunately, the solution was a bit clumsy, requiring you to give specific <em>commands</em> for the interactions, which made it really unwieldy in the long run. <a href="https://tagmanager.google.com/">Google Tag Manager</a> still doesn&rsquo;t offer us a native way to persist the <code>dataLayer</code> array or its <a href="https://www.simoahava.com/analytics/google-tag-manager-data-model/">internal data model</a> from one page to the other, so I thought it was about time I revisit this idea.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2018/11/persist-datalayer.png" title="Persist dataLayer">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2018/11/persist-datalayer.png#ZgotmplZ" alt="Persist dataLayer">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>This time, there won&rsquo;t be an <em>API</em> to interact with. Instead, the solution will simply store the contents of the <code>dataLayer</code> array AND the internal data model from page to page, until the user hasn&rsquo;t interacted with GTM&rsquo;s <code>dataLayer</code> for a given amount of time.</p>
+
+<h2 id="setting-it-up">Setting it up</h2>
+
+<p>To set it up, you need to create a Custom HTML tag, in which you&rsquo;ll copy the following code. If you like, you can also copy the code from <a href="https://gist.github.com/sahava/baee63650eed471a2d1eac5825037a05">this gist</a>.</p>
+
+<h3 id="the-custom-html-tag-code">The Custom HTML tag code</h3>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
+  (<span style="color:#66d9ef">function</span>() {
+    <span style="color:#75715e">// Set the timeout for when the dataLayer history should be purged. The default is 30 minutes.
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">// The timeout needs to be in milliseconds.
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">timeout</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">30</span><span style="color:#f92672">*</span><span style="color:#ae81ff">60</span><span style="color:#f92672">*</span><span style="color:#ae81ff">1000</span>;
+    
+    <span style="color:#75715e">// Change dataLayerName only if you&#39;ve defined another named for the dataLayer array in your
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">// GTM container snippet.
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">dataLayerName</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;dataLayer&#39;</span>;
+    
+    <span style="color:#75715e">// Don&#39;t change anything below.
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">// Initial settings
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">initialLoad</span>     <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>,
+        <span style="color:#a6e22e">oldPush</span>         <span style="color:#f92672">=</span> window[<span style="color:#a6e22e">dataLayerName</span>].<span style="color:#a6e22e">push</span>;
+    
+    <span style="color:#75715e">// Method to copy items from dataLayer from before the GTM container snippet was loaded.
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">backfillHistory</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>() {
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">tempHistory</span> <span style="color:#f92672">=</span> [],
+          <span style="color:#a6e22e">i</span>           <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>,
+          <span style="color:#a6e22e">len</span>         <span style="color:#f92672">=</span> window[<span style="color:#a6e22e">dataLayerName</span>].<span style="color:#a6e22e">length</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>;
+      <span style="color:#66d9ef">for</span> (; <span style="color:#a6e22e">i</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">len</span>; <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span>) {
+        <span style="color:#a6e22e">tempHistory</span>.<span style="color:#a6e22e">push</span>(window[<span style="color:#a6e22e">dataLayerName</span>][<span style="color:#a6e22e">i</span>]);
+      }
+      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">tempHistory</span>;
+    };
+    
+    <span style="color:#75715e">// Method to check if object is a plain object.
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">// From https://bit.ly/2A3Fuqe
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">isPlainObject</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">value</span>) {
+      <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">value</span> <span style="color:#f92672">||</span> <span style="color:#66d9ef">typeof</span> <span style="color:#a6e22e">value</span> <span style="color:#f92672">!==</span> <span style="color:#e6db74">&#39;object&#39;</span> <span style="color:#f92672">||</span>    <span style="color:#75715e">// Nulls, dates, etc.
+</span><span style="color:#75715e"></span>          <span style="color:#a6e22e">value</span>.<span style="color:#a6e22e">nodeType</span> <span style="color:#f92672">||</span>                             <span style="color:#75715e">// DOM nodes.
+</span><span style="color:#75715e"></span>          <span style="color:#a6e22e">value</span> <span style="color:#f92672">===</span> <span style="color:#a6e22e">value</span>.window) {                      <span style="color:#75715e">// Window objects.
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span>;
+      }
+      <span style="color:#66d9ef">try</span> {
+        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">value</span>.<span style="color:#a6e22e">constructor</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#f92672">!</span><span style="color:#a6e22e">value</span>.<span style="color:#a6e22e">hasOwnProperty</span>(<span style="color:#e6db74">&#39;constructor&#39;</span>) <span style="color:#f92672">&amp;&amp;</span>
+            <span style="color:#f92672">!</span><span style="color:#a6e22e">value</span>.<span style="color:#a6e22e">constructor</span>.<span style="color:#a6e22e">prototype</span>.<span style="color:#a6e22e">hasOwnProperty</span>(<span style="color:#e6db74">&#39;isPrototypeOf&#39;</span>)) {
+          <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span>;
+        }
+      } <span style="color:#66d9ef">catch</span> (<span style="color:#a6e22e">e</span>) {
+        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span>;
+      }
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">key</span>;
+      <span style="color:#66d9ef">for</span> (<span style="color:#a6e22e">key</span> <span style="color:#66d9ef">in</span> <span style="color:#a6e22e">value</span>) {}
+      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">key</span> <span style="color:#f92672">===</span> <span style="color:#66d9ef">undefined</span> <span style="color:#f92672">||</span> <span style="color:#a6e22e">value</span>.<span style="color:#a6e22e">hasOwnProperty</span>(<span style="color:#a6e22e">key</span>);
+    };
+    
+    <span style="color:#75715e">// Method to merge the stored data model and the history model together.
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">// From https://bit.ly/2FrPQWL
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">mergeStates</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">storedModel</span>, <span style="color:#a6e22e">historyModel</span>) {
+      <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">property</span> <span style="color:#66d9ef">in</span> <span style="color:#a6e22e">storedModel</span>) {
+        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">storedModel</span>.<span style="color:#a6e22e">hasOwnProperty</span>(<span style="color:#a6e22e">property</span>)) {
+          <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">storedProperty</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">storedModel</span>[<span style="color:#a6e22e">property</span>];
+          <span style="color:#66d9ef">if</span> (Array.<span style="color:#a6e22e">isArray</span>(<span style="color:#a6e22e">storedProperty</span>)) {
+            <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>Array.<span style="color:#a6e22e">isArray</span>(<span style="color:#a6e22e">historyModel</span>[<span style="color:#a6e22e">property</span>])) <span style="color:#a6e22e">historyModel</span>[<span style="color:#a6e22e">property</span>] <span style="color:#f92672">=</span> [];
+            <span style="color:#a6e22e">mergeStates</span>(<span style="color:#a6e22e">storedProperty</span>, <span style="color:#a6e22e">historyModel</span>[<span style="color:#a6e22e">property</span>]);
+          } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">isPlainObject</span>(<span style="color:#a6e22e">storedProperty</span>)) {
+            <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">isPlainObject</span>(<span style="color:#a6e22e">historyModel</span>[<span style="color:#a6e22e">property</span>])) <span style="color:#a6e22e">historyModel</span>[<span style="color:#a6e22e">property</span>] <span style="color:#f92672">=</span> {};
+            <span style="color:#a6e22e">mergeStates</span>(<span style="color:#a6e22e">storedProperty</span>, <span style="color:#a6e22e">historyModel</span>[<span style="color:#a6e22e">property</span>]);
+          } <span style="color:#66d9ef">else</span> {
+            <span style="color:#a6e22e">historyModel</span>[<span style="color:#a6e22e">property</span>] <span style="color:#f92672">=</span> <span style="color:#a6e22e">storedProperty</span>;
+          }
+        }
+      }
+    };
+    
+    window[<span style="color:#a6e22e">dataLayerName</span>].<span style="color:#a6e22e">push</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>() {
+      <span style="color:#66d9ef">try</span> {
+        
+        <span style="color:#75715e">// Build the history array from local storage
+</span><span style="color:#75715e"></span>        window.<span style="color:#a6e22e">_dataLayerHistory</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(
+          window.<span style="color:#a6e22e">localStorage</span>.<span style="color:#a6e22e">getItem</span>(<span style="color:#e6db74">&#39;_dataLayerHistory&#39;</span>) <span style="color:#f92672">||</span> 
+          <span style="color:#e6db74">&#39;{&#34;timeout&#34;: null, &#34;history&#34;: [], &#34;model&#34;: {}}&#39;</span>
+        );
+        
+        <span style="color:#75715e">// Initial settings
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">timeNow</span>     <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Date().<span style="color:#a6e22e">getTime</span>(),
+            <span style="color:#a6e22e">states</span>      <span style="color:#f92672">=</span> [].<span style="color:#a6e22e">slice</span>.<span style="color:#a6e22e">call</span>(<span style="color:#a6e22e">arguments</span>, <span style="color:#ae81ff">0</span>),
+            <span style="color:#a6e22e">results</span>     <span style="color:#f92672">=</span> <span style="color:#a6e22e">oldPush</span>.<span style="color:#a6e22e">apply</span>(window[<span style="color:#a6e22e">dataLayerName</span>], <span style="color:#a6e22e">states</span>),
+            <span style="color:#a6e22e">oDataLayer</span>  <span style="color:#f92672">=</span> window[<span style="color:#a6e22e">dataLayerName</span>],
+            <span style="color:#a6e22e">dHistory</span>    <span style="color:#f92672">=</span> window.<span style="color:#a6e22e">_dataLayerHistory</span>,
+            <span style="color:#a6e22e">oDataModel</span>  <span style="color:#f92672">=</span> window.<span style="color:#a6e22e">google_tag_manager</span>[{{<span style="color:#a6e22e">Container</span> <span style="color:#a6e22e">ID</span>}}][<span style="color:#a6e22e">dataLayerName</span>].<span style="color:#a6e22e">get</span>({<span style="color:#a6e22e">split</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">function</span>() { <span style="color:#66d9ef">return</span> []; }});
+        
+        <span style="color:#75715e">// Method to reset the history array to the current page state only
+</span><span style="color:#75715e"></span>        <span style="color:#a6e22e">dHistory</span>.<span style="color:#a6e22e">reset</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>() {
+          <span style="color:#a6e22e">dHistory</span>.<span style="color:#a6e22e">timeout</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">null</span>;
+          <span style="color:#a6e22e">dHistory</span>.<span style="color:#a6e22e">history</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">backfillHistory</span>();
+          <span style="color:#a6e22e">dHistory</span>.<span style="color:#a6e22e">model</span> <span style="color:#f92672">=</span> {};
+          <span style="color:#a6e22e">mergeStates</span>(<span style="color:#a6e22e">oDataModel</span>, <span style="color:#a6e22e">dHistory</span>.<span style="color:#a6e22e">model</span>);
+          window.<span style="color:#a6e22e">localStorage</span>.<span style="color:#a6e22e">setItem</span>(<span style="color:#e6db74">&#39;_dataLayerHistory&#39;</span>, <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">dHistory</span>));
+        };
+      
+        <span style="color:#75715e">// From https://bit.ly/2A2ZcCG
+</span><span style="color:#75715e"></span>        <span style="color:#a6e22e">dHistory</span>.<span style="color:#a6e22e">model</span>.<span style="color:#a6e22e">get</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">key</span>) {
+          <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">target</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">dModel</span>;
+          <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">split</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">key</span>.<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#39;.&#39;</span>);
+          <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">i</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">split</span>.<span style="color:#a6e22e">length</span>; <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span>) {
+            <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">target</span>[<span style="color:#a6e22e">split</span>[<span style="color:#a6e22e">i</span>]] <span style="color:#f92672">===</span> <span style="color:#66d9ef">undefined</span>) <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">undefined</span>;
+            <span style="color:#a6e22e">target</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">target</span>[<span style="color:#a6e22e">split</span>[<span style="color:#a6e22e">i</span>]];
+          }
+          <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">target</span>;
+        };
+
+        <span style="color:#75715e">// Add history if this is the initialization event itself
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">initialLoad</span>) {
+          <span style="color:#a6e22e">dHistory</span>.<span style="color:#a6e22e">history</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">dHistory</span>.<span style="color:#a6e22e">history</span>.<span style="color:#a6e22e">concat</span>(<span style="color:#a6e22e">backfillHistory</span>());
+          <span style="color:#a6e22e">initialLoad</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>;
+        }
+        
+        <span style="color:#75715e">// If timeout is reached, reset the history array
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">dHistory</span>.<span style="color:#a6e22e">hasOwnProperty</span>(<span style="color:#e6db74">&#39;timeout&#39;</span>) <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">dHistory</span>.<span style="color:#a6e22e">timeout</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">timeNow</span>) {
+          <span style="color:#a6e22e">dHistory</span>.<span style="color:#a6e22e">reset</span>();
+        }
+        
+        <span style="color:#75715e">// Push latest item from dataLayer into the history array
+</span><span style="color:#75715e"></span>        <span style="color:#a6e22e">dHistory</span>.<span style="color:#a6e22e">history</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">oDataLayer</span>[<span style="color:#a6e22e">oDataLayer</span>.<span style="color:#a6e22e">length</span><span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>]);
+        
+        <span style="color:#75715e">// Merge GTM&#39;s data model with the history model
+</span><span style="color:#75715e"></span>        <span style="color:#a6e22e">mergeStates</span>(<span style="color:#a6e22e">oDataModel</span>, <span style="color:#a6e22e">dHistory</span>.<span style="color:#a6e22e">model</span>);
+        
+        <span style="color:#75715e">// Update the timeout
+</span><span style="color:#75715e"></span>        <span style="color:#a6e22e">dHistory</span>.<span style="color:#a6e22e">timeout</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">timeNow</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">timeout</span>;
+        
+        <span style="color:#75715e">// Write the new history into localStorage
+</span><span style="color:#75715e"></span>        window.<span style="color:#a6e22e">localStorage</span>.<span style="color:#a6e22e">setItem</span>(<span style="color:#e6db74">&#39;_dataLayerHistory&#39;</span>, <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">dHistory</span>));
+        <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">results</span>;
+      } <span style="color:#66d9ef">catch</span>(<span style="color:#a6e22e">e</span>) {
+        <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#39;Problem interacting with dataLayer history: &#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">e</span>);
+        <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">states</span>  <span style="color:#f92672">=</span> [].<span style="color:#a6e22e">slice</span>.<span style="color:#a6e22e">call</span>(<span style="color:#a6e22e">arguments</span>, <span style="color:#ae81ff">0</span>),
+            <span style="color:#a6e22e">results</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">oldPush</span>.<span style="color:#a6e22e">apply</span>(window[<span style="color:#a6e22e">dataLayerName</span>], <span style="color:#a6e22e">states</span>);
+        <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">results</span>;
+      }
+    };
+  })();
+&lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
+
+<p>In the very beginning of the snippet, there are two variables whose values you need to modify.</p>
+
+<p><code>var timeout = 30*60*1000;</code></p>
+
+<p>The line above establishes the <strong>timeout</strong> for the local storage. This means that once the user hasn&rsquo;t interacted with <code>dataLayer</code> for as long as you set in the timeout, the history will be reset to start from the current page. The default value is <strong>30 minutes</strong>, and if you want to modify it make sure you set the timeout in <strong>milliseconds</strong>, as in the default value.</p>
+
+<p><code>var dataLayerName = 'dataLayer';</code></p>
+
+<p>The line above is the name of the <code>dataLayer</code> array that Google Tag Manager uses, and it defaults to the unmodified container snippet. If you&rsquo;ve changed the <code>dataLayer</code> name in the container snippet, make sure it&rsquo;s updated here, too.</p>
+
+<h3 id="other-tag-settings">Other tag settings</h3>
+
+<p>In addition to copy-pasting the code above, set the <strong>Tag Priority</strong> value to <code>9999</code> or any number that&rsquo;s higher than any other Tag Priority for tags firing on the All Pages trigger.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2018/11/tag-priority.png" title="tag priority">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2018/11/tag-priority.png#ZgotmplZ" alt="tag priority">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<h3 id="trigger">Trigger</h3>
+
+<p>Set this Custom HTML tag to fire on the <strong>All Pages</strong> trigger. You want it to be the first tag that fires on the page. Naturally, if you have tags firing on an event that&rsquo;s pushed into <code>dataLayer</code> before the Google Tag Manager container snippet, you need to make sure this tag fires on <strong>that</strong> trigger instead.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2018/11/all-pages-trigger.png" title="All pages trigger">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2018/11/all-pages-trigger.png#ZgotmplZ" alt="All pages trigger">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<h2 id="how-it-works">How it works</h2>
+
+<p>Whenever something is pushed into <code>dataLayer</code>, it is also pushed into a new array under <code>window._dataLayerHistory</code>. This is a global object, and you can access it from anywhere on the page, including GTM&rsquo;s Custom HTML tags and Custom JavaScript variables.</p>
+
+<p>In addition to being added to this history array, this array is also consistently written into the <code>window.localStorage</code> structure, which persists across pages until the user decides to clear their browser storage.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2018/11/local-storage.png" title="browser localstorage">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2018/11/local-storage.png#ZgotmplZ" alt="browser localstorage">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>In short, there&rsquo;s a new <code>window._dataLayerHistory</code> object that contains information about all the items pushed into <code>dataLayer</code> across pages, and you can access this object from any JavaScript context on the page.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2018/11/datalayer-history.png" title="data layer history">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2018/11/datalayer-history.png#ZgotmplZ" alt="data layer history">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<h3 id="the-history-array">The history array</h3>
+
+<p>The array itself, representing the history of the <code>window.dataLayer</code> array, can be found at <code>window._dataLayerProxy.history</code>.</p>
+
+<p>When the Custom HTML tag is first loaded on any page, this history array is first <strong>back-filled</strong> with items from the current <code>window.dataLayer</code> that were pushed before the Custom HTML tag was fired. This is necessary, because the Custom HTML tag creates its own <code>.push()</code> listener only when it fires, at which point the <code>window.dataLayer</code> array will already contain items.</p>
+
+<p>One quirky thing you might notice is that if there&rsquo;s a <code>window.dataLayer.push()</code> call taking place in a <a href="https://www.simoahava.com/analytics/understanding-tag-sequencing-in-google-tag-manager/">tag sequence</a>, the object pushed into the history array will not contain the <code>gtm.uniqueEventId</code> key. There&rsquo;s not much I can do about this, unfortunately, but it shouldn&rsquo;t be a big deal.</p>
+
+<h3 id="the-data-model">The data model</h3>
+
+<p>If you&rsquo;re not familiar with <a href="https://www.simoahava.com/analytics/google-tag-manager-data-model/">GTM&rsquo;s data model</a>, it&rsquo;s essentially a lookup table to which GTM copies and merges the key-value pairs you push into the <code>dataLayer</code> array.</p>
+
+<p>It&rsquo;s important to understand this distinction, because GTM uses the internal data model for <strong>Data Layer variables</strong>.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2018/11/datalayer-model.png" title="data model">
+  
+    <img class="fig-img" src="https://www.simoahava.com/images/2018/11/datalayer-model.png#ZgotmplZ" alt="data model">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>The data model is also persisted from page to page in <code>window._dataLayerHistory.model</code>. This object has a <code>get()</code> method you can use to fetch data model values, just like GTM&rsquo;s own native interface does:</p>
+
+<p><code>window._dataLayerHistory.model.get('someOldVariableFromAPreviousPage');</code></p>
+
+<p>This might be useful. For example, if your site writes to <code>dataLayer</code> something like <code>{userLoggedIn: true}</code> when the user logs into the site, but it only does this when the user actual logs in, you can fetch this value on later pages by querying the history object:</p>
+
+<p><code>window._dataLayerHistory.model.get('userLoggedIn');</code></p>
+
+<p>The history model applies the same type of <strong>recursive merge</strong> that GTM does with its internal data model. This might lead to unexpected outcomes with objects and arrays, so be sure to read up on <a href="https://www.simoahava.com/analytics/google-tag-manager-data-model/#add-and-modify-the-key">recursive merge</a> before moving on.</p>
+
+<h3 id="reset">Reset</h3>
+
+<p>You can also reset the history by executing this command:</p>
+
+<p><code>window._dataLayerHistory.reset();</code></p>
+
+<p>This nulls the timeout and resets the history array and history model to the states of the current page, thus removing any history from both. It also resets the object stored in browser storage to this, reset state.</p>
+
+<h2 id="applications">Applications</h2>
+
+<p>There are many things you could do with a persistent <code>dataLayer</code> and data model. Here are some examples.</p>
+
+<h3 id="get-number-of-pages-loaded">Get number of pages loaded</h3>
+
+<p>To identify how many pages the user has visited, you could have a Custom JavaScript variable that does this:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
+  <span style="color:#66d9ef">return</span> window.<span style="color:#a6e22e">_dataLayerHistory</span>.<span style="color:#a6e22e">history</span>.<span style="color:#a6e22e">filter</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">obj</span>) { <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">event</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#39;gtm.js&#39;</span>; }).<span style="color:#a6e22e">length</span>;
+}
+</code></pre></div>
+
+<p>This returns the number of times that the <code>gtm.js</code> event has been pushed into <code>dataLayer</code>, and you can use this as a reasonably good proxy for determining how many pages the user has visited. Note that if you use either <a href="https://developers.google.com/analytics/devguides/collection/gtagjs/">gtag.js</a> or <a href="https://marketingplatform.google.com/about/optimize/">Google Optimize</a>, this variable might not return an accurate result.</p>
+
+<h3 id="check-the-entire-datalayer-history-for-some-key-or-value">Check the entire <code>dataLayer</code> history for some key or value</h3>
+
+<p>Here&rsquo;s an extension of <a href="https://www.simoahava.com/analytics/search-datalayer-for-key-value-pair/">this solution</a> I wrote for the <code>window.dataLayer</code> array (i.e. the <code>dataLayer</code> of the <strong>current</strong> page only). With this, you can search the entire history of the <code>dataLayer</code> array for a given key-value pair. This is what the modified Custom JavaScript variable looks like:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
+  <span style="color:#75715e">// Modify the searchObject below.
+</span><span style="color:#75715e"></span>  <span style="color:#75715e">//
+</span><span style="color:#75715e"></span>  <span style="color:#75715e">// Add each key-value pair you want to look for directly into the searchObject object. Use
+</span><span style="color:#75715e"></span>  <span style="color:#75715e">// strings for keys. 
+</span><span style="color:#75715e"></span>  <span style="color:#75715e">//
+</span><span style="color:#75715e"></span>  <span style="color:#75715e">// The variable will look for any key-value pair you specify, and return true if any one of them
+</span><span style="color:#75715e"></span>  <span style="color:#75715e">// is found. If you use dot notation, the variable will try to find a key with this name first,
+</span><span style="color:#75715e"></span>  <span style="color:#75715e">// after which it will parse the nested structure looking for a match.
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">searchObject</span> <span style="color:#f92672">=</span> {
+    <span style="color:#e6db74">&#39;user.consentGiven&#39;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;false&#39;</span>
+  };
+  
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">dataLayerName</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;_dataLayerHistory&#39;</span>;
+  
+  <span style="color:#75715e">// Don&#39;t edit anything below this line.
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">getValueForObjectString</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">obj</span>, <span style="color:#a6e22e">key</span>) {
+    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">key</span>.<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#34;.&#34;</span>).<span style="color:#a6e22e">reduce</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">o</span>, <span style="color:#a6e22e">x</span>) {
+        <span style="color:#66d9ef">return</span> (<span style="color:#66d9ef">typeof</span> <span style="color:#a6e22e">o</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;undefined&#34;</span> <span style="color:#f92672">||</span> <span style="color:#a6e22e">o</span> <span style="color:#f92672">===</span> <span style="color:#66d9ef">null</span>) <span style="color:#f92672">?</span> <span style="color:#a6e22e">o</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">o</span>[<span style="color:#a6e22e">x</span>];
+    }, <span style="color:#a6e22e">obj</span>);
+  };
+  
+  <span style="color:#66d9ef">return</span> window[<span style="color:#a6e22e">dataLayerName</span>].<span style="color:#a6e22e">filter</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">obj</span>) {
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">found</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>;
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">prop</span>;
+    
+    <span style="color:#66d9ef">for</span> (<span style="color:#a6e22e">prop</span> <span style="color:#66d9ef">in</span> <span style="color:#a6e22e">searchObject</span>) {
+      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">obj</span>[<span style="color:#a6e22e">prop</span>] <span style="color:#f92672">==</span> <span style="color:#a6e22e">searchObject</span>[<span style="color:#a6e22e">prop</span>] <span style="color:#f92672">||</span> <span style="color:#a6e22e">getValueForObjectString</span>(<span style="color:#a6e22e">obj</span>, <span style="color:#a6e22e">prop</span>) <span style="color:#f92672">==</span> <span style="color:#a6e22e">searchObject</span>[<span style="color:#a6e22e">prop</span>]) {
+        <span style="color:#a6e22e">found</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>;
+      }
+    }
+    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">found</span>;
+  }).<span style="color:#a6e22e">length</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>;
+}
+</code></pre></div>
+
+<h2 id="summary">Summary</h2>
+
+<p>You can use this script to persist the <code>dataLayer</code> array as well as Google Tag Manager&rsquo;s internal data model from one page to the next.</p>
+
+<p>It&rsquo;s not foolproof. For example, it doesn&rsquo;t understand <strong>command arrays</strong> or <strong>command functions</strong>, and it doesn&rsquo;t understand any manual <code>.set()</code> commands you run against GTM&rsquo;s own, internal data model. (Note, if any of the terms in this paragraph were alien to you, please read my article on <a href="https://www.simoahava.com/analytics/google-tag-manager-data-model/">GTM&rsquo;s internal data model</a>).</p>
+
+<p>As always, this was more a tech demo than a turnkey solution. Please let me know in the comments if you have uses for this kind of a solution. Also, if you have improvement suggestions, let me know of those, too!</p>
+
+              
+
+            </div>
+          </div>
+          <div id="post-footer" class="post-footer main-content-wrap">
+            
+              
+                
+                
+                  <div class="post-footer-tags">
+                    <span class="text-color-light text-small">TAGGED IN</span><br/>
+                    
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/google-tag-manager/">google tag manager</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/datalayer/">datalayer</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/localstorage/">localstorage</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/data-model/">data model</a>
+
+                  </div>
+                
+              
+            
+            
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--disabled">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/search-datalayer-for-key-value-pair/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/persist-datalayer-across-pages/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Persist%20Google%20Tag%20Manager%27s%20dataLayer%20Across%20Pages%20https://www.simoahava.com/analytics/persist-datalayer-across-pages/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://www.simoahava.com/analytics/persist-datalayer-across-pages/">
+              <i class="fa fa-google-plus"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/persist-datalayer-across-pages/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#disqus">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+            
+              
+                <span id="disqus"></span>
+<div id="disqus_thread">
+  <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+
+              
+            
+          </div>
+        </article>
+        <footer id="footer" class="main-content-wrap">
+  <span class="copyrights">
+    &copy; 2018 Simo Ahava. All Rights Reserved
+  </span>
+</footer>
+
+      </div>
+      
+      <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+        
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--disabled">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/search-datalayer-for-key-value-pair/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/persist-datalayer-across-pages/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Persist%20Google%20Tag%20Manager%27s%20dataLayer%20Across%20Pages%20https://www.simoahava.com/analytics/persist-datalayer-across-pages/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://www.simoahava.com/analytics/persist-datalayer-across-pages/">
+              <i class="fa fa-google-plus"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/persist-datalayer-across-pages/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#disqus">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+      </div>
+      
+      <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+  <i id="btn-close-shareoptions" class="fa fa-close"></i>
+  <ul class="share-options">
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/persist-datalayer-across-pages/">
+          <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=Persist%20Google%20Tag%20Manager%27s%20dataLayer%20Across%20Pages%20https://www.simoahava.com/analytics/persist-datalayer-across-pages/%20via%20@SimoAhava">
+          <i class="fa fa-twitter"></i><span>Share on Twitter</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://www.simoahava.com/analytics/persist-datalayer-across-pages/">
+          <i class="fa fa-google-plus"></i><span>Share on Google&#43;</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/persist-datalayer-across-pages/">
+          <i class="fa fa-linkedin"></i><span>Share on LinkedIn</span>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+<div id="share-options-mask" class="share-options-mask"></div>
+
+    </div>
+    
+    <div id="about">
+  <div id="about-card">
+    <div id="about-btn-close">
+      <i class="fa fa-remove"></i>
+    </div>
+    
+      <img id="about-card-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+    
+    <h4 id="about-card-name">Simo Ahava</h4>
+    
+      <div id="about-card-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</div>
+    
+    
+      <div id="about-card-job">
+        <i class="fa fa-briefcase"></i>
+        <br/>
+        Senior Data Advocate at Reaktor
+      </div>
+    
+    
+      <div id="about-card-location">
+        <i class="fa fa-map-marker"></i>
+        <br/>
+        Finland
+      </div>
+    
+  </div>
+</div>
+
+    
+  
+    
+    <div id="cover" style="background-image:url('https://www.simoahava.com/images/maisema.jpg');"></div>
+  
+
+
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.7/js/jquery.fancybox.min.js" integrity="sha256-GEAnjcTqVP+vBp3SSc8bEDQqvWAZMiHyUSIorrWwH50=" crossorigin="anonymous"></script>
+
+
+<script src="https://www.simoahava.com/js/script.js"></script>
+
+
+
+
+  
+    
+      <script>
+        
+
+
+
+
+
+        (function() {
+          
+          
+          if (window.location.hostname == "localhost") {
+            return;
+          }
+          var d = document, s = d.createElement('script');
+          var disqus_shortname = 'simoahava';
+          s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      </script>
+    
+  
+
+
+
+    
+  </body>
+</html>
+
