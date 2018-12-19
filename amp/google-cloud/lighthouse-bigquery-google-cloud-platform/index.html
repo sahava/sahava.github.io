@@ -130,7 +130,7 @@
 
 <meta itemprop="datePublished" content="2018-12-18T09:03:08&#43;02:00" />
 <meta itemprop="dateModified" content="2018-12-18T09:03:08&#43;02:00" />
-<meta itemprop="wordCount" content="4030">
+<meta itemprop="wordCount" content="4040">
 
 
 
@@ -1257,9 +1257,11 @@ git version <span class="m">2</span>.19.2</code></pre></div>
 </tbody>
 </table>
 
-<p>If you don&rsquo;t want to set any flags for lighthouse, or if you don&rsquo;t want to write anything to a Google Cloud Storage bucket, you can (and should) remove the respective fields from the configuration.</p>
+<p>The only optional field is <code>lighthouseFlags</code>. If you don&rsquo;t set <code>lighthouseFlags.output</code> to an array of available filetypes, no reports will be written to Google Cloud Storage. The other field provided by default is <code>emulatedFormFactor</code>, which specifies that the performance audit should emulate a desktop browser.</p>
 
-<p>The <code>minTimeBetweenTriggers</code> flag is used to add a wait time before you can audit any given ID again. The Cloud Functions service doesn&rsquo;t guarantee that a function is run just once per trigger. This means that any code that&rsquo;s run should aim to be <em>idempotent</em>; that is, multiple executions of the code in a short amount of time should not result in additional state changes (e.g. BigQuery loads). I ended up using a simple stateful mechanism in Google Cloud Storage. A file named <code>states.json</code> is written into the root of the GCS bucket, and this contains timestamps for when each trigger last activated its respective event. If this activation was less than 60 seconds ago (or whatever you specify in the configuration file), the function will abort.</p>
+<p>The <code>minTimeBetweenTriggers</code> flag is used to add a wait time before you can audit any given ID again. The Cloud Functions service doesn&rsquo;t guarantee that a function is run just once per trigger. This means that any code that&rsquo;s run should aim to be <em>idempotent</em>; that is, multiple executions of the code in a short amount of time should not result in additional state changes (e.g. BigQuery loads).</p>
+
+<p>I ended up using a simple stateful mechanism in Google Cloud Storage. A file named <code>states.json</code> is written into the root of the GCS bucket, and this contains timestamps for when each trigger last activated its respective event. If this activation was less than 300 seconds ago (or whatever you specify in the configuration file), the function will abort.</p>
 
 <p>Once done with the configuration, save the changes you made.</p>
 
