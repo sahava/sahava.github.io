@@ -1,0 +1,1085 @@
+
+
+  
+    
+  
+
+
+  
+
+
+
+
+
+  
+
+
+  
+
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta name="google-site-verification" content="xQwWI2KUfP9LbFKhw2CVLFtrMY6Czrla7L3PD2aBolA" />
+
+
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org", 
+  "@type": "BlogPosting",
+  "headline": "Scrape The URLs Of A Domain And Write The Results To Bigquery | Simo Ahava's blog",
+  "image": "https://www.simoahava.com/images/2018/12/bigquery-status-codes.jpg",
+  "editor": "Simo Ahava",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Simo Ahava's blog",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://www.simoahava.com/images/simo.png",
+      "height": "393",
+      "width": "407"
+    }
+  },
+  "url": "https://www.simoahava.com/google-cloud/scrape-domain-and-write-results-to-bigquery/",
+  "datePublished": "2018-12-31T11:14:06+02:00",
+  "dateModified": "2018-12-31T11:14:06+02:00",
+  "description": "Use a Google Compute Engine virtual machine to scrape all the internal (and external) links of a given domain, and write the results to a BigQuery table.",
+  "author": {
+    "@type": "Person",
+    "name": "Simo Ahava"
+  }
+}
+</script>
+
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Hugo 0.48 with theme Tranquilpeak 0.4.3-BETA">
+    <title>Scrape The URLs Of A Domain And Write The Results To Bigquery | Simo Ahava's blog</title>
+    
+    <script>
+      window.dataLayer=window.dataLayer||[];window.dataLayer.push({pageType: 'article'});
+    </script>
+    
+
+    <script src="https://www.simoahava.com/x-js/lazyload.iife.min.js"></script>
+
+    <script src="//de.cdn-v3.conductrics.com/ac-GeQBKxGTiA/v3/agent-api/js/f-TNZdDPOknZ/dt-8BnrVvfJuB1PwktQxXXgVK2OikZ9WR?apikey=api-WDrqMnckreSqejZgDAMu" type="text/javascript"></script>
+
+    
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-PZ7GMV9');</script>
+    
+    <script src="//simoahava.disqus.com/count.js" id="dsq-count-scr" async></script>
+    <meta name="author" content="Simo Ahava">
+    <meta name="keywords" content="">
+
+    <link rel="icon" href="https://www.simoahava.com/images/favicon.ico">
+    
+    <link rel="amphtml" href="https://www.simoahava.com/amp/google-cloud/scrape-domain-and-write-results-to-bigquery/">
+    
+    <meta name="description" content="Use a Google Compute Engine virtual machine to scrape all the internal (and external) links of a given domain, and write the results to a BigQuery table.">
+    <meta property="og:description" content="Use a Google Compute Engine virtual machine to scrape all the internal (and external) links of a given domain, and write the results to a BigQuery table.">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="Scrape The URLs Of A Domain And Write The Results To Bigquery">
+    <meta property="og:url" content="/google-cloud/scrape-domain-and-write-results-to-bigquery/">
+    <meta property="og:site_name" content="Simo Ahava&#39;s blog">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Scrape The URLs Of A Domain And Write The Results To Bigquery">
+    <meta name="twitter:description" content="Use a Google Compute Engine virtual machine to scrape all the internal (and external) links of a given domain, and write the results to a BigQuery table.">
+    
+      <meta name="twitter:creator" content="@SimoAhava">
+      
+    
+
+    
+    
+
+    
+      <meta property="og:image" content="https://www.simoahava.com/images/simo.png">
+    
+
+    
+      <meta name="twitter:image" content="https://www.simoahava.com/images/2018/12/bigquery-status-codes.jpg">  
+      <meta property="og:image" content="https://www.simoahava.com/images/2018/12/bigquery-status-codes.jpg">
+    
+    
+    
+
+    
+
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/jquery.fancybox.min.css" integrity="sha256-vuXZ9LGmmwtjqFX1F+EKin1ThZMub58gKULUyf0qECk=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/helpers/jquery.fancybox-thumbs.min.css" integrity="sha256-SEa4XYAHihTcEP1f5gARTB2K26Uk8PsndQYHQC1f4jU=" crossorigin="anonymous" />
+    
+    
+    <link rel="stylesheet" href="https://www.simoahava.com/css/style.css" />
+    
+    
+
+    
+      
+    
+    
+  </head>
+
+  <body>
+    <div id="blog">
+      <header id="header" data-behavior="4">
+  <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+  <div class="header-title">
+    <a class="header-title-link" href="https://www.simoahava.com/">Simo Ahava&#39;s blog</a>
+  </div>
+  
+</header>
+
+      <nav id="sidebar" data-behavior="4">
+  <div class="sidebar-container">
+    
+      <div class="sidebar-profile">
+        <a href="https://www.simoahava.com/">
+          <img class="sidebar-profile-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+        </a>
+        <h4 class="sidebar-profile-name">Simo Ahava</h4>
+        
+          <h5 class="sidebar-profile-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</h5>
+        
+      </div>
+    
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+      
+      <span class="sidebar-button-desc">Home</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+      
+      <span class="sidebar-button-desc">Categories</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tags/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Tags</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/gtm-tips/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-magic"></i>
+      
+      <span class="sidebar-button-desc">GTM Tips</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/about-simo-ahava/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+      
+      <span class="sidebar-button-desc">About</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tools/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-wrench"></i>
+      
+      <span class="sidebar-button-desc">Tools</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/blog-statistics/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bar-chart"></i>
+      
+      <span class="sidebar-button-desc">Blog statistics</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://github.com/sahava" target="_blank" rel="noopener">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+      
+      <span class="sidebar-button-desc">GitHub</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/upcoming-talks/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bullhorn"></i>
+      
+      <span class="sidebar-button-desc">Upcoming talks</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
+
+    </ul>
+  </div>
+</nav>
+
+      
+
+      <div id="main" data-behavior="4"
+        class="
+               hasCoverMetaIn
+               ">
+        <article class="post">
+	  <form id="search" action="/search/">
+  <input name="q" type="text" class="form-control input--xlarge" placeholder="Search blog..." autocomplete="off">
+  </form>
+
+          
+          
+            <div class="post-header main-content-wrap text-left">
+
+  
+
+    <h1>
+      Scrape The URLs Of A Domain And Write The Results To Bigquery
+    </h1>
+  
+  
+  <div class="postShorten-meta post-meta">
+    
+      <time datetime="2018-12-31T11:14:06&#43;02:00">
+        
+  December 31, 2018
+
+      </time>
+    
+      
+  
+  
+    <span>in</span>
+    
+      <a class="category-link" href="https://www.simoahava.com/categories/google-cloud">Google Cloud</a>
+    
+  
+
+
+       | <a href="https://www.simoahava.com/google-cloud/scrape-domain-and-write-results-to-bigquery/#disqus_thread">Comments</a>
+  </div>
+
+
+</div>
+
+          
+          <div class="post-content markdown">
+            <div class="main-content-wrap">
+              
+
+<p>In my intense love affair with the <a href="https://cloud.google.com/">Google Cloud Platform</a>, I&rsquo;ve never felt more inspired to write content and try things out. After starting with a <a href="https://www.simoahava.com/analytics/install-snowplow-on-the-google-cloud-platform/">Snowplow Analytics setup guide</a>, and continuing with a <a href="https://www.simoahava.com/google-cloud/lighthouse-bigquery-google-cloud-platform/">Lighthouse audit automation tutorial</a>, I&rsquo;m going to show you yet another cool thing you can do with GCP.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2018/12/bigquery-status-codes.jpg" title="BigQuery status codes">
+  
+    <img class="fig-img lazy" data-src="/images/2018/12/bigquery-status-codes.jpg#ZgotmplZ" alt="BigQuery status codes">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>In this guide, I&rsquo;ll show you how to use an <a href="https://github.com/yujiosaka/headless-chrome-crawler">open-source web crawler</a> running in a <a href="https://cloud.google.com/compute/">Google Compute Engine</a> virtual machine (VM) instance to scrape all the internal and external links of a given domain, and write the results into a <a href="https://cloud.google.com/bigquery/">BigQuery table</a>. With this setup, you can audit and monitor the links in any website, looking for bad status codes or missing titles, and fix them to improve your site&rsquo;s logical architecture.</p>
+
+<h1 id="table-of-contents">Table of Contents</h1><nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#how-it-works">How it works</a></li>
+<li><a href="#preparations">Preparations</a>
+<ul>
+<li><a href="#install-command-line-tools">Install command line tools</a></li>
+<li><a href="#set-up-a-new-google-cloud-platform-project-with-billing">Set up a new Google Cloud Platform project with Billing</a></li>
+<li><a href="#clone-the-github-repo-and-edit-the-configuration">Clone the Github repo and edit the configuration</a></li>
+<li><a href="#upload-the-configuration-to-gcs">Upload the configuration to GCS</a></li>
+<li><a href="#edit-the-install-script">Edit the install script</a></li>
+<li><a href="#make-sure-the-required-services-have-been-enabled-in-google-cloud-platform">Make sure the required services have been enabled in Google Cloud Platform</a></li>
+</ul></li>
+<li><a href="#create-the-gce-vm-instance">Create the GCE VM instance</a></li>
+<li><a href="#check-to-see-if-it-works">Check to see if it works</a></li>
+<li><a href="#final-thoughts">Final thoughts</a></li>
+</ul></li>
+</ul>
+</nav>
+
+<h2 id="how-it-works">How it works</h2>
+
+<p>The idea is fairly simple. You&rsquo;re using a <strong>Google Compute Engine</strong> VM instance to run the crawler script. The purpose here is that you can scale the instance up as much as you like (and can afford) to get the extra power you might now have with your local machine.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2018/12/compute-engine-instance.jpg" title="Compute engine instance">
+  
+    <img class="fig-img lazy" data-src="/images/2018/12/compute-engine-instance.jpg#ZgotmplZ" alt="Compute engine instance">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>The crawler runs through the pages of the domain you specify in the <strong>configuration</strong>, and writes the results into a <strong>BigQuery</strong> table.</p>
+
+<p>There are only a few moving parts here. Whenever you want to run the crawl again, all you need to do is just start the instance again. You won&rsquo;t be charged for the time the instance is stopped (the script auto-stops the instance once the crawl is done), so you can simply leave the instance in its stopped state until you need to do a recrawl.</p>
+
+<p>You could even create a <a href="https://cloud.google.com/functions/">Google Cloud Function</a> that starts the instance with a trigger (an HTTP request or a <a href="https://cloud.google.com/pubsub/docs/">Pub/Sub message</a>, for example). There are many ways to skin this cat, too!</p>
+
+<p>The configuration also has a setting for utilizing a <a href="https://redis.io/">Redis</a> cache by way of <a href="https://cloud.google.com/memorystore/">GCP Memorystore</a>, for example. The cache is useful if you have a huuuuuuge domain to crawl and you want to be able to pause/resume the crawl, or even utilize more than one VM instance to do the crawl.</p>
+
+<p>The <strong>cost</strong> of running this setup really depends on how big the crawl is and how much power you dedicate to the VM instance.</p>
+
+<p>On my own site, the ~7500 links and images being crawled take about 10 minutes on a 16 CPU, 60 GB instance (without Redis) VM instance. This translates to a couple of euros per crawl. I could scale down the instance for a lower cost, and I&rsquo;m sure there are other ways of optimizing it, too.</p>
+
+<h2 id="preparations">Preparations</h2>
+
+<p>The preparations are almost the same as in my <a href="https://www.simoahava.com/google-cloud/lighthouse-bigquery-google-cloud-platform/">earlier articles</a>, but with some simplifications.</p>
+
+<h3 id="install-command-line-tools">Install command line tools</h3>
+
+<p>Start by installing the following CLI tools:</p>
+
+<ol>
+<li><p><a href="https://cloud.google.com/sdk/">Google Cloud SDK</a></p></li>
+
+<li><p><a href="https://git-scm.com/downloads">Git</a></p></li>
+</ol>
+
+<p>To verify you have these up and running, run the following commands in your terminal:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ gcloud -v
+Google Cloud SDK <span style="color:#ae81ff">228</span>.0.0
+
+$ git --version
+git version <span style="color:#ae81ff">2</span>.19.2</code></pre></div>
+
+<h3 id="set-up-a-new-google-cloud-platform-project-with-billing">Set up a new Google Cloud Platform project with Billing</h3>
+
+<p>Follow the steps <a href="https://www.simoahava.com/google-cloud/lighthouse-bigquery-google-cloud-platform/#set-up-a-new-google-cloud-platform-project-with-billing">here</a>, and make sure you write down the Project ID since you&rsquo;ll need it in a number of places. I&rsquo;ll use my example of <code>web-scraper-gcp</code> in this guide.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2018/12/web-scraper-gcp-project.jpg" title="New project">
+  
+    <img class="fig-img lazy" data-src="/images/2018/12/web-scraper-gcp-project.jpg#ZgotmplZ" alt="New project">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<h3 id="clone-the-github-repo-and-edit-the-configuration">Clone the Github repo and edit the configuration</h3>
+
+<p>Before getting things up and running in GCP, you&rsquo;ll need to create a <strong>configuration</strong> file first.</p>
+
+<p>The easiest way to access the necessary files is to clone the <a href="https://www.github.com/">Github</a> repo for this project.</p>
+
+<ol>
+<li><p>Browse to a local directory where you want to write the contents of the repo to.</p></li>
+
+<li><p>Run the following command to write the files into a new folder named <code>web-scraper-gcp/</code>:</p></li>
+</ol>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ git clone https://github.com/sahava/web-scraper-gcp.git</code></pre></div>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2018/12/web-scraper-dir.jpg" title="Web scraper directory">
+  
+    <img class="fig-img lazy" data-src="/images/2018/12/web-scraper-dir.jpg#ZgotmplZ" alt="Web scraper directory">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>Next, run the command <code>mv config.json.sample config.json</code> while in the <code>web-scraper-gcp/</code> directory.</p>
+
+<p>Finally, open the file <code>config.json</code> for editing in your favorite text editor. Here&rsquo;s what the sample file looks like:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">{
+  <span style="color:#f92672">&#34;domain&#34;</span>: <span style="color:#e6db74">&#34;www.gtmtools.com&#34;</span>,
+  <span style="color:#f92672">&#34;startUrl&#34;</span>: <span style="color:#e6db74">&#34;https://www.gtmtools.com/&#34;</span>,
+  <span style="color:#f92672">&#34;projectId&#34;</span>: <span style="color:#e6db74">&#34;web-scraper-gcp&#34;</span>,
+  <span style="color:#f92672">&#34;bigQuery&#34;</span>: {
+    <span style="color:#f92672">&#34;datasetId&#34;</span>: <span style="color:#e6db74">&#34;web_scraper_gcp&#34;</span>,
+    <span style="color:#f92672">&#34;tableId&#34;</span>: <span style="color:#e6db74">&#34;crawl_results&#34;</span>
+  },
+  <span style="color:#f92672">&#34;redis&#34;</span>: {
+    <span style="color:#f92672">&#34;active&#34;</span>: <span style="color:#66d9ef">false</span>,
+    <span style="color:#f92672">&#34;host&#34;</span>: <span style="color:#e6db74">&#34;10.0.0.3&#34;</span>,
+    <span style="color:#f92672">&#34;port&#34;</span>: <span style="color:#ae81ff">6379</span>
+  }
+}</code></pre></div>
+
+<p>Here&rsquo;s an explanation of what the fields are and what you&rsquo;ll need to do.</p>
+
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td><code>&quot;domain&quot;</code></td>
+<td><code>&quot;gtmtools.com&quot;</code></td>
+<td>This is used for determining what is an <strong>internal</strong> and what is an <strong>external</strong> URL. The check will be a pattern match, so if the crawled URL <em>includes</em> this string, it will be considered an internal URL.</td>
+</tr>
+
+<tr>
+<td><code>&quot;startUrl&quot;</code></td>
+<td><code>&quot;https://www.gtmtools.com/&quot;</code></td>
+<td>A fully qualified URL address that represents the entry point of the crawl.</td>
+</tr>
+
+<tr>
+<td><code>&quot;projectId&quot;</code></td>
+<td><code>&quot;web-scraper-gcp&quot;</code></td>
+<td>The Google Cloud Platform project ID.</td>
+</tr>
+
+<tr>
+<td><code>&quot;bigQuery.datasetId&quot;</code></td>
+<td><code>&quot;web_scraper_gcp&quot;</code></td>
+<td>The ID of the BigQuery dataset the script will attempt to create. You must follow the <a href="https://cloud.google.com/bigquery/docs/datasets#create-dataset">naming rules</a>.</td>
+</tr>
+
+<tr>
+<td><code>&quot;bigQuery.tableId&quot;</code></td>
+<td><code>&quot;crawl_results&quot;</code></td>
+<td>The ID of the table the script will attempt to create. You must follow the <a href="https://cloud.google.com/bigquery/docs/tables#create-table">naming rules</a>.</td>
+</tr>
+
+<tr>
+<td><code>&quot;redis.active&quot;</code></td>
+<td><code>false</code></td>
+<td>Set to <code>true</code> if you want to use a <strong>Redis</strong> cache to persist the crawl queue.</td>
+</tr>
+
+<tr>
+<td><code>&quot;redis.host&quot;</code></td>
+<td><code>&quot;10.0.0.3&quot;</code></td>
+<td>Set to the IP address via which the script can connect to the Redis instance.</td>
+</tr>
+
+<tr>
+<td><code>&quot;redis.port&quot;</code></td>
+<td><code>6379</code></td>
+<td>Set to the port number of the Redis instance (usually <code>6379</code>).</td>
+</tr>
+</tbody>
+</table>
+
+<p>Once you&rsquo;ve edited the configuration, you&rsquo;ll need to upload it to a Google Cloud Storage bucket.</p>
+
+<h3 id="upload-the-configuration-to-gcs">Upload the configuration to GCS</h3>
+
+<p>Browse to <a href="https://console.cloud.google.com/storage/browser">https://console.cloud.google.com/storage/browser</a> and make sure you have the correct project selected.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2018/12/gcs-correct-project.jpg" title="GCS correct project">
+  
+    <img class="fig-img lazy" data-src="/images/2018/12/gcs-correct-project.jpg#ZgotmplZ" alt="GCS correct project">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>Next, <strong>create a new bucket</strong> in a region nearby, and give it an easy-to-remember name.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2018/12/new-gcs-bucket-nearline.jpg" title="New GCS bucket">
+  
+    <img class="fig-img lazy" data-src="/images/2018/12/new-gcs-bucket-nearline.jpg#ZgotmplZ" alt="New GCS bucket">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>Once done, enter the bucket, choose <strong>Upload files</strong>, and locate the <code>config.json</code> file from your local computer and upload it into the bucket.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2018/12/config-json-in-bucket.jpg" title="Upload file to GCS">
+  
+    <img class="fig-img lazy" data-src="/images/2018/12/config-json-in-bucket.jpg#ZgotmplZ" alt="Upload file to GCS">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<h3 id="edit-the-install-script">Edit the install script</h3>
+
+<p>The Git repo you downloaded comes with a file named <code>gce-install.sh</code>. This script will be used to fire up the VM instance with the correct settings (and it will initiate the crawl when started). However, you&rsquo;ll need to edit the file so that it knows where to fetch your configuration file from. So, **open the <code>gce-install.sh</code> file for editing.</p>
+
+<p>Edit the following line:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">bucket<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;gs://web-scraper-config/config.json&#39;</span></code></pre></div>
+
+<p>Change the <code>web-scraper-config</code> part to the name of the bucket you just created. So if you named the bucket <code>my-configuration-bucket</code>, you&rsquo;d change the line to this:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">bucket<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;gs://my-configuration-bucket/config.json&#39;</span></code></pre></div>
+
+<h3 id="make-sure-the-required-services-have-been-enabled-in-google-cloud-platform">Make sure the required services have been enabled in Google Cloud Platform</h3>
+
+<p>Final preparatory step is to make sure you have the required services enabled in Google Cloud Platform.</p>
+
+<ol>
+<li><p>Browse <a href="https://console.cloud.google.com/apis/api/compute.googleapis.com">here</a>, and make sure the Compute Engine API has been enabled.</p></li>
+
+<li><p>Browse <a href="https://console.cloud.google.com/apis/api/bigquery-json.googleapis.com">here</a>, and make sure the BigQuery API has been enabled.</p></li>
+
+<li><p>Browse <a href="https://console.cloud.google.com/apis/api/storage-component.googleapis.com">here</a>, and make sure the Google Cloud Storage API has been enabled.</p></li>
+</ol>
+
+<h2 id="create-the-gce-vm-instance">Create the GCE VM instance</h2>
+
+<p>Now you&rsquo;re ready to create the Google Compute Engine instance, firing it up with your install script. Here&rsquo;s what&rsquo;s going to happen when you do so:</p>
+
+<ol>
+<li><p>Once the instance is created, it will run the <code>gce-install.sh</code> script. In fact, it will run this script whenever you start the instance again.</p></li>
+
+<li><p>The script will install all the required dependencies to run the web crawler. There&rsquo;s quite a few of them because running a headless Chrome browser in a virtual machine isn&rsquo;t the most trivial operation.</p></li>
+
+<li><p>The penultimate step of the install script is to run the Node app containing the code I&rsquo;ve written to perform the crawl task.</p></li>
+
+<li><p>The Node app will grab the <code>startUrl</code> and BigQuery information from the configuration file (downloaded from the GCS bucket), and will crawl the domain, writing the results into BigQuery.</p></li>
+
+<li><p>Once the crawl is complete, the VM instance will shut itself down.</p></li>
+</ol>
+
+<p>To create the instance, you&rsquo;ll need to run this command:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ gcloud compute instances create web-scraper-gcp <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>      --metadata-from-file<span style="color:#f92672">=</span>startup-script<span style="color:#f92672">=</span>./gce-install.sh <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>      --scopes<span style="color:#f92672">=</span>bigquery,cloud-platform
+      --machine-type<span style="color:#f92672">=</span>n1-standard-16 <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>      --zone<span style="color:#f92672">=</span>europe-north1-a</code></pre></div>
+
+<p>Edit the <code>machine-type</code> and <code>zone</code> if you want to have the instance run on a different CPU/memory profile, and/or if you want to run it in a different zone. You can find a list of the machine types <a href="https://cloud.google.com/compute/docs/machine-types">here</a>, and a list of zones <a href="https://cloud.google.com/compute/docs/regions-zones/">here</a>.</p>
+
+<p>Once done, you should see something like this:</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2018/12/gce-create-command.jpg" title="GCE Create command">
+  
+    <img class="fig-img lazy" data-src="/images/2018/12/gce-create-command.jpg#ZgotmplZ" alt="GCE Create command">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<h2 id="check-to-see-if-it-works">Check to see if it works</h2>
+
+<p>First, head on over to the <a href="https://console.cloud.google.com/compute/instances">instance list</a>, and make sure you see the instance running (you should see a green checkmark next to it):</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2018/12/vm-instance-running.jpg" title="VM instance running">
+  
+    <img class="fig-img lazy" data-src="/images/2018/12/vm-instance-running.jpg#ZgotmplZ" alt="VM instance running">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>Naturally, the fact that it&rsquo;s running doesn&rsquo;t really tell you much, yet.</p>
+
+<p>Next, head on over to <a href="https://console.cloud.google.com/bigquery">BigQuery</a>. You should see your project in the navigator, so click it open. Under the project, you should see a dataset and a table.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2018/12/dataset-table.jpg" title="Dataset and table">
+  
+    <img class="fig-img lazy" data-src="/images/2018/12/dataset-table.jpg#ZgotmplZ" alt="Dataset and table">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>If you see them, the next step is to run a simple query in the <strong>query editor</strong>. Click the table name in the navigator, and then click the <strong>QUERY TABLE</strong> link. The Query editor should be pre-filled with a table query, so between the <code>SELECT</code> and <code>FROM</code> keywords, type: <code>count(*)</code>. This is what the query should end up looking like:</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2018/12/select-count.jpg" title="Select count(*)">
+  
+    <img class="fig-img lazy" data-src="/images/2018/12/select-count.jpg#ZgotmplZ" alt="Select count(*)">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>Finally, click the <strong>Run</strong> button.</p>
+
+<p>This will run the query against the BigQuery table. The crawl is still probably running, but thanks to <strong>streaming inserts</strong> it is constantly adding rows to the table. The query should return a result that shows you how many rows there are in the table currently:</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2018/12/test-query.jpg" title="Test the query">
+  
+    <img class="fig-img lazy" data-src="/images/2018/12/test-query.jpg#ZgotmplZ" alt="Test the query">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>If you see a result, it means the whole thing is working! Keep on monitoring the size of the table. Once the crawl finishes, the virtual machine instance will shut down, and you&rsquo;ll be able to see it in its stopped state.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2018/12/stopped-instance.jpg" title="Stopped instance">
+  
+    <img class="fig-img lazy" data-src="/images/2018/12/stopped-instance.jpg#ZgotmplZ" alt="Stopped instance">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<h2 id="final-thoughts">Final thoughts</h2>
+
+<p>First of all, this was an <strong>exercise</strong>. I&rsquo;m fully aware of awesome crawling tools such as <a href="https://www.screamingfrog.co.uk/seo-spider/">Screaming Frog</a>, which you can use to achieve very much the same thing.</p>
+
+<p>However, this setup has some cool features:</p>
+
+<ol>
+<li><p>You can modify the crawler with additional <a href="https://github.com/yujiosaka/headless-chrome-crawler/blob/master/docs/API.md">options</a>, AND you can pass <a href="https://github.com/GoogleChrome/puppeteer/blob/v1.11.0/docs/api.md">flags</a> to the <a href="https://github.com/GoogleChrome/puppeteer">Puppeteer</a> instance running in the background.</p></li>
+
+<li><p>Since this crawler uses a headless browser, it works better on dynamically generated sites than a regular HTTP request crawler. It actually generates the JavaScript and crawls the dynamic links, too.</p></li>
+
+<li><p>Because it writes the data to BigQuery, you can monitor the status codes and link integrity of your website in tools like Google Data Studio.</p></li>
+</ol>
+
+<p>Anyway, I didn&rsquo;t set out to create a tool that replaces some of the stuff already out there. Instead, I wanted to show you how easy it is to run scripts and perform tasks in the Google Cloud.</p>
+
+<p>Let me know in the comments if you&rsquo;re having trouble with this setup! I&rsquo;m happy to see where the problem might lie.</p>
+
+              
+
+            </div>
+          </div>
+          <div id="post-footer" class="post-footer main-content-wrap">
+            
+              
+                
+                
+                  <div class="post-footer-tags">
+                    <span class="text-color-light text-small">TAGGED IN</span><br/>
+                    
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/google-cloud/">google cloud</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/bigquery/">bigquery</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/nodejs/">nodejs</a>
+
+                  </div>
+                
+              
+            
+            
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--disabled">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/how-to-unset-a-user-scoped-custom-dimension-in-google-analytics/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/google-cloud/scrape-domain-and-write-results-to-bigquery/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Scrape%20The%20URLs%20Of%20A%20Domain%20And%20Write%20The%20Results%20To%20Bigquery%20https://www.simoahava.com/google-cloud/scrape-domain-and-write-results-to-bigquery/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://www.simoahava.com/google-cloud/scrape-domain-and-write-results-to-bigquery/">
+              <i class="fa fa-google-plus"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/google-cloud/scrape-domain-and-write-results-to-bigquery/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#disqus">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+            
+              
+                <span id="disqus"></span>
+<div id="disqus_thread">
+  <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+
+              
+            
+          </div>
+        </article>
+        <footer id="footer" class="main-content-wrap">
+  <span class="copyrights">
+    &copy; 2018 Simo Ahava. All Rights Reserved
+  </span>
+</footer>
+
+      </div>
+      
+      <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+        
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--disabled">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/how-to-unset-a-user-scoped-custom-dimension-in-google-analytics/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/google-cloud/scrape-domain-and-write-results-to-bigquery/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Scrape%20The%20URLs%20Of%20A%20Domain%20And%20Write%20The%20Results%20To%20Bigquery%20https://www.simoahava.com/google-cloud/scrape-domain-and-write-results-to-bigquery/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://www.simoahava.com/google-cloud/scrape-domain-and-write-results-to-bigquery/">
+              <i class="fa fa-google-plus"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/google-cloud/scrape-domain-and-write-results-to-bigquery/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#disqus">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+      </div>
+      
+      <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+  <i id="btn-close-shareoptions" class="fa fa-close"></i>
+  <ul class="share-options">
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/google-cloud/scrape-domain-and-write-results-to-bigquery/">
+          <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=Scrape%20The%20URLs%20Of%20A%20Domain%20And%20Write%20The%20Results%20To%20Bigquery%20https://www.simoahava.com/google-cloud/scrape-domain-and-write-results-to-bigquery/%20via%20@SimoAhava">
+          <i class="fa fa-twitter"></i><span>Share on Twitter</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://www.simoahava.com/google-cloud/scrape-domain-and-write-results-to-bigquery/">
+          <i class="fa fa-google-plus"></i><span>Share on Google&#43;</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/google-cloud/scrape-domain-and-write-results-to-bigquery/">
+          <i class="fa fa-linkedin"></i><span>Share on LinkedIn</span>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+<div id="share-options-mask" class="share-options-mask"></div>
+
+    </div>
+    
+    <div id="about">
+  <div id="about-card">
+    <div id="about-btn-close">
+      <i class="fa fa-remove"></i>
+    </div>
+    
+      <img id="about-card-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+    
+    <h4 id="about-card-name">Simo Ahava</h4>
+    
+      <div id="about-card-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</div>
+    
+    
+      <div id="about-card-job">
+        <i class="fa fa-briefcase"></i>
+        <br/>
+        Senior Data Advocate at Reaktor
+      </div>
+    
+    
+      <div id="about-card-location">
+        <i class="fa fa-map-marker"></i>
+        <br/>
+        Finland
+      </div>
+    
+  </div>
+</div>
+
+    
+  
+    
+    <div id="cover" style="background-image:url('https://www.simoahava.com/images/maisema.jpg');"></div>
+  
+
+
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.7/js/jquery.fancybox.min.js" integrity="sha256-GEAnjcTqVP+vBp3SSc8bEDQqvWAZMiHyUSIorrWwH50=" crossorigin="anonymous"></script>
+
+
+<script src="https://www.simoahava.com/js/script.js"></script>
+
+
+
+
+  
+    
+      <script>
+        
+
+
+
+
+
+        (function() {
+          
+          
+          if (window.location.hostname == "localhost") {
+            return;
+          }
+          var d = document, s = d.createElement('script');
+          var disqus_shortname = 'simoahava';
+          s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      </script>
+    
+  
+
+
+    <script>
+      var mylazyload = new LazyLoad({elements_selector: '.lazy'});
+      </script>
+
+    
+  </body>
+</html>
+
