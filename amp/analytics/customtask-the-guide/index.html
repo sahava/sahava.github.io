@@ -128,7 +128,7 @@
 
 <meta itemprop="datePublished" content="2018-02-21T07:15:38&#43;02:00" />
 <meta itemprop="dateModified" content="2018-02-21T07:15:38&#43;02:00" />
-<meta itemprop="wordCount" content="3507">
+<meta itemprop="wordCount" content="3670">
 
 
 
@@ -1185,6 +1185,18 @@ on
 <p>The idea is that when the hit is built, the <code>customTask</code> looks for the given iframe on the page, and if it&rsquo;s found within a configured timeout, the iframe is reloaded with cross-domain tracking parameters.</p>
 
 <p>This is a more elegant way to approach the problem of cross-domain iframes, because it skips past the race condition of running the script before the iframe has been loaded on the page, and it also uses the correct tracker object instead of just the first tracker on the page.</p>
+
+<h3 id="15-prevent-duplicate-transactions-from-being-sent">15. Prevent duplicate transactions from being sent</h3>
+
+<p>Link to article: <a href="https://www.simoahava.com/amp/analytics/prevent-google-analytics-duplicate-transactions-with-customtask/">Prevent Duplicate Transactions In Google Analytics With customTask</a>.</p>
+
+<p>Again an update to an <a href="https://www.simoahava.com/amp/gtm-tips/prevent-repeat-transactions/">old trick</a>.</p>
+
+<p>In this solution, <code>customTask</code> stores all sent <strong>TransactionIDs</strong> in the browser. Once a transaction hit is queued for dispatching to GA, the <code>customTask</code> checks if the hit&rsquo;s Transaction ID is found in this list of IDs that have already been sent. If a match is made, the hit is blocked, thus preventing duplicated data from being sent to GA.</p>
+
+<p>If no match is made, the hit is sent normally, and the Transaction ID is written into the list of sent IDs, so that any future attempt to send a transaction with this ID will be blocked.</p>
+
+<p>Contrary to the older solution, this upgraded method will block Enhanced Ecommerce as well. For Standard Ecommerce, you can (and should) still use the <code>customTask</code>, but you&rsquo;ll still need to use triggers and exceptions. This is all detailed behind the link above.</p>
 
 <h2 id="putting-it-all-together-literally">Putting it all together (literally)</h2>
 
