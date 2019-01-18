@@ -128,7 +128,7 @@
 
 <meta itemprop="datePublished" content="2018-12-06T07:00:22&#43;02:00" />
 <meta itemprop="dateModified" content="2018-12-06T07:00:22&#43;02:00" />
-<meta itemprop="wordCount" content="7782">
+<meta itemprop="wordCount" content="8188">
 
 
 
@@ -862,6 +862,8 @@ on
     <section class="post-content">
       
 
+<p><em>Last updated 18 Jan 2019: Added details about the <strong>free tier</strong> limitations, and showed how to avoid the Dataflow jobs <strong>auto-scaling</strong> out of control.</em></p>
+
 <p>I&rsquo;m (still) a huge fan of <a href="https://snowplowanalytics.com/">Snowplow Analytics</a>. Their open-source, modular approach to DIY analytics pipelines has inspired me two write <a href="https://www.simoahava.com/amp/tags/snowplow/">articles</a> about them, and to host a <a href="https://www.meetup.com/Snowplow-Analytics-Helsinki/">meetup</a> in Helsinki. In my previous <a href="https://www.simoahava.com/amp/analytics/snowplow-full-setup-with-google-analytics-tracking/">Snowplow with Amazon Web Services guide</a>, I walked you through setting up a Snowplow pipeline using <a href="https://aws.amazon.com/">Amazon Web Services</a>. This time around, I&rsquo;m looking at the wondrous <a href="https://cloud.google.com">Google Cloud Platform</a>, for which Snowplow introduced support in an <a href="https://snowplowanalytics.com/blog/2018/03/21/snowplow-r101-neapolis-with-initial-gcp-support/">early 2018 release</a>.</p>
 
 
@@ -909,6 +911,10 @@ on
 <h2 id="word-of-warning">Word of warning</h2>
 
 <p>This probably won&rsquo;t come as a surprise to you, but working with a cloud platform is <strong>not free of charge</strong>. If you&rsquo;re a first-time user, you should be eligible for the <a href="https://cloud.google.com/free/">free trial</a> of $300 to be spent during the first 12 months. This is more than enough to build a pipeline and test it out over a number of days, but it won&rsquo;t get you far.</p>
+
+<blockquote>
+<p><strong>UPDATE 18 Jan 2019</strong>: The free tier only gives you <strong>8 CPUs</strong> <em>total</em> across your entire project. That means that you must keep count of all the instances you&rsquo;ll be using for the collector and for the ETL machine. Start with a low number, e.g. 1 or 2 CPUs per instance to see how Snowplow works. Once you have the budget, you can shoot for more ambitious setups.</p>
+</blockquote>
 
 
 
@@ -1757,7 +1763,7 @@ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config a
 
 <h3 id="step-2-create-an-instance-group">Step 2: Create an instance group</h3>
 
-<p>Next, we&rsquo;ll need to create an <strong>instance group</strong>, which is used by the load balancer to automatically create new instances when necessary (for scaling reasons or when a previous instance fails for some reason).</p>
+<p>Next, we&rsquo;ll need to create an <strong>instance group</strong>, which is used by the load balancer as the backend service.</p>
 
 <p><strong>(1)</strong> Scroll to <a href="https://console.cloud.google.com/compute/instanceGroups/list">https://console.cloud.google.com/compute/instanceGroups/list</a>, and click <strong>Create instance group</strong>.</p>
 
@@ -1786,6 +1792,10 @@ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config a
     </a>
   
 
+
+<blockquote>
+<p><strong>UPDATE 18 Jan 2019</strong>: You can also set <strong>Autoscaling</strong> <code>Off</code>. This means that the instance will not generate new machines automatically. You can start off with this, and then move to an autoscaling setup if you find the Collector lagging behind a lot.</p>
+</blockquote>
 
 <p><strong>(5)</strong> Scroll down to <strong>Health check</strong>, click the menu, and select <strong>Create a health check</strong>.</p>
 
@@ -2562,6 +2572,26 @@ gsutil cp gs://<span class="nv">$bucket_name</span>/bigquery_config.json .
 
 ./snowplow-bigquery-loader-<span class="nv">$bq_version</span>/bin/snowplow-bigquery-loader --config<span class="o">=</span><span class="k">$(</span>cat bigquery_config.json <span class="p">|</span> base64 -w <span class="m">0</span><span class="k">)</span> --resolver<span class="o">=</span><span class="k">$(</span>cat iglu_resolver.json <span class="p">|</span> base64 -w <span class="m">0</span><span class="k">)</span> --runner<span class="o">=</span>DataFlowRunner --project<span class="o">=</span><span class="nv">$project_id</span> --region<span class="o">=</span><span class="nv">$region</span> --gcpTempLocation<span class="o">=</span>gs://<span class="nv">$bucket_name</span>/temp-files</code></pre></div>
 
+<hr />
+
+<p><strong>UPDATE 18 Jan 2019</strong>.</p>
+
+<p>It might be wise to start off by capping the auto-scaling of the Dataflow jobs. Otherwise, since you&rsquo;re working with streaming inserts, you might end up with lots and lots of virtual machines being started to support the hit stream.</p>
+
+<p>To prevent the <code>mutator</code> and <code>loader</code> from auto-scaling out of control, you can cap the number of available workers at e.g. 3 (so max. 3 CPUs are used by the job), or you can turn off auto-scaling altogether by capping the worker number at <code>1</code>.</p>
+
+<p>To add a cap of 3 workers, for example, to the mutator, add this option to the end of the <code>snowplow-bigquery-mutator listen</code> command:</p>
+
+<p><code>--maxNumWorkers 3</code></p>
+
+<p>To set the maximum of 3 workers to the loader, add this to the end of the <code>snowplow-bigquery-loader</code> command:</p>
+
+<p><code>--maxNumWorkers=3</code></p>
+
+<p>Setting the maximum to 1 will lead to a single-worker, non-autoscaling setup. To have more than one worker but no autoscaling, you&rsquo;ll also need to add the option <code>--autoscalingAlgorithm NONE</code> for the mutator and <code>--autoscalingAlgorithm=NONE</code> for the loader.</p>
+
+<hr />
+
 <p>You&rsquo;ll need to populate the five variables in the beginning of the code block before saving the instance template.</p>
 
 <ul>
@@ -2587,6 +2617,10 @@ gsutil cp gs://<span class="nv">$bucket_name</span>/bigquery_config.json .
 <h3 id="step-2-start-up-a-new-instance-group">Step 2: Start up a new instance group</h3>
 
 <p>Now that you have the template created, it&rsquo;s time to create and start an auto-scaling instance group using this template. The idea is that when requests start flooding in, you&rsquo;ll want to fire up new instances for your enrichment and loading steps so that your data collection won&rsquo;t be impacted too severely by latency.</p>
+
+<blockquote>
+<p><strong>UPDATE 18 Jan 2019</strong>: Instead of creating an auto-scaling instance group, it&rsquo;s more than enough to just use a single machine in the group to handle the Dataflow! This part of the guide was originally based on some misinformation. You can still go ahead with the instance template, but once we reach the section about the instance group, please read the steps carefully.</p>
+</blockquote>
 
 <p><strong>(1)</strong> While still in the <strong>instance template list</strong>, click open the template you just created.</p>
 
@@ -2617,6 +2651,10 @@ gsutil cp gs://<span class="nv">$bucket_name</span>/bigquery_config.json .
     </a>
   
 
+
+<blockquote>
+<p><strong>UPDATE 18 Jan 2019</strong>: You can set <strong>Autoscaling</strong> <code>Off</code>. The machine starting the Dataflow jobs does <strong>not</strong> need to autoscale. The Dataflow jobs are the ones that will require more power depending on the throughput rate, but you can start this machine with one static instance, scaling up manually if necessary.</p>
+</blockquote>
 
 <p><strong>(6)</strong> You can keep the rest of the options with their default values, but if you like, you can set the health check to what you use for the collector instance, too.</p>
 
