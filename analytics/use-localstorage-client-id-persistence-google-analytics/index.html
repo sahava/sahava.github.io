@@ -1,0 +1,860 @@
+
+
+  
+    
+  
+
+
+  
+
+
+
+
+
+  
+
+
+  
+
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta name="google-site-verification" content="xQwWI2KUfP9LbFKhw2CVLFtrMY6Czrla7L3PD2aBolA" />
+
+
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org", 
+  "@type": "BlogPosting",
+  "headline": "#GTMTips: Use localStorage For Client ID Persistence In Google Analytics | Simo Ahava's blog",
+  "image": "https://www.simoahava.com/images/2019/02/localstorage-clientid-google-analytics.jpg",
+  "editor": "Simo Ahava",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Simo Ahava's blog",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://www.simoahava.com/images/simo.png",
+      "height": "393",
+      "width": "407"
+    }
+  },
+  "url": "https://www.simoahava.com/analytics/use-localstorage-client-id-persistence-google-analytics/",
+  "datePublished": "2019-02-25T12:31:37+02:00",
+  "dateModified": "2019-02-25T12:31:37+02:00",
+  "description": "Use this customTask trick to persist the Client ID in browser localStorage in situations where the Google Analytics cookie is not available or has expired due to Safari's Intelligent Tracking Prevention measures.",
+  "author": {
+    "@type": "Person",
+    "name": "Simo Ahava"
+  }
+}
+</script>
+
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Hugo 0.53 with theme Tranquilpeak 0.4.3-BETA">
+    <title>#GTMTips: Use localStorage For Client ID Persistence In Google Analytics | Simo Ahava's blog</title>
+    
+    <script>
+      window.dataLayer=window.dataLayer||[];window.dataLayer.push({pageType: 'article'});
+    </script>
+    
+
+    
+
+    <script src="https://www.simoahava.com/x-js/lazyload.iife.min.js"></script>
+
+    <script src="//de.cdn-v3.conductrics.com/ac-GeQBKxGTiA/v3/agent-api/js/f-TNZdDPOknZ/dt-8BnrVvfJuB1PwktQxXXgVK2OikZ9WR?apikey=api-WDrqMnckreSqejZgDAMu" type="text/javascript"></script>
+
+    
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-PZ7GMV9');</script>
+    
+    <script src="//simoahava.disqus.com/count.js" id="dsq-count-scr" async></script>
+    <meta name="author" content="Simo Ahava">
+    <meta name="keywords" content="">
+
+    <link rel="icon" href="https://www.simoahava.com/images/favicon.ico">
+    
+    <link rel="amphtml" href="https://www.simoahava.com/amp/analytics/use-localstorage-client-id-persistence-google-analytics/">
+    
+    <meta name="description" content="Use this customTask trick to persist the Client ID in browser localStorage in situations where the Google Analytics cookie is not available or has expired due to Safari&#39;s Intelligent Tracking Prevention measures.">
+    <meta property="og:description" content="Use this customTask trick to persist the Client ID in browser localStorage in situations where the Google Analytics cookie is not available or has expired due to Safari&#39;s Intelligent Tracking Prevention measures.">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="#GTMTips: Use localStorage For Client ID Persistence In Google Analytics">
+    <meta property="og:url" content="/analytics/use-localstorage-client-id-persistence-google-analytics/">
+    <meta property="og:site_name" content="Simo Ahava&#39;s blog">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="#GTMTips: Use localStorage For Client ID Persistence In Google Analytics">
+    <meta name="twitter:description" content="Use this customTask trick to persist the Client ID in browser localStorage in situations where the Google Analytics cookie is not available or has expired due to Safari&#39;s Intelligent Tracking Prevention measures.">
+    
+      <meta name="twitter:creator" content="@SimoAhava">
+      
+    
+
+    
+    
+
+    
+      <meta property="og:image" content="https://www.simoahava.com/images/simo.png">
+    
+
+    
+      <meta name="twitter:image" content="https://www.simoahava.com/images/2019/02/localstorage-clientid-google-analytics.jpg">  
+      <meta property="og:image" content="https://www.simoahava.com/images/2019/02/localstorage-clientid-google-analytics.jpg">
+    
+    
+    
+
+    
+
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/jquery.fancybox.min.css" integrity="sha256-vuXZ9LGmmwtjqFX1F+EKin1ThZMub58gKULUyf0qECk=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/helpers/jquery.fancybox-thumbs.min.css" integrity="sha256-SEa4XYAHihTcEP1f5gARTB2K26Uk8PsndQYHQC1f4jU=" crossorigin="anonymous" />
+    
+    
+    <link rel="stylesheet" href="https://www.simoahava.com/css/style.css" />
+    
+    
+
+    
+      
+    
+    
+  </head>
+
+  <body>
+    <div id="blog">
+      <header id="header" data-behavior="4">
+  <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+  <div class="header-title">
+    <a class="header-title-link" href="https://www.simoahava.com/">Simo Ahava&#39;s blog</a>
+  </div>
+  
+</header>
+
+      <nav id="sidebar" data-behavior="4">
+  <div class="sidebar-container">
+    
+      <div class="sidebar-profile">
+        <a href="https://www.simoahava.com/">
+          <img class="sidebar-profile-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+        </a>
+        <h4 class="sidebar-profile-name">Simo Ahava</h4>
+        
+          <h5 class="sidebar-profile-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</h5>
+        
+      </div>
+    
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+      
+      <span class="sidebar-button-desc">Home</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+      
+      <span class="sidebar-button-desc">Categories</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tags/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Tags</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/gtm-tips/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-magic"></i>
+      
+      <span class="sidebar-button-desc">GTM Tips</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/about-simo-ahava/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+      
+      <span class="sidebar-button-desc">About</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tools/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-wrench"></i>
+      
+      <span class="sidebar-button-desc">Tools</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/blog-statistics/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bar-chart"></i>
+      
+      <span class="sidebar-button-desc">Blog statistics</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://github.com/sahava" target="_blank" rel="noopener">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+      
+      <span class="sidebar-button-desc">GitHub</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/upcoming-talks/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bullhorn"></i>
+      
+      <span class="sidebar-button-desc">Upcoming talks</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
+
+    </ul>
+  </div>
+</nav>
+
+      
+
+      <div id="main" data-behavior="4"
+        class="
+               hasCoverMetaIn
+               ">
+        <article class="post">
+	  <form id="search" action="/search/">
+  <input name="q" type="text" class="form-control input--xlarge" placeholder="Search blog..." autocomplete="off">
+  </form>
+
+          
+          
+            <div class="post-header main-content-wrap text-left">
+
+  
+
+    <h1>
+      #GTMTips: Use localStorage For Client ID Persistence In Google Analytics
+    </h1>
+  
+  
+  <div class="postShorten-meta post-meta">
+    
+      <time datetime="2019-02-25T12:31:37&#43;02:00">
+        
+  February 25, 2019
+
+      </time>
+    
+      
+  
+  
+    <span>in</span>
+    
+      <a class="category-link" href="https://www.simoahava.com/categories/gtm-tips">GTM Tips</a>
+    
+  
+
+
+       | <a href="https://www.simoahava.com/analytics/use-localstorage-client-id-persistence-google-analytics/#disqus_thread">Comments</a>
+  </div>
+
+
+</div>
+
+          
+          <div class="post-content markdown">
+            <div class="main-content-wrap">
+              
+
+<p>Looks like Safari is tightening the noose around browser cookies with the introduction of <a href="https://webkit.org/blog/8613/intelligent-tracking-prevention-2-1/">ITP 2.1</a> (Intelligent Tracking Prevention). Among other things, <strong>ITP 2.1</strong> caps the expiration of client-side cookies to <strong>7 days</strong>. <em>Client-side cookies</em> in this context refer to cookies set with the <code>document.cookie</code> API, which would cover pretty much all cookies set by vendored JavaScript libraries like Google Analytics&rsquo; <strong>analytics.js</strong>.</p>
+
+<p>Personally, I think anything that forces a rethink of the cookie model is welcome. It&rsquo;s awkward and twisted that we still rely on such flimsy and fragile browser storage for persisting important data such as anonymous analytics identifiers, authentication flags, and basically anything that needs to persist from one page to the next.</p>
+
+<p>Having said that, this can make <em>potentially benevolent</em> tracking such as that done with <a href="https://analytics.google.com/">Google Analytics</a> on a website quite difficult for users with Safari browsers. Since GA relies on a browser cookie capped at 2 years&rsquo; expiration (by default), this 7 days max can really hurt data quality.</p>
+
+<p>In this article, I want to show you how to use <a href="https://www.simoahava.com/analytics/customtask-the-guide/"><code>customTask</code></a> with <code>localStorage</code> to serve as a <em>backup</em> of sorts for your cookie-based Client ID persistence.</p>
+
+<p>It&rsquo;s not perfect. Check out the <a href="#caveats">caveats</a> chapter for details. Please treat this as a technology demo rather than a be-all, end-all solution to cookie woes. We&rsquo;ll need to rely on the vendors and browsers finding consensus for how to make life harder on the bad agents without compromising the work us &ldquo;regular folks&rdquo; need to do to improve our websites with first-party analytics data.</p>
+
+<h2 id="tip-96-persist-the-client-id-in-localstorage">Tip 96: Persist the Client ID in <code>localStorage</code></h2>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2019/02/localstorage-clientid-google-analytics.jpg" title="localStorage to persist clientId">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2019/02/localstorage-clientid-google-analytics.jpg#ZgotmplZ" alt="localStorage to persist clientId">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>It&rsquo;s not a novel trick. In fact, Google themselves <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/cookies-user-id#using_localstorage_to_store_the_client_id">show you how to do this</a> in the developer documentation. The thing is, though, that Google only shows you how to <strong>replace</strong> cookie storage with <code>localStorage</code>. I still want to leverage cookies, because they make things like cross-domain tracking far easier to do.</p>
+
+<p>The process is basically this:</p>
+
+<ol>
+<li><p>When a Google Analytics tracker is created, check if Client ID is persisted in <code>localStorage</code>.</p></li>
+
+<li><p>If this is the case, check if its expiration is in the future.</p></li>
+
+<li><p>If this is the case, build the tracker with the Client ID from <code>localStorage</code> (the tracker will generate the <code>_ga</code> cookie with this data, too).</p></li>
+
+<li><p>If there is no Client ID in <code>localStorage</code> use GA&rsquo;s default Client ID creation and storage mechanisms.</p></li>
+
+<li><p>When the tag fires, write the Client ID in <code>localStorage</code>.</p></li>
+</ol>
+
+<p>It should be pretty smooth sailing. Since the <code>_ga</code> cookie and <code>localStorage</code> are kept in sync, this should work across origins which is something that <code>localStorage</code> by default doesn&rsquo;t do.</p>
+
+<p><strong>NOTE!</strong> Since you&rsquo;re always checking <code>localStorage</code> first, this means that if the user deletes their cookies, they don&rsquo;t actually delete the Client ID, because that would require <code>localStorage</code> to be flushed, too. You might need to make a point of this in the privacy statement of your website.</p>
+
+<h3 id="how-to-set-the-client-id">How to set the Client ID</h3>
+
+<p>You&rsquo;ll need <strong>two Custom JavaScript variables</strong>. One to <strong>set</strong> the Client ID, and one to <strong>get</strong> it.</p>
+
+<p>To <strong>set</strong> the Client ID, go to the <a href="https://www.simoahava.com/tools/customtask-builder/"><code>customTask</code> Builder tool</a>, select the option named <strong>Use localStorage To Persist ClientId</strong>, and then click <strong>Copy to clipboard</strong>.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2019/02/copy-customtask.jpg" title="Copy customTask">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2019/02/copy-customtask.jpg#ZgotmplZ" alt="Copy customTask">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>In <a href="https://tagmanager.google.com/">Google Tag Manager</a>, create a new Custom JavaScript variable, and paste the clipboard content within. Then, do the following two maintenance operations:</p>
+
+<ol>
+<li><p>Delete the following text from the start of the code block: <code>var customTask =</code>. Just that, nothing else.</p></li>
+
+<li><p>Delete the last character of the entire code block, which should be a semi-colon.</p></li>
+</ol>
+
+<p>Then, modify the configuration object, if you wish.</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">localStorageCid</span> <span style="color:#f92672">=</span> {
+  <span style="color:#a6e22e">objectName</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;ga_client_id&#39;</span>,
+  <span style="color:#a6e22e">expires</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">1000</span><span style="color:#f92672">*</span><span style="color:#ae81ff">60</span><span style="color:#f92672">*</span><span style="color:#ae81ff">60</span><span style="color:#f92672">*</span><span style="color:#ae81ff">24</span><span style="color:#f92672">*</span><span style="color:#ae81ff">365</span><span style="color:#f92672">*</span><span style="color:#ae81ff">2</span>
+};
+</code></pre></div>
+
+<p>If you want the name of the object written to <code>localStorage</code> to be something other than <code>'ga_client_id'</code>, change the respective string value. The <code>expires</code> value is a number <strong>in milliseconds</strong> denoting how long the object should be in storage. It&rsquo;s updated every time a tag fires with this <code>customTask</code> script. If you want the storage to expire sooner or later than two years&rsquo; time, change the value of <code>expires</code> accordingly.</p>
+
+<blockquote>
+<p><strong>NOTE!</strong> There is no automatic expiration mechanism with <code>localStorage</code>. &ldquo;Expires&rdquo; here simply means that if the expiration of the item is in the past, it will be overwritten with the Client ID generated by GA.</p>
+</blockquote>
+
+<p>Finally, add this <code>customTask</code> to <strong>all your Google Analytics tags</strong>. Easiest way to do it is to use a <a href="https://www.simoahava.com/analytics/google-analytics-settings-variable-in-gtm/">Google Analytics Settings variable</a>. Add it like this:</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2019/02/customtask-to-tag.jpg" title="Customtask added to tag">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2019/02/customtask-to-tag.jpg#ZgotmplZ" alt="Customtask added to tag">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>Remember that you can only add one <code>customTask</code> per tag or Google Analytics Settings variable. Use the <a href="https://www.simoahava.com/tools/customtask-builder/"><code>customTask</code> Builder tool</a> to compile a <code>customTask</code> that incorporates multiple different functions.</p>
+
+<h3 id="how-to-get-the-client-id">How to get the Client ID</h3>
+
+<p>The second <strong>Custom JavaScript variable</strong> you&rsquo;ll need is something that will pull the Client ID from <code>localStorage</code> and use that instead of the value stored in the <code>_ga</code> cookie (if any).</p>
+
+<p>This is what the Custom JavaScript variable code looks like:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">objectName</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;ga_client_id&#39;</span>;
+  <span style="color:#66d9ef">if</span> (window.<span style="color:#a6e22e">localStorage</span>) {
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">jsonObj</span> <span style="color:#f92672">=</span> window.<span style="color:#a6e22e">localStorage</span>.<span style="color:#a6e22e">getItem</span>(<span style="color:#a6e22e">objectName</span>) <span style="color:#f92672">||</span> <span style="color:#e6db74">&#39;{}&#39;</span>;
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(<span style="color:#a6e22e">jsonObj</span>);
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">now</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Date().<span style="color:#a6e22e">getTime</span>();
+    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">clientId</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">expires</span>) {
+      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">now</span> <span style="color:#f92672">&lt;=</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">expires</span>) {
+        <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">clientId</span>;
+      }
+    }
+  }
+  <span style="color:#66d9ef">return</span>;
+}
+</code></pre></div>
+
+<p>Change the value of <code>objectName</code> to match the name of the <code>localStorage</code> object you set in the <code>customTask</code> above. By default, it&rsquo;s <code>'ga_client_id'</code>.</p>
+
+<p>This script checks if a Google Analytics Client ID is found in <code>localStorage</code>, and that if found, its expiration time hasn&rsquo;t whizzed past yet. If both of these conditions pass, the Client ID is returned from <code>localStorage</code>.</p>
+
+<p>If no item is found, or if object has expired, or if the browser doesn&rsquo;t support <code>localStorage</code>, the variable returns <code>undefined</code> which basically means that GA falls back to its default method of Client ID generation, retrieval, and storage.</p>
+
+<p>You need to add this variable to <strong>every single tag to which you added the <code>customTask</code> from above</strong>. Again, it&rsquo;s imperative that every single tag uses this new <code>localStorage</code> method consistently, or you might end up with tags firing with the wrong Client ID, thus skewing your data.</p>
+
+<p>You add this variable with the field name <code>clientId</code>, like this:</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2019/02/clientid-fields-to-set.jpg" title="ClientID get">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2019/02/clientid-fields-to-set.jpg#ZgotmplZ" alt="ClientID get">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>That&rsquo;s it for this simple solution. There is <strong>one big problem</strong> with this approach, though. It will <strong>always</strong> take the Client ID from <code>localStorage</code> if it&rsquo;s available and hasn&rsquo;t expired. This is problematic in one specific scenario: <strong>cross-domain tracking</strong>.</p>
+
+<h3 id="how-to-respect-ga-s-cross-domain-linker-parameter">How to respect GA&rsquo;s cross-domain linker parameter</h3>
+
+<p>Turns out, this isn&rsquo;t totally trivial to do. Even if you set the <code>allowLinker</code> field to <code>true</code> in the tag, the Client ID from <code>localStorage</code> will always overwrite the respective field in the tag, no matter how valid the linker parameter was.</p>
+
+<p>So, you need to replicate how <code>allowLinker</code> works, checking if the URL has a valid linker parameter. If it does, then you need to bypass the <code>localStorage</code> fetch, so that analytics.js can build the Client ID with the linker parameter, and then write the updated ID into <code>localStorage</code> in the <code>customTask</code>.</p>
+
+<p>Unfortunately, <strong>analytics.js</strong> doesn&rsquo;t expose the <code>allowLinker</code> functionality as an API you could simply query to know whether the URL has a valid linker parameter or not.</p>
+
+<p>This leaves us with very few options. Your best bet is to actually <strong>reproduce</strong> what <code>allowLinker</code> does. It&rsquo;s not trivial, so I did the legwork for you (thanks to <a href="https://www.thyngster.com/">David Vallejo&rsquo;s</a> generous help). You can find the source code in <a href="https://gist.github.com/sahava/f3718f981bb01768c0eba714ee94e2d2">this Gist</a>.</p>
+
+<p>To add it to your setup, open the Custom JavaScript variable you created in the previous chapter, and edit it to this:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">objectName</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;ga_client_id&#39;</span>;
+  
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">checkLinker</span><span style="color:#f92672">=</span><span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">t</span>){<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">n</span>,<span style="color:#a6e22e">e</span>,<span style="color:#a6e22e">i</span><span style="color:#f92672">=</span><span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">t</span>,<span style="color:#a6e22e">n</span>){<span style="color:#66d9ef">for</span>(<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">e</span><span style="color:#f92672">=</span><span style="color:#66d9ef">new</span> Date,<span style="color:#a6e22e">i</span><span style="color:#f92672">=</span>window.<span style="color:#a6e22e">navigator</span>,<span style="color:#a6e22e">r</span><span style="color:#f92672">=</span><span style="color:#a6e22e">i</span>.<span style="color:#a6e22e">plugins</span><span style="color:#f92672">||</span>[],<span style="color:#a6e22e">a</span><span style="color:#f92672">=</span>[<span style="color:#a6e22e">t</span>,<span style="color:#a6e22e">i</span>.<span style="color:#a6e22e">userAgent</span>,<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">getTimezoneOffset</span>(),<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">getYear</span>(),<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">getDate</span>(),<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">getHours</span>(),<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">getMinutes</span>()<span style="color:#f92672">+</span><span style="color:#a6e22e">n</span>],<span style="color:#a6e22e">s</span><span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>;<span style="color:#a6e22e">s</span><span style="color:#f92672">&lt;</span><span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">length</span>;<span style="color:#f92672">++</span><span style="color:#a6e22e">s</span>)<span style="color:#a6e22e">a</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">r</span>[<span style="color:#a6e22e">s</span>].<span style="color:#a6e22e">description</span>);<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">o</span>(<span style="color:#a6e22e">a</span>.<span style="color:#a6e22e">join</span>(<span style="color:#e6db74">&#34;.&#34;</span>))},<span style="color:#a6e22e">r</span><span style="color:#f92672">=</span><span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">t</span>,<span style="color:#a6e22e">n</span>){<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">e</span><span style="color:#f92672">=</span><span style="color:#66d9ef">new</span> Date,<span style="color:#a6e22e">i</span><span style="color:#f92672">=</span>window.<span style="color:#a6e22e">navigator</span>,<span style="color:#a6e22e">r</span><span style="color:#f92672">=</span><span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">getHours</span>()<span style="color:#f92672">+</span>Math.<span style="color:#a6e22e">floor</span>((<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">getMinutes</span>()<span style="color:#f92672">+</span><span style="color:#a6e22e">n</span>)<span style="color:#960050;background-color:#1e0010">/60);return o([t,i.userAgent,i.language||&#34;&#34;,e.getTimezoneOffset(),e.getYear(),e.getDate()+Math.floor(r/24),(24+r)%24,(60+e.getMinutes()+n)%60].join(&#34;.&#34;))},o=function(t){var n,e=1;if(t)for(e=0,n=t.length-1;0&lt;=n;n--){var i=t.charCodeAt(n);e=0!=(i=266338304&amp;(e=(e&lt;&lt;6&amp;268435455)+i+(i&lt;&lt;14)))?e^i&gt;&gt;21:e}return e.toString()};if(&#34;string&#34;==typeof t&amp;&amp;t.length){if(!/_ga=/.test(t))return&#34;Invalid linker format in string argument!&#34;;e=t.split(&#34;&amp;&#34;).filter(function(t){return&#34;_ga&#34;===t.split(&#34;=&#34;)[0]}).shift()}else e=(n=/[?&amp;]_ga=/.test(window.location.search)?&#34;search&#34;:/[#&amp;]_ga=/.test(window.location.hash)?&#34;hash&#34;:void 0)&amp;&amp;window.location[n].substring(1).split(&#34;&amp;&#34;).filter(function(t){return&#34;_ga&#34;===t.split(&#34;=&#34;)[0]}).shift();if(void 0===e||!e.length)return&#34;Invalid linker format in URL!&#34;;var a,s,g,u,f=e.indexOf(&#34;.&#34;);return f&gt;-1&amp;&amp;(e.substring(0,f),s=(a=e.substring(f+1)).indexOf(&#34;.&#34;),g=a.substring(0,s),u=a.substring(s+1)),void 0!==u?g===i(u=u.split(&#34;-&#34;).join(&#34;&#34;),0)||g===i(u,-1)||g===i(u,-2)||g===r(u,0)||g===r(u,-1)||g===r(u,-2):void 0};</span>
+  
+  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">checkLinker</span>()) {
+    <span style="color:#66d9ef">return</span>;
+  }
+  
+  <span style="color:#66d9ef">if</span> (window.<span style="color:#a6e22e">localStorage</span>) {
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">jsonObj</span> <span style="color:#f92672">=</span> window.<span style="color:#a6e22e">localStorage</span>.<span style="color:#a6e22e">getItem</span>(<span style="color:#a6e22e">objectName</span>) <span style="color:#f92672">||</span> <span style="color:#e6db74">&#39;{}&#39;</span>;
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(<span style="color:#a6e22e">jsonObj</span>);
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">now</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Date().<span style="color:#a6e22e">getTime</span>();
+    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">clientId</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">expires</span>) {
+      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">now</span> <span style="color:#f92672">&lt;=</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">expires</span>) {
+        <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">clientId</span>;
+      }
+    }
+  }
+  <span style="color:#66d9ef">return</span>;
+}
+</code></pre></div>
+
+<p>That big block of code starting with <code>var checkLinker=</code> contains the code in the <a href="https://gist.github.com/sahava/f3718f981bb01768c0eba714ee94e2d2">GitHubGist</a> just minified to reduce clutter.</p>
+
+<p>The <code>checkLinker()</code> method parses the URL for a valid linker parameter. If one is found, then the variable ignores the Client ID stored in <code>localStorage</code> and allows the GA tag to build the Client ID from the linker parameter instead.</p>
+
+<p>Read on for one major caveat in this approach.</p>
+
+<h3 id="caveats">Caveats</h3>
+
+<p>There are, naturally, some caveats to this workaround.</p>
+
+<ul>
+<li><p>There&rsquo;s no mechanism involved to handle multiple <code>_ga</code> cookies. So if you have a set of tags that need to have their Client ID handled separately (e.g. due to <a href="https://www.simoahava.com/gtm-tips/cross-domain-tracking-with-multiple-ga-trackers/">roll-up tracking</a>, simply use a different <code>localStorage</code> object name for that set of tags.</p></li>
+
+<li><p>Unlike typically with <code>localStorage</code>, you don&rsquo;t have to worry about cross-origin tracking, since the <code>_ga</code> cookie would persist across subdomains (assuming it has the <code>cookieDomain</code> field set to <code>auto</code>), and thus when the user lands on a subdomain without the <code>localStorage</code> object, the <code>_ga</code> cookie is used instead, and this is then written into <code>localStorage</code> in the <code>customTask</code>.</p></li>
+
+<li><p>Cross-domain tracking, even with the hack above, is still a pain. Google is experimenting with different linker parameters, so the solution above might become outdated soon. I&rsquo;ll update the code when the linker parameter format changes.</p></li>
+
+<li><p>Safari is already blocking <code>localStorage.setItem()</code> in private browsing mode, and other browsers might follow suit.</p></li>
+</ul>
+
+<p>And then, of course, the biggest caveat:</p>
+
+<p><strong>This isn&rsquo;t the last we&rsquo;ve seen of the concentrated attach against browser cookie storage</strong>. Other browsers will likely follow suit, after they let Safari take the blow for being the first one audacious enough to delimit first-party cookies in this way.</p>
+
+<h3 id="final-thoughts">Final thoughts</h3>
+
+<p>I want you to consider this a <strong>tech demo</strong> first and foremost. It&rsquo;s not robust enough to carry your entire enterprise web analytics setup, but it should be usable in situations where you want to minimize data loss especially with Safari users.</p>
+
+<p>Please do note that you are potentially making it more difficult for your visitors to clear their tracking identifiers. Make it obvious in your privacy statement that this type of persistence is happening, even if it&rsquo;s not necessary per the regulations or laws of your region. It&rsquo;s just good behavior. Users should be allowed to purge their tracking identifiers without having to be rocket scientists to do so.</p>
+
+<p>I&rsquo;m also expecting this solution to be temporary. It&rsquo;s still unclear how Intelligent Tracking Prevention evolves. One of the purposes of the 7-day cap to client-side cookies is to prevent third party JavaScript libraries from writing cookies on one domain and accessing them on another subdomain. If Apple considers this <code>localStorage</code> trick to be a hack around this limitation, it&rsquo;s possible they&rsquo;ll invest in measures to prevent this from working, too.</p>
+
+<p>Also, I&rsquo;m expecting big vendors who suffer most from this (such as Google and Facebook) to introduce their own solutions that help avoid the potential compromisation of data quality that&rsquo;s at stake here. As such, I do hope that this article becomes outdated soon, when the platforms suggest an officially supported way of persisting data reliably.</p>
+
+<p>Finally, many might be now even more tempted to move towards server-side tracking due to the increased fragility of client-side persistence. <strong>You don&rsquo;t need a full server-side proxy to cope with ITP 2.1</strong>. Since it only targets cookies written with <code>document.cookie</code>, you could simply generate anonymous identifiers like GA&rsquo;s Client ID server-side, and set them in the <code>Set-Cookies</code> header of the HTTP response. This is trivial to do in most web servers, but it&rsquo;s beyond the scope of the current article. I might tackle this in a new article, if there&rsquo;s interest.</p>
+
+<p>What do you think of this latest ITP 2.1 release? Feel free to join the discussion in the comments!</p>
+
+              
+
+            </div>
+          </div>
+          <div id="post-footer" class="post-footer main-content-wrap">
+            
+              
+                
+                
+                  <div class="post-footer-tags">
+                    <span class="text-color-light text-small">TAGGED IN</span><br/>
+                    
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/google-tag-manager/">google tag manager</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/gtmtips/">gtmtips</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/customtask/">customtask</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/clientid/">clientid</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/itp/">itp</a>
+
+                  </div>
+                
+              
+            
+            
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--disabled">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/google-tag-manager-and-jquery/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/use-localstorage-client-id-persistence-google-analytics/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=%23GTMTips:%20Use%20localStorage%20For%20Client%20ID%20Persistence%20In%20Google%20Analytics%20https://www.simoahava.com/analytics/use-localstorage-client-id-persistence-google-analytics/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://www.simoahava.com/analytics/use-localstorage-client-id-persistence-google-analytics/">
+              <i class="fa fa-google-plus"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/use-localstorage-client-id-persistence-google-analytics/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#disqus">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+            
+              
+                <span id="disqus"></span>
+<div id="disqus_thread">
+  <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+
+              
+            
+          </div>
+        </article>
+        <footer id="footer" class="main-content-wrap">
+  <span class="copyrights">
+    &copy; 2019 Simo Ahava. All Rights Reserved
+  </span>
+</footer>
+
+      </div>
+      
+      <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+        
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--disabled">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/google-tag-manager-and-jquery/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/use-localstorage-client-id-persistence-google-analytics/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=%23GTMTips:%20Use%20localStorage%20For%20Client%20ID%20Persistence%20In%20Google%20Analytics%20https://www.simoahava.com/analytics/use-localstorage-client-id-persistence-google-analytics/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=https://www.simoahava.com/analytics/use-localstorage-client-id-persistence-google-analytics/">
+              <i class="fa fa-google-plus"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/use-localstorage-client-id-persistence-google-analytics/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#disqus">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+      </div>
+      
+      <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+  <i id="btn-close-shareoptions" class="fa fa-close"></i>
+  <ul class="share-options">
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/use-localstorage-client-id-persistence-google-analytics/">
+          <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=%23GTMTips:%20Use%20localStorage%20For%20Client%20ID%20Persistence%20In%20Google%20Analytics%20https://www.simoahava.com/analytics/use-localstorage-client-id-persistence-google-analytics/%20via%20@SimoAhava">
+          <i class="fa fa-twitter"></i><span>Share on Twitter</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=https://www.simoahava.com/analytics/use-localstorage-client-id-persistence-google-analytics/">
+          <i class="fa fa-google-plus"></i><span>Share on Google&#43;</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/use-localstorage-client-id-persistence-google-analytics/">
+          <i class="fa fa-linkedin"></i><span>Share on LinkedIn</span>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+<div id="share-options-mask" class="share-options-mask"></div>
+
+    </div>
+    
+    <div id="about">
+  <div id="about-card">
+    <div id="about-btn-close">
+      <i class="fa fa-remove"></i>
+    </div>
+    
+      <img id="about-card-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+    
+    <h4 id="about-card-name">Simo Ahava</h4>
+    
+      <div id="about-card-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</div>
+    
+    
+      <div id="about-card-job">
+        <i class="fa fa-briefcase"></i>
+        <br/>
+        Senior Data Advocate at Reaktor
+      </div>
+    
+    
+      <div id="about-card-location">
+        <i class="fa fa-map-marker"></i>
+        <br/>
+        Finland
+      </div>
+    
+  </div>
+</div>
+
+    
+  
+    
+    <div id="cover" style="background-image:url('https://www.simoahava.com/images/maisema.jpg');"></div>
+  
+
+
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.7/js/jquery.fancybox.min.js" integrity="sha256-GEAnjcTqVP+vBp3SSc8bEDQqvWAZMiHyUSIorrWwH50=" crossorigin="anonymous"></script>
+
+
+<script src="https://www.simoahava.com/js/script.js"></script>
+
+
+
+
+  
+    
+      <script>
+        
+
+
+
+
+
+        (function() {
+          
+          
+          if (window.location.hostname == "localhost") {
+            return;
+          }
+          var d = document, s = d.createElement('script');
+          var disqus_shortname = 'simoahava';
+          s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      </script>
+    
+  
+
+
+    <script>
+      var mylazyload = new LazyLoad({elements_selector: '.lazy'});
+      </script>
+
+    
+  </body>
+</html>
+
