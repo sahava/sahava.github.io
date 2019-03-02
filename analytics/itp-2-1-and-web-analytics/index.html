@@ -313,6 +313,10 @@
             <div class="main-content-wrap">
               
 
+<blockquote>
+<p>Updated <strong>2 March 2019</strong> with additional <a href="#technical-implications-and-solutions">solutions</a>.</p>
+</blockquote>
+
 <p>On 21st February 2019, <a href="https://webkit.org/">WebKit</a> announced the release of the latest iteration of Safari&rsquo;s <strong>Intelligent Tracking Prevention</strong> (ITP), known as <a href="https://webkit.org/blog/8613/intelligent-tracking-prevention-2-1/">ITP 2.1</a>. For a while now, Safari has been targeting cross-site tracking with ITP, first starting with <a href="https://webkit.org/blog/7675/intelligent-tracking-prevention/">cookies in third-party contexts</a>, then <a href="https://webkit.org/blog/8311/intelligent-tracking-prevention-2-0/">tightening the noose</a> after a number of workarounds emerged, and finally with the latest iteration targeting cookies that were moved from a third-party context to a first-party context.</p>
 
 
@@ -348,9 +352,9 @@
 <p>In the following chapters, I will use these two terms:</p>
 
 <ul>
-<li><p><strong>Third-party context</strong> means that a resource is requested from a domain external from the one the user is currently on, and this request tries to access cookies set on this external domain. Since the domain differs from the one the user is on (has to be a different root domain, basically), the interaction with this external domain happens in a <strong>third-party context</strong>.</p></li>
+<li><p><strong>Third-party context</strong> means that a resource is requested from a domain external from the one the user is currently on (i.e. they don&rsquo;t <strong>share</strong> the same <a href="https://godoc.org/golang.org/x/net/publicsuffix">eTLD + 1</a>), and this request tries to access cookies set on this external domain. Since the domain differs from the one the user is on (has to be a different root domain, basically), the interaction with this external domain happens in a <strong>third-party context</strong>.</p></li>
 
-<li><p><strong>First-party context</strong> means that a resource is requested from the current (root) domain the user is on. Since the user is in the same domain environment, any requests made happen in a <strong>first-party context</strong>.</p></li>
+<li><p><strong>First-party context</strong> means that a resource is requested from the current (parent) domain (eTLD + 1) the user is on. Since the user is in the same domain environment, any requests made happen in a <strong>first-party context</strong>.</p></li>
 </ul>
 
 <h3 id="itp-1-0">ITP 1.0</h3>
@@ -515,13 +519,13 @@
 
 <p>But because sites can&rsquo;t be trusted to handle privacy and tracking prevention on their own, Safari must now take the reins and do it for them.</p>
 
-<h2 id="technical-implications">Technical implications</h2>
+<h2 id="technical-implications-and-solutions">Technical implications and solutions</h2>
 
 <p>First of all, ITP 2.1 really only impacts <strong>browser cookies</strong> set with <code>document.cookie</code>. It will <strong>not</strong> impact other DOM storage (such as <code>localStorage</code>), because those are same-origin only, so lacking the capability of working across sub-domains. Similarly, it will <strong>not</strong> impact cookies set with HTTP responses, i.e. using the <code>Set-Cookie</code> header in the HTTP response.</p>
 
-<p>HTTP cookies require a server-side script (or an <a href="https://omr.ruhr/google-analytics-itp-2-1-prevention-http-set-cookie-snippet-182092779d40">edge cache</a> solution) to modify the HTTP response, so it&rsquo;s a deliberate decision from the site owner to set the cookies in the first-party context rather than a JavaScript library downloaded from a CDN being able to, at whim, set and get any first-party cookies it wants to. I suppose this is why they are not (yet) impacted by ITP.</p>
+<p>HTTP cookies require a server-side script (or an edge cache / serverless solution) to modify the HTTP response, so it&rsquo;s a deliberate decision from the site owner to set the cookies in the first-party context rather than a JavaScript library downloaded from a CDN being able to, at whim, set and get any first-party cookies it wants to. I suppose this is why they are not (yet) impacted by ITP.</p>
 
-<h3 id="localstorage-isn-t-a-solid-workaround"><code>localStorage</code> isn&rsquo;t a solid workaround</h3>
+<h3 id="localstorage-for-same-domain-browsing">localStorage for same-domain browsing</h3>
 
 <p>Many suggested using <code>localStorage</code> to persist these anonymous identifiers used by Google Analytics, for example. Instead of dropping a cookie named <code>_ga</code>, use <code>window.localStorage.setItem()</code> instead.</p>
 
@@ -531,7 +535,107 @@
 
 <p>Thus the only thing that <code>localStorage</code> actually solves is not having the 7-day expiration cap on data stored on a single domain. Since all my web traffic happens on www.simoahava.com, the <code>localStorage</code> is a good option for me, since it persists the Client ID nicely (though with <a href="https://www.simoahava.com/analytics/use-localstorage-client-id-persistence-google-analytics/#caveats">some caveats</a> nevertheless).</p>
 
-<h3 id="set-cookie-headers-could-work-for-now"><code>Set-Cookie</code> headers could work, for now</h3>
+<h3 id="localstorage-for-cross-subdomain-browsing">localStorage for cross-subdomain browsing</h3>
+
+<p>An alternative option to same-domain <code>localStorage</code> is to create a <strong>store</strong> on a page in one of your subdomains, and then load that page in an <code>iframe</code> element, utilizing the  <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage"><code>postMessage</code> API</a> to get and set persistent cookie values on your site.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2019/02/postmessage-localstorage-store.jpg" title="localStorage postMessage store">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2019/02/postmessage-localstorage-store.jpg#ZgotmplZ" alt="localStorage postMessage store">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>Since the <code>localStorage</code> store shares the same parent domain <a href="https://godoc.org/golang.org/x/net/publicsuffix">eTLD + 1</a> with the pages making the requests through the iframe, the interaction happens in a first-party context, and the <code>localStorage</code> store can be accessed without the Storage Access API. Also, in <strong>third-party contexts</strong>, <code>localStorage</code> is <strong>transient</strong> in Safari, meaning it is purged after the browser is closed. In first-party context this is not the case.</p>
+
+<p>The process would look like this.</p>
+
+<ol>
+<li><p>The page wanting to access the store would load the tracker page in an iframe, and send a message to it requesting a stored Client ID.</p></li>
+
+<li><p>The iframe checks if it has the Client ID stored. If it does, it returns it in a message back to the origin page. If it doesn&rsquo;t, it returns a string indicating this.</p></li>
+
+<li><p>On the origin page, a listener listens for the response. If the response has a Client ID, that is used in the trackers running on the page. If the response has a &ldquo;null&rdquo; indicator, the origin page builds the Client ID, and finally sends it with another message back into the iframe for storage.</p></li>
+</ol>
+
+<p>Here&rsquo;s what the parent page script would look like:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#75715e">// Create iframe
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">el</span> <span style="color:#f92672">=</span> document.<span style="color:#a6e22e">createElement</span>(<span style="color:#e6db74">&#39;iframe&#39;</span>);
+<span style="color:#a6e22e">el</span>.<span style="color:#a6e22e">src</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;https://www.maindomain.com/tracker.html&#39;</span>;
+<span style="color:#a6e22e">el</span>.<span style="color:#a6e22e">setAttribute</span>(<span style="color:#e6db74">&#39;style&#39;</span>, <span style="color:#e6db74">&#39;width:0;height:0;border:0;border:none&#39;</span>);
+document.<span style="color:#a6e22e">body</span>.<span style="color:#a6e22e">appendChild</span>(<span style="color:#a6e22e">el</span>);
+
+<span style="color:#75715e">// Add listener to get the stored Client ID
+</span><span style="color:#75715e"></span>window.<span style="color:#a6e22e">addEventListener</span>(<span style="color:#e6db74">&#39;message&#39;</span>, <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e</span>) {
+  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">origin</span> <span style="color:#f92672">!==</span> <span style="color:#e6db74">&#39;https://www.maindomain.com&#39;</span>) { <span style="color:#66d9ef">return</span>; }
+  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">data</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#39;null&#39;</span>) { <span style="color:#a6e22e">generateTracker</span>(<span style="color:#66d9ef">null</span>); }
+  <span style="color:#66d9ef">else</span> { <span style="color:#a6e22e">generateTracker</span>(<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">data</span>); }
+});
+
+<span style="color:#75715e">// Send request to get the Client ID
+</span><span style="color:#75715e"></span><span style="color:#a6e22e">el</span>.<span style="color:#a6e22e">contentWindow</span>.<span style="color:#a6e22e">postMessage</span>(<span style="color:#e6db74">&#39;get&#39;</span>, <span style="color:#e6db74">&#39;https://www.maindomain.com&#39;</span>);
+
+<span style="color:#75715e">// Send message to set the Client ID after the tracker has generated one
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">trackerGeneratedCallback</span>(<span style="color:#a6e22e">clientId</span>) {
+  <span style="color:#a6e22e">el</span>.<span style="color:#a6e22e">contentWindow</span>.<span style="color:#a6e22e">postMessage</span>(<span style="color:#a6e22e">clientId</span>, <span style="color:#e6db74">&#39;https://www.maindomain.com&#39;</span>);
+}
+</code></pre></div>
+
+<p>Here, the iframe is generated, after which a message is sent to the iframe to get the Client ID. A listener on the page then waits for the iframe to respond. If the iframe responds with a <code>'null'</code> message, a new tracker is generated (<code>generateTracker</code>) with its default Client ID generation mechanism.</p>
+
+<p>If the iframe responds with the stored Client ID, then a new tracker is generated with this stored Client ID instead.</p>
+
+<p>If the tracker <strong>did</strong> generate a new Client ID, then the <code>trackerGeneratedCallback</code> is called afterwards, and this sends the Client ID to the tracker page for storage.</p>
+
+<p>And this is what the iframe page would look like:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">html</span>&gt;
+&lt;<span style="color:#f92672">head</span>&gt;
+&lt;<span style="color:#f92672">meta</span> <span style="color:#a6e22e">name</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;robots&#34;</span> <span style="color:#a6e22e">content</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;noindex,nofollow&#34;</span>&gt;
+&lt;<span style="color:#f92672">script</span>&gt;
+  <span style="color:#75715e">// Check the request comes from *.maindomain.com
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">hostNameRegex</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">/^https:\/\/([^.]+\.)maindomain\.com/</span>;
+  
+  <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">processMessage</span>(<span style="color:#a6e22e">event</span>) {
+    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">hostnameRegex</span>.<span style="color:#a6e22e">test</span>(<span style="color:#a6e22e">event</span>.<span style="color:#a6e22e">origin</span>)) {
+      <span style="color:#66d9ef">return</span>;
+    }
+    
+    <span style="color:#75715e">// If request is to get the clientId, send it as a message back to the source page
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">// or send &#39;null&#39; if no Client ID is found.
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">event</span>.<span style="color:#a6e22e">data</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#39;get&#39;</span>) {
+      <span style="color:#a6e22e">event</span>.<span style="color:#a6e22e">source</span>.<span style="color:#a6e22e">postMessage</span>(window.<span style="color:#a6e22e">localStorage</span>.<span style="color:#a6e22e">getItem</span>(<span style="color:#e6db74">&#39;ga_client_id&#39;</span>) <span style="color:#f92672">||</span> <span style="color:#e6db74">&#39;null&#39;</span>, <span style="color:#a6e22e">event</span>.<span style="color:#a6e22e">origin</span>);
+      <span style="color:#66d9ef">return</span>;
+    }
+    
+    <span style="color:#75715e">// Otherwise, set the Client ID in localStorage using the message content
+</span><span style="color:#75715e"></span>    window.<span style="color:#a6e22e">localStorage</span>.<span style="color:#a6e22e">setItem</span>(<span style="color:#e6db74">&#39;ga_client_id&#39;</span>, <span style="color:#a6e22e">event</span>.<span style="color:#a6e22e">data</span>);
+    <span style="color:#66d9ef">return</span>,
+  }
+  
+  <span style="color:#75715e">// Add a listener to listen for postMessage messages
+</span><span style="color:#75715e"></span>  window.<span style="color:#a6e22e">addEventListener</span>(<span style="color:#e6db74">&#39;message&#39;</span>, <span style="color:#a6e22e">processMessage</span>);
+&lt;/<span style="color:#f92672">script</span>&gt;
+&lt;/<span style="color:#f92672">head</span>&gt;
+&lt;<span style="color:#f92672">body</span>&gt;
+&lt;/<span style="color:#f92672">body</span>&gt;
+&lt;/<span style="color:#f92672">html</span>&gt;</code></pre></div>
+
+<p>This way you could persist any client-side cookie values in the <code>localStorage</code> store of the domain where the iframe rests. This example is just for an arbitrary Client ID, but you could extend it for any value passed in the message.</p>
+
+<p>Just remember the idiosyncracies of each platform. With Google Analytics, for example, additional measures need to be taken to handle cross-domain tracking, cookie expiration, etc.</p>
+
+<h3 id="set-cookie-headers-in-a-server-side-script">Set-Cookie headers in a server-side script</h3>
 
 <p>Instead of setting the <code>_ga</code> cookie with <code>document.cookie</code>, you could instead set it with the HTTP response. For example, if running a <strong>node.js</strong> Express server, you could have the following lines in your code:</p>
 
@@ -555,15 +659,43 @@
 });
 </code></pre></div>
 
-<p>In this example, when the home page is requested from the server, its cookies are parsed. If the <code>_ga</code> cookie is found, its value is stored as a local variable. Then, if the request also had the cross-domain linker parameter, the parameter validity is verified (using e.g. my <a href="https://gist.github.com/sahava/f3718f981bb01768c0eba714ee94e2d2">Gist</a>) and if it&rsquo;s a valid parameter, the local variable is overwritten with the Client ID from the linker.</p>
+<p>In this example, when the home page is requested from the server, its cookies are parsed. If the <code>_ga</code> cookie is found, its value is stored as a local variable. Then, if the request also has the cross-domain linker parameter, the parameter validity is verified (using e.g. my <a href="https://gist.github.com/sahava/f3718f981bb01768c0eba714ee94e2d2">Gist</a>) and if it&rsquo;s a valid parameter, the local variable is overwritten with the Client ID from the linker.</p>
 
 <p>Finally, if the <code>_ga</code> cookie didn&rsquo;t exist and if the cross-domain linker was missing or broken, a new Client ID is generated.</p>
 
 <p>And in the HTTP response, the <code>_ga</code> cookie is set with this value, and its expiration is reset to two years.</p>
 
-<p>This type of server-side setup should be trivial to do in almost any web server environment (PHP/Apache, React, Node.js, IIS, etc.). But you do need access to the web server and how it handles requests to be able to do this.</p>
+<p>This type of server-side setup should be trivial to do in almost any web server environment (<a href="http://peter.nikolow.me/safari-itp-2-1-demo/">PHP/Apache</a>, React, Node.js, IIS, etc.). But you do need access to the web server and how it handles requests to be able to do this.</p>
 
-<p>It will be interesting to see if this way of setting the first-party cookie will also be targeted by ITP if its found that it, too, can be abused for cross-site tracking.</p>
+<h3 id="set-cookie-headers-in-an-edge-cache">Set-Cookie headers in an edge cache</h3>
+
+<p>If you&rsquo;re using a service such as <a href="https://www.cloudflare.com/">Cloudflare</a>, which caches your server content on &ldquo;the edge&rdquo;, you might also be able to run JavaScript to intercept and handle the HTTP requests between the browser and Cloudflare. On Cloudflare, this technology is called <a href="https://www.cloudflare.com/products/cloudflare-workers/">Cloudflare Workers</a>. Amazon has a similar solution called <a href="https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/lambda-at-the-edge.html">Lambda@Edge</a>.</p>
+
+<p>The idea is that when the HTTP request for content comes in, a script running in the edge &ldquo;rewrites&rdquo; any cookies in the HTTP header with <code>Set-Cookie</code>, thus avoiding ITP 2.1 limitations.</p>
+
+<p>Dustin Recko tackled this in a <a href="https://omr.ruhr/google-analytics-itp-2-1-prevention-http-set-cookie-snippet-182092779d40">recent article on ITP 2.1</a>.</p>
+
+<p>Since many sites are already leveraging Cloudflare or Amazon&rsquo;s Cloudfront, this would be a fairly lightweight way to handle the cookie routing.</p>
+
+<h3 id="shared-web-service-referenced-with-a-cname-record">Shared web service referenced with a CNAME record</h3>
+
+<p>This is super interesting. Apparently, it&rsquo;s what <a href="https://helpx.adobe.com/analytics/kb/adobe-analytics-anditp.html">Adobe</a> has already been doing for a while.</p>
+
+<p>The logic is similar to the <a href="#set-cookie-headers-in-a-server-side-script">server-side cookie router</a> and/or the <a href="#localstorage-for-cross-subdomain-browsing"><code>localStorage</code> store</a> described above. But instead of hosting the content on your own domain, you would create the endpoint in a virtual machine running in the Google Cloud, for example, and then create a <a href="https://en.wikipedia.org/wiki/CNAME_record">CNAME record</a> in your DNS to point <code>tracker.mydomain.com</code> to that virtual machine.</p>
+
+<p>Then, when a page is loaded, the first thing it does is call this endpoint (<code>tracker.mydomain.com</code>). The endpoint would grab the cookies from the HTTP headers and use <code>Set-Cookie</code> in the response to write the cookies on <code>mydomain.com</code>, thus avoiding the ITP 2.1 ban on client-side cookies.</p>
+
+<p>Alternatively, you could have <code>tracker.html</code> running in the service, and you&rsquo;d load <code>tracker.mydomain.com/tracker.html</code>) in an iframe, and use that as the <code>localStorage</code> store.</p>
+
+<p>Naturally, this incurs some extra costs, because you would have to route a lot of calls to this cloud endpoint to make sure all the relevant cookies get their expiration extended. This is why, I guess, Adobe offers it as a service.</p>
+
+<p>I&rsquo;d be curious to see if this is something Google is looking at, too. Seems like it would be a somewhat elegant way to handle the problem with the <code>_ga</code> cookie. They could create a service where the GA hit is not sent to <code>google-analytics.com/collect</code> but rather to <code>tracker.mydomain.com/collect</code>. The endpoint would then use <code>Set-Cookie</code> to set the <code>_ga</code> cookie on <strong>mydomain.com</strong>, and it would then forward the original request to GA.</p>
+
+<p>I verified with <a href="https://twitter.com/johnwilander">John Wilander</a> (a WebKit engineer working on ITP) that this should be OK:</p>
+
+<blockquote class="twitter-tweet"><p lang="en" dir="ltr">You’re asking two questions. Let me respond to them separately:<br>1) Same eTLD+1 is same-site, i.e. same “party.” ITP doesn’t look at subdomains.</p>&mdash; John Wilander (@johnwilander) <a href="https://twitter.com/johnwilander/status/1101726191457689600?ref_src=twsrc%5Etfw">March 2, 2019</a></blockquote>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
 
 <h3 id="server-side-proxying">Server-side proxying</h3>
 
