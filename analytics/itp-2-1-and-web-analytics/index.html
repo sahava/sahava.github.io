@@ -314,7 +314,7 @@
               
 
 <blockquote>
-<p>Updated <strong>2 March 2019</strong> with additional <a href="#technical-implications-and-solutions">solutions</a>.</p>
+<p>Updated <strong>5 March 2019</strong> with additional <a href="#technical-implications-and-solutions">solutions</a>.</p>
 </blockquote>
 
 <p>On 21st February 2019, <a href="https://webkit.org/">WebKit</a> announced the release of the latest iteration of Safari&rsquo;s <strong>Intelligent Tracking Prevention</strong> (ITP), known as <a href="https://webkit.org/blog/8613/intelligent-tracking-prevention-2-1/">ITP 2.1</a>. For a while now, Safari has been targeting cross-site tracking with ITP, first starting with <a href="https://webkit.org/blog/7675/intelligent-tracking-prevention/">cookies in third-party contexts</a>, then <a href="https://webkit.org/blog/8311/intelligent-tracking-prevention-2-0/">tightening the noose</a> after a number of workarounds emerged, and finally with the latest iteration targeting cookies that were moved from a third-party context to a first-party context.</p>
@@ -346,6 +346,38 @@
 <p>This means that any <strong>JavaScript library</strong> wanting to store a cookie in the web browser will have that cookie capped to a seven day lifetime. After seven days since cookie creation, the cookie will expire and will be removed from the browser.</p>
 
 <p>In this article, I want to explore the implications this has on web analytics, and what we can do to avoid losing the integrity of our data.</p>
+
+<h1 id="table-of-contents">Table of Contents</h1><nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#brief-introduction-to-itp">Brief introduction to ITP</a>
+<ul>
+<li><a href="#itp-1-0">ITP 1.0</a></li>
+<li><a href="#itp-1-1-and-storage-access-api">ITP 1.1 and Storage Access API</a></li>
+<li><a href="#itp-2-0">ITP 2.0</a></li>
+</ul></li>
+<li><a href="#itp-2-1">ITP 2.1</a></li>
+<li><a href="#technical-implications-and-solutions">Technical implications and solutions</a>
+<ul>
+<li><a href="#localstorage-for-same-domain-browsing">localStorage for same-domain browsing</a></li>
+<li><a href="#localstorage-for-cross-subdomain-browsing">localStorage for cross-subdomain browsing</a></li>
+<li><a href="#set-cookie-headers-in-a-server-side-script">Set-Cookie headers in a server-side script</a></li>
+<li><a href="#set-cookie-headers-in-an-edge-cache">Set-Cookie headers in an edge cache</a></li>
+<li><a href="#shared-web-service-referenced-with-a-cname-record">Shared web service referenced with a CNAME record</a></li>
+<li><a href="#reverse-proxy-to-third-party-service">Reverse proxy to third party service</a></li>
+<li><a href="#server-side-analytics">Server-side analytics</a></li>
+</ul></li>
+<li><a href="#final-thoughts">Final thoughts</a>
+<ul>
+<li><a href="#this-is-a-good-thing">This is a good thing&hellip;</a></li>
+<li><a href="#but-perhaps-the-baby-was-thrown-out-with-the-bathwater">&hellip;but perhaps the baby was thrown out with the bathwater</a></li>
+<li><a href="#and-this-is-definitely-not-the-last-of-it">And this is definitely not the last of it</a></li>
+<li><a href="#going-forward">Going forward</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
 
 <h2 id="brief-introduction-to-itp">Brief introduction to ITP</h2>
 
@@ -697,7 +729,7 @@ document.<span style="color:#a6e22e">body</span>.<span style="color:#a6e22e">app
 
 <p>Naturally, this incurs some extra costs, because you would have to route a lot of calls to this cloud endpoint to make sure all the relevant cookies get their expiration extended. This is why, I guess, Adobe offers it as a service.</p>
 
-<p>I&rsquo;d be curious to see if this is something Google is looking at, too. Seems like it would be a somewhat elegant way to handle the problem with the <code>_ga</code> cookie. They could create a service where the GA hit is not sent to <code>google-analytics.com/collect</code> but rather to <code>tracker.mydomain.com/collect</code>. The endpoint would then use <code>Set-Cookie</code> to set the <code>_ga</code> cookie on <strong>mydomain.com</strong>, and it would then forward the original request to GA.</p>
+<p>I&rsquo;d be curious to see if this is something Google is looking at, too. Seems like it would be a somewhat elegant way to handle the problem with the <code>_ga</code> cookie. They could, for example, have <code>analytics.js</code> fetched from this CNAME redirected domain, but in addition to serving the library, it would also write the <code>_ga</code> cookie in a <code>Set-Cookie</code> response.</p>
 
 <p>I verified with <a href="https://twitter.com/johnwilander">John Wilander</a> (a WebKit engineer working on ITP) that this should be OK:</p>
 
@@ -705,15 +737,67 @@ document.<span style="color:#a6e22e">body</span>.<span style="color:#a6e22e">app
 <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 
 
-<h3 id="server-side-proxying">Server-side proxying</h3>
+<p>The <strong>problem</strong> here is that it adds quite a bit of overhead to the web service providing the response. For one, it would need to do the calculations for the <code>_ga</code> ID, but also it would need to process the request and customize the response. It&rsquo;s possible that even if Google did do this, they wouldn&rsquo;t offer it as part of the <strong>free Google Analytics</strong> service.</p>
 
-<p>There have been an array of suggestions using terms like <strong>server-side proxying</strong> or <strong>server-side analytics</strong>, but I think these have misunderstood what ITP 2.1 does.</p>
+<h3 id="reverse-proxy-to-third-party-service">Reverse proxy to third party service</h3>
+
+<blockquote>
+<p>Thanks to <a href="https://www.linkedin.com/in/plamenarnaudov/">Plamen Arnaudov</a> for this suggestion.</p>
+</blockquote>
+
+<p>A <a href="https://www.cloudflare.com/learning/cdn/glossary/reverse-proxy/">reverse proxy</a> stands in front of web servers, masking their existence when the user requests for resources from a site. For example, a reverse proxy could forward a request for content to <a href="https://www.google.com/">https://www.google.com/</a>, but show <a href="https://www.simoahava.com/search-page">https://www.simoahava.com/search-page</a> in the URL.</p>
+
+<p>It&rsquo;s thus conceptually similar to the CNAME redirect, where the user is exploring content in their own domain namespace, but the content is delivered from another origin.</p>
+
+
+
+
+<div class="figure " >
+  
+    <a href="https://www.simoahava.com/images/2019/02/reverse-proxy-cloudflare.jpg" title="From https://www.cloudflare.com/learning/cdn/glossary/reverse-proxy/">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2019/02/reverse-proxy-cloudflare.jpg#ZgotmplZ" alt="From https://www.cloudflare.com/learning/cdn/glossary/reverse-proxy/">
+  
+    </a>
+  
+   
+    <span class="caption">From https://www.cloudflare.com/learning/cdn/glossary/reverse-proxy/</span>
+  
+</div>
+
+
+
+<p>With the reverse proxy, a service like Google Analytics should need to modify some endpoint to either rewrite the <code>_ga</code> cookie in the request header with a <code>Set-Cookie</code> response, or create the cookie upon the request and serve it with the HTTP header. It might make sense, for example, to have the request for <code>analytics.js</code> respond with the <code>Set-Cookie</code> header.</p>
+
+<p>We have the same limitations here as with the CNAME option above. Google would need to process the request before returning the header. Considering how many millions of requests to their services are made daily, any type of extra processing they&rsquo;d need to do would reflect in costs.</p>
+
+<p>The main difference between this and the CNAME option is that a reverse proxy requires the site owners and developers to add the server-side logic for the proxy, whereas CNAME requires just a DNS record change.</p>
+
+<p>Setting up a reverse proxy isn&rsquo;t complicated at all - with a Node.js server, you could do it with <code>http-proxy-middleware</code> in just a couple of lines:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">proxy</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;http-proxy-middleware&#39;</span>);
+
+...
+
+<span style="color:#a6e22e">app</span>.<span style="color:#a6e22e">get</span>(<span style="color:#e6db74">&#39;/analytics.js&#39;</span>, <span style="color:#a6e22e">proxy</span>({
+  <span style="color:#a6e22e">target</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;https://www.google-analytics.com/&#39;</span>,
+  <span style="color:#a6e22e">changeOrigin</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span>
+});
+</code></pre></div>
+
+<p>This would essentially perform the GET request for the <strong>analytics.js</strong> library on Google&rsquo;s domain, but serve its content under your domain&rsquo;s <code>/analytics.js</code> URL. If Google plays along, it could serve as a valid solution especially in cases where you can&rsquo;t add any more CNAME records to your DNS.</p>
+
+<h3 id="server-side-analytics">Server-side analytics</h3>
+
+<p>There have been an array of suggestions using terms like <strong>server-side analytics</strong>, but I think these have misunderstood what ITP 2.1 does.</p>
 
 <p>If there is no authentication against a backend, the user&rsquo;s browser is identified with an anonymous identifier set in a cookie. No matter what type of analytics server is used - third-party or first-party - it&rsquo;s this browser cookie that tells the service the user is the same as the one who visited some other page 5 minutes ago.</p>
 
 <p>Changing the endpoint from <code>www.google-analytics.com/collect</code> to <code>proxy.simoahava.com/collect</code>, or changing from <code>www.google-analytics.com/collect</code> to <code>snowplow.simoahava.com/track</code> doesn&rsquo;t change this dynamic. There&rsquo;s no way to really align requests sent from a browser with requests sent by the same browser without having this identifier binding those two together somehow.</p>
 
 <p>And if that cookie is set with <code>document.cookie</code>, it will fall under the 7-day expiration schedule, meaning two requests spread more than 7 days apart will not be able to enjoy the same cookie value any more.</p>
+
+<p>The only way any server-side solution would work is if cookies were set with HTTP requests instead of with <code>document.cookie</code>. At this point, it might be easier to setup a <a href="#set-cookie-headers-in-a-server-side-script">cookie router</a>, a <a href="#shared-web-service-referenced-with-a-cname-record">CNAME</a> redirect, or with a <a href="#reverse-proxy-to-third-party-service">reverse proxy</a>.</p>
 
 <h2 id="final-thoughts">Final thoughts</h2>
 
