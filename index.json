@@ -25,7 +25,7 @@
 	"title": "#GTMTips: Use Enhanced Ecommerce Data Layer With Facebook Pixel",
 	"tags": ["google tag manager", "gtmtips", "facebook", "enhanced ecommerce"],
 	"description": "Use the Enhanced Ecommerce object in the dataLayer to populate the required variables of a Facebook pixel in Google Tag Manager.",
-	"content": " A recurring question in the Google Tag Manager communities (e.g. product forums) is how to use an Enhanced Ecommerce dataLayer object with the Facebook pixel code? It\u0026rsquo;s a common question since running a Facebook conversion pixel on a site that also collects data from the store into Google Analytics\u0026rsquo; Enhanced Ecommerce reports is probably a very typical scenario.\n Side note: Since Google+ is about to go the way of the dodo, I\u0026rsquo;ve created an archive of the entire community which you can browse and make text searches against.\n I\u0026rsquo;ve shared a tip on this before, but I think I need to be even more specific and give concrete examples how to populate the various properties of the Facebook pixel object.\nFor a guide on how to implement the Facebook pixel, check out Yehoshua\u0026rsquo;s amazing Facebook Pixel with Google Tag Manager guide.\nTip 95: Use the Facebook Pixel with an Enhanced Ecommerce Data Layer   The solution here is to create an API that you can pass your Enhanced Ecommerce products array to, and it will return the array all reduced and converted to the various formats required by the Facebook Pixel.\nFirst things first, you need to create the Custom JavaScript variable.\n Create a new Custom JavaScript variable in the GTM UI.\n Name it {{EECFB API}} (or something less of an abomination, if you wish).\n Add the following code within:\n  function() { return function(products) { if (!Array.isArray(products)) { return; } var idList = products.map(function(prod) { return prod.id.toString(); }); var totalValue = products.reduce(function(acc, cur) { return acc + (cur.price * cur.quantity); }, 0); var totalQuantity = products.reduce(function(acc, cur) { return acc + cur.quantity; }, 0); var contentsArray = products.map(function(prod) { return { id: prod.id.toString(), item_price: parseFloat(prod.price), quantity: parseInt(prod.quantity) }; }); return { content_ids: idList, value: totalValue, num_items: totalQuantity, contents: contentsArray }; }; }  This code actually returns a function, so it\u0026rsquo;s basically a wrapper for a closure, which you can then call in your other tags using a parameter.\nWhen you invoke this API in a Custom HTML tag, for example, you need to have a variable reference to the products array at hand to pass to this API as a parameter (I\u0026rsquo;ll show you an example soon).\nThe API returns an object with four properties:\n   Property Description Sample output     content_ids Array of all the Product IDs. ['id123', 'id234', 'id345']   value The sum of all the product prices multiplied by their respective quantities. 63.55   num_items The sum of all the quantities in the array. 5   contents The products array converted to the format Facebook requires. [{id: 'id123', quantity: 2, item_price: 10.2}]    How to put it all together Let\u0026rsquo;s take the Facebook Purchase event as an example. Here\u0026rsquo;s what you\u0026rsquo;d need to do.\nFirst, let\u0026rsquo;s say this is what your Enhanced Ecommerce purchase object looks like:\necommerce: { purchase: { products: { actionField: {...}, products: [{ id: \u0026#39;shirt1\u0026#39;, name: \u0026#39;T-Shirt\u0026#39;, price: \u0026#39;15.99\u0026#39;, quantity: 2 },{ id: \u0026#39;pants2\u0026#39;, name: \u0026#39;Pants\u0026#39;, price: \u0026#39;9.99\u0026#39;, quantity: 3 }] } } }   First, create a Data Layer variable for variable name ecommerce.purchase.products and name it {{ecommerce.purchase.products}}. This is the reference to the products in your Enhanced Ecommerce purchase object.\n Create a Custom HTML tag that fires after your Facebook pixel has been initialized.\n This is what the contents might look like:\n  \u0026lt;script\u0026gt; (function() { // Get reference to the Enhanced Ecommerce products \tvar prods = {{ecommerce.purchase.products}}; // Poll the custom Facebook API with this array \tvar fbObj = {{EECFB API}}(prods); // Create the FB pixel call \tif (typeof window.fbq === \u0026#39;function\u0026#39;) { window.fbq(\u0026#39;track\u0026#39;, \u0026#39;Purchase\u0026#39;, { value: fbObj.value, content_ids: fbObj.content_ids, contents: fbObj.contents, num_items: fbObj.num_items }); } })(); \u0026lt;/script\u0026gt; It\u0026rsquo;s an imaginary situation - you wouldn\u0026rsquo;t typically send the Facebook Purchase event with that payload.\nAnyway, what happens here is that first you fetch a reference to the products array in the Enhanced Ecommerce purchase object. Then, you call the {{EECFB API}} passing that array as the parameter. The API returns an object, which you store in the fbObj local variable.\nThen, you simply access the properties of this object (listed in the table earlier in this article) in the fbq() call. That\u0026rsquo;s how you build the required pixel call with all the necessary parameters.\nSo, the window.fbq() method is actually called with these values:\nwindow.fbq(\u0026#39;track\u0026#39;, \u0026#39;Purchase\u0026#39;, { value: 61.95, content_ids: [\u0026#39;shirt1\u0026#39;, \u0026#39;pants2\u0026#39;], contents: [{ id: \u0026#39;shirt1\u0026#39;, item_price: 15.99, quantity: 2 },{ id: \u0026#39;pants2\u0026#39;, item_price: 9.99, quantity: 3 }], num_items: 5 });  Summary What you\u0026rsquo;re creating here is a helper function that automatically chews up your Enhanced Ecommerce products and spits out the values in a format required by the Facebook pixel.\nYou can freely extend the variable with other properties, and adapting it to other source object formats should be quite simple to do, too.\nIn any case, let me know in the comments if you think the API needs some other properties, or if you need help in extending it!\n"
+	"content": " A recurring question in the Google Tag Manager communities (e.g. product forums) is how to use an Enhanced Ecommerce dataLayer object with the Facebook pixel code? It\u0026rsquo;s a common question since running a Facebook conversion pixel on a site that also collects data from the store into Google Analytics\u0026rsquo; Enhanced Ecommerce reports is probably a very typical scenario.\n Side note: Since Google+ is about to go the way of the dodo, I\u0026rsquo;ve created an archive of the entire community which you can browse and make text searches against.\n I\u0026rsquo;ve shared a tip on this before, but I think I need to be even more specific and give concrete examples how to populate the various properties of the Facebook pixel object.\nFor a guide on how to implement the Facebook pixel, check out Yehoshua\u0026rsquo;s amazing Facebook Pixel with Google Tag Manager guide.\nTip 95: Use the Facebook Pixel with an Enhanced Ecommerce Data Layer   The solution here is to create an API that you can pass your Enhanced Ecommerce products array to, and it will return the array all reduced and converted to the various formats required by the Facebook Pixel.\nFirst things first, you need to create the Custom JavaScript variable.\n Create a new Custom JavaScript variable in the GTM UI.\n Name it {{EECFB API}} (or something less of an abomination, if you wish).\n Add the following code within:\n  function() { return function(products) { if (!Array.isArray(products)) { return; } var idList = products.map(function(prod) { return prod.id.toString(); }); var totalValue = products.reduce(function(acc, cur) { return acc + (cur.price * cur.quantity); }, 0); var totalQuantity = products.reduce(function(acc, cur) { return acc + parseInt(cur.quantity); }, 0); var contentsArray = products.map(function(prod) { return { id: prod.id.toString(), item_price: parseFloat(prod.price), quantity: parseInt(prod.quantity) }; }); return { content_ids: idList, value: totalValue, num_items: totalQuantity, contents: contentsArray }; }; }  This code actually returns a function, so it\u0026rsquo;s basically a wrapper for a closure, which you can then call in your other tags using a parameter.\nWhen you invoke this API in a Custom HTML tag, for example, you need to have a variable reference to the products array at hand to pass to this API as a parameter (I\u0026rsquo;ll show you an example soon).\nThe API returns an object with four properties:\n   Property Description Sample output     content_ids Array of all the Product IDs. ['id123', 'id234', 'id345']   value The sum of all the product prices multiplied by their respective quantities. 63.55   num_items The sum of all the quantities in the array. 5   contents The products array converted to the format Facebook requires. [{id: 'id123', quantity: 2, item_price: 10.2}]    How to put it all together Let\u0026rsquo;s take the Facebook Purchase event as an example. Here\u0026rsquo;s what you\u0026rsquo;d need to do.\nFirst, let\u0026rsquo;s say this is what your Enhanced Ecommerce purchase object looks like:\necommerce: { purchase: { products: { actionField: {...}, products: [{ id: \u0026#39;shirt1\u0026#39;, name: \u0026#39;T-Shirt\u0026#39;, price: \u0026#39;15.99\u0026#39;, quantity: 2 },{ id: \u0026#39;pants2\u0026#39;, name: \u0026#39;Pants\u0026#39;, price: \u0026#39;9.99\u0026#39;, quantity: 3 }] } } }   First, create a Data Layer variable for variable name ecommerce.purchase.products and name it {{ecommerce.purchase.products}}. This is the reference to the products in your Enhanced Ecommerce purchase object.\n Create a Custom HTML tag that fires after your Facebook pixel has been initialized.\n This is what the contents might look like:\n  \u0026lt;script\u0026gt; (function() { // Get reference to the Enhanced Ecommerce products \tvar prods = {{ecommerce.purchase.products}}; // Poll the custom Facebook API with this array \tvar fbObj = {{EECFB API}}(prods); // Create the FB pixel call \tif (typeof window.fbq === \u0026#39;function\u0026#39;) { window.fbq(\u0026#39;track\u0026#39;, \u0026#39;Purchase\u0026#39;, { value: fbObj.value, content_ids: fbObj.content_ids, contents: fbObj.contents, num_items: fbObj.num_items }); } })(); \u0026lt;/script\u0026gt; It\u0026rsquo;s an imaginary situation - you wouldn\u0026rsquo;t typically send the Facebook Purchase event with that payload.\nAnyway, what happens here is that first you fetch a reference to the products array in the Enhanced Ecommerce purchase object. Then, you call the {{EECFB API}} passing that array as the parameter. The API returns an object, which you store in the fbObj local variable.\nThen, you simply access the properties of this object (listed in the table earlier in this article) in the fbq() call. That\u0026rsquo;s how you build the required pixel call with all the necessary parameters.\nSo, the window.fbq() method is actually called with these values:\nwindow.fbq(\u0026#39;track\u0026#39;, \u0026#39;Purchase\u0026#39;, { value: 61.95, content_ids: [\u0026#39;shirt1\u0026#39;, \u0026#39;pants2\u0026#39;], contents: [{ id: \u0026#39;shirt1\u0026#39;, item_price: 15.99, quantity: 2 },{ id: \u0026#39;pants2\u0026#39;, item_price: 9.99, quantity: 3 }], num_items: 5 });  Summary What you\u0026rsquo;re creating here is a helper function that automatically chews up your Enhanced Ecommerce products and spits out the values in a format required by the Facebook pixel.\nYou can freely extend the variable with other properties, and adapting it to other source object formats should be quite simple to do, too.\nIn any case, let me know in the comments if you think the API needs some other properties, or if you need help in extending it!\n"
 },
 {
 	"uri": "https://www.simoahava.com/analytics/true-view-impressions-google-tag-manager/",
@@ -2030,14 +2030,14 @@
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/tags/analytics/",
+	"uri": "https://www.simoahava.com/categories/analytics/",
 	"title": "Analytics",
 	"tags": [],
 	"description": "",
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/categories/analytics/",
+	"uri": "https://www.simoahava.com/tags/analytics/",
 	"title": "Analytics",
 	"tags": [],
 	"description": "",
@@ -2338,14 +2338,14 @@
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/tags/content-management/",
+	"uri": "https://www.simoahava.com/categories/content-management/",
 	"title": "Content Management",
 	"tags": [],
 	"description": "",
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/categories/content-management/",
+	"uri": "https://www.simoahava.com/tags/content-management/",
 	"title": "Content Management",
 	"tags": [],
 	"description": "",
@@ -2590,14 +2590,14 @@
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/tags/digital-marketing/",
+	"uri": "https://www.simoahava.com/categories/digital-marketing/",
 	"title": "Digital Marketing",
 	"tags": [],
 	"description": "",
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/categories/digital-marketing/",
+	"uri": "https://www.simoahava.com/tags/digital-marketing/",
 	"title": "Digital Marketing",
 	"tags": [],
 	"description": "",
@@ -2849,14 +2849,14 @@
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/tags/google-cloud/",
+	"uri": "https://www.simoahava.com/categories/google-cloud/",
 	"title": "Google Cloud",
 	"tags": [],
 	"description": "",
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/categories/google-cloud/",
+	"uri": "https://www.simoahava.com/tags/google-cloud/",
 	"title": "Google Cloud",
 	"tags": [],
 	"description": "",
@@ -3269,14 +3269,14 @@
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/tags/personal/",
+	"uri": "https://www.simoahava.com/categories/personal/",
 	"title": "Personal",
 	"tags": [],
 	"description": "",
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/categories/personal/",
+	"uri": "https://www.simoahava.com/tags/personal/",
 	"title": "Personal",
 	"tags": [],
 	"description": "",
@@ -3843,13 +3843,6 @@
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/tags/web-design/",
-	"title": "Web Design",
-	"tags": [],
-	"description": "",
-	"content": ""
-},
-{
 	"uri": "https://www.simoahava.com/categories/web-design/",
 	"title": "Web Design",
 	"tags": [],
@@ -3857,14 +3850,21 @@
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/tags/web-development/",
-	"title": "Web Development",
+	"uri": "https://www.simoahava.com/tags/web-design/",
+	"title": "Web Design",
 	"tags": [],
 	"description": "",
 	"content": ""
 },
 {
 	"uri": "https://www.simoahava.com/categories/web-development/",
+	"title": "Web Development",
+	"tags": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "https://www.simoahava.com/tags/web-development/",
 	"title": "Web Development",
 	"tags": [],
 	"description": "",
