@@ -130,7 +130,7 @@
 
 <meta itemprop="datePublished" content="2017-12-21T10:06:19&#43;02:00" />
 <meta itemprop="dateModified" content="2017-12-21T10:06:19&#43;02:00" />
-<meta itemprop="wordCount" content="487">
+<meta itemprop="wordCount" content="517">
 
 
 
@@ -872,6 +872,10 @@ on
     <section class="post-content">
       
 
+<blockquote>
+<p>Update <strong>5 March 2019</strong> due to GTM not supporting negative lookbehinds any more.</p>
+</blockquote>
+
 <p><a href="https://tagmanager.google.com/">Google Tag Manager</a> makes it fairly easy to do <a href="https://support.google.com/analytics/answer/1034342">cross-domain tracking</a>. Basically, you list the hostnames you want to automatically decorate with linker parameters in the <strong>Auto-Link Domains</strong> field of your Page View tag, and that takes care of decorating the URLs with the necessary parameter. It&rsquo;s dead easy, even if there are a bunch of traps you need to watch out for (see my post on <a href="https://www.simoahava.com/amp/analytics/troubleshooting-cross-domain-tracking-in-google-analytics/">troubleshooting cross-domain tracking issues</a>).</p>
 
 <p>However, for some reason, GTM doesn&rsquo;t support regular expressions in the Auto-Link Domains field. The <code>autoLink</code> method supports both strings and regular expression literals, but GTM only uses the first. Hopefully, at some point this will be fixed and this article will become obsolete. The reason we want regular expressions is to be able to do things like negative lookbehinds, where we specify that a subset of domains of any given hostname be excluded from decoration. In the image below, you can see an example of this. The regular expression specifies that all other domains <em>except</em> <code>www.simoahava.com</code> should be decorated with cross-domain parameters.</p>
@@ -895,7 +899,7 @@ on
 <div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
   <span class="k">return</span> <span class="kd">function</span><span class="p">(</span><span class="nx">model</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">domainList</span> <span class="o">=</span> <span class="p">[</span>
-      <span class="sr">/^.*(?&lt;!dev\.)hostname\.com$/</span><span class="p">,</span>
+      <span class="sr">/^(?!dev)[^.]*\.?hostname\.com$/</span><span class="p">,</span>
 	  <span class="s1">&#39;somedomain.com&#39;</span><span class="p">,</span>
 	  <span class="s1">&#39;www.domain.com&#39;</span><span class="p">,</span>
 	  <span class="sr">/^example\.com$/</span>
@@ -912,9 +916,9 @@ on
 
 <p>Regular expressions give you the power of zero-length assertions such as negative and positive lookbehinds. This makes it easy to match, for example, all subdomains of <code>example.com</code> except for <code>test.example.com</code>.</p>
 
-<p><code>/^.*(?&lt;!test\.)example\.com$/</code></p>
+<p><code>/^(?!test)[^.]*\.?example\.com$/</code></p>
 
-<p>This regular expression reads out as: match any string that contains <code>example.com</code> except for those strings where <code>example.com</code> is directly preceded by <code>test.</code>.</p>
+<p>This regular expression reads out as: match any string that doesn&rsquo;t start with <code>test</code>, but contains <code>example.com</code> or any subdomain other than <code>test.example.com</code>. The clumsy <strong>positive lookahead</strong> is necessary because GTM doesn&rsquo;t currently (as of <strong>March 2019</strong>) support negative lookbehinds.</p>
 
 <p>The rest of the variable basically invokes the Universal Analytics tracker object used in the current hit, loads the linker plugin, and then decorates the domain list with cross-domain parameters.</p>
 
