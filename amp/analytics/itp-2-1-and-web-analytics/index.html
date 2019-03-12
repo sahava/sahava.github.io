@@ -128,7 +128,7 @@
 
 <meta itemprop="datePublished" content="2019-02-28T10:52:16&#43;02:00" />
 <meta itemprop="dateModified" content="2019-02-28T10:52:16&#43;02:00" />
-<meta itemprop="wordCount" content="4528">
+<meta itemprop="wordCount" content="4680">
 
 
 
@@ -869,7 +869,7 @@ on
       
 
 <blockquote>
-<p>Updated <strong>5 March 2019</strong> with additional <a href="#technical-implications-and-solutions">solutions</a>.</p>
+<p>Updated <strong>12 March 2019</strong> with some minor clarifications..</p>
 </blockquote>
 
 <p>On 21st February 2019, <a href="https://webkit.org/">WebKit</a> announced the release of the latest iteration of Safari&rsquo;s <strong>Intelligent Tracking Prevention</strong> (ITP), known as <a href="https://webkit.org/blog/8613/intelligent-tracking-prevention-2-1/">ITP 2.1</a>. For a while now, Safari has been targeting cross-site tracking with ITP, first starting with <a href="https://webkit.org/blog/7675/intelligent-tracking-prevention/">cookies in third-party contexts</a>, then <a href="https://webkit.org/blog/8311/intelligent-tracking-prevention-2-0/">tightening the noose</a> after a number of workarounds emerged, and finally with the latest iteration targeting cookies that were moved from a third-party context to a first-party context.</p>
@@ -996,7 +996,7 @@ on
 
 <h2 id="itp-2-1">ITP 2.1</h2>
 
-<p><a href="https://webkit.org/blog/8613/intelligent-tracking-prevention-2-1/">ITP 2.1</a> was announced of February 21st, 2019, and it will come to effect as soon as <strong>iOS 12.2</strong> and <strong>Safari 12.1</strong> come out of beta.</p>
+<p><a href="https://webkit.org/blog/8613/intelligent-tracking-prevention-2-1/">ITP 2.1</a> was announced on February 21st, 2019, and it will come to effect as soon as <strong>iOS 12.2</strong> and <strong>Safari 12.1</strong> come out of beta.</p>
 
 <blockquote>
 <p><strong>Update 8 March 2019</strong>: It looks like features that are now bundled as ITP 2.1 have been quitely rolling out since the beginning of this year already.</p>
@@ -1020,9 +1020,9 @@ on
 
 <p>As in the above example, any one of the subdomains of <strong>simoahava.com</strong> can write a first-party cookie on that root domain, after which <strong>any</strong> subdomain of simoahava.com can access that cookie. This is nothing new - this is how cookies set on a root domain have always worked.</p>
 
-<p>However, ITP now targets cookies set with JavaScript&rsquo;s <code>document.cookie</code> because it has become apparent that vendors have replaced cross-site tracking in a third-party context with cross-site tracking in a first-party context.</p>
+<p>However, ITP now targets cookies set with JavaScript&rsquo;s <code>document.cookie</code> because it has become apparent that some vendors (e.g. one whose name rhymes with <em>lacebook</em>) have begun repurposing first-party cookies to help with their cross-site tracking intentions. They are also taking advantage of the scenario depicted in the image above. Even if you limited these vendors&rsquo; pixels to fire only on a specific subdomain, they could still access cookies on higher-level domain names.</p>
 
-<p>The impact on web analytics is brutal, depending of course on Safari share of your traffic. Take the following example:</p>
+<p>The impact on web analytics is brutal, depending of course on Safari&rsquo;s share of your traffic. Take the following example:</p>
 
 <ul>
 <li><p><strong>Day 1</strong>: User visits www.simoahava.com, the <code>_ga</code> cookie is written on simoahava.com. It is set at a 7-day expiry (rather than the 2 years that analytics.js defaults to).</p></li>
@@ -1184,9 +1184,9 @@ on
 
 <p>Finally, if the <code>_ga</code> cookie didn&rsquo;t exist and if the cross-domain linker was missing or broken, a new Client ID is generated.</p>
 
-<p>And in the HTTP response, the <code>_ga</code> cookie is set with this value, and its expiration is reset to two years.</p>
+<p>In the HTTP response, the <code>_ga</code> cookie is set with this value, and its expiration is reset to two years.</p>
 
-<p>This type of server-side setup should be trivial to do in almost any web server environment (<a href="http://peter.nikolow.me/safari-itp-2-1-demo/">PHP/Apache</a>, React, Node.js, IIS, etc.). But you do need access to the web server and how it handles requests to be able to do this.</p>
+<p>This type of server-side setup should be trivial to do in almost any web server environment (<a href="http://peter.nikolow.me/safari-itp-2-1-demo/">PHP/Apache</a>, React, Node.js, IIS, etc.). But you do need access to the web server and its request handlers to be able to do this.</p>
 
 <h3 id="set-cookie-headers-in-an-edge-cache">Set-Cookie headers in an edge cache</h3>
 
@@ -1210,7 +1210,7 @@ on
 
 <p>Then, when a page is loaded, the first thing it does is call this endpoint (<code>tracker.mydomain.com</code>). The endpoint would grab the cookies from the HTTP headers and use <code>Set-Cookie</code> in the response to write the cookies on <code>mydomain.com</code>, thus avoiding the ITP 2.1 ban on client-side cookies.</p>
 
-<p>Alternatively, you could have <code>tracker.html</code> running in the service, and you&rsquo;d load <code>tracker.mydomain.com/tracker.html</code>) in an iframe, and use that as the <code>localStorage</code> store.</p>
+<p>Alternatively, you could have <code>tracker.html</code> running in the service, and you&rsquo;d load <code>tracker.mydomain.com/tracker.html</code> in an iframe, and use that as the <code>localStorage</code> store.</p>
 
 <p>Naturally, this incurs some extra costs, because you would have to route a lot of calls to this cloud endpoint to make sure all the relevant cookies get their expiration extended. This is why, I guess, Adobe offers it as a service.</p>
 
@@ -1239,7 +1239,7 @@ on
 
 <p>A <a href="https://www.cloudflare.com/learning/cdn/glossary/reverse-proxy/">reverse proxy</a> stands in front of web servers, masking their existence when the user requests for resources from a site. For example, a reverse proxy could forward a request for content to <a href="https://www.google.com/">https://www.google.com/</a>, but show <a href="https://www.simoahava.com/search-page">https://www.simoahava.com/search-page</a> in the URL.</p>
 
-<p>It&rsquo;s thus conceptually similar to the CNAME redirect, where the user is exploring content in their own domain namespace, but the content is delivered from another origin.</p>
+<p>It&rsquo;s thus conceptually similar to the CNAME redirect, where the user is exploring content in their own domain namespace but the content is delivered from another origin.</p>
 
 
 
@@ -1314,7 +1314,7 @@ on
 
 
 
-<p>I totally agree with cross-site tracking being <em>generally</em> bad. But there are ways to do web analytics without malicious intent. It would have made more sense to prevent cookies from being access across sub-domains, thus forcing sites to append linker parameters to internal links, but expiring all <code>document.cookie</code> setters with a 7-day cap is pretty drastic.</p>
+<p>I totally agree with cross-site tracking being <em>generally</em> bad. But there are ways to do web analytics without malicious intent. It would have made more sense to prevent cookies from being accessed outside the domain they were set on, thus forcing sites to append linker parameters to internal links, but expiring all <code>document.cookie</code> setters with a 7-day cap is pretty drastic.</p>
 
 <p>Having Google Analytics running on your site does not make you a bad person - you are using it to optimize the performance and usability of your site, and for creating better landing pages and marketing campaigns. But now that the cookie is capped at 7 days, you basically lose all ability to build cohorts of users who only visit your site once a month, for example, unless you invest in setting HTTP cookies instead.</p>
 
@@ -1343,13 +1343,15 @@ on
 
 <p>As workarounds for ITP are invented, new iterations of ITP will be introduced. Until now, each iteration has made ITP stricter. Even if they made a concession (Storage Access API without user prompt), they seem to not hesitate to pull it back in a later version.</p>
 
-<p>I don&rsquo;t think they&rsquo;ll let go of the 7-day cookie expiration for <code>document.cookie</code>. I think it&rsquo;s up to vendors now to figure out how to overcome this.</p>
+<p>I don&rsquo;t think they&rsquo;ll let go of the 7-day cookie expiration for <code>document.cookie</code>. If anything, they&rsquo;ll reduce it to just one day, or only allow session cookies. Or, perhaps eradicate JavaScript cookies altogethe. In any case, it&rsquo;s up to vendors and their enterprise clients (since money talks) to consider how big a deal this is, and how to solve this going forward.</p>
 
-<p>Adobe introduced their own ways of <a href="https://helpx.adobe.com/analytics/kb/adobe-analytics-anditp.html">tackling ITP</a> but with the ban on <code>document.cookie</code> it remains to be see how they&rsquo;ll react to ITP 2.1.</p>
+<p>Adobe has already introduced their own ways of <a href="https://helpx.adobe.com/analytics/kb/adobe-analytics-anditp.html">tackling ITP</a> but with the ban on <code>document.cookie</code> it remains to be see how they&rsquo;ll react to ITP 2.1.</p>
+
+<p>Vendors might be hesitant to take action because nothing is future-proofed. Any solution that caters to web analytics users could be misappropriated for cross-site tracking purposes, and at that point a future iteration of ITP would most certainly neuter it. And if that happens, the analytics vendor who encouraged enterprise clients to spend thousands of dollars in implementing the solution will now be blamed for not having enough foresight.</p>
 
 <h3 id="going-forward">Going forward</h3>
 
-<p>To sum up this article, here&rsquo;s the key takeaways:</p>
+<p>To sum up this article, here are the key takeaways:</p>
 
 <ol>
 <li><p>If you are tracking just root domains, and do not need cross-subdomain tracking to work without explicit linker parameters, you can use the <a href="https://www.simoahava.com/analytics/use-localstorage-client-id-persistence-google-analytics/"><code>localStorage</code> workaround</a>. See <a href="#localstorage-isn-t-a-solid-workaround">this chapter</a> for more information.</p></li>
