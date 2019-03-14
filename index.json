@@ -1,5 +1,12 @@
 [
 {
+	"uri": "https://www.simoahava.com/analytics/send-event-before-pageview-in-google-analytics/",
+	"title": "Send Event Hits Before Pageview Hits In Google Analytics",
+	"tags": ["google analytics", "session", "google tag manager"],
+	"description": "This article explores what actually happens if you end up sending event hits before pageview hits when using Google Analytics.",
+	"content": " One of the myths surrounding Google Analytics is that the first hit of a session should always be a pageview. It makes sense - sessions are initialized with a landing page, and thus need a page view to have one.\n  However, in this article I want to show you empirically how this myth is just that - a myth.\nThere is little discernible impact if the first hit of a session is an event, and GA is more than capable of stitching the first event together with the subsequent pageview into a session entity.\nThe three repercussions I could find were:\n Entrances and Sessions not matching up with the Page dimension. See here for some details, too.\n Behavior Flow report attributes the event page as the \u0026ldquo;Landing Page\u0026rdquo; and the page sent with the pageview as the \u0026ldquo;Starting Page\u0026rdquo;.\n Goal Completion Location for an event goal set for the event in question shows (entrance) if the event was the first hit of the session.\n    I\u0026rsquo;ll explore these later on in the article.\nTest setup Here\u0026rsquo;s how I tested this. I created four test cases. Each pair of event-pageview hits was contained in its own session (using the sessionControl parameter).\nAll events were sent from page /, where as the pageview hits always had a different page parameter. This was mainly to see the impact of the event\u0026rsquo;s page parameter on the Goal Completion Location (there was none).\nI also created an Event goal which matched all the events sent with this test.\nHere are the test cases:\n Non-interactive event as the 1st hit, pageview on /test-event-1 as the 2nd hit.\n Interactive event as the 1st hit, pageview on /test-event-3 as the 2nd hit.\n Pageview on /test-event-5 as the 1st hit, non-interactive event as the 2nd hit.\n Pageview on /test-event-7 as the 1st hit, interactive event as the 2nd hit.\n  Here\u0026rsquo;s what a sample command looked like. This is for the first test case:\nga(\u0026#39;create\u0026#39;, \u0026#39;UA-XXXXXX\u0026#39;, {name: \u0026#39;test\u0026#39;}); ga(\u0026#39;test.send\u0026#39;, \u0026#39;event\u0026#39;, \u0026#39;eventFirstHit\u0026#39;, \u0026#39;nonInteractive\u0026#39;, \u0026#39;noPath\u0026#39;, {nonInteraction: true, sessionControl: \u0026#39;start\u0026#39;, campaignSource: \u0026#39;test_event_1\u0026#39;, campaignMedium: \u0026#39;test_event_1\u0026#39;}); ga(\u0026#39;test.send\u0026#39;, \u0026#39;pageview\u0026#39;, {page: \u0026#39;/test-event-1\u0026#39;});  The first line creates the tracker.\nThe second line dispatches the event. You can ignore the noPath label and the campaignSource/Medium parameters - they were just used to control the test analysis in GA.\nThis is what the fourth test case code looked like:\nga(\u0026#39;create\u0026#39;, \u0026#39;UA-XXXXXX\u0026#39;, {name: \u0026#39;test\u0026#39;}); ga(\u0026#39;test.send\u0026#39;, \u0026#39;pageview\u0026#39;, {sessionControl: \u0026#39;start\u0026#39;, page: \u0026#39;/test-event-7\u0026#39;, campaignSource: \u0026#39;test_event_7\u0026#39;, campaignMedium: \u0026#39;test_event_7\u0026#39;}); ga(\u0026#39;test.send\u0026#39;, \u0026#39;event\u0026#39;, \u0026#39;eventNotFirstHit\u0026#39;, \u0026#39;Interactive\u0026#39;, \u0026#39;noPath\u0026#39;);  Results Here are the results of the test.\nThe first thing to note is that not one of the test cases produced a session with Landing Page (not set). That\u0026rsquo;s a red herring I\u0026rsquo;ll discuss this briefly in the next chapter.\nTest case 1    Item Description     1st hit Non-interactive event on /   2nd hit Pageview on /test-event-1   Landing Page /test-event-1   Goal Completion Location (entrance)   Sessions metric /test-event-1: 0, /: 1   Entrances metric /test-event-1: 1, /: 0      Test case 2    Item Description     1st hit Interactive event on /   2nd hit Pageview on /test-event-3   Landing Page /test-event-3   Goal Completion Location (entrance)   Sessions metric /test-event-3: 0, /: 1   Entrances metric /test-event-3: 1, /: 0      Test case 3    Item Description     1st hit Pageview on /test-event-5   2nd hit Non-interactive event on /   Landing Page /test-event-5   Goal Completion Location /test-event-5   Sessions metric /test-event-5: 1   Entrances metric /test-event-5: 1      Test case 4    Item Description     1st hit Pageview on /test-event-7   2nd hit Interactive event on /   Landing Page /test-event-7   Goal Completion Location /test-event-7   Sessions metric /test-event-7: 1   Entrances metric /test-event-7: 1      Results overview As you can see, even if the event was sent as the first hit of a session, it didn\u0026rsquo;t cause the cosmos to implode. Google Analytics is able to build the session nevertheless, treating the event as the first hit of the session, and adding subsequent hits (other events, pageview) to the session normally.\nThe main impacts of sending an event as the first hit of a session are:\n The Landing Page is associated with the first pageview of the session. The page sent with the event hit cannot be the Landing Page.\n When querying against the Page dimension, the Entrance is always incremented for the page sent with the pageview, but the Sessions metric is incremented for the first hit - non-interactive or interactive.\n Goal Completion Location will always be the URI of the most recent page view sent before the event goal was completed. If the event is the first hit of the session, there is no preceding pageview, so the goal completion happens at (entrance).\n  Landing page (not set) One red herring surrounding events and pageviews is that sending an event as the first hit of a session results in the Landing Page dimension showing (not set). This is something that Google Tag Assistant warns about.\n  Landing Page will be (not set) only if the session didn\u0026rsquo;t have ANY page views. Since the Landing Page is always the URI of the first pageview sent in the session, a session with no pageviews will have no Landing Page.\nSending an event as the first hit of a session does not automatically imply that the session will have no pageviews. Claiming otherwise is a non sequitur.\nNote that if you have any events firing on your page, you will always risk having sessions with only events. All it takes is for the user to take a break of 30 minutes after the pageview was dispatched, and then scroll down the page, firing a scroll event you\u0026rsquo;ve configured.\nThis will start its own session (since the previous one expired after the 30 minute timeout was reached). If this scroll event isn\u0026rsquo;t followed by a pageview within the session timeout period, the event will be contained in its own session with landing page (not set).\nBut, if the event is followed by a pageview before the session timeout expires, the landing page will be the path of the pageview. Remember that.\nSession with only non-interactive events Similarly, a session with only non-interactive events will have a Landing Page of (not set).\nHowever, unlike sessions with just interactive events (or a mix of interactive and non-interactive), sessions with just non-interactive events will not increment the Sessions metric, as that requires an interactive hit. They do increment the Users metric, which is why you\u0026rsquo;ll sometimes see more Users than Sessions.\n  But still, this is unrelated to having events fire before the pageview when a session starts.\nSummary As my tests above show, it\u0026rsquo;s OK to have an event precede the pageview hit when a session starts. You don\u0026rsquo;t have to rush to tag sequencing in Google Tag Manager to fix this \u0026ldquo;problem\u0026rdquo; - the implications are not severe at all.\nSo why is this still being warned about? Well, apart from misunderstanding how sessions work, there is a seed of truth in being cautious if you have events that can fire before the pageview on any given page. It\u0026rsquo;s potentially hazardous if you set campaign parameters with the pageview hit that are missing from the event hit.\nSince the pageview is the nexus of Google Analytics\u0026rsquo; session, it follows that most care is put into making sure the pageview hit has all the necessary session, campaign, and cookie modifications. This lopsided focus can be problematic in Google Tag Manager, where each hit has its own unique tracker object, and thus the hits don\u0026rsquo;t inherit anything from a common tracker, as with analytics.js and gtag.js.\nIn other words, you might modify your pageview hit to include campaign-defining fields such as campaignSource and campaignMedium, or you might modify its Document Location field to have UTM parameters manually appended to the URL string. Or, you might even rewrite the clientId field in the pageview hit alone.\nThe key thing here is consistency. Any modifications to campaign- or session-parameters in individual hits or tags should be applied to all hits or tags that can fire on the same page.\nSince an event hit is capable of creating and populating a session on its own, it\u0026rsquo;s vital to have that event hit mirror the campaign settings of the pageview hit, and vice versa.\nIf you do that, you\u0026rsquo;ll avoid having rogue sessions starting simply because an event hit had totally different campaign settings from the pageview hit. In Google Tag Manager, the best way to mitigate this is to use the Google Analytics Settings variable.\nDo you think I missed something crucial in this test? Please let me know in the comments.\n"
+},
+{
 	"uri": "https://www.simoahava.com/analytics/create-utility-variables-returning-functions/",
 	"title": "#GTMTips: Create Utility Variables By Returning Functions",
 	"tags": ["google tag manager", "gtmtips", "custom javascript"],
@@ -2037,14 +2044,14 @@
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/tags/analytics/",
+	"uri": "https://www.simoahava.com/categories/analytics/",
 	"title": "Analytics",
 	"tags": [],
 	"description": "",
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/categories/analytics/",
+	"uri": "https://www.simoahava.com/tags/analytics/",
 	"title": "Analytics",
 	"tags": [],
 	"description": "",
@@ -2345,14 +2352,14 @@
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/tags/content-management/",
+	"uri": "https://www.simoahava.com/categories/content-management/",
 	"title": "Content Management",
 	"tags": [],
 	"description": "",
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/categories/content-management/",
+	"uri": "https://www.simoahava.com/tags/content-management/",
 	"title": "Content Management",
 	"tags": [],
 	"description": "",
@@ -2597,14 +2604,14 @@
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/tags/digital-marketing/",
+	"uri": "https://www.simoahava.com/categories/digital-marketing/",
 	"title": "Digital Marketing",
 	"tags": [],
 	"description": "",
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/categories/digital-marketing/",
+	"uri": "https://www.simoahava.com/tags/digital-marketing/",
 	"title": "Digital Marketing",
 	"tags": [],
 	"description": "",
@@ -2856,14 +2863,14 @@
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/tags/google-cloud/",
+	"uri": "https://www.simoahava.com/categories/google-cloud/",
 	"title": "Google Cloud",
 	"tags": [],
 	"description": "",
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/categories/google-cloud/",
+	"uri": "https://www.simoahava.com/tags/google-cloud/",
 	"title": "Google Cloud",
 	"tags": [],
 	"description": "",
@@ -3276,14 +3283,14 @@
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/tags/personal/",
+	"uri": "https://www.simoahava.com/categories/personal/",
 	"title": "Personal",
 	"tags": [],
 	"description": "",
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/categories/personal/",
+	"uri": "https://www.simoahava.com/tags/personal/",
 	"title": "Personal",
 	"tags": [],
 	"description": "",
@@ -3850,13 +3857,6 @@
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/tags/web-design/",
-	"title": "Web Design",
-	"tags": [],
-	"description": "",
-	"content": ""
-},
-{
 	"uri": "https://www.simoahava.com/categories/web-design/",
 	"title": "Web Design",
 	"tags": [],
@@ -3864,14 +3864,21 @@
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/tags/web-development/",
-	"title": "Web Development",
+	"uri": "https://www.simoahava.com/tags/web-design/",
+	"title": "Web Design",
 	"tags": [],
 	"description": "",
 	"content": ""
 },
 {
 	"uri": "https://www.simoahava.com/categories/web-development/",
+	"title": "Web Development",
+	"tags": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "https://www.simoahava.com/tags/web-development/",
 	"title": "Web Development",
 	"tags": [],
 	"description": "",
