@@ -118,7 +118,7 @@
 
 <meta itemprop="datePublished" content="2018-08-15T07:26:32&#43;00:00" />
 <meta itemprop="dateModified" content="2018-08-15T07:26:32&#43;00:00" />
-<meta itemprop="wordCount" content="1781">
+<meta itemprop="wordCount" content="1838">
 
 
 
@@ -855,7 +855,9 @@ Simo Ahava
 
 <h2 id="deployment-with-google-tag-manager">Deployment with Google Tag Manager</h2>
 
-<p>If you are using Google Tag Manager, you need to copy-paste the code into a <strong>Custom JavaScript variable</strong>, and modify the first line by removing the <code>var _customTask =</code> part like this:</p>
+<p>If you are using Google Tag Manager, you need to copy-paste the code into a <strong>Custom JavaScript variable</strong>. If you use the &ldquo;Copy to clipboard (for GTM)&rdquo; button, you don&rsquo;t have to modify the JavaScript as instructed below.</p>
+
+<p>If, for some reason, you refuse to use the &ldquo;Copy to clipboard (for GTM)&rdquo; button, after copy-pasting the contents to the Custom JavaScript variable, you&rsquo;ll need to modify the first line by removing the <code>var _customTask =</code> part like this:</p>
 
 <div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="c1">// OLD, CHANGE THIS:
 </span><span class="c1"></span><span class="kd">var</span> <span class="nx">_customTask</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
@@ -938,7 +940,7 @@ Simo Ahava
     </tbody>
   </table>
 
-  <button id="copy">Copy to clipboard</button>
+  <button id="copyGtm">Copy to clipboard (for GTM)</button> | <button id="copy">Copy to clipboard</button>
   <pre id="result"></pre>
 
   <style>
@@ -949,7 +951,7 @@ Simo Ahava
       background: #f7f7ff;
     }
     
-    button#copy {
+    button#copy, button#copyGtm {
       border: 2px solid #ccc;
       background: #eee;
       font-size: 1em;
@@ -986,6 +988,7 @@ Simo Ahava
       var customTaskItems = document.querySelectorAll('[data-customtask-id]');
 
       var copyBtn = document.querySelector('#copy');
+      var copyGtmBtn = document.querySelector('#copyGtm');
 
       var rowsInCode = {
         cid: [7,8,9,10,113,114,115,116,117,118],
@@ -1364,9 +1367,12 @@ Simo Ahava
         buildResult();
       };
 
-      var copyToClipboard = function() {
+      var copyToClipboard = function(e) {
         var textArea = document.createElement("textarea");
         textArea.value = result.textContent;
+        if (e.target.id === 'copyGtm') {
+          textArea.value = textArea.value.replace('var _customTask = ', '').replace(/;$/, '');
+        }
         document.body.appendChild(textArea);
         textArea.focus();
         textArea.select();
@@ -1385,6 +1391,7 @@ Simo Ahava
       });
 
       copyBtn.addEventListener('click', copyToClipboard, true);
+      copyGtmBtn.addEventListener('click', copyToClipboard, true);
 
       buildResult();
     })();
