@@ -126,7 +126,7 @@
 
 <meta itemprop="datePublished" content="2018-09-19T08:35:17&#43;03:00" />
 <meta itemprop="dateModified" content="2018-09-19T08:35:17&#43;03:00" />
-<meta itemprop="wordCount" content="9131">
+<meta itemprop="wordCount" content="9216">
 
 
 
@@ -1098,7 +1098,9 @@ on
 <p>You can also modify a <strong>valid</strong> <code>ecommerce</code> object in the <code>dataLayer</code> in case you need to add some dynamic updates to it (such as Product-scoped Custom Dimensions). For example, here&rsquo;s me adding a <a href="#product-scoped-custom-dimensions-and-metrics">Product-scoped Custom Dimension</a> to all the products in a Purchase object:</p>
 
 <div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-  <span class="kd">var</span> <span class="nx">ecom</span> <span class="o">=</span> <span class="p">{{</span><span class="nx">Data</span> <span class="nx">Layer</span> <span class="nx">Variable</span> <span class="o">-</span> <span class="nx">ecommerce</span><span class="p">}};</span>
+  <span class="c1">// Create a copy of the variable to avoid
+</span><span class="c1"></span>  <span class="c1">// modifying the source object by reference
+</span><span class="c1"></span>  <span class="kd">var</span> <span class="nx">ecom</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({{</span><span class="nx">Data</span> <span class="nx">Layer</span> <span class="nx">Variable</span> <span class="o">-</span> <span class="nx">ecommerce</span><span class="p">}}));</span>
   <span class="k">try</span> <span class="p">{</span>
     <span class="nx">ecommerce</span><span class="p">.</span><span class="nx">purchase</span><span class="p">.</span><span class="nx">products</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">prod</span><span class="p">)</span> <span class="p">{</span>
       <span class="nx">prod</span><span class="p">.</span><span class="nx">dimension10</span> <span class="o">=</span> <span class="p">{{</span><span class="nx">get</span> <span class="nx">discount</span><span class="p">}}(</span><span class="nx">prod</span><span class="p">.</span><span class="nx">id</span><span class="p">);</span>
@@ -1112,7 +1114,9 @@ on
 
 <p>With this simple example, I&rsquo;m updating a perfectly valid <code>ecommerce</code> object (represented by <strong>{{Data Layer Variable - ecommerce}}</strong>), by adding a new field to every single product.</p>
 
-<p>Just one <strong>important thing to note</strong>. Data Layer Variables are, by default, <a href="https://www.simoahava.com/amp/gtm-tips/data-layer-variable-versions-explained/"><strong>Version 2</strong></a>. This means that they will merge all the existing <code>ecommerce</code> pushes into one big <code>ecommerce</code> object. So when you create the variable for <code>ecommerce</code>, you might want to use <strong>Version 1</strong>. Read <a href="https://www.simoahava.com/amp/analytics/enhanced-ecommerce-with-a-custom-javascript-variable/">this article</a> for more information.</p>
+<p>As you can see, I&rsquo;m making a <strong>copy</strong> of the original variable with the <code>JSON.parse(JSON.stringify(obj))</code> method. Because JavaScript copies objects by reference, any changes you make to the <code>ecom</code> variable would reflect in the original object stored in <code>dataLayer</code>. This might have adverse effects if the variable is run more than once, especially if you&rsquo;re running calculations on any fields (the calculations would be done over and over again).</p>
+
+<p>One additional <strong>important thing to note</strong>. Data Layer Variables are, by default, <a href="https://www.simoahava.com/amp/gtm-tips/data-layer-variable-versions-explained/"><strong>Version 2</strong></a>. This means that they will merge all the existing <code>ecommerce</code> pushes into one big <code>ecommerce</code> object. So when you create the variable for <code>ecommerce</code>, you might want to use <strong>Version 1</strong>. Read <a href="https://www.simoahava.com/amp/analytics/enhanced-ecommerce-with-a-custom-javascript-variable/">this article</a> for more information.</p>
 
 <h3 id="page-view-or-event-tag">Page View or Event tag</h3>
 

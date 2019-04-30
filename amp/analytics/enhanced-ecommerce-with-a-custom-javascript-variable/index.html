@@ -128,7 +128,7 @@
 
 <meta itemprop="datePublished" content="2015-07-06T08:15:39&#43;00:00" />
 <meta itemprop="dateModified" content="2015-07-06T08:15:39&#43;00:00" />
-<meta itemprop="wordCount" content="1316">
+<meta itemprop="wordCount" content="1373">
 
 
 
@@ -975,7 +975,9 @@ on
 
 <div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">dIndx</span> <span class="o">=</span> <span class="s1">&#39;2&#39;</span><span class="p">;</span> <span class="c1">// This is the Custom Dimension Index
-</span><span class="c1"></span>  <span class="kd">var</span> <span class="nx">ecomAddProducts</span> <span class="o">=</span> <span class="p">{{</span><span class="nx">DLV</span> <span class="o">-</span> <span class="nx">ecommerce</span><span class="p">}}[</span><span class="s1">&#39;add&#39;</span><span class="p">][</span><span class="s1">&#39;products&#39;</span><span class="p">];</span>
+</span><span class="c1"></span>  <span class="c1">// Make a shallow copy of the ecommerce object
+</span><span class="c1"></span>  <span class="kd">var</span> <span class="nx">ecom</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({{</span><span class="nx">DLV</span> <span class="o">-</span> <span class="nx">ecommerce</span><span class="p">}}));</span>
+  <span class="kd">var</span> <span class="nx">ecomAddProducts</span> <span class="o">=</span> <span class="nx">ecom</span><span class="p">[</span><span class="s1">&#39;add&#39;</span><span class="p">][</span><span class="s1">&#39;products&#39;</span><span class="p">];</span>
   <span class="nx">ecomAddProducts</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;dimension&#39;</span> <span class="o">+</span> <span class="nx">dIndx</span><span class="p">]</span> <span class="o">=</span> <span class="nx">ecomAddProducts</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="o">===</span> <span class="s1">&#39;12345&#39;</span> <span class="o">?</span> <span class="s1">&#39;Promotion&#39;</span> <span class="o">:</span> <span class="s1">&#39;Regular&#39;</span><span class="p">;</span>
   <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;ecommerce&#39;</span> <span class="o">:</span> <span class="p">{</span><span class="s1">&#39;add&#39;</span> <span class="o">:</span> <span class="p">{</span><span class="s1">&#39;products&#39;</span> <span class="o">:</span> <span class="nx">ecomAddProducts</span><span class="p">}}};</span>
 <span class="p">}</span>
@@ -983,7 +985,9 @@ on
 
 <p>On the first line, you define the Custom Dimension index. Next, you create a little placeholder variable for the &lsquo;products&rsquo; key in the <code>{'ecommerce' : {'add' : {}} }</code> object.</p>
 
-<p>In the third line, you basically check if the first (only) product in the &lsquo;products&rsquo; Array has ID &lsquo;12345&rsquo;. If it does, you add the Custom Dimension key &lsquo;dimension2&rsquo; into the product object with the value &lsquo;Promotion&rsquo;. If the ID is something else, the dimension value is set to &lsquo;Regular&rsquo;.</p>
+<p>Next, you&rsquo;ll make a copy of the original {{DLV - ecommerce}} variable by using the <code>JSON.parse(JSON.stringify(obj))</code> trick. This is to prevent multiple iterations of the Custom JS variable from inadvertently running whatever modifications you do over and over again on the source variable, resulting in unexpected results.</p>
+
+<p>Then, you basically check if the first (only) product in the &lsquo;products&rsquo; Array has ID &lsquo;12345&rsquo;. If it does, you add the Custom Dimension key &lsquo;dimension2&rsquo; into the product object with the value &lsquo;Promotion&rsquo;. If the ID is something else, the dimension value is set to &lsquo;Regular&rsquo;.</p>
 
 <p>You can be very creative here, fetching valid IDs from a Lookup Table, for example. The key thing is to <strong>return a complete &lsquo;ecommerce&rsquo; object</strong> in the Custom JavaScript Variable. That&rsquo;s how GTM works. If you don&rsquo;t return a syntactically valid &lsquo;ecommerce&rsquo; object, Enhanced Ecommerce will not work.</p>
 
