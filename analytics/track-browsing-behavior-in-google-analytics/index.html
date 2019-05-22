@@ -313,6 +313,10 @@
             <div class="main-content-wrap">
               
 
+<blockquote>
+<p><strong>Last updated 22 May 2019</strong>: Added expiration of currently open tabs.</p>
+</blockquote>
+
 <p>In this article, <a href="https://github.com/jethron">Jethro Nederhof</a> of <a href="https://www.snowflake-analytics.com/about/">Snowflake Analytics</a> fame and I will introduce you to some pretty neat web browser APIs. The purpose of these APIs is to find out more about <strong>how the user navigated to the current page</strong>, and <strong>what&rsquo;s going on with their browser tabs</strong>.</p>
 
 
@@ -691,22 +695,61 @@
 </span><span style="color:#75715e"></span>    <span style="color:#75715e">// if either button was pressed.
 </span><span style="color:#75715e"></span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">detailedBackForward</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>;
     
+    <span style="color:#75715e">// Set expiration of tab count in milliseconds. The recommended default is
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">// 72 hours (259200000 ms). Set to 0 if you don&#39;t want to expire the tab count.
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">expireTabs</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">259200000</span>;
+    
     <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!!</span>window.<span style="color:#a6e22e">Storage</span>) {
 
-      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">openTabs</span>  <span style="color:#f92672">=</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(<span style="color:#a6e22e">localStorage</span>.<span style="color:#a6e22e">getItem</span>(<span style="color:#e6db74">&#39;_tab_ids&#39;</span>)),
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">openTabs</span>  <span style="color:#f92672">=</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(<span style="color:#a6e22e">localStorage</span>.<span style="color:#a6e22e">getItem</span>(<span style="color:#e6db74">&#39;_tab_ids&#39;</span>)) <span style="color:#f92672">||</span> [],
           <span style="color:#a6e22e">tabId</span>     <span style="color:#f92672">=</span> <span style="color:#a6e22e">sessionStorage</span>.<span style="color:#a6e22e">getItem</span>(<span style="color:#e6db74">&#39;_tab_id&#39;</span>),
           <span style="color:#a6e22e">navPath</span>   <span style="color:#f92672">=</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(<span style="color:#a6e22e">sessionStorage</span>.<span style="color:#a6e22e">getItem</span>(<span style="color:#e6db74">&#39;_nav_path&#39;</span>)),
           <span style="color:#a6e22e">curPage</span>   <span style="color:#f92672">=</span> document.<span style="color:#a6e22e">location</span>.<span style="color:#a6e22e">href</span>,
           <span style="color:#a6e22e">newTab</span>    <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>,
-          <span style="color:#a6e22e">origin</span>    <span style="color:#f92672">=</span> document.<span style="color:#a6e22e">location</span>.<span style="color:#a6e22e">origin</span>;
+          <span style="color:#a6e22e">origin</span>	<span style="color:#f92672">=</span> document.<span style="color:#a6e22e">location</span>.<span style="color:#a6e22e">origin</span>;
 
       <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">tabCount</span>,
           <span style="color:#a6e22e">redirectCount</span>,
           <span style="color:#a6e22e">navigationType</span>,
           <span style="color:#a6e22e">prevInStack</span>,
           <span style="color:#a6e22e">lastInStack</span>,
-          <span style="color:#a6e22e">payload</span>;
+          <span style="color:#a6e22e">payload</span>,
+          <span style="color:#a6e22e">expiration</span>,
+          <span style="color:#a6e22e">newTabId</span>;
 
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">clearExpired</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">tabs</span>) {
+        
+        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">expireTabs</span> <span style="color:#f92672">===</span> <span style="color:#ae81ff">0</span>) { <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">tabs</span>; }
+        <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">tabs</span>.<span style="color:#a6e22e">filter</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">tab</span>) {
+          <span style="color:#66d9ef">try</span> {
+	        <span style="color:#a6e22e">expiration</span> <span style="color:#f92672">=</span> parseInt(<span style="color:#a6e22e">tab</span>.<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#39;_&#39;</span>)[<span style="color:#ae81ff">1</span>], <span style="color:#ae81ff">10</span>);
+    	    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">expiration</span> <span style="color:#f92672">&gt;</span> (<span style="color:#66d9ef">new</span> Date().<span style="color:#a6e22e">getTime</span>());
+          } <span style="color:#66d9ef">catch</span>(<span style="color:#a6e22e">e</span>) {
+            <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span>;
+          }
+        });
+        
+      };
+      
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">updateTabExpiration</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">tabId</span>) {
+        
+        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">expireTabs</span> <span style="color:#f92672">===</span> <span style="color:#ae81ff">0</span>) { <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">tabId</span>; }
+        <span style="color:#66d9ef">try</span> {
+          <span style="color:#a6e22e">newTabId</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">tabId</span>.<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#39;_&#39;</span>);
+          <span style="color:#a6e22e">expiration</span> <span style="color:#f92672">=</span> parseInt(<span style="color:#a6e22e">newTabId</span>[<span style="color:#ae81ff">1</span>], <span style="color:#ae81ff">10</span>);
+          <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">expiration</span> <span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">new</span> Date().<span style="color:#a6e22e">getTime</span>()) {
+            <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">tabId</span>;
+          } <span style="color:#66d9ef">else</span> {
+            <span style="color:#a6e22e">newTabId</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">newTabId</span>[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;_&#39;</span> <span style="color:#f92672">+</span> (<span style="color:#66d9ef">new</span> Date().<span style="color:#a6e22e">getTime</span>() <span style="color:#f92672">+</span> <span style="color:#a6e22e">expireTabs</span>);
+            <span style="color:#a6e22e">sessionStorage</span>.<span style="color:#a6e22e">setItem</span>(<span style="color:#e6db74">&#39;_tab_id&#39;</span>, <span style="color:#a6e22e">newTabId</span>);
+            <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">newTabId</span>;
+          }
+        } <span style="color:#66d9ef">catch</span>(<span style="color:#a6e22e">e</span>) {
+          <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">tabId</span>;
+        }
+      
+      };
+      
       <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">getBackForwardNavigation</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>() {
         
         <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">detailedBackForward</span> <span style="color:#f92672">===</span> <span style="color:#66d9ef">false</span>) {
@@ -733,10 +776,12 @@
         <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">index</span>;
 
         <span style="color:#75715e">// Get the most recent values from storage
-</span><span style="color:#75715e"></span>        <span style="color:#a6e22e">openTabs</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(<span style="color:#a6e22e">localStorage</span>.<span style="color:#a6e22e">getItem</span>(<span style="color:#e6db74">&#39;_tab_ids&#39;</span>));
+</span><span style="color:#75715e"></span>        <span style="color:#a6e22e">openTabs</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(<span style="color:#a6e22e">localStorage</span>.<span style="color:#a6e22e">getItem</span>(<span style="color:#e6db74">&#39;_tab_ids&#39;</span>)) <span style="color:#f92672">||</span> [];
         <span style="color:#a6e22e">tabId</span>    <span style="color:#f92672">=</span> <span style="color:#a6e22e">sessionStorage</span>.<span style="color:#a6e22e">getItem</span>(<span style="color:#e6db74">&#39;_tab_id&#39;</span>);
 
-        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">openTabs</span> <span style="color:#f92672">!==</span> <span style="color:#66d9ef">null</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">tabId</span> <span style="color:#f92672">!==</span> <span style="color:#66d9ef">null</span>) {
+        <span style="color:#a6e22e">openTabs</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">clearExpired</span>(<span style="color:#a6e22e">openTabs</span>);
+        
+        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">openTabs</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">tabId</span> <span style="color:#f92672">!==</span> <span style="color:#66d9ef">null</span>) {
           <span style="color:#a6e22e">index</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">openTabs</span>.<span style="color:#a6e22e">indexOf</span>(<span style="color:#a6e22e">tabId</span>);
           <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">index</span> <span style="color:#f92672">&gt;</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>) {
             <span style="color:#a6e22e">openTabs</span>.<span style="color:#a6e22e">splice</span>(<span style="color:#a6e22e">index</span>, <span style="color:#ae81ff">1</span>);
@@ -757,11 +802,12 @@
           <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">d</span> <span style="color:#f92672">+</span> Math.<span style="color:#a6e22e">random</span>() <span style="color:#f92672">*</span> <span style="color:#ae81ff">16</span>) <span style="color:#f92672">%</span> <span style="color:#ae81ff">16</span> <span style="color:#f92672">|</span> <span style="color:#ae81ff">0</span>;
           <span style="color:#a6e22e">d</span> <span style="color:#f92672">=</span> Math.<span style="color:#a6e22e">floor</span>(<span style="color:#a6e22e">d</span> <span style="color:#960050;background-color:#1e0010">/ 16);</span>
           <span style="color:#66d9ef">return</span> (<span style="color:#a6e22e">c</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#39;x&#39;</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">r</span> <span style="color:#f92672">:</span> (<span style="color:#a6e22e">r</span> <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">0x3</span> <span style="color:#f92672">|</span> <span style="color:#ae81ff">0x8</span>)).<span style="color:#a6e22e">toString</span>(<span style="color:#ae81ff">16</span>);
-        });
+        }) <span style="color:#f92672">+</span> (<span style="color:#a6e22e">expireTabs</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">?</span> <span style="color:#e6db74">&#39;_&#39;</span> <span style="color:#f92672">+</span> (<span style="color:#66d9ef">new</span> Date().<span style="color:#a6e22e">getTime</span>() <span style="color:#f92672">+</span> <span style="color:#a6e22e">expireTabs</span>) <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;&#39;</span>);
 
       };
       
       <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">validNavigation</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">type</span>, <span style="color:#a6e22e">newTab</span>) {
+        
         <span style="color:#75715e">// Return false if new tab and any other navigation type than
 </span><span style="color:#75715e"></span>        <span style="color:#75715e">// NAVIGATE or OTHER. Otherwise return true.
 </span><span style="color:#75715e"></span>        <span style="color:#66d9ef">return</span> <span style="color:#f92672">!</span>(<span style="color:#a6e22e">newTab</span> <span style="color:#f92672">===</span> <span style="color:#66d9ef">true</span> <span style="color:#f92672">&amp;&amp;</span> (<span style="color:#a6e22e">type</span> <span style="color:#f92672">!==</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">type</span> <span style="color:#f92672">!==</span> <span style="color:#ae81ff">255</span>));
@@ -772,9 +818,11 @@
         <span style="color:#a6e22e">tabId</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">generateTabId</span>();
         <span style="color:#a6e22e">newTab</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>;
         <span style="color:#a6e22e">sessionStorage</span>.<span style="color:#a6e22e">setItem</span>(<span style="color:#e6db74">&#39;_tab_id&#39;</span>, <span style="color:#a6e22e">tabId</span>);
-      }
-
-      <span style="color:#a6e22e">openTabs</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">openTabs</span> <span style="color:#f92672">||</span> [];
+      } <span style="color:#66d9ef">else</span> {
+        <span style="color:#a6e22e">tabId</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">updateTabExpiration</span>(<span style="color:#a6e22e">tabId</span>);
+      }   
+          
+      <span style="color:#a6e22e">openTabs</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">clearExpired</span>(<span style="color:#a6e22e">openTabs</span>); 
 
       <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">openTabs</span>.<span style="color:#a6e22e">indexOf</span>(<span style="color:#a6e22e">tabId</span>) <span style="color:#f92672">===</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>) {
         <span style="color:#a6e22e">openTabs</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">tabId</span>);
@@ -802,12 +850,12 @@
             <span style="color:#66d9ef">case</span> <span style="color:#ae81ff">2</span><span style="color:#f92672">:</span>
               <span style="color:#a6e22e">navigationType</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">getBackForwardNavigation</span>();
               <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">navigationType</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#39;FORWARD&#39;</span>) {
-                <span style="color:#75715e">// Only push if not coming from external domain
+                <span style="color:#75715e">// Only add to navigation if not coming from external domain
 </span><span style="color:#75715e"></span>                <span style="color:#66d9ef">if</span> (document.<span style="color:#a6e22e">referrer</span>.<span style="color:#a6e22e">indexOf</span>(<span style="color:#a6e22e">origin</span>) <span style="color:#f92672">&gt;</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>) {
                   <span style="color:#a6e22e">navPath</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">curPage</span>);
                 }
               } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">navigationType</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#39;BACK&#39;</span>) {
-                <span style="color:#75715e">// Only remove last if not coming from external domain
+                <span style="color:#75715e">// Only clear from navigation if not returning from external domain
 </span><span style="color:#75715e"></span>                <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">lastInStack</span> <span style="color:#f92672">!==</span> <span style="color:#a6e22e">curPage</span>) {
                   <span style="color:#a6e22e">navPath</span>.<span style="color:#a6e22e">pop</span>();
                 }
@@ -832,7 +880,7 @@
         <span style="color:#a6e22e">redirectCount</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">redirectCount</span>,
         <span style="color:#a6e22e">navigationType</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">navigationType</span>,
         <span style="color:#a6e22e">newTab</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">newTab</span> <span style="color:#f92672">===</span> <span style="color:#66d9ef">true</span> <span style="color:#f92672">?</span> <span style="color:#e6db74">&#39;New&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;Existing&#39;</span>,
-        <span style="color:#a6e22e">tabId</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">tabId</span>
+        <span style="color:#a6e22e">tabId</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">tabId</span>.<span style="color:#a6e22e">replace</span>(<span style="color:#e6db74">/_.+/</span>, <span style="color:#e6db74">&#39;&#39;</span>)
       };
 
       <span style="color:#75715e">// Set the data model keys directly so they can be used in the Page View tag
@@ -887,6 +935,10 @@
 
 <li><p>Count of tabs, count of redirects, navigation type, tab ID, and whether the tab was new or existing are all added to Google Tag Manager&rsquo;s data model, so that the Page View tag can grab these values with Data Layer variables.</p></li>
 </ol>
+
+<blockquote>
+<p><strong>UPDATE 22 May 2019</strong>: I added some extra code to handle expiration. By default, the expiration is 72 hours, so if the storage isn&rsquo;t interacted with in 72 hours, the current count of open tabs is cleared.</p>
+</blockquote>
 
 <p>There are some nuances to the steps listed above, mainly to account for edge cases, such as when navigating <code>BACK</code> or <code>FORWARD</code> from an external domain. Even with these precautions, there are situations where the solution will fail (see the <a href="https://www.simoahava.com/analytics/track-browsing-behavior-in-google-analytics/#2-caveats">Caveats</a> chapter).</p>
 

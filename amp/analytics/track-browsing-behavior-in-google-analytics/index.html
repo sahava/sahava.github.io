@@ -128,7 +128,7 @@
 
 <meta itemprop="datePublished" content="2018-04-24T11:00:00&#43;03:00" />
 <meta itemprop="dateModified" content="2018-04-24T11:00:00&#43;03:00" />
-<meta itemprop="wordCount" content="3966">
+<meta itemprop="wordCount" content="4165">
 
 
 
@@ -880,6 +880,10 @@ on
     <section class="post-content">
       
 
+<blockquote>
+<p><strong>Last updated 22 May 2019</strong>: Added expiration of currently open tabs.</p>
+</blockquote>
+
 <p>In this article, <a href="https://github.com/jethron">Jethro Nederhof</a> of <a href="https://www.snowflake-analytics.com/about/">Snowflake Analytics</a> fame and I will introduce you to some pretty neat web browser APIs. The purpose of these APIs is to find out more about <strong>how the user navigated to the current page</strong>, and <strong>what&rsquo;s going on with their browser tabs</strong>.</p>
 
 
@@ -1175,22 +1179,61 @@ on
 </span><span class="c1"></span>    <span class="c1">// if either button was pressed.
 </span><span class="c1"></span>    <span class="kd">var</span> <span class="nx">detailedBackForward</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
     
+    <span class="c1">// Set expiration of tab count in milliseconds. The recommended default is
+</span><span class="c1"></span>    <span class="c1">// 72 hours (259200000 ms). Set to 0 if you don&#39;t want to expire the tab count.
+</span><span class="c1"></span>    <span class="kd">var</span> <span class="nx">expireTabs</span> <span class="o">=</span> <span class="mi">259200000</span><span class="p">;</span>
+    
     <span class="k">if</span> <span class="p">(</span><span class="o">!!</span><span class="nb">window</span><span class="p">.</span><span class="nx">Storage</span><span class="p">)</span> <span class="p">{</span>
 
-      <span class="kd">var</span> <span class="nx">openTabs</span>  <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">localStorage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="s1">&#39;_tab_ids&#39;</span><span class="p">)),</span>
+      <span class="kd">var</span> <span class="nx">openTabs</span>  <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">localStorage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="s1">&#39;_tab_ids&#39;</span><span class="p">))</span> <span class="o">||</span> <span class="p">[],</span>
           <span class="nx">tabId</span>     <span class="o">=</span> <span class="nx">sessionStorage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="s1">&#39;_tab_id&#39;</span><span class="p">),</span>
           <span class="nx">navPath</span>   <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">sessionStorage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="s1">&#39;_nav_path&#39;</span><span class="p">)),</span>
           <span class="nx">curPage</span>   <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">location</span><span class="p">.</span><span class="nx">href</span><span class="p">,</span>
           <span class="nx">newTab</span>    <span class="o">=</span> <span class="kc">false</span><span class="p">,</span>
-          <span class="nx">origin</span>    <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">location</span><span class="p">.</span><span class="nx">origin</span><span class="p">;</span>
+          <span class="nx">origin</span>	<span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">location</span><span class="p">.</span><span class="nx">origin</span><span class="p">;</span>
 
       <span class="kd">var</span> <span class="nx">tabCount</span><span class="p">,</span>
           <span class="nx">redirectCount</span><span class="p">,</span>
           <span class="nx">navigationType</span><span class="p">,</span>
           <span class="nx">prevInStack</span><span class="p">,</span>
           <span class="nx">lastInStack</span><span class="p">,</span>
-          <span class="nx">payload</span><span class="p">;</span>
+          <span class="nx">payload</span><span class="p">,</span>
+          <span class="nx">expiration</span><span class="p">,</span>
+          <span class="nx">newTabId</span><span class="p">;</span>
 
+      <span class="kd">var</span> <span class="nx">clearExpired</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">tabs</span><span class="p">)</span> <span class="p">{</span>
+        
+        <span class="k">if</span> <span class="p">(</span><span class="nx">expireTabs</span> <span class="o">===</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">tabs</span><span class="p">;</span> <span class="p">}</span>
+        <span class="k">return</span> <span class="nx">tabs</span><span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">tab</span><span class="p">)</span> <span class="p">{</span>
+          <span class="k">try</span> <span class="p">{</span>
+	        <span class="nx">expiration</span> <span class="o">=</span> <span class="nb">parseInt</span><span class="p">(</span><span class="nx">tab</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">10</span><span class="p">);</span>
+    	    <span class="k">return</span> <span class="nx">expiration</span> <span class="o">&gt;</span> <span class="p">(</span><span class="k">new</span> <span class="nb">Date</span><span class="p">().</span><span class="nx">getTime</span><span class="p">());</span>
+          <span class="p">}</span> <span class="k">catch</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
+          <span class="p">}</span>
+        <span class="p">});</span>
+        
+      <span class="p">};</span>
+      
+      <span class="kd">var</span> <span class="nx">updateTabExpiration</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">tabId</span><span class="p">)</span> <span class="p">{</span>
+        
+        <span class="k">if</span> <span class="p">(</span><span class="nx">expireTabs</span> <span class="o">===</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">tabId</span><span class="p">;</span> <span class="p">}</span>
+        <span class="k">try</span> <span class="p">{</span>
+          <span class="nx">newTabId</span> <span class="o">=</span> <span class="nx">tabId</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">);</span>
+          <span class="nx">expiration</span> <span class="o">=</span> <span class="nb">parseInt</span><span class="p">(</span><span class="nx">newTabId</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">10</span><span class="p">);</span>
+          <span class="k">if</span> <span class="p">(</span><span class="nx">expiration</span> <span class="o">&gt;</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">().</span><span class="nx">getTime</span><span class="p">())</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="nx">tabId</span><span class="p">;</span>
+          <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="nx">newTabId</span> <span class="o">=</span> <span class="nx">newTabId</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="p">(</span><span class="k">new</span> <span class="nb">Date</span><span class="p">().</span><span class="nx">getTime</span><span class="p">()</span> <span class="o">+</span> <span class="nx">expireTabs</span><span class="p">);</span>
+            <span class="nx">sessionStorage</span><span class="p">.</span><span class="nx">setItem</span><span class="p">(</span><span class="s1">&#39;_tab_id&#39;</span><span class="p">,</span> <span class="nx">newTabId</span><span class="p">);</span>
+            <span class="k">return</span> <span class="nx">newTabId</span><span class="p">;</span>
+          <span class="p">}</span>
+        <span class="p">}</span> <span class="k">catch</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+          <span class="k">return</span> <span class="nx">tabId</span><span class="p">;</span>
+        <span class="p">}</span>
+      
+      <span class="p">};</span>
+      
       <span class="kd">var</span> <span class="nx">getBackForwardNavigation</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
         
         <span class="k">if</span> <span class="p">(</span><span class="nx">detailedBackForward</span> <span class="o">===</span> <span class="kc">false</span><span class="p">)</span> <span class="p">{</span>
@@ -1217,10 +1260,12 @@ on
         <span class="kd">var</span> <span class="nx">index</span><span class="p">;</span>
 
         <span class="c1">// Get the most recent values from storage
-</span><span class="c1"></span>        <span class="nx">openTabs</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">localStorage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="s1">&#39;_tab_ids&#39;</span><span class="p">));</span>
+</span><span class="c1"></span>        <span class="nx">openTabs</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">localStorage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="s1">&#39;_tab_ids&#39;</span><span class="p">))</span> <span class="o">||</span> <span class="p">[];</span>
         <span class="nx">tabId</span>    <span class="o">=</span> <span class="nx">sessionStorage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="s1">&#39;_tab_id&#39;</span><span class="p">);</span>
 
-        <span class="k">if</span> <span class="p">(</span><span class="nx">openTabs</span> <span class="o">!==</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="nx">tabId</span> <span class="o">!==</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">openTabs</span> <span class="o">=</span> <span class="nx">clearExpired</span><span class="p">(</span><span class="nx">openTabs</span><span class="p">);</span>
+        
+        <span class="k">if</span> <span class="p">(</span><span class="nx">openTabs</span><span class="p">.</span><span class="nx">length</span> <span class="o">&amp;&amp;</span> <span class="nx">tabId</span> <span class="o">!==</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
           <span class="nx">index</span> <span class="o">=</span> <span class="nx">openTabs</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="nx">tabId</span><span class="p">);</span>
           <span class="k">if</span> <span class="p">(</span><span class="nx">index</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
             <span class="nx">openTabs</span><span class="p">.</span><span class="nx">splice</span><span class="p">(</span><span class="nx">index</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
@@ -1241,11 +1286,12 @@ on
           <span class="kd">var</span> <span class="nx">r</span> <span class="o">=</span> <span class="p">(</span><span class="nx">d</span> <span class="o">+</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span> <span class="o">*</span> <span class="mi">16</span><span class="p">)</span> <span class="o">%</span> <span class="mi">16</span> <span class="o">|</span> <span class="mi">0</span><span class="p">;</span>
           <span class="nx">d</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nx">d</span> <span class="err">/ 16);</span>
           <span class="k">return</span> <span class="p">(</span><span class="nx">c</span> <span class="o">===</span> <span class="s1">&#39;x&#39;</span> <span class="o">?</span> <span class="nx">r</span> <span class="o">:</span> <span class="p">(</span><span class="nx">r</span> <span class="o">&amp;</span> <span class="mh">0x3</span> <span class="o">|</span> <span class="mh">0x8</span><span class="p">)).</span><span class="nx">toString</span><span class="p">(</span><span class="mi">16</span><span class="p">);</span>
-        <span class="p">});</span>
+        <span class="p">})</span> <span class="o">+</span> <span class="p">(</span><span class="nx">expireTabs</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="o">?</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="p">(</span><span class="k">new</span> <span class="nb">Date</span><span class="p">().</span><span class="nx">getTime</span><span class="p">()</span> <span class="o">+</span> <span class="nx">expireTabs</span><span class="p">)</span> <span class="o">:</span> <span class="s1">&#39;&#39;</span><span class="p">);</span>
 
       <span class="p">};</span>
       
       <span class="kd">var</span> <span class="nx">validNavigation</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">newTab</span><span class="p">)</span> <span class="p">{</span>
+        
         <span class="c1">// Return false if new tab and any other navigation type than
 </span><span class="c1"></span>        <span class="c1">// NAVIGATE or OTHER. Otherwise return true.
 </span><span class="c1"></span>        <span class="k">return</span> <span class="o">!</span><span class="p">(</span><span class="nx">newTab</span> <span class="o">===</span> <span class="kc">true</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="nx">type</span> <span class="o">!==</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="nx">type</span> <span class="o">!==</span> <span class="mi">255</span><span class="p">));</span>
@@ -1256,9 +1302,11 @@ on
         <span class="nx">tabId</span> <span class="o">=</span> <span class="nx">generateTabId</span><span class="p">();</span>
         <span class="nx">newTab</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
         <span class="nx">sessionStorage</span><span class="p">.</span><span class="nx">setItem</span><span class="p">(</span><span class="s1">&#39;_tab_id&#39;</span><span class="p">,</span> <span class="nx">tabId</span><span class="p">);</span>
-      <span class="p">}</span>
-
-      <span class="nx">openTabs</span> <span class="o">=</span> <span class="nx">openTabs</span> <span class="o">||</span> <span class="p">[];</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="nx">tabId</span> <span class="o">=</span> <span class="nx">updateTabExpiration</span><span class="p">(</span><span class="nx">tabId</span><span class="p">);</span>
+      <span class="p">}</span>   
+          
+      <span class="nx">openTabs</span> <span class="o">=</span> <span class="nx">clearExpired</span><span class="p">(</span><span class="nx">openTabs</span><span class="p">);</span> 
 
       <span class="k">if</span> <span class="p">(</span><span class="nx">openTabs</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="nx">tabId</span><span class="p">)</span> <span class="o">===</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
         <span class="nx">openTabs</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">tabId</span><span class="p">);</span>
@@ -1286,12 +1334,12 @@ on
             <span class="k">case</span> <span class="mi">2</span><span class="o">:</span>
               <span class="nx">navigationType</span> <span class="o">=</span> <span class="nx">getBackForwardNavigation</span><span class="p">();</span>
               <span class="k">if</span> <span class="p">(</span><span class="nx">navigationType</span> <span class="o">===</span> <span class="s1">&#39;FORWARD&#39;</span><span class="p">)</span> <span class="p">{</span>
-                <span class="c1">// Only push if not coming from external domain
+                <span class="c1">// Only add to navigation if not coming from external domain
 </span><span class="c1"></span>                <span class="k">if</span> <span class="p">(</span><span class="nb">document</span><span class="p">.</span><span class="nx">referrer</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="nx">origin</span><span class="p">)</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
                   <span class="nx">navPath</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">curPage</span><span class="p">);</span>
                 <span class="p">}</span>
               <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">navigationType</span> <span class="o">===</span> <span class="s1">&#39;BACK&#39;</span><span class="p">)</span> <span class="p">{</span>
-                <span class="c1">// Only remove last if not coming from external domain
+                <span class="c1">// Only clear from navigation if not returning from external domain
 </span><span class="c1"></span>                <span class="k">if</span> <span class="p">(</span><span class="nx">lastInStack</span> <span class="o">!==</span> <span class="nx">curPage</span><span class="p">)</span> <span class="p">{</span>
                   <span class="nx">navPath</span><span class="p">.</span><span class="nx">pop</span><span class="p">();</span>
                 <span class="p">}</span>
@@ -1316,7 +1364,7 @@ on
         <span class="nx">redirectCount</span><span class="o">:</span> <span class="nx">redirectCount</span><span class="p">,</span>
         <span class="nx">navigationType</span><span class="o">:</span> <span class="nx">navigationType</span><span class="p">,</span>
         <span class="nx">newTab</span><span class="o">:</span> <span class="nx">newTab</span> <span class="o">===</span> <span class="kc">true</span> <span class="o">?</span> <span class="s1">&#39;New&#39;</span> <span class="o">:</span> <span class="s1">&#39;Existing&#39;</span><span class="p">,</span>
-        <span class="nx">tabId</span><span class="o">:</span> <span class="nx">tabId</span>
+        <span class="nx">tabId</span><span class="o">:</span> <span class="nx">tabId</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/_.+/</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
       <span class="p">};</span>
 
       <span class="c1">// Set the data model keys directly so they can be used in the Page View tag
@@ -1365,6 +1413,10 @@ on
 
 <li><p>Count of tabs, count of redirects, navigation type, tab ID, and whether the tab was new or existing are all added to Google Tag Manager&rsquo;s data model, so that the Page View tag can grab these values with Data Layer variables.</p></li>
 </ol>
+
+<blockquote>
+<p><strong>UPDATE 22 May 2019</strong>: I added some extra code to handle expiration. By default, the expiration is 72 hours, so if the storage isn&rsquo;t interacted with in 72 hours, the current count of open tabs is cleared.</p>
+</blockquote>
 
 <p>There are some nuances to the steps listed above, mainly to account for edge cases, such as when navigating <code>BACK</code> or <code>FORWARD</code> from an external domain. Even with these precautions, there are situations where the solution will fail (see the <a href="https://www.simoahava.com/amp/analytics/track-browsing-behavior-in-google-analytics/#2-caveats">Caveats</a> chapter).</p>
 
