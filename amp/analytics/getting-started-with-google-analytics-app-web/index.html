@@ -124,7 +124,7 @@
 
 <meta itemprop="datePublished" content="2019-08-05T09:07:18&#43;03:00" />
 <meta itemprop="dateModified" content="2019-08-05T09:07:18&#43;03:00" />
-<meta itemprop="wordCount" content="3399">
+<meta itemprop="wordCount" content="3670">
 
 
 
@@ -941,13 +941,13 @@ on
 
 <li><p>No way to distinguish between automatically collected, recommended, and custom events in the reporting UI.</p></li>
 
-<li><p>No way to set user properties in the GTM tags.</p></li>
+<li><p><del>No way to set user properties in the GTM tags.</del> <strong>UPDATE</strong>: You <strong>can</strong> set User Properties, <a href="#set-user-properties">see below</a>.</p></li>
 
-<li><p>No way to send the <code>items</code> array (or any other multi-dimensional object) with the hit to Google Analytics when using GTM.</p></li>
+<li><p>No way to send the <code>items</code> array (or any other multi-dimensional object) as an event parameter to Google Analytics when using GTM.</p></li>
 
 <li><p>Setting persistent values in the configuration tag in GTM did not seem to work.</p></li>
 
-<li><p><del>No way to upgrade an existing Firebase Analytics property to an App + Web property.</del> <strong>UPDATE</strong>: Looks like <a href="https://support.google.com/analytics/answer/9289234#upgrading">this support doc</a> implies that upgrade is already possible, and some users have reported that they&rsquo;ve been able to do this.</p></li>
+<li><p><del>No way to upgrade an existing Firebase Analytics property to an App + Web property.</del> <strong>UPDATE</strong>: You can upgrade existing Firebase Analytics properties per <a href="https://support.google.com/analytics/answer/9289234#upgrading">this support doc</a>. When you open the property in Google Analytics (assuming you&rsquo;ve linked the property in Google Analytics), you&rsquo;ll see a blue banner in the top of the screen prompting you to upgrade.</p></li>
 </ul>
 
 <p>Be sure to follow the <a href="https://blog.google/products/marketingplatform/analytics/">official blog</a> as well as <a href="https://www.kristaseiden.com/">Krista</a>, as they will be your go-to channels for more information including releases that address the concerns listed in this chapter.</p>
@@ -1171,7 +1171,58 @@ on
 
 <p>According to <a href="https://developers.google.cn/analytics/devguides/collection/app-web/persistent-values">the documentation</a>, you should be able to define any event parameters in the <strong>Fields to set</strong> of the configuration tag, if you want those event parameters to be sent with every subsequent hit that uses the same Measurement ID. Unfortunately, at the time of writing this does not seem to work.</p>
 
-<p>Neither does there seem to be an option to send <a href="https://developers.google.cn/analytics/devguides/collection/app-web/tag-guide#user_properties">user properties</a>, so it looks like we&rsquo;re waiting for updates to the template for those, too.</p>
+<p><del>Neither does there seem to be an option to send <a href="https://developers.google.cn/analytics/devguides/collection/app-web/tag-guide#user_properties">user properties</a>, so it looks like we&rsquo;re waiting for updates to the template for those, too.</del></p>
+
+<h3 id="set-user-properties">Set user properties</h3>
+
+<p>To set user properties, you first need to <a href="https://developers.google.cn/analytics/devguides/collection/app-web/tag-guide#user_properties">create them</a> in the reporting UI.</p>
+
+
+
+    <a href="https://www.simoahava.com/amp/images/2019/08/user-properties.jpg" title="Create user property">
+  
+    <amp-img src="https://www.simoahava.com/amp/images/2019/08/user-properties.jpg" layout="responsive" alt="Create user property" height="1370" width="3354"></amp-img>
+  
+    </a>
+  
+
+
+<p>Next, in your configuration, go to <strong>Fields to Set</strong>, and add a new field. The name of the field needs to be <code>user_properties</code>.</p>
+
+
+
+    <a href="https://www.simoahava.com/amp/images/2019/08/user-properties-in-tag.jpg" title="User properties in tag">
+  
+    <amp-img src="https://www.simoahava.com/amp/images/2019/08/user-properties-in-tag.jpg" layout="responsive" alt="User properties in tag" height="380" width="1762"></amp-img>
+  
+    </a>
+  
+
+
+<p>As the <strong>value</strong> of the field, you need to use a Custom JavaScript variable (or a custom variable template) that <strong>returns an object</strong>, where each key of the object corresponds to a User Property name you created in the reporting UI, and the value is what you want to send as the user property in question.</p>
+
+<p>For example, to set the <code>user_type</code> property (see the screenshot above), I can create a Custom JavaScript variable that looks like this:</p>
+
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="p">{</span>
+    <span class="nx">user_type</span><span class="o">:</span> <span class="s1">&#39;Premium user&#39;</span>
+  <span class="p">};</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Then you need to add this variable as the value of the <code>user_properties</code> field in the configuration tag.</p>
+
+<p>An <strong>alternate method</strong> is to use a custom variable template (see <a href="https://www.simoahava.com/amp/analytics/custom-templates-guide-for-google-tag-manager/">my guide</a> if you are unsure what custom templates are). <a href="https://www.gtmtemplates.com/template/5672749318012928/user-properties-for-app-web">Here&rsquo;s a template</a> I created for returning a user properties object. You can use it to create a variable where you set the individual user property keys and values, and then set <em>that</em> variable as the value of the <code>user_properties</code> key in the configuration tag.</p>
+
+
+
+    <a href="https://www.simoahava.com/amp/images/2019/08/user-properties-template.jpg" title="User Properties template">
+  
+    <amp-img src="https://www.simoahava.com/amp/images/2019/08/user-properties-template.jpg" layout="responsive" alt="User Properties template" height="948" width="1860"></amp-img>
+  
+    </a>
+  
+
 
 <p>Once you&rsquo;ve created a configuration tag, set it to fire on the <strong>All Pages</strong> trigger and enter preview mode. Let&rsquo;s take a look at how this new measurement model works on the website!</p>
 
@@ -1203,7 +1254,7 @@ on
 
     <a href="https://www.simoahava.com/amp/images/2019/08/collect-request.jpg" title="Collect request">
   
-    <amp-img src="https://www.simoahava.com/amp/images/2019/08/collect-request.jpg" layout="responsive" alt="Collect request" height="898" width="2616"></amp-img>
+    <amp-img src="https://www.simoahava.com/amp/images/2019/08/collect-request.jpg" layout="responsive" alt="Collect request" height="916" width="2242"></amp-img>
   
     </a>
   
@@ -1242,6 +1293,8 @@ on
 <p>There is no longer a &ldquo;Hit Type&rdquo; dimension, but rather the <strong>en</strong> parameter (event name) is used to distinguish different types of hits from each other. This is a major difference to Universal Analytics, as in GAv2 you have one single event stream, where the event parameters you send with the event name determine how the data shows up in the reports.</p>
 
 <p><strong>Event parameters</strong> are prefixed with <code>ep.</code> or <code>epn.</code> for text parameters and number parameters, respectively. In the screenshot, I&rsquo;ve created an event parameter named <code>country</code> and set its value to <code>US</code>.</p>
+
+<p><strong>User Properties</strong> are prefixed with <code>up.</code> or <code>upn.</code> for user properties in text or number format, respectively. The screenshot shows a single text user property named <code>user_type</code> set to value <code>Premium user</code>.</p>
 
 <p>Finally, the <code>sid</code> parameter seems to contain the timestamp when the current session started (taken from the <strong>_ga_MEASUREMENT-ID</strong> cookie).</p>
 
