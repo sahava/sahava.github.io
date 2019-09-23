@@ -527,7 +527,7 @@
           height: 70
         };
       }
-
+      /*
       $('.fancybox').fancybox({
         maxWidth: 900,
         maxHeight: 800,
@@ -556,7 +556,7 @@
             $('.fancybox-next > span, .fancybox-prev > span').css('visibility', 'visible');
           }, 400);
         }
-      });
+      });*/
     }
 
     fancyFox();
