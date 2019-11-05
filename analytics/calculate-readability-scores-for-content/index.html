@@ -1,0 +1,1677 @@
+
+
+  
+    
+  
+
+
+  
+
+
+
+
+
+  
+
+
+  
+
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta name="google-site-verification" content="xQwWI2KUfP9LbFKhw2CVLFtrMY6Czrla7L3PD2aBolA" />
+
+
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org", 
+  "@type": "BlogPosting",
+  "headline": "Calculate Readability Scores For Content | Simo Ahava's blog",
+  "image": "https:\/\/www.simoahava.com\/images\/2019\/11\/readability-score-google-analytics.jpg",
+  "editor": "Simo Ahava",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Simo Ahava's blog",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https:\/\/www.simoahava.com\/images\/simo.png",
+      "height": "393",
+      "width": "407"
+    }
+  },
+  "url": "https:\/\/www.simoahava.com\/analytics\/calculate-readability-scores-for-content\/",
+  "datePublished": "2019-11-05T09:00:33\x2b03:00",
+  "dateModified": "2019-11-05T09:00:33\x2b03:00",
+  "description": "Calculate readability scores (e.g. Flesch-Kincaid, SMOG) for your content, and send the values as Custom Dimensions to Google Analytics.",
+  "author": {
+    "@type": "Person",
+    "name": "Simo Ahava"
+  }
+}
+</script>
+
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Hugo 0.58.3 with theme Tranquilpeak 0.4.3-BETA">
+    <title>Calculate Readability Scores For Content | Simo Ahava's blog</title>
+    
+    <script>
+      window.dataLayer=window.dataLayer||[];window.dataLayer.push({pageType: 'article'});
+    </script>
+    
+
+    
+
+    <script src="https://www.simoahava.com/x-js/lazyload.iife.min.js"></script>
+
+    
+
+    
+    <script>
+      (function(S,i,m,o){
+        window[m]=window[m]||[];
+        window[m].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
+        var f=S.getElementsByTagName(i)[0],j=S.createElement(i),dl=m!='dataLayer'?'&l='+m:'';
+        j.async=true;
+        j.src='https://www.googletagmanager.com/gtm.js?id='+o+dl;
+        f.parentNode.insertBefore(j,f);
+      })(document,'script','dataLayer','GTM-PZ7GMV9');
+    </script>
+    
+    <script src="//simoahava.disqus.com/count.js" id="dsq-count-scr" async></script>
+    <meta name="author" content="Simo Ahava">
+    <meta name="keywords" content="">
+
+    <link rel="icon" href="https://www.simoahava.com/images/favicon.ico">
+    
+    <link rel="amphtml" href="https://www.simoahava.com/amp/analytics/calculate-readability-scores-for-content/">
+    
+    <meta name="description" content="Calculate readability scores (e.g. Flesch-Kincaid, SMOG) for your content, and send the values as Custom Dimensions to Google Analytics.">
+    <meta property="og:description" content="Calculate readability scores (e.g. Flesch-Kincaid, SMOG) for your content, and send the values as Custom Dimensions to Google Analytics.">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="Calculate Readability Scores For Content">
+    <meta property="og:url" content="/analytics/calculate-readability-scores-for-content/">
+    <meta property="og:site_name" content="Simo Ahava&#39;s blog">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Calculate Readability Scores For Content">
+    <meta name="twitter:description" content="Calculate readability scores (e.g. Flesch-Kincaid, SMOG) for your content, and send the values as Custom Dimensions to Google Analytics.">
+    
+      <meta name="twitter:creator" content="@SimoAhava">
+      
+    
+
+    
+    
+
+    
+      <meta property="og:image" content="https://www.simoahava.com/images/simo.png">
+    
+
+    
+      <meta name="twitter:image" content="https://www.simoahava.com/images/2019/11/readability-score-google-analytics.jpg">  
+      <meta property="og:image" content="https://www.simoahava.com/images/2019/11/readability-score-google-analytics.jpg">
+    
+    
+    
+
+    
+
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+    
+    
+    
+    <link rel="stylesheet" href="https://www.simoahava.com/css/style.css" />
+    
+    
+
+    
+      
+    
+    
+  </head>
+
+  <body>
+    <div id="blog">
+      <header id="header" data-behavior="4">
+  <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+  <div class="header-title">
+    <a class="header-title-link" href="https://www.simoahava.com/">Simo Ahava&#39;s blog</a>
+  </div>
+  
+</header>
+
+      <nav id="sidebar" data-behavior="4">
+  <div class="sidebar-container">
+    
+      <div class="sidebar-profile">
+        <a href="https://www.simoahava.com/">
+          <img class="sidebar-profile-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+        </a>
+        <h4 class="sidebar-profile-name">Simo Ahava</h4>
+        
+          <h5 class="sidebar-profile-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</h5>
+        
+      </div>
+    
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+      
+      <span class="sidebar-button-desc">Home</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+      
+      <span class="sidebar-button-desc">Categories</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tags/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Tags</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/gtm-tips/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-magic"></i>
+      
+      <span class="sidebar-button-desc">GTM Tips</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/about-simo-ahava/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+      
+      <span class="sidebar-button-desc">About</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tools/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-wrench"></i>
+      
+      <span class="sidebar-button-desc">Tools</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/blog-statistics/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bar-chart"></i>
+      
+      <span class="sidebar-button-desc">Blog statistics</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://github.com/sahava" target="_blank" rel="noopener">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+      
+      <span class="sidebar-button-desc">GitHub</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/upcoming-talks/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bullhorn"></i>
+      
+      <span class="sidebar-button-desc">Upcoming talks</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
+
+    </ul>
+  </div>
+</nav>
+
+      
+
+      <div id="main" data-behavior="4"
+        class="
+               hasCoverMetaIn
+               ">
+        <article class="post">
+	  <form id="search" action="https://www.simoahava.com/search/">
+  <input name="q" type="text" class="form-control input--xlarge" placeholder="Search blog..." autocomplete="off">
+  </form>
+
+          
+          
+            <div class="post-header main-content-wrap text-left">
+
+  
+
+    <h1>
+      Calculate Readability Scores For Content
+    </h1>
+  
+  
+  <div class="postShorten-meta post-meta">
+    
+      <time datetime="2019-11-05T09:00:33&#43;03:00">
+        
+  November 5, 2019
+
+      </time>
+    
+      
+  
+  
+    <span>in</span>
+    
+      <a class="category-link" href="https://www.simoahava.com/categories/analytics">Analytics</a>
+    
+  
+
+
+       | <a href="https://www.simoahava.com/analytics/calculate-readability-scores-for-content/#disqus_thread">Comments</a>
+  </div>
+
+
+</div>
+
+          
+          <div class="post-content markdown">
+            <div class="main-content-wrap">
+              
+
+<p>There are lots of different <a href="https://readable.com/features/readability-formulas/">readability formulas</a> out there, which seek to provide an index on how <em>readable</em> any given excerpt of text is. Typically, these formulas output a <strong>grade-level score</strong>, which indicates, roughly, the level of education required to read the text excerpt with ease.</p>
+
+<p>Any &ldquo;quality index&rdquo; that seeks to reduce the complexity of something as multi-faceted as <em>reading</em> should be subject to scrutiny. This is true for Bounce Rate, this is true for Time On Page, and this is true for a <em>readability score</em>.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2019/11/readability-score-google-analytics.jpg" title="Readability score in Google Analytics">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2019/11/readability-score-google-analytics.jpg#ZgotmplZ" alt="Readability score in Google Analytics">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p><strong>However</strong>, I do think it&rsquo;s interesting metadata to collect for your content. Who knows, perhaps you&rsquo;ll find correlations between the difficulty of reading any piece of text and the amount of <a href="https://www.simoahava.com/analytics/track-content-engagement-part-2/">engagement</a> that the content engenders.</p>
+
+<p>In this article, I&rsquo;ll show you how to create a <strong>Custom JavaScript variable</strong> in <a href="https://tagmanager.google.com/">Google Tag Manager</a> that creates a <a href="https://www.simoahava.com/analytics/create-utility-variables-returning-functions/">utility function</a>. This function can be called with any piece of text (e.g. the text content of your main content DOM element), and it will return an object with a variety of scores based on different readability formulas, as well as a median grade level calculated from these scores.</p>
+
+<p>You can use this information to annotate your Page View hits with Custom Dimensions (with <a href="#google-analytics-setup">a caveat</a> regarding its triggers) when sending the data to <a href="https://analytics.google.com/">Google Analytics</a>.</p>
+
+<p>You can also send the data to a  <a href="https://www.simoahava.com/analytics/getting-started-with-google-analytics-app-web/">Google Analytics: App + Web</a> property ready for that juicy <a href="https://www.simoahava.com/analytics/enable-bigquery-export-google-analytics-app-web/">BigQuery data export</a>.</p>
+
+<p>I&rsquo;ll show you how to do both in this guide.</p>
+
+<blockquote>
+<p>Thanks to <strong>Munaz Anjum</strong> for inspiring me to write this article!</p>
+</blockquote>
+
+<h2 id="the-custom-javascript-variable">The Custom JavaScript variable</h2>
+
+<p>In this chapter, we&rsquo;ll go over the Custom JavaScript variable you&rsquo;ll need to create to make this work.</p>
+
+<p>&ldquo;Why a Custom JavaScript variable? Why not a <a href="https://www.simoahava.com/analytics/custom-templates-guide-for-google-tag-manager/">custom template</a>?&rdquo; I hear you ask. <em>I know!</em> This would be <em>perfect</em> for a custom template. Alas, templates do not support the full extent of regular expressions yet, and they are absolutely vital for the algorithms required by the formulae in the variable.</p>
+
+<h3 id="what-you-ll-get">What you&rsquo;ll get</h3>
+
+<p>The Custom JavaScript variable returns a <strong>function</strong>, which you can then invoke with a string in another Custom JavaScript variable or a Custom HTML tag.</p>
+
+<p>When you call the function with a string, e.g.:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">readabilityFunction</span> <span style="color:#f92672">=</span> {{<span style="color:#a6e22e">readabilityFunction</span>}};
+
+<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">text</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;At the heart of this paper lies the elusive concept of \
+</span><span style="color:#e6db74">variation: how speakers can simultaneously share a common knowledge \
+</span><span style="color:#e6db74">of a unified language system and develop it in idiosyncratic and unique \
+</span><span style="color:#e6db74">ways. Studies of variation do not come without their fair share of \
+</span><span style="color:#e6db74">controversy. Since they necessarily incorporate the attention to detail \
+</span><span style="color:#e6db74">that a descriptivist approach demands together with a level of abstraction \
+</span><span style="color:#e6db74">that is likewise required by all studies of linguistic phenomena, the \
+</span><span style="color:#e6db74">results are often as debatable as they are revelatory. It is thus the \
+</span><span style="color:#e6db74">researcher’s job to describe the phenomenon as lucidly as possible, \
+</span><span style="color:#e6db74">without drawing conclusions that extend beyond the scope of the data at hand.&#39;</span>
+
+<span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">readabilityFunction</span>(<span style="color:#a6e22e">text</span>));
+
+<span style="color:#75715e">// Outputs
+</span><span style="color:#75715e">// {
+</span><span style="color:#75715e">//   automatedReadabilityIndex: 15.48,
+</span><span style="color:#75715e">//   colemanLiauIndex: 13.12,
+</span><span style="color:#75715e">//   fleschKincaidGrade: 16.41,
+</span><span style="color:#75715e">//   fleschReadingEase: 28.17,
+</span><span style="color:#75715e">//   linsearWriteFormula: 18.25,
+</span><span style="color:#75715e">//   medianGrade: 17,
+</span><span style="color:#75715e">//   readingTime: 27.34,
+</span><span style="color:#75715e">//   rix: 9.5,
+</span><span style="color:#75715e">//   smogIndex: 17.41
+</span><span style="color:#75715e">// }
+</span></code></pre></div>
+
+<p>This particular excerpt (from my <a href="https://helda.helsinki.fi/bitstream/handle/10138/19347/intermed.pdf">master&rsquo;s thesis</a>) has a median readability grade of <strong>17</strong> which means, loosely translated, that it takes around 17 years of <em>education</em> to read text like this with ease. The <strong>reading time</strong> is around 27 seconds.</p>
+
+<p>The object for <strong>the article you are reading</strong> looks like this (ouch!):</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">{
+  <span style="color:#a6e22e">automatedReadabilityIndex</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">15.48</span>,
+  <span style="color:#a6e22e">colemanLiauIndex</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">3.77</span>,
+  <span style="color:#a6e22e">fleschKincaidGrade</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">16.96</span>,
+  <span style="color:#a6e22e">fleschReadingEase</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">39.67</span>,
+  <span style="color:#a6e22e">linsearWriteFormula</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">13.2</span>,
+  <span style="color:#a6e22e">medianGrade</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">15</span>,
+  <span style="color:#a6e22e">readingTime</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">1524.22</span>,
+  <span style="color:#a6e22e">rix</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">7.11</span>,
+  <span style="color:#a6e22e">smogIndex</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">15.85</span>
+}
+</code></pre></div>
+
+<p>I&rsquo;ll share what these different numbers and names mean in a bit.</p>
+
+<h3 id="variable-contents">Variable contents</h3>
+
+<p>The code is a JavaScript rewrite of the <a href="https://github.com/shivam5992/textstat/">textstat.py</a> Python library. I did not include any readability grades that rely on an English wordlist (so any formulae that require a definition of what is a &ldquo;common&rdquo; or &ldquo;easy&rdquo; word in English is ignored).</p>
+
+<p><strong>Create a new Custom JavaScript variable</strong>, give it a name (e.g. <code>readabilityFunction</code>), and copy-paste the following JavaScript in the body.</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
+  <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">text</span>) {
+
+    <span style="color:#75715e">/* To speed the script up, you can set a sampling rate in words. For example, if you set
+</span><span style="color:#75715e">     * sampleLimit to 1000, only the first 1000 words will be parsed from the input text.
+</span><span style="color:#75715e">     * Set to 0 to never sample.
+</span><span style="color:#75715e">     */</span>     
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">sampleLimit</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1000</span>;
+    
+    <span style="color:#75715e">// Manual rewrite of the textstat Python library (https://github.com/shivam5992/textstat/)
+</span><span style="color:#75715e"></span>    
+    <span style="color:#75715e">/* 
+</span><span style="color:#75715e">     * Regular expression to identify a sentence. No, it&#39;s not perfect. 
+</span><span style="color:#75715e">     * Fails e.g. with abbreviations and similar constructs mid-sentence.
+</span><span style="color:#75715e">     */</span>
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">sentenceRegex</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> RegExp(<span style="color:#e6db74">&#39;[.?!]\\s[^a-z]&#39;</span>, <span style="color:#e6db74">&#39;g&#39;</span>);
+    
+    <span style="color:#75715e">/*
+</span><span style="color:#75715e">     * Regular expression to identify a syllable. No, it&#39;s not perfect either.
+</span><span style="color:#75715e">     * It&#39;s based on English, so other languages with different vowel / consonant distributions
+</span><span style="color:#75715e">     * and syllable definitions need a rewrite.
+</span><span style="color:#75715e">     * Inspired by https://bit.ly/2VK9dz1
+</span><span style="color:#75715e">     */</span>
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">syllableRegex</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> RegExp(<span style="color:#e6db74">&#39;[aiouy]+e*|e(?!d$|ly).|[td]ed|le$&#39;</span>, <span style="color:#e6db74">&#39;g&#39;</span>);
+    
+    <span style="color:#75715e">// Baseline for FRE - English only
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">freBase</span> <span style="color:#f92672">=</span> {
+      <span style="color:#a6e22e">base</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">206.835</span>,
+      <span style="color:#a6e22e">sentenceLength</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">1.015</span>,
+      <span style="color:#a6e22e">syllablesPerWord</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">84.6</span>,
+      <span style="color:#a6e22e">syllableThreshold</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">3</span>
+    };
+    
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">cache</span> <span style="color:#f92672">=</span> {};
+    
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">punctuation</span> <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#39;!&#39;</span>,<span style="color:#e6db74">&#39;&#34;&#39;</span>,<span style="color:#e6db74">&#39;#&#39;</span>,<span style="color:#e6db74">&#39;$&#39;</span>,<span style="color:#e6db74">&#39;%&#39;</span>,<span style="color:#e6db74">&#39;&amp;&#39;</span>,<span style="color:#e6db74">&#39;\&#39;&#39;</span>,<span style="color:#e6db74">&#39;(&#39;</span>,<span style="color:#e6db74">&#39;)&#39;</span>,<span style="color:#e6db74">&#39;*&#39;</span>,<span style="color:#e6db74">&#39;+&#39;</span>,<span style="color:#e6db74">&#39;,&#39;</span>,<span style="color:#e6db74">&#39;-&#39;</span>,<span style="color:#e6db74">&#39;.&#39;</span>,<span style="color:#e6db74">&#39;/&#39;</span>,<span style="color:#e6db74">&#39;:&#39;</span>,<span style="color:#e6db74">&#39;;&#39;</span>,<span style="color:#e6db74">&#39;&lt;&#39;</span>,<span style="color:#e6db74">&#39;=&#39;</span>,<span style="color:#e6db74">&#39;&gt;&#39;</span>,<span style="color:#e6db74">&#39;?&#39;</span>,<span style="color:#e6db74">&#39;@&#39;</span>,<span style="color:#e6db74">&#39;[&#39;</span>,<span style="color:#e6db74">&#39;]&#39;</span>,<span style="color:#e6db74">&#39;^&#39;</span>,<span style="color:#e6db74">&#39;_&#39;</span>,<span style="color:#e6db74">&#39;`&#39;</span>,<span style="color:#e6db74">&#39;{&#39;</span>,<span style="color:#e6db74">&#39;|&#39;</span>,<span style="color:#e6db74">&#39;}&#39;</span>,<span style="color:#e6db74">&#39;~&#39;</span>];
+    
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">legacyRound</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">number</span>, <span style="color:#a6e22e">precision</span>) {
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">k</span> <span style="color:#f92672">=</span> Math.<span style="color:#a6e22e">pow</span>(<span style="color:#ae81ff">10</span>, (<span style="color:#a6e22e">precision</span> <span style="color:#f92672">||</span> <span style="color:#ae81ff">0</span>));
+      <span style="color:#66d9ef">return</span> Math.<span style="color:#a6e22e">floor</span>((<span style="color:#a6e22e">number</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">k</span>) <span style="color:#f92672">+</span> <span style="color:#ae81ff">0.5</span> <span style="color:#f92672">*</span> Math.<span style="color:#a6e22e">sign</span>(<span style="color:#a6e22e">number</span>)) <span style="color:#f92672">/</span> <span style="color:#a6e22e">k</span>;
+    };
+    
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">charCount</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">text</span>) {
+      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">cache</span>.<span style="color:#a6e22e">charCount</span>) <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">cache</span>.<span style="color:#a6e22e">charCount</span>;
+      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">sampleLimit</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) <span style="color:#a6e22e">text</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">text</span>.<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#39; &#39;</span>).<span style="color:#a6e22e">slice</span>(<span style="color:#ae81ff">0</span>, <span style="color:#a6e22e">sampleLimit</span>).<span style="color:#a6e22e">join</span>(<span style="color:#e6db74">&#39; &#39;</span>);
+      <span style="color:#a6e22e">text</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">text</span>.<span style="color:#a6e22e">replace</span>(<span style="color:#e6db74">/\s/g</span>, <span style="color:#e6db74">&#39;&#39;</span>);
+      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">cache</span>.<span style="color:#a6e22e">charCount</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">text</span>.<span style="color:#a6e22e">length</span>;
+    };
+    
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">removePunctuation</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">text</span>) {
+      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">text</span>.<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#39;&#39;</span>).<span style="color:#a6e22e">filter</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">c</span>) {
+        <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">punctuation</span>.<span style="color:#a6e22e">indexOf</span>(<span style="color:#a6e22e">c</span>) <span style="color:#f92672">===</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>;
+      }).<span style="color:#a6e22e">join</span>(<span style="color:#e6db74">&#39;&#39;</span>);
+    };
+    
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">letterCount</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">text</span>) {
+      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">sampleLimit</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) <span style="color:#a6e22e">text</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">text</span>.<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#39; &#39;</span>).<span style="color:#a6e22e">slice</span>(<span style="color:#ae81ff">0</span>, <span style="color:#a6e22e">sampleLimit</span>).<span style="color:#a6e22e">join</span>(<span style="color:#e6db74">&#39; &#39;</span>);
+      <span style="color:#a6e22e">text</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">text</span>.<span style="color:#a6e22e">replace</span>(<span style="color:#e6db74">/\s/g</span>, <span style="color:#e6db74">&#39;&#39;</span>);
+      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">removePunctuation</span>(<span style="color:#a6e22e">text</span>).<span style="color:#a6e22e">length</span>;
+    };
+    
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">lexiconCount</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">text</span>, <span style="color:#a6e22e">useCache</span>, <span style="color:#a6e22e">ignoreSample</span>) {
+      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">useCache</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">cache</span>.<span style="color:#a6e22e">lexiconCount</span>) <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">cache</span>.<span style="color:#a6e22e">lexiconCount</span>;
+      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">ignoreSample</span> <span style="color:#f92672">!==</span> <span style="color:#66d9ef">true</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">sampleLimit</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) <span style="color:#a6e22e">text</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">text</span>.<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#39; &#39;</span>).<span style="color:#a6e22e">slice</span>(<span style="color:#ae81ff">0</span>, <span style="color:#a6e22e">sampleLimit</span>).<span style="color:#a6e22e">join</span>(<span style="color:#e6db74">&#39; &#39;</span>);
+      <span style="color:#a6e22e">text</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">removePunctuation</span>(<span style="color:#a6e22e">text</span>);
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">lexicon</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">text</span>.<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#39; &#39;</span>).<span style="color:#a6e22e">length</span>;
+      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">useCache</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">cache</span>.<span style="color:#a6e22e">lexiconCount</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">lexicon</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">lexicon</span>;
+    };
+    
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">getWords</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">text</span>, <span style="color:#a6e22e">useCache</span>) {
+      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">useCache</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">cache</span>.<span style="color:#a6e22e">getWords</span>) <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">cache</span>.<span style="color:#a6e22e">getWords</span>;
+      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">sampleLimit</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) <span style="color:#a6e22e">text</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">text</span>.<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#39; &#39;</span>).<span style="color:#a6e22e">slice</span>(<span style="color:#ae81ff">0</span>, <span style="color:#a6e22e">sampleLimit</span>).<span style="color:#a6e22e">join</span>(<span style="color:#e6db74">&#39; &#39;</span>);
+      <span style="color:#a6e22e">text</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">text</span>.<span style="color:#a6e22e">toLowerCase</span>();
+      <span style="color:#a6e22e">text</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">removePunctuation</span>(<span style="color:#a6e22e">text</span>);
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">words</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">text</span>.<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#39; &#39;</span>);
+      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">useCache</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">cache</span>.<span style="color:#a6e22e">getWords</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">words</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">words</span>;
+    }
+    
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">syllableCount</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">text</span>, <span style="color:#a6e22e">useCache</span>) {
+      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">useCache</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">cache</span>.<span style="color:#a6e22e">syllableCount</span>) <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">cache</span>.<span style="color:#a6e22e">syllableCount</span>;
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">count</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">syllables</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">getWords</span>(<span style="color:#a6e22e">text</span>, <span style="color:#a6e22e">useCache</span>).<span style="color:#a6e22e">reduce</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">a</span>, <span style="color:#a6e22e">c</span>) {  
+        <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">a</span> <span style="color:#f92672">+</span> (<span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">match</span>(<span style="color:#a6e22e">syllableRegex</span>) <span style="color:#f92672">||</span> [<span style="color:#ae81ff">1</span>]).<span style="color:#a6e22e">length</span>;
+      }, <span style="color:#ae81ff">0</span>);
+      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">useCache</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">cache</span>.<span style="color:#a6e22e">syllableCount</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">syllables</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">syllables</span>;
+    };
+    
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">polySyllableCount</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">text</span>, <span style="color:#a6e22e">useCache</span>) {
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">count</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+      <span style="color:#a6e22e">getWords</span>(<span style="color:#a6e22e">text</span>, <span style="color:#a6e22e">useCache</span>).<span style="color:#a6e22e">forEach</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">word</span>) {
+        <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">syllables</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">syllableCount</span>(<span style="color:#a6e22e">word</span>);
+        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">syllables</span> <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">3</span>) {
+          <span style="color:#a6e22e">count</span> <span style="color:#f92672">+=</span> <span style="color:#ae81ff">1</span>;
+        }
+      });
+      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">count</span>;
+    };
+    
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">sentenceCount</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">text</span>, <span style="color:#a6e22e">useCache</span>) {
+      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">useCache</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">cache</span>.<span style="color:#a6e22e">sentenceCount</span>) <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">cache</span>.<span style="color:#a6e22e">sentenceCount</span>;
+      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">sampleLimit</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) <span style="color:#a6e22e">text</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">text</span>.<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#39; &#39;</span>).<span style="color:#a6e22e">slice</span>(<span style="color:#ae81ff">0</span>, <span style="color:#a6e22e">sampleLimit</span>).<span style="color:#a6e22e">join</span>(<span style="color:#e6db74">&#39; &#39;</span>);
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">ignoreCount</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">sentences</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">text</span>.<span style="color:#a6e22e">split</span>(<span style="color:#a6e22e">sentenceRegex</span>);
+      <span style="color:#a6e22e">sentences</span>.<span style="color:#a6e22e">forEach</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">s</span>) {
+        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">lexiconCount</span>(<span style="color:#a6e22e">s</span>, <span style="color:#66d9ef">true</span>, <span style="color:#66d9ef">false</span>) <span style="color:#f92672">&lt;=</span> <span style="color:#ae81ff">2</span>) { <span style="color:#a6e22e">ignoreCount</span> <span style="color:#f92672">+=</span> <span style="color:#ae81ff">1</span>; }
+      });
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">count</span> <span style="color:#f92672">=</span> Math.<span style="color:#a6e22e">max</span>(<span style="color:#ae81ff">1</span>, <span style="color:#a6e22e">sentences</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">ignoreCount</span>);
+      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">useCache</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">cache</span>.<span style="color:#a6e22e">sentenceCount</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">count</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">count</span>;
+    };
+    
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">avgSentenceLength</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">text</span>) {
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">avg</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">lexiconCount</span>(<span style="color:#a6e22e">text</span>, <span style="color:#66d9ef">true</span>) <span style="color:#f92672">/</span> <span style="color:#a6e22e">sentenceCount</span>(<span style="color:#a6e22e">text</span>, <span style="color:#66d9ef">true</span>);
+      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">legacyRound</span>(<span style="color:#a6e22e">avg</span>, <span style="color:#ae81ff">2</span>);
+    };
+    
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">avgSyllablesPerWord</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">text</span>) {
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">avg</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">syllableCount</span>(<span style="color:#a6e22e">text</span>, <span style="color:#66d9ef">true</span>) <span style="color:#f92672">/</span> <span style="color:#a6e22e">lexiconCount</span>(<span style="color:#a6e22e">text</span>, <span style="color:#66d9ef">true</span>);
+      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">legacyRound</span>(<span style="color:#a6e22e">avg</span>, <span style="color:#ae81ff">2</span>);
+    };
+    
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">avgCharactersPerWord</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">text</span>) {
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">avg</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">charCount</span>(<span style="color:#a6e22e">text</span>) <span style="color:#f92672">/</span> <span style="color:#a6e22e">lexiconCount</span>(<span style="color:#a6e22e">text</span>, <span style="color:#66d9ef">true</span>);
+      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">legacyRound</span>(<span style="color:#a6e22e">avg</span>, <span style="color:#ae81ff">2</span>);
+    };
+    
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">avgLettersPerWord</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">text</span>) {
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">avg</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">letterCount</span>(<span style="color:#a6e22e">text</span>, <span style="color:#66d9ef">true</span>) <span style="color:#f92672">/</span> <span style="color:#a6e22e">lexiconCount</span>(<span style="color:#a6e22e">text</span>, <span style="color:#66d9ef">true</span>);
+      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">legacyRound</span>(<span style="color:#a6e22e">avg</span>, <span style="color:#ae81ff">2</span>);
+    };
+    
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">avgSentencesPerWord</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">text</span>) {
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">avg</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sentenceCount</span>(<span style="color:#a6e22e">text</span>, <span style="color:#66d9ef">true</span>) <span style="color:#f92672">/</span> <span style="color:#a6e22e">lexiconCount</span>(<span style="color:#a6e22e">text</span>, <span style="color:#66d9ef">true</span>);
+      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">legacyRound</span>(<span style="color:#a6e22e">avg</span>, <span style="color:#ae81ff">2</span>);
+    };
+    
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">fleschReadingEase</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">text</span>) {
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">sentenceLength</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">avgSentenceLength</span>(<span style="color:#a6e22e">text</span>);
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">syllablesPerWord</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">avgSyllablesPerWord</span>(<span style="color:#a6e22e">text</span>);
+      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">legacyRound</span>(
+        <span style="color:#a6e22e">freBase</span>.<span style="color:#a6e22e">base</span> <span style="color:#f92672">-</span> 
+        <span style="color:#a6e22e">freBase</span>.<span style="color:#a6e22e">sentenceLength</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">sentenceLength</span> <span style="color:#f92672">-</span> 
+        <span style="color:#a6e22e">freBase</span>.<span style="color:#a6e22e">syllablesPerWord</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">syllablesPerWord</span>,
+        <span style="color:#ae81ff">2</span>
+      );
+    };
+    
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">fleschKincaidGrade</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">text</span>) {
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">sentenceLength</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">avgSentenceLength</span>(<span style="color:#a6e22e">text</span>);
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">syllablesPerWord</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">avgSyllablesPerWord</span>(<span style="color:#a6e22e">text</span>);
+      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">legacyRound</span>(
+        <span style="color:#ae81ff">0.39</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">sentenceLength</span> <span style="color:#f92672">+</span>
+        <span style="color:#ae81ff">11.8</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">syllablesPerWord</span> <span style="color:#f92672">-</span>
+        <span style="color:#ae81ff">15.59</span>,
+        <span style="color:#ae81ff">2</span>
+      );
+    };
+    
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">smogIndex</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">text</span>) {
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">sentences</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sentenceCount</span>(<span style="color:#a6e22e">text</span>, <span style="color:#66d9ef">true</span>);
+      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">sentences</span> <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">3</span>) {
+        <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">polySyllables</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">polySyllableCount</span>(<span style="color:#a6e22e">text</span>, <span style="color:#66d9ef">true</span>);
+        <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">smog</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1.043</span> <span style="color:#f92672">*</span> (Math.<span style="color:#a6e22e">pow</span>(<span style="color:#a6e22e">polySyllables</span> <span style="color:#f92672">*</span> (<span style="color:#ae81ff">30</span> <span style="color:#f92672">/</span> <span style="color:#a6e22e">sentences</span>), <span style="color:#ae81ff">0.5</span>)) <span style="color:#f92672">+</span> <span style="color:#ae81ff">3.1291</span>;
+        <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">legacyRound</span>(<span style="color:#a6e22e">smog</span>, <span style="color:#ae81ff">2</span>);
+      }
+      <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0.0</span>;
+    };
+    
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">colemanLiauIndex</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">text</span>) {
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">letters</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">legacyRound</span>(<span style="color:#a6e22e">avgLettersPerWord</span>(<span style="color:#a6e22e">text</span>) <span style="color:#f92672">*</span> <span style="color:#ae81ff">100</span>, <span style="color:#ae81ff">2</span>);
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">sentences</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">legacyRound</span>(<span style="color:#a6e22e">avgSentencesPerWord</span>(<span style="color:#a6e22e">text</span>) <span style="color:#f92672">*</span> <span style="color:#ae81ff">100</span>, <span style="color:#ae81ff">2</span>);
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">coleman</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.0588</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">letters</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">0.296</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">sentences</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">15.8</span>;
+      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">legacyRound</span>(<span style="color:#a6e22e">coleman</span>, <span style="color:#ae81ff">2</span>);
+    };
+    
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">automatedReadabilityIndex</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">text</span>) {
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">chars</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">charCount</span>(<span style="color:#a6e22e">text</span>);
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">words</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">lexiconCount</span>(<span style="color:#a6e22e">text</span>, <span style="color:#66d9ef">true</span>);
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">sentences</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sentenceCount</span>(<span style="color:#a6e22e">text</span>, <span style="color:#66d9ef">true</span>);
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">a</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">chars</span> <span style="color:#f92672">/</span> <span style="color:#a6e22e">words</span>;
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">b</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">words</span> <span style="color:#f92672">/</span> <span style="color:#a6e22e">sentences</span>;
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">readability</span> <span style="color:#f92672">=</span> (
+        <span style="color:#ae81ff">4.71</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">legacyRound</span>(<span style="color:#a6e22e">a</span>, <span style="color:#ae81ff">2</span>) <span style="color:#f92672">+</span>
+        <span style="color:#ae81ff">0.5</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">legacyRound</span>(<span style="color:#a6e22e">b</span>, <span style="color:#ae81ff">2</span>) <span style="color:#f92672">-</span>
+        <span style="color:#ae81ff">21.43</span>
+      );
+      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">legacyRound</span>(<span style="color:#a6e22e">readability</span>, <span style="color:#ae81ff">2</span>); 
+    };
+    
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">linsearWriteFormula</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">text</span>) {
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">easyWord</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">difficultWord</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">roughTextFirst100</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">text</span>.<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#39; &#39;</span>).<span style="color:#a6e22e">slice</span>(<span style="color:#ae81ff">0</span>,<span style="color:#ae81ff">100</span>).<span style="color:#a6e22e">join</span>(<span style="color:#e6db74">&#39; &#39;</span>);
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">plainTextListFirst100</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">getWords</span>(<span style="color:#a6e22e">text</span>, <span style="color:#66d9ef">true</span>).<span style="color:#a6e22e">slice</span>(<span style="color:#ae81ff">0</span>,<span style="color:#ae81ff">100</span>);
+      <span style="color:#a6e22e">plainTextListFirst100</span>.<span style="color:#a6e22e">forEach</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">word</span>) {
+        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">syllableCount</span>(<span style="color:#a6e22e">word</span>) <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">3</span>) {
+          <span style="color:#a6e22e">easyWord</span> <span style="color:#f92672">+=</span> <span style="color:#ae81ff">1</span>;
+        } <span style="color:#66d9ef">else</span> {
+          <span style="color:#a6e22e">difficultWord</span> <span style="color:#f92672">+=</span> <span style="color:#ae81ff">1</span>;
+        }
+      });
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">number</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">easyWord</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">difficultWord</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">3</span>) <span style="color:#f92672">/</span> <span style="color:#a6e22e">sentenceCount</span>(<span style="color:#a6e22e">roughTextFirst100</span>);
+      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">number</span> <span style="color:#f92672">&lt;=</span> <span style="color:#ae81ff">20</span>) {
+        <span style="color:#a6e22e">number</span> <span style="color:#f92672">-=</span> <span style="color:#ae81ff">2</span>;
+      }
+      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">legacyRound</span>(<span style="color:#a6e22e">number</span> <span style="color:#f92672">/</span> <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">2</span>);
+    };
+    
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">rix</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">text</span>) {
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">words</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">getWords</span>(<span style="color:#a6e22e">text</span>, <span style="color:#66d9ef">true</span>);
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">longCount</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">words</span>.<span style="color:#a6e22e">filter</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">word</span>) {
+        <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">word</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">6</span>;
+      }).<span style="color:#a6e22e">length</span>;
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">sentencesCount</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sentenceCount</span>(<span style="color:#a6e22e">text</span>, <span style="color:#66d9ef">true</span>);
+      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">legacyRound</span>(<span style="color:#a6e22e">longCount</span> <span style="color:#f92672">/</span> <span style="color:#a6e22e">sentencesCount</span>, <span style="color:#ae81ff">2</span>);
+    };
+    
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">readingTime</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">text</span>) {
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">wordsPerSecond</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">4.17</span>;
+      <span style="color:#75715e">// To get full reading time, ignore cache and sample
+</span><span style="color:#75715e"></span>      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">legacyRound</span>(<span style="color:#a6e22e">lexiconCount</span>(<span style="color:#a6e22e">text</span>, <span style="color:#66d9ef">false</span>, <span style="color:#66d9ef">true</span>) <span style="color:#f92672">/</span> <span style="color:#a6e22e">wordsPerSecond</span>, <span style="color:#ae81ff">2</span>);
+    };
+    
+    <span style="color:#75715e">// Build textStandard
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">grade</span> <span style="color:#f92672">=</span> [];
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> {};
+    (<span style="color:#66d9ef">function</span>() {
+      
+      <span style="color:#75715e">// FRE
+</span><span style="color:#75715e"></span>      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">fre</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">fleschReadingEase</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">fleschReadingEase</span>(<span style="color:#a6e22e">text</span>);
+      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">fre</span> <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">100</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">fre</span> <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">90</span>) {
+        <span style="color:#a6e22e">grade</span>.<span style="color:#a6e22e">push</span>(<span style="color:#ae81ff">5</span>);
+      } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">fre</span> <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">90</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">fre</span> <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">80</span>) {
+        <span style="color:#a6e22e">grade</span>.<span style="color:#a6e22e">push</span>(<span style="color:#ae81ff">6</span>);
+      } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">fre</span> <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">80</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">fre</span> <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">70</span>) {
+        <span style="color:#a6e22e">grade</span>.<span style="color:#a6e22e">push</span>(<span style="color:#ae81ff">7</span>);
+      } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">fre</span> <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">70</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">fre</span> <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">60</span>) {
+        <span style="color:#a6e22e">grade</span>.<span style="color:#a6e22e">push</span>(<span style="color:#ae81ff">8</span>);
+        <span style="color:#a6e22e">grade</span>.<span style="color:#a6e22e">push</span>(<span style="color:#ae81ff">9</span>);
+      } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">fre</span> <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">60</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">fre</span> <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">50</span>) {
+        <span style="color:#a6e22e">grade</span>.<span style="color:#a6e22e">push</span>(<span style="color:#ae81ff">10</span>);
+      } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">fre</span> <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">50</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">fre</span> <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">40</span>) {
+        <span style="color:#a6e22e">grade</span>.<span style="color:#a6e22e">push</span>(<span style="color:#ae81ff">11</span>);
+      } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">fre</span> <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">40</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">fre</span> <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">30</span>) {
+        <span style="color:#a6e22e">grade</span>.<span style="color:#a6e22e">push</span>(<span style="color:#ae81ff">12</span>);
+      } <span style="color:#66d9ef">else</span> {
+        <span style="color:#a6e22e">grade</span>.<span style="color:#a6e22e">push</span>(<span style="color:#ae81ff">13</span>);
+      }
+      
+      <span style="color:#75715e">// FK
+</span><span style="color:#75715e"></span>      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">fk</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">fleschKincaidGrade</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">fleschKincaidGrade</span>(<span style="color:#a6e22e">text</span>);
+      <span style="color:#a6e22e">grade</span>.<span style="color:#a6e22e">push</span>(Math.<span style="color:#a6e22e">floor</span>(<span style="color:#a6e22e">fk</span>));
+      <span style="color:#a6e22e">grade</span>.<span style="color:#a6e22e">push</span>(Math.<span style="color:#a6e22e">ceil</span>(<span style="color:#a6e22e">fk</span>));
+      
+      <span style="color:#75715e">// SMOG
+</span><span style="color:#75715e"></span>      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">smog</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">smogIndex</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">smogIndex</span>(<span style="color:#a6e22e">text</span>);
+      <span style="color:#a6e22e">grade</span>.<span style="color:#a6e22e">push</span>(Math.<span style="color:#a6e22e">floor</span>(<span style="color:#a6e22e">smog</span>));
+      <span style="color:#a6e22e">grade</span>.<span style="color:#a6e22e">push</span>(Math.<span style="color:#a6e22e">ceil</span>(<span style="color:#a6e22e">smog</span>));
+      
+      <span style="color:#75715e">// CL
+</span><span style="color:#75715e"></span>      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">cl</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">colemanLiauIndex</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">colemanLiauIndex</span>(<span style="color:#a6e22e">text</span>);
+      <span style="color:#a6e22e">grade</span>.<span style="color:#a6e22e">push</span>(Math.<span style="color:#a6e22e">floor</span>(<span style="color:#a6e22e">cl</span>));
+      <span style="color:#a6e22e">grade</span>.<span style="color:#a6e22e">push</span>(Math.<span style="color:#a6e22e">ceil</span>(<span style="color:#a6e22e">cl</span>));
+      
+      <span style="color:#75715e">// ARI
+</span><span style="color:#75715e"></span>      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">ari</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">automatedReadabilityIndex</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">automatedReadabilityIndex</span>(<span style="color:#a6e22e">text</span>);
+      <span style="color:#a6e22e">grade</span>.<span style="color:#a6e22e">push</span>(Math.<span style="color:#a6e22e">floor</span>(<span style="color:#a6e22e">ari</span>));
+      <span style="color:#a6e22e">grade</span>.<span style="color:#a6e22e">push</span>(Math.<span style="color:#a6e22e">ceil</span>(<span style="color:#a6e22e">ari</span>));
+      
+      <span style="color:#75715e">// LWF
+</span><span style="color:#75715e"></span>      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">lwf</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">linsearWriteFormula</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">linsearWriteFormula</span>(<span style="color:#a6e22e">text</span>);
+      <span style="color:#a6e22e">grade</span>.<span style="color:#a6e22e">push</span>(Math.<span style="color:#a6e22e">floor</span>(<span style="color:#a6e22e">lwf</span>));
+      <span style="color:#a6e22e">grade</span>.<span style="color:#a6e22e">push</span>(Math.<span style="color:#a6e22e">ceil</span>(<span style="color:#a6e22e">lwf</span>));
+      
+      <span style="color:#75715e">// RIX
+</span><span style="color:#75715e"></span>      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">rixScore</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">rix</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">rix</span>(<span style="color:#a6e22e">text</span>);
+      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">rixScore</span> <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">7.2</span>) {
+        <span style="color:#a6e22e">grade</span>.<span style="color:#a6e22e">push</span>(<span style="color:#ae81ff">13</span>);
+      } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">rixScore</span> <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">7.2</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">rixScore</span> <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">6.2</span>) {
+        <span style="color:#a6e22e">grade</span>.<span style="color:#a6e22e">push</span>(<span style="color:#ae81ff">12</span>);
+      } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">rixScore</span> <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">6.2</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">rixScore</span> <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">5.3</span>) {
+        <span style="color:#a6e22e">grade</span>.<span style="color:#a6e22e">push</span>(<span style="color:#ae81ff">11</span>);
+      } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">rixScore</span> <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">5.3</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">rixScore</span> <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">4.5</span>) {
+        <span style="color:#a6e22e">grade</span>.<span style="color:#a6e22e">push</span>(<span style="color:#ae81ff">10</span>);
+      } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">rixScore</span> <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">4.5</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">rixScore</span> <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">3.7</span>) {
+        <span style="color:#a6e22e">grade</span>.<span style="color:#a6e22e">push</span>(<span style="color:#ae81ff">9</span>);
+      } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">rixScore</span> <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">3.7</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">rixScore</span> <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">3.0</span>) {
+        <span style="color:#a6e22e">grade</span>.<span style="color:#a6e22e">push</span>(<span style="color:#ae81ff">8</span>);
+      } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">rixScore</span> <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">3.0</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">rixScore</span> <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">2.4</span>) {
+        <span style="color:#a6e22e">grade</span>.<span style="color:#a6e22e">push</span>(<span style="color:#ae81ff">7</span>);
+      } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">rixScore</span> <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">2.4</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">rixScore</span> <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">1.8</span>) {
+        <span style="color:#a6e22e">grade</span>.<span style="color:#a6e22e">push</span>(<span style="color:#ae81ff">6</span>);
+      } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">rixScore</span> <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">1.8</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">rixScore</span> <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">1.3</span>) {
+        <span style="color:#a6e22e">grade</span>.<span style="color:#a6e22e">push</span>(<span style="color:#ae81ff">5</span>);
+      } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">rixScore</span> <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">1.3</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">rixScore</span> <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">0.8</span>) {
+        <span style="color:#a6e22e">grade</span>.<span style="color:#a6e22e">push</span>(<span style="color:#ae81ff">4</span>);
+      } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">rixScore</span> <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0.8</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">rixScore</span> <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">0.5</span>) {
+        <span style="color:#a6e22e">grade</span>.<span style="color:#a6e22e">push</span>(<span style="color:#ae81ff">3</span>);
+      } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">rixScore</span> <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0.5</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">rixScore</span> <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">0.2</span>) {
+        <span style="color:#a6e22e">grade</span>.<span style="color:#a6e22e">push</span>(<span style="color:#ae81ff">2</span>);
+      } <span style="color:#66d9ef">else</span> {
+        <span style="color:#a6e22e">grade</span>.<span style="color:#a6e22e">push</span>(<span style="color:#ae81ff">1</span>);
+      }
+      
+      <span style="color:#75715e">// Find median grade
+</span><span style="color:#75715e"></span>      <span style="color:#a6e22e">grade</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">grade</span>.<span style="color:#a6e22e">sort</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">a</span>, <span style="color:#a6e22e">b</span>) { <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">a</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">b</span>; });
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">midPoint</span> <span style="color:#f92672">=</span> Math.<span style="color:#a6e22e">floor</span>(<span style="color:#a6e22e">grade</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">/</span> <span style="color:#ae81ff">2</span>);
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">medianGrade</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">legacyRound</span>(
+        <span style="color:#a6e22e">grade</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">%</span> <span style="color:#ae81ff">2</span> <span style="color:#f92672">?</span> 
+        <span style="color:#a6e22e">grade</span>[<span style="color:#a6e22e">midPoint</span>] <span style="color:#f92672">:</span> 
+        (<span style="color:#a6e22e">grade</span>[<span style="color:#a6e22e">midPoint</span><span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>] <span style="color:#f92672">+</span> <span style="color:#a6e22e">grade</span>[<span style="color:#a6e22e">midPoint</span>]) <span style="color:#f92672">/</span> <span style="color:#ae81ff">2.0</span>
+      );
+      <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">medianGrade</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">medianGrade</span>;
+      
+    })();
+    
+    <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">readingTime</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">readingTime</span>(<span style="color:#a6e22e">text</span>);
+      
+    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">obj</span>;
+  };
+}
+</code></pre></div>
+
+<p>It&rsquo;s a mouthful, so let&rsquo;s go over each formula together with the code that relates to it.</p>
+
+<h4 id="setup">Setup</h4>
+
+<p>The first couple of steps in the variable establish much of what follows.</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">sampleLimit</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1000</span>;
+</code></pre></div>
+
+<p>Running regular expressions can be <strong>slow</strong>. If you have an article of 5000 words, for example, counting the syllables of every single word can take a looooooong time, and can be hazardous if executed at page load.</p>
+
+<p>I&rsquo;ve introduced the <code>sampleLimit</code> variable, which basically establishes a maximum sample size to run the readability calculations against. If <code>sampleLimit</code> is set to the default of <code>1000</code>, the script will sample the first 1000 words of the input. The end result should be in the <em>ball park</em> of a score calculated against the full text, but this of course depends on what type of text is in question.</p>
+
+<p>If you want to avoid sampling, set <code>sampleLimit</code> to <code>0</code>.</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">sentenceRegex</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> RegExp(<span style="color:#e6db74">&#39;[.?!]\\s[^a-z]&#39;</span>, <span style="color:#e6db74">&#39;g&#39;</span>);
+<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">syllableRegex</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> RegExp(<span style="color:#e6db74">&#39;[aiouy]+e*|e(?!d$|ly).|[td]ed|le$&#39;</span>, <span style="color:#e6db74">&#39;g&#39;</span>);
+</code></pre></div>
+
+<p>The first regular expression is used to split a chunk of text in <em>sentences</em>. <strong>No, it&rsquo;s not perfect</strong>.</p>
+
+<p>But that&rsquo;s OK - we&rsquo;re looking for abstractions and the more text you have the more the score will converge towards a norm.</p>
+
+<p>The second regular expression counts the number of <em>syllables</em> in a text. <strong>No, it&rsquo;s not perfect either</strong>. It&rsquo;s based on English, and perhaps other Germanic languages, but syllabification can change from language to language so if you want to analyze content in other languages, you need to modify the regex.</p>
+
+<p>The rest of the setup steps are listed here.</p>
+
+<table>
+<thead>
+<tr>
+<th>Function / variable signature</th>
+<th>Description</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td><code>freBase</code></td>
+<td>The baseline numbers for calculating the Flesch Reading-Ease score in the English language.</td>
+</tr>
+
+<tr>
+<td><code>cache</code></td>
+<td>Utility that caches most of the calculations, so that the regexes are run just once for the cached items.</td>
+</tr>
+
+<tr>
+<td><code>punctuation</code></td>
+<td>List of punctuation symbols.</td>
+</tr>
+
+<tr>
+<td><code>legacyRound()</code></td>
+<td>Function to round the input number to the given precision.</td>
+</tr>
+
+<tr>
+<td><code>charCount()</code></td>
+<td>Count the characters in the input.</td>
+</tr>
+
+<tr>
+<td><code>removePunctuation()</code></td>
+<td>Remove all punctuation from the input.</td>
+</tr>
+
+<tr>
+<td><code>letterCount()</code></td>
+<td>Count the letters in the input.</td>
+</tr>
+
+<tr>
+<td><code>lexiconCount()</code></td>
+<td>Count the words in the input.</td>
+</tr>
+
+<tr>
+<td><code>getWords()</code></td>
+<td>Returns the words in the input.</td>
+</tr>
+
+<tr>
+<td><code>syllableCount()</code></td>
+<td>Count the syllables in the input.</td>
+</tr>
+
+<tr>
+<td><code>polySyllableCount()</code></td>
+<td>Count the number of words with three or more syllables in the input.</td>
+</tr>
+
+<tr>
+<td><code>sentenceCount()</code></td>
+<td>Count the number of sentences in the input.</td>
+</tr>
+
+<tr>
+<td><code>avgSentenceLength()</code></td>
+<td>Count the average length of sentences (number of words) in the input.</td>
+</tr>
+
+<tr>
+<td><code>avgSyllablesPerWord()</code></td>
+<td>Count the average number of syllables per word in the input.</td>
+</tr>
+
+<tr>
+<td><code>avgCharactersPerWord()</code></td>
+<td>Count the average number of characters per word in the input.</td>
+</tr>
+
+<tr>
+<td><code>avgLettersPerWord()</code></td>
+<td>Count the average number of letters per word in the input.</td>
+</tr>
+
+<tr>
+<td><code>avgSentencesPerWord()</code></td>
+<td>Count the average number of sentences per word in the input.</td>
+</tr>
+</tbody>
+</table>
+
+<p>These utilities are used to calculate the readability formulae.</p>
+
+<h4 id="1-flesch-reading-ease">1. Flesch Reading-Ease</h4>
+
+<p>The <a href="[https://en.wikipedia.org/wiki/Flesch%E2%80%93Kincaid_readability_tests#Flesch_reading_ease](https://en.wikipedia.org/wiki/Flesch–Kincaid_readability_tests#Flesch_reading_ease)">Flesch Reading-Ease</a> test is probably one of the better known readability tests. It&rsquo;s used by e.g. <a href="https://yoast.com/flesch-reading-ease-score/">Yoast</a> and <a href="https://www.grammarly.com/blog/readability-scores/">Grammarly</a> to calculate their readability scores.</p>
+
+<p>For the English language, the algorithm is:</p>
+
+<p><code>206.835 - 1.015 x (words / sentences) - 84.6 x (syllables / words)</code></p>
+
+<p>This outputs a score between 1 and 100, where the higher the score, the easier to read the text is.</p>
+
+<p>A score between <strong>70 and 80</strong> would be considered easy to read for a 7th grader in the US.</p>
+
+<p>In the Custom JavaScript variable, Flesch Reading-Ease is generated like this:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">fleschReadingEase</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">text</span>) {
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">sentenceLength</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">avgSentenceLength</span>(<span style="color:#a6e22e">text</span>);
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">syllablesPerWord</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">avgSyllablesPerWord</span>(<span style="color:#a6e22e">text</span>);
+  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">legacyRound</span>(
+    <span style="color:#a6e22e">freBase</span>.<span style="color:#a6e22e">base</span> <span style="color:#f92672">-</span> 
+    <span style="color:#a6e22e">freBase</span>.<span style="color:#a6e22e">sentenceLength</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">sentenceLength</span> <span style="color:#f92672">-</span> 
+    <span style="color:#a6e22e">freBase</span>.<span style="color:#a6e22e">syllablesPerWord</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">syllablesPerWord</span>,
+    <span style="color:#ae81ff">2</span>
+  );
+};
+</code></pre></div>
+
+<h4 id="2-flesch-kincaid-grade">2. Flesch-Kincaid Grade</h4>
+
+<p>The <a href="[https://en.wikipedia.org/wiki/Flesch%E2%80%93Kincaid_readability_tests#Flesch%E2%80%93Kincaid_grade_level](https://en.wikipedia.org/wiki/Flesch–Kincaid_readability_tests#Flesch–Kincaid_grade_level)">Flesch-Kincaid Grade Level</a> score outputs a number that corresponds to the U.S. grade level generally required to understand the text. If the score returns a number higher than 10, it can also be used to calculate the <strong>years of education</strong> required to understand the text.</p>
+
+<p>The algorithm is:</p>
+
+<p><code>0.39 x (words / sentences) + 11.8 x (syllables / words) - 15.59</code></p>
+
+<p>In the Custom JavaScript variable, this translates to:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-JavaScript" data-lang="JavaScript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">fleschKincaidGrade</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">text</span>) {
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">sentenceLength</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">avgSentenceLength</span>(<span style="color:#a6e22e">text</span>);
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">syllablesPerWord</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">avgSyllablesPerWord</span>(<span style="color:#a6e22e">text</span>);
+  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">legacyRound</span>(
+    <span style="color:#ae81ff">0.39</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">sentenceLength</span> <span style="color:#f92672">+</span>
+    <span style="color:#ae81ff">11.8</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">syllablesPerWord</span> <span style="color:#f92672">-</span>
+    <span style="color:#ae81ff">15.59</span>,
+    <span style="color:#ae81ff">2</span>
+  );
+};
+</code></pre></div>
+
+<h4 id="3-smog-grade">3. SMOG grade</h4>
+
+<p>The <a href="https://en.wikipedia.org/wiki/SMOG">SMOG grade</a>, short for <strong>S</strong>imple <strong>M</strong>easure <strong>o</strong>f <strong>G</strong>obbledygook, estimates the years of education required to understand any given text. It is particularly preferred (over Flesch-Kincaid) in the healthcare industry for content design.</p>
+
+<p>The algorithm is:</p>
+
+<p><code>1.0430 x squareroot(polysyllables x (30 / sentences)) + 3.1291</code></p>
+
+<p>In the variable, this would be:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">smogIndex</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">text</span>) {
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">sentences</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sentenceCount</span>(<span style="color:#a6e22e">text</span>, <span style="color:#66d9ef">true</span>);
+  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">sentences</span> <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">3</span>) {
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">polySyllables</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">polySyllableCount</span>(<span style="color:#a6e22e">text</span>, <span style="color:#66d9ef">true</span>);
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">smog</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1.043</span> <span style="color:#f92672">*</span> Math.<span style="color:#a6e22e">pow</span>(<span style="color:#a6e22e">polySyllables</span> <span style="color:#f92672">*</span> (<span style="color:#ae81ff">30</span> <span style="color:#f92672">/</span> <span style="color:#a6e22e">sentences</span>), <span style="color:#ae81ff">0.5</span>) <span style="color:#f92672">+</span> <span style="color:#ae81ff">3.1291</span>;
+    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">legacyRound</span>(<span style="color:#a6e22e">smog</span>, <span style="color:#ae81ff">2</span>);
+  }
+  <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0.0</span>;
+};
+</code></pre></div>
+
+<p>Note that the formula ignores content that has three or fewer sentences, as the grade would lose any semblance of accuracy in those cases.</p>
+
+<p>Just a note on the JavaScript, using <code>Math.pow(x, y)</code> calculates <code>x</code> to the power of <code>y</code>. When you set <code>y</code> to <code>0.5</code>, you get the square root of <code>x</code>.</p>
+
+<h4 id="4-coleman-liau-index">4. Coleman-Liau index</h4>
+
+<p>The <a href="[https://en.wikipedia.org/wiki/Coleman%E2%80%93Liau_index](https://en.wikipedia.org/wiki/Coleman–Liau_index)">Coleman-Liau index</a> again outputs an approximation of the U.S. grade level required to understand the text. It&rsquo;s better suited for computer programs as it doesn&rsquo;t care about the complexity of <strong>syllables</strong> but rather relies on <strong>character counts</strong>.</p>
+
+<p>The algorithm is:</p>
+
+<p><code>0.0588 x average_letters_per_100_words - 0.296 x average_sentences_per_100_words - 15.8</code></p>
+
+<p>In JavaScript, this would be:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">colemanLiauIndex</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">text</span>) {
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">letters</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">legacyRound</span>(<span style="color:#a6e22e">avgLettersPerWord</span>(<span style="color:#a6e22e">text</span>) <span style="color:#f92672">*</span> <span style="color:#ae81ff">100</span>, <span style="color:#ae81ff">2</span>);
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">sentences</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">legacyRound</span>(<span style="color:#a6e22e">avgSentencesPerWord</span>(<span style="color:#a6e22e">text</span>) <span style="color:#f92672">*</span> <span style="color:#ae81ff">100</span>, <span style="color:#ae81ff">2</span>);
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">coleman</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.0588</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">letters</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">0.296</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">sentences</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">15.8</span>;
+  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">legacyRound</span>(<span style="color:#a6e22e">coleman</span>, <span style="color:#ae81ff">2</span>);
+};
+</code></pre></div>
+
+<p>Now, you can see how abstract this is, again. It calculates the average number of letters in a word <em>from the entire text</em>, and multiplies this by 100 to get the average letters in a 100 word sample. Same thing for sentences. Thus, the number gets more accurate the larger the data sample.</p>
+
+<h4 id="5-automated-readability-index">5. Automated Readability Index</h4>
+
+<p>The <a href="https://en.wikipedia.org/wiki/Automated_readability_index">Automated Readability Index</a> returns yet again a U.S. grade level score thought to correspond with how readable the text is.</p>
+
+<p>The formula for ARI is:</p>
+
+<p><code>4.71 x (characters / words) + 0.5 x (words / sentences) - 21.43</code></p>
+
+<p>Similar to the Coleman-Liau index, ARI relies on characters rather than syllables, so is thus friendlier to machine calculation but can lead to a more diverse spread of scores compared to syllable-based systems.</p>
+
+<p>In JavaScript, ARI is calculated like this:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">automatedReadabilityIndex</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">text</span>) {
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">chars</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">charCount</span>(<span style="color:#a6e22e">text</span>);
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">words</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">lexiconCount</span>(<span style="color:#a6e22e">text</span>, <span style="color:#66d9ef">true</span>);
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">sentences</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sentenceCount</span>(<span style="color:#a6e22e">text</span>, <span style="color:#66d9ef">true</span>);
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">a</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">chars</span> <span style="color:#f92672">/</span> <span style="color:#a6e22e">words</span>;
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">b</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">words</span> <span style="color:#f92672">/</span> <span style="color:#a6e22e">sentences</span>;
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">readability</span> <span style="color:#f92672">=</span> (
+    <span style="color:#ae81ff">4.71</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">legacyRound</span>(<span style="color:#a6e22e">a</span>, <span style="color:#ae81ff">2</span>) <span style="color:#f92672">+</span>
+    <span style="color:#ae81ff">0.5</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">legacyRound</span>(<span style="color:#a6e22e">b</span>, <span style="color:#ae81ff">2</span>) <span style="color:#f92672">-</span>
+    <span style="color:#ae81ff">21.43</span>
+  );
+  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">legacyRound</span>(<span style="color:#a6e22e">readability</span>, <span style="color:#ae81ff">2</span>);
+};
+</code></pre></div>
+
+<h4 id="6-linsear-write">6. Linsear Write</h4>
+
+<p>The <a href="https://en.wikipedia.org/wiki/Linsear_Write">Linsear Write</a> metric uses a sample of 100 words to calculate the U.S. grade level required to understand the text. It also divides the text into &ldquo;easy words&rdquo; (two syllables or less) and &ldquo;difficult words&rdquo; (three syllables or more).</p>
+
+<p>The algorithm is:</p>
+
+<p><code>r = (count_of_easy_words + 3 x count_of_difficult_words) / sentences</code></p>
+
+<p><code>if r &gt; 20, result = r / 2</code></p>
+
+<p><code>if r &lt;= 20, result = r / 2 - 1</code></p>
+
+<p>In JavaScript, this would be:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">linsearWriteFormula</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">text</span>) {
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">easyWord</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">difficultWord</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">roughTextFirst100</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">text</span>.<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#39; &#39;</span>).<span style="color:#a6e22e">slice</span>(<span style="color:#ae81ff">0</span>,<span style="color:#ae81ff">100</span>).<span style="color:#a6e22e">join</span>(<span style="color:#e6db74">&#39; &#39;</span>);
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">plainTextListFirst100</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">getWords</span>(<span style="color:#a6e22e">text</span>, <span style="color:#66d9ef">true</span>).<span style="color:#a6e22e">slice</span>(<span style="color:#ae81ff">0</span>,<span style="color:#ae81ff">100</span>);
+  <span style="color:#a6e22e">plainTextListFirst100</span>.<span style="color:#a6e22e">forEach</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">word</span>) {
+    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">syllableCount</span>(<span style="color:#a6e22e">word</span>) <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">3</span>) {
+      <span style="color:#a6e22e">easyWord</span> <span style="color:#f92672">+=</span> <span style="color:#ae81ff">1</span>;
+    } <span style="color:#66d9ef">else</span> {
+      <span style="color:#a6e22e">difficultWord</span> <span style="color:#f92672">+=</span> <span style="color:#ae81ff">1</span>;
+    }
+  });
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">number</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">easyWord</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">difficultWord</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">3</span>) <span style="color:#f92672">/</span> <span style="color:#a6e22e">sentenceCount</span>(<span style="color:#a6e22e">roughTextFirst100</span>);
+  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">number</span> <span style="color:#f92672">&lt;=</span> <span style="color:#ae81ff">20</span>) {
+    <span style="color:#a6e22e">number</span> <span style="color:#f92672">-=</span> <span style="color:#ae81ff">2</span>;
+  }
+  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">legacyRound</span>(<span style="color:#a6e22e">number</span> <span style="color:#f92672">/</span> <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">2</span>);
+};
+</code></pre></div>
+
+<p>Yeah, it&rsquo;s a bit messy. The problem is that the &ldquo;easy words&rdquo; and &ldquo;difficult words&rdquo; need to be calculated from the lexicon without any punctuation, and the sentence count needs to be calculated from a sample with punctuation intact.</p>
+
+<p>In any case, the end result is the Linsear Write score for the text input with decent accuracy.</p>
+
+<h4 id="7-rix">7. Rix</h4>
+
+<p><a href="https://readable.com/features/readability-formulas/#rix">Rix</a> is quite plainly the number of long words divided by the number of sentences in the text. A long word is a word with more than six characters.</p>
+
+<p>The resulting score can be <a href="https://readable.com/features/readability-formulas/#rix">converted to U.S. grade-level</a>.</p>
+
+<p>In JavaScript, you can calculate Rix like this:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">rix</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">text</span>) {
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">words</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">getWords</span>(<span style="color:#a6e22e">text</span>, <span style="color:#66d9ef">true</span>);
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">longCount</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">words</span>.<span style="color:#a6e22e">filter</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">word</span>) {
+    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">word</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">6</span>;
+  }).<span style="color:#a6e22e">length</span>;
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">sentencesCount</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sentenceCount</span>(<span style="color:#a6e22e">text</span>, <span style="color:#66d9ef">true</span>);
+  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">legacyRound</span>(<span style="color:#a6e22e">longCount</span> <span style="color:#f92672">/</span> <span style="color:#a6e22e">sentencesCount</span>, <span style="color:#ae81ff">2</span>);
+};
+</code></pre></div>
+
+<h4 id="8-reading-time">8. Reading time</h4>
+
+<p>To calculate reading time of the text, we use <a href="https://www.healthguidance.org/entry/13263/1/What-Is-the-Average-Reading-Speed-and-the-Best-Rate-of-Reading.html">the benchmark</a> of <strong>250 words per minute</strong> read by the average adult. This translates to <strong>4.17</strong> words per second.</p>
+
+<p>The algorithm is simple:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">readingTime</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">text</span>) {
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">wordsPerSecond</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">4.17</span>;
+      <span style="color:#75715e">// To get full reading time, ignore cache and sample
+</span><span style="color:#75715e"></span>      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">legacyRound</span>(<span style="color:#a6e22e">lexiconCount</span>(<span style="color:#a6e22e">text</span>, <span style="color:#66d9ef">false</span>, <span style="color:#66d9ef">true</span>) <span style="color:#f92672">/</span> <span style="color:#a6e22e">wordsPerSecond</span>, <span style="color:#ae81ff">2</span>);
+    };
+</code></pre></div>
+
+<p>This outputs a value in <strong>seconds</strong> corresponding to the time it would take for the average adult to read the text.</p>
+
+<h4 id="median-grade">Median grade</h4>
+
+<p>The median grade is calculated by pushing all the <strong>grades</strong> (both lower and upper bound integers for floating point values), and then taking the <strong>median</strong> grade.</p>
+
+<p>This is not a scientific result in any way. Heck, the whole concept of <strong>readability</strong> escapes scientific scrutiny (just look at the number of different tests with different values!). If you want to modify it, you could use the <strong>average</strong> grade as well (take both rounded down and rounded up to get the grade spread). Or you could find what grade is the <strong>most common</strong> in the whole spread and use that instead.</p>
+
+<p>Regardless, I&rsquo;ve chosen <strong>median</strong> as it excludes the outliers nicely and typically the grades would converge enough to have the median reflect the average anyway.</p>
+
+<h3 id="how-to-use-the-utility-variable">How to use the utility variable</h3>
+
+<p>Once you create and save the Custom JavaScript variable, you can invoke it from other Custom JavaScript variables or Custom HTML tags.</p>
+
+<p>For example, let&rsquo;s say you have all the main content of any given page stored in an HTML element that can be accessed with the <a href="https://www.simoahava.com/analytics/css-selector-guide-google-tag-manager/">CSS selector</a> <code>.post-content .main-content-wrap</code>.</p>
+
+<p>Here&rsquo;s what a handful of different Custom JavaScript variables would look like, each returning a different value from the <code>readabilityFunction</code> output.</p>
+
+<p>There are many ways to skin this cat, so feel free to get creative.</p>
+
+<h4 id="get-the-flesch-kincaid-score">Get the Flesch-Kincaid Score</h4>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">el</span> <span style="color:#f92672">=</span> document.<span style="color:#a6e22e">querySelector</span>(<span style="color:#e6db74">&#39;.post-content .main-content-wrap&#39;</span>).<span style="color:#a6e22e">textContent</span>;
+  <span style="color:#66d9ef">return</span> {{<span style="color:#a6e22e">readabilityFunction</span>}}(<span style="color:#a6e22e">el</span>).<span style="color:#a6e22e">fleschKincaidGrade</span>;
+}
+</code></pre></div>
+
+<h4 id="get-the-median-grade">Get the median grade</h4>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">el</span> <span style="color:#f92672">=</span> document.<span style="color:#a6e22e">querySelector</span>(<span style="color:#e6db74">&#39;.post-content .main-content-wrap&#39;</span>).<span style="color:#a6e22e">textContent</span>;
+  <span style="color:#66d9ef">return</span> {{<span style="color:#a6e22e">readabilityFunction</span>}}(<span style="color:#a6e22e">el</span>).<span style="color:#a6e22e">medianGrade</span>;
+}
+</code></pre></div>
+
+<h4 id="get-the-reading-time-in-minutes-and-seconds">Get the reading time in minutes and seconds</h4>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">el</span> <span style="color:#f92672">=</span> document.<span style="color:#a6e22e">querySelector</span>(<span style="color:#e6db74">&#39;.post-content .main-content-wrap&#39;</span>).<span style="color:#a6e22e">textContent</span>;
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">readingTime</span> <span style="color:#f92672">=</span> {{<span style="color:#a6e22e">readabilityFunction</span>}}(<span style="color:#a6e22e">el</span>).<span style="color:#a6e22e">readingTime</span>;
+  <span style="color:#66d9ef">return</span> Math.<span style="color:#a6e22e">floor</span>(<span style="color:#a6e22e">readingTime</span> <span style="color:#f92672">/</span> <span style="color:#ae81ff">60</span>) <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;m&#34;</span> <span style="color:#f92672">+</span> Math.<span style="color:#a6e22e">round</span>(<span style="color:#a6e22e">readingTime</span> <span style="color:#f92672">%</span> <span style="color:#ae81ff">60</span>) <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;s&#34;</span>;
+}
+</code></pre></div>
+
+<p>This would convert a reading time (in seconds) of <code>129.67</code> to <code>&quot;2m10s&quot;</code>.</p>
+
+<h3 id="google-analytics-setup">Google Analytics setup</h3>
+
+<p>Once you have the values you want to access, all you need to do is send them to Google Analytics.</p>
+
+<p>Here&rsquo;s a sample setup. It sends the <a href="#get-the-median-grade"><strong>median grade</strong></a> to Google Analytics as a Custom Metric, and it collects the <a href="#8-reading-time"><strong>reading time</strong></a> as another Custom Metric. To make results easier to scan at a glance, we&rsquo;ll also send the median grade as a Custom Dimension.</p>
+
+<p>But before we start, here&rsquo;s a caveat you need to be aware of.</p>
+
+<h4 id="dom-ready">DOM Ready</h4>
+
+<p>If you use <strong>DOM methods</strong> to check the readability of content from the web page, you might not be able to use a Google Analytics tag that fires on the <strong>All Pages</strong> trigger.</p>
+
+<p>This is because a potential <em>race condition</em> can emerge where the <strong>All Pages</strong> trigger can fire before your DOM content is available for Google Tag Manager.</p>
+
+<p>In this case, you are left with two options:</p>
+
+<ol>
+<li>Send the readability data with an event (or another pageview) where you set the <code>nonInteraction</code> field to <code>true</code>.</li>
+<li>Delay the Page View hit a bit to fire on a <strong>DOM Ready</strong> trigger instead.</li>
+</ol>
+
+<p>The main problem with (1) is that you won&rsquo;t be able to parse the data in your main Page View report (which is the logical place for it), and would need to join the data outside Google Analytics instead (or perhaps use a <strong>custom report</strong> creatively).</p>
+
+<p>The main problem with (2) is that you risk missing a fraction of your pageviews because the hit is delayed a bit.</p>
+
+<p>If it&rsquo;s a <strong>single-page app</strong>, you are in luck as you can instruct the developers not to fire <a href="https://www.bounteous.com/insights/2018/03/30/single-page-applications-google-analytics/#page-paths-or-page-titles-are-incongruent-with-application-state">the virtual pageview event</a> until the content has been fully rendered on the page.</p>
+
+<h4 id="1-custom-javascript-variable-for-median-grade">1. Custom JavaScript variable for median grade</h4>
+
+<p>Remember to change the <code>el</code> variable assignment to match whatever content you want to evaluate. In this example, it&rsquo;s an HTML element accessible with the <a href="https://www.simoahava.com/analytics/css-selector-guide-google-tag-manager/">CSS selector</a> <code>.post-content .main-content-wrap</code>.</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">el</span> <span style="color:#f92672">=</span> document.<span style="color:#a6e22e">querySelector</span>(<span style="color:#e6db74">&#39;.post-content .main-content-wrap&#39;</span>).<span style="color:#a6e22e">textContent</span>;
+  <span style="color:#66d9ef">return</span> {{<span style="color:#a6e22e">readabilityFunction</span>}}(<span style="color:#a6e22e">el</span>).<span style="color:#a6e22e">medianGrade</span>;
+}
+</code></pre></div>
+
+<h4 id="2-custom-javascript-variable-for-reading-time">2. Custom JavaScript variable for reading time</h4>
+
+<p>Remember to change the <code>el</code> variable assignment to match whatever content you want to evaluate. In this example, it&rsquo;s an HTML element accessible with the <a href="https://www.simoahava.com/analytics/css-selector-guide-google-tag-manager/">CSS selector</a> <code>.post-content .main-content-wrap</code>.</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">el</span> <span style="color:#f92672">=</span> document.<span style="color:#a6e22e">querySelector</span>(<span style="color:#e6db74">&#39;.post-content .main-content-wrap&#39;</span>).<span style="color:#a6e22e">textContent</span>;
+  <span style="color:#66d9ef">return</span> {{<span style="color:#a6e22e">readabilityFunction</span>}}(<span style="color:#a6e22e">el</span>).<span style="color:#a6e22e">readingTime</span>;
+}
+</code></pre></div>
+
+<h4 id="3-google-analytics-admin-custom-definitions">3. Google Analytics - Admin - Custom Definitions</h4>
+
+<p>Here&rsquo;s what the <strong>Custom Metric</strong> for Reading Time looks like in Google Analytics admin:</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2019/10/custom-met-in-ga.jpg" title="Custom metric in GA">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2019/10/custom-met-in-ga.jpg#ZgotmplZ" alt="Custom metric in GA">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>If you want, you can build a <strong>Calculated Metric</strong> to get the <em>average</em> reading time across pageviews.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2019/10/calculated-metric-in-ga.jpg" title="Calculated metric in GA">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2019/10/calculated-metric-in-ga.jpg#ZgotmplZ" alt="Calculated metric in GA">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>Here&rsquo;s what the <strong>Custom Metric</strong> for Median Grade looks like:</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2019/11/custom-metric-median.jpg" title="Custom Metric Median Grade">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2019/11/custom-metric-median.jpg#ZgotmplZ" alt="Custom Metric Median Grade">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>Here&rsquo;s what the <strong>Custom Dimension</strong> for Median Grade looks like in Google Analytics admin:</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2019/10/custom-dim-in-ga.jpg" title="Custom dimension in GA">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2019/10/custom-dim-in-ga.jpg#ZgotmplZ" alt="Custom dimension in GA">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<h4 id="4-google-analytics-tag">4. Google Analytics tag</h4>
+
+<p>Finally, here&rsquo;s what a sample Page View tag would look like, modified.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2019/11/sample-ga-tag.jpg" title="Sample GA Tag">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2019/11/sample-ga-tag.jpg#ZgotmplZ" alt="Sample GA Tag">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>Just remember the <a href="#dom-ready">caveat</a> about <em>DOM ready triggering</em> I mentioned above.</p>
+
+<h4 id="5-how-to-access-the-results">5. How to access the results</h4>
+
+<p>The <strong>Custom Dimension</strong> will be available as a secondary dimension or in a custom report.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2019/11/custom-report.jpg" title="Custom report">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2019/11/custom-report.jpg#ZgotmplZ" alt="Custom report">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>The <strong>Custom Metrics</strong> (and the Calculated Metric if you opted to create one) will be available in custom reports as well.</p>
+
+<p>Note that instead of messing around with awkward custom reports, you might want to extract the data out of Google Analytics using e.g. the <a href="https://developers.google.com/analytics/solutions/google-analytics-spreadsheet-add-on">Google Sheets add-on</a> as this gives you far more flexibility in building your own reports.</p>
+
+<h3 id="google-analytics-app-web-setup">Google Analytics: App + Web setup</h3>
+
+<p>If you want to send the data to the new <a href="https://www.simoahava.com/analytics/getting-started-with-google-analytics-app-web/">App + Web</a> then all the power to you! Setting it up is easy - just create a new <strong>App + Web event tag</strong> for your Page View (you might want to disable the default Page View from the <em>config</em> tag), and add the variables as new event parameters.</p>
+
+<p>Make sure this tag, too, triggers on DOM Ready.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2019/10/app-web-pageview.jpg" title="App&#43;Web Pageview">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2019/10/app-web-pageview.jpg#ZgotmplZ" alt="App&#43;Web Pageview">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>Once you do this, the events should start showing up in the App + Web streams:</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2019/11/parameter-in-real-time.jpg" title="App&#43;web real time">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2019/11/parameter-in-real-time.jpg#ZgotmplZ" alt="App&#43;web real time">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>In order to build reports for these parameters, you need to <strong>include them in parameter reporting</strong>.</p>
+
+<p>Once you&rsquo;ve collected some data, head over to <strong>Events</strong> -&gt; <strong>All Events</strong>, and click the little action menu at the end of the row with the <code>page_view</code> event. Select <strong>Edit parameter reporting</strong> from this menu.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2019/10/parameter-menu.jpg" title="Parameter menu">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2019/10/parameter-menu.jpg#ZgotmplZ" alt="Parameter menu">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>In the overlay that appears, find the two <code>readability_*</code> parameters to add them to the list of parameters included in reporting. Set the type of the <em>median grade</em> parameter to <strong>Text</strong>, and the type of the <em>reading time</em> parameter to <strong>Number / Seconds</strong>.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2019/11/parameter-reporting-setup.jpg" title="Parameter reporting setup">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2019/11/parameter-reporting-setup.jpg#ZgotmplZ" alt="Parameter reporting setup">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>Once you&rsquo;ve done these, and once you&rsquo;ve accumulated some new data, you&rsquo;ll be able to find the two parameters as their own widgets when you select the <strong>page_view</strong> event in the event list, and when moving through the <strong>Analysis</strong> reports.</p>
+
+<p>Note that if you&rsquo;ve configured a <a href="https://www.simoahava.com/analytics/enable-bigquery-export-google-analytics-app-web/">BigQuery export</a>, the parameters will be included whether or not you add them via the event parameter reporting user interface!</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2019/11/bigquery-result.jpg" title="BigQuery result">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2019/11/bigquery-result.jpg#ZgotmplZ" alt="BigQuery result">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<h2 id="summary">Summary</h2>
+
+<p>Let&rsquo;s discuss the caveats first.</p>
+
+<p>The script itself is fairly simple, basically chopping down the text into constituent parts and then performing calculations with those parts. However, it can <strong>perform poorly</strong> if its fed a lot of content to process. Performance of regular expressions degrade in correlation with the amount of content, and with a large body of text the parsing can disrupt your page load. This is mitigated with the use of a <strong>cache</strong> and a <strong>sampling threshold</strong>, but you&rsquo;ll need to tinker with these to get the best accuracy and the best performance.</p>
+
+<p>The <strong>regular expressions are not perfect</strong>. Particularly parsing sentences turns out to be quite difficult to manage with clarity, and I have opted for a fairly simple algorithm in the script.</p>
+
+<p>All in all, <strong>readability scores</strong> need to be taken with a grain of salt. They abstract away much of what is gained with context, and they know nothing about the background of the reader. They count things like syllables, long words, and short words, and try to assign labels like &ldquo;easy&rdquo; and &ldquo;difficult&rdquo; based on these calculations.</p>
+
+<p>The grade-level abstractions are also calculated based on U.S. averages. Whether you want to draw any conclusions is totally up to you, but I do think how much different the levels would be in a country like Finland, where the education system is somewhat different.</p>
+
+<p>Having said all that, it&rsquo;s still a fun idea to play around with especially if you&rsquo;re in the business of creating content. <strong>Readability</strong> is a great concept to work towards, and the grades for my own content (almost categorically past college-level) have given me some pause. I think it&rsquo;s a great way to design content to be as readable as possible, and tools like this should give you some insight.</p>
+
+<p>Whether or not Google Analytics is the right place to measure this remains to be seen. But I would imagine there to be benefits to correlating readability and reading time with overall engagement metrics. Something to optimize against, I think!</p>
+
+<p>Let me know in the comments what you think about this approach!</p>
+
+              
+
+            </div>
+          </div>
+          <div id="post-footer" class="post-footer main-content-wrap">
+            
+              
+                
+                
+                  <div class="post-footer-tags">
+                    <span class="text-color-light text-small">TAGGED IN</span><br/>
+                    
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/google-tag-manager/">google tag manager</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/google-analytics/">google analytics</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/content/">content</a>
+
+                  </div>
+                
+              
+            
+            
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--disabled">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/gtm-tips/track-outbound-links-google-tag-manager/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/calculate-readability-scores-for-content/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Calculate%20Readability%20Scores%20For%20Content%20https://www.simoahava.com/analytics/calculate-readability-scores-for-content/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/calculate-readability-scores-for-content/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#disqus">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+            
+              
+                <span id="disqus"></span>
+<div id="disqus_thread">
+  <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+
+              
+            
+          </div>
+        </article>
+        <footer id="footer" class="main-content-wrap">
+  <span class="copyrights">
+    &copy; 2019 Simo Ahava. All Rights Reserved
+  </span>
+</footer>
+
+      </div>
+      
+      <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+        
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--disabled">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/gtm-tips/track-outbound-links-google-tag-manager/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/calculate-readability-scores-for-content/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Calculate%20Readability%20Scores%20For%20Content%20https://www.simoahava.com/analytics/calculate-readability-scores-for-content/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/calculate-readability-scores-for-content/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#disqus">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+      </div>
+      
+      <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+  <i id="btn-close-shareoptions" class="fa fa-close"></i>
+  <ul class="share-options">
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/calculate-readability-scores-for-content/">
+          <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=Calculate%20Readability%20Scores%20For%20Content%20https://www.simoahava.com/analytics/calculate-readability-scores-for-content/%20via%20@SimoAhava">
+          <i class="fa fa-twitter"></i><span>Share on Twitter</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/calculate-readability-scores-for-content/">
+          <i class="fa fa-linkedin"></i><span>Share on LinkedIn</span>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+<div id="share-options-mask" class="share-options-mask"></div>
+
+    </div>
+    
+    <div id="about">
+  <div id="about-card">
+    <div id="about-btn-close">
+      <i class="fa fa-remove"></i>
+    </div>
+    
+      <img id="about-card-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+    
+    <h4 id="about-card-name">Simo Ahava</h4>
+    
+      <div id="about-card-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</div>
+    
+    
+      <div id="about-card-job">
+        <i class="fa fa-briefcase"></i>
+        <br/>
+        Senior Data Advocate at Reaktor
+      </div>
+    
+    
+      <div id="about-card-location">
+        <i class="fa fa-map-marker"></i>
+        <br/>
+        Finland
+      </div>
+    
+  </div>
+</div>
+
+    
+  
+    
+    <div id="cover" style="background-image:url('https://www.simoahava.com/images/maisema.jpg');"></div>
+  
+
+
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+
+
+
+
+<script src="https://www.simoahava.com/js/script.js"></script>
+
+
+
+
+  
+    
+      <script>
+        
+
+
+
+
+
+        (function() {
+          
+          
+          if (window.location.hostname == "localhost") {
+            return;
+          }
+          var d = document, s = d.createElement('script');
+          var disqus_shortname = 'simoahava';
+          s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      </script>
+    
+  
+
+
+    <script>
+      var mylazyload = new LazyLoad({elements_selector: '.lazy'});
+      </script>
+
+    
+  </body>
+</html>
+
