@@ -1,0 +1,1171 @@
+
+
+  
+    
+  
+
+
+  
+
+
+
+
+
+  
+
+
+  
+
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta name="google-site-verification" content="xQwWI2KUfP9LbFKhw2CVLFtrMY6Czrla7L3PD2aBolA" />
+
+
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org", 
+  "@type": "BlogPosting",
+  "headline": "Writing Tests For Custom Templates In Google Tag Manager | Simo Ahava's blog",
+  "image": "https:\/\/www.simoahava.com\/images\/2019\/11\/custom-template-tests.jpg",
+  "editor": "Simo Ahava",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Simo Ahava's blog",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https:\/\/www.simoahava.com\/images\/simo.png",
+      "height": "393",
+      "width": "407"
+    }
+  },
+  "url": "https:\/\/www.simoahava.com\/analytics\/writing-tests-for-custom-templates-google-tag-manager\/",
+  "datePublished": "2019-11-07T16:00:00\x2b02:00",
+  "dateModified": "2019-11-07T16:00:00\x2b02:00",
+  "description": "A guide for writing unit tests for Google Tag Manager\x27s custom templates, using the Tests interface of the template editor.",
+  "author": {
+    "@type": "Person",
+    "name": "Simo Ahava"
+  }
+}
+</script>
+
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Hugo 0.58.3 with theme Tranquilpeak 0.4.3-BETA">
+    <title>Writing Tests For Custom Templates In Google Tag Manager | Simo Ahava's blog</title>
+    
+    <script>
+      window.dataLayer=window.dataLayer||[];window.dataLayer.push({pageType: 'article'});
+    </script>
+    
+
+    
+
+    <script src="https://www.simoahava.com/x-js/lazyload.iife.min.js"></script>
+
+    
+
+    
+    <script>
+      (function(S,i,m,o){
+        window[m]=window[m]||[];
+        window[m].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
+        var f=S.getElementsByTagName(i)[0],j=S.createElement(i),dl=m!='dataLayer'?'&l='+m:'';
+        j.async=true;
+        j.src='https://www.googletagmanager.com/gtm.js?id='+o+dl;
+        f.parentNode.insertBefore(j,f);
+      })(document,'script','dataLayer','GTM-PZ7GMV9');
+    </script>
+    
+    <script src="//simoahava.disqus.com/count.js" id="dsq-count-scr" async></script>
+    <meta name="author" content="Simo Ahava">
+    <meta name="keywords" content="">
+
+    <link rel="icon" href="https://www.simoahava.com/images/favicon.ico">
+    
+    <link rel="amphtml" href="https://www.simoahava.com/amp/analytics/writing-tests-for-custom-templates-google-tag-manager/">
+    
+    <meta name="description" content="A guide for writing unit tests for Google Tag Manager&#39;s custom templates, using the Tests interface of the template editor.">
+    <meta property="og:description" content="A guide for writing unit tests for Google Tag Manager&#39;s custom templates, using the Tests interface of the template editor.">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="Writing Tests For Custom Templates In Google Tag Manager">
+    <meta property="og:url" content="/analytics/writing-tests-for-custom-templates-google-tag-manager/">
+    <meta property="og:site_name" content="Simo Ahava&#39;s blog">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Writing Tests For Custom Templates In Google Tag Manager">
+    <meta name="twitter:description" content="A guide for writing unit tests for Google Tag Manager&#39;s custom templates, using the Tests interface of the template editor.">
+    
+      <meta name="twitter:creator" content="@SimoAhava">
+      
+    
+
+    
+    
+
+    
+      <meta property="og:image" content="https://www.simoahava.com/images/simo.png">
+    
+
+    
+      <meta name="twitter:image" content="https://www.simoahava.com/images/2019/11/custom-template-tests.jpg">  
+      <meta property="og:image" content="https://www.simoahava.com/images/2019/11/custom-template-tests.jpg">
+    
+    
+    
+
+    
+
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+    
+    
+    
+    <link rel="stylesheet" href="https://www.simoahava.com/css/style.css" />
+    
+    
+
+    
+      
+    
+    
+  </head>
+
+  <body>
+    <div id="blog">
+      <header id="header" data-behavior="4">
+  <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+  <div class="header-title">
+    <a class="header-title-link" href="https://www.simoahava.com/">Simo Ahava&#39;s blog</a>
+  </div>
+  
+</header>
+
+      <nav id="sidebar" data-behavior="4">
+  <div class="sidebar-container">
+    
+      <div class="sidebar-profile">
+        <a href="https://www.simoahava.com/">
+          <img class="sidebar-profile-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+        </a>
+        <h4 class="sidebar-profile-name">Simo Ahava</h4>
+        
+          <h5 class="sidebar-profile-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</h5>
+        
+      </div>
+    
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+      
+      <span class="sidebar-button-desc">Home</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+      
+      <span class="sidebar-button-desc">Categories</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tags/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Tags</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/gtm-tips/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-magic"></i>
+      
+      <span class="sidebar-button-desc">GTM Tips</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/about-simo-ahava/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+      
+      <span class="sidebar-button-desc">About</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tools/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-wrench"></i>
+      
+      <span class="sidebar-button-desc">Tools</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/blog-statistics/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bar-chart"></i>
+      
+      <span class="sidebar-button-desc">Blog statistics</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://github.com/sahava" target="_blank" rel="noopener">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+      
+      <span class="sidebar-button-desc">GitHub</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/upcoming-talks/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bullhorn"></i>
+      
+      <span class="sidebar-button-desc">Upcoming talks</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
+
+    </ul>
+  </div>
+</nav>
+
+      
+
+      <div id="main" data-behavior="4"
+        class="
+               hasCoverMetaIn
+               ">
+        <article class="post">
+	  <form id="search" action="https://www.simoahava.com/search/">
+  <input name="q" type="text" class="form-control input--xlarge" placeholder="Search blog..." autocomplete="off">
+  </form>
+
+          
+          
+            <div class="post-header main-content-wrap text-left">
+
+  
+
+    <h1>
+      Writing Tests For Custom Templates In Google Tag Manager
+    </h1>
+  
+  
+  <div class="postShorten-meta post-meta">
+    
+      <time datetime="2019-11-07T16:00:00&#43;02:00">
+        
+  November 7, 2019
+
+      </time>
+    
+      
+  
+  
+    <span>in</span>
+    
+      <a class="category-link" href="https://www.simoahava.com/categories/analytics">Analytics</a>
+    
+  
+
+
+       | <a href="https://www.simoahava.com/analytics/writing-tests-for-custom-templates-google-tag-manager/#disqus_thread">Comments</a>
+  </div>
+
+
+</div>
+
+          
+          <div class="post-content markdown">
+            <div class="main-content-wrap">
+              
+
+<p><a href="https://tagmanager.google.com/">Google Tag Manager</a> introduced the capability to add <a href="https://developers.google.com/tag-manager/templates/tests">tests</a> to your <a href="https://www.simoahava.com/analytics/custom-templates-guide-for-google-tag-manager/">Custom Templates</a>. Tests, in this context, refer specifically to <strong>unit tests</strong> that you write in order to make sure your template code works in a predictable way.  Unit tests are also used to drive development, ensuring that you have added contingencies for all the different scenarios that the template, when coupled with user input, might introduce.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2019/11/custom-template-tests.jpg" title="Custom template tests">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2019/11/custom-template-tests.jpg#ZgotmplZ" alt="Custom template tests">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>In this guide, I&rsquo;ll introduce how the <strong>Tests</strong> feature works. Some new APIs are introduced, as well as a <em>grammar</em> of sorts that you might be used to if you&rsquo;ve already worked with tests in a software development context.</p>
+
+<h1 id="table-of-contents">Table of Contents</h1><nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#unit-tests-in-custom-templates">Unit tests in Custom Templates</a>
+<ul>
+<li><a href="#simple-example-of-coverage">Simple example of coverage</a>
+<ul>
+<li><a href="#1-does-the-variable-return-undefined-for-array-input">1. Does the variable return <code>undefined</code> for array input</a></li>
+<li><a href="#2-does-the-variable-return-the-input">2. Does the variable return the input</a></li>
+<li><a href="#what-about-missing-input">What about missing input?</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#the-anatomy-of-a-test">The anatomy of a test</a>
+<ul>
+<li><a href="#1-mocking">1. Mocking</a>
+<ul>
+<li><a href="#mocking-the-data-object">Mocking the <code>data</code> object</a></li>
+<li><a href="#mocking-template-apis">Mocking template APIs</a></li>
+</ul></li>
+<li><a href="#2-running-the-code">2. Running the code</a></li>
+<li><a href="#3-failing-the-test">3. Failing the test</a></li>
+<li><a href="#4-assertions">4. Assertions</a>
+<ul>
+<li><a href="#using-assertthat">Using <code>assertThat</code></a></li>
+</ul></li>
+<li><a href="#using-assertapi">Using <code>assertApi</code></a></li>
+<li><a href="#the-test-setup">The test Setup</a></li>
+</ul></li>
+<li><a href="#running-tests">Running tests</a></li>
+<li><a href="#summary">Summary</a></li>
+</ul></li>
+</ul>
+</nav>
+
+<h2 id="unit-tests-in-custom-templates">Unit tests in Custom Templates</h2>
+
+<p><strong>Unit tests</strong> comprise code that is executed against the actual functions and variables of your template code.  The purpose of the test is to <strong>validate</strong> the template code, so that it returns an expected output for any given, tested input.</p>
+
+<p>The purpose of unit tests is to make your code more resilient to changes. By writing tests, you have a tool with which to verify that the changes you make in one place do not break something that happens in another place.</p>
+
+<p>With unit tests, you are testing the most atomic components of your code: the functions and variables. When you write tests, you aim for high <strong>code coverage</strong>. Coverage means the number of <strong>lines</strong> of code that are evaluated in some test.</p>
+
+<h3 id="simple-example-of-coverage">Simple example of coverage</h3>
+
+<p>For example, say that you have a simple variable template like this:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">getType</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;getType&#39;</span>);
+<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">input</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">input</span>;
+<span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">getType</span>(<span style="color:#a6e22e">input</span>) <span style="color:#f92672">===</span> <span style="color:#e6db74">&#39;array&#39;</span>) {
+  <span style="color:#66d9ef">return</span>;
+}
+<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">input</span>;
+</code></pre></div>
+
+<p>This template takes the user input and returns it. If the input is of type <strong>array</strong>, then <code>undefined</code> is returned instead.</p>
+
+<p>When writing tests for this variable, there are basically <strong>two</strong> scenarios you would need to test.</p>
+
+<h4 id="1-does-the-variable-return-undefined-for-array-input">1. Does the variable return <code>undefined</code> for array input</h4>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#75715e">// Call runCode to run the template&#39;s code.
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">mockData</span> <span style="color:#f92672">=</span> {
+  <span style="color:#a6e22e">input</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;notAnArray&#39;</span>
+};
+
+<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">variableResult</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">runCode</span>(<span style="color:#a6e22e">mockData</span>);
+
+<span style="color:#75715e">// Verify that the variable returns a result.
+</span><span style="color:#75715e"></span><span style="color:#a6e22e">assertThat</span>(<span style="color:#a6e22e">variableResult</span>).<span style="color:#a6e22e">isUndefined</span>();
+</code></pre></div>
+
+<p>Here you create a <strong>mock</strong> object that provides the input. This object has key-value pairs where each key corresponds to a property in the <code>data</code> object, reflecting the input the user would have added to the template fields.</p>
+
+<p>This object is passed to the <code>runCode</code> function, which is a template API that runs the template code against the data object.</p>
+
+<p>Finally, the result of <code>runCode</code> is passed to <code>assertThat</code>, which is an <strong>assertion</strong> method where you check whether the result of the code resolves to an expected value.</p>
+
+<h4 id="2-does-the-variable-return-the-input">2. Does the variable return the input</h4>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">mockInput</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;something&#39;</span>;
+<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">mockData</span> <span style="color:#f92672">=</span> {
+  <span style="color:#a6e22e">input</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">mockInput</span>
+};
+
+<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">expected</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">mockInput</span>;
+
+<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">variableResult</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">runCode</span>(<span style="color:#a6e22e">mockData</span>);
+
+<span style="color:#75715e">// Verify that the variable returns a result.
+</span><span style="color:#75715e"></span><span style="color:#a6e22e">assertThat</span>(<span style="color:#a6e22e">variableResult</span>).<span style="color:#a6e22e">isEqualTo</span>(<span style="color:#a6e22e">expected</span>);
+</code></pre></div>
+
+<p>As you can see, I&rsquo;m using constants and variables where possible to avoid hard-coding any values. This prevents simple typos from creating false positives or negatives in your tests.</p>
+
+<p>With these two tests, you actually achieve <strong>100% test coverage</strong> for the variable template, because the code tests all the possible variations of the variable.</p>
+
+<h4 id="what-about-missing-input">What about missing input?</h4>
+
+<p>When writing tests, you&rsquo;re faced with interesting design decisions as well.</p>
+
+<p>Take the example above. We&rsquo;re not specifically testing a scenario where the user didn&rsquo;t add <em>any</em> input to the field. Why? Because we&rsquo;ve decided to handle that in the user interface, by adding a <a href="https://www.simoahava.com/analytics/custom-templates-guide-for-google-tag-manager/#validation-rules">validation rule</a> that prevents the template code from running if there is no input in the field.</p>
+
+<p>So when writing tests, you need to know how the template works, and you need to be able to comprehensively approach the different scenarios that imaginative users can exploit when working with your template code.</p>
+
+<h2 id="the-anatomy-of-a-test">The anatomy of a test</h2>
+
+<p>You&rsquo;ve learned above that unit tests have some specific components. They are, in order:</p>
+
+<p><strong>Mock of the data object</strong><br />
+<strong>Mocks of the template APIs (<code>mock()</code>)</strong><br />
+<strong>The test runner (<code>runCode()</code>)</strong><br />
+<strong>(Optional <code>fail()</code>)</strong><br />
+<strong>Assertions (<code>assertApi()</code>, <code>assertThat()</code>)</strong></p>
+
+<h3 id="1-mocking">1. Mocking</h3>
+
+<p>To test a function, you use <em>mock data</em>. This is because with automated tests there is no prompt for user input. The test needs to run independently of the template itself. With unit tests - you are <strong>only</strong> testing the code itself, not the user experience.</p>
+
+<p>In Google Tag Manager&rsquo;s custom templates, mock data comes in two guises: the contents of the <code>data</code> object, and the result of running <a href="https://developers.google.com/tag-manager/templates/api">template APIs</a>.</p>
+
+<h4 id="mocking-the-data-object">Mocking the <code>data</code> object</h4>
+
+<p>The first is simple to do. You build an object, where each key corresponds to a property of the <code>data</code> object that your code processes.</p>
+
+<p>For example, if your template has a <a href="https://www.simoahava.com/analytics/custom-templates-guide-for-google-tag-manager/#text-input">text input</a> field named <code>name</code> and then a <a href="https://www.simoahava.com/analytics/custom-templates-guide-for-google-tag-manager/#simple-table">simple table</a> field named <code>optionalParameters</code>, you could build a mock object like this:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">mockData</span> <span style="color:#f92672">=</span> {
+  <span style="color:#a6e22e">name</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;Simo Ahava&#39;</span>,
+  <span style="color:#a6e22e">optionalParameters</span><span style="color:#f92672">:</span> [{
+    <span style="color:#a6e22e">parameterName</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;country&#39;</span>,
+    <span style="color:#a6e22e">parameterValue</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;Finland&#39;</span>
+  },{
+    <span style="color:#a6e22e">parameterName</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;hair_color&#39;</span>,
+    <span style="color:#a6e22e">parameterValue</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;n/a&#39;</span>
+  }]
+};
+</code></pre></div>
+
+<p>This mock data object would correspond with field input like this:</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2019/11/mockdata.jpg" title="Mock data">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2019/11/mockdata.jpg#ZgotmplZ" alt="Mock data">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>You pass this mock data object to the <code>runCode</code> method (more on this below) so that the template code is run with input from the object.</p>
+
+<h4 id="mocking-template-apis">Mocking template APIs</h4>
+
+<p>When you run tests for your template, you might not want the template to actually perform the API calls it is configured to do.</p>
+
+<p>Calling <a href="https://developers.google.com/tag-manager/templates/api#sendpixel"><code>sendPixel</code></a> over and over again with different inputs might <em>not</em> make a lot of sense.</p>
+
+<p>This is where API mocking plays a vital row. In the Tests interface, you can <strong>replace</strong> API functionality with a mock function. This way you can run the test <em>as if</em> the template had called the API, and process the returned value <em>as if</em> the API had returned it.</p>
+
+<p>For example, let&rsquo;s say we have a tag template that injects a script onto the page, where the domain name is input by the user into a template field. This is what the template code would look like:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sendPixel</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;sendPixel&#39;</span>);
+
+<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">domainName</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">domainName</span>;
+
+<span style="color:#a6e22e">sendPixel</span>(<span style="color:#a6e22e">domainName</span>, <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">gtmOnSuccess</span>, <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">gtmOnFailure</span>);
+</code></pre></div>
+
+<p>To test this, you could write a test that simply checks if <code>gtmOnSuccess</code> was called for a valid hostname and <code>gtmOnFailure</code> for an invalid one:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">mockData</span> <span style="color:#f92672">=</span> {
+  <span style="color:#a6e22e">domainName</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;https://invalid.com&#39;</span>
+};
+<span style="color:#a6e22e">runCode</span>(<span style="color:#a6e22e">mockData</span>);
+<span style="color:#a6e22e">assertApi</span>(<span style="color:#e6db74">&#39;gtmOnFailure&#39;</span>).<span style="color:#a6e22e">wasCalled</span>();
+</code></pre></div>
+
+<p>However, this test actually tries to send the pixel request to the domain name, meaning it&rsquo;s difficult to test positive and negative results without polluting the endpoint.</p>
+
+<p>Instead, you can <strong>mock</strong> the API like this:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">mockData</span> <span style="color:#f92672">=</span> {
+  <span style="color:#a6e22e">domainName</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;https://invalid.com&#39;</span>
+};
+
+<span style="color:#a6e22e">mock</span>(<span style="color:#e6db74">&#39;sendPixel&#39;</span>, (<span style="color:#a6e22e">url</span>, <span style="color:#a6e22e">onSuccess</span>, <span style="color:#a6e22e">onFailure</span>) =&gt; {
+  <span style="color:#a6e22e">onFailure</span>();
+});
+
+<span style="color:#a6e22e">runCode</span>(<span style="color:#a6e22e">mockData</span>);
+
+<span style="color:#a6e22e">assertApi</span>(<span style="color:#e6db74">&#39;gtmOnFailure&#39;</span>).<span style="color:#a6e22e">wasCalled</span>();
+</code></pre></div>
+
+<p>With <code>mock</code>, you instruct the test to use the function stub you provide, meaning whenever the <code>sendPixel</code> API is invoked, it always runs the <code>onFailure()</code> method regardless of input (at least, in this current test).</p>
+
+<p>So when using APIs that invoke external endpoints, it might be a good idea to mock them.</p>
+
+<p>Mocks are reset with every test, so you don&rsquo;t have to worry about your <code>onFailure()</code> leaking into other tests, too.</p>
+
+<h3 id="2-running-the-code">2. Running the code</h3>
+
+<p>Once you have your mocks ready, you can invoke the <code>runCode()</code> method.</p>
+
+<p>This method runs the template code, mocking the APIs you have chosen to replace, and using the data object that you pass to it as an argument.</p>
+
+<p>If you do not pass any object to it as an argument, or if you pass an empty object, the template will be run as if the user has not added any input to any field.</p>
+
+<p>With <strong>tag templates</strong>, you just need to execute <code>runCode()</code>, because your assertions will be made against the APIs that have been called. Tag templates do not return anything, so there&rsquo;s nothing to assess from the result of <code>runCode()</code>.</p>
+
+<p>With <strong>variable templates</strong>, the template should actually <strong>return</strong> something, and thus your assertions should also be done against the <em>result</em> of <code>runCode()</code>.</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">mockData</span> <span style="color:#f92672">=</span> {<span style="color:#a6e22e">input</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;test&#39;</span>};
+
+<span style="color:#75715e">// With tag templates
+</span><span style="color:#75715e"></span><span style="color:#a6e22e">runCode</span>(<span style="color:#a6e22e">mockData</span>);
+<span style="color:#a6e22e">assertApi</span>(<span style="color:#e6db74">&#39;someApi&#39;</span>).<span style="color:#a6e22e">wasCalled</span>();
+
+<span style="color:#75715e">// With variable templates
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">result</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">runCode</span>(<span style="color:#a6e22e">mockData</span>);
+<span style="color:#a6e22e">assertThat</span>(<span style="color:#a6e22e">result</span>).<span style="color:#a6e22e">isEqualTo</span>(<span style="color:#e6db74">&#39;test&#39;</span>);
+</code></pre></div>
+
+<p>Once the test has run, you are ready to <strong>assert</strong> the results.</p>
+
+<h3 id="3-failing-the-test">3. Failing the test</h3>
+
+<p>Custom Templates offer an API you can use to immediately fail a test.</p>
+
+<p>Note that the typical use case for <code>fail()</code> is to evaluate the <em>test itself</em> rather than the code that is being tested.</p>
+
+<p>Some like to use a fail mechanism to indicate tests that have not yet been written, others like to use it to expose paths that should never be encountered by tests.</p>
+
+<p>Typically, you wouldn&rsquo;t use <code>fail()</code> in production-ready code, because there would not be incomplete tests and assertion logic would handle all possible permutations of the template code.</p>
+
+<p>To use <code>fail()</code> is dead simple - just add the command to a branch of the code, and set the failure message as the argument.</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">mockData</span> <span style="color:#f92672">=</span> {<span style="color:#a6e22e">input</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;test&#39;</span>};
+
+<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">result</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">runCode</span>(<span style="color:#a6e22e">mockData</span>);
+
+<span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">result</span> <span style="color:#f92672">===</span> <span style="color:#66d9ef">undefined</span>) {
+  <span style="color:#a6e22e">fail</span>(<span style="color:#e6db74">&#39;Result should never be undefined.&#39;</span>);
+}
+<span style="color:#a6e22e">assertThat</span>(<span style="color:#a6e22e">result</span>).<span style="color:#a6e22e">isEqualTo</span>(<span style="color:#e6db74">&#39;test&#39;</span>);
+</code></pre></div>
+
+<p>You can use <code>fail()</code> to create custom assertions. For example, to check if the object returned by the code contains some property, you could do this:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">mockData</span> <span style="color:#f92672">=</span> {<span style="color:#a6e22e">input</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;test&#39;</span>};
+
+<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">result</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">runCode</span>(<span style="color:#a6e22e">mockData</span>);
+
+<span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">result</span>.<span style="color:#a6e22e">hasOwnProperty</span>(<span style="color:#e6db74">&#39;someProperty&#39;</span>)) {
+  <span style="color:#a6e22e">assertThat</span>(<span style="color:#66d9ef">true</span>);
+} <span style="color:#66d9ef">else</span> {
+  <span style="color:#a6e22e">fail</span>(<span style="color:#e6db74">&#39;Variable did not have &#34;someProperty&#34;.&#39;</span>);
+}
+</code></pre></div>
+
+<p>It&rsquo;s not pretty, but it does its job while we wait for new assertion APIs to be added.</p>
+
+<h3 id="4-assertions">4. Assertions</h3>
+
+<p>With <strong>assertions</strong>, you are making statements about the results of the test. The best assertion libraries are a pleasure to use, because assertions are written with a grammar and syntax reminiscent of actual language.</p>
+
+<p>For example, to assert that the variable template code returns a specific value, you add something like:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">assertThat</span>(<span style="color:#a6e22e">runCodeResult</span>).<span style="color:#a6e22e">isEqualTo</span>(<span style="color:#e6db74">&#39;some value&#39;</span>);
+</code></pre></div>
+
+<p>The test is a <strong>success</strong> if the assertion resolves to <code>true</code>. In other words, if the <code>runCodeResult</code> had exactly the value <code>'some value'</code>, the test would pass.</p>
+
+<p>With APIs, you are asserting whether the API was called or not.</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">assertApi</span>(<span style="color:#e6db74">&#39;sendPixel&#39;</span>).<span style="color:#a6e22e">wasCalled</span>();
+</code></pre></div>
+
+<p>This test would be a success if the <code>sendPIxel</code> API was invoked during the execution of the test code.</p>
+
+<blockquote>
+<p><strong>NOTE!</strong> To test whether an API was called with specific parameters, you should <strong>mock</strong> that API instead.</p>
+</blockquote>
+
+<p>You can add <strong>more than one assertion</strong> to a test case. All the assertions must pass for the test to be a success. I do recommend trying to keep the number of assertions per test to a minimum, though, as having granular test cases lets you more easily identify the link between the failed test and the broken code that caused it to fail.</p>
+
+<h4 id="using-assertthat">Using <code>assertThat</code></h4>
+
+<p>The <code>assertThat</code> API allows you to make assertions about the result of the code execution. The assertions follow the syntax used by e.g. Google&rsquo;s <a href="https://truth.dev/">Truth</a> and the <a href="https://joel-costigliola.github.io/assertj/">AssertJ</a> library.</p>
+
+<p>The <code>assertThat</code> API is most useful when testing variable templates, because the assertions would be run against the result (the returned value) of the variable template itself.</p>
+
+<p>The syntax is this:</p>
+
+<p><code>assertThat(someValueToTest).assertion(someExpectedValue);</code></p>
+
+<p>The <code>assertThat()</code> method takes the value to test as an argument, and it returns an object with all the different assertion APIs listed below.</p>
+
+<p>Some of the APIs (e.g. <code>isEqualTo()</code>) take an argument, where the asserted value is tested against this argument.</p>
+
+<p>Many APIs don&rsquo;t take any arguments at all - they are used for quick, simple assertions such as whether the asserted value was defined or not.</p>
+
+<p>Here are the assertions supported by the API.</p>
+
+<table>
+<thead>
+<tr>
+<th>Assertion</th>
+<th>Description</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td><code>isEqualTo(someValue)</code></td>
+<td>Checks if the asserted value is equal to <code>someValue</code>. Equality is not strict - you can check if <code>[1, 2, 3]</code> equals <code>[1, 2, 3]</code> and the test will pass. Similarly, you can check complex objects and the assertion will succeed if they have the exact same keys and values.</td>
+</tr>
+
+<tr>
+<td><code>isNotEqualTo(someValue)</code></td>
+<td>The assertion is a success if the asserted value is not equal to <code>someValue</code>. Same rules about strictness apply here.</td>
+</tr>
+
+<tr>
+<td><code>isStrictlyEqualTo(someValue)</code></td>
+<td>Similar to <code>isEqualTo</code>, except this time the asserted value must have exactly the same value as the target value. Thus objects and arrays would not pass the test, as they would point to different references.</td>
+</tr>
+
+<tr>
+<td><code>isStrictlyNotEqualTo(someValue)</code></td>
+<td>The assertion is a success if the asserted value is <strong>not</strong> the exact equal of <code>someValue</code>.</td>
+</tr>
+
+<tr>
+<td><code>isDefined()</code></td>
+<td>Assertion is a success if the asserted value is other than <code>undefined</code>.</td>
+</tr>
+
+<tr>
+<td><code>isUndefined()</code></td>
+<td>Assertion is a success if the asserted value is <code>undefined</code>.</td>
+</tr>
+
+<tr>
+<td><code>isNull()</code></td>
+<td>Assertion is a success if the asserted value is <code>null</code>.</td>
+</tr>
+
+<tr>
+<td><code>isNotNull()</code></td>
+<td>Assertion is a success if the asserted value is anything other than <code>null</code>.</td>
+</tr>
+
+<tr>
+<td><code>isTrue()</code></td>
+<td>Assertion is a success if the asserted value is <code>true</code>.</td>
+</tr>
+
+<tr>
+<td><code>isFalse()</code></td>
+<td>Assertion is a success if the asserted value is <code>false</code>.</td>
+</tr>
+
+<tr>
+<td><code>isTruthy()</code></td>
+<td>Assertion is a success if the asserted value is not <em>falsy</em> (see the next assertion for more details).</td>
+</tr>
+
+<tr>
+<td><code>isFalsy()</code></td>
+<td>Assertion is a success if the asserted value is <code>falsy</code>. Falsy values are: <code>undefined</code>, <code>null</code>, <code>false</code>, <code>NaN</code>, <code>0</code>, and <code>''</code>.</td>
+</tr>
+</tbody>
+</table>
+
+<p>This is the <em>current</em> list of available assertions. I&rsquo;m sure more will be added with time.</p>
+
+<h3 id="using-assertapi">Using <code>assertApi</code></h3>
+
+<p>The <code>assertApi()</code> function can be used to check if the template code has made calls to specific template APIs.</p>
+
+<p>This is a typical <em>flow test</em> - you are checking that certain things happen in order.</p>
+
+<p>For example, take the following template code:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">log</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;logToConsole&#39;</span>);
+<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">makeTableMap</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;makeTableMap&#39;</span>);
+<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sendPixel</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;sendPixel&#39;</span>);
+<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">injectScript</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;injectScript&#39;</span>);
+
+<span style="color:#75715e">// Log input to console
+</span><span style="color:#75715e"></span><span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">input</span>);
+
+<span style="color:#75715e">// Shape into object
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">makeTableMap</span>(<span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">input</span>, <span style="color:#e6db74">&#39;propertyName&#39;</span>, <span style="color:#e6db74">&#39;propertyValue&#39;</span>);
+
+<span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">someValue</span>) {
+  <span style="color:#a6e22e">sendPixel</span>(<span style="color:#e6db74">&#39;https://endPoint.com/?value=&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">someValue</span>, <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">gtmOnSuccess</span>, <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">gtmOnFailure</span>);
+} <span style="color:#66d9ef">else</span> {
+  <span style="color:#a6e22e">injectScript</span>(<span style="color:#e6db74">&#39;https://endPoint.com/script.js&#39;</span>, <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">gtmOnSuccess</span>, <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">gtmOnFailure</span>);
+}
+</code></pre></div>
+
+<p>To test the flow of this template, you could use a test like this:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">mockData</span> <span style="color:#f92672">=</span> {<span style="color:#a6e22e">someValue</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span>};
+
+<span style="color:#a6e22e">runCode</span>(<span style="color:#a6e22e">mockData</span>);
+
+<span style="color:#a6e22e">assertApi</span>(<span style="color:#e6db74">&#39;logToConsole&#39;</span>).<span style="color:#a6e22e">wasCalled</span>();
+<span style="color:#a6e22e">assertApi</span>(<span style="color:#e6db74">&#39;makeTableMap&#39;</span>).<span style="color:#a6e22e">wasCalled</span>();
+<span style="color:#a6e22e">assertApi</span>(<span style="color:#e6db74">&#39;sendPixel&#39;</span>).<span style="color:#a6e22e">wasCalled</span>();
+<span style="color:#a6e22e">assertApi</span>(<span style="color:#e6db74">&#39;injectScript&#39;</span>).<span style="color:#a6e22e">wasNotCalled</span>();
+
+<span style="color:#a6e22e">assertApi</span>(<span style="color:#e6db74">&#39;gtmOnSuccess&#39;</span>).<span style="color:#a6e22e">wasCalled</span>();
+</code></pre></div>
+
+<p>Pay attention to the last line - with tag templates you should always have a test that checks whether the <code>gtmOnSuccess</code> API was called. You can also test for <code>gtmOnFailure</code> in some circumstances (specifically, when the template executes <code>data.gtmOnFailure()</code>).</p>
+
+<p><code>assertApi(apiName)</code> returns an object that has two assertions:</p>
+
+<table>
+<thead>
+<tr>
+<th>Assertion</th>
+<th>Description</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td><code>wasCalled()</code></td>
+<td>Success if the API was called during test execution.</td>
+</tr>
+
+<tr>
+<td><code>wasNotCalled()</code></td>
+<td>Success if the API was NOT called during test execution.</td>
+</tr>
+</tbody>
+</table>
+
+<p>This is very simple, by design. You can only check if the API was called or not.</p>
+
+<p>If you want to know whether it was called with some specific value, you need to mock the APIs instead.</p>
+
+<h3 id="the-test-setup">The test Setup</h3>
+
+<p>When opening the <strong>Tests</strong> interface, you&rsquo;ll see the <strong>Setup</strong> box. You can use this to establish conditions that apply to all tests. It&rsquo;s a great place to define your <strong>mock</strong> objects for example, because then you don&rsquo;t have to write them over and over again in each test.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2019/11/test-setup.jpg" title="Test setup">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2019/11/test-setup.jpg#ZgotmplZ" alt="Test setup">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>I recommend making liberal use of <strong>Setup</strong> - it can make it much easier to add more tests as your code goes through iterations.</p>
+
+<h2 id="running-tests">Running tests</h2>
+
+<p>To run the tests, simply click the <strong>Run tests</strong> button at the top of the <strong>Tests</strong> view, or hit the play button next to any individual test.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2019/11/run-tests.jpg" title="run tests button">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2019/11/run-tests.jpg#ZgotmplZ" alt="run tests button">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<p>The console will log any test results, so play close attention to it.</p>
+
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2019/11/failed-tests.jpg" title="Failed tests">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2019/11/failed-tests.jpg#ZgotmplZ" alt="Failed tests">
+  
+    </a>
+  
+  
+</div>
+
+
+
+<h2 id="summary">Summary</h2>
+
+<p>So. Why should you test? Well, let&rsquo;s start with this cryptic tweet from Google Tag Manager&rsquo;s tech lead, Brian:</p>
+
+<blockquote class="twitter-tweet"><p lang="en" dir="ltr">I can assure you...there will be incentives for having tests :)</p>&mdash; Brian Kuhn (@briankuhn) <a href="https://twitter.com/briankuhn/status/1192305715865538560?ref_src=twsrc%5Etfw">November 7, 2019</a></blockquote>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+
+<p>I imagine at some point tests will become mandatory for templates added to the <a href="https://tagmanager.google.com/gallery/">gallery</a>.</p>
+
+<p>Another point is that tests bring you, the developer, comfort, since you can use them to validate that you don&rsquo;t generate broken code.</p>
+
+<p>Unit tests are problematic - the tests rely on mock data rather than actual use cases (those are explored with <strong>integration</strong> and <strong>functional</strong> tests). Their only purpose is to test the code you write, but the tests are done using &hellip; code you write.</p>
+
+<p>However, think of your template&rsquo;s users. When they download updates to your template from the gallery, they trust that the code works as it used to. Once your test gets more and more complex, it will be more and more difficult to manage the branching code.</p>
+
+<p>At that point, unit tests will be worth every second you spend with them.</p>
+
+<p>Do note that tests alone don&rsquo;t make your code work. You still need a good template. And writing tests just for coverage&rsquo;s sake doesn&rsquo;t make sense - you still need the tests to reflect actual use cases.</p>
+
+<p>I&rsquo;m looking forward to how the new <strong>Tests</strong> feature evolves in Google Tag Manager - it&rsquo;s a great leap forward for avoiding surprises and breaking mistakes in your template code!</p>
+
+              
+
+            </div>
+          </div>
+          <div id="post-footer" class="post-footer main-content-wrap">
+            
+              
+                
+                
+                  <div class="post-footer-tags">
+                    <span class="text-color-light text-small">TAGGED IN</span><br/>
+                    
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/google-tag-manager/">google tag manager</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/custom-templates/">custom templates</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/tag-templates/">tag templates</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/variable-templates/">variable templates</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/testing/">testing</a>
+
+                  </div>
+                
+              
+            
+            
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--disabled">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/custom-parameter-reporting-google-analytics-app-web/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/writing-tests-for-custom-templates-google-tag-manager/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Writing%20Tests%20For%20Custom%20Templates%20In%20Google%20Tag%20Manager%20https://www.simoahava.com/analytics/writing-tests-for-custom-templates-google-tag-manager/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/writing-tests-for-custom-templates-google-tag-manager/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#disqus">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+            
+              
+                <span id="disqus"></span>
+<div id="disqus_thread">
+  <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+
+              
+            
+          </div>
+        </article>
+        <footer id="footer" class="main-content-wrap">
+  <span class="copyrights">
+    &copy; 2019 Simo Ahava. All Rights Reserved
+  </span>
+</footer>
+
+      </div>
+      
+      <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+        
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--disabled">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/custom-parameter-reporting-google-analytics-app-web/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/writing-tests-for-custom-templates-google-tag-manager/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Writing%20Tests%20For%20Custom%20Templates%20In%20Google%20Tag%20Manager%20https://www.simoahava.com/analytics/writing-tests-for-custom-templates-google-tag-manager/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/writing-tests-for-custom-templates-google-tag-manager/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#disqus">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+      </div>
+      
+      <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+  <i id="btn-close-shareoptions" class="fa fa-close"></i>
+  <ul class="share-options">
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/writing-tests-for-custom-templates-google-tag-manager/">
+          <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=Writing%20Tests%20For%20Custom%20Templates%20In%20Google%20Tag%20Manager%20https://www.simoahava.com/analytics/writing-tests-for-custom-templates-google-tag-manager/%20via%20@SimoAhava">
+          <i class="fa fa-twitter"></i><span>Share on Twitter</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/writing-tests-for-custom-templates-google-tag-manager/">
+          <i class="fa fa-linkedin"></i><span>Share on LinkedIn</span>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+<div id="share-options-mask" class="share-options-mask"></div>
+
+    </div>
+    
+    <div id="about">
+  <div id="about-card">
+    <div id="about-btn-close">
+      <i class="fa fa-remove"></i>
+    </div>
+    
+      <img id="about-card-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+    
+    <h4 id="about-card-name">Simo Ahava</h4>
+    
+      <div id="about-card-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</div>
+    
+    
+      <div id="about-card-job">
+        <i class="fa fa-briefcase"></i>
+        <br/>
+        Senior Data Advocate at Reaktor
+      </div>
+    
+    
+      <div id="about-card-location">
+        <i class="fa fa-map-marker"></i>
+        <br/>
+        Finland
+      </div>
+    
+  </div>
+</div>
+
+    
+  
+    
+    <div id="cover" style="background-image:url('https://www.simoahava.com/images/maisema.jpg');"></div>
+  
+
+
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+
+
+
+
+<script src="https://www.simoahava.com/js/script.js"></script>
+
+
+
+
+  
+    
+      <script>
+        
+
+
+
+
+
+        (function() {
+          
+          
+          if (window.location.hostname == "localhost") {
+            return;
+          }
+          var d = document, s = d.createElement('script');
+          var disqus_shortname = 'simoahava';
+          s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      </script>
+    
+  
+
+
+    <script>
+      var mylazyload = new LazyLoad({elements_selector: '.lazy'});
+      </script>
+
+    
+  </body>
+</html>
+
