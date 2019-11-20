@@ -53,7 +53,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.58.3 with theme Tranquilpeak 0.4.3-BETA">
+    <meta name="generator" content="Hugo 0.59.1 with theme Tranquilpeak 0.4.3-BETA">
     <title>DIY Google Ads Account Monitor With R, AdWords API, And Slack API | Simo Ahava's blog</title>
     
     <script>
@@ -462,19 +462,19 @@ db_password <span style="color:#f92672">=</span> <span style="color:#e6db74">&#3
 <p>Create another file including the following code and save the file as <code>connect_db.R</code> in <code>/YOUR_R_USER_ROOT_DIR/</code>. This is your DB connector.</p>
 
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-R" data-lang="R"><span style="color:#75715e"># Include DB credentials from your /auth/ dir</span>
-<span style="color:#f92672">source</span>(<span style="color:#e6db74">&#34;~/auth/db_credentials.R&#34;</span>)
+<span style="color:#a6e22e">source</span>(<span style="color:#e6db74">&#34;~/auth/db_credentials.R&#34;</span>)
 
 <span style="color:#75715e"># Check if the required packages are installed, install if not</span>
-<span style="color:#66d9ef">if</span>(<span style="color:#f92672">!</span><span style="color:#f92672">require</span>(DBI)) install.packages(<span style="color:#e6db74">&#34;DBI&#34;</span>) 
-<span style="color:#66d9ef">if</span>(<span style="color:#f92672">!</span><span style="color:#f92672">require</span>(RMariaDB)) install.packages(<span style="color:#e6db74">&#34;RMariaDB&#34;</span>)
+<span style="color:#a6e22e">if</span>(<span style="color:#f92672">!</span><span style="color:#a6e22e">require</span>(DBI)) <span style="color:#a6e22e">install.packages</span>(<span style="color:#e6db74">&#34;DBI&#34;</span>) 
+<span style="color:#a6e22e">if</span>(<span style="color:#f92672">!</span><span style="color:#a6e22e">require</span>(RMariaDB)) <span style="color:#a6e22e">install.packages</span>(<span style="color:#e6db74">&#34;RMariaDB&#34;</span>)
 
 <span style="color:#75715e"># Load packages</span>
-<span style="color:#f92672">library</span>(DBI)
-<span style="color:#f92672">library</span>(RMariaDB)
+<span style="color:#a6e22e">library</span>(DBI)
+<span style="color:#a6e22e">library</span>(RMariaDB)
 
 <span style="color:#75715e"># Create a DB connection handle</span>
-con <span style="color:#f92672">&lt;-</span> dbConnect(
-  drv <span style="color:#f92672">=</span> RMariaDB<span style="color:#f92672">::</span>MariaDB(),
+con <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">dbConnect</span>(
+  drv <span style="color:#f92672">=</span> RMariaDB<span style="color:#f92672">::</span><span style="color:#a6e22e">MariaDB</span>(),
   username <span style="color:#f92672">=</span> db_username,
   password <span style="color:#f92672">=</span> db_password,
   host <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;YOUR_DB_HOST&#34;</span>,
@@ -485,39 +485,39 @@ con <span style="color:#f92672">&lt;-</span> dbConnect(
 <p>And finally the actual Ads R script, include the following code and save it as <code>google-ads-zero-cost-monitor.R</code> in <code>/YOUR_R_USER_ROOT_DIR/</code>.</p>
 
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e"># Init the DB connection</span>
-<span style="color:#f92672">source</span>(<span style="color:#e6db74">&#34;~/connect_db.R&#34;</span>)
+<span style="color:#a6e22e">source</span>(<span style="color:#e6db74">&#34;~/connect_db.R&#34;</span>)
 
 <span style="color:#75715e"># Check if the required packages are installed, install if not</span>
-<span style="color:#66d9ef">if</span>(<span style="color:#f92672">!</span><span style="color:#f92672">require</span>(RAdwords)) install.packages(<span style="color:#e6db74">&#34;RAdwords&#34;</span>)
+<span style="color:#a6e22e">if</span>(<span style="color:#f92672">!</span><span style="color:#a6e22e">require</span>(RAdwords)) <span style="color:#a6e22e">install.packages</span>(<span style="color:#e6db74">&#34;RAdwords&#34;</span>)
 
 <span style="color:#75715e"># Load packages</span>
-<span style="color:#f92672">library</span>(RAdwords)
+<span style="color:#a6e22e">library</span>(RAdwords)
 
 <span style="color:#75715e"># Define the file path where your AdWords API OAuth RData file should be stored to, we&#39;ll need this next</span>
 google_ads_auth_file <span style="color:#f92672">&lt;-</span> <span style="color:#e6db74">&#34;~/auth/google_ads_auth.RData&#34;</span>
 
 <span style="color:#75715e"># Check if the google_auth RData file already exists, create if not</span>
-<span style="color:#66d9ef">if</span>(<span style="color:#f92672">!</span><span style="color:#66d9ef">file.exists</span>(google_ads_auth_file)) {
+<span style="color:#a6e22e">if</span>(<span style="color:#f92672">!</span><span style="color:#a6e22e">file.exists</span>(google_ads_auth_file)) {
   <span style="color:#75715e"># Auth steps:</span>
   <span style="color:#75715e"># 1) You&#39;ll need Google API Client ID, Client Secret and AdWords Developer Token here for authenticating, see https://github.com/jburkhardt/RAdwords for details</span>
   <span style="color:#75715e"># 2) Once you&#39;ve provided those in your R console when R requests them, you&#39;ll get redirected to OAuth screen in your browser</span>
   <span style="color:#75715e"># 3) Authenticate with your Google Account (the same that has access to your AdWords account)</span>
   <span style="color:#75715e"># 4) You&#39;ll be redirected to a OAuth success screen that provides a final token code and asks you to copy/paste it to your application (to your R console in this case)</span>
-  google_auth <span style="color:#f92672">&lt;-</span> doAuth(save <span style="color:#f92672">=</span> <span style="color:#66d9ef">FALSE</span>)
+  google_auth <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">doAuth</span>(save <span style="color:#f92672">=</span> <span style="color:#66d9ef">FALSE</span>)
   
   <span style="color:#75715e"># Save the auth credentials, to be used the auth from a file from now on</span>
-  <span style="color:#66d9ef">save</span>(google_auth, file <span style="color:#f92672">=</span> google_ads_auth_file)
+  <span style="color:#a6e22e">save</span>(google_auth, file <span style="color:#f92672">=</span> google_ads_auth_file)
 }
 
 <span style="color:#75715e"># Load Google auth credentials</span>
-<span style="color:#66d9ef">load</span>(file <span style="color:#f92672">=</span> google_ads_auth_file)
+<span style="color:#a6e22e">load</span>(file <span style="color:#f92672">=</span> google_ads_auth_file)
 
 <span style="color:#75715e"># Init date vars</span>
-dayBeforeYesterday <span style="color:#f92672">&lt;-</span> <span style="color:#66d9ef">Sys.Date</span>() <span style="color:#f92672">-</span> <span style="color:#ae81ff">2</span>
-yesterday <span style="color:#f92672">&lt;-</span> <span style="color:#66d9ef">Sys.Date</span>() <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>
+dayBeforeYesterday <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">Sys.Date</span>() <span style="color:#f92672">-</span> <span style="color:#ae81ff">2</span>
+yesterday <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">Sys.Date</span>() <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>
 
 <span style="color:#75715e"># Fetch Google Ads Customer IDs from your DB</span>
-ads_accounts <span style="color:#f92672">&lt;-</span> dbGetQuery(con, <span style="color:#e6db74">&#34;SELECT ads_customer_id FROM ads_accounts&#34;</span>)
+ads_accounts <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">dbGetQuery</span>(con, <span style="color:#e6db74">&#34;SELECT ads_customer_id FROM ads_accounts&#34;</span>)
 
 <span style="color:#75715e"># Create a list of the IDs for later looping</span>
 account_list <span style="color:#f92672">&lt;-</span> ads_accounts<span style="color:#f92672">$</span>ads_customer_id
@@ -527,28 +527,28 @@ account_list <span style="color:#f92672">&lt;-</span> ads_accounts<span style="c
 
 <span style="color:#75715e"># Init AdWords API request</span>
 <span style="color:#75715e"># We&#39;re checking the cost data from two previous days</span>
-body <span style="color:#f92672">&lt;-</span> statement(select <span style="color:#f92672">=</span> <span style="color:#66d9ef">c</span>(<span style="color:#e6db74">&#39;Cost&#39;</span>),
+body <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">statement</span>(select <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#39;Cost&#39;</span>),
                   report <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;ACCOUNT_PERFORMANCE_REPORT&#34;</span>,
                   start  <span style="color:#f92672">=</span> dayBeforeYesterday,
                   end    <span style="color:#f92672">=</span> yesterday)
 
 <span style="color:#75715e"># Init a data frame for collecting the data and and an index variable for keeping track of progressing during the for loop</span>
-adsdata <span style="color:#f92672">&lt;-</span> <span style="color:#66d9ef">data.frame</span>()
+adsdata <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">data.frame</span>()
 progressIndex <span style="color:#f92672">&lt;-</span> <span style="color:#ae81ff">0</span>
 
 <span style="color:#75715e"># Get the Ads cost data</span>
-<span style="color:#66d9ef">for</span> (account <span style="color:#66d9ef">in</span> account_list) {
+<span style="color:#a6e22e">for </span>(account in account_list) {
 
   <span style="color:#75715e"># Get cost data</span>
-  ads_api_response <span style="color:#f92672">&lt;-</span> getData(clientCustomerId <span style="color:#f92672">=</span> account,
+  ads_api_response <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">getData</span>(clientCustomerId <span style="color:#f92672">=</span> account,
                               google_auth      <span style="color:#f92672">=</span> google_auth,
-                              statement        <span style="color:#f92672">=</span> <span style="color:#66d9ef">body</span>)
+                              statement        <span style="color:#f92672">=</span> body)
 
   <span style="color:#75715e"># Proceed only if the API doesn&#39;t return an error (happens when there&#39;s no data to return or when the API fails), this is for dropping off false zero cost alerts</span>
-  <span style="color:#66d9ef">if</span>(<span style="color:#f92672">!</span><span style="color:#66d9ef">is.null</span>(<span style="color:#66d9ef">dim</span>(ads_api_response))) {
+  <span style="color:#a6e22e">if</span>(<span style="color:#f92672">!</span><span style="color:#a6e22e">is.null</span>(<span style="color:#a6e22e">dim</span>(ads_api_response))) {
    
     <span style="color:#75715e"># Init empty data frame</span>
-    adsdata_temp <span style="color:#f92672">&lt;-</span> setNames(<span style="color:#66d9ef">data.frame</span>(<span style="color:#66d9ef">matrix</span>(ncol <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>, nrow <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>)), <span style="color:#66d9ef">c</span>(<span style="color:#e6db74">&#34;Cost&#34;</span>, <span style="color:#e6db74">&#34;Account&#34;</span>))
+    adsdata_temp <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">setNames</span>(<span style="color:#a6e22e">data.frame</span>(<span style="color:#a6e22e">matrix</span>(ncol <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>, nrow <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>)), <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;Cost&#34;</span>, <span style="color:#e6db74">&#34;Account&#34;</span>))
     
     <span style="color:#75715e"># Include account id</span>
     adsdata_temp<span style="color:#f92672">$</span>Account <span style="color:#f92672">&lt;-</span> account
@@ -556,27 +556,27 @@ progressIndex <span style="color:#f92672">&lt;-</span> <span style="color:#ae81f
     <span style="color:#75715e"># Include cost data</span>
     <span style="color:#75715e"># If there&#39;s no data, the result is doubled for some reason</span>
     <span style="color:#75715e"># Fix this by always reading the 1st value only with [1]</span>
-    adsdata_temp<span style="color:#f92672">$</span>Cost <span style="color:#f92672">&lt;-</span> ads_api_response<span style="color:#f92672">$</span>Cost[<span style="color:#ae81ff">1</span>]
+    adsdata_temp<span style="color:#f92672">$</span>Cost <span style="color:#f92672">&lt;-</span> ads_api_response<span style="color:#f92672">$</span>Cost[1]
     
     <span style="color:#75715e"># If cost is zero, NA is returned, replace it with zero</span>
-    <span style="color:#66d9ef">if</span>(<span style="color:#66d9ef">is.na</span>(adsdata_temp<span style="color:#f92672">$</span>Cost)) adsdata_temp<span style="color:#f92672">$</span>Cost <span style="color:#f92672">&lt;-</span> <span style="color:#ae81ff">0</span>
+    <span style="color:#a6e22e">if</span>(<span style="color:#a6e22e">is.na</span>(adsdata_temp<span style="color:#f92672">$</span>Cost)) adsdata_temp<span style="color:#f92672">$</span>Cost <span style="color:#f92672">&lt;-</span> <span style="color:#ae81ff">0</span>
     
     <span style="color:#75715e"># Collect during each iteration</span>
-    adsdata <span style="color:#f92672">&lt;-</span> <span style="color:#66d9ef">rbind</span>(adsdata, adsdata_temp, stringsAsFactors <span style="color:#f92672">=</span> <span style="color:#66d9ef">FALSE</span>)
+    adsdata <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">rbind</span>(adsdata, adsdata_temp, stringsAsFactors <span style="color:#f92672">=</span> <span style="color:#66d9ef">FALSE</span>)
   
   }
   
   <span style="color:#75715e"># Print progress to R console</span>
   progressIndex <span style="color:#f92672">&lt;-</span> progressIndex <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>
-  <span style="color:#66d9ef">cat</span>(<span style="color:#66d9ef">paste</span>(<span style="color:#e6db74">&#34;Query &#34;</span>, progressIndex, <span style="color:#e6db74">&#34; of &#34;</span>, <span style="color:#66d9ef">NROW</span>(account_list), <span style="color:#e6db74">&#34; done\r\n&#34;</span>, sep <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>))
+  <span style="color:#a6e22e">cat</span>(<span style="color:#a6e22e">paste</span>(<span style="color:#e6db74">&#34;Query &#34;</span>, progressIndex, <span style="color:#e6db74">&#34; of &#34;</span>, <span style="color:#a6e22e">NROW</span>(account_list), <span style="color:#e6db74">&#34; done\r\n&#34;</span>, sep <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>))
 
 }
 
 <span style="color:#75715e"># Keep accounts with zero cost only</span>
-ads_accounts_with_zero_cost <span style="color:#f92672">&lt;-</span> <span style="color:#66d9ef">subset</span>(adsdata, Cost <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>)
+ads_accounts_with_zero_cost <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">subset</span>(adsdata, Cost <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>)
 
 <span style="color:#75715e"># Count nbr of alerted accounts</span>
-nbr_of_accounts_with_alerts <span style="color:#f92672">&lt;-</span> <span style="color:#66d9ef">nrow</span>(ads_accounts_with_zero_cost)
+nbr_of_accounts_with_alerts <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">nrow</span>(ads_accounts_with_zero_cost)
 
 <span style="color:#75715e"># Save all alerts to DB, if there was any</span>
 <span style="color:#75715e"># This assumes you have DB table named &#34;alerts&#34; existing with fields: </span>
@@ -586,17 +586,17 @@ nbr_of_accounts_with_alerts <span style="color:#f92672">&lt;-</span> <span style
 <span style="color:#75715e"># created_at DATETIME</span>
 <span style="color:#75715e"># updated_at DATETIME</span>
 
-<span style="color:#66d9ef">if</span>(nbr_of_accounts_with_alerts <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
+<span style="color:#a6e22e">if</span>(nbr_of_accounts_with_alerts <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
   
-  <span style="color:#66d9ef">for</span> (i <span style="color:#66d9ef">in</span> <span style="color:#ae81ff">1</span><span style="color:#f92672">:</span><span style="color:#66d9ef">nrow</span>(ads_accounts_with_zero_cost)) {
+  <span style="color:#a6e22e">for </span>(i in <span style="color:#ae81ff">1</span><span style="color:#f92672">:</span><span style="color:#a6e22e">nrow</span>(ads_accounts_with_zero_cost)) {
     row <span style="color:#f92672">&lt;-</span> ads_accounts_with_zero_cost[i, ]
     
-    ads_customer_id <span style="color:#f92672">&lt;-</span> <span style="color:#66d9ef">row</span><span style="color:#f92672">$</span>ads_customer_id
-    <span style="color:#66d9ef">category</span> <span style="color:#f92672">&lt;-</span> <span style="color:#e6db74">&#34;ALERT_ZERO_COST&#34;</span> <span style="color:#75715e"># For categorizing different types of alerts</span>
+    ads_customer_id <span style="color:#f92672">&lt;-</span> row<span style="color:#f92672">$</span>ads_customer_id
+    category <span style="color:#f92672">&lt;-</span> <span style="color:#e6db74">&#34;ALERT_ZERO_COST&#34;</span> <span style="color:#75715e"># For categorizing different types of alerts</span>
     status_id <span style="color:#f92672">&lt;-</span> <span style="color:#ae81ff">0</span> <span style="color:#75715e"># To be set to eg. 1 when the alert is handled via a custom UI</span>
     
     <span style="color:#75715e"># Save each item to db</span>
-    query <span style="color:#f92672">&lt;-</span> <span style="color:#66d9ef">paste</span>(<span style="color:#e6db74">&#34;INSERT INTO alerts (
+    query <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">paste</span>(<span style="color:#e6db74">&#34;INSERT INTO alerts (
 </span><span style="color:#e6db74">                    ads_customer_id,
 </span><span style="color:#e6db74">                    category,
 </span><span style="color:#e6db74">                    status_id,
@@ -604,13 +604,13 @@ nbr_of_accounts_with_alerts <span style="color:#f92672">&lt;-</span> <span style
 </span><span style="color:#e6db74">                    updated_at)
 </span><span style="color:#e6db74">                   VALUES (&#34;</span>,
                     <span style="color:#e6db74">&#34;&#39;&#34;</span>, ads_customer_id, <span style="color:#e6db74">&#34;&#39;, &#34;</span>,
-                    <span style="color:#e6db74">&#34;&#39;&#34;</span>, <span style="color:#66d9ef">category</span>, <span style="color:#e6db74">&#34;&#39;, &#34;</span>,
+                    <span style="color:#e6db74">&#34;&#39;&#34;</span>, category, <span style="color:#e6db74">&#34;&#39;, &#34;</span>,
                     status_id, <span style="color:#e6db74">&#34;, &#34;</span>,
                     <span style="color:#e6db74">&#34;now(), &#34;</span>,
                     <span style="color:#e6db74">&#34;now())&#34;</span>,
                    sep <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>
     )
-    dbExecute(con, query)
+    <span style="color:#a6e22e">dbExecute</span>(con, query)
   }
   
 <span style="color:#75715e"># If you want to check/debug what was stored, uncomment and run these lines</span>
@@ -661,35 +661,35 @@ nbr_of_accounts_with_alerts <span style="color:#f92672">&lt;-</span> <span style
 webhook_url <span style="color:#f92672">&lt;-</span> <span style="color:#e6db74">&#34;https://hooks.slack.com/services/12345&#34;</span>
 
 <span style="color:#75715e"># Check if the required packages are installed, install if not</span>
-<span style="color:#66d9ef">if</span>(<span style="color:#f92672">!</span><span style="color:#f92672">require</span>(jsonlite)) install.packages(<span style="color:#e6db74">&#34;jsonlite&#34;</span>) 
-<span style="color:#66d9ef">if</span>(<span style="color:#f92672">!</span><span style="color:#f92672">require</span>(httr)) install.packages(<span style="color:#e6db74">&#34;httr&#34;</span>)
+<span style="color:#a6e22e">if</span>(<span style="color:#f92672">!</span><span style="color:#a6e22e">require</span>(jsonlite)) <span style="color:#a6e22e">install.packages</span>(<span style="color:#e6db74">&#34;jsonlite&#34;</span>) 
+<span style="color:#a6e22e">if</span>(<span style="color:#f92672">!</span><span style="color:#a6e22e">require</span>(httr)) <span style="color:#a6e22e">install.packages</span>(<span style="color:#e6db74">&#34;httr&#34;</span>)
 
 <span style="color:#75715e"># Load packages</span>
-<span style="color:#f92672">library</span>(jsonlite)
-<span style="color:#f92672">library</span>(httr)
+<span style="color:#a6e22e">library</span>(jsonlite)
+<span style="color:#a6e22e">library</span>(httr)
 
 <span style="color:#75715e"># Nbr of accounts for the Slack notification</span>
-nbr_of_accounts <span style="color:#f92672">&lt;-</span> <span style="color:#66d9ef">NROW</span>(account_list)
+nbr_of_accounts <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">NROW</span>(account_list)
 
 <span style="color:#75715e"># Setup the message you want to send to Slack</span>
-msg_desc <span style="color:#f92672">&lt;-</span> <span style="color:#66d9ef">paste</span>(<span style="color:#e6db74">&#34;Number of Google Ads accounts checked: &#34;</span>,
+msg_desc <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">paste</span>(<span style="color:#e6db74">&#34;Number of Google Ads accounts checked: &#34;</span>,
                   nbr_of_accounts,
                   sep <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>)
 
-msg_title <span style="color:#f92672">&lt;-</span> <span style="color:#66d9ef">paste</span>(<span style="color:#e6db74">&#34;ALERT - Number of zero cost accounts detected: &#34;</span>,
+msg_title <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">paste</span>(<span style="color:#e6db74">&#34;ALERT - Number of zero cost accounts detected: &#34;</span>,
                    nbr_of_accounts_with_alerts,
                    sep <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>)
 
 <span style="color:#75715e"># This places a channel ping if there were occurrences with zero cost, and if not, defaults to empty message</span>
-<span style="color:#66d9ef">if</span>(nbr_of_accounts_with_alerts <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
+<span style="color:#a6e22e">if</span>(nbr_of_accounts_with_alerts <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
   msg_body <span style="color:#f92672">&lt;-</span> <span style="color:#e6db74">&#34;Alerts saved to database! &lt;!channel&gt;&#34;</span>
-} <span style="color:#66d9ef">else</span> {
+} else {
   msg_body <span style="color:#f92672">&lt;-</span> <span style="color:#e6db74">&#34;&#34;</span>
 }
 
 <span style="color:#75715e"># Alert to Slack - POST the msg</span>
-request <span style="color:#f92672">&lt;-</span> POST(webhook_url,
-                body <span style="color:#f92672">=</span> <span style="color:#66d9ef">paste</span>(
+request <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">POST</span>(webhook_url,
+                body <span style="color:#f92672">=</span> <span style="color:#a6e22e">paste</span>(
                   <span style="color:#e6db74">&#39;{&#34;attachments&#34;: [{&#39;</span>,
                   
                   <span style="color:#e6db74">&#39;&#34;title&#34;: &#34;&#39;</span>,

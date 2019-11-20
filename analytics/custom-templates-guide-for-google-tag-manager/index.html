@@ -53,7 +53,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.58.3 with theme Tranquilpeak 0.4.3-BETA">
+    <meta name="generator" content="Hugo 0.59.1 with theme Tranquilpeak 0.4.3-BETA">
     <title>Custom Templates Guide For Google Tag Manager | Simo Ahava's blog</title>
     
     <script>
@@ -459,6 +459,7 @@
 <ul>
 <li><a href="#the-require-api">The <code>require</code> API</a></li>
 <li><a href="#the-querypermission-api">The <code>queryPermission</code> API</a></li>
+<li><a href="#the-copyfromdatalayer-api">The <code>copyFromDataLayer</code> API</a></li>
 <li><a href="#the-global-variable-apis">The &ldquo;global variable&rdquo; APIs</a></li>
 <li><a href="#the-maketablemap-api">The <code>makeTableMap</code> API</a></li>
 </ul></li>
@@ -2861,6 +2862,41 @@
 </code></pre></div>
 
 <p>The <code>setCookie()</code> API code is only run if the permissions allow you to write a cookie named <code>_gaClientId</code> on the domain <code>www.simoahava.com</code>. This is a good way to avoid your tag running into errors.</p>
+
+<h5 id="the-copyfromdatalayer-api">The <code>copyFromDataLayer</code> API</h5>
+
+<p><a href="https://developers.google.com/tag-manager/templates/api/#copyfromdatalayer">This API</a> is relatively straightforward - it fetches the item from GTM&rsquo;s data model that you requested. For example, to fetch the current value for <code>gtm.elementUrl</code>, you&rsquo;d run:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">copyFromDataLayer</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;copyFromDataLayer&#39;</span>);
+<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">clickUrl</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">copyFromDataLayer</span>(<span style="color:#e6db74">&#39;gtm.element&#39;</span>);
+</code></pre></div>
+
+<p>This code would fetch the value from the data model at the time that the tag was run.</p>
+
+<p>However, there&rsquo;s a very important <strong>catch</strong> here.</p>
+
+<p>If the template code fetching the <code>dataLayer</code> value is run <strong>asynchronously</strong> (e.g. with the <a href="https://developers.google.com/tag-manager/templates/api/#calllater"><code>callLater</code> API</a>), or if the tag built from the template is part of a <a href="https://www.simoahava.com/analytics/understanding-tag-sequencing-in-google-tag-manager/"><strong>tag sequence</strong></a>, the value fetched from <code>dataLayer</code> will be <strong>whatever is currently stored in the data model</strong>. In all other scenarios, the code is run synchronously, relative to the <code>dataLayer.push()</code>, so the value returned by <code>copyFromDataLayer</code> will reflect what was included in the pushed object.</p>
+
+<p>To illustrate, consider the following code executed on the site:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
+  <span style="color:#a6e22e">event</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;fire&#39;</span>,
+  <span style="color:#a6e22e">key</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;value&#39;</span>
+});
+
+window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
+  <span style="color:#a6e22e">event</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;fire&#39;</span>,
+  <span style="color:#a6e22e">key</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;otherValue&#39;</span>
+});
+</code></pre></div>
+
+<p>These two  <code>dataLayer.push()</code> calls are run one after the other. If you&rsquo;ve built a tag that fires on the &ldquo;fire&rdquo; event, and the template for that tag uses <code>copyFromDataLayer</code> to fetch the value for <code>key</code>, then in most cases it will always return whatever the value of <code>key</code> was during the trigger push.</p>
+
+<p>In other words, the first time the tag fires, <code>key</code> will be set to <code>value</code>, and the second time the tag fires, <code>key</code> will return <code>otherValue</code>. This is understandable, and it&rsquo;s how Google Tag Manager has always worked.</p>
+
+<p>However, if the template uses <code>copyFromDataLayer</code> in an asynchronous method, or if the tag is part of a sequence, then when the first tag fires, it&rsquo;s possible that <code>key</code> will actually return <code>otherValue</code>, because by the time the tag resolves that code, the second push will have happened and the values stored in GTM&rsquo;s data model will have been updated.</p>
+
+<p>This is something to be mindful of. I hope that we get the chance to control this behavior by providing a flag that lets us choose whether to use this asynchronous behavior or to fall back to the original, synchronous process.</p>
 
 <h5 id="the-global-variable-apis">The &ldquo;global variable&rdquo; APIs</h5>
 
