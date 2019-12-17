@@ -113,8 +113,6 @@
 
 <meta itemprop="name" content="Cross-domain Tracking Across Subdomains">
 <meta itemprop="description" content="Quick tip how cross-domain tracking to Google Analytics works across subdomains.">
-
-
 <meta itemprop="datePublished" content="2015-07-04T07:11:23&#43;00:00" />
 <meta itemprop="dateModified" content="2015-07-04T07:11:23&#43;00:00" />
 <meta itemprop="wordCount" content="716">
@@ -122,7 +120,6 @@
 
 
 <meta itemprop="keywords" content="" />
-
 <script type="application/ld+json">
 {
     "@context": "http://schema.org",
@@ -892,10 +889,7 @@ in
     </header>
 
     <section class="post-content">
-      
-
-<p>Wait. What? Why write an article about something that should work by default in <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/cross-domain">Universal Analytics</a>? I mean, here&rsquo;s a screenshot from the guide I just linked to in the previous sentence:</p>
-
+      <p>Wait. What? Why write an article about something that should work by default in <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/cross-domain">Universal Analytics</a>? I mean, here's a screenshot from the guide I just linked to in the previous sentence:</p>
 
 
     <a href="https://www.simoahava.com/amp/images/2015/07/developer-guide.jpg" title="Developer Guide for Cross-domain tracking">
@@ -905,13 +899,9 @@ in
     </a>
   
 
-
 <p>There it is. Clear as day: &ldquo;Tracking users across subdomains does not require any additional configuration.&rdquo; Also, some of the recent, <strong>excellent</strong> guides to cross-domain tracking, written by <a href="https://www.e-nor.com/blog/google-analytics/cross-domain-and-roll-up-reporting">E-Nor</a> and <a href="https://www.bounteous.com/insights/2015/06/16/cross-domain-tracking-with-google-tag-manager/">Bounteous</a> enforce the same: you just need a default Universal Analytics Tag in <a href="https://tagmanager.google.com">Google Tag Manager</a>.</p>
-
-<p>Well, unfortunately, that&rsquo;s not true. You do need a configuration setting, but it&rsquo;s thankfully very simple.</p>
-
+<p>Well, unfortunately, that's not true. You do need a configuration setting, but it's thankfully very simple.</p>
 <p><strong>TL;DR:</strong> In the <strong>Fields to Set</strong> of your Universal Analytics (Page View) Tag, add the following setting:</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2015/07/cookiedomain-auto.jpg" title="set cookieDomain auto for subdomain tracking">
@@ -921,19 +911,17 @@ in
     </a>
   
 
-
-<p>But since you&rsquo;re awesome, you didn&rsquo;t come here for the dirty truth, you want to know <em>why</em> this is necessary. So read on!</p>
-
+<p>But since you're awesome, you didn't come here for the dirty truth, you want to know <em>why</em> this is necessary. So read on!</p>
 <h2 id="how-universal-analytics-writes-cookies">How Universal Analytics writes cookies</h2>
-
 <p>To track the same user and session across any two pages, these pages require the following:</p>
-
 <ol>
-<li><p>A tracker object that tracks to the same Google Analytics Property ID (UA-XXXXXX-Y)</p></li>
-
-<li><p>A <code>_ga</code> cookie that has the same Client ID</p></li>
+<li>
+<p>A tracker object that tracks to the same Google Analytics Property ID (UA-XXXXXX-Y)</p>
+</li>
+<li>
+<p>A <code>_ga</code> cookie that has the same Client ID</p>
+</li>
 </ol>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2015/07/ga-cookie.jpg" title="_ga cookie">
@@ -943,66 +931,50 @@ in
     </a>
   
 
-
 <p>Client ID is what is used to stitch the hits in the session together, and also to stitch sessions the same user has had into a common level of aggregation (the GA concept of a <em>user</em>).</p>
-
-<p>Now, if you <strong>don&rsquo;t</strong> have any customizations in your Universal Analytics Tag, here&rsquo;s the logic with which cookies are written:</p>
-
+<p>Now, if you <strong>don't</strong> have any customizations in your Universal Analytics Tag, here's the logic with which cookies are written:</p>
 <ol>
-<li><p>If the hostname of the page (<a href="http://this">http://this</a> is the hostname/home/) starts with <strong>www.</strong>, the &ldquo;www&rdquo; is stripped, and the cookie is written on what remains. So, in the case of <strong>www.simoahava.com</strong>, the cookie is written on <strong>.simoahava.com</strong>.</p></li>
-
-<li><p>On all other hostnames, the cookie is written on the hostname itself, prefixed with a period. So, <strong>test.simoahava.com</strong> would retrieve a <code>_ga</code> cookie written on <strong>.test.simoahava.com</strong></p></li>
+<li>
+<p>If the hostname of the page (http://this is the hostname/home/) starts with <strong>www.</strong>, the &ldquo;www&rdquo; is stripped, and the cookie is written on what remains. So, in the case of <strong><a href="http://www.simoahava.com">www.simoahava.com</a></strong>, the cookie is written on <strong>.simoahava.com</strong>.</p>
+</li>
+<li>
+<p>On all other hostnames, the cookie is written on the hostname itself, prefixed with a period. So, <strong>test.simoahava.com</strong> would retrieve a <code>_ga</code> cookie written on <strong>.test.simoahava.com</strong></p>
+</li>
 </ol>
-
-<p>If prefixed with a period, like the <code>_ga</code> cookie is, the cookie can be used on all hostnames that <strong>contain this string</strong>. So the <em>.simoahava.com</em> cookie can be used by <strong>test.simoahava.com</strong>, <strong>www.simoahava.com</strong>, <strong>simoahava.com</strong>, and <strong>immortal.genius.simoahava.com</strong>, for example.</p>
-
-<p>The <em>.test.simoahava.com</em> cookie, on the other hand, can be used by <strong>www.test.simoahava.com</strong>, but not by <strong>www.simoahava.com</strong>, as the latter does not contain the string &ldquo;test.simoahava.com&rdquo;.</p>
-
-<p>Can you see where I&rsquo;m going with this?</p>
-
-<p><strong>If</strong> traffic is from www.simoahava.com to test.simoahava.com, the <code>_ga</code> cookie is shared, and all is well. Right?</p>
-
-<p>However, <strong>if</strong> the visitor first visits test.simoahava.com, and <em>then</em> moves to www.simoahava.com, these two domains will have <strong>different</strong> <code>_ga</code> cookies, and thus different Client IDs, and thus the user will be a different user with a new session!</p>
-
+<p>If prefixed with a period, like the <code>_ga</code> cookie is, the cookie can be used on all hostnames that <strong>contain this string</strong>. So the <em>.simoahava.com</em> cookie can be used by <strong>test.simoahava.com</strong>, <strong><a href="http://www.simoahava.com">www.simoahava.com</a></strong>, <strong>simoahava.com</strong>, and <strong>immortal.genius.simoahava.com</strong>, for example.</p>
+<p>The <em>.test.simoahava.com</em> cookie, on the other hand, can be used by <strong><a href="http://www.test.simoahava.com">www.test.simoahava.com</a></strong>, but not by <strong><a href="http://www.simoahava.com">www.simoahava.com</a></strong>, as the latter does not contain the string &ldquo;test.simoahava.com&rdquo;.</p>
+<p>Can you see where I'm going with this?</p>
+<p><strong>If</strong> traffic is from <a href="http://www.simoahava.com">www.simoahava.com</a> to test.simoahava.com, the <code>_ga</code> cookie is shared, and all is well. Right?</p>
+<p>However, <strong>if</strong> the visitor first visits test.simoahava.com, and <em>then</em> moves to <a href="http://www.simoahava.com,">www.simoahava.com,</a> these two domains will have <strong>different</strong> <code>_ga</code> cookies, and thus different Client IDs, and thus the user will be a different user with a new session!</p>
 <p>So clearly, in many, many cases, this will lead to problems. We need to somehow ensure that the <code>_ga</code> cookie is <strong>always</strong> written on <strong>.simoahava.com</strong>, so that it can be used by all subdomains, regardless of if they have &ldquo;www.&rdquo; or something else as a prefix.</p>
-
-<h2 id="cookiedomain-auto">cookieDomain : auto</h2>
-
-<p>The answer is in the <strong>cookieDomain</strong> setting. When you set cookieDomain to <strong>auto</strong>, the following will happen with a (fictional) domain like <em>www.simoahava.co.uk</em>:</p>
-
+<h2 id="cookiedomain--auto">cookieDomain : auto</h2>
+<p>The answer is in the <strong>cookieDomain</strong> setting. When you set cookieDomain to <strong>auto</strong>, the following will happen with a (fictional) domain like _<a href="http://www.simoahava.co.uk_:">www.simoahava.co.uk_:</a></p>
 <ol>
-<li><p>GA tries to write the cookie on <strong>.co.uk</strong>, which is the first possible root domain candidate. This fails because the browser is not authorized to write a cookie on a top-level domain like that.</p></li>
-
-<li><p>Next, GA tries to write the cookie on <strong>.simoahava.co.uk</strong>, which is the next possible root domain candidate. This works because that&rsquo;s a valid domain to write the cookie on.</p></li>
+<li>
+<p>GA tries to write the cookie on <strong>.co.uk</strong>, which is the first possible root domain candidate. This fails because the browser is not authorized to write a cookie on a top-level domain like that.</p>
+</li>
+<li>
+<p>Next, GA tries to write the cookie on <strong>.simoahava.co.uk</strong>, which is the next possible root domain candidate. This works because that's a valid domain to write the cookie on.</p>
+</li>
 </ol>
-
-<p>So there&rsquo;s a recursive algorithm, which tries to write the cookie, starting from the most generic domain-level (the top-level domain), and stopping once it succeeds. What should be left is the <em>root domain</em>, and thus the cookie will be available to all subdomains.</p>
-
+<p>So there's a recursive algorithm, which tries to write the cookie, starting from the most generic domain-level (the top-level domain), and stopping once it succeeds. What should be left is the <em>root domain</em>, and thus the cookie will be available to all subdomains.</p>
 <p>Yay!</p>
-
 <h2 id="the-new-and-improved-recommendation">The new and improved recommendation</h2>
-
-<p>Here&rsquo;s the improved recommendation for <strong>cross-domain tracking across subdomains</strong>:</p>
-
-<p><strong>Always</strong> default to having <strong>cookieDomain : auto</strong> in your tracker settings. In GTM, I&rsquo;ve shown an example in the beginning of the post.</p>
-
+<p>Here's the improved recommendation for <strong>cross-domain tracking across subdomains</strong>:</p>
+<p><strong>Always</strong> default to having <strong>cookieDomain : auto</strong> in your tracker settings. In GTM, I've shown an example in the beginning of the post.</p>
 <p>In the Universal Analytics tracking code, the snippet would look like this:</p>
+<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">script</span><span class="p"></span><span class="p">&gt;</span>
+  <span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">i</span><span class="p">,</span><span class="nx">s</span><span class="p">,</span><span class="nx">o</span><span class="p">,</span><span class="nx">g</span><span class="p">,</span><span class="nx">r</span><span class="p">,</span><span class="nx">a</span><span class="p">,</span><span class="nx">m</span><span class="p">)</span><span class="p">{</span><span class="nx">i</span><span class="p">[</span><span class="s1">&#39;GoogleAnalyticsObject&#39;</span><span class="p">]</span><span class="o">=</span><span class="nx">r</span><span class="p">;</span><span class="nx">i</span><span class="p">[</span><span class="nx">r</span><span class="p">]</span><span class="o">=</span><span class="nx">i</span><span class="p">[</span><span class="nx">r</span><span class="p">]</span><span class="o">||</span><span class="kd">function</span><span class="p">(</span><span class="p">)</span><span class="p">{</span>
+  <span class="p">(</span><span class="nx">i</span><span class="p">[</span><span class="nx">r</span><span class="p">]</span><span class="p">.</span><span class="nx">q</span><span class="o">=</span><span class="nx">i</span><span class="p">[</span><span class="nx">r</span><span class="p">]</span><span class="p">.</span><span class="nx">q</span><span class="o">||</span><span class="p">[</span><span class="p">]</span><span class="p">)</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">arguments</span><span class="p">)</span><span class="p">}</span><span class="p">,</span><span class="nx">i</span><span class="p">[</span><span class="nx">r</span><span class="p">]</span><span class="p">.</span><span class="nx">l</span><span class="o">=</span><span class="mi">1</span><span class="o">*</span><span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="p">)</span><span class="p">;</span><span class="nx">a</span><span class="o">=</span><span class="nx">s</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="nx">o</span><span class="p">)</span><span class="p">,</span>
+  <span class="nx">m</span><span class="o">=</span><span class="nx">s</span><span class="p">.</span><span class="nx">getElementsByTagName</span><span class="p">(</span><span class="nx">o</span><span class="p">)</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="p">;</span><span class="nx">a</span><span class="p">.</span><span class="nx">async</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span><span class="nx">a</span><span class="p">.</span><span class="nx">src</span><span class="o">=</span><span class="nx">g</span><span class="p">;</span><span class="nx">m</span><span class="p">.</span><span class="nx">parentNode</span><span class="p">.</span><span class="nx">insertBefore</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="nx">m</span><span class="p">)</span>
+  <span class="p">}</span><span class="p">)</span><span class="p">(</span><span class="nb">window</span><span class="p">,</span><span class="nb">document</span><span class="p">,</span><span class="s1">&#39;script&#39;</span><span class="p">,</span><span class="s1">&#39;//www.google-analytics.com/analytics.js&#39;</span><span class="p">,</span><span class="s1">&#39;ga&#39;</span><span class="p">)</span><span class="p">;</span>
 
-<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
-  <span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">i</span><span class="p">,</span><span class="nx">s</span><span class="p">,</span><span class="nx">o</span><span class="p">,</span><span class="nx">g</span><span class="p">,</span><span class="nx">r</span><span class="p">,</span><span class="nx">a</span><span class="p">,</span><span class="nx">m</span><span class="p">){</span><span class="nx">i</span><span class="p">[</span><span class="s1">&#39;GoogleAnalyticsObject&#39;</span><span class="p">]</span><span class="o">=</span><span class="nx">r</span><span class="p">;</span><span class="nx">i</span><span class="p">[</span><span class="nx">r</span><span class="p">]</span><span class="o">=</span><span class="nx">i</span><span class="p">[</span><span class="nx">r</span><span class="p">]</span><span class="o">||</span><span class="kd">function</span><span class="p">(){</span>
-  <span class="p">(</span><span class="nx">i</span><span class="p">[</span><span class="nx">r</span><span class="p">].</span><span class="nx">q</span><span class="o">=</span><span class="nx">i</span><span class="p">[</span><span class="nx">r</span><span class="p">].</span><span class="nx">q</span><span class="o">||</span><span class="p">[]).</span><span class="nx">push</span><span class="p">(</span><span class="nx">arguments</span><span class="p">)},</span><span class="nx">i</span><span class="p">[</span><span class="nx">r</span><span class="p">].</span><span class="nx">l</span><span class="o">=</span><span class="mi">1</span><span class="o">*</span><span class="k">new</span> <span class="nb">Date</span><span class="p">();</span><span class="nx">a</span><span class="o">=</span><span class="nx">s</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="nx">o</span><span class="p">),</span>
-  <span class="nx">m</span><span class="o">=</span><span class="nx">s</span><span class="p">.</span><span class="nx">getElementsByTagName</span><span class="p">(</span><span class="nx">o</span><span class="p">)[</span><span class="mi">0</span><span class="p">];</span><span class="nx">a</span><span class="p">.</span><span class="nx">async</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span><span class="nx">a</span><span class="p">.</span><span class="nx">src</span><span class="o">=</span><span class="nx">g</span><span class="p">;</span><span class="nx">m</span><span class="p">.</span><span class="nx">parentNode</span><span class="p">.</span><span class="nx">insertBefore</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="nx">m</span><span class="p">)</span>
-  <span class="p">})(</span><span class="nb">window</span><span class="p">,</span><span class="nb">document</span><span class="p">,</span><span class="s1">&#39;script&#39;</span><span class="p">,</span><span class="s1">&#39;//www.google-analytics.com/analytics.js&#39;</span><span class="p">,</span><span class="s1">&#39;ga&#39;</span><span class="p">);</span>
-
-  <span class="nx">ga</span><span class="p">(</span><span class="s1">&#39;create&#39;</span><span class="p">,</span> <span class="s1">&#39;UA-40669554-1&#39;</span><span class="p">,</span> <span class="s1">&#39;auto&#39;</span><span class="p">);</span>
-  <span class="nx">ga</span><span class="p">(</span><span class="s1">&#39;send&#39;</span><span class="p">,</span> <span class="s1">&#39;pageview&#39;</span><span class="p">);</span>
-<span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span></code></pre></div>
-
+  <span class="nx">ga</span><span class="p">(</span><span class="s1">&#39;create&#39;</span><span class="p">,</span> <span class="s1">&#39;UA-40669554-1&#39;</span><span class="p">,</span> <span class="s1">&#39;auto&#39;</span><span class="p">)</span><span class="p">;</span>
+  <span class="nx">ga</span><span class="p">(</span><span class="s1">&#39;send&#39;</span><span class="p">,</span> <span class="s1">&#39;pageview&#39;</span><span class="p">)</span><span class="p">;</span>
+<span class="p">&lt;</span><span class="p">/</span><span class="nt">script</span><span class="p">&gt;</span></code></pre></div>
 <p>This is, actually, what the Google Analytics Tracking Code, if copy-pasted from the Property settings, offers by default, so all is well if you use this.</p>
-
 <p>Personally, I think the setting should <strong>always</strong> default to &ldquo;auto&rdquo; unless explicitly changed to some other value.</p>
-
-<p>Here&rsquo;s <a href="https://plus.google.com/+SimoAhava/posts/SRyGbcaK4hF">a thread in Google+</a> which inspired me to write this post.</p>
+<p>Here's <a href="https://plus.google.com/+SimoAhava/posts/SRyGbcaK4hF">a thread in Google+</a> which inspired me to write this post.</p>
 
     </section>
 

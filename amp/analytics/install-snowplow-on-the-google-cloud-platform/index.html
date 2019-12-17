@@ -123,16 +123,13 @@
 
 <meta itemprop="name" content="Install Snowplow On The Google Cloud Platform">
 <meta itemprop="description" content="A walkthrough for deploying the Snowplow Analytics pipeline in the Google Cloud Platform environment.">
-
-
 <meta itemprop="datePublished" content="2018-12-06T07:00:22&#43;02:00" />
 <meta itemprop="dateModified" content="2018-12-06T07:00:22&#43;02:00" />
-<meta itemprop="wordCount" content="8155">
+<meta itemprop="wordCount" content="8156">
 
 
 
 <meta itemprop="keywords" content="google tag manager,snowplow,google cloud,gcp," />
-
 <script type="application/ld+json">
 {
     "@context": "http://schema.org",
@@ -913,12 +910,8 @@ on
     </header>
 
     <section class="post-content">
-      
-
-<p><em>Last updated 18 Jan 2019: Added details about the <strong>free tier</strong> limitations, and showed how to avoid the Dataflow jobs <strong>auto-scaling</strong> out of control.</em></p>
-
-<p>I&rsquo;m (still) a huge fan of <a href="https://snowplowanalytics.com/">Snowplow Analytics</a>. Their open-source, modular approach to DIY analytics pipelines has inspired me two write <a href="https://www.simoahava.com/amp/tags/snowplow/">articles</a> about them, and to host a <a href="https://www.meetup.com/Snowplow-Analytics-Helsinki/">meetup</a> in Helsinki. In my previous <a href="https://www.simoahava.com/amp/analytics/snowplow-full-setup-with-google-analytics-tracking/">Snowplow with Amazon Web Services guide</a>, I walked you through setting up a Snowplow pipeline using <a href="https://aws.amazon.com/">Amazon Web Services</a>. This time around, I&rsquo;m looking at the wondrous <a href="https://cloud.google.com">Google Cloud Platform</a>, for which Snowplow introduced support in an <a href="https://snowplowanalytics.com/blog/2018/03/21/snowplow-r101-neapolis-with-initial-gcp-support/">early 2018 release</a>.</p>
-
+      <p><em>Last updated 18 Jan 2019: Added details about the <strong>free tier</strong> limitations, and showed how to avoid the Dataflow jobs <strong>auto-scaling</strong> out of control.</em></p>
+<p>I'm (still) a huge fan of <a href="https://snowplowanalytics.com/">Snowplow Analytics</a>. Their open-source, modular approach to DIY analytics pipelines has inspired me two write <a href="https://www.simoahava.com/amp/tags/snowplow/">articles</a> about them, and to host a <a href="https://www.meetup.com/Snowplow-Analytics-Helsinki/">meetup</a> in Helsinki. In my previous <a href="https://www.simoahava.com/amp/analytics/snowplow-full-setup-with-google-analytics-tracking/">Snowplow with Amazon Web Services guide</a>, I walked you through setting up a Snowplow pipeline using <a href="https://aws.amazon.com/">Amazon Web Services</a>. This time around, I'm looking at the wondrous <a href="https://cloud.google.com">Google Cloud Platform</a>, for which Snowplow introduced support in an <a href="https://snowplowanalytics.com/blog/2018/03/21/snowplow-r101-neapolis-with-initial-gcp-support/">early 2018 release</a>.</p>
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/snowplow-gcp.jpg" title="Snowplow on the Google Cloud Platform">
@@ -928,13 +921,9 @@ on
     </a>
   
 
-
-<p>I won&rsquo;t be offering a comprehensive comparison between GCP and AWS, nor will I walk you through every single possible customization you could do when firing up the instances and building the pipeline. Those are left for you to discover by yourself, or to consult a data engineer who can help you with scale.</p>
-
-<p>In fact, the setup I&rsquo;ll walk you through will be suboptimal in many places. It won&rsquo;t be the most robust setup for a large flow of data through the pipeline, but what it will provide you is the comprehensive list of steps you need to make to get things running.</p>
-
-<p>Note that Snowplow also offers their own <a href="https://snowplowanalytics.com/products/snowplow-insights/">Snowplow Insights</a> service for setting up and managing the pipeline so that you can jump straight into data collection and analysis. I <strong>really</strong> recommend this service especially if you are unsure about how to set up the pipeline in an economical and scalable way. You might accrue a lot of extra costs if you don&rsquo;t know how to scale the required resources to suit what you actually need for efficient analysis.</p>
-
+<p>I won't be offering a comprehensive comparison between GCP and AWS, nor will I walk you through every single possible customization you could do when firing up the instances and building the pipeline. Those are left for you to discover by yourself, or to consult a data engineer who can help you with scale.</p>
+<p>In fact, the setup I'll walk you through will be suboptimal in many places. It won't be the most robust setup for a large flow of data through the pipeline, but what it will provide you is the comprehensive list of steps you need to make to get things running.</p>
+<p>Note that Snowplow also offers their own <a href="https://snowplowanalytics.com/products/snowplow-insights/">Snowplow Insights</a> service for setting up and managing the pipeline so that you can jump straight into data collection and analysis. I <strong>really</strong> recommend this service especially if you are unsure about how to set up the pipeline in an economical and scalable way. You might accrue a lot of extra costs if you don't know how to scale the required resources to suit what you actually need for efficient analysis.</p>
 
 
     <a href="https://www.simoahava.com/amp/images/2018/12/snowplow-insights.jpg" title="Snowplow insights">
@@ -944,11 +933,8 @@ on
     </a>
   
 
-
 <p>You can also follow the official <a href="https://github.com/snowplow/snowplow/wiki/GCP:-Getting-Started">Snowplow wiki</a>, if you wish. The steps are similar to what I go through in this guide, though I do think this guide will be better suited for you in case you are unfamiliar with how GCP works.</p>
-
-<!-- toc -->
-
+<!-- raw HTML omitted -->
 
 
     <a href="https://www.simoahava.com/amp/images/2018/12/full-process.jpg" title="Full process">
@@ -958,17 +944,12 @@ on
     </a>
   
 
-
 <p>My Powerpoint visualization skills just get better and better each passing year!</p>
-
 <h2 id="word-of-warning">Word of warning</h2>
-
-<p>This probably won&rsquo;t come as a surprise to you, but working with a cloud platform is <strong>not free of charge</strong>. If you&rsquo;re a first-time user, you should be eligible for the <a href="https://cloud.google.com/free/">free trial</a> of $300 to be spent during the first 12 months. This is more than enough to build a pipeline and test it out over a number of days, but it won&rsquo;t get you far.</p>
-
+<p>This probably won't come as a surprise to you, but working with a cloud platform is <strong>not free of charge</strong>. If you're a first-time user, you should be eligible for the <a href="https://cloud.google.com/free/">free trial</a> of $300 to be spent during the first 12 months. This is more than enough to build a pipeline and test it out over a number of days, but it won't get you far.</p>
 <blockquote>
-<p><strong>UPDATE 18 Jan 2019</strong>: The free tier only gives you <strong>8 CPUs</strong> <em>total</em> across your entire project. That means that you must keep count of all the instances you&rsquo;ll be using for the collector and for the ETL machine. Start with a low number, e.g. 1 or 2 CPUs per instance to see how Snowplow works. Once you have the budget, you can shoot for more ambitious setups.</p>
+<p><strong>UPDATE 18 Jan 2019</strong>: The free tier only gives you <strong>8 CPUs</strong> <em>total</em> across your entire project. That means that you must keep count of all the instances you'll be using for the collector and for the ETL machine. Start with a low number, e.g. 1 or 2 CPUs per instance to see how Snowplow works. Once you have the budget, you can shoot for more ambitious setups.</p>
 </blockquote>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/12/billing-dashboard.jpg" title="Billing dashboard">
@@ -978,33 +959,26 @@ on
     </a>
   
 
-
-<p>You&rsquo;ll need to keep a close eye on the <a href="https://console.cloud.google.com/billing/">billing dashboard</a> of your project. It helps you get an idea of how much cost you have factually accumulated to this day, and what the projected cost for the whole month will be.</p>
-
-<h2 id="what-you-ll-need">What you&rsquo;ll need</h2>
-
+<p>You'll need to keep a close eye on the <a href="https://console.cloud.google.com/billing/">billing dashboard</a> of your project. It helps you get an idea of how much cost you have factually accumulated to this day, and what the projected cost for the whole month will be.</p>
+<h2 id="what-youll-need">What you'll need</h2>
 <p>To follow this guide, you will need:</p>
-
 <ul>
-<li><p><strong>A Google account</strong> - something to log into Google services with, such as your Google Mail ID.</p></li>
-
-<li><p><strong>A credit card</strong> - you&rsquo;ll need to enable billing in your Google Cloud account to fire up some of the services we need.</p></li>
-
-<li><p><strong>A custom domain name</strong> - this is optional, but it&rsquo;s necessary if you want to set up the tracker as a secure HTTPS endpoint. Without a custom domain name, you&rsquo;re forced to use HTTP only. You can get a cheap domain name from <a href="https://domains.google/">Google Domains</a>. You <em>might</em> be able to set something up for free using <a href="https://cloud.google.com/endpoints/">Cloud Endpoints</a>, but this guide will not cover this.</p></li>
+<li>
+<p><strong>A Google account</strong> - something to log into Google services with, such as your Google Mail ID.</p>
+</li>
+<li>
+<p><strong>A credit card</strong> - you'll need to enable billing in your Google Cloud account to fire up some of the services we need.</p>
+</li>
+<li>
+<p><strong>A custom domain name</strong> - this is optional, but it's necessary if you want to set up the tracker as a secure HTTPS endpoint. Without a custom domain name, you're forced to use HTTP only. You can get a cheap domain name from <a href="https://domains.google/">Google Domains</a>. You <em>might</em> be able to set something up for free using <a href="https://cloud.google.com/endpoints/">Cloud Endpoints</a>, but this guide will not cover this.</p>
+</li>
 </ul>
-
 <p>Good luck! Let me know in the comments if some part of this guide was particularly unclear.</p>
-
 <h2 id="first-steps">First steps</h2>
-
-<p>Here we&rsquo;ll setup the GCP project, make sure you have the necessary resources enabled, and we&rsquo;ll also install the Google Cloud SDK so that you can interact with your project via your local terminal, too.</p>
-
+<p>Here we'll setup the GCP project, make sure you have the necessary resources enabled, and we'll also install the Google Cloud SDK so that you can interact with your project via your local terminal, too.</p>
 <h3 id="step-1-set-up-a-new-project">Step 1: Set up a new project</h3>
-
-<p>The first thing you&rsquo;ll need to do is set up a new Google Cloud project.</p>
-
-<p><strong>(1)</strong> Browse to <a href="https://console.cloud.google.com/cloud-resource-manager/">https://console.cloud.google.com/cloud-resource-manager/</a>. Remember to login with the Google ID which you&rsquo;ll use to manage this project. Click <strong>CREATE PROJECT</strong>.</p>
-
+<p>The first thing you'll need to do is set up a new Google Cloud project.</p>
+<p><strong>(1)</strong> Browse to <a href="https://console.cloud.google.com/cloud-resource-manager/">https://console.cloud.google.com/cloud-resource-manager/</a>. Remember to login with the Google ID which you'll use to manage this project. Click <strong>CREATE PROJECT</strong>.</p>
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/gcp-create-project.jpg" title="Create GCP project">
@@ -1014,19 +988,13 @@ on
     </a>
   
 
-
 <blockquote>
 <p>If this is the first time you use GCP with this account, you might see an offer for <strong>free credit</strong>. Take it!</p>
 </blockquote>
-
 <p><strong>(2)</strong> Give the project a name.</p>
-
 <p>For convenience, it might be good to change the <strong>Project ID</strong> to something more legible and easy to understand.</p>
-
 <p>If you have <strong>Organizations</strong> and <strong>Locations</strong> (such as folders) set up for your Google Cloud account, choose the appropriate ones from the menu.</p>
-
 <p>Also, if you already have a <strong>Billing Account</strong> set up, choose that as well from the respective drop-down menu.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/create-new-project.jpg" title="Create new project">
@@ -1036,11 +1004,8 @@ on
     </a>
   
 
-
-<p>Choose <strong>CREATE</strong> when you&rsquo;re done.</p>
-
-<p>After clicking the button, GCP will do some loading and spinning for a while, after which you should see your new project dashboard. If you don&rsquo;t, make sure to select it from the project selector menu.</p>
-
+<p>Choose <strong>CREATE</strong> when you're done.</p>
+<p>After clicking the button, GCP will do some loading and spinning for a while, after which you should see your new project dashboard. If you don't, make sure to select it from the project selector menu.</p>
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/gcp-dashboard.jpg" title="GCP dashboard">
@@ -1050,17 +1015,11 @@ on
     </a>
   
 
-
-<p>Congratulations! You&rsquo;ve created the project.</p>
-
+<p>Congratulations! You've created the project.</p>
 <h3 id="step-2-enable-billing">Step 2: Enable Billing</h3>
-
-<p>You&rsquo;ll need to create a <strong>billing account</strong> so that GCP can invoice you if necessary (sucks, I know).</p>
-
+<p>You'll need to create a <strong>billing account</strong> so that GCP can invoice you if necessary (sucks, I know).</p>
 <p><strong>(1)</strong> Browse to <a href="https://console.cloud.google.com/billing">https://console.cloud.google.com/billing</a>.</p>
-
 <p><strong>(2)</strong> Click <strong>Add billing account</strong>.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/add-billing-account.jpg" title="Add billing account">
@@ -1070,19 +1029,12 @@ on
     </a>
   
 
-
-<p>Here, follow the steps to add your credit card, or, if you&rsquo;re eligible for the <strong>free trial</strong>, to activate your free trial.</p>
-
+<p>Here, follow the steps to add your credit card, or, if you're eligible for the <strong>free trial</strong>, to activate your free trial.</p>
 <p>Make sure you follow the prompts to link your Snowpow project to the Billing account you just created.</p>
-
 <h3 id="step-3-enable-the-required-services">Step 3: Enable the required services</h3>
-
-<p>Next, you need to enable the services and APIs we&rsquo;ll need to get started. These steps let you set up the collector. When you move to the <a href="#prepare-the-etl-step">enrich and BigQuery load steps</a>, you&rsquo;ll need to enable additional services.</p>
-
+<p>Next, you need to enable the services and APIs we'll need to get started. These steps let you set up the collector. When you move to the <a href="#prepare-the-etl-step">enrich and BigQuery load steps</a>, you'll need to enable additional services.</p>
 <p><strong>(1)</strong> Browse to <a href="https://console.cloud.google.com/apis/library">https://console.cloud.google.com/apis/library</a>.</p>
-
-<p>You should see a search bar, so start by searching for <strong>Compute Engine API</strong> and click the relevant result. We&rsquo;ll need the Compute Engine to fire up our virtual machines on which the Snowplow collector will reside.</p>
-
+<p>You should see a search bar, so start by searching for <strong>Compute Engine API</strong> and click the relevant result. We'll need the Compute Engine to fire up our virtual machines on which the Snowplow collector will reside.</p>
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/compute-engine-api.jpg" title="Compute Engine API">
@@ -1092,9 +1044,7 @@ on
     </a>
   
 
-
 <p>Upon entering the Compute Engine API page, simply click the blue <strong>ENABLE</strong> button at the top.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/compute-engine-api-enable.jpg" title="Enable the Compute Engine API">
@@ -1104,9 +1054,7 @@ on
     </a>
   
 
-
-<p>Once it&rsquo;s done, you should see something like this where the <strong>Enable</strong> button used to be:</p>
-
+<p>Once it's done, you should see something like this where the <strong>Enable</strong> button used to be:</p>
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/compute-engine-api-enabled.jpg" title="Compute Engine API enabled">
@@ -1116,9 +1064,7 @@ on
     </a>
   
 
-
-<p>Now, follow these exact same steps for the <strong>Cloud Pub/Sub API</strong>. Pub/Sub (for <strong>Pub</strong>lisher/<strong>Sub</strong>scriber) is a real-time message queue we&rsquo;ll use to process the data fed into the Snowplow pipeline.</p>
-
+<p>Now, follow these exact same steps for the <strong>Cloud Pub/Sub API</strong>. Pub/Sub (for <strong>Pub</strong>lisher/<strong>Sub</strong>scriber) is a real-time message queue we'll use to process the data fed into the Snowplow pipeline.</p>
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/enable-pub-sub-api.jpg" title="Enable the Pub/Sub API">
@@ -1128,22 +1074,14 @@ on
     </a>
   
 
-
-<p>Once you&rsquo;re done enabling these services, you&rsquo;re ready to move onto the next step!</p>
-
+<p>Once you're done enabling these services, you're ready to move onto the next step!</p>
 <h3 id="step-4-install-the-google-cloud-sdk">Step 4: Install the Google Cloud SDK</h3>
-
-<p>The next thing you&rsquo;ll want to do is to install the Google Cloud SDK locally in your machine. It&rsquo;s very convenient because it lets you access your GCP project from the command line, and it lets you test some of the services from your local machine rather than having to find the appropriate paths through the often confusing UI.</p>
-
+<p>The next thing you'll want to do is to install the Google Cloud SDK locally in your machine. It's very convenient because it lets you access your GCP project from the command line, and it lets you test some of the services from your local machine rather than having to find the appropriate paths through the often confusing UI.</p>
 <p>To install the SDK, follow the steps for your platform, starting from <a href="https://cloud.google.com/sdk/">here</a>.</p>
-
-<p>Once you&rsquo;ve installed the SDK, you should be able to run these commands in your terminal / shell:</p>
-
+<p>Once you've installed the SDK, you should be able to run these commands in your terminal / shell:</p>
 <div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ gcloud auth login
 $ gcloud config <span class="nb">set</span> project PROJECT_ID</code></pre></div>
-
-<p>The first command logs you in with Google Cloud using the Google Account you choose in the web prompt. The second command points the current <code>gcloud</code> setup to the project ID you&rsquo;ll give (replace <code>PROJECT_ID</code> with the ID you configured when you created the project). The end result should be something like this:</p>
-
+<p>The first command logs you in with Google Cloud using the Google Account you choose in the web prompt. The second command points the current <code>gcloud</code> setup to the project ID you'll give (replace <code>PROJECT_ID</code> with the ID you configured when you created the project). The end result should be something like this:</p>
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/gcloud-set-project.jpg" title="Gcloud SDK setup">
@@ -1153,21 +1091,14 @@ $ gcloud config <span class="nb">set</span> project PROJECT_ID</code></pre></div
     </a>
   
 
-
 <h3 id="step-5-setup-a-service-account">Step 5: Setup a service account</h3>
-
-<p>The final initialization step is to setup a <strong>service account</strong>. A service account is basically a Google Cloud account which has full access to your GCP services and resources. It&rsquo;s a necessary step if you want to run services on GCP programmatically rather than with your own, personal Google account.</p>
-
+<p>The final initialization step is to setup a <strong>service account</strong>. A service account is basically a Google Cloud account which has full access to your GCP services and resources. It's a necessary step if you want to run services on GCP programmatically rather than with your own, personal Google account.</p>
 <blockquote>
 <p>Note that when you enable <strong>Compute Engine API</strong> for your project, a <strong>Compute Engine default service account</strong> is created for you automatically. the steps below really only apply if you wanted to create a different service account for your pipeline.</p>
 </blockquote>
-
 <p><strong>(1)</strong> Browse to <a href="https://console.cloud.google.com/apis/credentials">https://console.cloud.google.com/apis/credentials</a>.</p>
-
 <p><strong>(2)</strong> Make sure you have the correct project selected in the project selector menu.</p>
-
 <p><strong>(3)</strong> Click the blue <strong>Create credentials</strong> selector, and choose <strong>Service account key</strong> from the menu.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/create-credentials.jpg" title="Create credentials">
@@ -1177,9 +1108,7 @@ $ gcloud config <span class="nb">set</span> project PROJECT_ID</code></pre></div
     </a>
   
 
-
-<p>Since you&rsquo;ve enabled the <strong>Compute Engine API</strong>, you should be able to choose the default GCE service account from the drop-down.</p>
-
+<p>Since you've enabled the <strong>Compute Engine API</strong>, you should be able to choose the default GCE service account from the drop-down.</p>
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/default-service-account.jpg" title="Default service account">
@@ -1189,19 +1118,13 @@ $ gcloud config <span class="nb">set</span> project PROJECT_ID</code></pre></div
     </a>
   
 
-
 <p>Keep the <strong>JSON</strong> option selected, and choose <strong>Create</strong>.</p>
-
 <p>The browser should automatically download the JSON file, so make sure you find it in your local files and <strong>store it securely</strong>.</p>
-
 <blockquote>
-<p>At this point, it would be a good idea <strong>to create a local folder for this entire Snowplow experiment</strong>. In that local folder, you can store this service account key and any temporary configuration files you&rsquo;ll work on, and other stuff such as executables and binaries you&rsquo;ll eventually upload to the GCP, if necessary.</p>
+<p>At this point, it would be a good idea <strong>to create a local folder for this entire Snowplow experiment</strong>. In that local folder, you can store this service account key and any temporary configuration files you'll work on, and other stuff such as executables and binaries you'll eventually upload to the GCP, if necessary.</p>
 </blockquote>
-
-<p>Once you&rsquo;ve created the service account you are ready to move on. All the initial steps have now been completed, congratulations!</p>
-
-<h2 id="setting-up-the-pub-sub-topics">Setting up the Pub/Sub topics</h2>
-
+<p>Once you've created the service account you are ready to move on. All the initial steps have now been completed, congratulations!</p>
+<h2 id="setting-up-the-pubsub-topics">Setting up the Pub/Sub topics</h2>
 
 
     <a href="https://www.simoahava.com/amp/images/2018/12/pubsub-process.jpg" title="Pub/sub process">
@@ -1211,23 +1134,14 @@ $ gcloud config <span class="nb">set</span> project PROJECT_ID</code></pre></div
     </a>
   
 
-
 <p>Snowplow uses a <strong>collector</strong> as the endpoint of your tracker requests. This collector resides in a Compute Engine instance (a virtual machine, basically), and it processes the requests you send to the endpoint.</p>
-
 <p>These requests are then published into <strong>Pub/Sub topics</strong>, from where they are then passed on further down the pipeline for enrichment and parsing. Pub/Sub is essentially a real-time messaging pipeline, which collects messages in <strong>topics</strong>, which are then available for <strong>subscriptions</strong> to access.</p>
-
-<p>Make sure you check out Snowplow&rsquo;s official <a href="https://github.com/snowplow/snowplow/wiki/GCP:-Setting-up-the-Scala-Stream-Collector">wiki</a> for more information on this part of the pipeline.</p>
-
-<h3 id="step-1-create-the-pub-sub-topics">Step 1: Create the Pub/Sub topics</h3>
-
-<p>The first thing you&rsquo;ll need to do is create <strong>topics</strong> in the Pub/Sub you&rsquo;ve enabled for your project.</p>
-
+<p>Make sure you check out Snowplow's official <a href="https://github.com/snowplow/snowplow/wiki/GCP:-Setting-up-the-Scala-Stream-Collector">wiki</a> for more information on this part of the pipeline.</p>
+<h3 id="step-1-create-the-pubsub-topics">Step 1: Create the Pub/Sub topics</h3>
+<p>The first thing you'll need to do is create <strong>topics</strong> in the Pub/Sub you've enabled for your project.</p>
 <p><strong>(1)</strong> Browse to <a href="https://console.cloud.google.com/cloudpubsub/topicList">https://console.cloud.google.com/cloudpubsub/topicList</a>.</p>
-
 <p><strong>(2)</strong> Make sure you have the correct project selected in the project selector.</p>
-
 <p><strong>(3)</strong> Click the blue <strong>Create a topic</strong> button.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/create-a-pubsub-topic.jpg" title="create a topic">
@@ -1237,9 +1151,7 @@ $ gcloud config <span class="nb">set</span> project PROJECT_ID</code></pre></div
     </a>
   
 
-
 <p><strong>(4)</strong> Type <code>good</code> after the project path as in the screenshot below, and click <strong>CREATE</strong>.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/good-topic.jpg" title="Good topic">
@@ -1249,9 +1161,7 @@ $ gcloud config <span class="nb">set</span> project PROJECT_ID</code></pre></div
     </a>
   
 
-
 <p><strong>(5)</strong> Click <strong>CREATE TOPIC</strong> and type <code>bad</code> as the name of the new topic, and then click <strong>CREATE</strong>.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/create-bad-topic.jpg" title="Bad topic">
@@ -1261,17 +1171,11 @@ $ gcloud config <span class="nb">set</span> project PROJECT_ID</code></pre></div
     </a>
   
 
-
 <p>Snowplow uses these two topics to filter out hits and requests that validate (<code>good</code> stream) and those that have issues and errors (<code>bad</code> stream).</p>
-
 <h3 id="step-2-create-a-subscription-optional">Step 2: Create a subscription (optional)</h3>
-
 <p>Next, you can create a <strong>subscription</strong> with which you can test the stream. This is optional, but might be a good idea if you want to see how the pipeline is working.</p>
-
 <p><strong>(6)</strong> Click the <code>good</code> topic to enter its configuration page.</p>
-
 <p><strong>(7)</strong> Choose <strong>CREATE SUBSCRIPTION</strong> from the top navigation.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/create-subscription.jpg" title="Create subscription">
@@ -1281,11 +1185,8 @@ $ gcloud config <span class="nb">set</span> project PROJECT_ID</code></pre></div
     </a>
   
 
-
 <p><strong>(8)</strong> Give the subscription a name (<code>test-good</code>).</p>
-
 <p><strong>(9)</strong> Leave the other settings as they are, and click <strong>CREATE</strong>.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/test-good-subscription.jpg" title="Test good subscription">
@@ -1295,11 +1196,8 @@ $ gcloud config <span class="nb">set</span> project PROJECT_ID</code></pre></div
     </a>
   
 
-
-<p>Now that you&rsquo;ve created the Pub/Sub topics, it&rsquo;s time to step into one of the more complicated steps of this guide: <strong>setting up the collector itself</strong>.</p>
-
+<p>Now that you've created the Pub/Sub topics, it's time to step into one of the more complicated steps of this guide: <strong>setting up the collector itself</strong>.</p>
 <h2 id="create-an-http-endpoint-with-the-scala-stream-collector">Create an HTTP endpoint with the Scala Stream Collector</h2>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/12/collector-process.jpg" title="Pub/sub process">
@@ -1309,31 +1207,19 @@ $ gcloud config <span class="nb">set</span> project PROJECT_ID</code></pre></div
     </a>
   
 
-
 <p>Snowplow uses a collector written in <strong>Scala</strong> for processing the requests sent from your website. These records are parsed by the <strong>Scala Stream Collector</strong> and then distributed into the Pub/Sub topics you created in the previous chapter.</p>
-
-<p>We&rsquo;ll start with a simple <strong>HTTP endpoint</strong> using the default IP address assigned to the Compute Engine instance you&rsquo;ll spin up. This is only to test that the whole pipeline works. You&rsquo;ll want to configure your <a href="#create-an-https-endpoint-with-a-custom-domain-name">own custom domain name with an <strong>HTTPS endpoint</strong></a> for the actual tracker!</p>
-
+<p>We'll start with a simple <strong>HTTP endpoint</strong> using the default IP address assigned to the Compute Engine instance you'll spin up. This is only to test that the whole pipeline works. You'll want to configure your <a href="#create-an-https-endpoint-with-a-custom-domain-name">own custom domain name with an <strong>HTTPS endpoint</strong></a> for the actual tracker!</p>
 <h3 id="step-1-create-the-config-file">Step 1: Create the config file</h3>
-
-<p>In the local directory where you&rsquo;re storing all your project files (such as the service account credentials you created earlier), create a new file named <code>application.config</code>, and copy-paste the contents of <a href="https://gist.githubusercontent.com/sahava/1484fc64231f01deb66329bd777fb40d/raw/a946da40eb6d9b5c48cedb7411c1b6dc89678dd1/snowplow-application-config">this sample config</a> within.</p>
-
+<p>In the local directory where you're storing all your project files (such as the service account credentials you created earlier), create a new file named <code>application.config</code>, and copy-paste the contents of <a href="https://gist.githubusercontent.com/sahava/1484fc64231f01deb66329bd777fb40d/raw/a946da40eb6d9b5c48cedb7411c1b6dc89678dd1/snowplow-application-config">this sample config</a> within.</p>
 <p>At this time, the only line you need to edit is the one with <code>googleProjectId = your-project-id</code>. Change <code>your-project-id</code> to your actual Google Cloud project ID.</p>
-
-<p>Keep this file at hand, because you&rsquo;ll need to make some changes to it soon.</p>
-
+<p>Keep this file at hand, because you'll need to make some changes to it soon.</p>
 <h3 id="step-2-fire-up-a-gce-instance">Step 2: Fire up a GCE instance</h3>
-
 <p>You are now ready to start a Compute Engine instance.</p>
-
 <blockquote>
-<p>NOTE! Because this is just a test - remember to shut down the instance as soon as you&rsquo;re done so that you don&rsquo;t accumulate extra costs.</p>
+<p>NOTE! Because this is just a test - remember to shut down the instance as soon as you're done so that you don't accumulate extra costs.</p>
 </blockquote>
-
 <p><strong>(1)</strong> Browse to <a href="https://console.cloud.google.com/compute/instances">https://console.cloud.google.com/compute/instances</a> and make sure your project is selected in the project selector.</p>
-
 <p><strong>(2)</strong> Click <strong>Create</strong>.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/create-gce-instance.jpg" title="Create GCE instance">
@@ -1343,17 +1229,11 @@ $ gcloud config <span class="nb">set</span> project PROJECT_ID</code></pre></div
     </a>
   
 
-
-<p>Next, you&rsquo;ll be transported to the configuration screen.</p>
-
+<p>Next, you'll be transported to the configuration screen.</p>
 <p><strong>(3)</strong> Give the instance a <strong>name</strong>.</p>
-
 <p><strong>(4)</strong> Choose a region (somewhere close by, preferably) - you can use the default zone.</p>
-
-<p><strong>(5)</strong> Make sure the service account you&rsquo;ve created (or the default Compute Engine service account) is selected in the relevant list.</p>
-
+<p><strong>(5)</strong> Make sure the service account you've created (or the default Compute Engine service account) is selected in the relevant list.</p>
 <p><strong>(6)</strong> Choose <strong>Set access for each API</strong> from the scope selector.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/instance-initial-settings.jpg" title="Initial instance settings">
@@ -1363,9 +1243,7 @@ $ gcloud config <span class="nb">set</span> project PROJECT_ID</code></pre></div
     </a>
   
 
-
 <p><strong>(7)</strong> Scroll down the list of APIs, and choose <strong>Enabled</strong> for the <strong>Cloud Pub/Sub</strong> API.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/cloud-pubsub-enabled.jpg" title="Cloud pub/sub scope enabled">
@@ -1375,9 +1253,7 @@ $ gcloud config <span class="nb">set</span> project PROJECT_ID</code></pre></div
     </a>
   
 
-
 <p><strong>(8)</strong> Scroll down to <strong>Firewall</strong> and check <strong>Allow HTTP traffic</strong>. Next, click the <strong>Management, security, disks, networking, sole tenancy</strong> link.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/firewall-rule.jpg" title="Firewall rule">
@@ -1387,9 +1263,7 @@ $ gcloud config <span class="nb">set</span> project PROJECT_ID</code></pre></div
     </a>
   
 
-
 <p><strong>(9)</strong> Select the <strong>Networking</strong> tab, and type <code>collector</code> into the <strong>Network tags</strong> field.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/network-tag.jpg" title="Network tag">
@@ -1399,17 +1273,11 @@ $ gcloud config <span class="nb">set</span> project PROJECT_ID</code></pre></div
     </a>
   
 
-
-<p>Once you&rsquo;ve done these changes, click <strong>Create</strong> to fire up the instance!</p>
-
+<p>Once you've done these changes, click <strong>Create</strong> to fire up the instance!</p>
 <h3 id="step-3-create-a-firewall-rule">Step 3: Create a firewall rule</h3>
-
-<p>You&rsquo;ll need to create a firewall rule which accepts incoming connections from your website.</p>
-
+<p>You'll need to create a firewall rule which accepts incoming connections from your website.</p>
 <p><strong>(1)</strong> Browse to <a href="https://console.cloud.google.com/networking/firewalls/list">https://console.cloud.google.com/networking/firewalls/list</a> and make sure the correct project is selected.</p>
-
 <p><strong>(2)</strong> Click <strong>CREATE FIREWALL RULE</strong>.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/create-firewall-rule.jpg" title="Create firewall rule">
@@ -1419,15 +1287,10 @@ $ gcloud config <span class="nb">set</span> project PROJECT_ID</code></pre></div
     </a>
   
 
-
 <p><strong>(3)</strong> In the configuration that opens, give the rule some name, e.g. <code>snowplow-firewall-rule</code>.</p>
-
 <p><strong>(4)</strong> Scroll down to <strong>Target tags</strong> and type in the tag name you gave in the end of the <a href="#step-2-fire-up-a-gce-instance">previous step</a> (<code>collector</code> if you used my example).</p>
-
 <p><strong>(5)</strong> Make sure <strong>IP ranges</strong> is selected in the <strong>Source filter</strong> menu, and type <code>0.0.0.0/0</code> into the <strong>Source IP ranges</strong> field.</p>
-
 <p><strong>(6)</strong> Under <strong>Protocols and ports</strong>, check <strong>tcp</strong> and type <code>8080</code> as the port value.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/firewall-configuration.jpg" title="Firewall configuration">
@@ -1437,9 +1300,7 @@ $ gcloud config <span class="nb">set</span> project PROJECT_ID</code></pre></div
     </a>
   
 
-
 <p>When ready, click <strong>Create</strong> to finalize the firewall setup.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/snowplow-firewall-rule-created.jpg" title="Snowplow firewall rule created">
@@ -1449,13 +1310,9 @@ $ gcloud config <span class="nb">set</span> project PROJECT_ID</code></pre></div
     </a>
   
 
-
 <h3 id="step-4-create-a-storage-bucket-for-your-configuration-file">Step 4: Create a storage bucket for your configuration file</h3>
-
-<p>Next thing you&rsquo;ll need to do is upload the configuration file for the collector into a Cloud Storage bucket. This is because the file needs to be available for your instance to use, and it&rsquo;s extremely convenient to have the file available in Google Cloud, because the service account can simply pull the file directly from the bucket.</p>
-
+<p>Next thing you'll need to do is upload the configuration file for the collector into a Cloud Storage bucket. This is because the file needs to be available for your instance to use, and it's extremely convenient to have the file available in Google Cloud, because the service account can simply pull the file directly from the bucket.</p>
 <p><strong>(1)</strong> Browse to <a href="https://console.cloud.google.com/storage/browser">https://console.cloud.google.com/storage/browser</a>, and, as always, make sure you have the right project selected before clicking <strong>Create bucket</strong>.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/create-storage-bucket.jpg" title="Create storage bucket">
@@ -1465,11 +1322,8 @@ $ gcloud config <span class="nb">set</span> project PROJECT_ID</code></pre></div
     </a>
   
 
-
 <p><strong>(2)</strong> Give the bucket a descriptive (and unique) name, such as <code>snowplow-yourname-collector-bucket</code>.</p>
-
 <p><strong>(3)</strong> You can leave the rest of the settings with their default values, then click <strong>Create</strong>.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/create-storage-bucket-done.jpg" title="Create storage bucket done">
@@ -1479,9 +1333,7 @@ $ gcloud config <span class="nb">set</span> project PROJECT_ID</code></pre></div
     </a>
   
 
-
 <p><strong>(4)</strong> In the view that opens up, click <strong>Upload files</strong>, find the <code>application.config</code> file you downloaded earlier, and upload it to the bucket.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/upload-file-to-storage.jpg" title="Upload file to storage">
@@ -1491,21 +1343,14 @@ $ gcloud config <span class="nb">set</span> project PROJECT_ID</code></pre></div
     </a>
   
 
-
 <p>Good job! You are now ready to connect your GCE instance and fire up the collector!</p>
-
 <h3 id="step-5-ssh-into-the-compute-engine-instance">Step 5: SSH into the Compute Engine instance</h3>
-
 <p>Now that you have the virtual machine running in the cloud, and you have the configuration file uploaded to a Cloud Storage bucket, the next step is to connect to the virtual machine, download all the remaining files, and start the collector.</p>
-
 <blockquote>
-<p>It&rsquo;s very simple and trivial to do the following steps using the Google Cloud SDK on your local machine, too. If you want to try it out, follow the relevant steps in <a href="https://github.com/snowplow/snowplow/wiki/GCP:-Setting-up-the-Scala-Stream-Collector#4b-2-via-the-command-line">Snowplow&rsquo;s wiki</a>.</p>
+<p>It's very simple and trivial to do the following steps using the Google Cloud SDK on your local machine, too. If you want to try it out, follow the relevant steps in <a href="https://github.com/snowplow/snowplow/wiki/GCP:-Setting-up-the-Scala-Stream-Collector#4b-2-via-the-command-line">Snowplow's wiki</a>.</p>
 </blockquote>
-
 <p><strong>(1)</strong> Browse to <a href="https://console.cloud.google.com/compute/instances">https://console.cloud.google.com/compute/instances</a>.</p>
-
 <p><strong>(2)</strong> Click the <strong>SSH</strong> option next to your instance.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/ssh-to-instance.jpg" title="SSH to cloud instance">
@@ -1515,9 +1360,7 @@ $ gcloud config <span class="nb">set</span> project PROJECT_ID</code></pre></div
     </a>
   
 
-
-<p><strong>(3)</strong> Visit <a href="https://dl.bintray.com/snowplow/snowplow-generic/">https://dl.bintray.com/snowplow/snowplow-generic/</a> and find the file that starts with <code>snowplow_scala_stream_collector_google_pubsub_</code> and check what the latest version number is that doesn&rsquo;t have the <code>rcl</code> suffix. Make note of this version number (e.g. <code>0.14.0</code>), no need to download the file.</p>
-
+<p><strong>(3)</strong> Visit <a href="https://dl.bintray.com/snowplow/snowplow-generic/">https://dl.bintray.com/snowplow/snowplow-generic/</a> and find the file that starts with <code>snowplow_scala_stream_collector_google_pubsub_</code> and check what the latest version number is that doesn't have the <code>rcl</code> suffix. Make note of this version number (e.g. <code>0.14.0</code>), no need to download the file.</p>
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/latest-collector.jpg" title="Latest collector version">
@@ -1527,9 +1370,7 @@ $ gcloud config <span class="nb">set</span> project PROJECT_ID</code></pre></div
     </a>
   
 
-
 <p><strong>(4)</strong> Next, in the SSH window, run the following commands in order, pressing enter after each command.</p>
-
 <div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ sudo apt-get update
 $ sudo apt-get -y install default-jre
 $ sudo apt-get -y install unzip
@@ -1537,11 +1378,8 @@ $ wget https://dl.bintray.com/snowplow/snowplow-generic/snowplow_scala_stream_co
 $ gsutil cp gs://&lt;YOUR-BUCKET-NAME&gt;/application.conf .
 $ unzip snowplow_scala_stream_collector_google_pubsub_&lt;VERSION&gt;.zip
 $ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config application.conf</code></pre></div>
-
 <p>Replace all instances of <code>&lt;VERSION&gt;</code> with the latest version of the collector ZIP file which you checked in (3).</p>
-
 <p>Replace <code>&lt;YOUR-BUCKET-NAME&gt;</code> with the name you gave the cloud storage bucket in the <a href="#step-4-create-a-storage-bucket-for-your-configuration-file">previous step</a> (e.g. <code>snowplow-yourname-collector-bucket</code>).</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/instance-commands.jpg" title="commands in the cloud instance">
@@ -1551,9 +1389,7 @@ $ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config
     </a>
   
 
-
 <p>After running the last command, if all has been configured correctly, you should see the following output in the instance shell:</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/collector-started.jpg" title="Collector started">
@@ -1563,17 +1399,11 @@ $ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config
     </a>
   
 
-
 <p>You are now ready to send a test request to the endpoint, after which you can check your Pub/Sub subscription if it received the message!</p>
-
-<h3 id="step-6-send-a-test-request-and-verify-it-was-published-into-pub-sub">Step 6: Send a test request and verify it was published into Pub/Sub</h3>
-
-<p>To send the request, you&rsquo;ll first need to check what the external IP of your Cloud instance is.</p>
-
+<h3 id="step-6-send-a-test-request-and-verify-it-was-published-into-pubsub">Step 6: Send a test request and verify it was published into Pub/Sub</h3>
+<p>To send the request, you'll first need to check what the external IP of your Cloud instance is.</p>
 <p><strong>(1)</strong> Browse to <a href="https://console.cloud.google.com/compute/instances">https://console.cloud.google.com/compute/instances</a> and click the Snowplow instance name.</p>
-
 <p><strong>(2)</strong> Copy the IP address from the <strong>External IP</strong> field.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/external-ip.jpg" title="External IP">
@@ -1583,17 +1413,11 @@ $ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config
     </a>
   
 
-
 <p>The next step requires you to send an HTTP POST request with a specific payload to this IP endpoint. There are many ways to do it - you could use the JavaScript console of the web browser, for example.</p>
-
-<p>My preference for testing HTTP endpoints quickly is to use <a href="https://curl.haxx.se/">curl</a>, which is a command-line tool available in almost any terminal. If you&rsquo;re using an operating system that doesn&rsquo;t come equipped with curl, I recommend downloading and installing it from <a href="https://curl.haxx.se/download.html">here</a>.</p>
-
+<p>My preference for testing HTTP endpoints quickly is to use <a href="https://curl.haxx.se/">curl</a>, which is a command-line tool available in almost any terminal. If you're using an operating system that doesn't come equipped with curl, I recommend downloading and installing it from <a href="https://curl.haxx.se/download.html">here</a>.</p>
 <p><strong>(3)</strong> Open the terminal on your local machine, and copy-paste the following command, switching <code>&lt;EXTERNAL_IP&gt;</code> with the actual external IP you copied from the GCE instance settings.</p>
-
 <div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ curl -d <span class="s2">&#34;&amp;e=pv&amp;page=curl-test&amp;url=http%3A%2F%2Fjust-testing.com&amp;aid=snowplow-test&#34;</span> -X POST http://&lt;EXTERNAL_IP&gt;:8080/com.snowplowanalytics.iglu/v1</code></pre></div>
-
 <p>The payload is very simple - it basically has only four parameters:</p>
-
 <table>
 <thead>
 <tr>
@@ -1602,26 +1426,22 @@ $ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config
 <th>Description</th>
 </tr>
 </thead>
-
 <tbody>
 <tr>
 <td><code>e</code></td>
 <td><code>pv</code></td>
 <td>Event type, Pageview in this case.</td>
 </tr>
-
 <tr>
 <td><code>page</code></td>
 <td><code>curl-test</code></td>
 <td>Page name.</td>
 </tr>
-
 <tr>
 <td><code>url</code></td>
 <td><code>http://just-testing.com</code></td>
 <td>Source URL.</td>
 </tr>
-
 <tr>
 <td><code>aid</code></td>
 <td><code>snowplow-test</code></td>
@@ -1629,13 +1449,9 @@ $ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config
 </tr>
 </tbody>
 </table>
-
-<p>The endpoint is suffixed with <code>/com.snowplowanalytics.iglu/v1</code> to denote the <a href="https://github.com/snowplow/iglu">schema</a> you&rsquo;ll be using for processing and validating the incoming data. Since we&rsquo;re working with the most out-of-the-box solution available for testing purposes, you can use this default schema for now.</p>
-
-<p>Later, we&rsquo;ll use the Google Analytics plugin to simplify things and to send a more complete payload, but for the purposes of testing this will do.</p>
-
+<p>The endpoint is suffixed with <code>/com.snowplowanalytics.iglu/v1</code> to denote the <a href="https://github.com/snowplow/iglu">schema</a> you'll be using for processing and validating the incoming data. Since we're working with the most out-of-the-box solution available for testing purposes, you can use this default schema for now.</p>
+<p>Later, we'll use the Google Analytics plugin to simplify things and to send a more complete payload, but for the purposes of testing this will do.</p>
 <p><strong>(4)</strong> If everything worked, you should see a status code OK as a response.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/post-response.jpg" title="POST response">
@@ -1645,15 +1461,10 @@ $ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config
     </a>
   
 
-
 <p>Now you can test if your record was published in the <code>good</code> <strong>Pub/Sub topic</strong>. To test this, you need to <strong>pull</strong> the recent records from the topic by using the subscription you created earlier. The easiest way to do this is by using the Google Cloud SDK that you should now have installed and configured on your local machine.</p>
-
-<p><strong>(5)</strong> The command you&rsquo;ll need to use is:</p>
-
+<p><strong>(5)</strong> The command you'll need to use is:</p>
 <div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ gcloud pubsub subscriptions pull --auto-ack test-good</code></pre></div>
-
 <p>Where <code>test-good</code> is the name you gave to the subscription when you created it. If it worked, you should see the following output:</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/thrift-record.jpg" title="Thrift record">
@@ -1663,43 +1474,24 @@ $ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config
     </a>
   
 
-
-<p>Don&rsquo;t worry about the fact that it looks all garbled. This is the request stored in binary <a href="https://github.com/snowplow/snowplow/wiki/Collector-logging-formats#thrift">Thrift</a> format. You should see all sorts of interesting bits and pieces such as your local machine IP address, the User-Agent string (just <code>curl</code> for now), and the data payload itself. If you see all this in the <code>good</code> Pub/Sub topic, it means everything is working!</p>
-
-<p>You have now successfully created a collector behind an HTTP endpoint. You could proceed to the <a href="#prepare-the-etl-step">enrichment stage</a>, but I urge you to first <strong>stop</strong> the GCE instance so you don&rsquo;t accumulate extra costs for having it running.</p>
-
-<p>I also recommend you continue with the next chapter, where you&rsquo;ll learn how to use your own custom domain as an HTTPS-secured endpoint for the collector. Using HTTP is crippling, and you can&rsquo;t really create a production-ready endpoint with a single GCE instance behind the HTTP protocol.</p>
-
+<p>Don't worry about the fact that it looks all garbled. This is the request stored in binary <a href="https://github.com/snowplow/snowplow/wiki/Collector-logging-formats#thrift">Thrift</a> format. You should see all sorts of interesting bits and pieces such as your local machine IP address, the User-Agent string (just <code>curl</code> for now), and the data payload itself. If you see all this in the <code>good</code> Pub/Sub topic, it means everything is working!</p>
+<p>You have now successfully created a collector behind an HTTP endpoint. You could proceed to the <a href="#prepare-the-etl-step">enrichment stage</a>, but I urge you to first <strong>stop</strong> the GCE instance so you don't accumulate extra costs for having it running.</p>
+<p>I also recommend you continue with the next chapter, where you'll learn how to use your own custom domain as an HTTPS-secured endpoint for the collector. Using HTTP is crippling, and you can't really create a production-ready endpoint with a single GCE instance behind the HTTP protocol.</p>
 <h2 id="create-an-https-endpoint-with-a-custom-domain-name">Create an HTTPS endpoint with a custom domain name</h2>
-
-<p>This step replaces the previous chapter, effectively. Instead of using an ephemeral, external IP behind the HTTP protocol, we&rsquo;ll assign a <strong>static</strong> IP address to our virtual machine instance. On top of that, we&rsquo;ll configure a custom domain name to point to this static IP, and we&rsquo;ll have everything work behind the HTTPS protocol.</p>
-
-<p>You&rsquo;ll still want to read the previous chapter, though. We&rsquo;ll be doing a lot of similar things here.</p>
-
+<p>This step replaces the previous chapter, effectively. Instead of using an ephemeral, external IP behind the HTTP protocol, we'll assign a <strong>static</strong> IP address to our virtual machine instance. On top of that, we'll configure a custom domain name to point to this static IP, and we'll have everything work behind the HTTPS protocol.</p>
+<p>You'll still want to read the previous chapter, though. We'll be doing a lot of similar things here.</p>
 <p><strong>IMPORTANT!</strong> If you want to skip reading the previous chapter, then please note that you <strong>must</strong> do steps <a href="#step-1-create-the-config-file">(1)</a> and <a href="#step-4-create-a-storage-bucket-for-your-configuration-file">(4)</a> from the previous chapter before moving on with the HTTPS endpoint.</p>
-
-<p>This is, basically, what the final collector product should look like. You&rsquo;re using a <strong>load balancing</strong> system to automatically scale the instances with incoming traffic, AND you&rsquo;ll be able to avoid pesky cross-protocol errors due to using HTTPS as the sole endpoint. There&rsquo;s the added security, too.</p>
-
+<p>This is, basically, what the final collector product should look like. You're using a <strong>load balancing</strong> system to automatically scale the instances with incoming traffic, AND you'll be able to avoid pesky cross-protocol errors due to using HTTPS as the sole endpoint. There's the added security, too.</p>
 <h3 id="step-1-create-an-instance-template">Step 1: Create an instance template</h3>
-
-<p>Instead of working with a single GCE instance, we&rsquo;ll use a <strong>cluster</strong> of instances that will be scaled up and down automatically with traffic. This will, naturally, reflect on the cost structure of your monthly GCP invoices, so keep an eye on the <a href="https://console.cloud.google.com/home/dashboard">estimated charges in your dashboard</a>.</p>
-
-<p><strong>(1)</strong> If you followed the previous chapter, you can go ahead and delete the GCE instance and the Firewall Rule. You&rsquo;ll start from scratch here.</p>
-
+<p>Instead of working with a single GCE instance, we'll use a <strong>cluster</strong> of instances that will be scaled up and down automatically with traffic. This will, naturally, reflect on the cost structure of your monthly GCP invoices, so keep an eye on the <a href="https://console.cloud.google.com/home/dashboard">estimated charges in your dashboard</a>.</p>
+<p><strong>(1)</strong> If you followed the previous chapter, you can go ahead and delete the GCE instance and the Firewall Rule. You'll start from scratch here.</p>
 <p><strong>(2)</strong> You can keep the <code>application.conf</code> file as it is in the storage bucket. The same settings you used in the previous chapter apply here.</p>
-
 <p><strong>(3)</strong> Go to <a href="https://console.cloud.google.com/compute/instanceTemplates/list">https://console.cloud.google.com/compute/instanceTemplates/list</a> and click <strong>Create instance template</strong>.</p>
-
 <p>The <strong>instance template</strong> is what each new virtual machine will use as its &ldquo;template&rdquo;, meaning it will inherit the settings from this template as well as the startup script that will fire up the collector itself.</p>
-
-<p>The steps for the instance template are almost the same as for a single GCE instance from the previous chapter, but let&rsquo;s go over them anyway.</p>
-
+<p>The steps for the instance template are almost the same as for a single GCE instance from the previous chapter, but let's go over them anyway.</p>
 <p><strong>(4)</strong> Give a descriptive name for the instance.</p>
-
 <p><strong>(5)</strong> Make sure the default Compute Engine service account is selected.</p>
-
 <p><strong>(6)</strong> Choose <strong>Set access for each API</strong> in the <strong>Access Scopes</strong> list.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/snowplow-instance-template.jpg" title="Snowplow instance template">
@@ -1709,13 +1501,9 @@ $ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config
     </a>
   
 
-
 <p><strong>(7)</strong> Scroll down the list to <strong>Cloud Pub/Sub</strong> and choose <strong>Enable</strong>.</p>
-
 <p><strong>(8)</strong> Under <strong>Firewall</strong>, select <strong>Allow HTTP traffic</strong>.</p>
-
 <p><strong>(9)</strong> Expand the <strong>Management, security, disks, networking, sole tenancy</strong> accordion.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/instance-template-settings-2.jpg" title="Instance template settings">
@@ -1725,9 +1513,7 @@ $ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config
     </a>
   
 
-
 <p><strong>(10)</strong> Scroll down to <strong>Startup script</strong>, and copy-paste the following code within:</p>
-
 <div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="cp">#! /bin/bash
 </span><span class="cp"></span>sudo apt-get update
 sudo apt-get -y install default-jre
@@ -1737,11 +1523,8 @@ wget https://dl.bintray.com/snowplow/snowplow-generic/<span class="nv">$archive<
 gsutil cp gs://&lt;YOUR-BUCKET-NAME&gt;/application.conf .
 unzip <span class="nv">$archive</span>
 java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config application.conf <span class="p">&amp;</span></code></pre></div>
-
-<p><strong>(11)</strong> Edit the two instances of <code>&lt;VERSION&gt;</code> with the latest version number you can find for the <code>snowplow_scala_stream_collector_google_pubsub_</code> prefix <a href="https://dl.bintray.com/snowplow/snowplow-generic/">here</a> (don&rsquo;t use the version with the <code>_rcl</code> prefix). At the time of writing, the latest version was <code>0.14.0</code>.</p>
-
+<p><strong>(11)</strong> Edit the two instances of <code>&lt;VERSION&gt;</code> with the latest version number you can find for the <code>snowplow_scala_stream_collector_google_pubsub_</code> prefix <a href="https://dl.bintray.com/snowplow/snowplow-generic/">here</a> (don't use the version with the <code>_rcl</code> prefix). At the time of writing, the latest version was <code>0.14.0</code>.</p>
 <p><strong>(12)</strong> Replace <code>&lt;YOUR-BUCKET-NAME&gt;</code> with the name of the <a href="https://console.cloud.google.com/storage/browser">Cloud Storage bucket</a> that stores the <code>application.conf</code> file.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/startup-script.jpg" title="Startup script">
@@ -1751,11 +1534,8 @@ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config a
     </a>
   
 
-
 <p>This startup script is run whenever a new instance is built with this template. It loads all the dependencies and the runs the collector Java file.</p>
-
 <p><strong>(13)</strong> Click open the <strong>Networking</strong> tab, scroll to <strong>Network tags</strong>, and add <code>collector</code> as a tag.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/collector-tag.jpg" title="collector tag">
@@ -1765,9 +1545,7 @@ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config a
     </a>
   
 
-
 <p><strong>(14)</strong> Click <strong>Create</strong> when done.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/instance-template-created.jpg" title="Instance template created">
@@ -1777,21 +1555,13 @@ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config a
     </a>
   
 
-
 <h3 id="step-2-create-a-firewall-rule">Step 2: Create a firewall rule</h3>
-
-<p>You&rsquo;ll need to create a <strong>Firewall rule</strong> to allow external connections to your GCE instances.</p>
-
+<p>You'll need to create a <strong>Firewall rule</strong> to allow external connections to your GCE instances.</p>
 <p><strong>(1)</strong> Browse to <a href="https://console.cloud.google.com/networking/firewalls/list">https://console.cloud.google.com/networking/firewalls/list</a>, and click <strong>CREATE FIREWALL RULE</strong>.</p>
-
 <p><strong>(2)</strong> Give the rule a name.</p>
-
 <p><strong>(3)</strong> Scroll down to <strong>Target tags</strong>, and type <code>collector</code> in the field.</p>
-
 <p><strong>(4)</strong> In <strong>Source IP ranges</strong>, type <code>0.0.0.0/0</code>.</p>
-
 <p><strong>(5)</strong> Check the box next to <strong>TCP</strong> in the Protocols and ports selection (with <strong>Specified protocols and ports selected</strong>), and type in <code>8080</code>.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/new-firewall-rule.jpg" title="New firewall rule">
@@ -1801,9 +1571,7 @@ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config a
     </a>
   
 
-
 <p><strong>(6)</strong> Click <strong>Create</strong> when ready.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/snowplow-firewall-rule.jpg" title="new snowplow firewall rule">
@@ -1813,17 +1581,11 @@ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config a
     </a>
   
 
-
 <h3 id="step-2-create-an-instance-group">Step 2: Create an instance group</h3>
-
-<p>Next, we&rsquo;ll need to create an <strong>instance group</strong>, which is used by the load balancer as the backend service.</p>
-
+<p>Next, we'll need to create an <strong>instance group</strong>, which is used by the load balancer as the backend service.</p>
 <p><strong>(1)</strong> Scroll to <a href="https://console.cloud.google.com/compute/instanceGroups/list">https://console.cloud.google.com/compute/instanceGroups/list</a>, and click <strong>Create instance group</strong>.</p>
-
 <p><strong>(2)</strong> Give the group a descriptive name.</p>
-
 <p><strong>(3)</strong> Feel free to set the <strong>Location</strong> closer to home, if you wish.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/instance-group-settings.jpg" title="Instance group settings">
@@ -1833,9 +1595,7 @@ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config a
     </a>
   
 
-
 <p><strong>(4)</strong> Select the instance template you created in the previous step from the <strong>Instance template</strong> selector.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/instance-group-template-selection.jpg" title="Select template">
@@ -1845,13 +1605,10 @@ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config a
     </a>
   
 
-
 <blockquote>
 <p><strong>UPDATE 18 Jan 2019</strong>: You can also set <strong>Autoscaling</strong> <code>Off</code>. This means that the instance will not generate new machines automatically. You can start off with this, and then move to an autoscaling setup if you find the Collector lagging behind a lot.</p>
 </blockquote>
-
 <p><strong>(5)</strong> Scroll down to <strong>Health check</strong>, click the menu, and select <strong>Create a health check</strong>.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/create-health-check.jpg" title="Create a health check">
@@ -1861,20 +1618,16 @@ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config a
     </a>
   
 
-
 <p><strong>(6)</strong> Set the following options:</p>
-
 <ul>
-<li><strong>Name</strong>: a descriptive name<br /></li>
-<li><strong>Protocol</strong>: HTTP<br /></li>
-<li><strong>Port</strong>: 8080<br /></li>
+<li><strong>Name</strong>: a descriptive name</li>
+<li><strong>Protocol</strong>: HTTP</li>
+<li><strong>Port</strong>: 8080</li>
 <li><strong>Request path</strong>: /health</li>
-<li><strong>Check interval</strong>: 10 seconds<br /></li>
+<li><strong>Check interval</strong>: 10 seconds</li>
 <li><strong>Unhealthy threshold</strong>: 3 consecutive failures</li>
 </ul>
-
 <p>You can leave the rest of the settings to their default values.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/create-health-check-new.jpg" title="create new health check">
@@ -1884,11 +1637,8 @@ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config a
     </a>
   
 
-
 <p><strong>(7)</strong> Click <strong>Save and continue</strong> once finished with the health check settings.</p>
-
 <p><strong>(8)</strong> Click <strong>Create</strong> to finish creating the instance group.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/create-instance-group.jpg" title="Create a new instance group">
@@ -1898,13 +1648,9 @@ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config a
     </a>
   
 
-
 <p>Once you create the group, you should see it loading for a while, after which you will see that the group has been created and a new instance has already been fired up!</p>
-
 <p>At this point, you can quickly test if the instance is working.</p>
-
 <p><strong>(9)</strong> Browse to <a href="https://console.cloud.google.com/compute/instances">https://console.cloud.google.com/compute/instances</a>, and copy the IP address from the <strong>External IP</strong> field next to the instance created from your instance group.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/external-ip-copy.jpg" title="External IP address copied">
@@ -1914,39 +1660,22 @@ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config a
     </a>
   
 
-
 <p><strong>(10)</strong> Open your terminal software and run the following command:</p>
-
 <div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ curl http://&lt;EXTERNAL_IP_HERE&gt;:8080/health</code></pre></div>
-
 <p>Replace <code>&lt;EXTERNAL_IP_HERE&gt;</code> with the IP address you copied.</p>
-
 <p>You should see a <code>OK</code> message as the response.</p>
-
 <p>Next, try:</p>
-
 <div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ curl http://&lt;EXTERNAL_IP_HERE&gt;:8080/i</code></pre></div>
-
 <p>You should see a garbled GIF response (something like <code>GIF89a????!?,D;</code>).</p>
-
-<p>If you see those two, your instance is working, and you&rsquo;ve successfully created an HTTP endpoint.</p>
-
-<p>Huh? That&rsquo;s exactly what you did in the previous chapter!</p>
-
+<p>If you see those two, your instance is working, and you've successfully created an HTTP endpoint.</p>
+<p>Huh? That's exactly what you did in the previous chapter!</p>
 <p>But by using <strong>Instance groups</strong> you are now ready for the biggest step here: creating a load balancer.</p>
-
 <h3 id="step-3-create-a-load-balancer">Step 3: Create a load balancer</h3>
-
 <p>The purpose of the load balancer is to automatically scale your system up and down, depending on things like traffic spikes and CPU usage. It works by establishing a single IP address in the public-facing internet, which then tunnels/proxies the traffic to all the necessary internal IP addresses (your GCE instances, basically), without the outside world knowing this.</p>
-
 <p>The other benefit of the load balancer is that we can use it to assign a <strong>static IP address</strong> to the balancer, and with a static IP we can apply our <strong>custom domain name</strong> so that a <strong>Google-managed SSL certificate</strong> can be applied to the endpoint.</p>
-
-<p>So, there&rsquo;s a lot of stuff in this step, pay attention!</p>
-
+<p>So, there's a lot of stuff in this step, pay attention!</p>
 <p><strong>(1)</strong> Browse to <a href="https://console.cloud.google.com/net-services/loadbalancing/loadBalancers/list">https://console.cloud.google.com/net-services/loadbalancing/loadBalancers/list</a>, and click <strong>Create load balancer</strong>.</p>
-
 <p><strong>(2)</strong> Click <strong>Start configuration</strong> in the <strong>HTTP(S) Load Balancing</strong> panel.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/start-configuration-load-balancer.jpg" title="Load balancer start configuration">
@@ -1956,9 +1685,7 @@ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config a
     </a>
   
 
-
 <p><strong>(3)</strong> Give the load balancer a name, click <strong>Backend configuration</strong>, then <strong>Create or select backend services &amp; backend buckets</strong>, then choose <strong>Backend services -&gt; Create a backend service</strong>.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/create-a-backend-service.jpg" title="Create a backend service">
@@ -1968,11 +1695,8 @@ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config a
     </a>
   
 
-
 <p><strong>(4)</strong> Give the backend service a name.</p>
-
-<p><strong>(5)</strong> Leave all the other settings to their default values, but choose the <strong>Instance group</strong> you created earlier from the respective menu. Set <code>8080</code> in the <strong>Port numbers</strong> field, and select the <strong>Health check</strong> you&rsquo;ve also created earlier in the <strong>Health check</strong> menu.</p>
-
+<p><strong>(5)</strong> Leave all the other settings to their default values, but choose the <strong>Instance group</strong> you created earlier from the respective menu. Set <code>8080</code> in the <strong>Port numbers</strong> field, and select the <strong>Health check</strong> you've also created earlier in the <strong>Health check</strong> menu.</p>
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/backend-service-settings.jpg" title="Backend service">
@@ -1982,9 +1706,7 @@ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config a
     </a>
   
 
-
 <p><strong>(6)</strong> Click <strong>Create</strong> when ready.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/load-balancer-backend-ready.jpg" title="Backend configuration ready">
@@ -1994,9 +1716,7 @@ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config a
     </a>
   
 
-
 <p><strong>(7)</strong> Click open <strong>Host and path rules</strong>, and make sure the backend service you created is visible in the rule.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/host-and-path-rules.jpg" title="Host and path rules">
@@ -2006,15 +1726,10 @@ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config a
     </a>
   
 
-
 <p><strong>(8)</strong> Next, click <strong>Frontend configuration</strong>.</p>
-
 <p><strong>(9)</strong> Give the frontend service a name.</p>
-
 <p><strong>(10)</strong> Choose <strong>HTTPS</strong> as the <strong>Protocol</strong>.</p>
-
 <p><strong>(11)</strong> Select the <strong>IP Address</strong> list, and click <strong>create IP address</strong>.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/create-ip-address.jpg" title="Create static ip address">
@@ -2024,9 +1739,7 @@ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config a
     </a>
   
 
-
 <p><strong>(12)</strong> Choose a name for the IP address and click <strong>RESERVE</strong>.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/create-static-ip.jpg">
@@ -2036,13 +1749,9 @@ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config a
     </a>
   
 
-
-<p><strong>(13)</strong> Make sure the new IP address is selected in the frontend configuration, and <strong>copy the IP address to a text editor or something</strong>. You&rsquo;ll need it when configuring the DNS of your custom domain name!</p>
-
+<p><strong>(13)</strong> Make sure the new IP address is selected in the frontend configuration, and <strong>copy the IP address to a text editor or something</strong>. You'll need it when configuring the DNS of your custom domain name!</p>
 <p><strong>(14)</strong> Make sure <code>443</code> is set as the <strong>Port</strong>.</p>
-
 <p><strong>(15)</strong> In the <strong>Certificates</strong> menu, choose <strong>Create a new certificate</strong>.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/create-a-new-certificate.jpg" title="Create new certificate">
@@ -2052,15 +1761,10 @@ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config a
     </a>
   
 
-
 <p><strong>(16)</strong> Give the new certificate a name.</p>
-
 <p><strong>(17)</strong> Choose <strong>Create Google-managed certificate</strong>.</p>
-
 <p><strong>(18)</strong> Type the name of the domain you will set to point to your collector in the <strong>Domains</strong> field.</p>
-
 <p><strong>(19)</strong> When ready, click <strong>Create</strong>.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/create-certificate.jpg" title="Create a certificate">
@@ -2070,9 +1774,7 @@ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config a
     </a>
   
 
-
 <p><strong>(20)</strong> When finished with the frontend configuration, click <strong>Done</strong>.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/click-done.jpg" title="Click done">
@@ -2082,9 +1784,7 @@ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config a
     </a>
   
 
-
-<p><strong>(21)</strong> Click <strong>Review and finalize</strong> to see all the changes. You&rsquo;ll probably see that your certificate is still in the <code>PROVISIONING</code> status, because you haven&rsquo;t updated your domain DNS yet.</p>
-
+<p><strong>(21)</strong> Click <strong>Review and finalize</strong> to see all the changes. You'll probably see that your certificate is still in the <code>PROVISIONING</code> status, because you haven't updated your domain DNS yet.</p>
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/review-and-finalize.jpg" title="Review and finalize">
@@ -2094,17 +1794,11 @@ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config a
     </a>
   
 
-
 <p><strong>(22)</strong> When satisfied, click <strong>Create</strong> to create the load balancer.</p>
-
 <h3 id="step-4-configure-your-dns">Step 4: Configure your DNS</h3>
-
 <p>At this point, you need to go to your DNS settings for the custom domain name you want to point to your load balancing collector.</p>
-
 <p>You need to create an <code>A</code> record for the domain name, which points to the <strong>static IP address</strong> you created for the load balancer frontend above. You can set the <code>TTL</code> to something like 600 seconds to see the change quicker.</p>
-
 <p>This is what it would look like in <a href="https://www.godaddy.com/">GoDaddy</a>.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/a-record-godaddy.jpg" title="A record Godaddy">
@@ -2114,13 +1808,9 @@ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config a
     </a>
   
 
-
-<p>Once you&rsquo;ve configured the DNS, it will take a while for the new name to resolve. You can check what the status is by running this in your terminal:</p>
-
+<p>Once you've configured the DNS, it will take a while for the new name to resolve. You can check what the status is by running this in your terminal:</p>
 <div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ host tracker.gtmtools.com</code></pre></div>
-
 <p>Replace <code>tracker.gtmtools.com</code> with the domain name you configured in the DNS. If it works, you should see a response with the IP address you configured.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/host-command.jpg" title="Host command run">
@@ -2130,17 +1820,11 @@ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config a
     </a>
   
 
-
 <h3 id="step-5-testing-everything">Step 5: Testing everything</h3>
-
-<p>Once you&rsquo;ve configured the domain name and it resolves to the correct IP, you might still need to wait a while for the SSL certificate to be provisioned for the domain name. This might take anywhere from a couple of minutes to some hours, so be patient.</p>
-
+<p>Once you've configured the domain name and it resolves to the correct IP, you might still need to wait a while for the SSL certificate to be provisioned for the domain name. This might take anywhere from a couple of minutes to some hours, so be patient.</p>
 <p>You can check the status of your system by browsing to the <a href="https://console.cloud.google.com/net-services/loadbalancing/loadBalancers/list">load balancer list</a> and clicking the load balancer you created.</p>
-
 <p>The frontend should show a green checkmark next to your certificate name to indicate that the certificate has been assigned.</p>
-
 <p>In the backend service, you should see one healthy instance created.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/check-load-balancer.jpg" title="Check load balancer">
@@ -2150,15 +1834,10 @@ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config a
     </a>
   
 
-
 <p>If all is fine, the next step is to test the endpoint itself. Open the terminal and run the following command:</p>
-
 <div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ curl -d <span class="s2">&#34;&amp;e=pv&amp;page=https-test&amp;url=https%3A%2F%2Fjust-testing.com&amp;aid=snowplow-test&#34;</span> -X POST https://&lt;CUSTOM_DOMAIN&gt;/com.snowplowanalytics.iglu/v1</code></pre></div>
-
-<p>Replace <code>&lt;CUSTOM_DOMAIN&gt;</code> with the domain name you&rsquo;ve configured to point to the load balancer.</p>
-
+<p>Replace <code>&lt;CUSTOM_DOMAIN&gt;</code> with the domain name you've configured to point to the load balancer.</p>
 <p>If it worked, you should see an <code>OK</code> response.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/ok-response.jpg" title="OK Response">
@@ -2168,13 +1847,9 @@ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config a
     </a>
   
 
-
 <p>Next, you can try and retrieve the payload from the Pub/Sub topic with:</p>
-
 <div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ gcloud pubsub subscriptions pull --auto-ack test-good</code></pre></div>
-
 <p>You should see something like this as the response:</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/11/pubsub-test.jpg" title="Pubsub test">
@@ -2184,23 +1859,15 @@ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config a
     </a>
   
 
-
 <p>If you see that, then congratulations, you now have an HTTPS endpoint for your collector!</p>
-
-<p>If something&rsquo;s wrong, then you&rsquo;ll need to start narrowing down where the problem is. Check your Google Compute Engine pages, make sure there&rsquo;s a healthy GCE instance running. You can even SSH into the instance, browse to the <code>/var/log/</code> directory, and open the <code>daemon.log</code> file for editing to see if there was a problem with the startup script.</p>
-
-<p>Other than that, it&rsquo;s very difficult to say what the likely source of the problem is. Personally, I made many mistakes initially with port configurations and setting up the individual components. But if you follow this guide to the letter, you should be fine.</p>
-
+<p>If something's wrong, then you'll need to start narrowing down where the problem is. Check your Google Compute Engine pages, make sure there's a healthy GCE instance running. You can even SSH into the instance, browse to the <code>/var/log/</code> directory, and open the <code>daemon.log</code> file for editing to see if there was a problem with the startup script.</p>
+<p>Other than that, it's very difficult to say what the likely source of the problem is. Personally, I made many mistakes initially with port configurations and setting up the individual components. But if you follow this guide to the letter, you should be fine.</p>
 <p>Sometimes the problem is that you just need to wait for the DNS to resolve and the certificate to be assigned to the new domain name. This might take a while.</p>
-
 <p>Next up, <strong>enrichment</strong> and loading the data into <strong>BigQuery</strong>!</p>
-
 <blockquote>
-<p>Note! If you&rsquo;re going to take a break now, remember to <strong>STOP</strong> your GCE instance. You can always restart it when ready to go on. You don&rsquo;t want to accumulate any unwanted costs from having the instance running for no purpose!</p>
+<p>Note! If you're going to take a break now, remember to <strong>STOP</strong> your GCE instance. You can always restart it when ready to go on. You don't want to accumulate any unwanted costs from having the instance running for no purpose!</p>
 </blockquote>
-
 <h2 id="set-up-the-google-analytics-tracker">Set up the Google Analytics tracker</h2>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/12/tracker-process.jpg" title="Pub/sub process">
@@ -2210,15 +1877,10 @@ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config a
     </a>
   
 
-
-<p>Before we go on to enrichment, now is a good time to set up the <strong>tracker</strong>. For this purpose, we&rsquo;ll be using the <a href="https://www.simoahava.com/amp/analytics/automatically-fork-google-analytics-hits-snowplow/">Snowplow Google Analytics plugin</a>, because it&rsquo;s an easy way to leverage existing tracking on your site. If you want, feel free to use the regular <a href="https://github.com/snowplow/snowplow/wiki/javascript-tracker-setup">Snowplow JavaScript tracker</a>.</p>
-
+<p>Before we go on to enrichment, now is a good time to set up the <strong>tracker</strong>. For this purpose, we'll be using the <a href="https://www.simoahava.com/amp/analytics/automatically-fork-google-analytics-hits-snowplow/">Snowplow Google Analytics plugin</a>, because it's an easy way to leverage existing tracking on your site. If you want, feel free to use the regular <a href="https://github.com/snowplow/snowplow/wiki/javascript-tracker-setup">Snowplow JavaScript tracker</a>.</p>
 <p>To begin with, head on over to my <a href="https://www.simoahava.com/amp/tools/customtask-builder/#the-customtask-builder-tool">customTask Builder Tool</a>.</p>
-
 <p><strong>(1)</strong> Click the option labelled <code>Copy Hits to Snowplow Collector Endpoint</code>.</p>
-
 <p><strong>(2)</strong> Click <strong>Copy to clipboard</strong>.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/12/customtask-builder.jpg" title="customtask builder">
@@ -2228,15 +1890,10 @@ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config a
     </a>
   
 
-
 <p><strong>(3)</strong> Next, in <a href="https://tagmanager.google.com/">Google Tag Manager</a>, create a new <strong>Custom JavaScript variable</strong>, and paste the contents of the clipboard there.</p>
-
-<p><strong>(4)</strong> In the beginning of the code block, remove <code>var _customTask =</code>, so that the first characters of the block are <code>function() {</code>.</p>
-
+<p><strong>(4)</strong> In the beginning of the code block, remove <code>var _customTask = </code>, so that the first characters of the block are <code>function() {</code>.</p>
 <p><strong>(5)</strong> In the end of the block, remove the semicolon that is the very last character of the block.</p>
-
 <p><strong>(6)</strong> Edit the line starting with <code>var snowplowEndpoint = '...';</code> so that the string contains the URL to your collector endpoint.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/12/snowplow-customtask.jpg" title="Snowplow customtask">
@@ -2246,14 +1903,10 @@ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config a
     </a>
   
 
-
 <p><strong>(7)</strong> Save the variable with some name, e.g. <code>JS - Snowplow duplicator</code>.</p>
-
 <p><strong>(8)</strong> Next, open your <strong>Page View tag</strong>, check <strong>Enable overriding settings in this tag</strong>, scroll down to <strong>More Settings</strong> &gt; <strong>Fields to set</strong>, and add a new field:</p>
-
-<p><strong>Field name</strong>: customTask<br />
+<p><strong>Field name</strong>: customTask<br>
 <strong>Value</strong>: {{JS - Snowplow duplicator}}</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/12/fields-to-set.jpg" title="Fields to set">
@@ -2263,15 +1916,10 @@ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config a
     </a>
   
 
-
-<p>That&rsquo;s it for the tracker. The way it works now is that whenever your Page View tag fires, it will copy the payload to the Snowplow collector endpoint.</p>
-
+<p>That's it for the tracker. The way it works now is that whenever your Page View tag fires, it will copy the payload to the Snowplow collector endpoint.</p>
 <p>If you want, you can publish your container now, after which every visitor to your website will start sending those Page Views to your collector. However, I recommend you use Preview mode for now, so that only <strong>your</strong> Page Views are sent to the collector.</p>
-
 <p>Once the pipeline is up and running, you can start collecting more comprehensive data from your visitors.</p>
-
 <h2 id="prepare-the-etl-step">Prepare the ETL step</h2>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/12/etl-process.jpg" title="Pub/sub process">
@@ -2281,17 +1929,11 @@ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config a
     </a>
   
 
-
-<p>Before moving forward to the extract, transform, and load (ETL) of your collector data, we&rsquo;ll need to do some preparations.</p>
-
+<p>Before moving forward to the extract, transform, and load (ETL) of your collector data, we'll need to do some preparations.</p>
 <h3 id="step-1-enable-the-dataflow-api">Step 1: Enable the Dataflow API</h3>
-
 <p>The enrichment process and the BigQuery loader require a new service to be enabled.</p>
-
 <p><strong>(1)</strong> Browse to the <a href="https://console.cloud.google.com/apis/library">API library</a>.</p>
-
 <p><strong>(2)</strong> Search for <code>dataflow</code>, and click the <strong>Dataflow API</strong> selector.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/12/dataflow-api.jpg" title="Dataflow API">
@@ -2301,21 +1943,13 @@ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config a
     </a>
   
 
-
 <p><strong>Cloud Dataflow</strong> lets you enrich a data stream with minimal latency. This is exactly what we need. We need the enricher to pull in events for the <strong>Pub/Sub</strong> topic to which the collector writes them, enrich and shred them to proper format, and write them back into a Pub/Sub topic for BigQuery loading.</p>
-
 <p><strong>(3)</strong> Click the <strong>ENABLE</strong> button in the API page to enable this service.</p>
-
-<h3 id="step-2-create-the-necessary-pub-sub-topics-and-subscriptions">Step 2: Create the necessary Pub/Sub topics and subscriptions</h3>
-
+<h3 id="step-2-create-the-necessary-pubsub-topics-and-subscriptions">Step 2: Create the necessary Pub/Sub topics and subscriptions</h3>
 <p>By now, you should have two <strong>Pub/Sub</strong> topics, <code>good</code> and <code>bad</code> for hits processed by your collector.</p>
-
-<p>We&rsquo;ll need to create a bunch of additional topics and subscriptions for the remaining steps of the pipeline.</p>
-
+<p>We'll need to create a bunch of additional topics and subscriptions for the remaining steps of the pipeline.</p>
 <p><strong>(1)</strong> Browse to <a href="https://console.cloud.google.com/cloudpubsub/topicList">https://console.cloud.google.com/cloudpubsub/topicList</a>.</p>
-
 <p><strong>(2)</strong> Click open the <code>good</code> topic, and click <strong>Create Subscription</strong>. Give the subscription the name <code>good-sub</code>.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/12/good-sub.jpg" title="good subscription">
@@ -2325,9 +1959,7 @@ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config a
     </a>
   
 
-
 <p><strong>(3)</strong> Next, create the following topics:</p>
-
 <ol>
 <li><code>bq-bad-rows</code></li>
 <li><code>bq-failed-inserts</code></li>
@@ -2335,13 +1967,9 @@ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config a
 <li><code>enriched-bad</code></li>
 <li><code>enriched-good</code></li>
 </ol>
-
 <p><strong>(4)</strong> Then, click open <code>bq-types</code> and create a new subscription for it named <code>bq-types-sub</code>.</p>
-
 <p><strong>(5)</strong> Finally, click open <code>enriched-good</code> and create a new subscription for it named <code>enriched-good-sub</code>.</p>
-
 <p>This is what the <a href="https://console.cloud.google.com/cloudpubsub/topicList">topic list</a> should look like:</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/12/pubsub-topics.jpg" title="pubsub topics">
@@ -2351,9 +1979,7 @@ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config a
     </a>
   
 
-
 <p>This is what the <a href="https://console.cloud.google.com/cloudpubsub/subscriptions">subscription list</a> should look like:</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/12/subscription-list.jpg" title="Subscription list">
@@ -2363,17 +1989,11 @@ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config a
     </a>
   
 
-
 <p>You can, of course, create additional subscriptions for testing and debugging, but these are what the following steps of the pipeline specifically need.</p>
-
 <h3 id="step-3-create-a-new-storage-bucket-for-temporary-files">Step 3: Create a new storage bucket for temporary files</h3>
-
-<p>You&rsquo;ll need to create a new storage bucket for temporary files created by the enrichment process. But this is a good place to also store some files required by the enrich and load stages.</p>
-
+<p>You'll need to create a new storage bucket for temporary files created by the enrichment process. But this is a good place to also store some files required by the enrich and load stages.</p>
 <p><strong>(1)</strong> Browse to <a href="https://console.cloud.google.com/storage/browser/">https://console.cloud.google.com/storage/browser/</a>.</p>
-
 <p><strong>(2)</strong> Click <strong>CREATE BUCKET</strong> and create a new bucket with the name <code>snowplow-yourname-temp</code> like so:</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/12/snowplow-temp-bucket.jpg" title="Snowplow temp bucket">
@@ -2383,9 +2003,7 @@ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config a
     </a>
   
 
-
 <p><strong>(3)</strong> Click into that bucket and click <strong>Create folder</strong>, and name the new folder <code>temp-files</code>:</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/12/files-folder-bucket.jpg" title="Files folder bucket">
@@ -2395,15 +2013,10 @@ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config a
     </a>
   
 
-
-<h3 id="step-4-create-the-iglu-resolver-json-configuration">Step 4: Create the iglu_resolver.json configuration</h3>
-
+<h3 id="step-4-create-the-iglu-resolverjson-configuration">Step 4: Create the iglu_resolver.json configuration</h3>
 <p>Snowplow uses something called <strong>resolvers</strong> to automatically identify the parameters of each incoming hit. This is necessary for many reasons, the main being hit validation (to identify valid requests from invalid ones), for enriching and shredding the hits to the proper data format, and for mutating and loading the data into BigQuery tables.</p>
-
 <p><strong>(1)</strong> Download the <code>iglu_resolver.json</code> file from <a href="https://raw.githubusercontent.com/snowplow/snowplow/master/3-enrich/config/iglu_resolver.json">here</a> and open it for editing.</p>
-
-<p><strong>(2)</strong> Change the two <code>vendorPrefixes</code> parameters to also include the Google Analytics namespace (<strong>Note!</strong> You don&rsquo;t have to do this if you&rsquo;re using the vanilla Snowplow JavaScript tracker).</p>
-
+<p><strong>(2)</strong> Change the two <code>vendorPrefixes</code> parameters to also include the Google Analytics namespace (<strong>Note!</strong> You don't have to do this if you're using the vanilla Snowplow JavaScript tracker).</p>
 
 
     <a href="https://www.simoahava.com/amp/images/2018/12/google-analytics-schema.jpg" title="Google Analytics schema">
@@ -2413,11 +2026,8 @@ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config a
     </a>
   
 
-
 <p><strong>(3)</strong> Save the file locally.</p>
-
 <p><strong>(4)</strong> Browse to <a href="https://console.cloud.google.com/storage/browser/">https://console.cloud.google.com/storage/browser/</a>, click open the temporary file bucket you just created, and upload the modified <code>iglu_resolver.json</code> to the root of that bucket (so <strong>not</strong> in the <code>temp-files</code> folder).</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/12/iglu-resolver.jpg" title="Iglu resolver">
@@ -2427,15 +2037,10 @@ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config a
     </a>
   
 
-
-<p>With this resolver configuration, you&rsquo;re instructing the enricher and loader that hits using the Google Analytics namespace <em>might</em> be coming in.</p>
-
+<p>With this resolver configuration, you're instructing the enricher and loader that hits using the Google Analytics namespace <em>might</em> be coming in.</p>
 <h3 id="step-5-create-a-new-bigquery-dataset">Step 5: Create a new BigQuery dataset</h3>
-
-<p>Before moving on, you&rsquo;ll need to create a new dataset in BigQuery that will hold the table where your data will end up.</p>
-
+<p>Before moving on, you'll need to create a new dataset in BigQuery that will hold the table where your data will end up.</p>
 <p><strong>(1)</strong> Browse to <a href="https://console.cloud.google.com/bigquery">https://console.cloud.google.com/bigquery</a>, and choose your project from the selector to the left. Click <strong>CREATE DATASET</strong>.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/12/create-dataset.jpg" title="Create new dataset">
@@ -2445,9 +2050,7 @@ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config a
     </a>
   
 
-
 <p><strong>(2)</strong> Give the dataset an ID, such as <code>snowplow_yourname_dataset</code>, and click <strong>Create dataset</strong>.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/12/dataset-id.jpg" title="Dataset ID">
@@ -2457,17 +2060,11 @@ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config a
     </a>
   
 
-
 <p><strong>NOTE!</strong> At this point you might want to just create a new table manually and <a href="https://cloud.google.com/bigquery/docs/partitioned-tables">partition</a> that table on the <code>derived_tstamp</code> column. This way the BigQuery table is automatically partitioned by date of the hit, making it easier to manage and query by date.</p>
-
 <p>This guide proceeds without creating a partitioned table just so that you can see how the mutator works.</p>
-
 <h3 id="step-6-create-the-bigquery-configuration-file">Step 6: Create the BigQuery configuration file</h3>
-
 <p><strong>(1)</strong> Open a new file for editing in a <strong>plain text editor</strong>.</p>
-
 <p><strong>(2)</strong> Copy-paste the following within:</p>
-
 <div class="highlight"><pre class="chroma"><code class="language-json" data-lang="json"><span class="p">{</span>
     <span class="nt">&#34;schema&#34;</span><span class="p">:</span> <span class="s2">&#34;iglu:com.snowplowanalytics.snowplow.storage/bigquery_config/jsonschema/1-0-0&#34;</span><span class="p">,</span>
     <span class="nt">&#34;data&#34;</span><span class="p">:</span> <span class="p">{</span>
@@ -2487,24 +2084,17 @@ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config a
         <span class="nt">&#34;load&#34;</span><span class="p">:</span> <span class="p">{</span>
             <span class="nt">&#34;mode&#34;</span><span class="p">:</span> <span class="s2">&#34;STREAMING_INSERTS&#34;</span><span class="p">,</span>
             <span class="nt">&#34;retry&#34;</span><span class="p">:</span> <span class="kc">false</span>
-        <span class="p">},</span>
+        <span class="p">}</span><span class="p">,</span>
 
         <span class="nt">&#34;purpose&#34;</span><span class="p">:</span> <span class="s2">&#34;ENRICHED_EVENTS&#34;</span>
     <span class="p">}</span>
 <span class="p">}</span></code></pre></div>
-
 <p><strong>(3)</strong> Change the value of <code>&quot;id&quot;</code> to a random UUID which you can generate <a href="https://www.uuidgenerator.net/">here</a>. A valid value would be e.g. <code>&quot;3a27d47f-aeaf-4034-84b6-b1e82ca711d6&quot;</code>.</p>
-
 <p><strong>(4)</strong> Change the value of <code>&quot;projectId&quot;</code> to your GCP project ID (e.g. <code>&quot;snowplow-production-simoahava&quot;</code>).</p>
-
 <p><strong>(5)</strong> Change the value of <code>&quot;datasetId&quot;</code> to the ID you just gave your BigQuery dataset, e.g. <code>&quot;snowplow_simoahava_dataset&quot;</code>.</p>
-
 <p><strong>(6)</strong> Make sure the Pub/Sub topic and subscription names correspond with those you created earlier in this chapter.</p>
-
 <p><strong>(7)</strong> Save the file locally as <code>bigquery_config.json</code>.</p>
-
 <p><strong>(8)</strong> Upload it to the temporary file bucket, where you already uploaded <code>iglu_resolver.json</code> to:</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/12/config-uploaded.jpg" title="Config uploaded">
@@ -2514,29 +2104,17 @@ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config a
     </a>
   
 
-
-<p><strong>PHEW!</strong> That&rsquo;s all the prep work done. Now you&rsquo;ll need to just get the enricher and the BQ loader up and running in a new virtual instance group!</p>
-
+<p><strong>PHEW!</strong> That's all the prep work done. Now you'll need to just get the enricher and the BQ loader up and running in a new virtual instance group!</p>
 <h2 id="finalize-the-etl-process">Finalize the ETL process</h2>
-
-<p>For ETL (extraction, transformation, and loading of your collector data), we&rsquo;ll create a new <strong>instance template</strong> for an auto-scaling <strong>instance group</strong>.</p>
-
+<p>For ETL (extraction, transformation, and loading of your collector data), we'll create a new <strong>instance template</strong> for an auto-scaling <strong>instance group</strong>.</p>
 <p>You <em>could</em> use the same instance group as your collector, but this is not a sustainable way to run the pipeline, because the data streams from your site to the collector, from your collector to the enricher, and from the enriched stream to the BigQuery loader are vastly asymmetrical.</p>
-
 <p>It will lead to a lot of redundancy and overhead if you have all your eggs in one basket.</p>
-
-<p>Optimally, you&rsquo;d run the enrichment and the BQ loader in their own groups, too, but for the sake of this exercise I&rsquo;ll bunch them together for now.</p>
-
+<p>Optimally, you'd run the enrichment and the BQ loader in their own groups, too, but for the sake of this exercise I'll bunch them together for now.</p>
 <h3 id="step-1-create-the-instance-template">Step 1: Create the instance template</h3>
-
-<p>Since you&rsquo;ve done all the preparations in the previous chapter, this final step of the ETL is actually pretty simple. All you&rsquo;ll need to do is create the instance template and fire an instance group off of it.</p>
-
-<p>Well, it&rsquo;s simple <em>to you</em>. It took me hours and hours and hours to get the thing working, so you&rsquo;re welcome!</p>
-
+<p>Since you've done all the preparations in the previous chapter, this final step of the ETL is actually pretty simple. All you'll need to do is create the instance template and fire an instance group off of it.</p>
+<p>Well, it's simple <em>to you</em>. It took me hours and hours and hours to get the thing working, so you're welcome!</p>
 <p><strong>(1)</strong> Browse to <a href="https://console.cloud.google.com/compute/instanceTemplates/list">https://console.cloud.google.com/compute/instanceTemplates/list</a>, and click <strong>CREATE INSTANCE TEMPLATE</strong>.</p>
-
 <p><strong>(2)</strong> Give the template a name, e.g. <code>snowplow-etl-template</code>.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/12/create-etl-template.jpg" title="Create ETL template">
@@ -2546,9 +2124,7 @@ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config a
     </a>
   
 
-
 <p><strong>(3)</strong> Make sure the <strong>Compute Engine default service account</strong> is selected, and choose <strong>Set access for each API</strong> in the Access scopes list.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/12/etl-template-api.jpg" title="ETL template API access">
@@ -2558,18 +2134,14 @@ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config a
     </a>
   
 
-
 <p><strong>(4)</strong> Change the following API scopes:</p>
-
 <ul>
-<li>BigQuery: <strong>Enabled</strong><br /></li>
-<li>Cloud Pub/Sub: <strong>Enabled</strong><br /></li>
-<li>Compute Engine: <strong>Read Write</strong><br /></li>
+<li>BigQuery: <strong>Enabled</strong></li>
+<li>Cloud Pub/Sub: <strong>Enabled</strong></li>
+<li>Compute Engine: <strong>Read Write</strong></li>
 <li>Storage: <strong>Read Write</strong></li>
 </ul>
-
 <p>Leave the other options with their default values.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/12/api-scopes.jpg" title="API scopes">
@@ -2579,9 +2151,7 @@ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config a
     </a>
   
 
-
 <p><strong>(5)</strong> Scroll down and click the <strong>Management, security, disks, networking, sole tenancy</strong> accordion heading.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/12/management-accordion.jpg" title="Management accordion">
@@ -2591,9 +2161,7 @@ java -jar snowplow-stream-collector-google-pubsub-&lt;VERSION&gt;.jar --config a
     </a>
   
 
-
 <p><strong>(6)</strong> Under <strong>Automation</strong>, copy-paste the following code into <strong>Startup script</strong>:</p>
-
 <div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="cp">#! /bin/bash
 </span><span class="cp"></span><span class="nv">enrich_version</span><span class="o">=</span><span class="s2">&#34;0.1.0&#34;</span>
 <span class="nv">bq_version</span><span class="o">=</span><span class="s2">&#34;0.1.0&#34;</span>
@@ -2619,40 +2187,28 @@ gsutil cp gs://<span class="nv">$bucket_name</span>/bigquery_config.json .
 
 ./beam-enrich-<span class="nv">$enrich_version</span>/bin/beam-enrich --runner<span class="o">=</span>DataFlowRunner --project<span class="o">=</span><span class="nv">$project_id</span> --streaming<span class="o">=</span><span class="nb">true</span> --region<span class="o">=</span><span class="nv">$region</span> --gcpTempLocation<span class="o">=</span>gs://<span class="nv">$bucket_name</span>/temp-files --job-name<span class="o">=</span>beam-enrich --raw<span class="o">=</span>projects/<span class="nv">$project_id</span>/subscriptions/good-sub --enriched<span class="o">=</span>projects/<span class="nv">$project_id</span>/topics/enriched-good --bad<span class="o">=</span>projects/<span class="nv">$project_id</span>/topics/enriched-bad --resolver<span class="o">=</span>iglu_resolver.json
 
-./snowplow-bigquery-mutator-<span class="nv">$bq_version</span>/bin/snowplow-bigquery-mutator create --config <span class="k">$(</span>cat bigquery_config.json <span class="p">|</span> base64 -w <span class="m">0</span><span class="k">)</span> --resolver <span class="k">$(</span>cat iglu_resolver.json <span class="p">|</span> base64 -w <span class="m">0</span><span class="k">)</span>
+./snowplow-bigquery-mutator-<span class="nv">$bq_version</span>/bin/snowplow-bigquery-mutator create --config <span class="k">$(</span>cat bigquery_config.json <span class="p">|</span> base64 -w 0<span class="k">)</span> --resolver <span class="k">$(</span>cat iglu_resolver.json <span class="p">|</span> base64 -w 0<span class="k">)</span>
 
-./snowplow-bigquery-mutator-<span class="nv">$bq_version</span>/bin/snowplow-bigquery-mutator listen --config <span class="k">$(</span>cat bigquery_config.json <span class="p">|</span> base64 -w <span class="m">0</span><span class="k">)</span> --resolver <span class="k">$(</span>cat iglu_resolver.json <span class="p">|</span> base64 -w <span class="m">0</span><span class="k">)</span> <span class="p">&amp;</span>
+./snowplow-bigquery-mutator-<span class="nv">$bq_version</span>/bin/snowplow-bigquery-mutator listen --config <span class="k">$(</span>cat bigquery_config.json <span class="p">|</span> base64 -w 0<span class="k">)</span> --resolver <span class="k">$(</span>cat iglu_resolver.json <span class="p">|</span> base64 -w 0<span class="k">)</span> <span class="p">&amp;</span>
 
-./snowplow-bigquery-loader-<span class="nv">$bq_version</span>/bin/snowplow-bigquery-loader --config<span class="o">=</span><span class="k">$(</span>cat bigquery_config.json <span class="p">|</span> base64 -w <span class="m">0</span><span class="k">)</span> --resolver<span class="o">=</span><span class="k">$(</span>cat iglu_resolver.json <span class="p">|</span> base64 -w <span class="m">0</span><span class="k">)</span> --runner<span class="o">=</span>DataFlowRunner --project<span class="o">=</span><span class="nv">$project_id</span> --region<span class="o">=</span><span class="nv">$region</span> --gcpTempLocation<span class="o">=</span>gs://<span class="nv">$bucket_name</span>/temp-files</code></pre></div>
-
-<hr />
-
+./snowplow-bigquery-loader-<span class="nv">$bq_version</span>/bin/snowplow-bigquery-loader --config<span class="o">=</span><span class="k">$(</span>cat bigquery_config.json <span class="p">|</span> base64 -w 0<span class="k">)</span> --resolver<span class="o">=</span><span class="k">$(</span>cat iglu_resolver.json <span class="p">|</span> base64 -w 0<span class="k">)</span> --runner<span class="o">=</span>DataFlowRunner --project<span class="o">=</span><span class="nv">$project_id</span> --region<span class="o">=</span><span class="nv">$region</span> --gcpTempLocation<span class="o">=</span>gs://<span class="nv">$bucket_name</span>/temp-files</code></pre></div>
+<hr>
 <p><strong>UPDATE 18 Jan 2019</strong>.</p>
-
-<p>It might be wise to start off by capping the auto-scaling of the Dataflow jobs. Otherwise, since you&rsquo;re working with streaming inserts, you might end up with lots and lots of virtual machines being started to support the hit stream.</p>
-
+<p>It might be wise to start off by capping the auto-scaling of the Dataflow jobs. Otherwise, since you're working with streaming inserts, you might end up with lots and lots of virtual machines being started to support the hit stream.</p>
 <p>To prevent the <code>loader</code> from auto-scaling out of control, you can cap the number of available workers at e.g. 3 (so max. 3 CPUs are used by the job), or you can turn off auto-scaling altogether by capping the worker number at <code>1</code>.</p>
-
 <p>To set the maximum of 3 workers to the loader, add this to the end of the <code>snowplow-bigquery-loader</code> command:</p>
-
 <p><code>--maxNumWorkers=3</code></p>
-
-<p>Setting the maximum to 1 will lead to a single-worker, non-autoscaling setup. To have more than one worker but no autoscaling, you&rsquo;ll also need to add the option <code>--autoscalingAlgorithm=NONE</code> to the loader.</p>
-
-<hr />
-
-<p>You&rsquo;ll need to populate the five variables in the beginning of the code block before saving the instance template.</p>
-
+<p>Setting the maximum to 1 will lead to a single-worker, non-autoscaling setup. To have more than one worker but no autoscaling, you'll also need to add the option <code>--autoscalingAlgorithm=NONE</code> to the loader.</p>
+<hr>
+<p>You'll need to populate the five variables in the beginning of the code block before saving the instance template.</p>
 <ul>
-<li><code>enrich_version</code>: Get the latest Beam Enrich version number from <a href="https://bintray.com/snowplow/snowplow-generic/snowplow-beam-enrich">here</a>.<br /></li>
-<li><code>bq_version</code>: Get the latest BigQuery Loader version number from <a href="https://bintray.com/snowplow/snowplow-generic/snowplow-bigquery-loader">here</a>.<br /></li>
-<li><code>bucket_name</code>: Type the name of the storage bucket for temporary files you created earlier.<br /></li>
-<li><code>project_id</code>: Type your GCE project ID.<br /></li>
+<li><code>enrich_version</code>: Get the latest Beam Enrich version number from <a href="https://bintray.com/snowplow/snowplow-generic/snowplow-beam-enrich">here</a>.</li>
+<li><code>bq_version</code>: Get the latest BigQuery Loader version number from <a href="https://bintray.com/snowplow/snowplow-generic/snowplow-bigquery-loader">here</a>.</li>
+<li><code>bucket_name</code>: Type the name of the storage bucket for temporary files you created earlier.</li>
+<li><code>project_id</code>: Type your GCE project ID.</li>
 <li><code>region</code>: Choose a region for the Dataflow instances to run in (you need to choose from <a href="https://cloud.google.com/dataflow/docs/concepts/regional-endpoints">this</a> list).</li>
 </ul>
-
-<p>Once you&rsquo;ve made the changes to the startup script, click <strong>Create</strong>.</p>
-
+<p>Once you've made the changes to the startup script, click <strong>Create</strong>.</p>
 
 
     <a href="https://www.simoahava.com/amp/images/2018/12/create-etl-instance-template.jpg" title="Create ETL instance template">
@@ -2662,19 +2218,13 @@ gsutil cp gs://<span class="nv">$bucket_name</span>/bigquery_config.json .
     </a>
   
 
-
 <h3 id="step-2-start-up-a-new-instance-group">Step 2: Start up a new instance group</h3>
-
-<p>Now that you have the template created, it&rsquo;s time to create and start an auto-scaling instance group using this template. The idea is that when requests start flooding in, you&rsquo;ll want to fire up new instances for your enrichment and loading steps so that your data collection won&rsquo;t be impacted too severely by latency.</p>
-
+<p>Now that you have the template created, it's time to create and start an auto-scaling instance group using this template. The idea is that when requests start flooding in, you'll want to fire up new instances for your enrichment and loading steps so that your data collection won't be impacted too severely by latency.</p>
 <blockquote>
-<p><strong>UPDATE 18 Jan 2019</strong>: Instead of creating an auto-scaling instance group, it&rsquo;s more than enough to just use a single machine in the group to handle the Dataflow! This part of the guide was originally based on some misinformation. You can still go ahead with the instance template, but once we reach the section about the instance group, please read the steps carefully.</p>
+<p><strong>UPDATE 18 Jan 2019</strong>: Instead of creating an auto-scaling instance group, it's more than enough to just use a single machine in the group to handle the Dataflow! This part of the guide was originally based on some misinformation. You can still go ahead with the instance template, but once we reach the section about the instance group, please read the steps carefully.</p>
 </blockquote>
-
 <p><strong>(1)</strong> While still in the <strong>instance template list</strong>, click open the template you just created.</p>
-
 <p><strong>(2)</strong> In the top of the page, click <strong>CREATE INSTANCE GROUP</strong>.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/12/create-instance-group.jpg" title="Create instance group">
@@ -2684,13 +2234,9 @@ gsutil cp gs://<span class="nv">$bucket_name</span>/bigquery_config.json .
     </a>
   
 
-
 <p><strong>(3)</strong> Give the new group a descriptive name, such as <code>snowplow-etl-group</code>.</p>
-
 <p><strong>(4)</strong> Choose a region, e.g. <code>europe-west1</code>.</p>
-
 <p><strong>(5)</strong> Make sure the instance template you just created is selected in the <strong>Instance template</strong> menu.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/12/etl-instance-group.jpg" title="ETL instance group">
@@ -2700,13 +2246,10 @@ gsutil cp gs://<span class="nv">$bucket_name</span>/bigquery_config.json .
     </a>
   
 
-
 <blockquote>
 <p><strong>UPDATE 18 Jan 2019</strong>: You can set <strong>Autoscaling</strong> <code>Off</code>. The machine starting the Dataflow jobs does <strong>not</strong> need to autoscale. The Dataflow jobs are the ones that will require more power depending on the throughput rate, but you can start this machine with one static instance, scaling up manually if necessary.</p>
 </blockquote>
-
 <p><strong>(6)</strong> You can keep the rest of the options with their default values, but if you like, you can set the health check to what you use for the collector instance, too.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/12/snowplow-health-check.jpg" title="Snowplow health check">
@@ -2716,25 +2259,24 @@ gsutil cp gs://<span class="nv">$bucket_name</span>/bigquery_config.json .
     </a>
   
 
-
 <p>When ready, click <strong>Create</strong>.</p>
-
 <h2 id="test-everything">Test everything</h2>
-
 <p>When you create the instance group, it runs the startup script from beginning to end. These are the steps it takes, in order:</p>
-
 <ol>
-<li><p>Beam Enrich is started as a new Dataflow job, using <code>iglu_resolver.json</code> for configuration. The Dataflow job essentially starts a new GCE instance group for the job.</p></li>
-
-<li><p>The BigQuery Mutator is run with the <code>create</code> command, and this creates the <code>pageviews</code> table with a simple atomic structure in your BigQuery dataset.</p></li>
-
-<li><p>The Mutator is next run in its own thread with the <code>listen</code> command. This is basically a Java program which listens for incoming, enriched requests being populated in the <code>enriched-good</code> Pub/Sub topic. Each request is parsed for values and data types, and if the <code>pageviews</code> table in BigQuery doesn&rsquo;t have a corresponding column for some value in the request (validated against a schema resolved by the Iglu Resolver), a new column is created.</p></li>
-
-<li><p>Finally, the BigQuery Loader starts up as its own Dataflow GCE instance, and this will load your enriched data into the corresponding columns and rows in your BigQuery table.</p></li>
+<li>
+<p>Beam Enrich is started as a new Dataflow job, using <code>iglu_resolver.json</code> for configuration. The Dataflow job essentially starts a new GCE instance group for the job.</p>
+</li>
+<li>
+<p>The BigQuery Mutator is run with the <code>create</code> command, and this creates the <code>pageviews</code> table with a simple atomic structure in your BigQuery dataset.</p>
+</li>
+<li>
+<p>The Mutator is next run in its own thread with the <code>listen</code> command. This is basically a Java program which listens for incoming, enriched requests being populated in the <code>enriched-good</code> Pub/Sub topic. Each request is parsed for values and data types, and if the <code>pageviews</code> table in BigQuery doesn't have a corresponding column for some value in the request (validated against a schema resolved by the Iglu Resolver), a new column is created.</p>
+</li>
+<li>
+<p>Finally, the BigQuery Loader starts up as its own Dataflow GCE instance, and this will load your enriched data into the corresponding columns and rows in your BigQuery table.</p>
+</li>
 </ol>
-
-<p><strong>Before starting the debugging</strong>, make sure you&rsquo;re sending some hits from your site to the collector. So browse around, visit different pages, and check the network requests to make sure the requests to your collector are completing successfully.</p>
-
+<p><strong>Before starting the debugging</strong>, make sure you're sending some hits from your site to the collector. So browse around, visit different pages, and check the network requests to make sure the requests to your collector are completing successfully.</p>
 
 
     <a href="https://www.simoahava.com/amp/images/2018/12/tracker-success.jpg" title="Tracker success">
@@ -2744,11 +2286,8 @@ gsutil cp gs://<span class="nv">$bucket_name</span>/bigquery_config.json .
     </a>
   
 
-
 <h3 id="step-1-check-that-beam-enrich-is-running">Step 1: Check that Beam Enrich is running</h3>
-
 <p>To check if Beam Enrich is running, go to the <a href="https://console.cloud.google.com/dataflow">Dataflow job list</a>. You should see <code>beam-enrich</code> in the list with the status <strong>Running</strong>.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/12/dataflow-jobs.jpg" title="Dataflow jobs">
@@ -2758,11 +2297,8 @@ gsutil cp gs://<span class="nv">$bucket_name</span>/bigquery_config.json .
     </a>
   
 
-
 <h3 id="step-2-check-that-the-mutator-created-the-table">Step 2: Check that the mutator created the table</h3>
-
-<p>To check if the mutator&rsquo;s <code>create</code> command worked, go to your <a href="https://console.cloud.google.com/bigquery">BigQuery dataset</a>, and expand it. You should see a table named <code>pageviews</code> under it, and the table should be populated with a number of columns, such as <code>app_id</code>, <code>etl_tstamp</code>, etc. These columns are the &ldquo;default&rdquo; atomic data columns Snowplow uses.</p>
-
+<p>To check if the mutator's <code>create</code> command worked, go to your <a href="https://console.cloud.google.com/bigquery">BigQuery dataset</a>, and expand it. You should see a table named <code>pageviews</code> under it, and the table should be populated with a number of columns, such as <code>app_id</code>, <code>etl_tstamp</code>, etc. These columns are the &ldquo;default&rdquo; atomic data columns Snowplow uses.</p>
 
 
     <a href="https://www.simoahava.com/amp/images/2018/12/bigquery-columns.jpg" title="BigQuery columns">
@@ -2772,11 +2308,8 @@ gsutil cp gs://<span class="nv">$bucket_name</span>/bigquery_config.json .
     </a>
   
 
-
 <h3 id="step-3-check-that-the-mutator-creates-additional-columns-where-necessary">Step 3: Check that the mutator creates additional columns where necessary</h3>
-
 <p>Since you are collecting data with the Google Analytics tracker, you should shortly see a bunch of new columns added to the table description.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/12/google-analytics-columns.jpg" title="Google Analytics columns">
@@ -2786,11 +2319,8 @@ gsutil cp gs://<span class="nv">$bucket_name</span>/bigquery_config.json .
     </a>
   
 
-
 <h3 id="step-4-check-that-the-bigquery-loader-dataflow-job-started">Step 4: Check that the BigQuery loader Dataflow job started</h3>
-
 <p>Visit the <a href="https://console.cloud.google.com/dataflow">Dataflow job list</a> again. You should see something like <code>main-root-XXXXX-YYYYY</code> in the list with the status <strong>Running</strong>.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/12/dataflow-jobs.jpg" title="Dataflow jobs">
@@ -2800,17 +2330,11 @@ gsutil cp gs://<span class="nv">$bucket_name</span>/bigquery_config.json .
     </a>
   
 
-
 <h3 id="step-5-check-that-data-is-flowing-into-your-bigquery-table">Step 5: Check that data is flowing into your BigQuery table</h3>
-
 <p>Visit your <a href="https://console.cloud.google.com/bigquery">BigQuery dataset/table</a> again, and select the <code>pageviews</code> table.</p>
-
 <p>In the Query editor, type the following query and press <strong>Run query</strong>:</p>
-
 <div class="highlight"><pre class="chroma"><code class="language-sql" data-lang="sql"><span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="o">`</span><span class="n">your_dataset_name</span><span class="p">.</span><span class="n">pageviews</span><span class="o">`</span></code></pre></div>
-
 <p>Where <code>your_dataset_name</code> should be replaced with the name of your dataset. You should see a bunch of results returned after the query is complete.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/12/sql-query.jpg" title="BigQuery sample query">
@@ -2820,11 +2344,8 @@ gsutil cp gs://<span class="nv">$bucket_name</span>/bigquery_config.json .
     </a>
   
 
-
 <h3 id="troubleshooting">Troubleshooting</h3>
-
 <p>You can visit the <a href="https://console.cloud.google.com/compute/instances">VM instances</a> list and SSH directly into the ETL instance.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/12/instance-ssh.jpg" title="SSH into instance">
@@ -2834,43 +2355,35 @@ gsutil cp gs://<span class="nv">$bucket_name</span>/bigquery_config.json .
     </a>
   
 
-
 <p>There, you can visit <code>/var/log/</code>, and open the file <code>daemon.log</code> for editing with e.g.</p>
-
 <div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ pico /var/log/daemon.log</code></pre></div>
-
-<p>It&rsquo;s a full log of the the instance&rsquo;s processes. You&rsquo;ll need to run through the log and see where the error is.</p>
-
+<p>It's a full log of the the instance's processes. You'll need to run through the log and see where the error is.</p>
 <p>There are many things that might have gone wrong, but the most common (in my own experience) are:</p>
-
 <ol>
-<li><p>Incorrect access scopes in the instance template - double-check <a href="#step-1-create-the-instance-template">here</a>.</p></li>
-
-<li><p>Typo in <code>iglu_resolver.json</code> or <code>bigquery_config.json</code>, or forgot to add them to the correct cloud storage bucket - double-check <a href="#step-4-create-the-iglu-resolver-json-configuration">resolver here</a> and BigQuery config <a href="#step-6-create-the-bigquery-configuration-file">here</a>.</p></li>
-
-<li><p>Typo in the startup script - double-check <a href="#step-1-create-the-instance-template">here</a>.</p></li>
-
-<li><p>Collector not running - double-check <a href="#step-5-testing-everything">here</a>.</p></li>
-
-<li><p>Impatience - wait 10-15 minutes before trying all the steps above again. It&rsquo;s possible you&rsquo;re just too hasty and the virtual machine instance hasn&rsquo;t started up properly yet.</p></li>
+<li>
+<p>Incorrect access scopes in the instance template - double-check <a href="#step-1-create-the-instance-template">here</a>.</p>
+</li>
+<li>
+<p>Typo in <code>iglu_resolver.json</code> or <code>bigquery_config.json</code>, or forgot to add them to the correct cloud storage bucket - double-check <a href="#step-4-create-the-iglu-resolver-json-configuration">resolver here</a> and BigQuery config <a href="#step-6-create-the-bigquery-configuration-file">here</a>.</p>
+</li>
+<li>
+<p>Typo in the startup script - double-check <a href="#step-1-create-the-instance-template">here</a>.</p>
+</li>
+<li>
+<p>Collector not running - double-check <a href="#step-5-testing-everything">here</a>.</p>
+</li>
+<li>
+<p>Impatience - wait 10-15 minutes before trying all the steps above again. It's possible you're just too hasty and the virtual machine instance hasn't started up properly yet.</p>
+</li>
 </ol>
-
 <h2 id="final-thoughts">Final thoughts</h2>
-
-<p>It&rsquo;s a long guide, but I still worry if it&rsquo;s detailed enough. I&rsquo;m a bit ashamed at not being able to tell you exactly how you should scale and group your instances, or how you should optimize your load balancing system. But these are things you need to experiment with by yourself, or with the help of a seasoned data engineer. Remember that you can also utilize the <a href="https://snowplowanalytics.com/products/snowplow-insights/">Snowplow Insights service</a> to help you set things up and manage the pipeline!</p>
-
-<p>I very much prefer the GCP user interface over AWS - there&rsquo;s a <strong>flow</strong> to things, and related resources are grouped and linked together in a logical way. It makes moving from one service to another much smoother.</p>
-
-<p>Setting up the pipeline is fun (if you&rsquo;re into that kind of thing), but it does result in a huge data table full of columns and rows of often undecipherable data. One thing I tend to forget is that the real work begins after the pipeline is created. Making sense of the data requires, at the very least, visualization in a tool such as Data Studio, but you might want to look at what Snowplow has to say about data modelling, too.</p>
-
-<p>I think Snowplow&rsquo;s done an impressive job of making it possible create your own analytics pipeline with a fairly manageable cost. There are things that could have been done far more smoothly, such as utilizing <a href="https://cloud.google.com/cloud-build/docs/quickstart-docker">Docker</a> containers <a href="https://github.com/snowplow-incubator/snowplow-bigquery-loader/wiki/Setup-guide#docker-support">offered by Snowplow</a>.</p>
-
+<p>It's a long guide, but I still worry if it's detailed enough. I'm a bit ashamed at not being able to tell you exactly how you should scale and group your instances, or how you should optimize your load balancing system. But these are things you need to experiment with by yourself, or with the help of a seasoned data engineer. Remember that you can also utilize the <a href="https://snowplowanalytics.com/products/snowplow-insights/">Snowplow Insights service</a> to help you set things up and manage the pipeline!</p>
+<p>I very much prefer the GCP user interface over AWS - there's a <strong>flow</strong> to things, and related resources are grouped and linked together in a logical way. It makes moving from one service to another much smoother.</p>
+<p>Setting up the pipeline is fun (if you're into that kind of thing), but it does result in a huge data table full of columns and rows of often undecipherable data. One thing I tend to forget is that the real work begins after the pipeline is created. Making sense of the data requires, at the very least, visualization in a tool such as Data Studio, but you might want to look at what Snowplow has to say about data modelling, too.</p>
+<p>I think Snowplow's done an impressive job of making it possible create your own analytics pipeline with a fairly manageable cost. There are things that could have been done far more smoothly, such as utilizing <a href="https://cloud.google.com/cloud-build/docs/quickstart-docker">Docker</a> containers <a href="https://github.com/snowplow-incubator/snowplow-bigquery-loader/wiki/Setup-guide#docker-support">offered by Snowplow</a>.</p>
 <p>There are many moving parts in the pipeline. For me, personally, the race between different services enriching, shredding, mutating, and loading each incoming request is still a bit of a mystery. Snowplow has services (such as the <a href="https://github.com/snowplow-incubator/snowplow-bigquery-loader/wiki/Setup-guide#forwarder">BigQuery forwarder</a>) that handle these problems, but setting it up was beyond the scope of this guide.</p>
-
-<p>There&rsquo;s also the whole world of enrichments that I deliberately skipped. It&rsquo;s painful to see the columns for e.g. geographical data showing <code>null</code>, but I&rsquo;ll leave those for another guide.</p>
-
-<p>One thing to note is that you should keep a keen eye on projected and actualized costs. Once you&rsquo;ve managed to build the pipeline itself, your next job as a data engineer is to look for optimization opportunities. With a scalable cloud infrastructure, it&rsquo;s important to understand the often strenuous relationship between latency, scale, and cost.</p>
-
+<p>There's also the whole world of enrichments that I deliberately skipped. It's painful to see the columns for e.g. geographical data showing <code>null</code>, but I'll leave those for another guide.</p>
+<p>One thing to note is that you should keep a keen eye on projected and actualized costs. Once you've managed to build the pipeline itself, your next job as a data engineer is to look for optimization opportunities. With a scalable cloud infrastructure, it's important to understand the often strenuous relationship between latency, scale, and cost.</p>
 
 
     <a href="https://www.simoahava.com/amp/images/2018/12/cost.jpg">
@@ -2880,10 +2393,8 @@ gsutil cp gs://<span class="nv">$bucket_name</span>/bigquery_config.json .
     </a>
   
 
-
-<p>I hope this guide has been useful. I also hope it doesn&rsquo;t become outdated too soon.</p>
-
-<p>Huge thanks to <strong>Snowplow</strong> for providing me with help and resources throughout writing this guide. I&rsquo;m especially grateful to <strong>Yali Sassoon</strong> and <strong>Joao Luis</strong> for their support.</p>
+<p>I hope this guide has been useful. I also hope it doesn't become outdated too soon.</p>
+<p>Huge thanks to <strong>Snowplow</strong> for providing me with help and resources throughout writing this guide. I'm especially grateful to <strong>Yali Sassoon</strong> and <strong>Joao Luis</strong> for their support.</p>
 
     </section>
 

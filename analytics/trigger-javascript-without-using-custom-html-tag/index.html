@@ -53,7 +53,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.59.1 with theme Tranquilpeak 0.4.3-BETA">
+    <meta name="generator" content="Hugo 0.61.0 with theme Tranquilpeak 0.4.3-BETA">
     <title>#GTMTips: Trigger Javascript Function Without Using A Custom HTML Tag | Simo Ahava's blog</title>
     
     <script>
@@ -319,16 +319,10 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              
-
-<p>The <strong>Custom HTML tag</strong> in <a href="https://tagmanager.google.com/">Google Tag Manager</a> is splendid. It&rsquo;s your go-to tool when you need to run arbitrary JavaScript on the webpage. Some might even use it to actually add HTML elements to the page, but I&rsquo;m willing to bet running JavaScript is its most common use.</p>
-
-<p>However, there&rsquo;s a downside to Custom HTML tags, which is only made more apparent on single-page apps which do not clear the full page when transitioning from one state to another. Custom HTML tags are <strong>injected to the end of <code>&lt;body&gt;</code></strong>, which means you might end up with a <strong>lot</strong> of clutter in your Document Object Model.</p>
-
-<p>In this article, I&rsquo;ll show you a pretty neat trick. We&rsquo;ll use <a href="https://www.simoahava.com/analytics/customtask-the-guide/"><code>customTask</code></a> to run a &ldquo;dummy&rdquo; Universal Analytics tag, whose only purpose is to execute your JavaScript code when the tag is triggered. This way, nothing is injected into the DOM, and the only overhead you&rsquo;ll run is the initial effort of creating the Google Analytics tracker.</p>
-
+              <p>The <strong>Custom HTML tag</strong> in <a href="https://tagmanager.google.com/">Google Tag Manager</a> is splendid. It's your go-to tool when you need to run arbitrary JavaScript on the webpage. Some might even use it to actually add HTML elements to the page, but I'm willing to bet running JavaScript is its most common use.</p>
+<p>However, there's a downside to Custom HTML tags, which is only made more apparent on single-page apps which do not clear the full page when transitioning from one state to another. Custom HTML tags are <strong>injected to the end of <code>&lt;body&gt;</code></strong>, which means you might end up with a <strong>lot</strong> of clutter in your Document Object Model.</p>
+<p>In this article, I'll show you a pretty neat trick. We'll use <a href="https://www.simoahava.com/analytics/customtask-the-guide/"><code>customTask</code></a> to run a &ldquo;dummy&rdquo; Universal Analytics tag, whose only purpose is to execute your JavaScript code when the tag is triggered. This way, nothing is injected into the DOM, and the only overhead you'll run is the initial effort of creating the Google Analytics tracker.</p>
 <h2 id="tip-94-trigger-custom-javascript-without-using-a-custom-html-tag">Tip 94: Trigger custom JavaScript without using a Custom HTML tag</h2>
-
 
 
 
@@ -344,9 +338,7 @@
 </div>
 
 
-
 <p>The way it works is fairly simple if you understand how <a href="https://www.simoahava.com/analytics/customtask-the-guide/"><code>customTask</code></a> works. This is what a sample function might look like:</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
   <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">model</span>) {
     <span style="color:#75715e">// Prevent task queue from being run
@@ -362,13 +354,9 @@
   }
 }
 </code></pre></div>
-
-<p>The first few lines of the closure simply prevent the tag from doing anything. They <code>null</code> every single value stored in the model object, including all the <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/tasks">tasks</a>. This way once the <code>customTask</code> finishes, the hit builder will no longer do anything else (such as build and send the hit). That&rsquo;s why I call it a &ldquo;dummy&rdquo; tag.</p>
-
-<p>After <code>// The code you want to execute</code> is where you&rsquo;ll add the JavaScript you want to run. In this example, I&rsquo;m firing a simple HTTP POST request to an endpoint on my server.</p>
-
+<p>The first few lines of the closure simply prevent the tag from doing anything. They <code>null</code> every single value stored in the model object, including all the <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/tasks">tasks</a>. This way once the <code>customTask</code> finishes, the hit builder will no longer do anything else (such as build and send the hit). That's why I call it a &ldquo;dummy&rdquo; tag.</p>
+<p>After <code>// The code you want to execute</code> is where you'll add the JavaScript you want to run. In this example, I'm firing a simple HTTP POST request to an endpoint on my server.</p>
 <p>The tag itself can be any Universal Analytics tag. All it needs is the Tracking ID (can be anything you want since the hit will never be dispatched) and the <code>customTask</code> in its field, like so:</p>
-
 
 
 
@@ -384,13 +372,9 @@
 </div>
 
 
-
 <p>As you can see, the tag is extremely simple. Its only purpose is to execute the JavaScript in the <code>customTask</code> variable.</p>
-
 <p>The other critical thing is the <strong>trigger</strong>. Use the trigger to establish when the JavaScript should be executed. In the example above, when the <code>nonIdle</code> event is pushed into <code>dataLayer</code>, the tag will run the code within <strong>{{JS - function - Increase counter}}</strong>.</p>
-
 <p>To <strong>summarize</strong>, this method seeks to address the following malady:</p>
-
 
 
 
@@ -406,14 +390,10 @@
 </div>
 
 
-
 <p>Aside from looking hideous, every single element dynamically inserted into the DOM forces a <strong>reflow</strong> of the page, which becomes cumulatively more and more expensive the more elements are being added.</p>
-
-<p>By avoiding DOM injection, the JavaScript function is run within the bowels of Google Tag Manager&rsquo;s container (where it&rsquo;s compiled into a function) and analytics.js (which builds the hit).</p>
-
-<p>This way, you&rsquo;ve essentially created a <strong>JavaScript Function Tag</strong>, whose only purpose is to trigger the execution of JavaScript code.</p>
-
-<p><code>customTask</code> strikes again! Do you think you&rsquo;ll have uses for a hack like this? Let me know in the comments.</p>
+<p>By avoiding DOM injection, the JavaScript function is run within the bowels of Google Tag Manager's container (where it's compiled into a function) and analytics.js (which builds the hit).</p>
+<p>This way, you've essentially created a <strong>JavaScript Function Tag</strong>, whose only purpose is to trigger the execution of JavaScript code.</p>
+<p><code>customTask</code> strikes again! Do you think you'll have uses for a hack like this? Let me know in the comments.</p>
 
               
 

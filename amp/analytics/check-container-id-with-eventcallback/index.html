@@ -121,8 +121,6 @@
 
 <meta itemprop="name" content="#GTMTips: Check Container ID With eventCallback">
 <meta itemprop="description" content="When using eventCallback with dataLayer.push(), Google Tag Manager automatically passes the container ID which invoked the callback as an argument. Use this to run code against the correct container.">
-
-
 <meta itemprop="datePublished" content="2018-03-14T11:40:51&#43;02:00" />
 <meta itemprop="dateModified" content="2018-03-14T11:40:51&#43;02:00" />
 <meta itemprop="wordCount" content="497">
@@ -130,7 +128,6 @@
 
 
 <meta itemprop="keywords" content="google tag manager,gtmtips,eventcallback," />
-
 <script type="application/ld+json">
 {
     "@context": "http://schema.org",
@@ -909,20 +906,12 @@ on
     </header>
 
     <section class="post-content">
-      
-
-<p>When you use the <code>dataLayer.push()</code> command on a page with a <a href="https://tagmanager.google.com/">Google Tag Manager</a> container, you pass information to GTM&rsquo;s <a href="https://www.simoahava.com/amp/analytics/data-layer/">internal data model</a> and potentially fire tags (if the <code>push()</code> <a href="https://www.simoahava.com/amp/gtm-tips/add-the-event-key-to-datalayer-pushes/">contained an <code>event</code> key</a>). You can also <a href="https://www.simoahava.com/amp/gtm-tips/hitcallback-eventcallback/">add the <code>eventCallback</code> key</a> to these pushes. The value of this key should be a function, and this function is then executed once the container finishes processing any tags that might have fired on that <code>dataLayer.push()</code>.</p>
-
+      <p>When you use the <code>dataLayer.push()</code> command on a page with a <a href="https://tagmanager.google.com/">Google Tag Manager</a> container, you pass information to GTM's <a href="https://www.simoahava.com/amp/analytics/data-layer/">internal data model</a> and potentially fire tags (if the <code>push()</code> <a href="https://www.simoahava.com/amp/gtm-tips/add-the-event-key-to-datalayer-pushes/">contained an <code>event</code> key</a>). You can also <a href="https://www.simoahava.com/amp/gtm-tips/hitcallback-eventcallback/">add the <code>eventCallback</code> key</a> to these pushes. The value of this key should be a function, and this function is then executed once the container finishes processing any tags that might have fired on that <code>dataLayer.push()</code>.</p>
 <p>This is useful if you want to give Google Tag Manager time to complete its operations before proceeding with other actions on the page, for example.</p>
-
-<p>There&rsquo;s a wrinkle, though. Because <a href="https://www.simoahava.com/gtm-tips/multiple-gtm-containers-on-the-page/">Google Tag Manager supports adding multiple containers to the page</a>, the <code>eventCallback</code> is called once for every single container on the page.</p>
-
-<p>&ldquo;But I don&rsquo;t use multiple containers on the page&rdquo;, I hear you exclaim. Good for you! However, if you are running an <a href="https://optimize.google.com/">Optimize</a> experiment on the page, or if you are also loading <a href="https://developers.google.com/gtagjs/">gtag.js</a>, <code>eventCallback</code> will be invoked once per each implementation thereof, too. Why? Because they use Google Tag Manager as the underlying tech.</p>
-
-<p>In this tip, we&rsquo;ll learn how to detect which Google Tag Manager container invoked the callback and use that to effectively deduplicate the execution of our code.</p>
-
+<p>There's a wrinkle, though. Because <a href="https://www.simoahava.com/gtm-tips/multiple-gtm-containers-on-the-page/">Google Tag Manager supports adding multiple containers to the page</a>, the <code>eventCallback</code> is called once for every single container on the page.</p>
+<p>&ldquo;But I don't use multiple containers on the page&rdquo;, I hear you exclaim. Good for you! However, if you are running an <a href="https://optimize.google.com/">Optimize</a> experiment on the page, or if you are also loading <a href="https://developers.google.com/gtagjs/">gtag.js</a>, <code>eventCallback</code> will be invoked once per each implementation thereof, too. Why? Because they use Google Tag Manager as the underlying tech.</p>
+<p>In this tip, we'll learn how to detect which Google Tag Manager container invoked the callback and use that to effectively deduplicate the execution of our code.</p>
 <h2 id="tip-74-eventcallback-automatically-receives-the-container-id-as-the-method-argument">Tip 74: eventCallback automatically receives the Container ID as the method argument</h2>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/03/check-container-id-eventcallback.jpg" title="Check the container ID argument in eventCallback">
@@ -932,44 +921,37 @@ on
     </a>
   
 
-
 <p>The tip is simple (as these things usually tend to be). The <strong>Google Tag Manager container ID</strong> (e.g. <strong>GTM-12345</strong>) which invoked the <code>eventCallback</code> method will be automatically passed as a parameter to the function you have set up as the <code>eventCallback</code>.</p>
-
 <p>If you have multiple containers on the page, <code>eventCallback</code> will fire once for each container, once they finish firing whatever tags the <code>dataLayer.push()</code> triggered. Each time a container invokes the <code>eventCallback</code> method, its container ID will be the argument.</p>
-
-<p>As an example, let&rsquo;s say I have three Google Tag Manager containers running on the site.</p>
-
+<p>As an example, let's say I have three Google Tag Manager containers running on the site.</p>
 <ol>
-<li><p>Google Tag Manager container with ID GTM-12345</p></li>
-
-<li><p>Google Optimize container with ID GTM-23456</p></li>
-
-<li><p>gtag.js library collecting to UA-12345-1</p></li>
+<li>
+<p>Google Tag Manager container with ID GTM-12345</p>
+</li>
+<li>
+<p>Google Optimize container with ID GTM-23456</p>
+</li>
+<li>
+<p>gtag.js library collecting to UA-12345-1</p>
+</li>
 </ol>
-
-<p>Next, I&rsquo;ll run the following code in the JavaScript console:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nb">window</span><span class="p">.</span><span class="nx">dataLayer</span> <span class="o">=</span> <span class="nb">window</span><span class="p">.</span><span class="nx">dataLayer</span> <span class="o">||</span> <span class="p">[];</span>
-<span class="nb">window</span><span class="p">.</span><span class="nx">dataLayer</span><span class="p">.</span><span class="nx">push</span><span class="p">({</span>
+<p>Next, I'll run the following code in the JavaScript console:</p>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nb">window</span><span class="p">.</span><span class="nx">dataLayer</span> <span class="o">=</span> <span class="nb">window</span><span class="p">.</span><span class="nx">dataLayer</span> <span class="o">||</span> <span class="p">[</span><span class="p">]</span><span class="p">;</span>
+<span class="nb">window</span><span class="p">.</span><span class="nx">dataLayer</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="p">{</span>
   <span class="nx">event</span><span class="o">:</span> <span class="s1">&#39;GTMEvent&#39;</span><span class="p">,</span>
   <span class="nx">eventCallback</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">containerId</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Container ID: &#39;</span> <span class="o">+</span> <span class="nx">containerId</span><span class="p">);</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Container ID: &#39;</span> <span class="o">+</span> <span class="nx">containerId</span><span class="p">)</span><span class="p">;</span>
   <span class="p">}</span>
-<span class="p">});</span>
+<span class="p">}</span><span class="p">)</span><span class="p">;</span>
 </code></pre></div>
-
 <p>The output in the console looks something like this:</p>
-
 <div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">Container ID: GTM-12345
 Container ID: GTM-23456
 Container ID: UA-12345-1</code></pre></div>
-
-<p>As you can see, with each iteration of the callback, the container ID was automatically assigned as an argument to the function. With this information, it&rsquo;s easy to deduplicate your <code>eventCallback</code> method so that it only reacts to the &ldquo;correct&rdquo; container.</p>
-
+<p>As you can see, with each iteration of the callback, the container ID was automatically assigned as an argument to the function. With this information, it's easy to deduplicate your <code>eventCallback</code> method so that it only reacts to the &ldquo;correct&rdquo; container.</p>
 <p>For example, here I want to execute some code only when GTM-12345 invokes the callback:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nb">window</span><span class="p">.</span><span class="nx">dataLayer</span> <span class="o">=</span> <span class="nb">window</span><span class="p">.</span><span class="nx">dataLayer</span> <span class="o">||</span> <span class="p">[];</span>
-<span class="nb">window</span><span class="p">.</span><span class="nx">dataLayer</span><span class="p">.</span><span class="nx">push</span><span class="p">({</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nb">window</span><span class="p">.</span><span class="nx">dataLayer</span> <span class="o">=</span> <span class="nb">window</span><span class="p">.</span><span class="nx">dataLayer</span> <span class="o">||</span> <span class="p">[</span><span class="p">]</span><span class="p">;</span>
+<span class="nb">window</span><span class="p">.</span><span class="nx">dataLayer</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="p">{</span>
   <span class="nx">event</span><span class="o">:</span> <span class="s1">&#39;GTMEvent&#39;</span><span class="p">,</span>
   <span class="nx">eventCallback</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">containerId</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="nx">containerId</span> <span class="o">===</span> <span class="s1">&#39;GTM-12345&#39;</span><span class="p">)</span> <span class="p">{</span>
@@ -977,10 +959,9 @@ Container ID: UA-12345-1</code></pre></div>
 </span><span class="c1"></span>    <span class="p">}</span>
     <span class="c1">// Ignore if not GTM-12345
 </span><span class="c1"></span>  <span class="p">}</span>
-<span class="p">});</span>
+<span class="p">}</span><span class="p">)</span><span class="p">;</span>
 </code></pre></div>
-
-<p>By simply checking what the container ID passed as an argument was, it&rsquo;s trivial to make sure your <code>eventCallback</code> code isn&rsquo;t executed over and over again with each additional container on the page.</p>
+<p>By simply checking what the container ID passed as an argument was, it's trivial to make sure your <code>eventCallback</code> code isn't executed over and over again with each additional container on the page.</p>
 
     </section>
 

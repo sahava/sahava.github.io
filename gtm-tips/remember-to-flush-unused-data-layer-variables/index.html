@@ -53,7 +53,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.59.1 with theme Tranquilpeak 0.4.3-BETA">
+    <meta name="generator" content="Hugo 0.61.0 with theme Tranquilpeak 0.4.3-BETA">
     <title>#GTMTips: Remember To Flush Unused Data Layer Variables | Simo Ahava's blog</title>
     
     <script>
@@ -319,12 +319,8 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              
-
-<p>Here&rsquo;s a tip that&rsquo;s especially important to anyone working with a single-page application. <a href="https://tagmanager.google.com">Google Tag Manager</a> <em>persists</em> items in its <a href="https://www.simoahava.com/analytics/google-tag-manager-data-model/">data model</a> until you either manually delete the variable and/or its value from the data model, or until the user browses away from the page. There&rsquo;s nothing as annoying as the example in the image below, where a value that was set for an earlier Tag is resent with a new Tag, even though the purpose was to leave it out.</p>
-
+              <p>Here's a tip that's especially important to anyone working with a single-page application. <a href="https://tagmanager.google.com">Google Tag Manager</a> <em>persists</em> items in its <a href="https://www.simoahava.com/analytics/google-tag-manager-data-model/">data model</a> until you either manually delete the variable and/or its value from the data model, or until the user browses away from the page. There's nothing as annoying as the example in the image below, where a value that was set for an earlier Tag is resent with a new Tag, even though the purpose was to leave it out.</p>
 <h2 id="tip-26-flush-unused-data-layer-variables">Tip 26: Flush unused Data Layer Variables</h2>
-
 
 
 
@@ -340,38 +336,26 @@
 </div>
 
 
-
-<p>Let&rsquo;s extend the example in the image above. Say you have a Google Analytics Event Tag, which fires on the <code>makeMoney</code> Custom Event Trigger, and has the following Tag settings:</p>
-
-<p><strong>Event Category:</strong> Make Money<br />
-<strong>Event Action:</strong> {{DLV - userId}}<br />
-<strong>Event Label:</strong> {{DLV - criminalStatus}}<br />
+<p>Let's extend the example in the image above. Say you have a Google Analytics Event Tag, which fires on the <code>makeMoney</code> Custom Event Trigger, and has the following Tag settings:</p>
+<p><strong>Event Category:</strong> Make Money<br>
+<strong>Event Action:</strong> {{DLV - userId}}<br>
+<strong>Event Label:</strong> {{DLV - criminalStatus}}<br>
 <strong>Event Value:</strong> {{DLV - howMuch}}</p>
-
-<p>As you can see, the naming convention I use for the Variables is pretty self-explanatory. It&rsquo;s just the variable name in the Data Layer prefixed by &ldquo;DLV - &ldquo;.</p>
-
+<p>As you can see, the naming convention I use for the Variables is pretty self-explanatory. It's just the variable name in the Data Layer prefixed by &ldquo;DLV - &ldquo;.</p>
 <p>So, this Tag fires when the first payload is pushed. It gets the following values:</p>
-
-<p><strong>Event Category:</strong> Make Money<br />
-<strong>Event Action:</strong> abcb-1234<br />
-<strong>Event Label:</strong> true<br />
+<p><strong>Event Category:</strong> Make Money<br>
+<strong>Event Action:</strong> abcb-1234<br>
+<strong>Event Label:</strong> true<br>
 <strong>Event Value:</strong> 10000</p>
-
 <p>This Event signifies that a user with ID &ldquo;abcb-1234&rdquo; has scored 10000 dollars in a nefarious scheme, and this event is thus labelled as a criminal act. I will send this information to the proper authorities, after first taking my cut.</p>
-
 <p>Next, the same person, on the same page, decides to make amends and scores a far more appropriate amount of cash in this cyber-scam:</p>
-
-<p><strong>Event Category:</strong> Make Money<br />
-<strong>Event Action:</strong> ddff-2211<br />
-<strong>Event Label:</strong> true<br />
+<p><strong>Event Category:</strong> Make Money<br>
+<strong>Event Action:</strong> ddff-2211<br>
+<strong>Event Label:</strong> true<br>
 <strong>Event Value:</strong> 2000</p>
-
-<p>But what&rsquo;s that? Criminal status is still <strong>true</strong>?! But you left it out of the <code>dataLayer.push()</code>, why would it still be there? Shouldn&rsquo;t it be empty? Is there no way for this vigilante to escape the searchlights of the police helicopter patrolling the abandoned brick factory?</p>
-
-<p>You see, because there was no reload, the value of the <code>criminalStatus</code> variable in GTM&rsquo;s data model remains <strong>true</strong> until overwritten, or until a page (re)load is executed.</p>
-
-<p>This is why the following bit is important. Whenever you push a payload to <code>dataLayer</code> that makes a Tag Trigger, make sure you&rsquo;ve accounted for <strong>any other Data Layer Variables the Tag might use</strong>. In the example we&rsquo;ve used until now, if you want to make sure that <code>criminalStatus</code> is flushed for the second push, you would use the following syntax in the push:</p>
-
+<p>But what's that? Criminal status is still <strong>true</strong>?! But you left it out of the <code>dataLayer.push()</code>, why would it still be there? Shouldn't it be empty? Is there no way for this vigilante to escape the searchlights of the police helicopter patrolling the abandoned brick factory?</p>
+<p>You see, because there was no reload, the value of the <code>criminalStatus</code> variable in GTM's data model remains <strong>true</strong> until overwritten, or until a page (re)load is executed.</p>
+<p>This is why the following bit is important. Whenever you push a payload to <code>dataLayer</code> that makes a Tag Trigger, make sure you've accounted for <strong>any other Data Layer Variables the Tag might use</strong>. In the example we've used until now, if you want to make sure that <code>criminalStatus</code> is flushed for the second push, you would use the following syntax in the push:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
   <span style="color:#e6db74">&#39;event&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;makeMoney&#39;</span>,
   <span style="color:#e6db74">&#39;howMuch&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;2000&#39;</span>,
@@ -379,14 +363,10 @@
   <span style="color:#e6db74">&#39;criminalStatus&#39;</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">undefined</span>
 });
 </code></pre></div>
-
 <p>This stores the value <code>undefined</code> for the variable <code>criminalStatus</code>, effectively making it so that the variable does not resolve, dropping the parameter from the Google Analytics hit entirely.</p>
-
 <p>So remember to flush those unused variables!</p>
-
-<p>One other thing. You might be concerned that when using <strong>Enhanced Ecommerce</strong>, this means that your impressions (which you send with the Page View Tag, right?) will be sent with every single other Enhanced Ecommerce hit on the page as well. Worry not! Enhanced Ecommerce is special. It leverages an older version of GTM&rsquo;s data model, where objects are not merged together. With <a href="https://www.simoahava.com/analytics/ecommerce-tips-google-tag-manager/">Enhanced Ecommerce</a>, only the most recent hit is ever processed by your Tags.</p>
-
-<p>That&rsquo;s it. Go enjoy the summer!</p>
+<p>One other thing. You might be concerned that when using <strong>Enhanced Ecommerce</strong>, this means that your impressions (which you send with the Page View Tag, right?) will be sent with every single other Enhanced Ecommerce hit on the page as well. Worry not! Enhanced Ecommerce is special. It leverages an older version of GTM's data model, where objects are not merged together. With <a href="https://www.simoahava.com/analytics/ecommerce-tips-google-tag-manager/">Enhanced Ecommerce</a>, only the most recent hit is ever processed by your Tags.</p>
+<p>That's it. Go enjoy the summer!</p>
 
               
 

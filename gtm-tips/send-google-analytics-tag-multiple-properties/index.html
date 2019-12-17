@@ -53,7 +53,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.59.1 with theme Tranquilpeak 0.4.3-BETA">
+    <meta name="generator" content="Hugo 0.61.0 with theme Tranquilpeak 0.4.3-BETA">
     <title>#GTMTips: Send Google Analytics Tag To Multiple Properties | Simo Ahava's blog</title>
     
     <script>
@@ -319,14 +319,9 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              
-
-<p>Here we are again, revisiting an old theme. When using <a href="https://tagmanager.google.com/">Google Tag Manager</a>, we often want to send the contents of the same tag to multiple <a href="https://analytics.google.com">Universal Analytics</a> properties. With on-page GA, this used to be quite simple, as all you had to do was create a new tracker and then just remember to run the <code>ga('trackerName.send'...)</code> commands to all the trackers (or you could use my <a href="https://www.simoahava.com/analytics/simple-tracker-duplication-universal-analytics/">duplicator</a> plugin). With GTM, your options are more limited, since Google Tag Manager abstracts the tracker object, giving you far fewer tools to work with.</p>
-
+              <p>Here we are again, revisiting an old theme. When using <a href="https://tagmanager.google.com/">Google Tag Manager</a>, we often want to send the contents of the same tag to multiple <a href="https://analytics.google.com">Universal Analytics</a> properties. With on-page GA, this used to be quite simple, as all you had to do was create a new tracker and then just remember to run the <code>ga('trackerName.send'...)</code> commands to all the trackers (or you could use my <a href="https://www.simoahava.com/analytics/simple-tracker-duplication-universal-analytics/">duplicator</a> plugin). With GTM, your options are more limited, since Google Tag Manager abstracts the tracker object, giving you far fewer tools to work with.</p>
 <p>Even though there are <a href="https://www.simoahava.com/analytics/firing-a-single-tag-multiple-times-in-gtm/">workarounds</a>, only the very recent release of the <a href="https://www.simoahava.com/gtm-tips/use-customtask-access-tracker-values-google-tag-manager/"><code>customTask</code></a> gave us a way to do this economically with minimum risk to our existing tracking.</p>
-
 <h2 id="tip-60-use-customtask-to-duplicate-your-ga-hits">Tip 60: Use customTask to duplicate your GA hits</h2>
-
 
 
 
@@ -342,16 +337,11 @@
 </div>
 
 
-
-<p>With this solution, you&rsquo;re overriding <code>customTask</code> in the GA tags that you want to distribute to multiple properties. The new <code>customTask</code> modifies the Universal Analytics task queue, so that the original hit is first sent, then the payload is duplicated with a new tracking ID, and then the modified payload is sent to GA, too.</p>
-
+<p>With this solution, you're overriding <code>customTask</code> in the GA tags that you want to distribute to multiple properties. The new <code>customTask</code> modifies the Universal Analytics task queue, so that the original hit is first sent, then the payload is duplicated with a new tracking ID, and then the modified payload is sent to GA, too.</p>
 <p>The way it works is simple. In <strong>all your Universal Analytics tags that you want to duplicate</strong>, scroll down to <strong>Fields to set</strong>, and add a new field:</p>
-
-<p><strong>Field name:</strong> customTask<br />
+<p><strong>Field name:</strong> customTask<br>
 <strong>Value:</strong> {{JS - customTask hit duplicator}}</p>
-
 <p>The <strong>{{JS - customTask hit duplicator}}</strong> is a new, user-defined Custom JavaScript Variable that you need to create. The variable content should look like this:</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
   <span style="color:#75715e">// Replace newTrackingId value with the UA property to which you want to duplicate this tag
 </span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">newTrackingId</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;UA-XXXXX-Y&#39;</span>;  
@@ -368,24 +358,22 @@
   };
 }
 </code></pre></div>
-
 <p>Remember to change the value of the <code>newTrackingId</code> variable to contain the Property ID you want to send your duplicated hit data to!</p>
-
 <p>Now, when your Universal Analytics tag with this <code>customTask</code> field is run, the solution runs through the following steps:</p>
-
 <ol>
-<li><p>First, the tag with its original settings is executed (line 10).</p></li>
-
-<li><p>Next, the original Tracking ID in the hit payload is replaced with the <code>newTrackingId</code> (line 11).</p></li>
-
-<li><p>Finally, the modified hit payload is sent to Universal Analytics (line 12).</p></li>
+<li>
+<p>First, the tag with its original settings is executed (line 10).</p>
+</li>
+<li>
+<p>Next, the original Tracking ID in the hit payload is replaced with the <code>newTrackingId</code> (line 11).</p>
+</li>
+<li>
+<p>Finally, the modified hit payload is sent to Universal Analytics (line 12).</p>
+</li>
 </ol>
-
 <p>If you want, you can run this <code>sendModel.set('hitPayload'...) --&gt; window[globalSendTaskName](sendModel)</code> multiple times to send the data to even more Universal Analytics properties.</p>
-
 <p>When you add the <code>customTask</code> field with this variable to your Universal Analytics tags, these tags will automatically duplicate the entire hit payload to the new tracking ID you specified.</p>
-
-<p>Because you are overwriting the <code>sendHitTask</code> task, the hit payload has already been generated, which is why you need to modify it with regular expressions rather than being able to simply change values in the <code>model</code> object itself. It&rsquo;s not the most elegant option when you want to make other changes to the hit payload (e.g. change the index of a custom dimension), but it does its job.</p>
+<p>Because you are overwriting the <code>sendHitTask</code> task, the hit payload has already been generated, which is why you need to modify it with regular expressions rather than being able to simply change values in the <code>model</code> object itself. It's not the most elegant option when you want to make other changes to the hit payload (e.g. change the index of a custom dimension), but it does its job.</p>
 
               
 

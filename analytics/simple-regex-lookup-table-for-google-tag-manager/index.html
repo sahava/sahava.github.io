@@ -53,7 +53,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.59.1 with theme Tranquilpeak 0.4.3-BETA">
+    <meta name="generator" content="Hugo 0.61.0 with theme Tranquilpeak 0.4.3-BETA">
     <title>Simple RegEx Table For Google Tag Manager | Simo Ahava's blog</title>
     
     <script>
@@ -319,10 +319,7 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              
-
-<p>When our good friends in the <a href="http://tagmanager.google.com">Google Tag Manager</a> developer team first introduced the <a href="https://www.simoahava.com/analytics/google-tag-manager-lookup-table-macro/">Lookup Table Macro</a>, we were excited. For many of us, it soon became the weapon of choice especially when used as a management and optimization tool for the container itself.</p>
-
+              <p>When our good friends in the <a href="http://tagmanager.google.com">Google Tag Manager</a> developer team first introduced the <a href="https://www.simoahava.com/analytics/google-tag-manager-lookup-table-macro/">Lookup Table Macro</a>, we were excited. For many of us, it soon became the weapon of choice especially when used as a management and optimization tool for the container itself.</p>
 
 
 
@@ -338,31 +335,18 @@
 </div>
 
 
-
-<p>However, the macro wasn&rsquo;t considered perfect. In fact, the most frequently heard request had to do with the core functionality of the feature itself: the macro should support <em>operations</em>, that is, <em>predicate logic</em>. It&rsquo;s not enough to just have equal match lookups; people wanted support for operations such as &ldquo;is x larger than y&rdquo; or &ldquo;does y contain x&rdquo;.</p>
-
-<p>The thing is, I don&rsquo;t agree with changing the Lookup Table Macro to support these types of operations. Sure, a table whose values you can query with more complex operations than simple lookups would be awesome, but it wouldn&rsquo;t be a <strong>lookup table</strong> anymore. We&rsquo;d need a different variable type for those use cases.</p>
-
-<p>In this post, I&rsquo;ll take a look at just what makes a lookup table a lookup table, and I&rsquo;ll also give you a nifty Custom JavaScript variable that lets you create a regular expression table by yourself. This table lets you query an input variable (e.g. {{Page Path}}) against a number of regular expressions (rows). If a match is made, then some value is returned. So, it&rsquo;s essentially a variation of the Lookup Table, but with regular expressions instead of exact match lookups.</p>
-
+<p>However, the macro wasn't considered perfect. In fact, the most frequently heard request had to do with the core functionality of the feature itself: the macro should support <em>operations</em>, that is, <em>predicate logic</em>. It's not enough to just have equal match lookups; people wanted support for operations such as &ldquo;is x larger than y&rdquo; or &ldquo;does y contain x&rdquo;.</p>
+<p>The thing is, I don't agree with changing the Lookup Table Macro to support these types of operations. Sure, a table whose values you can query with more complex operations than simple lookups would be awesome, but it wouldn't be a <strong>lookup table</strong> anymore. We'd need a different variable type for those use cases.</p>
+<p>In this post, I'll take a look at just what makes a lookup table a lookup table, and I'll also give you a nifty Custom JavaScript variable that lets you create a regular expression table by yourself. This table lets you query an input variable (e.g. {{Page Path}}) against a number of regular expressions (rows). If a match is made, then some value is returned. So, it's essentially a variation of the Lookup Table, but with regular expressions instead of exact match lookups.</p>
 <h2 id="look-it-up">Look it up!</h2>
-
-<p>Even though I&rsquo;m a product of the unsurpassed Finnish education system, I suck at ornithology. So you&rsquo;ll excuse me for the following, clumsy metaphor.</p>
-
+<p>Even though I'm a product of the unsurpassed Finnish education system, I suck at ornithology. So you'll excuse me for the following, clumsy metaphor.</p>
 <p>Consider the homing pigeon. It has an intimate knowledge of a location, and it flies to that location. If there is nothing there, it gets confused and poops. If it does find a recipient or a message, it does its thing and coos happily.</p>
-
-<p>Well, when you have a lookup table, it&rsquo;s the same thing. You use a variable reference to pinpoint to a specific cell in a table. If this cell exists, any value stored within is returned. If the cell doesn&rsquo;t exist, the script gets confused and poops an undefined or an error.</p>
-
-<p>This is what makes lookup tables so incredibly efficient. It&rsquo;s all based on binary logic.</p>
-
-<p>There are no complex operations, no predicates to be evaluated. It&rsquo;s just a question of &ldquo;does table X have a value under label Y&rdquo;.</p>
-
+<p>Well, when you have a lookup table, it's the same thing. You use a variable reference to pinpoint to a specific cell in a table. If this cell exists, any value stored within is returned. If the cell doesn't exist, the script gets confused and poops an undefined or an error.</p>
+<p>This is what makes lookup tables so incredibly efficient. It's all based on binary logic.</p>
+<p>There are no complex operations, no predicates to be evaluated. It's just a question of &ldquo;does table X have a value under label Y&rdquo;.</p>
 <p>In JavaScript, a lookup table can be a plain object (most common), or an Array, or even a String. Basically, it can be any Array-like structure.</p>
-
-<p>If you use a plain object as a lookup table, it&rsquo;s common to call it an <em>associative array</em> or a <em>hash table</em>, but we&rsquo;ll call them lookup tables here for clarity.</p>
-
+<p>If you use a plain object as a lookup table, it's common to call it an <em>associative array</em> or a <em>hash table</em>, but we'll call them lookup tables here for clarity.</p>
 <p>So, you can perform lookups on all Array-like structures. The three examples listed above can be used for lookups like this:</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#75715e">// Plain object
 </span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">newValue</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">objectTable</span>[<span style="color:#e6db74">&#39;key&#39;</span>];
 <span style="color:#75715e">// Array
@@ -370,43 +354,24 @@
 <span style="color:#75715e">// String
 </span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">newestValue</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;String&#39;</span>[<span style="color:#ae81ff">5</span>];
 </code></pre></div>
-
 <p>With the plain object, you can also use dot notation in some cases.</p>
-
-<p>As you can see, you&rsquo;re directly requesting a specifically labelled value in the table, and if it exists, it&rsquo;s returned to you without any further operations.</p>
-
+<p>As you can see, you're directly requesting a specifically labelled value in the table, and if it exists, it's returned to you without any further operations.</p>
 <p>Now, if you were to introduce predicate logic into the mix, with something like <code>table['[Kk]ey']</code> (fictional example), it would mean that the lookup should check <em>every single cell until a match is made</em> in the table to see if they have either &lsquo;Key&rsquo; or &lsquo;key&rsquo; as their label.</p>
-
-<p>This is because with JavaScript data structures, a label can only ever be one thing. With lookup tables, you&rsquo;re requesting for a given label without any variations, e.g. &lsquo;Key&rsquo;, and <em>only</em> that label is thus queried in the table. This is because programming logic dictates that only one cell can exist in the table with that label.</p>
-
-<p>As soon as you add predicate logic into the mix, you&rsquo;re forcing the lookup to check every single cell until a match is made, because you can&rsquo;t label cells with regular expressions or dynamic values (e.g. &lsquo;Key/key&rsquo;).</p>
-
+<p>This is because with JavaScript data structures, a label can only ever be one thing. With lookup tables, you're requesting for a given label without any variations, e.g. &lsquo;Key&rsquo;, and <em>only</em> that label is thus queried in the table. This is because programming logic dictates that only one cell can exist in the table with that label.</p>
+<p>As soon as you add predicate logic into the mix, you're forcing the lookup to check every single cell until a match is made, because you can't label cells with regular expressions or dynamic values (e.g. &lsquo;Key/key&rsquo;).</p>
 <p>The difference between the binary check of the lookup vs. the traversal of a more complex operation becomes clearer when thinking in terms of performance.</p>
-
-<p>Queries on a lookup table are said to work in <em>constant time</em>. Since you&rsquo;re querying for a specific label in a table of arbitrary size, the complexity of the operation will always be the same. Either the label exists or it doesn&rsquo;t. The table can be huge or it can be miniscule, the performance is always the same.</p>
-
+<p>Queries on a lookup table are said to work in <em>constant time</em>. Since you're querying for a specific label in a table of arbitrary size, the complexity of the operation will always be the same. Either the label exists or it doesn't. The table can be huge or it can be miniscule, the performance is always the same.</p>
 <p>Performance is usually indicated with <a href="http://en.wikipedia.org/wiki/Big_O_notation">Big O</a> notation. The notation for constant time (i.e. the lookup) would be <strong>O(1)</strong>.</p>
-
 <p>When using predicate logic, you achieve <strong>O(1)</strong> only if you match the query with the first cell that is checked. Every subsequent cell that is checked for a match incurs a linear decrease in the performance. Thus, comparison logic is said to work in <em>linear time</em>.</p>
-
 <p>Describing linear time operations with <strong>O(1)</strong> would be fairly optimistic. For this reason, Big O notation tends to describe the worst-case scenario. The worst-case scenario of linear time would be that the value is in the very last cell that is queried. Thus, the notation would be <strong>O(n)</strong>, where <strong>n</strong> is the number of cells in the table.</p>
-
 <p>This also means that the larger the table, the more expensive the operation becomes, in terms of performance.</p>
-
-<p>With small tables this difference is pretty trivial, but with large tables and multitudes of chained variables, the performance hit can be significant, especially if it takes time to make the match, and the labels are arbitrary enough that you can&rsquo;t use facilitating data structures or search algorithms.</p>
-
-<p>So if you&rsquo;re concerned about performance, and you should be if it&rsquo;s a web page, always use the Lookup Table variable.</p>
-
+<p>With small tables this difference is pretty trivial, but with large tables and multitudes of chained variables, the performance hit can be significant, especially if it takes time to make the match, and the labels are arbitrary enough that you can't use facilitating data structures or search algorithms.</p>
+<p>So if you're concerned about performance, and you should be if it's a web page, always use the Lookup Table variable.</p>
 <h2 id="regex-lookup-table-with-custom-javascript">RegEx Lookup Table with Custom JavaScript</h2>
-
-<p>Well I know you&rsquo;re not satisfied with my explanation, and you&rsquo;re still craving for a more flexible way to fetch values from a table.</p>
-
-<p>I hope the GTM developers will, at some point, introduce another variable type that&rsquo;s essentially a lookup table but where you can specify the predicate logic used row-by-row.</p>
-
+<p>Well I know you're not satisfied with my explanation, and you're still craving for a more flexible way to fetch values from a table.</p>
+<p>I hope the GTM developers will, at some point, introduce another variable type that's essentially a lookup table but where you can specify the predicate logic used row-by-row.</p>
 <p>Until then, you can make do with workarounds such as the script below.</p>
-
 <p>Copy the following code into a new Custom JavaScript Variable:</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
     <span style="color:#75715e">// Set inputVariable to the input you want to assess
 </span><span style="color:#75715e"></span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">inputVariable</span> <span style="color:#f92672">=</span> {{<span style="color:#a6e22e">Page</span> <span style="color:#a6e22e">URL</span>}};
@@ -443,42 +408,39 @@
     <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">defaultVal</span>;
 }
 </code></pre></div>
-
-<p>Here&rsquo;s how the variable works:</p>
-
+<p>Here's how the variable works:</p>
 <ol>
-<li><p>First, you give it the input: some variable or value that you want to assess in the table rows</p></li>
-
-<li><p>Next, you insert the rows</p></li>
-
-<li><p>Rows are actually Arrays within the <code>table</code> Array</p>
-
-<ol>
-<li><p>The first cell contains the regular expression you want to evaluate against the input (note, you will need to <em>double</em> escape reserved characters!)</p></li>
-
-<li><p>The second cell contains the value that is returned if a match is made</p></li>
-
-<li><p>The third cell is optional, and can contain any regular expression flags (e.g. &lsquo;g&rsquo;, &lsquo;i&rsquo;) you might want to use</p></li>
-</ol></li>
-
-<li><p>Finally, there&rsquo;s a little for-loop which loops through each row of the <code>table</code> Array, checking the regular expression against the input variable. If and when a match is made, the specified return value is returned by the function</p></li>
-
-<li><p>If no match is made, the specified default value is returned</p></li>
+<li>
+<p>First, you give it the input: some variable or value that you want to assess in the table rows</p>
+</li>
+<li>
+<p>Next, you insert the rows</p>
+</li>
+<li>
+<p>Rows are actually Arrays within the <code>table</code> Array</p>
+</li>
 </ol>
+<pre><code>1. The first cell contains the regular expression you want to evaluate against the input (note, you will need to _double_ escape reserved characters!)
 
-<p>Remember to edit the rows to match your table. Since it&rsquo;s plain text JavaScript, you could also create the table in Excel (formatting it with the square brackets and all), and then just copy-paste it as plain text to the JavaScript macro body.</p>
+2. The second cell contains the value that is returned if a match is made
 
+3. The third cell is optional, and can contain any regular expression flags (e.g. 'g', 'i') you might want to use
+</code></pre>
+<ol start="4">
+<li>
+<p>Finally, there's a little for-loop which loops through each row of the <code>table</code> Array, checking the regular expression against the input variable. If and when a match is made, the specified return value is returned by the function</p>
+</li>
+<li>
+<p>If no match is made, the specified default value is returned</p>
+</li>
+</ol>
+<p>Remember to edit the rows to match your table. Since it's plain text JavaScript, you could also create the table in Excel (formatting it with the square brackets and all), and then just copy-paste it as plain text to the JavaScript macro body.</p>
 <h2 id="summary">Summary</h2>
-
 <p>As always, this solution is educational first, a proof-of-concept second, and a usable, out-of-the-box workaround last. So feel free to modify it to your own purposes, or just ditch it completely.</p>
-
 <p>The key takeaway from this article should be an understanding of how Lookup Tables work, and how much more complicated they would get if operational logic would be introduced as well. For that reason, my feature request remains that the Lookup Table would be kept as it is, but a new variable type would be introduced, where you can specify the operation on a row-by-row basis. This way, everyone wins.</p>
-
-<p>By the way, if you&rsquo;re interested in performance, JavaScript, and other data structures and search algorithms, take a look at this book:</p>
-
+<p>By the way, if you're interested in performance, JavaScript, and other data structures and search algorithms, take a look at this book:</p>
 <p><a href="http://shop.oreilly.com/product/0636920029557.do">Michael McMillan: Data Structures and Algorithms with JavaScript</a></p>
-
-<p>The book has the basics summed up really well. The next step would be to grab a book about design patterns and more complex data structures. It&rsquo;s all very educational.</p>
+<p>The book has the basics summed up really well. The next step would be to grab a book about design patterns and more complex data structures. It's all very educational.</p>
 
               
 

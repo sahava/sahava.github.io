@@ -53,7 +53,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.59.1 with theme Tranquilpeak 0.4.3-BETA">
+    <meta name="generator" content="Hugo 0.61.0 with theme Tranquilpeak 0.4.3-BETA">
     <title>Fun With Google Tag Manager: Part 1 | Simo Ahava's blog</title>
     
     <script>
@@ -319,10 +319,7 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              
-
-<p>It&rsquo;s time to dig into my tip library for some pretty cool things you can do with <a href="http://www.google.com/tagmanager">Google Tag Manager</a> to enhance your site tagging. Some of these are <a href="https://www.simoahava.com/analytics/macro-magic-google-tag-manager/">macro magic</a> through and through, some of these are best practices, and some of these are things that will make your life easier while <em>managing</em> a tag management solution.</p>
-
+              <p>It's time to dig into my tip library for some pretty cool things you can do with <a href="http://www.google.com/tagmanager">Google Tag Manager</a> to enhance your site tagging. Some of these are <a href="https://www.simoahava.com/analytics/macro-magic-google-tag-manager/">macro magic</a> through and through, some of these are best practices, and some of these are things that will make your life easier while <em>managing</em> a tag management solution.</p>
 
 
 
@@ -338,50 +335,37 @@
 </div>
 
 
-
-<p>I&rsquo;ve split this post into two parts to make it more Hobbit and less Lord Of the Rings length-wise.</p>
-
-<p>Here&rsquo;s what you&rsquo;ll find within this first part:</p>
-
+<p>I've split this post into two parts to make it more Hobbit and less Lord Of the Rings length-wise.</p>
+<p>Here's what you'll find within this first part:</p>
 <ol>
-<li><p>Unbind jQuery</p></li>
-
-<li><p>Undefined fields are not sent to GA</p></li>
-
-<li><p>Track copy event</p></li>
-
-<li><p>Errors as events</p></li>
+<li>
+<p>Unbind jQuery</p>
+</li>
+<li>
+<p>Undefined fields are not sent to GA</p>
+</li>
+<li>
+<p>Track copy event</p>
+</li>
+<li>
+<p>Errors as events</p>
+</li>
 </ol>
-
 <p>Keep your eyes peeled for the second part.</p>
-
 <p>I know, the anticipation is probably killing you.</p>
-
 <h2 id="1-unbind-jquery">1. Unbind jQuery</h2>
-
-<p>I&rsquo;m not a huge fan of <a href="http://jquery.com/">jQuery</a>. I mean, it&rsquo;s definitely useful, since it simplifies a lot of the difficult and error-prone syntax that complex JavaScript entails. At the same time, I enjoy complex challenges, and learning the hard way has definitely made me a better developer.</p>
-
-<p>In my experience, and this is definitely a <strong>very</strong> marginal view, jQuery introduces a certain degree of, erm, <em>sloppiness</em>. I know the &ldquo;it&rsquo;s too easy&rdquo; argument is infantile, but in some cases the lack of transparency to what&rsquo;s actually happening in the code can invite some pretty poor development work. In a way, jQuery is more about <a href="http://api.jquery.com/">reading a manual</a> than about actually creating code, and that sucks. Especially with event handlers, some development decisions are clearly influenced by how easy it is to bind the handlers to elements.</p>
-
-<p>For Google Tag Manager, this is <a href="https://www.simoahava.com/analytics/dont-gtm-listeners-work/">all too familiar</a>. An innocuous <code>return false;</code> or <code>e.stopPropagation()</code> will prevent your GTM listeners from ever retrieving the DOM event. Often the only reason propagation is cancelled like this is the fact that the code was copy-pasted from some Stack Overflow discussion completely unrelated to your website&rsquo;s markup.</p>
-
-<p>OK, sorry for the rant. Here&rsquo;s what I suggest. Whenever your GTM listener doesn&rsquo;t fire when it should, open the JavaScript console and type the following line of code there&hellip;</p>
-
+<p>I'm not a huge fan of <a href="http://jquery.com/">jQuery</a>. I mean, it's definitely useful, since it simplifies a lot of the difficult and error-prone syntax that complex JavaScript entails. At the same time, I enjoy complex challenges, and learning the hard way has definitely made me a better developer.</p>
+<p>In my experience, and this is definitely a <strong>very</strong> marginal view, jQuery introduces a certain degree of, erm, <em>sloppiness</em>. I know the &ldquo;it's too easy&rdquo; argument is infantile, but in some cases the lack of transparency to what's actually happening in the code can invite some pretty poor development work. In a way, jQuery is more about <a href="http://api.jquery.com/">reading a manual</a> than about actually creating code, and that sucks. Especially with event handlers, some development decisions are clearly influenced by how easy it is to bind the handlers to elements.</p>
+<p>For Google Tag Manager, this is <a href="https://www.simoahava.com/analytics/dont-gtm-listeners-work/">all too familiar</a>. An innocuous <code>return false;</code> or <code>e.stopPropagation()</code> will prevent your GTM listeners from ever retrieving the DOM event. Often the only reason propagation is cancelled like this is the fact that the code was copy-pasted from some Stack Overflow discussion completely unrelated to your website's markup.</p>
+<p>OK, sorry for the rant. Here's what I suggest. Whenever your GTM listener doesn't fire when it should, open the JavaScript console and type the following line of code there&hellip;</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">if</span>(<span style="color:#66d9ef">typeof</span>(<span style="color:#a6e22e">jQuery</span>)<span style="color:#f92672">!==</span><span style="color:#e6db74">&#39;undefined&#39;</span>){<span style="color:#a6e22e">jQuery</span>(<span style="color:#e6db74">&#39;body&#39;</span>).<span style="color:#a6e22e">find</span>(<span style="color:#e6db74">&#39;*&#39;</span>).<span style="color:#a6e22e">off</span>();}
 </code></pre></div>
-
 <p>&hellip;and press enter. Then try clicking or form submitting again.</p>
-
-<p>What this simple line does is it unbinds <strong>all</strong> jQuery event handlers from all HTML elements in the document body. If your GTM listener works after this, it means that there&rsquo;s some interfering jQuery script. The next step is to find the problematic script, and ask your developer to fix it so that propagation isn&rsquo;t prevented.</p>
-
+<p>What this simple line does is it unbinds <strong>all</strong> jQuery event handlers from all HTML elements in the document body. If your GTM listener works after this, it means that there's some interfering jQuery script. The next step is to find the problematic script, and ask your developer to fix it so that propagation isn't prevented.</p>
 <p>(Be sure to check out my <a href="https://www.simoahava.com/analytics/gtm-auto-event-listener-debugger-v1-1/">Chrome extension</a>, where this feature is handily one button click away!).</p>
-
-<p>Or you can choose the hacker route. If you find the interfering script, and if you find the function that&rsquo;s grabbing your clicks or submits and preventing propagation, you can use a Custom HTML tag to fix it.</p>
-
-<p><strong>NOTE!</strong> This is a <em>hack</em>. Be sure to test, test and TEST before publishing a container where you unbind jQuery. Also, it wouldn&rsquo;t hurt to consult with someone who has an understanding of just what event handlers are used on the site.</p>
-
-<p>Let&rsquo;s say you have a Back To Top button which is not sending clicks to GTM&rsquo;s listeners. You find the code in one of the page assets, and it looks something like this:</p>
-
+<p>Or you can choose the hacker route. If you find the interfering script, and if you find the function that's grabbing your clicks or submits and preventing propagation, you can use a Custom HTML tag to fix it.</p>
+<p><strong>NOTE!</strong> This is a <em>hack</em>. Be sure to test, test and TEST before publishing a container where you unbind jQuery. Also, it wouldn't hurt to consult with someone who has an understanding of just what event handlers are used on the site.</p>
+<p>Let's say you have a Back To Top button which is not sending clicks to GTM's listeners. You find the code in one of the page assets, and it looks something like this:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">jQuery</span>(<span style="color:#e6db74">&#39;.top-of-page, a[href=&#34;#top&#34;]&#39;</span>).<span style="color:#a6e22e">click</span>(<span style="color:#66d9ef">function</span> () {
   <span style="color:#a6e22e">jQuery</span>(<span style="color:#e6db74">&#39;html, body&#39;</span>).<span style="color:#a6e22e">animate</span>({
     <span style="color:#a6e22e">scrollTop</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">0</span>
@@ -389,11 +373,8 @@
   <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span>;
 });
 </code></pre></div>
-
-<p>As you can see, the dreaded <code>return false;</code> is there. That&rsquo;s what&rsquo;s stopping the events from climbing up the DOM tree.</p>
-
+<p>As you can see, the dreaded <code>return false;</code> is there. That's what's stopping the events from climbing up the DOM tree.</p>
 <p>To fix this, create a new Custom HTML tag with the following code within:</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
   <span style="color:#a6e22e">jQuery</span>(<span style="color:#e6db74">&#39;.top-of-page, a[href=&#34;#top&#34;]&#39;</span>).<span style="color:#a6e22e">off</span>(<span style="color:#e6db74">&#39;click&#39;</span>);
   <span style="color:#a6e22e">jQuery</span>(<span style="color:#e6db74">&#39;.top-of-page, a[href=&#34;#top&#34;]&#39;</span>).<span style="color:#a6e22e">click</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e</span>) {
@@ -403,23 +384,14 @@
     }, <span style="color:#ae81ff">400</span>);
   });
 &lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
-
-<p>If jQuery and the problematic script are loaded in the <code>&lt;head&gt;</code> of your template, you can have this tag fire on <strong>{{url}} matches RegEx .</strong>*. If they&rsquo;re loaded elsewhere (like in the footer of your page), you might need some other event rule such as <strong>{{event}} equals gtm.load</strong>.</p>
-
+<p>If jQuery and the problematic script are loaded in the <code>&lt;head&gt;</code> of your template, you can have this tag fire on <strong>{{url}} matches RegEx .</strong>*. If they're loaded elsewhere (like in the footer of your page), you might need some other event rule such as <strong>{{event}} equals gtm.load</strong>.</p>
 <p>On the first line, I unbind the original click handler. Then, I add <code>e</code> as an argument of the new click function. This <code>e</code> contains the event object, and I can then use its <code>preventDefault()</code> method to stop the original action of the click <em>without</em> stopping its propagation. Finally, I remove the <code>return false;</code> from the end of the function.</p>
-
-<p>Naturally, you&rsquo;ll need to test, test, test and then test some more whether this hack breaks down your entire site or not.</p>
-
-<p>Of course, it&rsquo;s not just jQuery that might interfere with your listeners. It might be vanilla JavaScript or some other library. This chapter focuses on jQuery simply because it&rsquo;s so widely spread that most of the time it really is the source of the problem.</p>
-
+<p>Naturally, you'll need to test, test, test and then test some more whether this hack breaks down your entire site or not.</p>
+<p>Of course, it's not just jQuery that might interfere with your listeners. It might be vanilla JavaScript or some other library. This chapter focuses on jQuery simply because it's so widely spread that most of the time it really is the source of the problem.</p>
 <h2 id="2-undefined-fields-are-not-sent-to-ga">2. Undefined fields are not sent to GA</h2>
-
-<p>Here&rsquo;s a fun fact about the Google Analytics API: if a field such as Custom Dimension is <em>undefined</em> when the GA endpoint is called, the Custom Dimension is left out of the payload. How is this fun? Well, it introduces an opportunity to make your tags a bit more dynamic.</p>
-
+<p>Here's a fun fact about the Google Analytics API: if a field such as Custom Dimension is <em>undefined</em> when the GA endpoint is called, the Custom Dimension is left out of the payload. How is this fun? Well, it introduces an opportunity to make your tags a bit more dynamic.</p>
 <p>It would be nice to get a list of all the fields that behave this way, and also how they behave with other return values such as <strong>false</strong> or <strong>0</strong>.</p>
-
-<p>So, let&rsquo;s say you have a Custom Dimension such as <em>blog author</em> that you want to send with your page view tags. Naturally, you only set the blog author on blog pages. You don&rsquo;t want to send a dummy value like &ldquo;empty&rdquo; or &ldquo;n/a&rdquo; on other pages on your site, so you&rsquo;re absolutely certain that you need two tags: one when the blog author is populated (and can be sent as a Custom Dimension), and one on all the other pages (where the Custom Dimension will be left out of the tag).</p>
-
+<p>So, let's say you have a Custom Dimension such as <em>blog author</em> that you want to send with your page view tags. Naturally, you only set the blog author on blog pages. You don't want to send a dummy value like &ldquo;empty&rdquo; or &ldquo;n/a&rdquo; on other pages on your site, so you're absolutely certain that you need two tags: one when the blog author is populated (and can be sent as a Custom Dimension), and one on all the other pages (where the Custom Dimension will be left out of the tag).</p>
 
 
 
@@ -435,9 +407,7 @@
 </div>
 
 
-
-<p>However, thanks to how the GA API works, you only need one tag. Just make sure that the macro which returns the Custom Dimension value resolves to <em>undefined type</em> when the dimension doesn&rsquo;t have a value. There are a bunch of ways you can do this:</p>
-
+<p>However, thanks to how the GA API works, you only need one tag. Just make sure that the macro which returns the Custom Dimension value resolves to <em>undefined type</em> when the dimension doesn't have a value. There are a bunch of ways you can do this:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
   <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">t</span>;
   <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">y</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>;
@@ -449,11 +419,8 @@
 </span><span style="color:#75715e"></span>  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">x</span>; <span style="color:#75715e">// throws ReferenceError
 </span><span style="color:#75715e"></span>}
 </code></pre></div>
-
-<p>As you can see, returning <strong>false</strong>, an empty string, or a variable which hasn&rsquo;t been declared will not do.</p>
-
-<p>The cool thing about GTM is that if you have a Data Layer Variable Macro which doesn&rsquo;t resolve, it will be automatically set to <em>undefined type</em>, meaning a Custom Dimension which refers to this macro will not get sent. So the best way to navigate through this particular scenario is to have <strong>blog-author</strong> declared in the dataLayer declaration before the container snippet on the page template. If the page isn&rsquo;t a blog page, then this declaration can just be left out.</p>
-
+<p>As you can see, returning <strong>false</strong>, an empty string, or a variable which hasn't been declared will not do.</p>
+<p>The cool thing about GTM is that if you have a Data Layer Variable Macro which doesn't resolve, it will be automatically set to <em>undefined type</em>, meaning a Custom Dimension which refers to this macro will not get sent. So the best way to navigate through this particular scenario is to have <strong>blog-author</strong> declared in the dataLayer declaration before the container snippet on the page template. If the page isn't a blog page, then this declaration can just be left out.</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
   <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">dataLayer</span> <span style="color:#f92672">=</span> [{<span style="color:#e6db74">&#39;blog-author&#39;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;Simo Ahava&#39;</span>}]; <span style="color:#75715e">// Blog author declared, dimension will get sent
 </span><span style="color:#75715e"></span>&lt;/<span style="color:#f92672">script</span>&gt;
@@ -461,17 +428,11 @@
 &lt;<span style="color:#f92672">script</span>&gt;
   <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">dataLayer</span> <span style="color:#f92672">=</span> []; <span style="color:#75715e">// Blog author not declared, dimension will not get sent
 </span><span style="color:#75715e"></span>&lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
-
-<p>Then, when you create a Data Layer Variable Macro, on pages with <strong>blog-author</strong> in the array, it will fire the Custom Dimension with the blog author&rsquo;s name as the value. On all other pages the dimension will not get sent.</p>
-
+<p>Then, when you create a Data Layer Variable Macro, on pages with <strong>blog-author</strong> in the array, it will fire the Custom Dimension with the blog author's name as the value. On all other pages the dimension will not get sent.</p>
 <p>Once you familiarize yourself with JavaScript and understand all the different ways how GTM and JavaScript resolve variables to <em>undefined</em> type, you can get really creative with this feature, making your tags even more leaner.</p>
-
 <h2 id="3-track-copy-event">3. Track copy event</h2>
-
 <p>Ever wondered how often people copy text using CTRL+C or some other means? Well, wonder no more, because now you can track it as an event!</p>
-
 <p>Create this simple Custom HTML tag:</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
   <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">c</span> <span style="color:#f92672">=</span> document.<span style="color:#a6e22e">getElementById</span>(<span style="color:#e6db74">&#34;entry-content&#34;</span>);
   <span style="color:#66d9ef">if</span>(<span style="color:#66d9ef">typeof</span>(<span style="color:#a6e22e">c</span>)<span style="color:#f92672">!==</span><span style="color:#e6db74">&#39;undefined&#39;</span>) {
@@ -480,24 +441,16 @@
     });
   }
 &lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
-
 <p>This is a very simple script that pushes the dataLayer event &lsquo;copy&rsquo; whenever someone copies something on your page within the HTML element with ID <em>entry-content</em> (e.g. <code>&lt;div id=&quot;entry-content&quot;&gt;&lt;/div&gt;</code>).</p>
-
 <p>Be sure to change the element whose content you want to track with the event listener to match the markup on your website.</p>
-
 <p>You can make it more versatile by exploring the contents of the <code>evt</code> argument, which is the event object. Its <code>target</code> property contains the HTML element which was the target of the event. Here are some ideas:</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">...
 <span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({<span style="color:#e6db74">&#39;event&#39;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;copy&#39;</span>, <span style="color:#e6db74">&#39;copy-id&#39;</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">evt</span>.<span style="color:#a6e22e">target</span>.<span style="color:#a6e22e">id</span>, <span style="color:#e6db74">&#39;copy-content&#39;</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">evt</span>.<span style="color:#a6e22e">target</span>.<span style="color:#a6e22e">innerHTML</span>});
 ...
 </code></pre></div>
-
-<p>And so on. Note that <code>evt.target</code> stores the element where the copy event started. So if the copy action takes place over multiple paragraphs, headers, or spans, for example, you&rsquo;ll only be able to observe the properties of the first element targeted by the action.</p>
-
+<p>And so on. Note that <code>evt.target</code> stores the element where the copy event started. So if the copy action takes place over multiple paragraphs, headers, or spans, for example, you'll only be able to observe the properties of the first element targeted by the action.</p>
 <h2 id="4-errors-as-events">4. Errors as events</h2>
-
 <p>Google Tag Manager has this cool thing called the <a href="https://support.google.com/tagmanager/answer/3415369?hl=en#JSErrorListener">JavaScript Error Listener</a>. This fires whenever an <em>unchecked</em> exception occurs on the site. For example, consider the following:</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">myText</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Hello!&#34;</span>;
 <span style="color:#a6e22e">alert</span>(<span style="color:#a6e22e">myTxt</span>); <span style="color:#75715e">// Unchecked ReferenceError, will fire GTM&#39;s error listener
 </span><span style="color:#75715e"></span>
@@ -508,9 +461,7 @@
   <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">message</span>);
 }
 </code></pre></div>
-
-<p>With GTM&rsquo;s error listener, you can send each uncaught error as an event to Google Analytics. You can then analyze these events to find problems with your scripts. If you have a huge site, you might get hundreds of these errors, so you&rsquo;ll need to adjust the code to perhaps only listen for certain pages or errors.</p>
-
+<p>With GTM's error listener, you can send each uncaught error as an event to Google Analytics. You can then analyze these events to find problems with your scripts. If you have a huge site, you might get hundreds of these errors, so you'll need to adjust the code to perhaps only listen for certain pages or errors.</p>
 
 
 
@@ -526,33 +477,36 @@
 </div>
 
 
-
-<p>I&rsquo;m hoping at some point we can have the listener fire only for errors propagated by GTM&rsquo;s tags and macros. This way you can debug your GTM installation without having to worry about all the other errors on your website (<strong>even though you definitely should!</strong>).</p>
-
+<p>I'm hoping at some point we can have the listener fire only for errors propagated by GTM's tags and macros. This way you can debug your GTM installation without having to worry about all the other errors on your website (<strong>even though you definitely should!</strong>).</p>
 <p>To get the listener up and running, do the following:</p>
-
 <ol>
-<li><p>Create a new JavaScript Error Listener tag</p></li>
-
-<li><p>Have it fire on all pages (or some other rule of your choice)</p></li>
-
-<li><p>Create a new rule <strong>Event - gtm.pageError</strong>, where <strong>{{event}} equals gtm.pageError</strong></p></li>
-
-<li><p>Create three new Data Layer Variable macros:</p>
-
-<ol>
-<li><p>{{Error - Message}}, where variable name is gtm.errorMessage</p></li>
-
-<li><p>{{Error - Line}}, where variable name is gtm.errorLineNumber</p></li>
-
-<li><p>{{Error - URL}}, where variable name is gtm.errorUrl</p></li>
-</ol></li>
-
-<li><p>Create a new Event tag and configure it to your liking</p></li>
-
-<li><p>Make sure the Event tag fires on the rule you created in (3)</p></li>
+<li>
+<p>Create a new JavaScript Error Listener tag</p>
+</li>
+<li>
+<p>Have it fire on all pages (or some other rule of your choice)</p>
+</li>
+<li>
+<p>Create a new rule <strong>Event - gtm.pageError</strong>, where <strong>{{event}} equals gtm.pageError</strong></p>
+</li>
+<li>
+<p>Create three new Data Layer Variable macros:</p>
+</li>
 </ol>
+<pre><code>1. {{Error - Message}}, where variable name is gtm.errorMessage
 
+2. {{Error - Line}}, where variable name is gtm.errorLineNumber
+
+3. {{Error - URL}}, where variable name is gtm.errorUrl
+</code></pre>
+<ol start="5">
+<li>
+<p>Create a new Event tag and configure it to your liking</p>
+</li>
+<li>
+<p>Make sure the Event tag fires on the rule you created in (3)</p>
+</li>
+</ol>
 
 
 
@@ -568,28 +522,26 @@
 </div>
 
 
-
-<p><strong>Remember to set the Non-Interaction Hit parameter of the Event tag to true.</strong> You don&rsquo;t want to kill your bounce rate with errors on your site!</p>
-
-<p>If you&rsquo;re seeing a lot of <strong>Script error.</strong> hits, it means that the errors occur in JavaScript resources loaded from other domains. Due to browser / cross-domain security policies the actual error name and message are obfuscated.</p>
-
+<p><strong>Remember to set the Non-Interaction Hit parameter of the Event tag to true.</strong> You don't want to kill your bounce rate with errors on your site!</p>
+<p>If you're seeing a lot of <strong>Script error.</strong> hits, it means that the errors occur in JavaScript resources loaded from other domains. Due to browser / cross-domain security policies the actual error name and message are obfuscated.</p>
 <h2 id="conclusions">Conclusions</h2>
-
-<p>The second part of this post is on its way. I didn&rsquo;t want to puke too much text into a simple tips &amp; tricks post, but this one is 1800+ words already, so&hellip; :) Topics in the next post are:</p>
-
+<p>The second part of this post is on its way. I didn't want to puke too much text into a simple tips &amp; tricks post, but this one is 1800+ words already, so&hellip; :) Topics in the next post are:</p>
 <ol>
-<li><p>dataLayer declaration vs. dataLayer.push()</p></li>
-
-<li><p>How to stop a GTM timer listener</p></li>
-
-<li><p>Adopting a proper naming convention</p></li>
-
-<li><p>Annotating container versions with names and notes</p></li>
+<li>
+<p>dataLayer declaration vs. dataLayer.push()</p>
+</li>
+<li>
+<p>How to stop a GTM timer listener</p>
+</li>
+<li>
+<p>Adopting a proper naming convention</p>
+</li>
+<li>
+<p>Annotating container versions with names and notes</p>
+</li>
 </ol>
-
-<p>Anyway, I love nothing better than to explore the versatility of Google Tag Manager. There&rsquo;s so much you can do with JavaScript, DOM API, and the Google Tag Manager library!</p>
-
-<p>All that&rsquo;s required is a bit of know-how with JavaScript and the Document Object Model, a lot of creativity, and a lot of testing, previewing and debugging.</p>
+<p>Anyway, I love nothing better than to explore the versatility of Google Tag Manager. There's so much you can do with JavaScript, DOM API, and the Google Tag Manager library!</p>
+<p>All that's required is a bit of know-how with JavaScript and the Document Object Model, a lot of creativity, and a lot of testing, previewing and debugging.</p>
 
               
 

@@ -53,7 +53,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.59.1 with theme Tranquilpeak 0.4.3-BETA">
+    <meta name="generator" content="Hugo 0.61.0 with theme Tranquilpeak 0.4.3-BETA">
     <title>Prevent Site Speed Sampling Rate From Skewing Custom Dimensions And Custom Metrics | Simo Ahava's blog</title>
     
     <script>
@@ -319,10 +319,7 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              
-
-<p><a href="https://analytics.google.com">Universal Analytics</a> can collect <a href="https://support.google.com/analytics/answer/1205784">Page Timing</a> data from users that load your pages. This data is populated in to the <strong>Behavior</strong> -&gt; <strong>Site Speed</strong> -&gt; <strong>Page Timings</strong> report, and it&rsquo;s a very useful feature for optimizing your website.</p>
-
+              <p><a href="https://analytics.google.com">Universal Analytics</a> can collect <a href="https://support.google.com/analytics/answer/1205784">Page Timing</a> data from users that load your pages. This data is populated in to the <strong>Behavior</strong> -&gt; <strong>Site Speed</strong> -&gt; <strong>Page Timings</strong> report, and it's a very useful feature for optimizing your website.</p>
 
 
 
@@ -338,9 +335,7 @@
 </div>
 
 
-
-<p>However, there&rsquo;s a murky underside to this generous feature. The way Page Timings collection works is that when <strong>Pageview</strong> hits are sent from the site, a sample of these (1% by default) are automatically followed by a <code>timing</code> hit which includes page performance data grabbed from the Navigation Timing API.</p>
-
+<p>However, there's a murky underside to this generous feature. The way Page Timings collection works is that when <strong>Pageview</strong> hits are sent from the site, a sample of these (1% by default) are automatically followed by a <code>timing</code> hit which includes page performance data grabbed from the Navigation Timing API.</p>
 
 
 
@@ -356,11 +351,8 @@
 </div>
 
 
-
-<p>So far so good. This is how it&rsquo;s supposed to work. If you&rsquo;ve set <code>siteSpeedSampleRate</code> to 100, the first pageview request of every page will be automatically followed by this timing hit.</p>
-
+<p>So far so good. This is how it's supposed to work. If you've set <code>siteSpeedSampleRate</code> to 100, the first pageview request of every page will be automatically followed by this timing hit.</p>
 <p>However, the timing hit copies its information from the pageview hit. Basically, all the Custom Dimensions and Custom Metrics are copied from the pageview. Luckily, things like Enhanced Ecommerce metadata are not copied into the timing hit.</p>
-
 
 
 
@@ -376,32 +368,20 @@
 </div>
 
 
-
-<p>As you can see, the timing hit below the pageview has the same Custom Dimension and the same Custom Metric as the Pageview hit. This is annoying, especially if you use hit-scoped Custom Dimensions or pretty much any type of Custom Metrics. This is data inflation that you can&rsquo;t control.</p>
-
+<p>As you can see, the timing hit below the pageview has the same Custom Dimension and the same Custom Metric as the Pageview hit. This is annoying, especially if you use hit-scoped Custom Dimensions or pretty much any type of Custom Metrics. This is data inflation that you can't control.</p>
 <p>So we need a way to reset Custom Dimensions and Custom Metrics for the timing hit.</p>
-
 <p>I am grateful to <strong>Clément Simon</strong> for helping me come up with the following solution.</p>
-
 <h2 id="solution-customtask">Solution: customTask</h2>
-
-<p>If you&rsquo;ve been reading my recent articles, you might have seen this coming. I consider <code>customTask</code> to be one of the most versatile features recently added to analytics.js.</p>
-
-<p>We&rsquo;ll use <code>customTask</code> to check if the hit type is a timing hit, and if it is, we&rsquo;ll make sure no Custom Dimensions and Custom Metrics are sent with the hit.</p>
-
-<h3 id="analytics-js">analytics.js</h3>
-
+<p>If you've been reading my recent articles, you might have seen this coming. I consider <code>customTask</code> to be one of the most versatile features recently added to analytics.js.</p>
+<p>We'll use <code>customTask</code> to check if the hit type is a timing hit, and if it is, we'll make sure no Custom Dimensions and Custom Metrics are sent with the hit.</p>
+<h3 id="analyticsjs">analytics.js</h3>
 <p>This is what the situation is with analytics.js <strong>before</strong> you make the change:</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">ga</span>(<span style="color:#e6db74">&#39;create&#39;</span>, <span style="color:#e6db74">&#39;UA-12345-1&#39;</span>, {<span style="color:#a6e22e">siteSpeedSampleRate</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">100</span>});
 <span style="color:#a6e22e">ga</span>(<span style="color:#e6db74">&#39;set&#39;</span>, <span style="color:#e6db74">&#39;dimension1&#39;</span>, <span style="color:#e6db74">&#39;My Value&#39;</span>);
 <span style="color:#a6e22e">ga</span>(<span style="color:#e6db74">&#39;send&#39;</span>, <span style="color:#e6db74">&#39;pageview&#39;</span>, {<span style="color:#a6e22e">metric1</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">20</span>);
 </code></pre></div>
-
-<p>This creates a tracker, sets a Custom Dimension, and then sends a pageview request with a Custom Metric. Since you&rsquo;re sampling Page Timings at 100%, the pageview hit will be instantly followed by a timing hit that contains these two custom definitions, too.</p>
-
-<p>To fix it, this is what you&rsquo;ll do:</p>
-
+<p>This creates a tracker, sets a Custom Dimension, and then sends a pageview request with a Custom Metric. Since you're sampling Page Timings at 100%, the pageview hit will be instantly followed by a timing hit that contains these two custom definitions, too.</p>
+<p>To fix it, this is what you'll do:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">ga</span>(<span style="color:#e6db74">&#39;create&#39;</span>, <span style="color:#e6db74">&#39;UA-12345-1&#39;</span>, {<span style="color:#a6e22e">siteSpeedSampleRate</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">100</span>});
 <span style="color:#a6e22e">ga</span>(<span style="color:#e6db74">&#39;set&#39;</span>, <span style="color:#e6db74">&#39;dimension1&#39;</span>, <span style="color:#e6db74">&#39;My Value&#39;</span>);
 
@@ -420,15 +400,10 @@
 
 <span style="color:#a6e22e">ga</span>(<span style="color:#e6db74">&#39;send&#39;</span>, <span style="color:#e6db74">&#39;pageview&#39;</span>, {<span style="color:#a6e22e">metric1</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">20</span>});
 </code></pre></div>
-
 <p>This clears all the possible Custom Dimensions and Custom Metrics from the timing hit, and thus data inflation is avoided.</p>
-
 <h3 id="google-tag-manager">Google Tag Manager</h3>
-
-<p>To fix this in <a href="https://tagmanager.google.com/">Google Tag Manager</a>, you&rsquo;ll need a <strong>Custom JavaScript Variable</strong>, and you&rsquo;ll need to add a new field in your Page View tag.</p>
-
+<p>To fix this in <a href="https://tagmanager.google.com/">Google Tag Manager</a>, you'll need a <strong>Custom JavaScript Variable</strong>, and you'll need to add a new field in your Page View tag.</p>
 <p>The Custom JavaScript Variable has the following code:</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
   <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">model</span>) {
     <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">tempFieldObject</span> <span style="color:#f92672">=</span> {};
@@ -444,9 +419,7 @@
   };
 }
 </code></pre></div>
-
 <p>And then you add it to your tag like this:</p>
-
 
 
 
@@ -462,16 +435,11 @@
 </div>
 
 
-
 <p>Whichever method you use, the <code>customTask</code> implementation will purge all Custom Dimensions and Custom Metrics from the automatically generated timing hit.</p>
-
 <h2 id="summary">Summary</h2>
-
-<p>This was just a quick tip to fix a potential data integrity issue on your site. Granted, it&rsquo;s rare for you to run into problems with the Custom Dimension duplication (unless you use it against the <code>ga:hits</code> metric), but on an aggregate level the Custom Metrics inflation can be troublesome.</p>
-
-<p>This isn&rsquo;t the only thing where the Site Speed Sample Rate can wreak havoc on your data. With Google Tag Manager and &ldquo;virtual&rdquo; pageviews, you might be inflating your page timing data by a great deal, and I&rsquo;ve written about how to solve this issue <a href="https://www.simoahava.com/analytics/site-speed-sample-rate-multiple-page-views/">here</a>.</p>
-
-<p>Note also that these are client-side fixes to something that, in my opinion, should be prevented by analytics.js to start with. I don&rsquo;t understand why the Page Timing hit just copies everything from the pageview. I&rsquo;d want it to be configurable, at the very least.</p>
+<p>This was just a quick tip to fix a potential data integrity issue on your site. Granted, it's rare for you to run into problems with the Custom Dimension duplication (unless you use it against the <code>ga:hits</code> metric), but on an aggregate level the Custom Metrics inflation can be troublesome.</p>
+<p>This isn't the only thing where the Site Speed Sample Rate can wreak havoc on your data. With Google Tag Manager and &ldquo;virtual&rdquo; pageviews, you might be inflating your page timing data by a great deal, and I've written about how to solve this issue <a href="https://www.simoahava.com/analytics/site-speed-sample-rate-multiple-page-views/">here</a>.</p>
+<p>Note also that these are client-side fixes to something that, in my opinion, should be prevented by analytics.js to start with. I don't understand why the Page Timing hit just copies everything from the pageview. I'd want it to be configurable, at the very least.</p>
 
               
 

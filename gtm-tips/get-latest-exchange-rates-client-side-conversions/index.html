@@ -53,7 +53,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.59.1 with theme Tranquilpeak 0.4.3-BETA">
+    <meta name="generator" content="Hugo 0.61.0 with theme Tranquilpeak 0.4.3-BETA">
     <title>#GTMTips: Get Latest Exchange Rates For Client-side Conversions | Simo Ahava's blog</title>
     
     <script>
@@ -319,14 +319,9 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              
-
-<p>It&rsquo;s been a while since I&rsquo;ve last written a bona fide <a href="https://tagmanager.google.com/">Google Tag Manager</a> <strong>trick</strong>, so here comes. This was inspired by Bart Gibby&rsquo;s question in <a href="https://www.measure.chat/">Measure Slack</a>.</p>
-
-<p>The purpose is to fetch the latest currency exchange rates from the <a href="https://exchangeratesapi.io">exchangeratesapi.io</a> service, cache them using <code>sessionStorage</code>, and push the results into <code>dataLayer</code>. From <code>dataLayer</code>, they can then be utilized in Custom JavaScript variables and custom variable templates to perform client-side conversions. I&rsquo;ll show you how!</p>
-
+              <p>It's been a while since I've last written a bona fide <a href="https://tagmanager.google.com/">Google Tag Manager</a> <strong>trick</strong>, so here comes. This was inspired by Bart Gibby's question in <a href="https://www.measure.chat/">Measure Slack</a>.</p>
+<p>The purpose is to fetch the latest currency exchange rates from the <a href="https://exchangeratesapi.io">exchangeratesapi.io</a> service, cache them using <code>sessionStorage</code>, and push the results into <code>dataLayer</code>. From <code>dataLayer</code>, they can then be utilized in Custom JavaScript variables and custom variable templates to perform client-side conversions. I'll show you how!</p>
 <h2 id="tip-103-get-latest-currency-exchange-rates-in-gtm">Tip 103: Get latest currency exchange rates in GTM</h2>
-
 
 
 
@@ -342,9 +337,7 @@
 </div>
 
 
-
 <p>The API request itself is run in a <strong>Custom HTML tag</strong> (as custom templates do not support arbitrary HTTP requests yet), so go ahead and create one. In the tag, add the following code:</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
   (<span style="color:#66d9ef">function</span>() {
     <span style="color:#75715e">// Set expiration to stored cache. Default 24 hours.
@@ -381,23 +374,19 @@
     }
   })();
 &lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
-
-<p>Modify the <code>cacheExpiresHours</code> to determine how long the currency rates should be cached in the browser for. If you don&rsquo;t want to cache them, set it to <code>0</code>. This would fetch the latest rates with every page load.</p>
-
-<p>I would recommend using a cache. The API is a free service, and it&rsquo;s free for as long as it&rsquo;s not abused. It makes no sense to continually fetch the latest rates, so set the cache to something you can live with.</p>
-
-<p>You&rsquo;ll also need to set a base currency against which the rates are calculated. In the example, I&rsquo;m using <code>'EUR'</code> as I want the rates to be calculated against euros.</p>
-
+<p>Modify the <code>cacheExpiresHours</code> to determine how long the currency rates should be cached in the browser for. If you don't want to cache them, set it to <code>0</code>. This would fetch the latest rates with every page load.</p>
+<p>I would recommend using a cache. The API is a free service, and it's free for as long as it's not abused. It makes no sense to continually fetch the latest rates, so set the cache to something you can live with.</p>
+<p>You'll also need to set a base currency against which the rates are calculated. In the example, I'm using <code>'EUR'</code> as I want the rates to be calculated against euros.</p>
 <p>The rest of the code follows this pattern:</p>
-
 <ol>
-<li><p>If the currency rates are found in browser storage, and the cache expiration duration has not been met yet, then fetch the rates from storage and push them into <code>dataLayer</code>.</p></li>
-
-<li><p>If the rates are not found in browser storage, or if the cache expiration duration has been met, fetch the latest rates using an HTTP request to <code>https://api.exchangeratesapi.io/latest</code>, using the base currency rate you provided in the script configuration. Push the results into <code>dataLayer</code>. Cache the results in browser storage.</p></li>
+<li>
+<p>If the currency rates are found in browser storage, and the cache expiration duration has not been met yet, then fetch the rates from storage and push them into <code>dataLayer</code>.</p>
+</li>
+<li>
+<p>If the rates are not found in browser storage, or if the cache expiration duration has been met, fetch the latest rates using an HTTP request to <code>https://api.exchangeratesapi.io/latest</code>, using the base currency rate you provided in the script configuration. Push the results into <code>dataLayer</code>. Cache the results in browser storage.</p>
+</li>
 </ol>
-
 <p>I also included a key to reflect whether or not the results were cached (<code>ratesType: 'fresh/cached'</code>), which you can use to determine the reliability of the results. This is what the <code>dataLayer</code> would look like:</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">{
   <span style="color:#a6e22e">event</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;exchangeRates&#34;</span>,
   <span style="color:#a6e22e">rates</span><span style="color:#f92672">:</span> {
@@ -416,13 +405,9 @@
   <span style="color:#a6e22e">ratesType</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;fresh&#39;</span>
 }
 </code></pre></div>
-
 <p><strong>Set this tag to fire on the All Pages trigger</strong>. That way it will fire as soon as the GTM container has loaded.</p>
-
 <p>Now that the data is in <code>dataLayer</code>, you can create some variables that will let you use the results.</p>
-
-<p>To start off, a <strong>Data Layer variable</strong> for <code>rates</code> will fetch the corresponding object from GTM&rsquo;s data model.</p>
-
+<p>To start off, a <strong>Data Layer variable</strong> for <code>rates</code> will fetch the corresponding object from GTM's data model.</p>
 
 
 
@@ -438,9 +423,7 @@
 </div>
 
 
-
 <p>Now, to perform a conversion, you need the source variable (the value you want to convert) and this Data Layer variable. For example, if your source value is in Australian dollars, you can convert that to euros with a Custom JavaScript variable that has the following code:</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
   <span style="color:#75715e">// Update these if necessary
 </span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">convertFrom</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;AUD&#39;</span>;
@@ -454,13 +437,9 @@
   <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">sourceVariable</span> <span style="color:#f92672">/</span> <span style="color:#a6e22e">rates</span>[<span style="color:#a6e22e">convertFrom</span>];
 }
 </code></pre></div>
-
-<p>This variable pulls in the source value and the <code>rates</code> object. In case the <code>rates</code> object doesn&rsquo;t exist, OR it doesn&rsquo;t contain the currency symbol you want to convert from, OR the source variable does not return a number, the source variable is returned untouched.</p>
-
+<p>This variable pulls in the source value and the <code>rates</code> object. In case the <code>rates</code> object doesn't exist, OR it doesn't contain the currency symbol you want to convert from, OR the source variable does not return a number, the source variable is returned untouched.</p>
 <p>Otherwise, the variable divides the source variable with the exchange rate to give you the source variable value in the base currency you configured in the Custom HTML tag.</p>
-
 <p>You can also create a <a href="https://www.simoahava.com/analytics/custom-templates-guide-for-google-tag-manager/#variable-template-walkthrough">custom variable template</a> where the user indicates which source variable to use and what the currency symbol would be. The template would then return the result of the conversion.</p>
-
 
 
 
@@ -476,14 +455,11 @@
 </div>
 
 
-
 <p>You can download the template I created <a href="https://www.gtmtemplates.com/template/5754435435233280/currency-conversion">here</a>.</p>
-
 <blockquote>
 <p><strong>NOTE</strong>: The currency conversion will only work if the source variable is available when then conversion is made AND if the exchange rates have been successfully fetched. The request for the exchange rates is asynchronous, so you need to be careful not to fall into a race condition. You can use the <code>exchangeRates</code> event name in a Custom Event trigger if you want to fire a tag only after the exchange rates have been successfully retrieved.</p>
 </blockquote>
-
-<p>I hope this tip proves useful to someone, or at the very least gives you ideas for how to pull in data from public APIs, through GTM, into the user&rsquo;s web browser.</p>
+<p>I hope this tip proves useful to someone, or at the very least gives you ideas for how to pull in data from public APIs, through GTM, into the user's web browser.</p>
 
               
 

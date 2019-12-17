@@ -53,7 +53,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.59.1 with theme Tranquilpeak 0.4.3-BETA">
+    <meta name="generator" content="Hugo 0.61.0 with theme Tranquilpeak 0.4.3-BETA">
     <title>#GTMTips: Implement Referral Exclusions Via GTM | Simo Ahava's blog</title>
     
     <script>
@@ -319,14 +319,9 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              
-
-<p>Maintaining the list of <a href="https://support.google.com/analytics/answer/2795830?hl=en">Referral Exclusions</a> in <a href="https://analytics.google.com">Google Analytics</a> admin is a <strong>pain</strong>. Especially if you have a webstore, the number of referral sources you need to exclude to avoid sessions being split can grow really fast. Also, it&rsquo;s not like the list is has the most intuitive UI. Instead of a handy text area where you could just copy-paste stuff, you&rsquo;re left with a horrible line-by-line list, and there&rsquo;s no way of copying lists across properties or anything useful like that.</p>
-
-<p>So, in this tip, I&rsquo;ll show you how you can modify the data at its source (the website), so that it becomes easier to manage the list of referrals you want to exclude.</p>
-
+              <p>Maintaining the list of <a href="https://support.google.com/analytics/answer/2795830?hl=en">Referral Exclusions</a> in <a href="https://analytics.google.com">Google Analytics</a> admin is a <strong>pain</strong>. Especially if you have a webstore, the number of referral sources you need to exclude to avoid sessions being split can grow really fast. Also, it's not like the list is has the most intuitive UI. Instead of a handy text area where you could just copy-paste stuff, you're left with a horrible line-by-line list, and there's no way of copying lists across properties or anything useful like that.</p>
+<p>So, in this tip, I'll show you how you can modify the data at its source (the website), so that it becomes easier to manage the list of referrals you want to exclude.</p>
 <h2 id="tip-27-exclude-referrals-with-a-custom-javascript-variable">Tip 27: Exclude referrals with a Custom JavaScript Variable</h2>
-
 
 
 
@@ -342,13 +337,9 @@
 </div>
 
 
-
-<p>First, let&rsquo;s get one thing straight. The referral exclude list <strong>excludes</strong> referral traffic, it doesn&rsquo;t <strong>block</strong> it. &lsquo;Exclude&rsquo; here means that traffic that comes in from a referral you&rsquo;ve excluded gets converted into the <strong>Direct / (none)</strong> source/medium bucket. If you know your Google Analytics, you know that GA attributes all hits to the <em>last non-direct acquisition source</em>. In plain English this means that all hits that have no referral information get attributed to whatever non-direct source you previously had active. If you don&rsquo;t have a previous campaign, or if the <a href="https://support.google.com/analytics/answer/2795871?hl=en">Campaign Timeout</a> setting has expired, then it gets attributed to <strong>Direct / (none)</strong>.</p>
-
+<p>First, let's get one thing straight. The referral exclude list <strong>excludes</strong> referral traffic, it doesn't <strong>block</strong> it. &lsquo;Exclude&rsquo; here means that traffic that comes in from a referral you've excluded gets converted into the <strong>Direct / (none)</strong> source/medium bucket. If you know your Google Analytics, you know that GA attributes all hits to the <em>last non-direct acquisition source</em>. In plain English this means that all hits that have no referral information get attributed to whatever non-direct source you previously had active. If you don't have a previous campaign, or if the <a href="https://support.google.com/analytics/answer/2795871?hl=en">Campaign Timeout</a> setting has expired, then it gets attributed to <strong>Direct / (none)</strong>.</p>
 <p>That means also that <strong>Referral Exclusion Lists should not be used to fight <a href="https://www.simoahava.com/analytics/spam-filter-insertion-tool/">referral spam</a></strong>. So many people have recommended this method, and all these people are thus guilty of giving horrible, horrible advice.</p>
-
-<p>Now that we&rsquo;ve got that cleared, let&rsquo;s get on with the solution. For this to work, you need to create a new <strong>Custom JavaScript Variable</strong>. Give it a descriptive name such as <strong>{{JS - Exclude Referrals}}</strong>. Copy-paste the following code within:</p>
-
+<p>Now that we've got that cleared, let's get on with the solution. For this to work, you need to create a new <strong>Custom JavaScript Variable</strong>. Give it a descriptive name such as <strong>{{JS - Exclude Referrals}}</strong>. Copy-paste the following code within:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
   <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">referrals</span> <span style="color:#f92672">=</span> [
     <span style="color:#e6db74">&#39;referrer1.com&#39;</span>,
@@ -367,45 +358,41 @@
   <span style="color:#66d9ef">return</span> {{<span style="color:#a6e22e">Referrer</span>}};
 }
 </code></pre></div>
-
-<p>The only thing you need to edit is the <code>referrals</code> Array. Each referral source you want to exclude is on its own row, enclosed in single quotes, and all lines end with a comma except the last one. That&rsquo;s the syntax.</p>
-
+<p>The only thing you need to edit is the <code>referrals</code> Array. Each referral source you want to exclude is on its own row, enclosed in single quotes, and all lines end with a comma except the last one. That's the syntax.</p>
 <p>The list gets turned into a <em>regular expression</em>, against which the referrer of the page (i.e. the URL of the page that brought the visitor to the current page) is tested. The regular expression is <strong>open on the left, and closed on the right</strong>, meaning that an entry such as <strong>simoahava.co</strong> will match the following:</p>
-
 <ul>
-<li><p>simoahava.co</p></li>
-
-<li><p>www.simoahava.co</p></li>
-
-<li><p>super.genious.simoahava.co</p></li>
+<li>
+<p>simoahava.co</p>
+</li>
+<li>
+<p><a href="http://www.simoahava.co">www.simoahava.co</a></p>
+</li>
+<li>
+<p>super.genious.simoahava.co</p>
+</li>
 </ul>
-
 <p>But not the following:</p>
-
 <ul>
-<li><p>simoahava.com</p></li>
-
-<li><p>www.simoahava.co.uk</p></li>
-
-<li><p>www.google.fi</p></li>
+<li>
+<p>simoahava.com</p>
+</li>
+<li>
+<p><a href="http://www.simoahava.co.uk">www.simoahava.co.uk</a></p>
+</li>
+<li>
+<p><a href="http://www.google.fi">www.google.fi</a></p>
+</li>
 </ul>
-
-<p>I hope you get the drift. If you&rsquo;re handy with regular expressions, feel free to modify the strings in the <code>referrals</code> Array. For example, to <em>only</em> exclude <strong>simoahava.com</strong> but not, for example <strong>store.simoahava.com</strong>, you&rsquo;d create the entry like:</p>
-
+<p>I hope you get the drift. If you're handy with regular expressions, feel free to modify the strings in the <code>referrals</code> Array. For example, to <em>only</em> exclude <strong>simoahava.com</strong> but not, for example <strong>store.simoahava.com</strong>, you'd create the entry like:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">referrals</span> <span style="color:#f92672">=</span> [
   <span style="color:#e6db74">&#39;^simoahava.com&#39;</span>
 ];
 </code></pre></div>
-
 <p>The <code>$</code> which closes the expression at the end is added automatically to each line later in the script.</p>
-
-<p>So, the script tests each entry you&rsquo;ve added into the <code>referrals</code> Array against the hostname of the current referrer, and if there is a match, <em>null</em> is returned. This means that any GA Tag that uses this Variable will not send the <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/field-reference#referrer">Document Referrer</a> key with the payload, which is what GA uses to establish referral traffic.</p>
-
+<p>So, the script tests each entry you've added into the <code>referrals</code> Array against the hostname of the current referrer, and if there is a match, <em>null</em> is returned. This means that any GA Tag that uses this Variable will not send the <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/field-reference#referrer">Document Referrer</a> key with the payload, which is what GA uses to establish referral traffic.</p>
 <p>To add this to your Google Analytics Tag, browse to <strong>More Settings</strong> -&gt; <strong>Fields to Set</strong>, and add the following details:</p>
-
-<p><strong>Field Name</strong>: referrer<br />
+<p><strong>Field Name</strong>: referrer<br>
 <strong>Value</strong>: {{JS - Exclude Referrals}}</p>
-
 
 
 
@@ -421,9 +408,7 @@
 </div>
 
 
-
 <p>Like so.</p>
-
 <p><strong>Note!</strong> Try this at your own risk. Remember to test the solution carefully before going ahead with a full-scale implementation. Referrer information is crucial in Google Analytics, as it can make or break your traffic attribution reports.</p>
 
               

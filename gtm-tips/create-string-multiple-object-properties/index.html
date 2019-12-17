@@ -53,7 +53,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.59.1 with theme Tranquilpeak 0.4.3-BETA">
+    <meta name="generator" content="Hugo 0.61.0 with theme Tranquilpeak 0.4.3-BETA">
     <title>#GTMTips: Create String From Multiple Object Properties | Simo Ahava's blog</title>
     
     <script>
@@ -319,16 +319,10 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              
-
-<p><a href="https://developers.facebook.com/docs/facebook-pixel/">Facebook&rsquo;s pixel</a> has an attribute named <code>content_ids</code> (required for <a href="https://developers.facebook.com/docs/marketing-api/dynamic-ad">Dynamic Ads</a>), which requires an Array of content IDs as its value. It&rsquo;s very possible you&rsquo;re running this pixel on a site which already has <a href="https://developers.google.com/tag-manager/enhanced-ecommerce">Enhanced Ecommerce</a> for Universal Analytics implemented, and now you want to use the same Enhanced Ecommerce data that your developers have already made available in this Facebook pixel.</p>
-
+              <p><a href="https://developers.facebook.com/docs/facebook-pixel/">Facebook's pixel</a> has an attribute named <code>content_ids</code> (required for <a href="https://developers.facebook.com/docs/marketing-api/dynamic-ad">Dynamic Ads</a>), which requires an Array of content IDs as its value. It's very possible you're running this pixel on a site which already has <a href="https://developers.google.com/tag-manager/enhanced-ecommerce">Enhanced Ecommerce</a> for Universal Analytics implemented, and now you want to use the same Enhanced Ecommerce data that your developers have already made available in this Facebook pixel.</p>
 <p>Or perhaps you want to concatenate a list of strings, such as article tags (<code>['culture', 'politics']</code>), and send it as a comma-separated string to Google Analytics (<code>'culture,politics'</code>).</p>
-
 <p>This is easy to do - just follow this tip!</p>
-
 <h2 id="tip-61-build-an-array-or-concatenated-string-from-multiple-object-properties">Tip 61: Build an Array or concatenated string from multiple object properties</h2>
-
 
 
 
@@ -344,11 +338,8 @@
 </div>
 
 
-
-<p>With JavaScript&rsquo;s Array methods, this is easy to do. Here&rsquo;s a walkthrough using an actual example.</p>
-
-<p>Let&rsquo;s say you have an order receipt page on your ecommerce store, where you have implemented the following <a href="https://developers.google.com/tag-manager/enhanced-ecommerce#purchases">Enhanced Ecommerce</a> <code>purchase</code> setup:</p>
-
+<p>With JavaScript's Array methods, this is easy to do. Here's a walkthrough using an actual example.</p>
+<p>Let's say you have an order receipt page on your ecommerce store, where you have implemented the following <a href="https://developers.google.com/tag-manager/enhanced-ecommerce#purchases">Enhanced Ecommerce</a> <code>purchase</code> setup:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">window.<span style="color:#a6e22e">dataLayer</span> <span style="color:#f92672">=</span> window.<span style="color:#a6e22e">dataLayer</span> <span style="color:#f92672">||</span> [];
 window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
   <span style="color:#a6e22e">event</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;ecommerce&#39;</span>,
@@ -371,13 +362,9 @@ window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">
   }
 });
 </code></pre></div>
-
 <p>If you know your <a href="https://www.simoahava.com/analytics/enhanced-ecommerce-tips-and-learnings/">Enhanced Ecommerce</a>, this code represents a well-formed purchase object, and if you have an Enhanced Ecommerce enabled tag firing on an <code>ecommerce</code> Custom Event Trigger, you should be able to collect this purchase data in your Universal Analytics property.</p>
-
 <p>But now we have a pixel (such as Facebook), which requires an Array of <em>only</em> the product IDs (i.e. <code>['product1', 'product2']</code>. Or, you might have a tracker, which requires a comma-separated string of the same (i.e. <code>'product1,product2'</code>].</p>
-
-<p>First, you&rsquo;ll need to create a <strong>Data Layer Variable</strong> which points to the <em>Array that holds the objects whose properties you want to access</em>. In this case, it would be <code>ecommerce.purchase.products</code>:</p>
-
+<p>First, you'll need to create a <strong>Data Layer Variable</strong> which points to the <em>Array that holds the objects whose properties you want to access</em>. In this case, it would be <code>ecommerce.purchase.products</code>:</p>
 
 
 
@@ -393,33 +380,23 @@ window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">
 </div>
 
 
-
-<p>I&rsquo;ve chosen to name this <strong>{{DLV - ecommerce.purchase.products}}</strong>.</p>
-
-<p>Next, you&rsquo;ll need a Custom JavaScript Variable where the magic happens. This variable returns an <strong>Array</strong> of all the product IDs (i.e. <code>['product1', 'product2']</code>).</p>
-
+<p>I've chosen to name this <strong>{{DLV - ecommerce.purchase.products}}</strong>.</p>
+<p>Next, you'll need a Custom JavaScript Variable where the magic happens. This variable returns an <strong>Array</strong> of all the product IDs (i.e. <code>['product1', 'product2']</code>).</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
   <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">products</span> <span style="color:#f92672">=</span> {{<span style="color:#a6e22e">DLV</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">ecommerce</span>.<span style="color:#a6e22e">purchase</span>.<span style="color:#a6e22e">products</span>}};
   <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">products</span>.<span style="color:#a6e22e">reduce</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">arr</span>, <span style="color:#a6e22e">prod</span>) { <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">arr</span>.<span style="color:#a6e22e">concat</span>(<span style="color:#a6e22e">prod</span>.<span style="color:#a6e22e">id</span>); }, []);
 }
 </code></pre></div>
-
-<p>The <code>reduce()</code> method basically takes an Array (the <code>products</code> Array), and for every member in the Array you can choose to increment an accumulator (an empty Array in this case) with the data of your choice. In this case, we&rsquo;re taking the <code>id</code> value from every item in the Array, and building a new Array with this information.</p>
-
+<p>The <code>reduce()</code> method basically takes an Array (the <code>products</code> Array), and for every member in the Array you can choose to increment an accumulator (an empty Array in this case) with the data of your choice. In this case, we're taking the <code>id</code> value from every item in the Array, and building a new Array with this information.</p>
 <p>If you want to turn this into a <strong>comma-separated string</strong> (i.e. <code>'product1,product2'</code>), you only need to chain another Array method to the <code>return</code> statement:</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
   <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">products</span> <span style="color:#f92672">=</span> {{<span style="color:#a6e22e">DLV</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">ecommerce</span>.<span style="color:#a6e22e">purchase</span>.<span style="color:#a6e22e">products</span>}};
   <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">products</span>.<span style="color:#a6e22e">reduce</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">arr</span>, <span style="color:#a6e22e">prod</span>) { <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">arr</span>.<span style="color:#a6e22e">concat</span>(<span style="color:#a6e22e">prod</span>.<span style="color:#a6e22e">id</span>); }, []).<span style="color:#a6e22e">join</span>();
 }
 </code></pre></div>
-
-<p>The <code>join()</code> method flattens any Array into a string, using whatever you pass into the parentheses as the separator. If you don&rsquo;t explicitly define a delimiter, a comma is automatically used.</p>
-
+<p>The <code>join()</code> method flattens any Array into a string, using whatever you pass into the parentheses as the separator. If you don't explicitly define a delimiter, a comma is automatically used.</p>
 <p>These two functions should let you easily turn any complex Array of objects into a single, straightforward data structure - whatever you need in any given situation.</p>
-
-<p><strong>UPDATE</strong>: Thanks to postman31&rsquo;s comment below, you can also use the <code>Array.prototype.map()</code> method to perform these tasks even more elegantly.</p>
-
+<p><strong>UPDATE</strong>: Thanks to postman31's comment below, you can also use the <code>Array.prototype.map()</code> method to perform these tasks even more elegantly.</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
   <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">products</span> <span style="color:#f92672">=</span> {{<span style="color:#a6e22e">DLV</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">ecommerce</span>.<span style="color:#a6e22e">purchase</span>.<span style="color:#a6e22e">products</span>}};
   <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">products</span>.<span style="color:#a6e22e">map</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">prod</span>) { <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">prod</span>.<span style="color:#a6e22e">id</span>; });

@@ -53,7 +53,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.59.1 with theme Tranquilpeak 0.4.3-BETA">
+    <meta name="generator" content="Hugo 0.61.0 with theme Tranquilpeak 0.4.3-BETA">
     <title>Track Autocomplete Search In Google Tag Manager | Simo Ahava's blog</title>
     
     <script>
@@ -319,10 +319,7 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              
-
-<p>Autocomplete search is a tricky thing to track. The underlying logic is that when the user starts feeding characters into a search form, the search suggests results based on a limited input. If the user is not satisfied with the results, they can continue adding characters to the search, thus increasing the accuracy. Often there&rsquo;s also the option to revert to a regular search with what they&rsquo;ve already written. Tracking this logic in tools like <a href="https://analytics.google.com">Google Analytics</a> is difficult, because there&rsquo;s really no way to know <em>if the search was successful</em>.</p>
-
+              <p>Autocomplete search is a tricky thing to track. The underlying logic is that when the user starts feeding characters into a search form, the search suggests results based on a limited input. If the user is not satisfied with the results, they can continue adding characters to the search, thus increasing the accuracy. Often there's also the option to revert to a regular search with what they've already written. Tracking this logic in tools like <a href="https://analytics.google.com">Google Analytics</a> is difficult, because there's really no way to know <em>if the search was successful</em>.</p>
 
 
 
@@ -338,11 +335,8 @@
 </div>
 
 
-
-<p>Take the example in the screenshot above. The user has written <code>ban</code> into the search field, and they&rsquo;ve received a list of search items to proceed with. If they now chose any item in that list, <strong>would the search be considered successful?</strong></p>
-
+<p>Take the example in the screenshot above. The user has written <code>ban</code> into the search field, and they've received a list of search items to proceed with. If they now chose any item in that list, <strong>would the search be considered successful?</strong></p>
 <p>Yes. And (maybe) no. Yes, it would be a successful search because the user clicked an item in the list, thus validating the suggestion. And (maybe) no, because we have no idea if that is the item the user was <em>searching for in the first place</em>. If the purpose of our search is to match a response to a query, then any click on the search results is a success. If the purpose of our search is to match a response to the original intent of the query, then only a certain type of search result click is a success.</p>
-
 
 
 
@@ -358,23 +352,14 @@
 </div>
 
 
-
-<p>This is going too far into the ontology of search and intent, so I&rsquo;m going to stop with the philosophy here. However, what I do want to show you is a pretty simple way of tracking what users do search in the autocomplete search field, using <a href="https://tagmanager.google.com/">Google Tag Manager</a>. It&rsquo;s up to you to decipher if the searches are successful, though.</p>
-
+<p>This is going too far into the ontology of search and intent, so I'm going to stop with the philosophy here. However, what I do want to show you is a pretty simple way of tracking what users do search in the autocomplete search field, using <a href="https://tagmanager.google.com/">Google Tag Manager</a>. It's up to you to decipher if the searches are successful, though.</p>
 <h2 id="how-it-works">How it works</h2>
-
-<p>The setup is basically just a <strong>Custom HTML tag</strong>. In this tag, we&rsquo;ll write a custom listener for the <code>keydown</code> browser event, which is registered when the user presses (down) a key. You must provide a minimum length of search for this handler, as well as the timeout you want the browser to wait before sending a search term to Google Analytics (or whatever platform you want to use this with).</p>
-
+<p>The setup is basically just a <strong>Custom HTML tag</strong>. In this tag, we'll write a custom listener for the <code>keydown</code> browser event, which is registered when the user presses (down) a key. You must provide a minimum length of search for this handler, as well as the timeout you want the browser to wait before sending a search term to Google Analytics (or whatever platform you want to use this with).</p>
 <p>For example, if you set <code>minLength = 3</code> and <code>timeout = 2000</code>, the handler will only send searches that are at least three characters in length, and where 2 seconds have elapsed since the last character was written. This is necessary to eliminate accidental keystrokes and search terms with far too little information to be useful.</p>
-
 <p>The search event thus occurs when two seconds have passed since the last character has been typed OR when the user presses the Enter key OR when the focus leaves the search field.</p>
-
-<p>The code is all contained in a single <strong>Custom HTML tag</strong> which fires on the <strong>DOM Ready</strong> trigger. You&rsquo;ll then need a <strong>Custom Event trigger</strong> to fire when a valid search is recorded, as well as a <strong>Data Layer Variable</strong> to grab that search term.</p>
-
+<p>The code is all contained in a single <strong>Custom HTML tag</strong> which fires on the <strong>DOM Ready</strong> trigger. You'll then need a <strong>Custom Event trigger</strong> to fire when a valid search is recorded, as well as a <strong>Data Layer Variable</strong> to grab that search term.</p>
 <h2 id="1-the-custom-html-tag">1. The Custom HTML tag</h2>
-
-<p>Here&rsquo;s the code that runs the whole thing:</p>
-
+<p>Here's the code that runs the whole thing:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
   (<span style="color:#66d9ef">function</span>() {
     <span style="color:#75715e">// Set searchField to the search input field.
@@ -421,35 +406,32 @@
     }
   })();
 &lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
-
 <p>First, you need to define some utility variables.</p>
-
 <ul>
-<li><p>Set <code>searchField</code> to capture the search field HTML element. This is the element to which the handlers will be attached to.</p></li>
-
-<li><p>Set <code>timeout</code> to the time in <strong>milliseconds</strong> you want the script to wait after the last character has been typed into the field. This is to prevent the search event from happening too often, especially when people type slowly.</p></li>
-
-<li><p>Set <code>minLength</code> to the minimum number of characters that constitutes a search. If the search is less than this number in length, the search will not be recorded.</p></li>
+<li>
+<p>Set <code>searchField</code> to capture the search field HTML element. This is the element to which the handlers will be attached to.</p>
+</li>
+<li>
+<p>Set <code>timeout</code> to the time in <strong>milliseconds</strong> you want the script to wait after the last character has been typed into the field. This is to prevent the search event from happening too often, especially when people type slowly.</p>
+</li>
+<li>
+<p>Set <code>minLength</code> to the minimum number of characters that constitutes a search. If the search is less than this number in length, the search will not be recorded.</p>
+</li>
 </ul>
-
 <p>The <code>handleInput</code> method checks if the search is long enough. If it is, an object is pushed to <code>dataLayer</code> with the following key-value pairs:</p>
-
 <ul>
-<li><p><code>event: 'customSearch'</code>, which we&rsquo;ll use to build the Custom Event Trigger that fires any tags you want when a search is recorded.</p></li>
-
-<li><p><code>customSearchInput: searchText</code>, which grabs the text the user wrote into the search field.</p></li>
+<li>
+<p><code>event: 'customSearch'</code>, which we'll use to build the Custom Event Trigger that fires any tags you want when a search is recorded.</p>
+</li>
+<li>
+<p><code>customSearchInput: searchText</code>, which grabs the text the user wrote into the search field.</p>
+</li>
 </ul>
-
 <p>The <code>startTimer</code> method is run each time the user types something into the search field. First, it stops the current timer (which is counting the time to the <code>timeout</code> limit), because we want to reset the timer with each key press.</p>
-
 <p>Next, it checks if the key that was pressed was the Enter key (<code>keyCode === 13</code>). If it was, then we interpret this as a valid search and run the <code>handleInput</code> method. Finally, the timer is started again, and after the timer hits the <code>timeout</code> limit, <code>handleInput</code> is called.</p>
-
 <p>The final rows of the script add the <code>keydown</code> and <code>blur</code> listeners to the search field to track keystrokes and if the focus leaves the search field, respectively.</p>
-
 <h2 id="2-the-triggers">2. The triggers</h2>
-
 <p>To fire the <strong>Custom HTML tag</strong> above, use a <strong>DOM Ready</strong> trigger. It makes sense to only fire the trigger on pages where you have the search form, so adding a DOM Variable condition to the trigger is not an altogether bad idea.</p>
-
 
 
 
@@ -465,11 +447,8 @@
 </div>
 
 
-
 <p>This way your search listener will only fire on pages with the search field (sensible!).</p>
-
-<p>Next, you&rsquo;ll need a <strong>Custom Event trigger</strong> to fire your tags when a successful search is registered:</p>
-
+<p>Next, you'll need a <strong>Custom Event trigger</strong> to fire your tags when a successful search is registered:</p>
 
 
 
@@ -485,13 +464,9 @@
 </div>
 
 
-
-<p>As you can see, I&rsquo;m also checking if the search field had some text. This is, again, a sensible precaution to avoid false positives if something goes wrong with the script.</p>
-
+<p>As you can see, I'm also checking if the search field had some text. This is, again, a sensible precaution to avoid false positives if something goes wrong with the script.</p>
 <h2 id="3-the-data-layer-variable">3. The Data Layer Variable</h2>
-
-<p>The Data Layer Variable you&rsquo;ll need to capture the search term is simple:</p>
-
+<p>The Data Layer Variable you'll need to capture the search term is simple:</p>
 
 
 
@@ -507,13 +482,9 @@
 </div>
 
 
-
 <p>This Data Layer Variable pulls the value of the key <code>customSearchInput</code>, pushed by the script upon a successfully recorded search.</p>
-
 <h2 id="putting-it-all-together">Putting it all together</h2>
-
-<p>So now you have the components, and it&rsquo;s time to put this all together. Below is an example, where I use a Universal Analytics tag to send the search term to Google Analytics using a custom query parameter.</p>
-
+<p>So now you have the components, and it's time to put this all together. Below is an example, where I use a Universal Analytics tag to send the search term to Google Analytics using a custom query parameter.</p>
 
 
 
@@ -529,21 +500,13 @@
 </div>
 
 
-
 <p>The key is the <code>page</code> field, which is overwritten with:</p>
-
 <p><strong>/search/?q={{DLV - customSearchInput}}</strong></p>
-
 <p>Thus, when the Universal Analytics fires with the <strong>Event - customSearch</strong> trigger, the <code>page</code> field is sent with the custom path <strong>/search/?q=searchterm</strong>. So if I wrote <code>uunilohi</code> into the search field, the page path sent to GA would be <strong>/search/?q=uunilohi</strong>.</p>
-
 <p>After this, all you need to do is go to <strong>View Settings</strong> in Google Analytics, and set the parameter <strong>q</strong> to be the site search parameter Google Analytics uses to build the site search reports.</p>
-
 <h2 id="summary">Summary</h2>
-
-<p>Tracking autocomplete search is difficult not just because of the technical restrictions but because it&rsquo;s difficult to determine original intent with just a few characters to work with.</p>
-
-<p>It can be argued that ANY search that precedes a click of search results or even a conversion is successful, and I tend to agree with this. However, especially for content creators it&rsquo;s important to align searches with <em>relevant</em> results, not just any old result that the user finds attractive. For this reason, it&rsquo;s important to track partial searches as well as searches with refined inputs.</p>
-
+<p>Tracking autocomplete search is difficult not just because of the technical restrictions but because it's difficult to determine original intent with just a few characters to work with.</p>
+<p>It can be argued that ANY search that precedes a click of search results or even a conversion is successful, and I tend to agree with this. However, especially for content creators it's important to align searches with <em>relevant</em> results, not just any old result that the user finds attractive. For this reason, it's important to track partial searches as well as searches with refined inputs.</p>
 <p>How have you solved the problem of autocomplete search? Do you trust the site search reports when you see only partial searches, and do you find this information useful when optimizing the site to be more responsive to complex searches?</p>
 
               

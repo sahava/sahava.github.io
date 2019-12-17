@@ -53,7 +53,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.59.1 with theme Tranquilpeak 0.4.3-BETA">
+    <meta name="generator" content="Hugo 0.61.0 with theme Tranquilpeak 0.4.3-BETA">
     <title>#GTMTips: Product-Scoped Custom Dimensions And Metrics | Simo Ahava's blog</title>
     
     <script>
@@ -319,14 +319,9 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              
-
-<p>With the advent of <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/enhanced-ecommerce">Enhanced Ecommerce for Universal Analytics</a>, a new <strong>scope</strong> was introduced for <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/custom-dims-mets">Custom Dimensions and Metrics</a>. <strong>Product scope</strong> can be used to send information about each product that is sent through Enhanced Ecommerce, but it&rsquo;s not exactly the most logical or intuitive thing to wrap your head around.</p>
-
-<p>In this <a href="https://www.simoahava.com/categories/gtm-tips/">#GTMTips</a> post, we&rsquo;ll take a look at how to implement Product-Scoped Custom definitions via <a href="https://developers.google.com/tag-manager/enhanced-ecommerce">Google Tag Manager</a>, and I&rsquo;ll quickly explain how they work in relation to queries and reports you might want to build on top of them.</p>
-
+              <p>With the advent of <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/enhanced-ecommerce">Enhanced Ecommerce for Universal Analytics</a>, a new <strong>scope</strong> was introduced for <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/custom-dims-mets">Custom Dimensions and Metrics</a>. <strong>Product scope</strong> can be used to send information about each product that is sent through Enhanced Ecommerce, but it's not exactly the most logical or intuitive thing to wrap your head around.</p>
+<p>In this <a href="https://www.simoahava.com/categories/gtm-tips/">#GTMTips</a> post, we'll take a look at how to implement Product-Scoped Custom definitions via <a href="https://developers.google.com/tag-manager/enhanced-ecommerce">Google Tag Manager</a>, and I'll quickly explain how they work in relation to queries and reports you might want to build on top of them.</p>
 <h2 id="tip-29-add-product-scoped-custom-dimensions-and-metrics-to-enhanced-ecommerce">Tip 29: Add product-scoped Custom Dimensions and Metrics to Enhanced Ecommerce</h2>
-
 
 
 
@@ -342,29 +337,28 @@
 </div>
 
 
-
-<p>Here&rsquo;s the key piece of information about the product scope: it&rsquo;s bound to the <strong>Enhanced Ecommerce event</strong> and <strong>product</strong> it&rsquo;s sent with. So, if you send the dimension or metric with a product in the <strong>Add to cart</strong> payload, it will only exist in that event. It <strong>won&rsquo;t persist</strong> through the entire Enhanced Ecommerce funnel!</p>
-
-<p>This is crucial information, as it reminds us that Enhanced Ecommerce is very clinical by nature. Barring some exceptions (e.g. product list click attribution), a well-oiled Enhanced Ecommerce funnel requires <em>consistency</em>. It&rsquo;s critical to maintain a uniform product object throughout the funnel, adding relevant dimensions when they become available, as product variant (e.g. size) might be something you select only <em>after</em> the detail view, when you add the product to cart.</p>
-
+<p>Here's the key piece of information about the product scope: it's bound to the <strong>Enhanced Ecommerce event</strong> and <strong>product</strong> it's sent with. So, if you send the dimension or metric with a product in the <strong>Add to cart</strong> payload, it will only exist in that event. It <strong>won't persist</strong> through the entire Enhanced Ecommerce funnel!</p>
+<p>This is crucial information, as it reminds us that Enhanced Ecommerce is very clinical by nature. Barring some exceptions (e.g. product list click attribution), a well-oiled Enhanced Ecommerce funnel requires <em>consistency</em>. It's critical to maintain a uniform product object throughout the funnel, adding relevant dimensions when they become available, as product variant (e.g. size) might be something you select only <em>after</em> the detail view, when you add the product to cart.</p>
 <p>Product-scoped custom dimensions and metrics give you more dimensions and metrics to play with, but they are bound by the same consistency requirement as the regular dimensions and metrics. So keep this in mind when implementing them. In the picture above, <code>dimension12</code> is used to maintain product size, which is &ldquo;N/A&rdquo; until the Add To Cart step. So any queries for &ldquo;Show product abc123 with size Large&rdquo; would only return hits for Add To Cart, Checkout and Purchase - not Impressions or Detail.</p>
-
 <p>Example uses for these custom dimensions and metrics would be:</p>
-
 <ul>
-<li><p>In stock vs. out of stock (dimension)</p></li>
-
-<li><p>Stock status (metric)</p></li>
-
-<li><p>Profit margin (dimension if percentage, metric if value)</p></li>
-
-<li><p>VAT-less price (metric)</p></li>
-
-<li><p>Host product or bundle add-on (dimension)</p></li>
+<li>
+<p>In stock vs. out of stock (dimension)</p>
+</li>
+<li>
+<p>Stock status (metric)</p>
+</li>
+<li>
+<p>Profit margin (dimension if percentage, metric if value)</p>
+</li>
+<li>
+<p>VAT-less price (metric)</p>
+</li>
+<li>
+<p>Host product or bundle add-on (dimension)</p>
+</li>
 </ul>
-
 <p>To implement product-scoped custom definitions, you basically add the dimension or metric key directly into the relevant <code>products</code> Array object in <code>dataLayer</code>:</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
   <span style="color:#e6db74">&#39;event&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;eecDetail&#39;</span>,
   <span style="color:#e6db74">&#39;ecommerce&#39;</span> <span style="color:#f92672">:</span> {
@@ -382,11 +376,8 @@
   }
 });
 </code></pre></div>
-
 <p>After this, any Enhanced Ecommerce / Data Layer -enabled Tag which fires on Custom Event <strong>eecDetail</strong> will also send these custom dimension and metric values to GA along with their respective products.</p>
-
 <p>To be more generic with <code>dataLayer</code>, a simple way of incorporating Google Analytics -specific dimensions (such as these product-scoped definitions) is to utilize the <a href="https://www.simoahava.com/analytics/enhanced-ecommerce-with-a-custom-javascript-variable/">Custom JavaScript Variable</a> method for Enhanced Ecommerce implementation.</p>
-
 <p>If you want to see a nice example of how to use a product-scoped custom metric, check out my post on <a href="https://www.simoahava.com/analytics/measure-cart-value-in-enhanced-ecommerce/">measuring cart value</a> with Google Tag Manager.</p>
 
               

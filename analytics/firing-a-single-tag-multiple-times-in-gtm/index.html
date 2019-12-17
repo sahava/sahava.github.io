@@ -53,7 +53,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.59.1 with theme Tranquilpeak 0.4.3-BETA">
+    <meta name="generator" content="Hugo 0.61.0 with theme Tranquilpeak 0.4.3-BETA">
     <title>Firing A Single Tag Multiple Times In GTM | Simo Ahava's blog</title>
     
     <script>
@@ -319,16 +319,10 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              
-
-<p>There might be many reasons you&rsquo;d want to fire a single Tag multiple times in <a href="https://tagmanager.google.com/">Google Tag Manager</a>. The most common one is when you want to deploy multiples of a single tracking point on the web. Perhaps you have a roll-up account you want to send the hits to, in addition to the site-specific tracking property.</p>
-
+              <p>There might be many reasons you'd want to fire a single Tag multiple times in <a href="https://tagmanager.google.com/">Google Tag Manager</a>. The most common one is when you want to deploy multiples of a single tracking point on the web. Perhaps you have a roll-up account you want to send the hits to, in addition to the site-specific tracking property.</p>
 <p>Quite a while ago, I <a href="https://www.simoahava.com/analytics/fun-google-tag-manager-part-2/">gave a solution for this</a> with a specific focus on <a href="https://analytics.google.com">Google Analytics</a> Tags. It leveraged the <a href="https://www.simoahava.com/gtm-tips/hitcallback-eventcallback/">hitCallback</a> feature of the Universal Analytics library by increasing a global counter each time a Tag had fired. This solution had a number of drawbacks: being GA-specific, polluting the global namespace, and requiring a unique setup for every single Tag you wanted to fire.</p>
-
-<p>Not long after this, I actually started doing the whole thing in a different way. A much more durable, sensible, robust way, and in this article I want to open up the method. In fact, it&rsquo;s not just <em>me</em> who wants to introduce this. This article is a collaboration with Marco Wekking from <a href="http://www.adwise.nl">Adwise</a>. He approached me with almost exactly the same solution asking for a review. Instead of reviewing, I asked if he would like to contribute to a collaboration of sorts on this post, and he gracefully accepted. So, much of this post is from Marco&rsquo;s pen, with my typical bad humour and some JavaScript shenanigans intertwined in the rhetoric.</p>
-
+<p>Not long after this, I actually started doing the whole thing in a different way. A much more durable, sensible, robust way, and in this article I want to open up the method. In fact, it's not just <em>me</em> who wants to introduce this. This article is a collaboration with Marco Wekking from <a href="http://www.adwise.nl">Adwise</a>. He approached me with almost exactly the same solution asking for a review. Instead of reviewing, I asked if he would like to contribute to a collaboration of sorts on this post, and he gracefully accepted. So, much of this post is from Marco's pen, with my typical bad humour and some JavaScript shenanigans intertwined in the rhetoric.</p>
 <h2 id="how-it-works">How it works</h2>
-
 
 
 
@@ -344,31 +338,25 @@
 </div>
 
 
-
 <p>The skilfully grafted diagram above shows how the solution works. Every single event that passes through <code>dataLayer</code> is duplicated by suffixing it with <code>.first</code> and <code>.second</code>. This way, all the Tags you want to fire twice per event just need to be modified to use the original event name plus the two suffixes. You can even use this in a Lookup Table to fire the hits to different Google Analytics tracking properties, for example.</p>
-
-<p>It&rsquo;s a simple, elegant solution to a pressing problem which, if you ask me, should be handled natively by the platform. This is such a common use case for so many people - it would be immensely helpful if you could just denote multiple cycles to each Tag using the Tag template settings instead of having to resort to hacks like this.</p>
-
+<p>It's a simple, elegant solution to a pressing problem which, if you ask me, should be handled natively by the platform. This is such a common use case for so many people - it would be immensely helpful if you could just denote multiple cycles to each Tag using the Tag template settings instead of having to resort to hacks like this.</p>
 <h2 id="how-to-do-it">How to do it</h2>
-
 <p>The solution comprises three steps:</p>
-
 <ol>
-<li><p>Create a new Custom Event Trigger</p></li>
-
-<li><p>Create the Custom HTML Tag which manages the duplication</p></li>
-
-<li><p>Create new Triggers</p></li>
+<li>
+<p>Create a new Custom Event Trigger</p>
+</li>
+<li>
+<p>Create the Custom HTML Tag which manages the duplication</p>
+</li>
+<li>
+<p>Create new Triggers</p>
+</li>
 </ol>
-
-<p>We&rsquo;ll wrap it up with an example of how to leverage this when firing to multiple Google Analytics properties! So stay tuned.</p>
-
+<p>We'll wrap it up with an example of how to leverage this when firing to multiple Google Analytics properties! So stay tuned.</p>
 <h2 id="1-create-the-custom-event-trigger">1. Create the Custom Event Trigger</h2>
-
-<p>To fire the Custom HTML Tag, we&rsquo;ll need a Trigger which activates on <em>every single event</em>. Why? Because we want to duplicate every single event! There&rsquo;s just one exception - we don&rsquo;t want to fire the Trigger when the actual duplication events are pushed into <code>dataLayer</code>, or we might find ourselves in an infinite loop. Ontologically fascinating, but not cool when it comes to site performance.</p>
-
+<p>To fire the Custom HTML Tag, we'll need a Trigger which activates on <em>every single event</em>. Why? Because we want to duplicate every single event! There's just one exception - we don't want to fire the Trigger when the actual duplication events are pushed into <code>dataLayer</code>, or we might find ourselves in an infinite loop. Ontologically fascinating, but not cool when it comes to site performance.</p>
 <p>Before you create the Trigger, make sure you have the <strong>Event</strong> Built-in Variable checked in the appropriate slot of the Variables page in your container.</p>
-
 
 
 
@@ -384,11 +372,8 @@
 </div>
 
 
-
 <p>This is required for the Trigger to work.</p>
-
-<p>Next, create a Trigger which matches all events except for the duplicated ones. In this example, we&rsquo;re using the generic <code>.first</code> and <code>.second</code> as the suffixes, but nothing&rsquo;s stopping you from using something more descriptive, for example <code>.Country</code> and <code>.Rollup</code>.</p>
-
+<p>Next, create a Trigger which matches all events except for the duplicated ones. In this example, we're using the generic <code>.first</code> and <code>.second</code> as the suffixes, but nothing's stopping you from using something more descriptive, for example <code>.Country</code> and <code>.Rollup</code>.</p>
 
 
 
@@ -404,15 +389,10 @@
 </div>
 
 
-
-<p>To reiterate: <strong>The exception is important</strong>! If you don&rsquo;t add that Fire On condition, you will run into issues, as the Trigger would fire again and again with each duplication cycle. Yes, you could use the <a href="https://support.google.com/tagmanager/answer/6279951?hl=en">Tag Firing Options</a> feature of the Tag templates, but it&rsquo;s better to nip bad behavior in its bud.</p>
-
+<p>To reiterate: <strong>The exception is important</strong>! If you don't add that Fire On condition, you will run into issues, as the Trigger would fire again and again with each duplication cycle. Yes, you could use the <a href="https://support.google.com/tagmanager/answer/6279951?hl=en">Tag Firing Options</a> feature of the Tag templates, but it's better to nip bad behavior in its bud.</p>
 <h2 id="2-create-the-custom-html-tag">2. Create the Custom HTML Tag</h2>
-
-<p>The Custom HTML Tag is the heart and soul of this solution. It&rsquo;s very simple, but it does have some peculiarities that might surprise if you&rsquo;re not familiar with how GTM works.</p>
-
-<p>Actually, to ensure that one of these special features works as it should, you&rsquo;ll need to activate yet another Built-In Variable: Container ID. This returns, surprise surprise, the public ID of the GTM container the Tag is firing in (GTM-XXXX).</p>
-
+<p>The Custom HTML Tag is the heart and soul of this solution. It's very simple, but it does have some peculiarities that might surprise if you're not familiar with how GTM works.</p>
+<p>Actually, to ensure that one of these special features works as it should, you'll need to activate yet another Built-In Variable: Container ID. This returns, surprise surprise, the public ID of the GTM container the Tag is firing in (GTM-XXXX).</p>
 
 
 
@@ -428,9 +408,7 @@
 </div>
 
 
-
 <p>Create a new Custom HTML Tag and add the following code within:</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
   (<span style="color:#66d9ef">function</span>() {
     <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">event</span> <span style="color:#f92672">=</span> {{<span style="color:#a6e22e">Event</span>}};
@@ -445,27 +423,25 @@
     });
   })();
 &lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
-
-<p>We&rsquo;re wrapping the whole thing in an <a href="https://en.wikipedia.org/wiki/Immediately-invoked_function_expression">IIFE</a> as we want to avoid polluting the global namespace. Next, we&rsquo;re assigning a local variable <code>event</code> with whatever value is currently stored in the Built-in <strong>Event</strong> variable (i.e. the event that was pushed in the first place).</p>
-
-<p>Finally, we&rsquo;re doing <strong>two</strong> consecutive <code>dataLayer.push()</code> commands, one for each iteration of the cycle. If you want to add more events there, be my guest. As far as we know, there is no limitation to the number of events you can push into <code>dataLayer</code> this way.</p>
-
-<p>The latter push includes the special <code>eventCallback</code> key (read more about it <a href="https://www.simoahava.com/gtm-tips/hitcallback-eventcallback/">here</a>). The key holds a callback function which is invoked as soon as Tags which fire on this particular push have signalled <em>their</em> completion. Within this callback, we&rsquo;re using the <code>onHtmlSuccess()</code> feature of GTM&rsquo;s interface. This is something that was exposed for public use with the <a href="https://www.simoahava.com/analytics/understanding-tag-sequencing-in-google-tag-manager/">Tag sequencing</a> feature. The only thing you need to know about it is that it&rsquo;s our way of telling GTM that it can now proceed with whatever was going on before this loop of <code>dataLayer.push()</code> commands.</p>
-
-<p>In other words, if you&rsquo;re duplicating a <strong>Click / Just Links</strong>, and you&rsquo;ve got &ldquo;Wait for Tags&rdquo; checked (meaning the Trigger will wait for all dependent Tags to fire before proceeding with the link default action), the process goes something like this:</p>
-
+<p>We're wrapping the whole thing in an <a href="https://en.wikipedia.org/wiki/Immediately-invoked_function_expression">IIFE</a> as we want to avoid polluting the global namespace. Next, we're assigning a local variable <code>event</code> with whatever value is currently stored in the Built-in <strong>Event</strong> variable (i.e. the event that was pushed in the first place).</p>
+<p>Finally, we're doing <strong>two</strong> consecutive <code>dataLayer.push()</code> commands, one for each iteration of the cycle. If you want to add more events there, be my guest. As far as we know, there is no limitation to the number of events you can push into <code>dataLayer</code> this way.</p>
+<p>The latter push includes the special <code>eventCallback</code> key (read more about it <a href="https://www.simoahava.com/gtm-tips/hitcallback-eventcallback/">here</a>). The key holds a callback function which is invoked as soon as Tags which fire on this particular push have signalled <em>their</em> completion. Within this callback, we're using the <code>onHtmlSuccess()</code> feature of GTM's interface. This is something that was exposed for public use with the <a href="https://www.simoahava.com/analytics/understanding-tag-sequencing-in-google-tag-manager/">Tag sequencing</a> feature. The only thing you need to know about it is that it's our way of telling GTM that it can now proceed with whatever was going on before this loop of <code>dataLayer.push()</code> commands.</p>
+<p>In other words, if you're duplicating a <strong>Click / Just Links</strong>, and you've got &ldquo;Wait for Tags&rdquo; checked (meaning the Trigger will wait for all dependent Tags to fire before proceeding with the link default action), the process goes something like this:</p>
 <ol>
-<li><p>The link click Trigger fires this Custom HTML Tag.</p></li>
-
-<li><p>The Custom HTML Tag pushes the first duplicated event, and any Tags which use it start their execution.</p></li>
-
-<li><p>Immediately after, the Custom HTML Tag pushes the second duplicated event, and any Tags which use it start their execution.</p></li>
-
-<li><p>Once the last Tag firing on the second duplicated push signals its completion, the <code>eventCallback</code> callback is invoked, and the Custom HTML Tag tells the link click Trigger that everything is done, allowing it to proceed with the redirect.</p></li>
+<li>
+<p>The link click Trigger fires this Custom HTML Tag.</p>
+</li>
+<li>
+<p>The Custom HTML Tag pushes the first duplicated event, and any Tags which use it start their execution.</p>
+</li>
+<li>
+<p>Immediately after, the Custom HTML Tag pushes the second duplicated event, and any Tags which use it start their execution.</p>
+</li>
+<li>
+<p>Once the last Tag firing on the second duplicated push signals its completion, the <code>eventCallback</code> callback is invoked, and the Custom HTML Tag tells the link click Trigger that everything is done, allowing it to proceed with the redirect.</p>
+</li>
 </ol>
-
-<p>Now, add the Trigger you created in the previous step to this Tag, and you&rsquo;re ready to duplicate. You can preview this to see what happens in your dataLayer with each event.</p>
-
+<p>Now, add the Trigger you created in the previous step to this Tag, and you're ready to duplicate. You can preview this to see what happens in your dataLayer with each event.</p>
 
 
 
@@ -481,27 +457,21 @@
 </div>
 
 
-
-<p>As you can see, each event is duplicated. There&rsquo;s the <strong>Pageview</strong>, followed by its duplicates: <strong>gtm.js.first</strong> and <strong>gtm.js.second</strong>. There&rsquo;s <strong>DOM Ready</strong>, followed by its duplicates: <strong>gtm.dom.first</strong> and <strong>gtm.dom.second</strong>, and so on.</p>
-
-<p>(If you don&rsquo;t understand what &ldquo;Pageview&rdquo; and &ldquo;gtm.js&rdquo; have to do with each other, the latter is the underlying event representation of the former. More information in my <a href="https://www.simoahava.com/analytics/trigger-guide-google-tag-manager/">Trigger guide</a>.)</p>
-
+<p>As you can see, each event is duplicated. There's the <strong>Pageview</strong>, followed by its duplicates: <strong>gtm.js.first</strong> and <strong>gtm.js.second</strong>. There's <strong>DOM Ready</strong>, followed by its duplicates: <strong>gtm.dom.first</strong> and <strong>gtm.dom.second</strong>, and so on.</p>
+<p>(If you don't understand what &ldquo;Pageview&rdquo; and &ldquo;gtm.js&rdquo; have to do with each other, the latter is the underlying event representation of the former. More information in my <a href="https://www.simoahava.com/analytics/trigger-guide-google-tag-manager/">Trigger guide</a>.)</p>
 <h2 id="3-create-new-triggers">3. Create new Triggers</h2>
-
-<p>The only housekeeping pain you&rsquo;ll need with this solution is with the Triggers. Here&rsquo;s how it should work:</p>
-
+<p>The only housekeeping pain you'll need with this solution is with the Triggers. Here's how it should work:</p>
 <ul>
-<li><p>To duplicate a Trigger, you need one &ldquo;base&rdquo; Trigger of the event type firing without any delimiting conditions. This is the event that is duplicated.</p></li>
-
-<li><p>To fire your duplicate Tags, you&rsquo;ll need to use Custom Event Triggers which use the original event name (e.g. <strong>gtm.linkClick</strong>) plus <strong>.first</strong> or <strong>.second</strong>, all wrapped in a simple regular expression.</p></li>
+<li>
+<p>To duplicate a Trigger, you need one &ldquo;base&rdquo; Trigger of the event type firing without any delimiting conditions. This is the event that is duplicated.</p>
+</li>
+<li>
+<p>To fire your duplicate Tags, you'll need to use Custom Event Triggers which use the original event name (e.g. <strong>gtm.linkClick</strong>) plus <strong>.first</strong> or <strong>.second</strong>, all wrapped in a simple regular expression.</p>
+</li>
 </ul>
-
-<p>In other words, we&rsquo;re taking a step back to how GTM used to work before the auto-event triggers. We&rsquo;re creating <em>listeners</em> using the generic event Triggers, and when these are duplicated, the Custom Event Triggers are used to delimit the Tags to fire only when specific conditions exist.</p>
-
-<p><strong>NOTE!</strong> You don&rsquo;t need to create a &ldquo;base&rdquo; Trigger for the Page View event type. This is because &ldquo;Pageview&rdquo;, &ldquo;DOM Ready&rdquo;, and &ldquo;Window Loaded&rdquo; are automatically pushed into <code>dataLayer</code> as the page and GTM load. In other words, they are automatically duplicated, and you just need to focus on creating the Custom Event Triggers.</p>
-
+<p>In other words, we're taking a step back to how GTM used to work before the auto-event triggers. We're creating <em>listeners</em> using the generic event Triggers, and when these are duplicated, the Custom Event Triggers are used to delimit the Tags to fire only when specific conditions exist.</p>
+<p><strong>NOTE!</strong> You don't need to create a &ldquo;base&rdquo; Trigger for the Page View event type. This is because &ldquo;Pageview&rdquo;, &ldquo;DOM Ready&rdquo;, and &ldquo;Window Loaded&rdquo; are automatically pushed into <code>dataLayer</code> as the page and GTM load. In other words, they are automatically duplicated, and you just need to focus on creating the Custom Event Triggers.</p>
 <p>Look at the illustration below for clarity:</p>
-
 
 
 
@@ -517,9 +487,7 @@
 </div>
 
 
-
-<p>Let&rsquo;s zoom in. If you have an &ldquo;Outbound Links&rdquo; Trigger, which fires when the Click URL is not your own hostname, the duplicated Trigger would look something like this:</p>
-
+<p>Let's zoom in. If you have an &ldquo;Outbound Links&rdquo; Trigger, which fires when the Click URL is not your own hostname, the duplicated Trigger would look something like this:</p>
 
 
 
@@ -535,9 +503,7 @@
 </div>
 
 
-
-<p>Make note of the &ldquo;Event name&rdquo; field. That&rsquo;s what it should look like for your Triggers. With custom event names it&rsquo;s easy, as you&rsquo;re the one pushing them into <code>dataLayer</code> in the first place. With the built-in Triggers it might be a bit more difficult, so here&rsquo;s a cheat sheet for you:</p>
-
+<p>Make note of the &ldquo;Event name&rdquo; field. That's what it should look like for your Triggers. With custom event names it's easy, as you're the one pushing them into <code>dataLayer</code> in the first place. With the built-in Triggers it might be a bit more difficult, so here's a cheat sheet for you:</p>
 <table>
 <thead>
 <tr>
@@ -545,61 +511,48 @@
 <th>Underlying event name</th>
 </tr>
 </thead>
-
 <tbody>
 <tr>
 <td>Page View / Page View (also All Pages)</td>
 <td>gtm.js</td>
 </tr>
-
 <tr>
 <td>Page View / DOM Ready</td>
 <td>gtm.dom</td>
 </tr>
-
 <tr>
 <td>Page View / Window Loaded</td>
 <td>gtm.load</td>
 </tr>
-
 <tr>
 <td>Click / All Elements</td>
 <td>gtm.click</td>
 </tr>
-
 <tr>
 <td>Click / Just Links</td>
 <td>gtm.linkClick</td>
 </tr>
-
 <tr>
 <td>Form Submit</td>
 <td>gtm.formSubmit</td>
 </tr>
-
 <tr>
 <td>History Change</td>
 <td>gtm.historyChange</td>
 </tr>
-
 <tr>
 <td>JavaScript Error</td>
 <td>gtm.pageError</td>
 </tr>
-
 <tr>
 <td>Timer</td>
 <td>gtm.timer</td>
 </tr>
 </tbody>
 </table>
-
-<p>Make sure you&rsquo;ve got the <strong>Fire On</strong> condition on the <em>Custom Event Trigger</em>, as you don&rsquo;t need it on the generic event Trigger. If you miss it from the Custom Event Trigger, you&rsquo;ll inadvertently fire the Tag whenever <em>any</em> such event is detected on the page. For example, if we&rsquo;d left out the <strong>Click URL Hostname</strong> condition from the example above, the Outbound Links Tag would fire whenever the Link Click event is pushed into <code>dataLayer</code>.</p>
-
+<p>Make sure you've got the <strong>Fire On</strong> condition on the <em>Custom Event Trigger</em>, as you don't need it on the generic event Trigger. If you miss it from the Custom Event Trigger, you'll inadvertently fire the Tag whenever <em>any</em> such event is detected on the page. For example, if we'd left out the <strong>Click URL Hostname</strong> condition from the example above, the Outbound Links Tag would fire whenever the Link Click event is pushed into <code>dataLayer</code>.</p>
 <h2 id="bonus-use-variable-tracking-id">BONUS: Use variable Tracking ID</h2>
-
-<p>Here&rsquo;s a tip straight from Marco. To create a variable which sends a different Universal Analytics tracking ID depending on which cycle of the duplication loop is currently active, use the following <strong>Custom JavaScript Variable</strong>:</p>
-
+<p>Here's a tip straight from Marco. To create a variable which sends a different Universal Analytics tracking ID depending on which cycle of the duplication loop is currently active, use the following <strong>Custom JavaScript Variable</strong>:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
   
   <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">event</span> <span style="color:#f92672">=</span> {{<span style="color:#a6e22e">Event</span>}};
@@ -617,23 +570,14 @@
 </span><span style="color:#75715e"></span>
 }
 </code></pre></div>
-
 <p>This returns the UA code &ldquo;UA-XXXXXXXX-1&rdquo; if the Tag is firing on the first loop of the duplication cycle, and &ldquo;UA-XXXXXXXX-2&rdquo; if on the second. You might want to setup some type of fallback or default return value in case neither matches.</p>
-
 <h2 id="overview-and-summary">Overview and summary</h2>
-
 <p>While the solution works for all kinds of tags and creates less redundancy in many setups, it has some drawbacks of its own.</p>
-
-<p>First, it inflates the number of <code>dataLayer</code> events significantly. A simple setup with just two events (Page View and Outbound Link Clicks) already triples the amount. Note that this doesn&rsquo;t really have any impact on performance. <code>dataLayer</code> is just a message bus used by Google Tag Manager&rsquo;s <a href="https://www.simoahava.com/analytics/google-tag-manager-data-model/">internal data model</a>. Whenever GTM needs to access the &ldquo;Data Layer&rdquo;, it&rsquo;s actually just performing a lookup in its own data model, so the size of <code>dataLayer</code> is inconsequential here.</p>
-
-<p>Second, it requires a different and probably more difficult approach to triggers. All tags need to be linked to custom event triggers instead of the built-in Trigger types you might have become used to. If you were around during GTM&rsquo;s previous version, you might be familiar with the setup, as it resembles how things were done with the old auto-event tracking setup. However, when you really chew it down, all you&rsquo;re actually doing is creating <strong>one</strong> extra Trigger per event type, and moving from the built-in Trigger types to Custom Event Triggers.</p>
-
+<p>First, it inflates the number of <code>dataLayer</code> events significantly. A simple setup with just two events (Page View and Outbound Link Clicks) already triples the amount. Note that this doesn't really have any impact on performance. <code>dataLayer</code> is just a message bus used by Google Tag Manager's <a href="https://www.simoahava.com/analytics/google-tag-manager-data-model/">internal data model</a>. Whenever GTM needs to access the &ldquo;Data Layer&rdquo;, it's actually just performing a lookup in its own data model, so the size of <code>dataLayer</code> is inconsequential here.</p>
+<p>Second, it requires a different and probably more difficult approach to triggers. All tags need to be linked to custom event triggers instead of the built-in Trigger types you might have become used to. If you were around during GTM's previous version, you might be familiar with the setup, as it resembles how things were done with the old auto-event tracking setup. However, when you really chew it down, all you're actually doing is creating <strong>one</strong> extra Trigger per event type, and moving from the built-in Trigger types to Custom Event Triggers.</p>
 <p>Finally, trigger conditions become more critical as they can cause infinite loops or Tags firing in wrong situations. While such accidents shouldn’t cause infinite regret (assuming you test before publish) it does remain another difficulty for you to deal with.</p>
-
-<p>One thing you might be concerned about is whether or not all the Variables populated with the initial base Trigger are still available when the duplicate Custom Event Triggers fire. For example, you might need the <strong>Click URL</strong> Variable, and now you&rsquo;re worried that it&rsquo;s not available when the duplicate Triggers fire. Don&rsquo;t worry! GTM persists Variable values until they&rsquo;re overwritten or there&rsquo;s a page unload/refresh. So, unless you&rsquo;re manually overriding the Data Layer values populated by GTM&rsquo;s auto-event Triggers, you should be fine.</p>
-
+<p>One thing you might be concerned about is whether or not all the Variables populated with the initial base Trigger are still available when the duplicate Custom Event Triggers fire. For example, you might need the <strong>Click URL</strong> Variable, and now you're worried that it's not available when the duplicate Triggers fire. Don't worry! GTM persists Variable values until they're overwritten or there's a page unload/refresh. So, unless you're manually overriding the Data Layer values populated by GTM's auto-event Triggers, you should be fine.</p>
 <p>Well, we might have overstated the simplicity and elegance of the setup, but the idea of intercepting each event and duplicating it is far more approachable than the complex hitCallback setup used before.</p>
-
 <p>I want to thank Marco for putting the approach into writing, and most of the content in this article has come from his pen, edited to suit the devil-may-care style of this blog. Any errors, factual mistakes, or radicalist propaganda cleverly hidden in the whitespace is solely the fault of me, Simo, and I take full responsibility for all the uprisings that will inevitably follow.</p>
 
               

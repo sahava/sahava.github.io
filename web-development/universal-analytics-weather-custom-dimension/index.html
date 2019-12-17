@@ -53,7 +53,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.59.1 with theme Tranquilpeak 0.4.3-BETA">
+    <meta name="generator" content="Hugo 0.61.0 with theme Tranquilpeak 0.4.3-BETA">
     <title>Universal Analytics: Weather As A Custom Dimension | Simo Ahava's blog</title>
     
     <script>
@@ -319,18 +319,11 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              
-
-<p><em>There is a new version of this post for GTM V2 <a href="https://www.simoahava.com/analytics/send-weather-data-to-google-analytics-in-gtm-v2/">here</a>.</em></p>
-
-<p>[Last updated June 2014] I&rsquo;ve fallen in love with <a href="https://support.google.com/analytics/answer/2790010?hl=en">Universal Analytics</a> and <a href="http://www.google.com/tagmanager/">Google Tag Manager</a>. Together they form an incredibly powerful tool for marketing professionals. In most cases, I no longer need to post recommendations to my client for yet another page template revision, since with the tag manager in place, I can just add custom code via the admin panel. Add to that the power of Universal Analytics with its ultra-sensitive Measurement Protocol, and the ability to craft custom dimensions and metrics, and voila! I&rsquo;m in a happy place.</p>
-
-<p>In this post, I take you through a short JavaScript dev journey of utilizing weather data as a custom dimension in your site&rsquo;s Analytics. You only need to have Universal Analytics and Google Tag Manager installed on your site.</p>
-
+              <p><em>There is a new version of this post for GTM V2 <a href="https://www.simoahava.com/analytics/send-weather-data-to-google-analytics-in-gtm-v2/">here</a>.</em></p>
+<p>[Last updated June 2014] I've fallen in love with <a href="https://support.google.com/analytics/answer/2790010?hl=en">Universal Analytics</a> and <a href="http://www.google.com/tagmanager/">Google Tag Manager</a>. Together they form an incredibly powerful tool for marketing professionals. In most cases, I no longer need to post recommendations to my client for yet another page template revision, since with the tag manager in place, I can just add custom code via the admin panel. Add to that the power of Universal Analytics with its ultra-sensitive Measurement Protocol, and the ability to craft custom dimensions and metrics, and voila! I'm in a happy place.</p>
+<p>In this post, I take you through a short JavaScript dev journey of utilizing weather data as a custom dimension in your site's Analytics. You only need to have Universal Analytics and Google Tag Manager installed on your site.</p>
 <h2 id="the-end-result">The end result</h2>
-
 <p>This is what you get:</p>
-
 
 
 
@@ -346,17 +339,13 @@
 </div>
 
 
-
-<p>As you can see, I&rsquo;ve created a custom report which shows visits, pageviews and conversion rates (Pages / Visit &gt; 2) for various weather conditions. This report unequivocally, with a plain-as-day-without-a-doubt display of causality, proves that when it rains, people are more likely to convert. I should do more targeting to British audiences&hellip;</p>
-
+<p>As you can see, I've created a custom report which shows visits, pageviews and conversion rates (Pages / Visit &gt; 2) for various weather conditions. This report unequivocally, with a plain-as-day-without-a-doubt display of causality, proves that when it rains, people are more likely to convert. I should do more targeting to British audiences&hellip;</p>
 <h2 id="create-a-new-tag-in-gtm">Create a new tag in GTM</h2>
-
 <ul>
 <li>Name the tag &ldquo;Weather API&rdquo;</li>
 <li>Choose <strong>Custom HTML Tag</strong> as the tag type</li>
 <li>Enter the following code into the HTML field (<em>Note! You need to load jQuery for this to work! See here for more information)</em>:</li>
 </ul>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
   <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">lat</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">geoplugin_latitude</span>();
   <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">lon</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">geoplugin_longitude</span>();
@@ -380,30 +369,20 @@
     }
   });
 &lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
-
 <ul>
 <li>Add rule to fire tag on every page (<em>{{url}} matches RegEx .*</em>)</li>
 </ul>
-
-<p>Here&rsquo;s what&rsquo;s going on.</p>
-
-<p>First, a couple of external JavaScript functions are called to retrieve the longitude and latitude of the visitor by using their IP addresses. I&rsquo;m using the free <a href="http://www.geoplugin.com">geoPlugin</a> service. You can load it on your site by adding <code>&lt;script src=&quot;http://www.geoplugin.net/javascript.gp&quot;&gt;&lt;/script&gt;</code> in your template.</p>
-
-<p><em>Remember to load this script BEFORE the weather API runs. It&rsquo;s best to put it in the <code>&lt;head/&gt;</code> of your page template. If you want, you can also put the script load as the first line of the custom HTML tag you just created.</em></p>
-
+<p>Here's what's going on.</p>
+<p>First, a couple of external JavaScript functions are called to retrieve the longitude and latitude of the visitor by using their IP addresses. I'm using the free <a href="http://www.geoplugin.com">geoPlugin</a> service. You can load it on your site by adding <code>&lt;script src=&quot;http://www.geoplugin.net/javascript.gp&quot;&gt;&lt;/script&gt;</code> in your template.</p>
+<p><em>Remember to load this script BEFORE the weather API runs. It's best to put it in the <code>&lt;head/&gt;</code> of your page template. If you want, you can also put the script load as the first line of the custom HTML tag you just created.</em></p>
 <p>Next, I use the API of <a href="http://openweathermap.org/">OpenWeatherMap</a> to retrieve the weather data for the latitude and longitude I got in the previous step.</p>
-
 <p>In the AJAX call, I make an asynchronous call to the API, requesting the data in JSONP (since it originates from a different domain than mine). If the call is successful, I look for the /weather/main/ node, as it has a nice, short description of the weather in the area (e.g. &ldquo;Clear&rdquo;). I then push the string into the data layer.</p>
-
 <p>Finally, whether the API call is a success or not, I push an event &ldquo;weatherDone&rdquo; into the data layer. This is used to make sure the API call is done before the Universal Analytics tag is fired (see below).</p>
-
 <h2 id="create-new-custom-dimension-in-ga">Create new custom dimension in GA</h2>
-
 <ul>
 <li>Go to the admin panel of your Google Analytics site</li>
 <li>Under <strong>Property</strong>, choose Custom Definitions / Custom Dimensions</li>
 </ul>
-
 
 
 
@@ -419,7 +398,6 @@
 </div>
 
 
-
 <ul>
 <li>Create a new Custom Dimension with the name &ldquo;Weather&rdquo;</li>
 <li>Scope the new dimension to Session</li>
@@ -427,15 +405,11 @@
 <li>Click Save</li>
 <li>Make note of the index of the new dimension</li>
 </ul>
-
 <p>Here you create a new dimension in Google Analytics and set it active. You need to make note of the dimension index, since you will be referring to this in a short while.</p>
-
 <h2 id="create-new-macro-in-gtm">Create new macro in GTM</h2>
-
 <ul>
-<li>In Google Tag Manager, go to your container and click New Macro<br /></li>
+<li>In Google Tag Manager, go to your container and click New Macro</li>
 </ul>
-
 
 
 
@@ -451,22 +425,16 @@
 </div>
 
 
-
 <ul>
-<li>Name the macro &ldquo;Weather&rdquo;<br /></li>
-<li>Set Macro Type as Data Layer Variable<br /></li>
-<li>Type &ldquo;weather&rdquo; in Data Layer Variable Name<br /></li>
-<li>Click Save<br /></li>
+<li>Name the macro &ldquo;Weather&rdquo;</li>
+<li>Set Macro Type as Data Layer Variable</li>
+<li>Type &ldquo;weather&rdquo; in Data Layer Variable Name</li>
+<li>Click Save</li>
 </ul>
-
 <p>You create the macro to access the weather string you pushed into the data layer a couple of steps ago.</p>
-
 <h2 id="edit-your-ga-tag">Edit your GA tag</h2>
-
 <p>(<strong>NOTE!</strong> I suggest you take a look at <a href="https://www.simoahava.com/analytics/universal-analytics-send-custom-dimension-event/">this post</a> for details on sending the weather data using a non-interaction event instead. This way your precious pageviews will never be compromised if the weather script fails to work.)</p>
-
 <p>Steps:</p>
-
 <ul>
 <li>Go to the tag that tracks your pageviews and sends them to GA</li>
 <li>Choose More Settings</li>
@@ -474,7 +442,6 @@
 <li>Add the index number of your new dimension in the Index field</li>
 <li>In the Dimension field, click {{+macro}} and choose the macro you just created</li>
 </ul>
-
 
 
 
@@ -490,11 +457,9 @@
 </div>
 
 
-
 <ul>
 <li>Edit the firing rule and add condition <strong>{{event}} equals weatherDone</strong></li>
 </ul>
-
 
 
 
@@ -510,22 +475,17 @@
 </div>
 
 
-
 <ul>
 <li>Save the tag</li>
 <li>Create a new container version</li>
 <li>Publish the new container version</li>
 </ul>
-
-<p>Here you send a new custom dimension with the pageview, and it gets its content from the data layer variable you pushed into the data layer during the weather API call. Since the calls are asynchronous, you&rsquo;ll need to make sure the UA tag is fired only after the weather API call has been made. This is done by waiting for the event <em>weatherDone</em> to be pushed into the data layer.</p>
-
+<p>Here you send a new custom dimension with the pageview, and it gets its content from the data layer variable you pushed into the data layer during the weather API call. Since the calls are asynchronous, you'll need to make sure the UA tag is fired only after the weather API call has been made. This is done by waiting for the event <em>weatherDone</em> to be pushed into the data layer.</p>
 <h2 id="make-sure-everything-works">Make sure everything works</h2>
-
 <ul>
 <li>Visit your site</li>
 <li>Take a look at the requests your site sends by using <a href="http://www.getfirebug.com/">Firebug</a> or something similar</li>
 </ul>
-
 
 
 
@@ -541,27 +501,16 @@
 </div>
 
 
-
 <h2 id="enjoy">Enjoy</h2>
-
 <p>I created a new custom report in GA, with visits, pageviews and conversion rate as metrics, and my new custom dimension as the dimension.</p>
-
-<p>Note that it might take some time for the new dimension to start pulling in data. If Firebug tells you that the weather data is sent along with your pageview data, you&rsquo;re fine.</p>
-
-<p>This could be done in so many different ways, but I chose JavaScript simply for this quick prototype. I&rsquo;m pretty pleased with the result, and even though I make a couple of external calls, page load speed is not an issue. There&rsquo;s always a risk with asynchronous scripting that the user is quick enough to interact with the site before the pageview is sent, but I don&rsquo;t think that will be an issue with this light-weight scripting.</p>
-
-<p>I can think of a number of cool applications for this weather API, but I&rsquo;ll leave those to your imagination.</p>
-
-<p>Google Tag Manager and Universal Analytics do a terrific job of providing high value for marketing professionals. I love the fact that you don&rsquo;t need to mess with the page template, and you can test and preview your tags as much as you want before publishing them.</p>
-
+<p>Note that it might take some time for the new dimension to start pulling in data. If Firebug tells you that the weather data is sent along with your pageview data, you're fine.</p>
+<p>This could be done in so many different ways, but I chose JavaScript simply for this quick prototype. I'm pretty pleased with the result, and even though I make a couple of external calls, page load speed is not an issue. There's always a risk with asynchronous scripting that the user is quick enough to interact with the site before the pageview is sent, but I don't think that will be an issue with this light-weight scripting.</p>
+<p>I can think of a number of cool applications for this weather API, but I'll leave those to your imagination.</p>
+<p>Google Tag Manager and Universal Analytics do a terrific job of providing high value for marketing professionals. I love the fact that you don't need to mess with the page template, and you can test and preview your tags as much as you want before publishing them.</p>
 <p><strong>EDIT</strong>: I edited the firing rules so that the UA tag occurs only after the weather API call has completed.</p>
-
 <p><strong>EDIT II:</strong> Note that <strong>you need to load jQuery</strong> for this to work! The <em>$.ajax</em> call is a jQuery function! So either load the jQuery resource in the <code>&lt;head/&gt;</code> of your page method (so that it gets loaded before the GTM container) OR have the following as the first line of the custom HTML tag:</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span> <span style="color:#a6e22e">src</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js&#34;</span>&gt;&lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
-
 <p><strong>EDIT III:</strong> Be sure to check my post on how to make sure the weather API is polled just <a href="https://www.simoahava.com/analytics/universal-analytics-fire-script-just-per-session/">once per visit</a>. This will improve site performance, and decrease the burden on the external API.</p>
-
 <p><strong>EDIT IV:</strong> Finally, see this post on <a href="https://www.simoahava.com/analytics/universal-analytics-send-custom-dimension-event/">sending custom dimensions with events</a> rather than pageviews for the optimal version of the code above.</p>
 
               

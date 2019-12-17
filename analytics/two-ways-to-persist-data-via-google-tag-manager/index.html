@@ -53,7 +53,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.59.1 with theme Tranquilpeak 0.4.3-BETA">
+    <meta name="generator" content="Hugo 0.61.0 with theme Tranquilpeak 0.4.3-BETA">
     <title>Two Ways To Persist Data Via Google Tag Manager | Simo Ahava's blog</title>
     
     <script>
@@ -319,10 +319,7 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              
-
-<p>The web is stateless. It&rsquo;s basically blind to your past, and it does a poor job of predicting what you might do in the future. When you browse to a website, the browser requests the page from the web server, and then proceeds to render it for you. This is a detached, clinical process, and any <em>personalized</em> or <em>stateful</em> data transfer is left to the sophistication of your web server.</p>
-
+              <p>The web is stateless. It's basically blind to your past, and it does a poor job of predicting what you might do in the future. When you browse to a website, the browser requests the page from the web server, and then proceeds to render it for you. This is a detached, clinical process, and any <em>personalized</em> or <em>stateful</em> data transfer is left to the sophistication of your web server.</p>
 
 
 
@@ -338,31 +335,27 @@
 </div>
 
 
-
-<p>Statelessness has some implications to us concerned about web analytics and measuring our visitors. In <a href="https://tagmanager.google.com/">Google Tag Manager</a>, this is an ever-present elephant in the room. Indeed, many suffer over not being able to fire Tags for e.g. <strong>returning</strong> visitors, or <strong>after five</strong> page views, or if the <strong>original source</strong> of the Session was AdWords. GTM is (for now) blind to this type of thinking, as it&rsquo;s simply a JavaScript machine operating in a stateless environment. Any notion of <em>state</em> needs to be injected manually into the machine.</p>
-
+<p>Statelessness has some implications to us concerned about web analytics and measuring our visitors. In <a href="https://tagmanager.google.com/">Google Tag Manager</a>, this is an ever-present elephant in the room. Indeed, many suffer over not being able to fire Tags for e.g. <strong>returning</strong> visitors, or <strong>after five</strong> page views, or if the <strong>original source</strong> of the Session was AdWords. GTM is (for now) blind to this type of thinking, as it's simply a JavaScript machine operating in a stateless environment. Any notion of <em>state</em> needs to be injected manually into the machine.</p>
 <p>And how is this done? <strong>Cookies</strong> and the <strong>Web Storage API</strong>.</p>
-
 <h2 id="browser-cookies">Browser cookies</h2>
-
-<p>Cookies in the browser are the de facto way of persisting information in the web. They&rsquo;ve been around for a long time (over 20 years!), and they&rsquo;re supported by pretty much all browsers - legacy and modern. For a refresher on what cookies are and how they work, check out <a href="https://en.wikipedia.org/wiki/HTTP_cookie">this Wikipedia article</a>. The most relevant features of browser cookies are:</p>
-
+<p>Cookies in the browser are the de facto way of persisting information in the web. They've been around for a long time (over 20 years!), and they're supported by pretty much all browsers - legacy and modern. For a refresher on what cookies are and how they work, check out <a href="https://en.wikipedia.org/wiki/HTTP_cookie">this Wikipedia article</a>. The most relevant features of browser cookies are:</p>
 <ol>
-<li><p>4KB size limitation (per cookie)</p></li>
-
-<li><p>Unencrypted in a single string, stored in <code>document.cookie</code></p></li>
-
-<li><p>Sent to the server with every single HTTP request</p></li>
-
-<li><p>Can be set with an expiration date</p></li>
+<li>
+<p>4KB size limitation (per cookie)</p>
+</li>
+<li>
+<p>Unencrypted in a single string, stored in <code>document.cookie</code></p>
+</li>
+<li>
+<p>Sent to the server with every single HTTP request</p>
+</li>
+<li>
+<p>Can be set with an expiration date</p>
+</li>
 </ol>
-
 <p>The size limitation quickly becomes an issue with large payloads, and the fact that they are sent to the server unencrypted with each request can be a turn-off for those with security concerns.</p>
-
 <h2 id="web-storage-api">Web Storage API</h2>
-
 <p>The <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API">Web Storage API</a> is a more recent innovation, and this is represented by lack of support from Internet Explorer 7 and older (who cares, though!). The API has two interfaces: <code>localStorage</code> and <code>sessionStorage</code>. The main difference is that the latter persists for the duration of the browser session (i.e. is flushed when the browser instance is shut down), and the former persists indefinitely.</p>
-
 
 
 
@@ -378,32 +371,26 @@
 </div>
 
 
-
 <p>Features of the Web Storage API are:</p>
-
 <ol>
-<li><p>Can only be read client-side in the browser. No data is sent to the server.</p></li>
-
-<li><p>Stores a maximum of 5MB per domain</p></li>
-
-<li><p>Stores data in a hash table, meaning you can make exact queries without having to parse the data</p></li>
+<li>
+<p>Can only be read client-side in the browser. No data is sent to the server.</p>
+</li>
+<li>
+<p>Stores a maximum of 5MB per domain</p>
+</li>
+<li>
+<p>Stores data in a hash table, meaning you can make exact queries without having to parse the data</p>
+</li>
 </ol>
-
-<p>Basically, the Web Storage API is a logical evolution of persistence, taking the best of cookies and adding better data access and management features. The big drawback is the lack of server-side communication, so if you rely on cookies to pass information to the web server, migrating to the Web Storage API wouldn&rsquo;t be logical unless you manually send the data to the server (e.g. via POST request).</p>
-
+<p>Basically, the Web Storage API is a logical evolution of persistence, taking the best of cookies and adding better data access and management features. The big drawback is the lack of server-side communication, so if you rely on cookies to pass information to the web server, migrating to the Web Storage API wouldn't be logical unless you manually send the data to the server (e.g. via POST request).</p>
 <h2 id="cookies-and-gtm">Cookies and GTM</h2>
-
-<p>Google Tag Manager, thankfully, already provides us an interface to query for cookie values: the <a href="https://www.simoahava.com/analytics/variable-guide-google-tag-manager/">1st Party Cookie Variable</a>. When you set the Variable to a cookie name, it will always return whatever value is stored in that particular cookie. This is a huge help, since you don&rsquo;t need to go through the rather tedious process of parsing the entire cookie string for the name-value pair you&rsquo;re looking for.</p>
-
+<p>Google Tag Manager, thankfully, already provides us an interface to query for cookie values: the <a href="https://www.simoahava.com/analytics/variable-guide-google-tag-manager/">1st Party Cookie Variable</a>. When you set the Variable to a cookie name, it will always return whatever value is stored in that particular cookie. This is a huge help, since you don't need to go through the rather tedious process of parsing the entire cookie string for the name-value pair you're looking for.</p>
 <p>Setting a cookie, however, still needs to be done manually. The easiest way to set a cookie is to add the following code in a Custom HTML Tag:</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">document.<span style="color:#a6e22e">cookie</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;cookieName=cookieValue&#39;</span>;
 </code></pre></div>
-
 <p>This would set a cookie with the name <strong>cookieName</strong> and the value <strong>cookieValue</strong>. However, using this code alone would set the cookie to expire at the end of the <strong>browser session</strong> (i.e. when the browser is shut down), and the cookie would be set on the current <strong>path</strong> and the current <strong>domain</strong> only. The path and domain combination is especially important, as the cookie would only be accessible via the page it was set on.</p>
-
-<p>This is why it&rsquo;s customary to create a helper function, with which you can provide some important parameters. To create this type of helper in GTM&rsquo;s context, I suggest using a <strong>Custom JavaScript Variable</strong> named <strong>{{JS - setCookie}}</strong>:</p>
-
+<p>This is why it's customary to create a helper function, with which you can provide some important parameters. To create this type of helper in GTM's context, I suggest using a <strong>Custom JavaScript Variable</strong> named <strong>{{JS - setCookie}}</strong>:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
   <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">name</span>, <span style="color:#a6e22e">value</span>, <span style="color:#a6e22e">ms</span>, <span style="color:#a6e22e">path</span>, <span style="color:#a6e22e">domain</span>) {
     <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">name</span> <span style="color:#f92672">||</span> <span style="color:#f92672">!</span><span style="color:#a6e22e">value</span>) {
@@ -422,43 +409,36 @@
   }
 }
 </code></pre></div>
-
 <p>This handy little function actually <em>returns</em> another function, which takes a number of parameters:</p>
-
 <ul>
-<li><p>name: <strong>Required</strong>. The cookie name.</p></li>
-
-<li><p>value: <strong>Required</strong>. Value for the cookie.</p></li>
-
-<li><p>ms: Expiration time of the cookie in milliseconds. If not set, defaults to <em>Session</em>.</p></li>
-
-<li><p>path: Path of the cookie. If not set, defaults to the current path.</p></li>
-
-<li><p>domain: Domain of the cookie. If not set, defaults to the current domain.</p></li>
+<li>
+<p>name: <strong>Required</strong>. The cookie name.</p>
+</li>
+<li>
+<p>value: <strong>Required</strong>. Value for the cookie.</p>
+</li>
+<li>
+<p>ms: Expiration time of the cookie in milliseconds. If not set, defaults to <em>Session</em>.</p>
+</li>
+<li>
+<p>path: Path of the cookie. If not set, defaults to the current path.</p>
+</li>
+<li>
+<p>domain: Domain of the cookie. If not set, defaults to the current domain.</p>
+</li>
 </ul>
-
 <p>To use this Variable in a script, you need to use the following syntax:</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">{{<span style="color:#a6e22e">JS</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">setCookie</span>}}(<span style="color:#e6db74">&#39;session&#39;</span>, <span style="color:#e6db74">&#39;true&#39;</span>, <span style="color:#ae81ff">1800000</span>, <span style="color:#e6db74">&#39;/&#39;</span>, <span style="color:#e6db74">&#39;simoahava.com&#39;</span>);
 </code></pre></div>
-
 <p>This would set a cookie with the name <strong>session</strong> and value <strong>true</strong>, which persists for <strong>30 minutes</strong>, and is written on the root page of the root domain.</p>
-
-<p>If you want to leave a parameter out, you&rsquo;ll need to replace it with <code>undefined</code>, if you still want to send one of the latter parameters. For example:</p>
-
+<p>If you want to leave a parameter out, you'll need to replace it with <code>undefined</code>, if you still want to send one of the latter parameters. For example:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">{{<span style="color:#a6e22e">JS</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">setCookie</span>}}(<span style="color:#e6db74">&#39;session&#39;</span>, <span style="color:#e6db74">&#39;true&#39;</span>, <span style="color:#66d9ef">undefined</span>, <span style="color:#66d9ef">undefined</span>, <span style="color:#e6db74">&#39;simoahava.com&#39;</span>);
 </code></pre></div>
-
 <p>Would set a cookie with name <strong>session</strong>, value <strong>true</strong>, which would be a Session cookie, written on the current page of the root domain.</p>
-
-<p>Phew! That&rsquo;s a mouthful of code. But it does its job nicely. Combine this with the excellent 1st Party Cookie Variable, and you&rsquo;ve managed to create a nice and handy cookie setter/getter.</p>
-
+<p>Phew! That's a mouthful of code. But it does its job nicely. Combine this with the excellent 1st Party Cookie Variable, and you've managed to create a nice and handy cookie setter/getter.</p>
 <h2 id="web-storage-api-and-gtm">Web Storage API and GTM</h2>
-
-<p>You could create a fancy set of Custom JavaScript Variables for <code>localStorage</code> and <code>sessionStorage</code> as well, but why bother? They&rsquo;re dead simple to interact with.</p>
-
+<p>You could create a fancy set of Custom JavaScript Variables for <code>localStorage</code> and <code>sessionStorage</code> as well, but why bother? They're dead simple to interact with.</p>
 <p>To set a key-value pair in storage, you can use the following syntax:</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">if</span> (window[<span style="color:#e6db74">&#39;Storage&#39;</span>]) {
   <span style="color:#75715e">// localStorage persists indefinitely
 </span><span style="color:#75715e"></span>  <span style="color:#a6e22e">localStorage</span>.<span style="color:#a6e22e">setItem</span>(<span style="color:#e6db74">&#39;session&#39;</span>, <span style="color:#e6db74">&#39;true&#39;</span>); 
@@ -469,27 +449,18 @@
 </span><span style="color:#75715e"></span>  {{<span style="color:#a6e22e">JS</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">setCookie</span>}}(<span style="color:#e6db74">&#39;session&#39;</span>, <span style="color:#e6db74">&#39;true&#39;</span>);
 }
 </code></pre></div>
-
-<p>First of all, you need to check if the browser supports the Web Storage API. That&rsquo;s just a simple <code>if...else</code> block. See what I did with the fallback? That&rsquo;s right! I used the <strong>{{JS - setCookie}}</strong> method we just created! What a beautiful segue.</p>
-
-<p>Web Storage only accepts strings as values, so you need to make sure whatever you&rsquo;re storing can be safely converted into a String. Don&rsquo;t worry, the Storage API does the casting for you, if you fail to explicitly save a String type.</p>
-
+<p>First of all, you need to check if the browser supports the Web Storage API. That's just a simple <code>if...else</code> block. See what I did with the fallback? That's right! I used the <strong>{{JS - setCookie}}</strong> method we just created! What a beautiful segue.</p>
+<p>Web Storage only accepts strings as values, so you need to make sure whatever you're storing can be safely converted into a String. Don't worry, the Storage API does the casting for you, if you fail to explicitly save a String type.</p>
 <p>Unfortunately, as of yet GTM does not have a handy Variable you can use to fetch items from storage (I hope this changes soon!). But to retrieve a value is just as simple as setting one:</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">if</span> (window[<span style="color:#e6db74">&#39;Storage&#39;</span>]) {
   <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">localSession</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">localStorage</span>.<span style="color:#a6e22e">getItem</span>(<span style="color:#e6db74">&#39;session&#39;</span>);
   <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">sessionSession</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sessionStorage</span>.<span style="color:#a6e22e">getItem</span>(<span style="color:#e6db74">&#39;session&#39;</span>);
 }
 </code></pre></div>
-
-<p>That&rsquo;s right, it&rsquo;s the <code>getItem()</code> method of the API that lets you access stored keys. It returns <code>null</code> if the item isn&rsquo;t found.</p>
-
-<p>And that&rsquo;s how you roll with the Web Storage API. You get by with a LOT less code, and the value lookup is way more intuitive than with cookies, though GTM does take a lot of the burden away from you with its awesome 1st Party Cookie Variable.</p>
-
+<p>That's right, it's the <code>getItem()</code> method of the API that lets you access stored keys. It returns <code>null</code> if the item isn't found.</p>
+<p>And that's how you roll with the Web Storage API. You get by with a LOT less code, and the value lookup is way more intuitive than with cookies, though GTM does take a lot of the burden away from you with its awesome 1st Party Cookie Variable.</p>
 <h2 id="summary">Summary</h2>
-
-<p>For many interactions, persisting data in the browser is very important. However, not all persistence should be left for the client, since servers do a far better and more robust job of storing user- and usage-based data. That&rsquo;s why Google Analytics shifted from client-side calculations (ga.js and older) to server-side algorithms (Universal Analytics). And that&rsquo;s why if you really have pressing and business-critical needs to persist information, you might want to talk to your developers about storing this in a proper data store or database, exposing the information in the <code>dataLayer</code> when and where relevant.</p>
-
+<p>For many interactions, persisting data in the browser is very important. However, not all persistence should be left for the client, since servers do a far better and more robust job of storing user- and usage-based data. That's why Google Analytics shifted from client-side calculations (ga.js and older) to server-side algorithms (Universal Analytics). And that's why if you really have pressing and business-critical needs to persist information, you might want to talk to your developers about storing this in a proper data store or database, exposing the information in the <code>dataLayer</code> when and where relevant.</p>
 <p>But for the simple, session-scoped persistence, the two methods outlined in this guide should be quite useful. I strongly recommend using the Web Storage API, but unfortunately you might need to introduce a fallback with browser cookies, since there are still many fools out there using outdated browsers.</p>
 
               

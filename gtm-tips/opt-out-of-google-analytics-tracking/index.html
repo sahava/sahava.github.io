@@ -53,7 +53,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.59.1 with theme Tranquilpeak 0.4.3-BETA">
+    <meta name="generator" content="Hugo 0.61.0 with theme Tranquilpeak 0.4.3-BETA">
     <title>#GTMTips: Opt-out Of Google Analytics Tracking | Simo Ahava's blog</title>
     
     <script>
@@ -319,14 +319,9 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              
-
-<p>A while ago I posted a <a href="https://www.simoahava.com/categories/gtm-tips/">#GTMTips</a> post where I detailed the steps you can take to <a href="https://www.simoahava.com/gtm-tips/respect-opt-out-from-advertising-and-analytics/">opt-out of all Google Analytics tracking</a> and the DoubleClick redirects that often follow. It was a fun exercise, but because it relies on preventing requests on a tag-by-tag basis (using the ubiquituous <a href="https://www.simoahava.com/tags/customtask/"><code>customTask</code></a>), it can be a chore to handle in large containers.</p>
-
-<p>In this article, we&rsquo;ll continue with the theme of opting out from <a href="https://analytics.google.com/">Google Analytics</a> tracking by leveraging a solution provided by the <a href="https://developers.google.com/analytics/devguides/collection/gtagjs/user-opt-out">tool itself</a>. To make it work, we&rsquo;ll use a Custom HTML tag together with some <a href="https://www.simoahava.com/analytics/understanding-tag-sequencing-in-google-tag-manager/">tag sequencing</a>.</p>
-
+              <p>A while ago I posted a <a href="https://www.simoahava.com/categories/gtm-tips/">#GTMTips</a> post where I detailed the steps you can take to <a href="https://www.simoahava.com/gtm-tips/respect-opt-out-from-advertising-and-analytics/">opt-out of all Google Analytics tracking</a> and the DoubleClick redirects that often follow. It was a fun exercise, but because it relies on preventing requests on a tag-by-tag basis (using the ubiquituous <a href="https://www.simoahava.com/tags/customtask/"><code>customTask</code></a>), it can be a chore to handle in large containers.</p>
+<p>In this article, we'll continue with the theme of opting out from <a href="https://analytics.google.com/">Google Analytics</a> tracking by leveraging a solution provided by the <a href="https://developers.google.com/analytics/devguides/collection/gtagjs/user-opt-out">tool itself</a>. To make it work, we'll use a Custom HTML tag together with some <a href="https://www.simoahava.com/analytics/understanding-tag-sequencing-in-google-tag-manager/">tag sequencing</a>.</p>
 <h2 id="tip-68-opt-out-of-google-analytics-tracking-with-a-global-variable">Tip 68: Opt-out of Google Analytics tracking with a global variable</h2>
-
 
 
 
@@ -342,39 +337,26 @@
 </div>
 
 
-
 <p>The trick is to set a global variable <strong>before</strong> the first GA tag fires on the page. This is crucial, because the global variable needs to be created before the tracker object is created. So, unfortunately, <code>customTask</code> will not work this time (I know, HUGE disappointment!).</p>
-
 <p>The variable itself is very simple to create. It needs to look like this:</p>
-
 <p><code>window['ga-disable-UA-XXXXXX-Y'] = true</code></p>
-
 <p>Here, <code>UA-XXXXXX-Y</code> is the tracking ID you want to block for all subsequent GA requests sent on the page. You can create multiple global variables like this, one for each tracking ID you want to block.</p>
-
 <p>So, if I wanted to block GA tracking to UA-12345-1 when the user has a specific cookie in their browser, I could use something like this in a <strong>Custom HTML tag</strong>:</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
   <span style="color:#66d9ef">if</span> ({{<span style="color:#a6e22e">Cookie</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">_ga_opt_out</span>}} <span style="color:#f92672">===</span> <span style="color:#e6db74">&#39;true&#39;</span>) {
     window[<span style="color:#e6db74">&#39;ga-disable-{{GA ID}}&#39;</span>] <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>;
   }
 &lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
-
 <p>Here, <strong>{{Cookie - _ga_opt_out}}</strong> is an (imaginary) first party cookie, which stores the value <code>true</code> if the user has opted out of tracking on my (imaginary) site. <strong>{{GA ID}}</strong> is a <a href="https://www.simoahava.com/gtm-tips/save-gatc-constant-string-macro/">constant variable</a> that returns the Google Analytics tracking ID the user is opting-out from.</p>
-
 <p>Or, if I want to use the <code>doNotTrack</code> feature that <a href="https://support.google.com/chrome/answer/2790761?co=GENIE.Platform%3DDesktop&amp;hl=en">most browsers</a> let you set in their settings:</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
   <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">navigator</span>.<span style="color:#a6e22e">doNotTrack</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">navigator</span>.<span style="color:#a6e22e">doNotTrack</span> <span style="color:#f92672">===</span> <span style="color:#ae81ff">1</span>) {
     window[<span style="color:#e6db74">&#39;ga-disable-{{GA ID}}&#39;</span>] <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>;
   }
 &lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
-
 <p>Note that <strong>you should not add any triggers to this Custom HTML tag</strong>, as it will only fire when in a tag sequence.</p>
-
 <p>Finally, you need to find the <strong>first</strong> Universal Analytics tag that fires on the page with that tracking ID. Typically this would be a Page View tag which fires on the All Pages trigger.</p>
-
 <p>Then, scroll down to its <strong>Advanced Settings</strong>, and make sure the Tag Sequencing setting is setup as follows:</p>
-
 
 
 
@@ -390,10 +372,8 @@
 </div>
 
 
-
 <p>This setting ensures that before the Page View tag fires, your opt-out script has time to complete, and set the browser to opt-out of Google Analytics tracking to the tracking ID established in the global variable.</p>
-
-<p>That&rsquo;s all there is to it, really. The obvious downside is that if you are tracking to more than one GA property, you&rsquo;ll need to exclude all of them. You&rsquo;ll also need to modify the conditional statement in the script to match whatever opt-out scheme your website offers.</p>
+<p>That's all there is to it, really. The obvious downside is that if you are tracking to more than one GA property, you'll need to exclude all of them. You'll also need to modify the conditional statement in the script to match whatever opt-out scheme your website offers.</p>
 
               
 

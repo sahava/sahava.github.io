@@ -53,7 +53,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.59.1 with theme Tranquilpeak 0.4.3-BETA">
+    <meta name="generator" content="Hugo 0.61.0 with theme Tranquilpeak 0.4.3-BETA">
     <title>#GTMtips: Once userId, Always userId | Simo Ahava's blog</title>
     
     <script>
@@ -319,18 +319,11 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              
-
-<p>The <a href="https://support.google.com/analytics/answer/3123663">User ID</a> is definitely one of the coolest things about Universal Analytics, <em>if used correctly</em>. It might reveal some surprising insights about your visitors, since now you&rsquo;re not restricted to analysing visitors as just browser or device instances as before, but rather you can build your stories around all the touch points the user might have had on their journey to and through your web properties.</p>
-
+              <p>The <a href="https://support.google.com/analytics/answer/3123663">User ID</a> is definitely one of the coolest things about Universal Analytics, <em>if used correctly</em>. It might reveal some surprising insights about your visitors, since now you're not restricted to analysing visitors as just browser or device instances as before, but rather you can build your stories around all the touch points the user might have had on their journey to and through your web properties.</p>
 <p>With this simple tip, you can extend User ID tracking to return users without them needing to authenticate. This is done with a cookie.</p>
-
-<p><strong>Note!</strong> This means that the User ID will often persist on public computers, so the person you&rsquo;re tracking might not actually be the same <em>human</em> (it might also be a llama with some tech skills).</p>
-
-<p>This idea was inspired by the comments in Annie Cushing&rsquo;s blog post: <a href="http://www.annielytics.com/blog/analytics/google-analytics-user-metrics-bs-sites/">Why Google Analytics User Metrics Are BS (For Most Sites)</a>. Especially the comments by John Mitchell and Christopher Mason were particularly insightful.</p>
-
+<p><strong>Note!</strong> This means that the User ID will often persist on public computers, so the person you're tracking might not actually be the same <em>human</em> (it might also be a llama with some tech skills).</p>
+<p>This idea was inspired by the comments in Annie Cushing's blog post: <a href="http://www.annielytics.com/blog/analytics/google-analytics-user-metrics-bs-sites/">Why Google Analytics User Metrics Are BS (For Most Sites)</a>. Especially the comments by John Mitchell and Christopher Mason were particularly insightful.</p>
 <h2 id="tip-8-user-id-for-non-authenticated-return-users">Tip 8: User ID for non-authenticated return users</h2>
-
 
 
 
@@ -346,23 +339,25 @@
 </div>
 
 
-
 <p>The process is pretty much this:</p>
-
 <ol>
-<li><p>When users authenticate, the user ID should be stored in dataLayer</p></li>
-
-<li><p>When subsequent Universal Analytics tags are fired, the <code>&amp;uid;</code> key should first check if the User ID is in <code>dataLayer</code></p></li>
-
-<li><p>If it is, then a cookie is written in the user&rsquo;s browser with this User ID, and finally the value is returned to the tag</p></li>
-
-<li><p>If the User ID is not in <code>dataLayer</code>, GTM checks if it&rsquo;s stored in a cookie, and if it is, the cookie value is returned</p></li>
-
-<li><p>If there is no such cookie, nothing is returned and the User ID parameter will not get sent</p></li>
+<li>
+<p>When users authenticate, the user ID should be stored in dataLayer</p>
+</li>
+<li>
+<p>When subsequent Universal Analytics tags are fired, the <code>&amp;uid;</code> key should first check if the User ID is in <code>dataLayer</code></p>
+</li>
+<li>
+<p>If it is, then a cookie is written in the user's browser with this User ID, and finally the value is returned to the tag</p>
+</li>
+<li>
+<p>If the User ID is not in <code>dataLayer</code>, GTM checks if it's stored in a cookie, and if it is, the cookie value is returned</p>
+</li>
+<li>
+<p>If there is no such cookie, nothing is returned and the User ID parameter will not get sent</p>
+</li>
 </ol>
-
-<p>So, for this to work you&rsquo;ll need three variables. First one is <strong>{{uid in datalayer}}</strong>, and it&rsquo;s a simple Data Layer Variable where the variable name it points to is whatever you have configured by your website. I&rsquo;ll user <code>userId</code> in this example.</p>
-
+<p>So, for this to work you'll need three variables. First one is <strong>{{uid in datalayer}}</strong>, and it's a simple Data Layer Variable where the variable name it points to is whatever you have configured by your website. I'll user <code>userId</code> in this example.</p>
 
 
 
@@ -378,19 +373,14 @@
 </div>
 
 
-
 <p>So when a user logs in, the website should push their User ID into <code>dataLayer</code> like so:</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
   <span style="color:#e6db74">&#39;userId&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;AAA-123&#39;</span>,
   <span style="color:#e6db74">&#39;event&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;authentication&#39;</span>
 });
 </code></pre></div>
-
-<p>This shouldn&rsquo;t come as a surprise, right? That&rsquo;s how you should do it in any case. The &lsquo;event&rsquo; push fires the Event Tag which sends the user ID to Google Analytics. Nothing ground-breaking here, yet.</p>
-
-<p>Next, you&rsquo;ll need two other variables. The first one is a <strong>1st Party Cookie</strong> variable, which looks for whatever cookie name you&rsquo;ve decided to store the user ID in. I&rsquo;ll use <code>userId</code> again for consistency, but note that it&rsquo;s a pretty common name, and you don&rsquo;t want to overwrite other cookies written by your scripts.</p>
-
+<p>This shouldn't come as a surprise, right? That's how you should do it in any case. The &lsquo;event&rsquo; push fires the Event Tag which sends the user ID to Google Analytics. Nothing ground-breaking here, yet.</p>
+<p>Next, you'll need two other variables. The first one is a <strong>1st Party Cookie</strong> variable, which looks for whatever cookie name you've decided to store the user ID in. I'll use <code>userId</code> again for consistency, but note that it's a pretty common name, and you don't want to overwrite other cookies written by your scripts.</p>
 
 
 
@@ -406,9 +396,7 @@
 </div>
 
 
-
-<p>Finally, you&rsquo;ll need a <strong>Custom JavaScript Variable</strong>, which we&rsquo;ll call <strong>{{user id}}</strong>. Its task is to perform the algorithm described in the beginning of this chapter.</p>
-
+<p>Finally, you'll need a <strong>Custom JavaScript Variable</strong>, which we'll call <strong>{{user id}}</strong>. Its task is to perform the algorithm described in the beginning of this chapter.</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
     <span style="color:#66d9ef">if</span> ({{<span style="color:#a6e22e">uid</span> <span style="color:#66d9ef">in</span> <span style="color:#a6e22e">datalayer</span>}}) {
         <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">d</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Date();
@@ -422,9 +410,7 @@
     <span style="color:#66d9ef">return</span>;
 }
 </code></pre></div>
-
 <p>And, finally (phew! this was supposed to be a simple tip), you need to edit your Universal Analytics tags to fetch the <strong>{{user id}}</strong> for the <code>&amp;uid;</code>:</p>
-
 
 
 
@@ -440,10 +426,8 @@
 </div>
 
 
-
 <p>And that will do it.</p>
-
-<p>Remember, this isn&rsquo;t for everyone. There&rsquo;s no inherent benefit of always tracking return users unless it&rsquo;s something you consider necessary for you to achieve your business goals. Sometimes it&rsquo;s a business requirement itself to track return users who <em>don&rsquo;t</em> authenticate. And don&rsquo;t forget the warning about public computers. You might want to edit this script to only work for mobile phones and tablets, since it&rsquo;s less likely that they have as many users as a library computer might.</p>
+<p>Remember, this isn't for everyone. There's no inherent benefit of always tracking return users unless it's something you consider necessary for you to achieve your business goals. Sometimes it's a business requirement itself to track return users who <em>don't</em> authenticate. And don't forget the warning about public computers. You might want to edit this script to only work for mobile phones and tablets, since it's less likely that they have as many users as a library computer might.</p>
 
               
 

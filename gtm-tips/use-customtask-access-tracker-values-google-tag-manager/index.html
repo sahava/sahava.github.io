@@ -53,7 +53,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.59.1 with theme Tranquilpeak 0.4.3-BETA">
+    <meta name="generator" content="Hugo 0.61.0 with theme Tranquilpeak 0.4.3-BETA">
     <title>#GTMTips: Use customTask To Access Tracker Values In Google Tag Manager | Simo Ahava's blog</title>
     
     <script>
@@ -319,18 +319,11 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              
-
-<p>One of the things I&rsquo;ve recommended from the get-go is to <a href="https://www.simoahava.com/analytics/improve-data-collection-with-four-custom-dimensions/">always send the Client ID</a> to <a href="https://analytics.google.com">Google Analytics</a> with your users&rsquo; hits. This is very useful for adding a level of granularity to your tracking. At first, I recommended using an Event tag to do this. Then I modified my approach a little so that you could send it with your initial <a href="https://www.simoahava.com/analytics/access-the-tracker-object-in-your-page-view-tag/">Page View</a> (thus not inflating your hit counts).</p>
-
-<p>However, Universal Analytics recently released a new <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/tasks">task API</a>, <code>customTask</code>, which lets you access the model object mid-tag, thus letting you modify the payload that is dispatched to Google Analytics. In this article, I&rsquo;ll show you how this works by using the classic example of sending the Client ID to Google Analytics.</p>
-
+              <p>One of the things I've recommended from the get-go is to <a href="https://www.simoahava.com/analytics/improve-data-collection-with-four-custom-dimensions/">always send the Client ID</a> to <a href="https://analytics.google.com">Google Analytics</a> with your users&rsquo; hits. This is very useful for adding a level of granularity to your tracking. At first, I recommended using an Event tag to do this. Then I modified my approach a little so that you could send it with your initial <a href="https://www.simoahava.com/analytics/access-the-tracker-object-in-your-page-view-tag/">Page View</a> (thus not inflating your hit counts).</p>
+<p>However, Universal Analytics recently released a new <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/tasks">task API</a>, <code>customTask</code>, which lets you access the model object mid-tag, thus letting you modify the payload that is dispatched to Google Analytics. In this article, I'll show you how this works by using the classic example of sending the Client ID to Google Analytics.</p>
 <h2 id="tip-59-access-the-model-object-mid-tag-in-google-tag-manager">Tip 59: Access the model object mid-tag in Google Tag Manager</h2>
-
-<p>The setup is really simple. You need a <strong>Custom Dimension</strong> setup in Universal Analytics, and then you simply need to add a new <strong>Field to set</strong> in your Page View tag (or whatever you want to use to send the data to GA). Remember to read <a href="https://www.simoahava.com/analytics/improve-data-collection-with-four-custom-dimensions/">my article</a> on sending this type of metadata to Google Analytics, if you&rsquo;re unsure why you would want to do this in the first place.</p>
-
+<p>The setup is really simple. You need a <strong>Custom Dimension</strong> setup in Universal Analytics, and then you simply need to add a new <strong>Field to set</strong> in your Page View tag (or whatever you want to use to send the data to GA). Remember to read <a href="https://www.simoahava.com/analytics/improve-data-collection-with-four-custom-dimensions/">my article</a> on sending this type of metadata to Google Analytics, if you're unsure why you would want to do this in the first place.</p>
 <p>The tag setup would look like this:</p>
-
 
 
 
@@ -346,9 +339,7 @@
 </div>
 
 
-
 <p>Field name should be set to <strong>customTask</strong>, and as its value you need to use a <strong>Custom JavaScript Variable</strong>. The variable looks like this:</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
   <span style="color:#75715e">// Modify customDimensionIndex to match the index number you want to send the data to
 </span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">customDimensionIndex</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">5</span>;
@@ -357,13 +348,9 @@
   }
 }
 </code></pre></div>
-
 <p>What happens is that once Google Tag Manager starts executing the tag code, it first encounters the <strong>customTask</strong> field. It resolves the variable to a <em>closure</em>, which is basically a function that automatically receives a <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/model-object-reference">model object</a> as a parameter. The model object can be manipulated using the <code>get</code> and <code>set</code> methods.</p>
-
 <p>Next, we <strong>set</strong> the Custom Dimension at index 5 (as determined by the value of <code>customDimensionIndex</code>) to the Client ID, which we retrieve with the <strong>get</strong> method of the model object.</p>
-
-<p>This little trick means that we can tell the GA tag to fetch the Client ID from the tracker object and send it in a Custom Dimension without any extra hacks or workarounds that we had to employ previously. The fact that <code>customTask</code> has no other function in Universal Analytics means that we don&rsquo;t have to mind the fact that we&rsquo;re overwriting a task method with this tag.</p>
-
+<p>This little trick means that we can tell the GA tag to fetch the Client ID from the tracker object and send it in a Custom Dimension without any extra hacks or workarounds that we had to employ previously. The fact that <code>customTask</code> has no other function in Universal Analytics means that we don't have to mind the fact that we're overwriting a task method with this tag.</p>
 <p>You can use this for <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/field-reference">any fields</a> in the model/tracker object if you wish.</p>
 
               

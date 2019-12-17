@@ -53,7 +53,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.59.1 with theme Tranquilpeak 0.4.3-BETA">
+    <meta name="generator" content="Hugo 0.61.0 with theme Tranquilpeak 0.4.3-BETA">
     <title>Form Field Timing With Google Tag Manager | Simo Ahava's blog</title>
     
     <script>
@@ -319,10 +319,7 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              
-
-<p>The inimitable <a href="https://twitter.com/optimiseordie">Craig Sullivan</a> gave me an idea for a continuation to my <a href="https://www.simoahava.com/analytics/track-form-abandonment-with-google-tag-manager/">latest post on form abandonment tracking</a>. In this short tutorial, I&rsquo;ll show you how to track the time users spend on your form fields. We&rsquo;re going to use the <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/user-timings">User Timings</a> hit type, and we&rsquo;ll send the data for just one form. With small modifications, you can expand the script to cover multiple forms on a page.</p>
-
+              <p>The inimitable <a href="https://twitter.com/optimiseordie">Craig Sullivan</a> gave me an idea for a continuation to my <a href="https://www.simoahava.com/analytics/track-form-abandonment-with-google-tag-manager/">latest post on form abandonment tracking</a>. In this short tutorial, I'll show you how to track the time users spend on your form fields. We're going to use the <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/user-timings">User Timings</a> hit type, and we'll send the data for just one form. With small modifications, you can expand the script to cover multiple forms on a page.</p>
 
 
 
@@ -338,21 +335,15 @@
 </div>
 
 
-
 <p>This simple solution tracks the time the user spends on each form field by measuring the distance between the <code>focus</code> event and the <code>blur</code> or <code>change</code> event. The first one occurs when a form field is entered, and the latter depends on if a value changed (<code>change</code>) or no change was registered (<code>blur</code>).</p>
-
-<p>The timing object that is sent to GA looks like this:<br />
-<strong>Timing Category</strong> - Comment Form Field Timing<br />
-<strong>Timing Variable</strong> - Form field <code>name</code> attribute value<br />
-<strong>Timing Label</strong> - &lsquo;blur&rsquo; or &lsquo;change&rsquo; depending on how the field was exited<br />
+<p>The timing object that is sent to GA looks like this:<br>
+<strong>Timing Category</strong> - Comment Form Field Timing<br>
+<strong>Timing Variable</strong> - Form field <code>name</code> attribute value<br>
+<strong>Timing Label</strong> - &lsquo;blur&rsquo; or &lsquo;change&rsquo; depending on how the field was exited<br>
 <strong>Timing Value</strong> - Time spent in the field in milliseconds</p>
-
-<p>Note! Timings are counted against the <strong>500 hits / session</strong> limit in Google Analytics. That&rsquo;s why you have to be careful when implementing this. I suggest you only implement it on one form and for a short time, and then see if users&rsquo; sessions are getting miscalculated thanks to them surpassing the 500 hit limit. There are some <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/user-timings#sampling">additional limitations</a> per property as well, but they only count towards the timing hits and not all hits in the session.</p>
-
+<p>Note! Timings are counted against the <strong>500 hits / session</strong> limit in Google Analytics. That's why you have to be careful when implementing this. I suggest you only implement it on one form and for a short time, and then see if users&rsquo; sessions are getting miscalculated thanks to them surpassing the 500 hit limit. There are some <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/user-timings#sampling">additional limitations</a> per property as well, but they only count towards the timing hits and not all hits in the session.</p>
 <h2 id="the-custom-html-tag">The Custom HTML Tag</h2>
-
 <p>The Custom HTML Tag looks like this:</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
 (<span style="color:#66d9ef">function</span>() {
   <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">form</span> <span style="color:#f92672">=</span> document.<span style="color:#a6e22e">querySelector</span>(<span style="color:#e6db74">&#39;#commentform&#39;</span>);
@@ -388,69 +379,43 @@
   }
 })();
 &lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
-
 <p>To fire this Tag, I suggest you create a <strong>Page View Trigger</strong> which only fires this Tag on pages where your form exists.</p>
-
 <p>Next, change the very first variable <code>var form = document.querySelector('#commentform');</code> to select the form you want to track. On my site this happens to be a form with ID #commentform.</p>
-
 <p>Whenever a <code>focus</code> event is detected, a hash table is updated with the form field name and the time when the field was entered.</p>
-
-<p>Then, when the field is exited, and either a <code>blur</code> or <code>change</code> is recorded, the time spent in the field is calculated, and then the field name is deleted from the hash table. If you don&rsquo;t delete the field, a <code>change</code> event would send the timing twice, because when the user edits the value of a field and leaves it, a <code>change</code> is dispatched first, and then a <code>blur</code>.</p>
-
-<p>Anyway, feel free to change the value of the &lsquo;timingCategory&rsquo; variable in the <code>dataLayer.push()</code>. I use &lsquo;Comment Form Field Timing&rsquo;, as that&rsquo;s what I&rsquo;m doing here.</p>
-
+<p>Then, when the field is exited, and either a <code>blur</code> or <code>change</code> is recorded, the time spent in the field is calculated, and then the field name is deleted from the hash table. If you don't delete the field, a <code>change</code> event would send the timing twice, because when the user edits the value of a field and leaves it, a <code>change</code> is dispatched first, and then a <code>blur</code>.</p>
+<p>Anyway, feel free to change the value of the &lsquo;timingCategory&rsquo; variable in the <code>dataLayer.push()</code>. I use &lsquo;Comment Form Field Timing&rsquo;, as that's what I'm doing here.</p>
 <p>Finally, if the form selector you use in the very first variable declaration of the script works, the three listeners are attached to the form with their respective callbacks.</p>
-
-<p>This is the script itself. We&rsquo;ll wrap up the setup in the next chapter.</p>
-
+<p>This is the script itself. We'll wrap up the setup in the next chapter.</p>
 <h2 id="timing-tag-trigger-and-data-layer-variables">Timing Tag, Trigger, and Data Layer Variables</h2>
-
 <p>To make the setup work, we need a Timing Tag, a Custom Event Trigger and four Data Layer Variables.</p>
-
 <h3 id="data-layer-variables">Data Layer Variables</h3>
-
 <p>Create the Data Layer Variables first. You need <strong>four</strong> Variables with the following settings:</p>
-
-<p>Name: <strong>{{DLV - timingCategory}}</strong><br />
+<p>Name: <strong>{{DLV - timingCategory}}</strong><br>
 Data Layer Variable Name: <strong>timingCategory</strong></p>
-
-<p>Name: <strong>{{DLV - timingVariable}}</strong><br />
+<p>Name: <strong>{{DLV - timingVariable}}</strong><br>
 Data Layer Variable Name: <strong>timingVariable</strong></p>
-
-<p>Name: <strong>{{DLV - timingLabel}}</strong><br />
+<p>Name: <strong>{{DLV - timingLabel}}</strong><br>
 Data Layer Variable Name: <strong>timingLabel</strong></p>
-
-<p>Name: <strong>{{DLV - timingValue}}</strong><br />
+<p>Name: <strong>{{DLV - timingValue}}</strong><br>
 Data Layer Variable Name: <strong>timingValue</strong></p>
-
 <h3 id="custom-event-trigger">Custom Event Trigger</h3>
-
 <p>The Trigger is a <strong>Custom Event Trigger</strong> with the following settings:</p>
-
-<p>Name: <strong>Event - fieldTiming</strong><br />
+<p>Name: <strong>Event - fieldTiming</strong><br>
 Fire On / Event name: <strong>fieldTiming</strong></p>
-
 <h3 id="timing-tag">Timing Tag</h3>
-
 <p>Finally, you need to create the Timing Tag. Create a new Tag of type <strong>Google Analytics</strong>, and set the following settings:</p>
-
-<p>Name: <strong>UA - Timing - Form Field Timing</strong><br />
-Tracking ID: <strong>UA-XXXXXX-Y</strong> (substitute with your property ID)<br />
-Track Type: <strong>Timing</strong><br />
-Var: <strong>{{DLV - timingVariable}}</strong><br />
-Category: <strong>{{DLV - timingCategory}}</strong><br />
-Value: <strong>{{DLV - timingValue}}</strong><br />
+<p>Name: <strong>UA - Timing - Form Field Timing</strong><br>
+Tracking ID: <strong>UA-XXXXXX-Y</strong> (substitute with your property ID)<br>
+Track Type: <strong>Timing</strong><br>
+Var: <strong>{{DLV - timingVariable}}</strong><br>
+Category: <strong>{{DLV - timingCategory}}</strong><br>
+Value: <strong>{{DLV - timingValue}}</strong><br>
 Label: <strong>{{DLV - timingLabel}}</strong></p>
-
 <p>Attach the Trigger you created in the previous section to this Tag.</p>
-
-<p>And now you&rsquo;re set to go! Each interaction with the fields in your form should now send the Timing hit. You can find the results in Google Analytics, by going to <strong>Behavior</strong> -&gt; <strong>Site Speed</strong> -&gt; <strong>User Timings</strong>.</p>
-
+<p>And now you're set to go! Each interaction with the fields in your form should now send the Timing hit. You can find the results in Google Analytics, by going to <strong>Behavior</strong> -&gt; <strong>Site Speed</strong> -&gt; <strong>User Timings</strong>.</p>
 <h2 id="summary">Summary</h2>
-
 <p>Like I mentioned, this is a very simple solution. It just measures the time spent on each form field, and reports this as a User Timing hit to Google Analytics. You might want to tweak it a little to be more robust, and you have to be mindful of the <strong>500 hits / session</strong> limitation that GA imposes on sessions.</p>
-
-<p>You can do some cool stuff with the data, such as building a histogram where it&rsquo;s easier to visualize the problematic fields. It would be also interesting to see if long time spent on a field correlates with <a href="https://www.simoahava.com/analytics/track-form-abandonment-with-google-tag-manager/">form abandonment</a>.</p>
+<p>You can do some cool stuff with the data, such as building a histogram where it's easier to visualize the problematic fields. It would be also interesting to see if long time spent on a field correlates with <a href="https://www.simoahava.com/analytics/track-form-abandonment-with-google-tag-manager/">form abandonment</a>.</p>
 
               
 

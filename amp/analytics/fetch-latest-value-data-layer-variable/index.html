@@ -123,8 +123,6 @@
 
 <meta itemprop="name" content="#GTMTips: Fetch The Latest Value Of A Data Layer Variable">
 <meta itemprop="description" content="Use a custom JavaScript function in Google Tag Manager to fetch the latest value of any Data Layer Variable - regardless of when the tag itself fired.">
-
-
 <meta itemprop="datePublished" content="2019-04-25T12:00:56&#43;03:00" />
 <meta itemprop="dateModified" content="2019-04-25T12:00:56&#43;03:00" />
 <meta itemprop="wordCount" content="551">
@@ -132,7 +130,6 @@
 
 
 <meta itemprop="keywords" content="google tag manager,gtmtips,custom javascript,data layer variable," />
-
 <script type="application/ld+json">
 {
     "@context": "http://schema.org",
@@ -913,14 +910,9 @@ on
     </header>
 
     <section class="post-content">
-      
-
-<p>One of <a href="https://tagmanager.google.com/">Google Tag Manager&rsquo;s</a> oldest and most reliable features is that it <strong>freezes</strong> the state of Data Layer variables to the moment when the trigger event occurred. Thus, any tags firing on this trigger (and any variables resolved on this trigger event) will always have access to the same value of each Data Layer variable.</p>
-
+      <p>One of <a href="https://tagmanager.google.com/">Google Tag Manager's</a> oldest and most reliable features is that it <strong>freezes</strong> the state of Data Layer variables to the moment when the trigger event occurred. Thus, any tags firing on this trigger (and any variables resolved on this trigger event) will always have access to the same value of each Data Layer variable.</p>
 <p>However, there are situations where this is not a good thing. One is <a href="https://www.simoahava.com/amp/analytics/understanding-tag-sequencing-in-google-tag-manager/#5-note-about-using-datalayer-push-in-the-sequence">tag sequencing</a>, and the other is a scenario where you want to run some custom code that should access the <strong>latest</strong> value of the Data Layer variable at a moment in time <strong>after</strong> the tag has already fired. Read on for an example!</p>
-
 <h2 id="tip-98-access-the-latest-value-of-a-data-layer-variable">Tip 98: Access the latest value of a Data Layer variable</h2>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2019/04/fetch-latest-data-layer-variable-value.jpg" title="Fetch latest Data Layer variable value">
@@ -930,54 +922,40 @@ on
     </a>
   
 
-
-<p>For example, let&rsquo;s say your site has a <a href="https://www.simoahava.com/amp/analytics/simple-custom-event-listeners-gtm/">custom event listener</a> built to detect when the user is about to leave a page (using the <a href="https://www.simoahava.com/amp/analytics/fire-trigger-when-user-about-to-leave-page/"><code>beforeunload</code></a> custom event). However, you only want to send that event if the user is logged out, for some obscure reason.</p>
-
-<p>This is what your first attempt might look like. It&rsquo;s a Custom HTML tag set to fire when the page is first loaded with the <strong>All Pages</strong> trigger.</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
-  <span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-    <span class="nb">window</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">&#39;beforeunload&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-	  <span class="k">if</span> <span class="p">({{</span><span class="nx">DLV</span> <span class="o">-</span> <span class="nx">loginStatus</span><span class="p">}}</span> <span class="o">===</span> <span class="s1">&#39;logged-out&#39;</span><span class="p">)</span> <span class="p">{</span>
-  	    <span class="nb">window</span><span class="p">.</span><span class="nx">dataLayer</span><span class="p">.</span><span class="nx">push</span><span class="p">({</span>
+<p>For example, let's say your site has a <a href="https://www.simoahava.com/amp/analytics/simple-custom-event-listeners-gtm/">custom event listener</a> built to detect when the user is about to leave a page (using the <a href="https://www.simoahava.com/amp/analytics/fire-trigger-when-user-about-to-leave-page/"><code>beforeunload</code></a> custom event). However, you only want to send that event if the user is logged out, for some obscure reason.</p>
+<p>This is what your first attempt might look like. It's a Custom HTML tag set to fire when the page is first loaded with the <strong>All Pages</strong> trigger.</p>
+<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">script</span><span class="p"></span><span class="p">&gt;</span>
+  <span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nb">window</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">&#39;beforeunload&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="p">)</span> <span class="p">{</span>
+	  <span class="k">if</span> <span class="p">(</span><span class="p">{</span><span class="p">{</span><span class="nx">DLV</span> <span class="o">-</span> <span class="nx">loginStatus</span><span class="p">}</span><span class="p">}</span> <span class="o">===</span> <span class="s1">&#39;logged-out&#39;</span><span class="p">)</span> <span class="p">{</span>
+  	    <span class="nb">window</span><span class="p">.</span><span class="nx">dataLayer</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="p">{</span>
 	      <span class="nx">event</span><span class="o">:</span> <span class="s1">&#39;userLeavesPages&#39;</span>
-	    <span class="p">});</span>
+	    <span class="p">}</span><span class="p">)</span><span class="p">;</span>
 	  <span class="p">}</span>
-	<span class="p">});</span>
-  <span class="p">})();</span>
-<span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span></code></pre></div>
-
+	<span class="p">}</span><span class="p">)</span><span class="p">;</span>
+  <span class="p">}</span><span class="p">)</span><span class="p">(</span><span class="p">)</span><span class="p">;</span>
+<span class="p">&lt;</span><span class="p">/</span><span class="nt">script</span><span class="p">&gt;</span></code></pre></div>
 <p>Now, when the Custom HTML tag fires, the <code>beforeunload</code> listener is created, and the <strong>{{DLV - loginStatus}}</strong> variable is resolved to whatever value it had when the tag fired.</p>
-
 <p>Then, when the user is about to leave the page by closing the browser or clicking a link, the <code>beforeunload</code> callback is executed, and it checks if this original state of <code>loginStatus</code> is &ldquo;logged-out&rdquo;, in which case it runs the <code>dataLayer.push()</code>.</p>
-
-<p>Do you see the problem here? The <code>beforeunload</code> event is not fired until the user tries to leave the page, but the <strong>{{DLV - loginStatus}}</strong> is resolved to whatever value it had when the tag itself was initially run. If the <code>loginStatus</code> <strong>changes</strong> while the user is on the page, it wouldn&rsquo;t make a difference. The initial value is what&rsquo;s used in the <code>if...</code> condition, meaning you&rsquo;ll risk losing valid hits because of that.</p>
-
+<p>Do you see the problem here? The <code>beforeunload</code> event is not fired until the user tries to leave the page, but the <strong>{{DLV - loginStatus}}</strong> is resolved to whatever value it had when the tag itself was initially run. If the <code>loginStatus</code> <strong>changes</strong> while the user is on the page, it wouldn't make a difference. The initial value is what's used in the <code>if...</code> condition, meaning you'll risk losing valid hits because of that.</p>
 <p>So we need a mechanism that fetches the value of the Data Layer variable <strong>when the relevant code is run</strong>. We want the <code>if...</code> condition to evaluate against what the value of <code>loginStatus</code> is <strong>at the time of the <code>beforeunload</code> event</strong> and <em>not</em> when the tag is first run.</p>
-
 <p>For this, we use a JavaScript method that is built into Google Tag Manager and allows us to do exactly this.</p>
-
 <p><code>window.google_tag_manager[{{Container ID}}].dataLayer.get('variableNameHere');</code></p>
-
 <p>Remember to enable the Container ID <a href="https://www.simoahava.com/amp/analytics/variable-guide-google-tag-manager/#built-in-variables">built-in variable</a> for this.</p>
-
-<p>This method polls GTM&rsquo;s internal <a href="https://www.simoahava.com/amp/analytics/google-tag-manager-data-model/">data model</a> and fetches the latest value of the <code>variableNameHere</code> Data Layer variable. So, to modify the original example, here&rsquo;s what you end up with:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
-  <span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-    <span class="nb">window</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">&#39;beforeunload&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-	  <span class="k">if</span> <span class="p">(</span><span class="nb">window</span><span class="p">.</span><span class="nx">google_tag_manager</span><span class="p">[{{</span><span class="nx">Container</span> <span class="nx">ID</span><span class="p">}}].</span><span class="nx">dataLayer</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;loginStatus&#39;</span><span class="p">)</span> <span class="o">===</span> <span class="s1">&#39;logged-out&#39;</span><span class="p">)</span> <span class="p">{</span>
-	    <span class="nb">window</span><span class="p">.</span><span class="nx">dataLayer</span><span class="p">.</span><span class="nx">push</span><span class="p">({</span>
+<p>This method polls GTM's internal <a href="https://www.simoahava.com/amp/analytics/google-tag-manager-data-model/">data model</a> and fetches the latest value of the <code>variableNameHere</code> Data Layer variable. So, to modify the original example, here's what you end up with:</p>
+<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">script</span><span class="p"></span><span class="p">&gt;</span>
+  <span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nb">window</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">&#39;beforeunload&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="p">)</span> <span class="p">{</span>
+	  <span class="k">if</span> <span class="p">(</span><span class="nb">window</span><span class="p">.</span><span class="nx">google_tag_manager</span><span class="p">[</span><span class="p">{</span><span class="p">{</span><span class="nx">Container</span> <span class="nx">ID</span><span class="p">}</span><span class="p">}</span><span class="p">]</span><span class="p">.</span><span class="nx">dataLayer</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;loginStatus&#39;</span><span class="p">)</span> <span class="o">===</span> <span class="s1">&#39;logged-out&#39;</span><span class="p">)</span> <span class="p">{</span>
+	    <span class="nb">window</span><span class="p">.</span><span class="nx">dataLayer</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="p">{</span>
 		  <span class="nx">event</span><span class="o">:</span> <span class="s1">&#39;userLeavesPage&#39;</span>
-	    <span class="p">});</span>
+	    <span class="p">}</span><span class="p">)</span><span class="p">;</span>
 	  <span class="p">}</span>
-    <span class="p">});</span>
-  <span class="p">})();</span>
-<span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span></code></pre></div>
-
+    <span class="p">}</span><span class="p">)</span><span class="p">;</span>
+  <span class="p">}</span><span class="p">)</span><span class="p">(</span><span class="p">)</span><span class="p">;</span>
+<span class="p">&lt;</span><span class="p">/</span><span class="nt">script</span><span class="p">&gt;</span></code></pre></div>
 <p>Now the <code>if...</code> condition checks what the <strong>latest</strong> value of <code>loginStatus</code> is, and it will work nicely if the status has changed while the user is on the current page.</p>
-
-<p>It&rsquo;s a simple trick, but can come in handy when working with GTM&rsquo;s idiosyncractic way of freezing the variable state for the duration of each trigger event.</p>
+<p>It's a simple trick, but can come in handy when working with GTM's idiosyncractic way of freezing the variable state for the duration of each trigger event.</p>
 
     </section>
 

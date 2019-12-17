@@ -53,7 +53,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.59.1 with theme Tranquilpeak 0.4.3-BETA">
+    <meta name="generator" content="Hugo 0.61.0 with theme Tranquilpeak 0.4.3-BETA">
     <title>Simple Tracker Duplication For Universal Analytics | Simo Ahava's blog</title>
     
     <script>
@@ -319,12 +319,8 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              
-
-<p>First of all, I&rsquo;m sorry about the title. I should really stop throwing the word &ldquo;simple&rdquo; around, since people always tell me that the stuff I claim to be easy and straightforward is rarely so. But since this is my blog, I reserve the right to use whatever stupid and misleading terminology I want. I maintain that what follows IS quite simple, especially when considering the amount of complexity it reduces in your <a href="https://analytics.google.com/">Universal Analytics</a> setup.</p>
-
+              <p>First of all, I'm sorry about the title. I should really stop throwing the word &ldquo;simple&rdquo; around, since people always tell me that the stuff I claim to be easy and straightforward is rarely so. But since this is my blog, I reserve the right to use whatever stupid and misleading terminology I want. I maintain that what follows IS quite simple, especially when considering the amount of complexity it reduces in your <a href="https://analytics.google.com/">Universal Analytics</a> setup.</p>
 <p>Next, I want to direct your gaze to my latest Keynote / PowerPoint creation:</p>
-
 
 
 
@@ -340,23 +336,14 @@
 </div>
 
 
-
 <p>This piece of art is called &ldquo;&hellip;while waiting for the cosmos&rdquo;. Note the enigmatic ellipsis in the beginning, the lack of capitalization, and the fact that the title has nothing to do with the image. Yes, friend. This is post-post-modernism at its best!</p>
-
-<p>So, I guess my amazing art kind of gave away what I want to show to you in this article. In short, it&rsquo;s a simple little plugin I&rsquo;ve been using in projects I work on, which duplicates all hits sent to a Google Analytics property. These duplicated hits are sent to <em>another</em> Google Analytics property, whose property ID you specify when initiating the plugin.</p>
-
-<p>This tutorial uses a <a href="https://www.simoahava.com/analytics/universal-analytics-plugins-explained/">Universal Analytics plugin</a> (d&rsquo;oh), which, in turn, utilizies the <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/tasks">Tasks API</a>.</p>
-
-<p>Before I proceed, I want to direct you to <a href="https://www.thyngster.com/universal-analytics-plugin-dual-tracking/">David Vallejo&rsquo;s blog</a>, where he and a bunch of other people are working together on an <a href="https://github.com/thyngster/universal-analytics-dual-tracking-plugin">open-source project</a> which does similar stuff, but on a WAY more configurable level. The plugin I&rsquo;m about to walk you through will simply make an <em>exact</em> duplicate of the hit you sent, without letting you modify the payload one bit.</p>
-
-<p>Why, you may ask? Well, a surprisingly large number of projects I work with have a need for a &ldquo;rollup&rdquo; property, which collects data from all sites in the organization. The data sent to the rollup often mirrors whatever is collected in the local sites. It&rsquo;s quite a chore to duplicate <code>send</code> commands across all trackers, so if the project is fine with simple duplication, I use this plugin.</p>
-
-<p><strong>CAVEAT</strong>: This will <strong>best</strong> work with <strong>named trackers</strong>. Thus <a href="https://tagmanager.google.com/">Google Tag Manager</a> setting this up in Google Tag Manager is difficult, as you&rsquo;ll have to mess with the <a href="https://www.simoahava.com/gtm-tips/be-careful-with-the-tracker-name-setting/">Tracker name</a> field. If you&rsquo;re confident with your GTM implementation skills, feel free to do whatever you wish, of course. Nevertheless, in its current state, the plugin caters best to an on-page Universal Analytics implementation.</p>
-
+<p>So, I guess my amazing art kind of gave away what I want to show to you in this article. In short, it's a simple little plugin I've been using in projects I work on, which duplicates all hits sent to a Google Analytics property. These duplicated hits are sent to <em>another</em> Google Analytics property, whose property ID you specify when initiating the plugin.</p>
+<p>This tutorial uses a <a href="https://www.simoahava.com/analytics/universal-analytics-plugins-explained/">Universal Analytics plugin</a> (d'oh), which, in turn, utilizies the <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/tasks">Tasks API</a>.</p>
+<p>Before I proceed, I want to direct you to <a href="https://www.thyngster.com/universal-analytics-plugin-dual-tracking/">David Vallejo's blog</a>, where he and a bunch of other people are working together on an <a href="https://github.com/thyngster/universal-analytics-dual-tracking-plugin">open-source project</a> which does similar stuff, but on a WAY more configurable level. The plugin I'm about to walk you through will simply make an <em>exact</em> duplicate of the hit you sent, without letting you modify the payload one bit.</p>
+<p>Why, you may ask? Well, a surprisingly large number of projects I work with have a need for a &ldquo;rollup&rdquo; property, which collects data from all sites in the organization. The data sent to the rollup often mirrors whatever is collected in the local sites. It's quite a chore to duplicate <code>send</code> commands across all trackers, so if the project is fine with simple duplication, I use this plugin.</p>
+<p><strong>CAVEAT</strong>: This will <strong>best</strong> work with <strong>named trackers</strong>. Thus <a href="https://tagmanager.google.com/">Google Tag Manager</a> setting this up in Google Tag Manager is difficult, as you'll have to mess with the <a href="https://www.simoahava.com/gtm-tips/be-careful-with-the-tracker-name-setting/">Tracker name</a> field. If you're confident with your GTM implementation skills, feel free to do whatever you wish, of course. Nevertheless, in its current state, the plugin caters best to an on-page Universal Analytics implementation.</p>
 <h2 id="modifying-the-tracking-code">Modifying the tracking code</h2>
-
-<p>For this to work, you will need to make a small change to your Universal Analytics tracking code. Let&rsquo;s say the code looks like this now:</p>
-
+<p>For this to work, you will need to make a small change to your Universal Analytics tracking code. Let's say the code looks like this now:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
   (<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">i</span>,<span style="color:#a6e22e">s</span>,<span style="color:#a6e22e">o</span>,<span style="color:#a6e22e">g</span>,<span style="color:#a6e22e">r</span>,<span style="color:#a6e22e">a</span>,<span style="color:#a6e22e">m</span>){<span style="color:#a6e22e">i</span>[<span style="color:#e6db74">&#39;GoogleAnalyticsObject&#39;</span>]<span style="color:#f92672">=</span><span style="color:#a6e22e">r</span>;<span style="color:#a6e22e">i</span>[<span style="color:#a6e22e">r</span>]<span style="color:#f92672">=</span><span style="color:#a6e22e">i</span>[<span style="color:#a6e22e">r</span>]<span style="color:#f92672">||</span><span style="color:#66d9ef">function</span>(){
   (<span style="color:#a6e22e">i</span>[<span style="color:#a6e22e">r</span>].<span style="color:#a6e22e">q</span><span style="color:#f92672">=</span><span style="color:#a6e22e">i</span>[<span style="color:#a6e22e">r</span>].<span style="color:#a6e22e">q</span><span style="color:#f92672">||</span>[]).<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">arguments</span>)},<span style="color:#a6e22e">i</span>[<span style="color:#a6e22e">r</span>].<span style="color:#a6e22e">l</span><span style="color:#f92672">=</span><span style="color:#ae81ff">1</span><span style="color:#f92672">*</span><span style="color:#66d9ef">new</span> Date();<span style="color:#a6e22e">a</span><span style="color:#f92672">=</span><span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">createElement</span>(<span style="color:#a6e22e">o</span>),
@@ -366,9 +353,7 @@
   <span style="color:#a6e22e">ga</span>(<span style="color:#e6db74">&#39;create&#39;</span>, <span style="color:#e6db74">&#39;UA-12345-1&#39;</span>, <span style="color:#e6db74">&#39;auto&#39;</span>);
   <span style="color:#a6e22e">ga</span>(<span style="color:#e6db74">&#39;send&#39;</span>, <span style="color:#e6db74">&#39;pageview&#39;</span>);
 &lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
-
-<p>You&rsquo;ll need to add the following modification:</p>
-
+<p>You'll need to add the following modification:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
   (<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">i</span>,<span style="color:#a6e22e">s</span>,<span style="color:#a6e22e">o</span>,<span style="color:#a6e22e">g</span>,<span style="color:#a6e22e">r</span>,<span style="color:#a6e22e">a</span>,<span style="color:#a6e22e">m</span>){<span style="color:#a6e22e">i</span>[<span style="color:#e6db74">&#39;GoogleAnalyticsObject&#39;</span>]<span style="color:#f92672">=</span><span style="color:#a6e22e">r</span>;<span style="color:#a6e22e">i</span>[<span style="color:#a6e22e">r</span>]<span style="color:#f92672">=</span><span style="color:#a6e22e">i</span>[<span style="color:#a6e22e">r</span>]<span style="color:#f92672">||</span><span style="color:#66d9ef">function</span>(){
   (<span style="color:#a6e22e">i</span>[<span style="color:#a6e22e">r</span>].<span style="color:#a6e22e">q</span><span style="color:#f92672">=</span><span style="color:#a6e22e">i</span>[<span style="color:#a6e22e">r</span>].<span style="color:#a6e22e">q</span><span style="color:#f92672">||</span>[]).<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">arguments</span>)},<span style="color:#a6e22e">i</span>[<span style="color:#a6e22e">r</span>].<span style="color:#a6e22e">l</span><span style="color:#f92672">=</span><span style="color:#ae81ff">1</span><span style="color:#f92672">*</span><span style="color:#66d9ef">new</span> Date();<span style="color:#a6e22e">a</span><span style="color:#f92672">=</span><span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">createElement</span>(<span style="color:#a6e22e">o</span>),
@@ -382,16 +367,11 @@
 
   <span style="color:#a6e22e">ga</span>(<span style="color:#e6db74">&#39;send&#39;</span>, <span style="color:#e6db74">&#39;pageview&#39;</span>);
 &lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
-
-<p>There&rsquo;s a single addition: <code>ga('require', 'simolatorDuplicator', {'newId' : 'UA-12345-2'});</code>. This line invokes a plugin called <code>simolatorDuplicator</code> (I know! The awesomest plugin name in the UNIVERSE!), after which you pass an <em>object</em> with a single key-value pair: <code>{newId : newTrackerId}</code>. In place of <code>newTrackerId</code>, you place a String with the Google Analytics property ID to which you want to duplicate all the hits.</p>
-
+<p>There's a single addition: <code>ga('require', 'simolatorDuplicator', {'newId' : 'UA-12345-2'});</code>. This line invokes a plugin called <code>simolatorDuplicator</code> (I know! The awesomest plugin name in the UNIVERSE!), after which you pass an <em>object</em> with a single key-value pair: <code>{newId : newTrackerId}</code>. In place of <code>newTrackerId</code>, you place a String with the Google Analytics property ID to which you want to duplicate all the hits.</p>
 <h2 id="the-plugin-itself">The plugin itself</h2>
-
 <p>There are two quick and easy (sorry about those words again) ways to load the plugin. Either host it in its own JavaScript file which you then load with a <code>&lt;script&gt;&lt;/script&gt;</code> loader, or just run the code in the page template itself.</p>
-
-<p>What&rsquo;s important is that the <strong>plugin code needs to be loaded AFTER the tracking code</strong>.
+<p>What's important is that the <strong>plugin code needs to be loaded AFTER the tracking code</strong>.
 The code looks like this:</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">(<span style="color:#66d9ef">function</span>() {
   <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">ga</span> <span style="color:#f92672">=</span> window[window[<span style="color:#e6db74">&#39;GoogleAnalyticsObject&#39;</span>]];
   <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">GADuplicate</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">tracker</span>, <span style="color:#a6e22e">propertyId</span>) {
@@ -409,16 +389,14 @@ The code looks like this:</p>
   <span style="color:#a6e22e">ga</span>(<span style="color:#e6db74">&#39;provide&#39;</span>, <span style="color:#e6db74">&#39;simolatorDuplicator&#39;</span>, <span style="color:#a6e22e">GADuplicate</span>);
 })();
 </code></pre></div>
-
 <p>So either write this in a file named <strong>something.js</strong> (feel free to replace <strong>something</strong> with something else), or just add the code in its own <code>&lt;script&gt;</code> block after the tracking snippet.</p>
-
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html"><span style="color:#75715e">&lt;!-- METHOD 1 --&gt;</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html"><span style="color:#75715e">&lt;!--</span><span style="color:#75715e"> METHOD 1 </span><span style="color:#75715e">--&gt;</span>
 &lt;<span style="color:#f92672">script</span>&gt;
   <span style="color:#75715e">// GA Tracking code here
 </span><span style="color:#75715e"></span>&lt;/<span style="color:#f92672">script</span>&gt;
 &lt;<span style="color:#f92672">script</span> <span style="color:#a6e22e">src</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;something.js&#34;</span> <span style="color:#a6e22e">async</span>&gt;&lt;/<span style="color:#f92672">script</span>&gt;
 
-<span style="color:#75715e">&lt;!-- METHOD 2 --&gt;</span>
+<span style="color:#75715e">&lt;!--</span><span style="color:#75715e"> METHOD 2 </span><span style="color:#75715e">--&gt;</span>
 &lt;<span style="color:#f92672">script</span>&gt;
   <span style="color:#75715e">// GA Tracking code here
 </span><span style="color:#75715e"></span>&lt;/<span style="color:#f92672">script</span>&gt;
@@ -440,26 +418,18 @@ The code looks like this:</p>
   <span style="color:#a6e22e">ga</span>(<span style="color:#e6db74">&#39;provide&#39;</span>, <span style="color:#e6db74">&#39;simolatorDuplicator&#39;</span>, <span style="color:#a6e22e">GADuplicate</span>);
 })();
 &lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
-
 <p>Both are equally fine, though to keep things nice and tidy I do recommend the first method.</p>
-
-<p>Let&rsquo;s take a quick stroll through the code.</p>
-
+<p>Let's take a quick stroll through the code.</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">(<span style="color:#66d9ef">function</span>() {
   <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">ga</span> <span style="color:#f92672">=</span> window[window[<span style="color:#e6db74">&#39;GoogleAnalyticsObject&#39;</span>]] <span style="color:#f92672">||</span> <span style="color:#66d9ef">function</span>() {};
   ...
   <span style="color:#a6e22e">ga</span>(<span style="color:#e6db74">&#39;provide&#39;</span>, <span style="color:#e6db74">&#39;simolatorDuplicator&#39;</span>, <span style="color:#a6e22e">GADuplicate</span>);
 })();
 </code></pre></div>
-
-<p>These lines wrap the plugin code in an <a href="https://en.wikipedia.org/wiki/Immediately-invoked_function_expression">immediately invoked function expression</a>, which I use to protect the global namespace. No, you didn&rsquo;t need to understand any of that.</p>
-
-<p>The next line establishes the <code>ga()</code> interface locally, by scoping it to the global Google Analytics Object. This is so that the plugin still works even if you&rsquo;ve renamed the global GA interface from <code>ga</code> to something else.</p>
-
-<p>After the plugin code (represented by the &ldquo;&hellip;&rdquo;) we make the plugin available to the <code>ga</code> interface. This is a very important line, as it is the counterpart to the <code>ga('require', 'simolatorDuplicator'...);</code> command used in the tracking code. If you didn&rsquo;t have this line, or if you had a typo in the plugin name, your GA code would not work at all! So remember to test, test, TEST.</p>
-
+<p>These lines wrap the plugin code in an <a href="https://en.wikipedia.org/wiki/Immediately-invoked_function_expression">immediately invoked function expression</a>, which I use to protect the global namespace. No, you didn't need to understand any of that.</p>
+<p>The next line establishes the <code>ga()</code> interface locally, by scoping it to the global Google Analytics Object. This is so that the plugin still works even if you've renamed the global GA interface from <code>ga</code> to something else.</p>
+<p>After the plugin code (represented by the &ldquo;&hellip;&quot;) we make the plugin available to the <code>ga</code> interface. This is a very important line, as it is the counterpart to the <code>ga('require', 'simolatorDuplicator'...);</code> command used in the tracking code. If you didn't have this line, or if you had a typo in the plugin name, your GA code would not work at all! So remember to test, test, TEST.</p>
 <p>Next, the plugin constructor itself:</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">GADuplicate</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">tracker</span>, <span style="color:#a6e22e">config</span>) {
     <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">o</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">tracker</span>.<span style="color:#a6e22e">get</span>(<span style="color:#e6db74">&#39;sendHitTask&#39;</span>);
     <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">temp</span>;
@@ -473,33 +443,20 @@ The code looks like this:</p>
     });
   };
 </code></pre></div>
-
 <p>Lots of things going on here.</p>
-
-<p>First, the function expression establishes a new function called <code>GADuplicate</code>, which takes two parameters: <code>tracker</code> and <code>config</code>. The <code>tracker</code> parameter is passed automatically by the plugin logic, and it contains a reference to the Universal Analytics tracker object which invoked the plugin. The <code>config</code> object is passed as a parameter in the modified tracking code. It&rsquo;s the <code>{'newId' : 'UA-12345-2'}</code> which we covered earlier.</p>
-
-<p>Next, we make a copy of the original <code>sendHitTask</code>. This little method is actually the entire dispatch logic of analytics.js, so we&rsquo;ll need it to send our data to Google Analytics.</p>
-
+<p>First, the function expression establishes a new function called <code>GADuplicate</code>, which takes two parameters: <code>tracker</code> and <code>config</code>. The <code>tracker</code> parameter is passed automatically by the plugin logic, and it contains a reference to the Universal Analytics tracker object which invoked the plugin. The <code>config</code> object is passed as a parameter in the modified tracking code. It's the <code>{'newId' : 'UA-12345-2'}</code> which we covered earlier.</p>
+<p>Next, we make a copy of the original <code>sendHitTask</code>. This little method is actually the entire dispatch logic of analytics.js, so we'll need it to send our data to Google Analytics.</p>
 <p>We need it especially because on the very next line after the variable declarations we <em>overwrite</em> the <code>sendHitTask</code> of the tracker with a new one!</p>
-
-<p>First, the <em>original</em> <code>sendHitTask</code>, temporarily copied to the method <code>o()</code>, is used to send the regular hit to Universal Analytics. This is really important, as without this you&rsquo;d just be sending your duplicate hit!</p>
-
-<p>Then, we take the <code>hitPayload</code> you just sent to GA, and we replace all instances of the current property ID with the new property ID that you configured in the tracking code! This is the main logic in this plugin. We take the payload, we send it first regularly, and then we modify it and send the modified version. By using <code>model.set('hitPayload', temp, true);</code> we&rsquo;re rewriting the payload, which is then submitted with a new invocation of the <code>o()</code> method.</p>
-
-<p>I maintain that it&rsquo;s really quite simple when you think about it, but naturally it does require some understanding of how the APIs work. So feel free to plunge into <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/tasks">the documentation</a>.</p>
-
-<p>And that&rsquo;s it! That&rsquo;s the code, the setup, and the implementation. Remember, you will need to modify the tracking code accordingly on all pages of your site where you want to use this plugin. You can use it with named trackers, too; just modify the plugin call to:</p>
-
+<p>First, the <em>original</em> <code>sendHitTask</code>, temporarily copied to the method <code>o()</code>, is used to send the regular hit to Universal Analytics. This is really important, as without this you'd just be sending your duplicate hit!</p>
+<p>Then, we take the <code>hitPayload</code> you just sent to GA, and we replace all instances of the current property ID with the new property ID that you configured in the tracking code! This is the main logic in this plugin. We take the payload, we send it first regularly, and then we modify it and send the modified version. By using <code>model.set('hitPayload', temp, true);</code> we're rewriting the payload, which is then submitted with a new invocation of the <code>o()</code> method.</p>
+<p>I maintain that it's really quite simple when you think about it, but naturally it does require some understanding of how the APIs work. So feel free to plunge into <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/tasks">the documentation</a>.</p>
+<p>And that's it! That's the code, the setup, and the implementation. Remember, you will need to modify the tracking code accordingly on all pages of your site where you want to use this plugin. You can use it with named trackers, too; just modify the plugin call to:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">ga</span>(<span style="color:#e6db74">&#39;myNamedTracker:require&#39;</span>, <span style="color:#e6db74">&#39;simolatorDuplicator&#39;</span>, {<span style="color:#e6db74">&#39;newId&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;UA-12345-2&#39;</span>});
 </code></pre></div>
-
 <p>And <em>yes</em>, you can rename the plugin to something else than <code>simolatorDuplicator</code>, though I will love you slightly less if you do so.</p>
-
 <h2 id="summary">Summary</h2>
-
-<p>Please remember, this is an <em>exact</em> hit duplication method. If you want to modify the payload, you&rsquo;ll need to add some additional logic to the code, and I really recommend you check out the link to David Vallejo&rsquo;s blog in the introductory chapter of this article.</p>
-
-<p>Let me know if you&rsquo;re having problems with this, or if you have suggestions! Please do test this thoroughly before implementing it. You are messing with code that can potentially cripple your Google Analytics implementation.</p>
+<p>Please remember, this is an <em>exact</em> hit duplication method. If you want to modify the payload, you'll need to add some additional logic to the code, and I really recommend you check out the link to David Vallejo's blog in the introductory chapter of this article.</p>
+<p>Let me know if you're having problems with this, or if you have suggestions! Please do test this thoroughly before implementing it. You are messing with code that can potentially cripple your Google Analytics implementation.</p>
 
               
 

@@ -123,8 +123,6 @@
 
 <meta itemprop="name" content="#GTMTips: Delay The History Change Trigger">
 <meta itemprop="description" content="Use a Custom HTML tag to delay the History Change trigger in order to accommodate for single-page frameworks that load the content after the history change event has been pushed.">
-
-
 <meta itemprop="datePublished" content="2018-05-09T10:06:13&#43;03:00" />
 <meta itemprop="dateModified" content="2018-05-09T10:06:13&#43;03:00" />
 <meta itemprop="wordCount" content="977">
@@ -132,7 +130,6 @@
 
 
 <meta itemprop="keywords" content="google tag manager,gtmtips,history,spa," />
-
 <script type="application/ld+json">
 {
     "@context": "http://schema.org",
@@ -913,20 +910,12 @@ on
     </header>
 
     <section class="post-content">
-      
-
-<p>When working with the analytics of <a href="https://en.wikipedia.org/wiki/Single-page_application">single-page applications (SPA)</a>, there are a number of things to pay attention to. For example, you need to make sure that Google Analytics doesn&rsquo;t <a href="https://www.simoahava.com/amp/gtm-tips/fix-rogue-referral-problem-single-page-sites/">break your session attribution</a>, and that you are not inadvertently <a href="https://www.simoahava.com/amp/analytics/site-speed-sample-rate-multiple-page-views/">inflating your page speed timing metrics</a>. Actually, there are so many &ldquo;gotchas&rdquo; when it comes to SPA tracking in tools like <a href="https://analytics.google.com/">Google Analytics</a> that you just can&rsquo;t get by with a plug-and-play implementation.</p>
-
-<p>See <a href="https://www.bounteous.com/insights/2018/03/30/single-page-applications-google-analytics/">Dan Wilkerson&rsquo;s excellent article</a>, which sums nicely the can of worms involved with tracking an SPA.</p>
-
+      <p>When working with the analytics of <a href="https://en.wikipedia.org/wiki/Single-page_application">single-page applications (SPA)</a>, there are a number of things to pay attention to. For example, you need to make sure that Google Analytics doesn't <a href="https://www.simoahava.com/amp/gtm-tips/fix-rogue-referral-problem-single-page-sites/">break your session attribution</a>, and that you are not inadvertently <a href="https://www.simoahava.com/amp/analytics/site-speed-sample-rate-multiple-page-views/">inflating your page speed timing metrics</a>. Actually, there are so many &ldquo;gotchas&rdquo; when it comes to SPA tracking in tools like <a href="https://analytics.google.com/">Google Analytics</a> that you just can't get by with a plug-and-play implementation.</p>
+<p>See <a href="https://www.bounteous.com/insights/2018/03/30/single-page-applications-google-analytics/">Dan Wilkerson's excellent article</a>, which sums nicely the can of worms involved with tracking an SPA.</p>
 <p>One of the problems with frameworks that load their content dynamically using JavaScript (e.g. <a href="https://reactjs.org/">React</a>) is when the history event is dispatched <em>before</em> the content has been loaded or the URL has actually changed.</p>
-
 <p>This is problematic, since you might actually want to refer to elements loaded in this dynamic state change in your tags, but because the <a href="https://www.simoahava.com/amp/analytics/google-tag-manager-history-listener/">History Change trigger</a> fires as soon as the event is dispatched, the content might not be there yet when your tags fire.</p>
-
-<p>So in this article I&rsquo;ll show a quick and dirty way to delay the trigger, so that your tags don&rsquo;t fire until the page has had time to load the content.</p>
-
+<p>So in this article I'll show a quick and dirty way to delay the trigger, so that your tags don't fire until the page has had time to load the content.</p>
 <h2 id="tip-79-delay-the-history-change-trigger">Tip 79: Delay The History Change Trigger</h2>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/05/delay-the-history-change-trigger.jpg" title="Delay the history change trigger">
@@ -936,49 +925,46 @@ on
     </a>
   
 
-
 <p>The <strong>easy way</strong> to do it is to fire a <strong>Custom HTML tag</strong> with the <strong>History Change trigger that is causing problems on your site</strong>.</p>
-
 <p>First, make sure you have all the history-related <a href="https://www.simoahava.com/analytics/variable-guide-google-tag-manager/#history">Built-in variables</a> enabled in the container.</p>
-
 <p>Then, in the Custom HTML tag, add the following code:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
-  <span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">script</span><span class="p"></span><span class="p">&gt;</span>
+  <span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">timeout</span> <span class="o">=</span> <span class="mi">500</span><span class="p">;</span> <span class="c1">// Milliseconds - change to what you want the timeout to be.
-</span><span class="c1"></span>    <span class="nb">window</span><span class="p">.</span><span class="nx">setTimeout</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-      <span class="nb">window</span><span class="p">.</span><span class="nx">dataLayer</span><span class="p">.</span><span class="nx">push</span><span class="p">({</span>
+</span><span class="c1"></span>    <span class="nb">window</span><span class="p">.</span><span class="nx">setTimeout</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nb">window</span><span class="p">.</span><span class="nx">dataLayer</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="p">{</span>
         <span class="nx">event</span><span class="o">:</span> <span class="s1">&#39;custom.historyChange&#39;</span><span class="p">,</span>
         <span class="nx">custom</span><span class="o">:</span> <span class="p">{</span>
-          <span class="nx">historyChangeSource</span><span class="o">:</span> <span class="p">{{</span><span class="nx">History</span> <span class="nx">Source</span><span class="p">}},</span>
-          <span class="nx">newHistoryState</span><span class="o">:</span> <span class="p">{{</span><span class="nx">New</span> <span class="nx">History</span> <span class="nx">State</span><span class="p">}},</span>
-          <span class="nx">oldHistoryState</span><span class="o">:</span> <span class="p">{{</span><span class="nx">Old</span> <span class="nx">History</span> <span class="nx">State</span><span class="p">}},</span>
-          <span class="nx">newHistoryFragment</span><span class="o">:</span> <span class="p">{{</span><span class="nx">New</span> <span class="nx">History</span> <span class="nx">Fragment</span><span class="p">}},</span>
-          <span class="nx">oldHistoryFragment</span><span class="o">:</span> <span class="p">{{</span><span class="nx">Old</span> <span class="nx">History</span> <span class="nx">Fragment</span><span class="p">}}</span>
+          <span class="nx">historyChangeSource</span><span class="o">:</span> <span class="p">{</span><span class="p">{</span><span class="nx">History</span> <span class="nx">Source</span><span class="p">}</span><span class="p">}</span><span class="p">,</span>
+          <span class="nx">newHistoryState</span><span class="o">:</span> <span class="p">{</span><span class="p">{</span><span class="nx">New</span> <span class="nx">History</span> <span class="nx">State</span><span class="p">}</span><span class="p">}</span><span class="p">,</span>
+          <span class="nx">oldHistoryState</span><span class="o">:</span> <span class="p">{</span><span class="p">{</span><span class="nx">Old</span> <span class="nx">History</span> <span class="nx">State</span><span class="p">}</span><span class="p">}</span><span class="p">,</span>
+          <span class="nx">newHistoryFragment</span><span class="o">:</span> <span class="p">{</span><span class="p">{</span><span class="nx">New</span> <span class="nx">History</span> <span class="nx">Fragment</span><span class="p">}</span><span class="p">}</span><span class="p">,</span>
+          <span class="nx">oldHistoryFragment</span><span class="o">:</span> <span class="p">{</span><span class="p">{</span><span class="nx">Old</span> <span class="nx">History</span> <span class="nx">Fragment</span><span class="p">}</span><span class="p">}</span>
         <span class="p">}</span>
-      <span class="p">});</span>
-    <span class="p">},</span> <span class="nx">timeout</span><span class="p">);</span>
-  <span class="p">})();</span>
-<span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span></code></pre></div>
-
+      <span class="p">}</span><span class="p">)</span><span class="p">;</span>
+    <span class="p">}</span><span class="p">,</span> <span class="nx">timeout</span><span class="p">)</span><span class="p">;</span>
+  <span class="p">}</span><span class="p">)</span><span class="p">(</span><span class="p">)</span><span class="p">;</span>
+<span class="p">&lt;</span><span class="p">/</span><span class="nt">script</span><span class="p">&gt;</span></code></pre></div>
 <p>As said above, make sure this tag fires on the History Change trigger you want to delay.</p>
-
 <p>The Custom HTML tag adds a 500 millisecond delay, after which it pushes a custom event named <code>custom.historyChange</code> into the <code>dataLayer</code>. With this event, five new Data Layer variables are pushed, each with the values from the <em>original</em> History event that triggered the Custom HTML tag in the first place. These new variables are:</p>
-
 <ul>
-<li><p><code>custom.historyChangeSource</code> - the history event that triggered the delay (e.g. <code>pushState</code> or <code>replaceState</code>).</p></li>
-
-<li><p><code>custom.newHistoryState</code> - the <em>state object</em> set in the history event.</p></li>
-
-<li><p><code>custom.oldHistoryState</code> - the <em>state object</em> that was overwritten with the new state object.</p></li>
-
-<li><p><code>custom.newHistoryFragment</code> - the <em>hash fragment</em> set in the history event (e.g. <code>#contactus</code>).</p></li>
-
-<li><p><code>custom.oldHistoryFragment</code> - the <em>hash fragment</em> that was overwritten with the new hash.</p></li>
+<li>
+<p><code>custom.historyChangeSource</code> - the history event that triggered the delay (e.g. <code>pushState</code> or <code>replaceState</code>).</p>
+</li>
+<li>
+<p><code>custom.newHistoryState</code> - the <em>state object</em> set in the history event.</p>
+</li>
+<li>
+<p><code>custom.oldHistoryState</code> - the <em>state object</em> that was overwritten with the new state object.</p>
+</li>
+<li>
+<p><code>custom.newHistoryFragment</code> - the <em>hash fragment</em> set in the history event (e.g. <code>#contactus</code>).</p>
+</li>
+<li>
+<p><code>custom.oldHistoryFragment</code> - the <em>hash fragment</em> that was overwritten with the new hash.</p>
+</li>
 </ul>
-
-<p>Now, create a new <strong>Custom Event trigger</strong> for event name <code>custom.historyChange</code>, and create <strong>Data Layer variables</strong> for all of the new custom variables listed above (or at least the ones that make sense in your case). Here&rsquo;s what the trigger and a sample variable would look like:</p>
-
+<p>Now, create a new <strong>Custom Event trigger</strong> for event name <code>custom.historyChange</code>, and create <strong>Data Layer variables</strong> for all of the new custom variables listed above (or at least the ones that make sense in your case). Here's what the trigger and a sample variable would look like:</p>
 
 
     <a href="https://www.simoahava.com/amp/images/2018/05/trigger-and-variable.jpg" title="Custom Event trigger and Data Layer variable">
@@ -988,15 +974,10 @@ on
     </a>
   
 
-
 <p>Add the Custom Event trigger to whatever tag you want to fire with the history event, and use the new Data Layer variables where necessary.</p>
-
 <p>You might be wondering why rewrite the original Built-in variables into custom Data Layer variables. This is just a precaution. If your site dispatches more than one history event before the 500 millisecond delay is over, then the Built-in variables will always refer to the <strong>latest</strong> history state, and not the one that was delayed.</p>
-
 <h3 id="problem-with-this-approach">Problem with this approach</h3>
-
-<p>There&rsquo;s one, potentially big issue with this approach. By firing a Custom HTML tag with every single history event, you are clogging up the document object model of the page, because that gets unloaded when the user navigates away from the page, and not when new content is pulled in. For example, after ten history events, this is what the DOM can end up looking like:</p>
-
+<p>There's one, potentially big issue with this approach. By firing a Custom HTML tag with every single history event, you are clogging up the document object model of the page, because that gets unloaded when the user navigates away from the page, and not when new content is pulled in. For example, after ten history events, this is what the DOM can end up looking like:</p>
 
 
     <a href="https://www.simoahava.com/amp/images/2018/05/clogged-up-dom.jpg" title="DOM getting full of custom html tags">
@@ -1006,30 +987,23 @@ on
     </a>
   
 
-
 <p>The problem with rewriting the DOM so many times is that each new element added forces a re-evaluation of the document object model, and the more items in the DOM, the longer this re-evaluation takes. So the more Custom HTML tags that fire without a page reload or refresh, the more the page performance will suffer.</p>
-
 <h3 id="potential-solution">Potential solution</h3>
-
 <p>One potential solution is to use only a single Custom HTML tag, where you overwrite the <code>window.history.pushState</code> and <code>window.history.replaceState</code> methods. The overwritten code should include the delayed <code>dataLayer.push()</code>, and you <strong>must</strong> pass the arguments to the original <code>window.history.pushState</code> using <code>apply()</code>, unless you want to destroy your site navigation. See <a href="https://stackoverflow.com/a/4585031/2367037">here</a> for inspiration.</p>
-
-<p>Basically, you&rsquo;re writing a <a href="https://www.simoahava.com/amp/analytics/simple-custom-event-listeners-gtm/">custom event listener</a>, but instead of listening for user interactions, you&rsquo;ll be listening for <code>pushState</code> and <code>replaceState</code> events.</p>
-
-<p>I&rsquo;m not going to write the solution here - it&rsquo;s difficult to write a generic history listener that works with your particular use case. But the <a href="https://stackoverflow.com/a/4585031/2367037">Stack Overflow article</a> should help you get started. Just remember to test <strong>thoroughly</strong> if overwriting basic browser interfaces like the Window History API.</p>
-
+<p>Basically, you're writing a <a href="https://www.simoahava.com/amp/analytics/simple-custom-event-listeners-gtm/">custom event listener</a>, but instead of listening for user interactions, you'll be listening for <code>pushState</code> and <code>replaceState</code> events.</p>
+<p>I'm not going to write the solution here - it's difficult to write a generic history listener that works with your particular use case. But the <a href="https://stackoverflow.com/a/4585031/2367037">Stack Overflow article</a> should help you get started. Just remember to test <strong>thoroughly</strong> if overwriting basic browser interfaces like the Window History API.</p>
 <h2 id="summary">Summary</h2>
-
 <p>The trick outlined in this article should really be a <strong>temporary</strong> solution (as all hacks should). You really ought to talk to your developers and ask them to implement the custom event push directly into whatever JavaScript is handling the route / state changes on the site.</p>
-
 <p>By delegating the work to your developers, they can ensure that the <code>dataLayer</code> event is dispatched at the exact right time. Using a delay like the 500 milliseconds of this article is sub-optimal for two reasons:</p>
-
 <ol>
-<li><p>It can be <strong>too short</strong>, meaning the delay goes off, the custom event is pushed, but the transition is still not complete.</p></li>
-
-<li><p>It can be <strong>too long</strong>, meaning you are wasting time with the trigger, and tracking the page view of each dynamic transition can lag behind the events dispatched with each new bit of content.</p></li>
+<li>
+<p>It can be <strong>too short</strong>, meaning the delay goes off, the custom event is pushed, but the transition is still not complete.</p>
+</li>
+<li>
+<p>It can be <strong>too long</strong>, meaning you are wasting time with the trigger, and tracking the page view of each dynamic transition can lag behind the events dispatched with each new bit of content.</p>
+</li>
 </ol>
-
-<p>Regardless, it&rsquo;s a way to <strong>make things work</strong>, which I guess is a good justification as any for using hacks.</p>
+<p>Regardless, it's a way to <strong>make things work</strong>, which I guess is a good justification as any for using hacks.</p>
 
     </section>
 

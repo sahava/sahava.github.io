@@ -53,7 +53,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.59.1 with theme Tranquilpeak 0.4.3-BETA">
+    <meta name="generator" content="Hugo 0.61.0 with theme Tranquilpeak 0.4.3-BETA">
     <title>#GTMTips: Use eventTimeout With eventCallback | Simo Ahava's blog</title>
     
     <script>
@@ -319,30 +319,17 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              
-
-<p>There are times when I&rsquo;m disappointed with <a href="https://developers.google.com/tag-manager/devguide">Google&rsquo;s developer documentation</a>, especially for <a href="https://tagmanager.google.com/">Google Tag Manager</a>. Most of the time they get it right, and I&rsquo;d say around 80% of questions being thrown around the forums can be answered just by reading through the documentation. But there are some cases where the documentation is misleading or even downright dangerous. One of these cases is <a href="https://developers.google.com/tag-manager/enhanced-ecommerce">Enhanced Ecommerce</a>.</p>
-
-<p>This isn&rsquo;t going to be a thorough critique of said documentation, but the tip in this post has to do with one of the examples that the documentation gives for <a href="https://developers.google.com/tag-manager/enhanced-ecommerce#product-clicks">measuring Product Clicks</a>. In the comment it says:</p>
-
+              <p>There are times when I'm disappointed with <a href="https://developers.google.com/tag-manager/devguide">Google's developer documentation</a>, especially for <a href="https://tagmanager.google.com/">Google Tag Manager</a>. Most of the time they get it right, and I'd say around 80% of questions being thrown around the forums can be answered just by reading through the documentation. But there are some cases where the documentation is misleading or even downright dangerous. One of these cases is <a href="https://developers.google.com/tag-manager/enhanced-ecommerce">Enhanced Ecommerce</a>.</p>
+<p>This isn't going to be a thorough critique of said documentation, but the tip in this post has to do with one of the examples that the documentation gives for <a href="https://developers.google.com/tag-manager/enhanced-ecommerce#product-clicks">measuring Product Clicks</a>. In the comment it says:</p>
 <blockquote>...This function uses the eventCallback dataLayer variable to handle navigation after the ecommerce data has been sent to Google Analytics...</blockquote>
-
-<p>Well, that&rsquo;s an excellent use case for <a href="https://www.simoahava.com/gtm-tips/hitcallback-eventcallback/">eventCallback</a>. After all, it&rsquo;s sole purpose is to execute code <em>after</em> all Tags have completed for the given event in the <code>dataLayer.push</code> payload.</p>
-
-<p>However, the pain point here is that you&rsquo;re using Google Tag Manager to defer a crucial, potentially UX- and business-hurting action: the link redirect. The point of the example is that the link redirect is cancelled, and only once the <code>eventCallback</code> is invoked will the redirect continue.</p>
-
+<p>Well, that's an excellent use case for <a href="https://www.simoahava.com/gtm-tips/hitcallback-eventcallback/">eventCallback</a>. After all, it's sole purpose is to execute code <em>after</em> all Tags have completed for the given event in the <code>dataLayer.push</code> payload.</p>
+<p>However, the pain point here is that you're using Google Tag Manager to defer a crucial, potentially UX- and business-hurting action: the link redirect. The point of the example is that the link redirect is cancelled, and only once the <code>eventCallback</code> is invoked will the redirect continue.</p>
 <p>That, my friends, is not a good pattern.</p>
-
-<p>If any of the Tags that fire on this payload fail, timeout, or in some other way fail to inform GTM that they have completed, the redirect will never happen, and the user is left confused since the link they&rsquo;re trying to click doesn&rsquo;t work.</p>
-
-<p><strong>IMPORTANT UPDATE, 5 Jan 2018</strong>: Firefox&rsquo;s latest update to its <strong>Tracking Protection in Private Browsing</strong> now blocks Google Tag Manager, too. So even setting <code>eventTimeout</code> won&rsquo;t help. My suggestion is to not cancel clicks outside Google Tag Manager with the intention of doing the redirect via some Google Tag Manager -related method, such as <code>eventCallback</code>. (Update over).</p>
-
-<p><strong>This is especially important in the recent versions of the Firefox web browser!</strong> Firefox introduced something called <a href="https://support.mozilla.org/en-US/kb/tracking-protection-pbm">Tracking Protection in Private Browsing</a> a while ago, and one of its features is that it blocks Google Analytics from loading on the page. However, <em>it does not block Google Tag Manager</em>. In other words, Google Tag Manager loads, the <code>dataLayer.push()</code> is processed and everything, but if there&rsquo;s even a single Google Analytics Tag with a dependency on the push, the <code>eventCallback</code> function is never called.</p>
-
-<p>To fix this, here&rsquo;s a tip:</p>
-
+<p>If any of the Tags that fire on this payload fail, timeout, or in some other way fail to inform GTM that they have completed, the redirect will never happen, and the user is left confused since the link they're trying to click doesn't work.</p>
+<p><strong>IMPORTANT UPDATE, 5 Jan 2018</strong>: Firefox's latest update to its <strong>Tracking Protection in Private Browsing</strong> now blocks Google Tag Manager, too. So even setting <code>eventTimeout</code> won't help. My suggestion is to not cancel clicks outside Google Tag Manager with the intention of doing the redirect via some Google Tag Manager -related method, such as <code>eventCallback</code>. (Update over).</p>
+<p><strong>This is especially important in the recent versions of the Firefox web browser!</strong> Firefox introduced something called <a href="https://support.mozilla.org/en-US/kb/tracking-protection-pbm">Tracking Protection in Private Browsing</a> a while ago, and one of its features is that it blocks Google Analytics from loading on the page. However, <em>it does not block Google Tag Manager</em>. In other words, Google Tag Manager loads, the <code>dataLayer.push()</code> is processed and everything, but if there's even a single Google Analytics Tag with a dependency on the push, the <code>eventCallback</code> function is never called.</p>
+<p>To fix this, here's a tip:</p>
 <h2 id="tip-48-always-add-eventtimeout-when-you-use-eventcallback">Tip 48: Always add eventTimeout when you use eventCallback</h2>
-
 
 
 
@@ -358,11 +345,8 @@
 </div>
 
 
-
 <p>Always add the <code>eventTimeout</code> when using <code>eventCallback</code>. The former takes a numerical value as its parameter, representing the number of <strong>milliseconds</strong> to wait before calling <code>eventCallback</code> anyway. In other words, even if your Tags stall and never signal completion, after two seconds <code>eventCallback</code> is invoked.</p>
-
-<p>So, let&rsquo;s imagine you have this, problematic code:</p>
-
+<p>So, let's imagine you have this, problematic code:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">processLinkClick</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e</span>) {
   <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">preventDefault</span>();
   <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">targetUrl</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">target</span>.<span style="color:#a6e22e">href</span>;
@@ -375,11 +359,8 @@
   });
 };
 </code></pre></div>
-
-<p>It&rsquo;s a function which grabs the event object, prevents its default action (redirect), does the <code>dataLayer.push()</code>, and finally in the <code>eventCallback</code> finalizes the redirect. But there&rsquo;s no safeguard a) for when Google Tag Manager isn&rsquo;t loaded, and b) if the Tags stall.</p>
-
-<p>So here&rsquo;s the fixed code:</p>
-
+<p>It's a function which grabs the event object, prevents its default action (redirect), does the <code>dataLayer.push()</code>, and finally in the <code>eventCallback</code> finalizes the redirect. But there's no safeguard a) for when Google Tag Manager isn't loaded, and b) if the Tags stall.</p>
+<p>So here's the fixed code:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">processLinkClick</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e</span>) {
   <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">targetUrl</span>;
   <span style="color:#66d9ef">if</span> (window[<span style="color:#e6db74">&#39;google_tag_manager&#39;</span>]) {
@@ -396,12 +377,9 @@
   }
 };
 </code></pre></div>
-
-<p>As you can see, we&rsquo;re now also checking for the existence of <code>google_tag_manager</code>, which is the interface created by the gtm.js library when it is executed. So if the Google Tag Manager library isn&rsquo;t loaded, the <code>dataLayer.push()</code> is never executed. Sure, there might be a race condition where the library is still in the process of being loaded, but there are ways to mitigate this, too.</p>
-
+<p>As you can see, we're now also checking for the existence of <code>google_tag_manager</code>, which is the interface created by the gtm.js library when it is executed. So if the Google Tag Manager library isn't loaded, the <code>dataLayer.push()</code> is never executed. Sure, there might be a race condition where the library is still in the process of being loaded, but there are ways to mitigate this, too.</p>
 <p>Finally, the <code>eventTimeout</code> introduces a timeout of two seconds, after which the redirect is done. Thus even if any Tags that fire on the &ldquo;processLink&rdquo; event stall, the redirect is not blocked.</p>
-
-<p>I hope this tip was useful to you! There are many instances where you really need to be careful that you Google Tag Manager setup isn&rsquo;t killing the usability of your website. This is one of them.</p>
+<p>I hope this tip was useful to you! There are many instances where you really need to be careful that you Google Tag Manager setup isn't killing the usability of your website. This is one of them.</p>
 
               
 

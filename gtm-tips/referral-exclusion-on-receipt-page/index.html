@@ -53,7 +53,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.59.1 with theme Tranquilpeak 0.4.3-BETA">
+    <meta name="generator" content="Hugo 0.61.0 with theme Tranquilpeak 0.4.3-BETA">
     <title>#GTMTips: Referral Exclusion On Receipt Page | Simo Ahava's blog</title>
     
     <script>
@@ -319,16 +319,10 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              
-
-<p>You might have noticed that the <a href="https://support.google.com/analytics/answer/2795830?hl=en">Referral Exclusion List</a> in <a href="https://analytics.google.com/">Google Analytics</a> is difficult to maintain. You can&rsquo;t copy a list from one property to another, the list is a wildcard match for domain names (so all subdomains are automatically excluded), and it&rsquo;s just about the clunkiest user interface we&rsquo;ve seen since ERP tools from the 1990s. A while ago, I <a href="https://www.simoahava.com/gtm-tips/implement-referral-exclusions-via-gtm/">wrote of a solution</a> which lets you manage referral exclusions using <a href="https://tagmanager.google.com">Google Tag Manager</a>, and it&rsquo;s still a neat trick, as it&rsquo;s way more flexible than said clunky UI.</p>
-
-<p>However, it&rsquo;s still an <em>a priori</em> setup. You need to <strong>know</strong> what referrals are coming in. Also, if you have hundreds of referrals that you want to exclude, it&rsquo;s still a headache. With Ecommerce payment gateway referrals, it&rsquo;s very common to have a huge amount of domains you didn&rsquo;t even know to exist polluting your session data.</p>
-
-<p>In this tip, I&rsquo;ll show you a simple and elegant way to make sure that nothing interferes with correct attribution on your Ecommerce receipt page.</p>
-
+              <p>You might have noticed that the <a href="https://support.google.com/analytics/answer/2795830?hl=en">Referral Exclusion List</a> in <a href="https://analytics.google.com/">Google Analytics</a> is difficult to maintain. You can't copy a list from one property to another, the list is a wildcard match for domain names (so all subdomains are automatically excluded), and it's just about the clunkiest user interface we've seen since ERP tools from the 1990s. A while ago, I <a href="https://www.simoahava.com/gtm-tips/implement-referral-exclusions-via-gtm/">wrote of a solution</a> which lets you manage referral exclusions using <a href="https://tagmanager.google.com">Google Tag Manager</a>, and it's still a neat trick, as it's way more flexible than said clunky UI.</p>
+<p>However, it's still an <em>a priori</em> setup. You need to <strong>know</strong> what referrals are coming in. Also, if you have hundreds of referrals that you want to exclude, it's still a headache. With Ecommerce payment gateway referrals, it's very common to have a huge amount of domains you didn't even know to exist polluting your session data.</p>
+<p>In this tip, I'll show you a simple and elegant way to make sure that nothing interferes with correct attribution on your Ecommerce receipt page.</p>
 <h2 id="tip-34-exclude-all-referrals-on-your-receipt-page">Tip 34: Exclude all referrals on your receipt page</h2>
-
 
 
 
@@ -344,33 +338,21 @@
 </div>
 
 
-
-<p>That&rsquo;s right! We&rsquo;re going to brutally exclude <strong>all</strong> referrals on the receipt page. No matter where you come from, you will not be counted as a referral, and thanks to Google Analytics&rsquo; last non-direct source attribution, your pre-payment-gateway-session will stay intact.</p>
-
+<p>That's right! We're going to brutally exclude <strong>all</strong> referrals on the receipt page. No matter where you come from, you will not be counted as a referral, and thanks to Google Analytics&rsquo; last non-direct source attribution, your pre-payment-gateway-session will stay intact.</p>
 <p>&ldquo;Exclude all referrals? Regardless of where they come from?&rdquo; I hear you whisper in fear. Speculations about me finally losing my mind along with my hair are flying to and fro like suicidal swans.</p>
-
-<p>I&rsquo;m serious! Think of a scenario where a <em>referral</em> to your <em>receipt page</em> is significant. You&rsquo;re not going to be sending campaign traffic to that page. You&rsquo;re not going to want to see it in Google&rsquo;s search index. Unless you&rsquo;re the worst SEO manager in the world, you&rsquo;re not going to want to build links to that page. So we don&rsquo;t <em>care</em> about referrals to the receipt page. The hypothesis is that whenever someone lands on the receipt page, it&rsquo;s <em>always</em> as part of your checkout funnel.</p>
-
-<p>I know, <em>always</em> is not something you should articulate outside of singing Bon Jovi at the local karaoke bar. But in this case it&rsquo;s worth the risk. The only reason you might want to see referral data on the receipt page is to debug some issue with your checkout funnel. But, my friends, there are better tools than Google Analytics&rsquo; session attribution to do that. If you&rsquo;re really concerned, you can always send the referrer as a Custom Dimension.</p>
-
-<p>Anyway, to get things working, you need to do two things: create a <strong>Custom JavaScript Variable</strong> and modify the <strong>Tags</strong> which fire on the receipt page. Let&rsquo;s start with the first one.</p>
-
+<p>I'm serious! Think of a scenario where a <em>referral</em> to your <em>receipt page</em> is significant. You're not going to be sending campaign traffic to that page. You're not going to want to see it in Google's search index. Unless you're the worst SEO manager in the world, you're not going to want to build links to that page. So we don't <em>care</em> about referrals to the receipt page. The hypothesis is that whenever someone lands on the receipt page, it's <em>always</em> as part of your checkout funnel.</p>
+<p>I know, <em>always</em> is not something you should articulate outside of singing Bon Jovi at the local karaoke bar. But in this case it's worth the risk. The only reason you might want to see referral data on the receipt page is to debug some issue with your checkout funnel. But, my friends, there are better tools than Google Analytics&rsquo; session attribution to do that. If you're really concerned, you can always send the referrer as a Custom Dimension.</p>
+<p>Anyway, to get things working, you need to do two things: create a <strong>Custom JavaScript Variable</strong> and modify the <strong>Tags</strong> which fire on the receipt page. Let's start with the first one.</p>
 <p>Create a new Custom JavaScript Variable, and name it <strong>{{JS - Null referrer on thank you page}}</strong> or whatever suits your fancy. Next, populate it with the following code:</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
   <span style="color:#66d9ef">return</span> {{<span style="color:#a6e22e">Page</span> <span style="color:#a6e22e">Path</span>}}.<span style="color:#a6e22e">indexOf</span>(<span style="color:#e6db74">&#39;/thank-you-page/&#39;</span>) <span style="color:#f92672">&gt;</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span> <span style="color:#f92672">?</span> <span style="color:#66d9ef">null</span> <span style="color:#f92672">:</span> document.<span style="color:#a6e22e">referrer</span>;
 }
 </code></pre></div>
-
-<p>I&rsquo;m aware that this is different than the code in the image above. I&rsquo;m dark, mysterious, and unpredictable that way! (Both work just fine).</p>
-
-<p>The key thing is to change the string in the <code>indexOf</code> method to match the path (or part of path) of your receipt page. It&rsquo;s case sensitive, so if you&rsquo;re one of the 3 people who think that URLs that are something else than all lowercase are cool, make sure you include the case in the check.</p>
-
-<p>Once you&rsquo;ve created the Variable, head on over to your Universal Analytics Tags which fire on the receipt page. That&rsquo;s right, you&rsquo;ll need to edit <em>all</em> of them, because even a single Tag which gets through with incorrect referrer information will start a new session. In the Tag settings, browse down to <strong>Fields to Set</strong>, and add a new field with this setup:</p>
-
-<p>Field Name: <strong>referrer</strong><br />
+<p>I'm aware that this is different than the code in the image above. I'm dark, mysterious, and unpredictable that way! (Both work just fine).</p>
+<p>The key thing is to change the string in the <code>indexOf</code> method to match the path (or part of path) of your receipt page. It's case sensitive, so if you're one of the 3 people who think that URLs that are something else than all lowercase are cool, make sure you include the case in the check.</p>
+<p>Once you've created the Variable, head on over to your Universal Analytics Tags which fire on the receipt page. That's right, you'll need to edit <em>all</em> of them, because even a single Tag which gets through with incorrect referrer information will start a new session. In the Tag settings, browse down to <strong>Fields to Set</strong>, and add a new field with this setup:</p>
+<p>Field Name: <strong>referrer</strong><br>
 Value: <strong>{{JS - Null referrer on thank you page}}</strong></p>
-
 
 
 
@@ -386,11 +368,8 @@ Value: <strong>{{JS - Null referrer on thank you page}}</strong></p>
 </div>
 
 
-
-<p>And now you&rsquo;re all set! When you run this setup, whenever the user lands on /thank-you-page/, all hits to GA are sent without a referrer.</p>
-
+<p>And now you're all set! When you run this setup, whenever the user lands on /thank-you-page/, all hits to GA are sent without a referrer.</p>
 <p><em>Thanks to Michael] for bringing up the point of editing all the Tags on the page, not just the Page View Tag.</em></p>
-
 <p>Simple, elegant, and quick.</p>
 
               

@@ -53,7 +53,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.59.1 with theme Tranquilpeak 0.4.3-BETA">
+    <meta name="generator" content="Hugo 0.61.0 with theme Tranquilpeak 0.4.3-BETA">
     <title>#GTMTips: Test Against Multiple URLs In Your Triggers | Simo Ahava's blog</title>
     
     <script>
@@ -319,14 +319,9 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              
-
-<p>The beauty of <a href="https://www.simoahava.com/categories/gtm-tips/">#GTMTips</a>, at least how I&rsquo;ve envisioned them, is that they can be really simple or crazy complex. The important thing is that the <em>idea</em> is conveyed clearly enough. That&rsquo;s why so many of these tips have originated from discussions in our <a href="https://tagmanager.google.com/">Google Tag Manager</a> <a href="https://plus.google.com/communities/104865292981489764063">Google+ community</a>, the <a href="https://productforums.google.com/forum/#!forum/tag-manager">Product Forums</a>, and in private email correspondence with people asking for help. Today&rsquo;s tip, for example, originated from a back-and-forth with Süleyman Okan, so thank you for the inspiration!</p>
-
+              <p>The beauty of <a href="https://www.simoahava.com/categories/gtm-tips/">#GTMTips</a>, at least how I've envisioned them, is that they can be really simple or crazy complex. The important thing is that the <em>idea</em> is conveyed clearly enough. That's why so many of these tips have originated from discussions in our <a href="https://tagmanager.google.com/">Google Tag Manager</a> <a href="https://plus.google.com/communities/104865292981489764063">Google+ community</a>, the <a href="https://productforums.google.com/forum/#!forum/tag-manager">Product Forums</a>, and in private email correspondence with people asking for help. Today's tip, for example, originated from a back-and-forth with Süleyman Okan, so thank you for the inspiration!</p>
 <p>This tip lets you take list of seemingly unrelated URLs, and group them together so that any given trigger will only activate if the current page URL contains one of these URL strings.</p>
-
 <h2 id="tip-55-test-current-page-url-against-a-list-of-url-strings">Tip 55: Test current page URL against a list of URL strings</h2>
-
 
 
 
@@ -342,19 +337,15 @@
 </div>
 
 
-
-<p>First, why is this necessary? Well, let&rsquo;s say you have the following URLs, and you want your trigger to only fire when the page the visitor is on matches one of these:</p>
-
+<p>First, why is this necessary? Well, let's say you have the following URLs, and you want your trigger to only fire when the page the visitor is on matches one of these:</p>
 <ul>
-<li>/page/login.html<br /></li>
-<li>/login/<br /></li>
-<li>/my-account/<br /></li>
-<li>mydomain.com/users/signin/<br /></li>
+<li>/page/login.html</li>
+<li>/login/</li>
+<li>/my-account/</li>
+<li>mydomain.com/users/signin/</li>
 <li>mydomain.co.uk/en/profile/</li>
 </ul>
-
 <p>Your first impulse would be to create a trigger that looks like the following. This will <strong>not work</strong>, because in a trigger with multiple conditions, <strong>all of the conditions must match</strong>.</p>
-
 
 
 
@@ -370,19 +361,12 @@
 </div>
 
 
-
 <p>So unless the current URL looks something like <strong><a href="http://www.mydomain.com/users/signin/login/my-account/mydomain.co.uk/en/profile/page/login.html">http://www.mydomain.com/users/signin/login/my-account/mydomain.co.uk/en/profile/page/login.html</a></strong>, this trigger will not work.</p>
-
 <p>An alternative would be to write a long regular expression, since in regular expressions you can indicate optional patterns with the pipe symbol (<code>|</code>):</p>
-
 <p>Page URL <strong>matches RegEx (ignore case)</strong> /page/login.html|/login/|/my-account/|mydomain.com/users/signin/|mydomain.co.uk/en/profile/</p>
-
 <p>But the problem with this approach is that the trigger itself becomes quite difficult to maintain, as any changes would require that you dig in to this single field value.</p>
-
 <p>The third option would be to create a trigger for each of the URL variations individually (or maybe you can save some effort by grouping logically similar URLs together), but this is cumbersome to maintain as soon as you have more than one tag that needs these triggers.</p>
-
 <p>So, my suggestion is to leverage a <strong>Custom JavaScript Variable</strong> to check against a list of URLs that you provide, and then it will return <code>true</code> if the current URL contains any one of the URL strings in the list, or <code>false</code> otherwise. This is what the variable might look like:</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
   <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">urlsToTest</span> <span style="color:#f92672">=</span> [
     <span style="color:#e6db74">&#39;/page/login.html&#39;</span>,
@@ -401,15 +385,10 @@
   <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span>;
 }
 </code></pre></div>
-
 <p><em>This code was <strong>updated</strong> thanks to David Porter in the comments below. The original code had some flaws which prevented this from working.</em></p>
-
 <p>In the <code>urlsToTest</code> array, you provide a comma-separated list of strings that you want to test the current URL against. They can be just page paths, or they can even be complete URLs with protocol, domain name, query string, and hash in place.</p>
-
 <p>The variable loops through each member of the list, and if the current page URL contains any one of these URL strings, the function returns <code>true</code>.</p>
-
 <p>To include this in your triggers, all you need is something like:</p>
-
 
 
 
@@ -425,10 +404,8 @@
 </div>
 
 
-
-<p>Here, I&rsquo;ve named the variable <strong>{{URL is login page}}</strong>, and you can see how easy it is to add this as a trigger condition.</p>
-
-<p>And that&rsquo;s all there is to it! There are many ways to make this even more useful, such as changing from a string method (<code>indexOf()</code>) to regular expressions (<code>match()</code>). This way you&rsquo;ll have more power over things like case-sensitivity, or whether the URL should match the string from the beginning, from the end, or from anywhere.</p>
+<p>Here, I've named the variable <strong>{{URL is login page}}</strong>, and you can see how easy it is to add this as a trigger condition.</p>
+<p>And that's all there is to it! There are many ways to make this even more useful, such as changing from a string method (<code>indexOf()</code>) to regular expressions (<code>match()</code>). This way you'll have more power over things like case-sensitivity, or whether the URL should match the string from the beginning, from the end, or from anywhere.</p>
 
               
 

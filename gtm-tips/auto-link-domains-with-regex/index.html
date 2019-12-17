@@ -53,7 +53,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.59.1 with theme Tranquilpeak 0.4.3-BETA">
+    <meta name="generator" content="Hugo 0.61.0 with theme Tranquilpeak 0.4.3-BETA">
     <title>#GTMTips: Auto Link Domains With Regex | Simo Ahava's blog</title>
     
     <script>
@@ -319,20 +319,13 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              
-
-<blockquote>
+              <blockquote>
 <p>Update <strong>5 March 2019</strong> due to GTM not supporting negative lookbehinds any more.</p>
 </blockquote>
-
-<p><a href="https://tagmanager.google.com/">Google Tag Manager</a> makes it fairly easy to do <a href="https://support.google.com/analytics/answer/1034342">cross-domain tracking</a>. Basically, you list the hostnames you want to automatically decorate with linker parameters in the <strong>Auto-Link Domains</strong> field of your Page View tag, and that takes care of decorating the URLs with the necessary parameter. It&rsquo;s dead easy, even if there are a bunch of traps you need to watch out for (see my post on <a href="https://www.simoahava.com/analytics/troubleshooting-cross-domain-tracking-in-google-analytics/">troubleshooting cross-domain tracking issues</a>).</p>
-
-<p>However, for some reason, GTM doesn&rsquo;t support regular expressions in the Auto-Link Domains field. The <code>autoLink</code> method supports both strings and regular expression literals, but GTM only uses the first. Hopefully, at some point this will be fixed and this article will become obsolete. The reason we want regular expressions is to be able to do things like negative lookbehinds, where we specify that a subset of domains of any given hostname be excluded from decoration. In the image below, you can see an example of this. The regular expression specifies that all other domains <em>except</em> <code>www.simoahava.com</code> should be decorated with cross-domain parameters.</p>
-
-<p>To make this work in GTM of today, we&rsquo;ll use the amazing <code>customTask</code> feature (see <a href="https://www.simoahava.com/tags/customtask">here</a> for all my <code>customTask</code> solutions).</p>
-
+<p><a href="https://tagmanager.google.com/">Google Tag Manager</a> makes it fairly easy to do <a href="https://support.google.com/analytics/answer/1034342">cross-domain tracking</a>. Basically, you list the hostnames you want to automatically decorate with linker parameters in the <strong>Auto-Link Domains</strong> field of your Page View tag, and that takes care of decorating the URLs with the necessary parameter. It's dead easy, even if there are a bunch of traps you need to watch out for (see my post on <a href="https://www.simoahava.com/analytics/troubleshooting-cross-domain-tracking-in-google-analytics/">troubleshooting cross-domain tracking issues</a>).</p>
+<p>However, for some reason, GTM doesn't support regular expressions in the Auto-Link Domains field. The <code>autoLink</code> method supports both strings and regular expression literals, but GTM only uses the first. Hopefully, at some point this will be fixed and this article will become obsolete. The reason we want regular expressions is to be able to do things like negative lookbehinds, where we specify that a subset of domains of any given hostname be excluded from decoration. In the image below, you can see an example of this. The regular expression specifies that all other domains <em>except</em> <code>www.simoahava.com</code> should be decorated with cross-domain parameters.</p>
+<p>To make this work in GTM of today, we'll use the amazing <code>customTask</code> feature (see <a href="https://www.simoahava.com/tags/customtask">here</a> for all my <code>customTask</code> solutions).</p>
 <h2 id="tip-67-use-customtask-to-auto-link-domains-based-on-regular-expressions">Tip 67: Use customTask to auto-link domains based on regular expressions</h2>
-
 
 
 
@@ -348,9 +341,7 @@
 </div>
 
 
-
 <p>The trick is to use a Custom JavaScript variable as the value of the <code>customTask</code> field. This is what the variable looks like:</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
   <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">model</span>) {
     <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">domainList</span> <span style="color:#f92672">=</span> [
@@ -366,19 +357,12 @@
   };
 }
 </code></pre></div>
-
 <p>In the <code>domainList</code> array, you need to add all the domains you want to automatically link separating each value with a comma. You can specify both strings (wrap them in quotes) and <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions">regular expression literals</a>. When you use <strong>strings</strong>, the auto-linker uses an open-ended pattern match. Thus if you have <code>'example.com'</code> as one member of the array, GTM will decorate <code>example.com</code> and <strong>all</strong> its subdomains.</p>
-
 <p>Regular expressions give you the power of zero-length assertions such as negative and positive lookbehinds. This makes it easy to match, for example, all subdomains of <code>example.com</code> except for <code>test.example.com</code>.</p>
-
 <p><code>/^(?!test)[^.]*\.?example\.com$/</code></p>
-
-<p>This regular expression reads out as: match any string that doesn&rsquo;t start with <code>test</code>, but contains <code>example.com</code> or any subdomain other than <code>test.example.com</code>. The clumsy <strong>positive lookahead</strong> is necessary because GTM doesn&rsquo;t currently (as of <strong>March 2019</strong>) support negative lookbehinds.</p>
-
+<p>This regular expression reads out as: match any string that doesn't start with <code>test</code>, but contains <code>example.com</code> or any subdomain other than <code>test.example.com</code>. The clumsy <strong>positive lookahead</strong> is necessary because GTM doesn't currently (as of <strong>March 2019</strong>) support negative lookbehinds.</p>
 <p>The rest of the variable basically invokes the Universal Analytics tracker object used in the current hit, loads the linker plugin, and then decorates the domain list with cross-domain parameters.</p>
-
-<p>All you then have to do is add this variable to the value of the <strong>customTask</strong> field in your Page View tag&rsquo;s Fields to set.</p>
-
+<p>All you then have to do is add this variable to the value of the <strong>customTask</strong> field in your Page View tag's Fields to set.</p>
 
 
 
@@ -392,7 +376,6 @@
   
   
 </div>
-
 
 
 <p>This simple fix will make auto-linking domains for cross-domain tracking purposes much more flexible with Google Tag Manager. But, as I mention in the beginning of this article, I really wish that the Auto-Link Domains field in the tag settings will soon support regular expressions, just like the linker plugin regularly does!</p>

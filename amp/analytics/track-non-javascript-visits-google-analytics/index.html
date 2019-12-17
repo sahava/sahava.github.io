@@ -121,8 +121,6 @@
 
 <meta itemprop="name" content="Track Non-JavaScript Visits In Google Analytics">
 <meta itemprop="description" content="How to collect data from users who do not have JavaScript enabled in their browser. You can use Google Tag Manager to collect this information to Google Analytics.">
-
-
 <meta itemprop="datePublished" content="2015-02-09T15:48:25&#43;00:00" />
 <meta itemprop="dateModified" content="2015-02-09T15:48:25&#43;00:00" />
 <meta itemprop="wordCount" content="1455">
@@ -130,7 +128,6 @@
 
 
 <meta itemprop="keywords" content="Google Tag Manager,JavaScript,Google Analytics," />
-
 <script type="application/ld+json">
 {
     "@context": "http://schema.org",
@@ -909,14 +906,9 @@ on
     </header>
 
     <section class="post-content">
-      
-
-<p>One of the big mysteries in browser-based data collection platforms like <a href="http://analytics.google.com">Google Analytics</a> is what happens when the visitor is not being tracked. This is most obvious in cases where the user explicitly opts out of tracking, when the user does not have JavaScript active in their browser, in bounced sessions, and on exit pages.</p>
-
-<p><strong>Opt-outing</strong> means that the user explicitly prohibits a website from tracking them. In some cases, it&rsquo;s possible that opt-out is the default, and the user must explicitly opt-in to allow GA to record their visits. In this article, I will of course <em>not</em> give you ideas how to circumvent this, as you must respect the user&rsquo;s wishes.</p>
-
-<p><strong>Browsing with JavaScript disabled</strong> is surprisingly common, even though it makes a large part of the web unusable. If you disable JavaScript in your browser, the browser will no longer be able to run <code>script</code> blocks or arbitrary JavaScript functions. DOM methods still work, for example, but you won&rsquo;t be able to use persistent storage such as cookies in your GTM container.</p>
-
+      <p>One of the big mysteries in browser-based data collection platforms like <a href="http://analytics.google.com">Google Analytics</a> is what happens when the visitor is not being tracked. This is most obvious in cases where the user explicitly opts out of tracking, when the user does not have JavaScript active in their browser, in bounced sessions, and on exit pages.</p>
+<p><strong>Opt-outing</strong> means that the user explicitly prohibits a website from tracking them. In some cases, it's possible that opt-out is the default, and the user must explicitly opt-in to allow GA to record their visits. In this article, I will of course <em>not</em> give you ideas how to circumvent this, as you must respect the user's wishes.</p>
+<p><strong>Browsing with JavaScript disabled</strong> is surprisingly common, even though it makes a large part of the web unusable. If you disable JavaScript in your browser, the browser will no longer be able to run <code>script</code> blocks or arbitrary JavaScript functions. DOM methods still work, for example, but you won't be able to use persistent storage such as cookies in your GTM container.</p>
 
 
     <a href="https://www.simoahava.com/amp/images/2015/02/no-javascript.jpg" title="No JavaScript in reports">
@@ -926,39 +918,29 @@ on
     </a>
   
 
-
 <p><strong>Bounced sessions and exit pages</strong> are problematic, since certain metrics such as <em>Time on Page</em> can only be calculated with two pageviews. This means that bounced sessions, which have a maximum of one pageview, will not be able to tell you how much time a visitor spent on your site. Similarly, an exit page does not have a subsequent pageview, which means that time on page is lost for these as well.</p>
-
-<p>I&rsquo;ve got two use cases I want to explore. Because I want to keep things short(er than usual), I&rsquo;ve split this into two articles. The first one, this, concerns sending pageview hits from browsers with JavaScript disabled.</p>
-
+<p>I've got two use cases I want to explore. Because I want to keep things short(er than usual), I've split this into two articles. The first one, this, concerns sending pageview hits from browsers with JavaScript disabled.</p>
 <p>The second article (<a href="https://www.simoahava.com/amp/analytics/leverage-usebeacon-beforeunload-google-analytics/">read it here</a>) covers using User Timings to capture time on page for bounced sessions and exit pages.</p>
-
-<p>I&rsquo;m implementing both use cases using <a href="http://tagmanager.google.com">Google Tag Manager</a>. As usual, these articles aren&rsquo;t just about tackling specific GA use cases. They&rsquo;re also about introducing cool JavaScript APIs and lesser-known Google Analytics features to the non-developer public.</p>
-
+<p>I'm implementing both use cases using <a href="http://tagmanager.google.com">Google Tag Manager</a>. As usual, these articles aren't just about tackling specific GA use cases. They're also about introducing cool JavaScript APIs and lesser-known Google Analytics features to the non-developer public.</p>
 <h2 id="collect-pageviews-from-non-js-browsers">Collect pageviews from non-JS browsers</h2>
-
-<p>To collect pageviews from browsers where JavaScript has been disabled, we&rsquo;ll need to leverage a number of advanced features of both Google Tag Manager and Google Analytics. The steps we&rsquo;re going to take are these:</p>
-
+<p>To collect pageviews from browsers where JavaScript has been disabled, we'll need to leverage a number of advanced features of both Google Tag Manager and Google Analytics. The steps we're going to take are these:</p>
 <ol>
-<li><p>Add a <code>dataLayer</code> key-value pair into the <code>iframe</code> of the <code>noscript</code> element in the GTM container snippet.</p></li>
-
-<li><p>Use a <a href="https://support.google.com/tagmanager/answer/3281386?hl=en#CustomImage">Custom Image Tag</a> to fire a <a href="https://developers.google.com/analytics/devguides/collection/protocol/v1/">Measurement Protocol</a> pixel when this <code>dataLayer</code> key-value pair is detected.</p></li>
-
-<li><p>Filter these MP hits into their own Google Analytics profile.</p></li>
+<li>
+<p>Add a <code>dataLayer</code> key-value pair into the <code>iframe</code> of the <code>noscript</code> element in the GTM container snippet.</p>
+</li>
+<li>
+<p>Use a <a href="https://support.google.com/tagmanager/answer/3281386?hl=en#CustomImage">Custom Image Tag</a> to fire a <a href="https://developers.google.com/analytics/devguides/collection/protocol/v1/">Measurement Protocol</a> pixel when this <code>dataLayer</code> key-value pair is detected.</p>
+</li>
+<li>
+<p>Filter these MP hits into their own Google Analytics profile.</p>
+</li>
 </ol>
-
-<p>(<strong>NOTE:</strong> The point of this solution is to show how the <code>iframe</code> can be used to leverage the Data Layer Variable in GTM. There&rsquo;s actually a much more elegant way to check if the user doesn&rsquo;t have JavaScript enabled in their browsers. Check Duncan&rsquo;s comment  below for the solution!)</p>
-
-<p>This means that when a browser that&rsquo;s disabled JavaScript enters the site, the <code>noscript</code> tag is executed, and the <code>dataLayer</code> key-value pair causes the Custom Image Tag to fire. This tag is a pageview hit to the Universal Analytics endpoint using Measurement Protocol. This way you can collect data from visitors who have JavaScript disabled!</p>
-
+<p>(<strong>NOTE:</strong> The point of this solution is to show how the <code>iframe</code> can be used to leverage the Data Layer Variable in GTM. There's actually a much more elegant way to check if the user doesn't have JavaScript enabled in their browsers. Check Duncan's comment  below for the solution!)</p>
+<p>This means that when a browser that's disabled JavaScript enters the site, the <code>noscript</code> tag is executed, and the <code>dataLayer</code> key-value pair causes the Custom Image Tag to fire. This tag is a pageview hit to the Universal Analytics endpoint using Measurement Protocol. This way you can collect data from visitors who have JavaScript disabled!</p>
 <h3 id="1-edit-the-container-snippet">1. Edit the container snippet</h3>
-
 <p>So, the first thing you need to do is edit <a href="https://www.simoahava.com/amp/analytics/container-snippet-gtm-secrets-revealed/">the container snippet</a>. When a browser without JavaScript tries to render the container snippet, it will not execute any of the code within the <code>script</code> element. Instead, it finds the <code>noscript</code> block, and renders the contained HTML code.</p>
-
 <p>Google Tag Manager loads an <code>iframe</code>, which is tailored to your container. By passing key-value pairs as query parameters to this <code>iframe</code>, you add data into the <a href="https://www.simoahava.com/amp/analytics/google-tag-manager-data-model/">internal data model</a> of Google Tag Manager, and it can be used by the Data Layer Variable even on browsers without JavaScript enabled.</p>
-
-<p>So, in this use case, I want to send a key-value pair to Google Tag Manager, which I can then use as a Trigger condition to fire a Tag only for browsers which render the <code>iframe</code>. As you can see below, I&rsquo;m sending <strong>nojscript=true</strong> to GTM. This is the non-JavaScript equivalent of <code>dataLayer.push({'nojscript' : 'true'});</code></p>
-
+<p>So, in this use case, I want to send a key-value pair to Google Tag Manager, which I can then use as a Trigger condition to fire a Tag only for browsers which render the <code>iframe</code>. As you can see below, I'm sending <strong>nojscript=true</strong> to GTM. This is the non-JavaScript equivalent of <code>dataLayer.push({'nojscript' : 'true'});</code></p>
 
 
     <a href="https://www.simoahava.com/amp/images/2015/02/container-snippet.jpg" title="Container snippet modified">
@@ -968,11 +950,8 @@ on
     </a>
   
 
-
 <h3 id="2-data-layer-variable-for-nojscript">2. Data Layer Variable for nojscript</h3>
-
-<p>Next, we&rsquo;ll need a <strong>Data Layer Variable</strong> that accesses this key-value pair, and a <strong>Custom Event Trigger</strong> which fires the tag when <strong>nojscript=true</strong> is found in the data model.</p>
-
+<p>Next, we'll need a <strong>Data Layer Variable</strong> that accesses this key-value pair, and a <strong>Custom Event Trigger</strong> which fires the tag when <strong>nojscript=true</strong> is found in the data model.</p>
 
 
     <a href="https://www.simoahava.com/amp/images/2015/02/nojscript-data-layer-variable.jpg" title="nojscript Data Layer Variable">
@@ -982,13 +961,9 @@ on
     </a>
   
 
-
 <p>This Data Layer Variable will retrieve the value of the key <strong>nojscript</strong> from the data model if such a key exists.</p>
-
 <h3 id="3-custom-event-trigger">3. Custom Event Trigger</h3>
-
 <p>The Trigger which fires the Tag when <strong>nojscript=true</strong> looks like this:</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2015/02/trigger-nojscript-true.jpg" title="Trigger - nojscript is true">
@@ -998,15 +973,10 @@ on
     </a>
   
 
-
 <p>As you can see, the Event for the Trigger is still <strong>gtm.js</strong>. This is the equivalent of the &ldquo;All Pages&rdquo; Trigger. However, you need to specify a new condition, which demands that the Data Layer Variable for <strong>nojscript</strong> resolve to <strong>true</strong>.</p>
-
-<p>So, quick recap. Now we&rsquo;ve modified the container snippet to push <strong>nojscript=true</strong> into Google Tag Manager&rsquo;s data model when the user&rsquo;s browser does not have JavaScript enabled. Then, we have a Data Layer Variable which picks up this information from the data model. Finally, we have a Trigger which fires any Tag it is attached to, when the value of <strong>nojscript</strong> is <strong>true</strong>.</p>
-
+<p>So, quick recap. Now we've modified the container snippet to push <strong>nojscript=true</strong> into Google Tag Manager's data model when the user's browser does not have JavaScript enabled. Then, we have a Data Layer Variable which picks up this information from the data model. Finally, we have a Trigger which fires any Tag it is attached to, when the value of <strong>nojscript</strong> is <strong>true</strong>.</p>
 <h3 id="4-custom-image-tag">4. Custom Image Tag</h3>
-
 <p>Now, we need the Tag itself. Create a new Custom Image Tag:</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2015/02/non-javascript-image-tag.jpg" title="No JavaScript Custom Image Tag">
@@ -1016,21 +986,13 @@ on
     </a>
   
 
-
 <p>Use the Trigger you just created as the only Trigger for this Tag.</p>
-
-<p>Custom Image Tags are still supported even if the visitor&rsquo;s browser does not use JavaScript. This is because the special <code>iframe</code> document that is loaded in the <code>noscript</code> can still render normal HTML tags, which an <code>img</code> very much is.</p>
-
-<p>The URL of the <code>img</code> tag is a Measurement Protocol pixel call. If you know your Universal Analytics, you&rsquo;ll know that every single hit from your web properties uses the Measurement Protocol, since it&rsquo;s basically just a pixel that is loaded from the URL <strong><a href="https://www.google-analytics.com/collect">https://www.google-analytics.com/collect</a></strong>. All the fields and settings for each hit are provided as parameters to this call. So, this is what the Measurement Protocol hit for the Custom Image Tag would look like:</p>
-
+<p>Custom Image Tags are still supported even if the visitor's browser does not use JavaScript. This is because the special <code>iframe</code> document that is loaded in the <code>noscript</code> can still render normal HTML tags, which an <code>img</code> very much is.</p>
+<p>The URL of the <code>img</code> tag is a Measurement Protocol pixel call. If you know your Universal Analytics, you'll know that every single hit from your web properties uses the Measurement Protocol, since it's basically just a pixel that is loaded from the URL <strong><a href="https://www.google-analytics.com/collect">https://www.google-analytics.com/collect</a></strong>. All the fields and settings for each hit are provided as parameters to this call. So, this is what the Measurement Protocol hit for the Custom Image Tag would look like:</p>
 <p><code>https://www.google-analytics.com/collect?v=1&amp;t=pageview&amp;dl={{Page URL}}&amp;dt=No%20JavaScript&amp;cid={{Random Number}}&amp;tid=UA-XXXXXXX-X&amp;gtm=GTM-XXXX</code></p>
-
 <p>This sends a very simple pageview hit with no extra parameters or dimensions. The Document Location, which GA uses to parse the page path from, is taken from the <strong>{{Page URL}}</strong> <a href="https://www.simoahava.com/amp/analytics/variable-guide-google-tag-manager/">Built-In Variable</a>, the Document Title of the page is &ldquo;No JavaScript&rdquo;, and the Client ID of the hit is a random number, generated by another Built-In Variable. Remember to substitute your own Google Analytics tracking code for the <strong>&amp;tid=</strong> parameter. Also, if you want to mimic other GTM hits, add the <strong>&amp;gtm=</strong> parameter with your container ID.</p>
-
 <p>Add any other parameters you might like to. For the full list of available parameters, see <a href="https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters">this guide</a>.</p>
-
 <p>I use &ldquo;No JavaScript&rdquo; as the page title because I use that to create the Include filter in Google Analytics:</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2015/02/no-javascript-filter.jpg" title="No JavaScript filter">
@@ -1040,21 +1002,13 @@ on
     </a>
   
 
-
-<p>Naturally, you&rsquo;ll want to add a similar Exclude filter to your main reporting profiles.</p>
-
-<p>In the Measurement Protocoll call, we can&rsquo;t use a stored client ID in the hit, because cookies are inaccessible in browsers where JavaScript is disabled. This means that you will not be able to stitch hits together as sessions, or sessions as users. Each hit is a new session, essentially. This is why it won&rsquo;t make sense to include these hits in your main reporting profile.</p>
-
-<p>There are ways around this restriction. You&rsquo;ll need to build a server-side script which takes the client ID from the <strong>_ga</strong> cookie sent with each GET request, and renders this as another URL parameter in the <code>iframe</code> URL in the GTM <code>noscript</code> snippet. However, this is way beyond the scope of this simple guide.</p>
-
+<p>Naturally, you'll want to add a similar Exclude filter to your main reporting profiles.</p>
+<p>In the Measurement Protocoll call, we can't use a stored client ID in the hit, because cookies are inaccessible in browsers where JavaScript is disabled. This means that you will not be able to stitch hits together as sessions, or sessions as users. Each hit is a new session, essentially. This is why it won't make sense to include these hits in your main reporting profile.</p>
+<p>There are ways around this restriction. You'll need to build a server-side script which takes the client ID from the <strong>_ga</strong> cookie sent with each GET request, and renders this as another URL parameter in the <code>iframe</code> URL in the GTM <code>noscript</code> snippet. However, this is way beyond the scope of this simple guide.</p>
 <p>Once you publish this setup, you should end up with a profile in Google Analytics collecting pageview hits from all visitors who do not have JavaScript enabled in their browsers. You can use this data to get an idea of just how many hits you are actually missing because of these over-cautious visitors. You can also use the average for Pages / Session to get an estimate of how many sessions these hits comprise.</p>
-
 <h2 id="summary">Summary</h2>
-
-<p>The idea behind this guide was to introduce the elusive <code>noscript</code> tag of the GTM container snippet. You can use it to push key-value pairs into Google Tag Manager&rsquo;s data model, and you can then use this information to fire any Tags you want to reserve for users without JavaScript.</p>
-
-<p>If you have marketing platforms that have specified a <code>&lt;noscript&gt;</code> alternative, you would use this solution to compile the image tag that&rsquo;s usually provided as the JavaScript-less option.</p>
-
+<p>The idea behind this guide was to introduce the elusive <code>noscript</code> tag of the GTM container snippet. You can use it to push key-value pairs into Google Tag Manager's data model, and you can then use this information to fire any Tags you want to reserve for users without JavaScript.</p>
+<p>If you have marketing platforms that have specified a <code>&lt;noscript&gt;</code> alternative, you would use this solution to compile the image tag that's usually provided as the JavaScript-less option.</p>
 <p>Remember to come back in a little time to read the next part of this guide: how to get an <a href="https://www.simoahava.com/amp/analytics/leverage-usebeacon-beforeunload-google-analytics/">accurate time on page metric</a> for bounced sessions and exit pages!</p>
 
     </section>

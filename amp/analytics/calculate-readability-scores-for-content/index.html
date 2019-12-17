@@ -121,8 +121,6 @@
 
 <meta itemprop="name" content="Calculate Readability Scores For Content">
 <meta itemprop="description" content="Calculate readability scores (e.g. Flesch-Kincaid, SMOG) for your content, and send the values as Custom Dimensions to Google Analytics.">
-
-
 <meta itemprop="datePublished" content="2019-11-05T09:00:33&#43;02:00" />
 <meta itemprop="dateModified" content="2019-11-05T09:00:33&#43;02:00" />
 <meta itemprop="wordCount" content="4801">
@@ -130,7 +128,6 @@
 
 
 <meta itemprop="keywords" content="google tag manager,google analytics,content," />
-
 <script type="application/ld+json">
 {
     "@context": "http://schema.org",
@@ -909,12 +906,8 @@ on
     </header>
 
     <section class="post-content">
-      
-
-<p>There are lots of different <a href="https://readable.com/features/readability-formulas/">readability formulas</a> out there, which seek to provide an index on how <em>readable</em> any given excerpt of text is. Typically, these formulas output a <strong>grade-level score</strong>, which indicates, roughly, the level of education required to read the text excerpt with ease.</p>
-
+      <p>There are lots of different <a href="https://readable.com/features/readability-formulas/">readability formulas</a> out there, which seek to provide an index on how <em>readable</em> any given excerpt of text is. Typically, these formulas output a <strong>grade-level score</strong>, which indicates, roughly, the level of education required to read the text excerpt with ease.</p>
 <p>Any &ldquo;quality index&rdquo; that seeks to reduce the complexity of something as multi-faceted as <em>reading</em> should be subject to scrutiny. This is true for Bounce Rate, this is true for Time On Page, and this is true for a <em>readability score</em>.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2019/11/readability-score-google-analytics.jpg" title="Readability score in Google Analytics">
@@ -924,34 +917,21 @@ on
     </a>
   
 
-
-<p><strong>However</strong>, I do think it&rsquo;s interesting metadata to collect for your content. Who knows, perhaps you&rsquo;ll find correlations between the difficulty of reading any piece of text and the amount of <a href="https://www.simoahava.com/amp/analytics/track-content-engagement-part-2/">engagement</a> that the content engenders.</p>
-
-<p>In this article, I&rsquo;ll show you how to create a <strong>Custom JavaScript variable</strong> in <a href="https://tagmanager.google.com/">Google Tag Manager</a> that creates a <a href="https://www.simoahava.com/amp/analytics/create-utility-variables-returning-functions/">utility function</a>. This function can be called with any piece of text (e.g. the text content of your main content DOM element), and it will return an object with a variety of scores based on different readability formulas, as well as a median grade level calculated from these scores.</p>
-
+<p><strong>However</strong>, I do think it's interesting metadata to collect for your content. Who knows, perhaps you'll find correlations between the difficulty of reading any piece of text and the amount of <a href="https://www.simoahava.com/amp/analytics/track-content-engagement-part-2/">engagement</a> that the content engenders.</p>
+<p>In this article, I'll show you how to create a <strong>Custom JavaScript variable</strong> in <a href="https://tagmanager.google.com/">Google Tag Manager</a> that creates a <a href="https://www.simoahava.com/amp/analytics/create-utility-variables-returning-functions/">utility function</a>. This function can be called with any piece of text (e.g. the text content of your main content DOM element), and it will return an object with a variety of scores based on different readability formulas, as well as a median grade level calculated from these scores.</p>
 <p>You can use this information to annotate your Page View hits with Custom Dimensions (with <a href="#google-analytics-setup">a caveat</a> regarding its triggers) when sending the data to <a href="https://analytics.google.com/">Google Analytics</a>.</p>
-
 <p>You can also send the data to a  <a href="https://www.simoahava.com/amp/analytics/getting-started-with-google-analytics-app-web/">Google Analytics: App + Web</a> property ready for that juicy <a href="https://www.simoahava.com/amp/analytics/enable-bigquery-export-google-analytics-app-web/">BigQuery data export</a>.</p>
-
-<p>I&rsquo;ll show you how to do both in this guide.</p>
-
+<p>I'll show you how to do both in this guide.</p>
 <blockquote>
 <p>Thanks to <strong>Munaz Anjum</strong> for inspiring me to write this article!</p>
 </blockquote>
-
 <h2 id="the-custom-javascript-variable">The Custom JavaScript variable</h2>
-
-<p>In this chapter, we&rsquo;ll go over the Custom JavaScript variable you&rsquo;ll need to create to make this work.</p>
-
+<p>In this chapter, we'll go over the Custom JavaScript variable you'll need to create to make this work.</p>
 <p>&ldquo;Why a Custom JavaScript variable? Why not a <a href="https://www.simoahava.com/amp/analytics/custom-templates-guide-for-google-tag-manager/">custom template</a>?&rdquo; I hear you ask. <em>I know!</em> This would be <em>perfect</em> for a custom template. Alas, templates do not support the full extent of regular expressions yet, and they are absolutely vital for the algorithms required by the formulae in the variable.</p>
-
-<h3 id="what-you-ll-get">What you&rsquo;ll get</h3>
-
+<h3 id="what-youll-get">What you'll get</h3>
 <p>The Custom JavaScript variable returns a <strong>function</strong>, which you can then invoke with a string in another Custom JavaScript variable or a Custom HTML tag.</p>
-
 <p>When you call the function with a string, e.g.:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">readabilityFunction</span> <span class="o">=</span> <span class="p">{{</span><span class="nx">readabilityFunction</span><span class="p">}};</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">readabilityFunction</span> <span class="o">=</span> <span class="p">{</span><span class="p">{</span><span class="nx">readabilityFunction</span><span class="p">}</span><span class="p">}</span><span class="p">;</span>
 
 <span class="kd">var</span> <span class="nx">text</span> <span class="o">=</span> <span class="s1">&#39;At the heart of this paper lies the elusive concept of \
 </span><span class="s1">variation: how speakers can simultaneously share a common knowledge \
@@ -964,26 +944,23 @@ on
 </span><span class="s1">researcher’s job to describe the phenomenon as lucidly as possible, \
 </span><span class="s1">without drawing conclusions that extend beyond the scope of the data at hand.&#39;</span>
 
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">readabilityFunction</span><span class="p">(</span><span class="nx">text</span><span class="p">));</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">readabilityFunction</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span><span class="p">)</span><span class="p">;</span>
 
 <span class="c1">// Outputs
-</span><span class="c1">// {
-</span><span class="c1">//   automatedReadabilityIndex: 15.48,
-</span><span class="c1">//   colemanLiauIndex: 13.12,
-</span><span class="c1">//   fleschKincaidGrade: 16.41,
-</span><span class="c1">//   fleschReadingEase: 28.17,
-</span><span class="c1">//   linsearWriteFormula: 18.25,
-</span><span class="c1">//   medianGrade: 17,
-</span><span class="c1">//   readingTime: 27.34,
-</span><span class="c1">//   rix: 9.5,
-</span><span class="c1">//   smogIndex: 17.41
-</span><span class="c1">// }
+</span><span class="c1"></span><span class="c1">// {
+</span><span class="c1"></span><span class="c1">//   automatedReadabilityIndex: 15.48,
+</span><span class="c1"></span><span class="c1">//   colemanLiauIndex: 13.12,
+</span><span class="c1"></span><span class="c1">//   fleschKincaidGrade: 16.41,
+</span><span class="c1"></span><span class="c1">//   fleschReadingEase: 28.17,
+</span><span class="c1"></span><span class="c1">//   linsearWriteFormula: 18.25,
+</span><span class="c1"></span><span class="c1">//   medianGrade: 17,
+</span><span class="c1"></span><span class="c1">//   readingTime: 27.34,
+</span><span class="c1"></span><span class="c1">//   rix: 9.5,
+</span><span class="c1"></span><span class="c1">//   smogIndex: 17.41
+</span><span class="c1"></span><span class="c1">// }
 </span></code></pre></div>
-
-<p>This particular excerpt (from my <a href="https://helda.helsinki.fi/bitstream/handle/10138/19347/intermed.pdf">master&rsquo;s thesis</a>) has a median readability grade of <strong>17</strong> which means, loosely translated, that it takes around 17 years of <em>education</em> to read text like this with ease. The <strong>reading time</strong> is around 27 seconds.</p>
-
+<p>This particular excerpt (from my <a href="https://helda.helsinki.fi/bitstream/handle/10138/19347/intermed.pdf">master's thesis</a>) has a median readability grade of <strong>17</strong> which means, loosely translated, that it takes around 17 years of <em>education</em> to read text like this with ease. The <strong>reading time</strong> is around 27 seconds.</p>
 <p>The object for <strong>the article you are reading</strong> looks like this (ouch!):</p>
-
 <div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="p">{</span>
   <span class="nx">automatedReadabilityIndex</span><span class="o">:</span> <span class="mf">15.48</span><span class="p">,</span>
   <span class="nx">colemanLiauIndex</span><span class="o">:</span> <span class="mf">3.77</span><span class="p">,</span>
@@ -996,16 +973,11 @@ on
   <span class="nx">smogIndex</span><span class="o">:</span> <span class="mf">15.85</span>
 <span class="p">}</span>
 </code></pre></div>
-
-<p>I&rsquo;ll share what these different numbers and names mean in a bit.</p>
-
+<p>I'll share what these different numbers and names mean in a bit.</p>
 <h3 id="variable-contents">Variable contents</h3>
-
 <p>The code is a JavaScript rewrite of the <a href="https://github.com/shivam5992/textstat/">textstat.py</a> Python library. I did not include any readability grades that rely on an English wordlist (so any formulae that require a definition of what is a &ldquo;common&rdquo; or &ldquo;easy&rdquo; word in English is ignored).</p>
-
 <p><strong>Create a new Custom JavaScript variable</strong>, give it a name (e.g. <code>readabilityFunction</code>), and copy-paste the following JavaScript in the body.</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span><span class="p">(</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">return</span> <span class="kd">function</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span> <span class="p">{</span>
 
     <span class="cm">/* To speed the script up, you can set a sampling rate in words. For example, if you set
@@ -1020,7 +992,7 @@ on
 </span><span class="cm">     * Regular expression to identify a sentence. No, it&#39;s not perfect. 
 </span><span class="cm">     * Fails e.g. with abbreviations and similar constructs mid-sentence.
 </span><span class="cm">     */</span>
-    <span class="kd">var</span> <span class="nx">sentenceRegex</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">RegExp</span><span class="p">(</span><span class="s1">&#39;[.?!]\\s[^a-z]&#39;</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">sentenceRegex</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">RegExp</span><span class="p">(</span><span class="s1">&#39;[.?!]\\s[^a-z]&#39;</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">)</span><span class="p">;</span>
     
     <span class="cm">/*
 </span><span class="cm">     * Regular expression to identify a syllable. No, it&#39;s not perfect either.
@@ -1028,7 +1000,7 @@ on
 </span><span class="cm">     * and syllable definitions need a rewrite.
 </span><span class="cm">     * Inspired by https://bit.ly/2VK9dz1
 </span><span class="cm">     */</span>
-    <span class="kd">var</span> <span class="nx">syllableRegex</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">RegExp</span><span class="p">(</span><span class="s1">&#39;[aiouy]+e*|e(?!d$|ly).|[td]ed|le$&#39;</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">syllableRegex</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">RegExp</span><span class="p">(</span><span class="s1">&#39;[aiouy]+e*|e(?!d$|ly).|[td]ed|le$&#39;</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">)</span><span class="p">;</span>
     
     <span class="c1">// Baseline for FRE - English only
 </span><span class="c1"></span>    <span class="kd">var</span> <span class="nx">freBase</span> <span class="o">=</span> <span class="p">{</span>
@@ -1036,324 +1008,311 @@ on
       <span class="nx">sentenceLength</span><span class="o">:</span> <span class="mf">1.015</span><span class="p">,</span>
       <span class="nx">syllablesPerWord</span><span class="o">:</span> <span class="mf">84.6</span><span class="p">,</span>
       <span class="nx">syllableThreshold</span><span class="o">:</span> <span class="mi">3</span>
-    <span class="p">};</span>
+    <span class="p">}</span><span class="p">;</span>
     
-    <span class="kd">var</span> <span class="nx">cache</span> <span class="o">=</span> <span class="p">{};</span>
+    <span class="kd">var</span> <span class="nx">cache</span> <span class="o">=</span> <span class="p">{</span><span class="p">}</span><span class="p">;</span>
     
-    <span class="kd">var</span> <span class="nx">punctuation</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;!&#39;</span><span class="p">,</span><span class="s1">&#39;&#34;&#39;</span><span class="p">,</span><span class="s1">&#39;#&#39;</span><span class="p">,</span><span class="s1">&#39;$&#39;</span><span class="p">,</span><span class="s1">&#39;%&#39;</span><span class="p">,</span><span class="s1">&#39;&amp;&#39;</span><span class="p">,</span><span class="s1">&#39;\&#39;&#39;</span><span class="p">,</span><span class="s1">&#39;(&#39;</span><span class="p">,</span><span class="s1">&#39;)&#39;</span><span class="p">,</span><span class="s1">&#39;*&#39;</span><span class="p">,</span><span class="s1">&#39;+&#39;</span><span class="p">,</span><span class="s1">&#39;,&#39;</span><span class="p">,</span><span class="s1">&#39;-&#39;</span><span class="p">,</span><span class="s1">&#39;.&#39;</span><span class="p">,</span><span class="s1">&#39;/&#39;</span><span class="p">,</span><span class="s1">&#39;:&#39;</span><span class="p">,</span><span class="s1">&#39;;&#39;</span><span class="p">,</span><span class="s1">&#39;&lt;&#39;</span><span class="p">,</span><span class="s1">&#39;=&#39;</span><span class="p">,</span><span class="s1">&#39;&gt;&#39;</span><span class="p">,</span><span class="s1">&#39;?&#39;</span><span class="p">,</span><span class="s1">&#39;@&#39;</span><span class="p">,</span><span class="s1">&#39;[&#39;</span><span class="p">,</span><span class="s1">&#39;]&#39;</span><span class="p">,</span><span class="s1">&#39;^&#39;</span><span class="p">,</span><span class="s1">&#39;_&#39;</span><span class="p">,</span><span class="s1">&#39;`&#39;</span><span class="p">,</span><span class="s1">&#39;{&#39;</span><span class="p">,</span><span class="s1">&#39;|&#39;</span><span class="p">,</span><span class="s1">&#39;}&#39;</span><span class="p">,</span><span class="s1">&#39;~&#39;</span><span class="p">];</span>
+    <span class="kd">var</span> <span class="nx">punctuation</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;!&#39;</span><span class="p">,</span><span class="s1">&#39;&#34;&#39;</span><span class="p">,</span><span class="s1">&#39;#&#39;</span><span class="p">,</span><span class="s1">&#39;$&#39;</span><span class="p">,</span><span class="s1">&#39;%&#39;</span><span class="p">,</span><span class="s1">&#39;&amp;&#39;</span><span class="p">,</span><span class="s1">&#39;\&#39;&#39;</span><span class="p">,</span><span class="s1">&#39;(&#39;</span><span class="p">,</span><span class="s1">&#39;)&#39;</span><span class="p">,</span><span class="s1">&#39;*&#39;</span><span class="p">,</span><span class="s1">&#39;+&#39;</span><span class="p">,</span><span class="s1">&#39;,&#39;</span><span class="p">,</span><span class="s1">&#39;-&#39;</span><span class="p">,</span><span class="s1">&#39;.&#39;</span><span class="p">,</span><span class="s1">&#39;/&#39;</span><span class="p">,</span><span class="s1">&#39;:&#39;</span><span class="p">,</span><span class="s1">&#39;;&#39;</span><span class="p">,</span><span class="s1">&#39;&lt;&#39;</span><span class="p">,</span><span class="s1">&#39;=&#39;</span><span class="p">,</span><span class="s1">&#39;&gt;&#39;</span><span class="p">,</span><span class="s1">&#39;?&#39;</span><span class="p">,</span><span class="s1">&#39;@&#39;</span><span class="p">,</span><span class="s1">&#39;[&#39;</span><span class="p">,</span><span class="s1">&#39;]&#39;</span><span class="p">,</span><span class="s1">&#39;^&#39;</span><span class="p">,</span><span class="s1">&#39;_&#39;</span><span class="p">,</span><span class="s1">&#39;`&#39;</span><span class="p">,</span><span class="s1">&#39;{&#39;</span><span class="p">,</span><span class="s1">&#39;|&#39;</span><span class="p">,</span><span class="s1">&#39;}&#39;</span><span class="p">,</span><span class="s1">&#39;~&#39;</span><span class="p">]</span><span class="p">;</span>
     
     <span class="kd">var</span> <span class="nx">legacyRound</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">number</span><span class="p">,</span> <span class="nx">precision</span><span class="p">)</span> <span class="p">{</span>
-      <span class="kd">var</span> <span class="nx">k</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">pow</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="p">(</span><span class="nx">precision</span> <span class="o">||</span> <span class="mi">0</span><span class="p">));</span>
-      <span class="k">return</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">((</span><span class="nx">number</span> <span class="o">*</span> <span class="nx">k</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">sign</span><span class="p">(</span><span class="nx">number</span><span class="p">))</span> <span class="o">/</span> <span class="nx">k</span><span class="p">;</span>
-    <span class="p">};</span>
+      <span class="kd">var</span> <span class="nx">k</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">pow</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="p">(</span><span class="nx">precision</span> <span class="o">||</span> <span class="mi">0</span><span class="p">)</span><span class="p">)</span><span class="p">;</span>
+      <span class="k">return</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="p">(</span><span class="nx">number</span> <span class="o">*</span> <span class="nx">k</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">sign</span><span class="p">(</span><span class="nx">number</span><span class="p">)</span><span class="p">)</span> <span class="o">/</span> <span class="nx">k</span><span class="p">;</span>
+    <span class="p">}</span><span class="p">;</span>
     
     <span class="kd">var</span> <span class="nx">charCount</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span> <span class="p">{</span>
       <span class="k">if</span> <span class="p">(</span><span class="nx">cache</span><span class="p">.</span><span class="nx">charCount</span><span class="p">)</span> <span class="k">return</span> <span class="nx">cache</span><span class="p">.</span><span class="nx">charCount</span><span class="p">;</span>
-      <span class="k">if</span> <span class="p">(</span><span class="nx">sampleLimit</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="nx">text</span> <span class="o">=</span> <span class="nx">text</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">).</span><span class="nx">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nx">sampleLimit</span><span class="p">).</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">);</span>
-      <span class="nx">text</span> <span class="o">=</span> <span class="nx">text</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/\s/g</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">);</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">sampleLimit</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="nx">text</span> <span class="o">=</span> <span class="nx">text</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nx">sampleLimit</span><span class="p">)</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span><span class="p">;</span>
+      <span class="nx">text</span> <span class="o">=</span> <span class="nx">text</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/\s/g</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="p">;</span>
       <span class="k">return</span> <span class="nx">cache</span><span class="p">.</span><span class="nx">charCount</span> <span class="o">=</span> <span class="nx">text</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span>
-    <span class="p">};</span>
+    <span class="p">}</span><span class="p">;</span>
     
     <span class="kd">var</span> <span class="nx">removePunctuation</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">return</span> <span class="nx">text</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">).</span><span class="nx">filter</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">c</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">text</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">c</span><span class="p">)</span> <span class="p">{</span>
         <span class="k">return</span> <span class="nx">punctuation</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="nx">c</span><span class="p">)</span> <span class="o">===</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
-      <span class="p">}).</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">);</span>
-    <span class="p">};</span>
+      <span class="p">}</span><span class="p">)</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="p">;</span>
+    <span class="p">}</span><span class="p">;</span>
     
     <span class="kd">var</span> <span class="nx">letterCount</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">if</span> <span class="p">(</span><span class="nx">sampleLimit</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="nx">text</span> <span class="o">=</span> <span class="nx">text</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">).</span><span class="nx">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nx">sampleLimit</span><span class="p">).</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">);</span>
-      <span class="nx">text</span> <span class="o">=</span> <span class="nx">text</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/\s/g</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">);</span>
-      <span class="k">return</span> <span class="nx">removePunctuation</span><span class="p">(</span><span class="nx">text</span><span class="p">).</span><span class="nx">length</span><span class="p">;</span>
-    <span class="p">};</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">sampleLimit</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="nx">text</span> <span class="o">=</span> <span class="nx">text</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nx">sampleLimit</span><span class="p">)</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span><span class="p">;</span>
+      <span class="nx">text</span> <span class="o">=</span> <span class="nx">text</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/\s/g</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="p">;</span>
+      <span class="k">return</span> <span class="nx">removePunctuation</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span>
+    <span class="p">}</span><span class="p">;</span>
     
     <span class="kd">var</span> <span class="nx">lexiconCount</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="nx">useCache</span><span class="p">,</span> <span class="nx">ignoreSample</span><span class="p">)</span> <span class="p">{</span>
       <span class="k">if</span> <span class="p">(</span><span class="nx">useCache</span> <span class="o">&amp;&amp;</span> <span class="nx">cache</span><span class="p">.</span><span class="nx">lexiconCount</span><span class="p">)</span> <span class="k">return</span> <span class="nx">cache</span><span class="p">.</span><span class="nx">lexiconCount</span><span class="p">;</span>
-      <span class="k">if</span> <span class="p">(</span><span class="nx">ignoreSample</span> <span class="o">!==</span> <span class="kc">true</span> <span class="o">&amp;&amp;</span> <span class="nx">sampleLimit</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="nx">text</span> <span class="o">=</span> <span class="nx">text</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">).</span><span class="nx">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nx">sampleLimit</span><span class="p">).</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">);</span>
-      <span class="nx">text</span> <span class="o">=</span> <span class="nx">removePunctuation</span><span class="p">(</span><span class="nx">text</span><span class="p">);</span>
-      <span class="kd">var</span> <span class="nx">lexicon</span> <span class="o">=</span> <span class="nx">text</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">).</span><span class="nx">length</span><span class="p">;</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">ignoreSample</span> <span class="o">!==</span> <span class="kc">true</span> <span class="o">&amp;&amp;</span> <span class="nx">sampleLimit</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="nx">text</span> <span class="o">=</span> <span class="nx">text</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nx">sampleLimit</span><span class="p">)</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span><span class="p">;</span>
+      <span class="nx">text</span> <span class="o">=</span> <span class="nx">removePunctuation</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span><span class="p">;</span>
+      <span class="kd">var</span> <span class="nx">lexicon</span> <span class="o">=</span> <span class="nx">text</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span>
       <span class="k">return</span> <span class="nx">useCache</span> <span class="o">?</span> <span class="nx">cache</span><span class="p">.</span><span class="nx">lexiconCount</span> <span class="o">=</span> <span class="nx">lexicon</span> <span class="o">:</span> <span class="nx">lexicon</span><span class="p">;</span>
-    <span class="p">};</span>
+    <span class="p">}</span><span class="p">;</span>
     
     <span class="kd">var</span> <span class="nx">getWords</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="nx">useCache</span><span class="p">)</span> <span class="p">{</span>
       <span class="k">if</span> <span class="p">(</span><span class="nx">useCache</span> <span class="o">&amp;&amp;</span> <span class="nx">cache</span><span class="p">.</span><span class="nx">getWords</span><span class="p">)</span> <span class="k">return</span> <span class="nx">cache</span><span class="p">.</span><span class="nx">getWords</span><span class="p">;</span>
-      <span class="k">if</span> <span class="p">(</span><span class="nx">sampleLimit</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="nx">text</span> <span class="o">=</span> <span class="nx">text</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">).</span><span class="nx">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nx">sampleLimit</span><span class="p">).</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">);</span>
-      <span class="nx">text</span> <span class="o">=</span> <span class="nx">text</span><span class="p">.</span><span class="nx">toLowerCase</span><span class="p">();</span>
-      <span class="nx">text</span> <span class="o">=</span> <span class="nx">removePunctuation</span><span class="p">(</span><span class="nx">text</span><span class="p">);</span>
-      <span class="kd">var</span> <span class="nx">words</span> <span class="o">=</span> <span class="nx">text</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">);</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">sampleLimit</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="nx">text</span> <span class="o">=</span> <span class="nx">text</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nx">sampleLimit</span><span class="p">)</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span><span class="p">;</span>
+      <span class="nx">text</span> <span class="o">=</span> <span class="nx">text</span><span class="p">.</span><span class="nx">toLowerCase</span><span class="p">(</span><span class="p">)</span><span class="p">;</span>
+      <span class="nx">text</span> <span class="o">=</span> <span class="nx">removePunctuation</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span><span class="p">;</span>
+      <span class="kd">var</span> <span class="nx">words</span> <span class="o">=</span> <span class="nx">text</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span><span class="p">;</span>
       <span class="k">return</span> <span class="nx">useCache</span> <span class="o">?</span> <span class="nx">cache</span><span class="p">.</span><span class="nx">getWords</span> <span class="o">=</span> <span class="nx">words</span> <span class="o">:</span> <span class="nx">words</span><span class="p">;</span>
     <span class="p">}</span>
     
     <span class="kd">var</span> <span class="nx">syllableCount</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="nx">useCache</span><span class="p">)</span> <span class="p">{</span>
       <span class="k">if</span> <span class="p">(</span><span class="nx">useCache</span> <span class="o">&amp;&amp;</span> <span class="nx">cache</span><span class="p">.</span><span class="nx">syllableCount</span><span class="p">)</span> <span class="k">return</span> <span class="nx">cache</span><span class="p">.</span><span class="nx">syllableCount</span><span class="p">;</span>
       <span class="kd">var</span> <span class="nx">count</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-      <span class="kd">var</span> <span class="nx">syllables</span> <span class="o">=</span> <span class="nx">getWords</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="nx">useCache</span><span class="p">).</span><span class="nx">reduce</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">c</span><span class="p">)</span> <span class="p">{</span>  
-        <span class="k">return</span> <span class="nx">a</span> <span class="o">+</span> <span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="nx">syllableRegex</span><span class="p">)</span> <span class="o">||</span> <span class="p">[</span><span class="mi">1</span><span class="p">]).</span><span class="nx">length</span><span class="p">;</span>
-      <span class="p">},</span> <span class="mi">0</span><span class="p">);</span>
+      <span class="kd">var</span> <span class="nx">syllables</span> <span class="o">=</span> <span class="nx">getWords</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="nx">useCache</span><span class="p">)</span><span class="p">.</span><span class="nx">reduce</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">c</span><span class="p">)</span> <span class="p">{</span>  
+        <span class="k">return</span> <span class="nx">a</span> <span class="o">+</span> <span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="nx">syllableRegex</span><span class="p">)</span> <span class="o">||</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="p">)</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span>
+      <span class="p">}</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="p">;</span>
       <span class="k">return</span> <span class="nx">useCache</span> <span class="o">?</span> <span class="nx">cache</span><span class="p">.</span><span class="nx">syllableCount</span> <span class="o">=</span> <span class="nx">syllables</span> <span class="o">:</span> <span class="nx">syllables</span><span class="p">;</span>
-    <span class="p">};</span>
+    <span class="p">}</span><span class="p">;</span>
     
     <span class="kd">var</span> <span class="nx">polySyllableCount</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="nx">useCache</span><span class="p">)</span> <span class="p">{</span>
       <span class="kd">var</span> <span class="nx">count</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-      <span class="nx">getWords</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="nx">useCache</span><span class="p">).</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">word</span><span class="p">)</span> <span class="p">{</span>
-        <span class="kd">var</span> <span class="nx">syllables</span> <span class="o">=</span> <span class="nx">syllableCount</span><span class="p">(</span><span class="nx">word</span><span class="p">);</span>
+      <span class="nx">getWords</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="nx">useCache</span><span class="p">)</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">word</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">syllables</span> <span class="o">=</span> <span class="nx">syllableCount</span><span class="p">(</span><span class="nx">word</span><span class="p">)</span><span class="p">;</span>
         <span class="k">if</span> <span class="p">(</span><span class="nx">syllables</span> <span class="o">&gt;=</span> <span class="mi">3</span><span class="p">)</span> <span class="p">{</span>
           <span class="nx">count</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">;</span>
         <span class="p">}</span>
-      <span class="p">});</span>
+      <span class="p">}</span><span class="p">)</span><span class="p">;</span>
       <span class="k">return</span> <span class="nx">count</span><span class="p">;</span>
-    <span class="p">};</span>
+    <span class="p">}</span><span class="p">;</span>
     
     <span class="kd">var</span> <span class="nx">sentenceCount</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="nx">useCache</span><span class="p">)</span> <span class="p">{</span>
       <span class="k">if</span> <span class="p">(</span><span class="nx">useCache</span> <span class="o">&amp;&amp;</span> <span class="nx">cache</span><span class="p">.</span><span class="nx">sentenceCount</span><span class="p">)</span> <span class="k">return</span> <span class="nx">cache</span><span class="p">.</span><span class="nx">sentenceCount</span><span class="p">;</span>
-      <span class="k">if</span> <span class="p">(</span><span class="nx">sampleLimit</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="nx">text</span> <span class="o">=</span> <span class="nx">text</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">).</span><span class="nx">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nx">sampleLimit</span><span class="p">).</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">);</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">sampleLimit</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="nx">text</span> <span class="o">=</span> <span class="nx">text</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nx">sampleLimit</span><span class="p">)</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span><span class="p">;</span>
       <span class="kd">var</span> <span class="nx">ignoreCount</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-      <span class="kd">var</span> <span class="nx">sentences</span> <span class="o">=</span> <span class="nx">text</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="nx">sentenceRegex</span><span class="p">);</span>
+      <span class="kd">var</span> <span class="nx">sentences</span> <span class="o">=</span> <span class="nx">text</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="nx">sentenceRegex</span><span class="p">)</span><span class="p">;</span>
       <span class="nx">sentences</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">s</span><span class="p">)</span> <span class="p">{</span>
         <span class="k">if</span> <span class="p">(</span><span class="nx">lexiconCount</span><span class="p">(</span><span class="nx">s</span><span class="p">,</span> <span class="kc">true</span><span class="p">,</span> <span class="kc">false</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">2</span><span class="p">)</span> <span class="p">{</span> <span class="nx">ignoreCount</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">;</span> <span class="p">}</span>
-      <span class="p">});</span>
-      <span class="kd">var</span> <span class="nx">count</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nx">sentences</span><span class="p">.</span><span class="nx">length</span> <span class="o">-</span> <span class="nx">ignoreCount</span><span class="p">);</span>
+      <span class="p">}</span><span class="p">)</span><span class="p">;</span>
+      <span class="kd">var</span> <span class="nx">count</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nx">sentences</span><span class="p">.</span><span class="nx">length</span> <span class="o">-</span> <span class="nx">ignoreCount</span><span class="p">)</span><span class="p">;</span>
       <span class="k">return</span> <span class="nx">useCache</span> <span class="o">?</span> <span class="nx">cache</span><span class="p">.</span><span class="nx">sentenceCount</span> <span class="o">=</span> <span class="nx">count</span> <span class="o">:</span> <span class="nx">count</span><span class="p">;</span>
-    <span class="p">};</span>
+    <span class="p">}</span><span class="p">;</span>
     
     <span class="kd">var</span> <span class="nx">avgSentenceLength</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span> <span class="p">{</span>
-      <span class="kd">var</span> <span class="nx">avg</span> <span class="o">=</span> <span class="nx">lexiconCount</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="kc">true</span><span class="p">)</span> <span class="o">/</span> <span class="nx">sentenceCount</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
-      <span class="k">return</span> <span class="nx">legacyRound</span><span class="p">(</span><span class="nx">avg</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
-    <span class="p">};</span>
+      <span class="kd">var</span> <span class="nx">avg</span> <span class="o">=</span> <span class="nx">lexiconCount</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="kc">true</span><span class="p">)</span> <span class="o">/</span> <span class="nx">sentenceCount</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="kc">true</span><span class="p">)</span><span class="p">;</span>
+      <span class="k">return</span> <span class="nx">legacyRound</span><span class="p">(</span><span class="nx">avg</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="p">;</span>
+    <span class="p">}</span><span class="p">;</span>
     
     <span class="kd">var</span> <span class="nx">avgSyllablesPerWord</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span> <span class="p">{</span>
-      <span class="kd">var</span> <span class="nx">avg</span> <span class="o">=</span> <span class="nx">syllableCount</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="kc">true</span><span class="p">)</span> <span class="o">/</span> <span class="nx">lexiconCount</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
-      <span class="k">return</span> <span class="nx">legacyRound</span><span class="p">(</span><span class="nx">avg</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
-    <span class="p">};</span>
+      <span class="kd">var</span> <span class="nx">avg</span> <span class="o">=</span> <span class="nx">syllableCount</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="kc">true</span><span class="p">)</span> <span class="o">/</span> <span class="nx">lexiconCount</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="kc">true</span><span class="p">)</span><span class="p">;</span>
+      <span class="k">return</span> <span class="nx">legacyRound</span><span class="p">(</span><span class="nx">avg</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="p">;</span>
+    <span class="p">}</span><span class="p">;</span>
     
     <span class="kd">var</span> <span class="nx">avgCharactersPerWord</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span> <span class="p">{</span>
-      <span class="kd">var</span> <span class="nx">avg</span> <span class="o">=</span> <span class="nx">charCount</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span> <span class="o">/</span> <span class="nx">lexiconCount</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
-      <span class="k">return</span> <span class="nx">legacyRound</span><span class="p">(</span><span class="nx">avg</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
-    <span class="p">};</span>
+      <span class="kd">var</span> <span class="nx">avg</span> <span class="o">=</span> <span class="nx">charCount</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span> <span class="o">/</span> <span class="nx">lexiconCount</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="kc">true</span><span class="p">)</span><span class="p">;</span>
+      <span class="k">return</span> <span class="nx">legacyRound</span><span class="p">(</span><span class="nx">avg</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="p">;</span>
+    <span class="p">}</span><span class="p">;</span>
     
     <span class="kd">var</span> <span class="nx">avgLettersPerWord</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span> <span class="p">{</span>
-      <span class="kd">var</span> <span class="nx">avg</span> <span class="o">=</span> <span class="nx">letterCount</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="kc">true</span><span class="p">)</span> <span class="o">/</span> <span class="nx">lexiconCount</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
-      <span class="k">return</span> <span class="nx">legacyRound</span><span class="p">(</span><span class="nx">avg</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
-    <span class="p">};</span>
+      <span class="kd">var</span> <span class="nx">avg</span> <span class="o">=</span> <span class="nx">letterCount</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="kc">true</span><span class="p">)</span> <span class="o">/</span> <span class="nx">lexiconCount</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="kc">true</span><span class="p">)</span><span class="p">;</span>
+      <span class="k">return</span> <span class="nx">legacyRound</span><span class="p">(</span><span class="nx">avg</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="p">;</span>
+    <span class="p">}</span><span class="p">;</span>
     
     <span class="kd">var</span> <span class="nx">avgSentencesPerWord</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span> <span class="p">{</span>
-      <span class="kd">var</span> <span class="nx">avg</span> <span class="o">=</span> <span class="nx">sentenceCount</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="kc">true</span><span class="p">)</span> <span class="o">/</span> <span class="nx">lexiconCount</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
-      <span class="k">return</span> <span class="nx">legacyRound</span><span class="p">(</span><span class="nx">avg</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
-    <span class="p">};</span>
+      <span class="kd">var</span> <span class="nx">avg</span> <span class="o">=</span> <span class="nx">sentenceCount</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="kc">true</span><span class="p">)</span> <span class="o">/</span> <span class="nx">lexiconCount</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="kc">true</span><span class="p">)</span><span class="p">;</span>
+      <span class="k">return</span> <span class="nx">legacyRound</span><span class="p">(</span><span class="nx">avg</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="p">;</span>
+    <span class="p">}</span><span class="p">;</span>
     
     <span class="kd">var</span> <span class="nx">fleschReadingEase</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span> <span class="p">{</span>
-      <span class="kd">var</span> <span class="nx">sentenceLength</span> <span class="o">=</span> <span class="nx">avgSentenceLength</span><span class="p">(</span><span class="nx">text</span><span class="p">);</span>
-      <span class="kd">var</span> <span class="nx">syllablesPerWord</span> <span class="o">=</span> <span class="nx">avgSyllablesPerWord</span><span class="p">(</span><span class="nx">text</span><span class="p">);</span>
+      <span class="kd">var</span> <span class="nx">sentenceLength</span> <span class="o">=</span> <span class="nx">avgSentenceLength</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span><span class="p">;</span>
+      <span class="kd">var</span> <span class="nx">syllablesPerWord</span> <span class="o">=</span> <span class="nx">avgSyllablesPerWord</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span><span class="p">;</span>
       <span class="k">return</span> <span class="nx">legacyRound</span><span class="p">(</span>
         <span class="nx">freBase</span><span class="p">.</span><span class="nx">base</span> <span class="o">-</span> 
         <span class="nx">freBase</span><span class="p">.</span><span class="nx">sentenceLength</span> <span class="o">*</span> <span class="nx">sentenceLength</span> <span class="o">-</span> 
         <span class="nx">freBase</span><span class="p">.</span><span class="nx">syllablesPerWord</span> <span class="o">*</span> <span class="nx">syllablesPerWord</span><span class="p">,</span>
         <span class="mi">2</span>
-      <span class="p">);</span>
-    <span class="p">};</span>
+      <span class="p">)</span><span class="p">;</span>
+    <span class="p">}</span><span class="p">;</span>
     
     <span class="kd">var</span> <span class="nx">fleschKincaidGrade</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span> <span class="p">{</span>
-      <span class="kd">var</span> <span class="nx">sentenceLength</span> <span class="o">=</span> <span class="nx">avgSentenceLength</span><span class="p">(</span><span class="nx">text</span><span class="p">);</span>
-      <span class="kd">var</span> <span class="nx">syllablesPerWord</span> <span class="o">=</span> <span class="nx">avgSyllablesPerWord</span><span class="p">(</span><span class="nx">text</span><span class="p">);</span>
+      <span class="kd">var</span> <span class="nx">sentenceLength</span> <span class="o">=</span> <span class="nx">avgSentenceLength</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span><span class="p">;</span>
+      <span class="kd">var</span> <span class="nx">syllablesPerWord</span> <span class="o">=</span> <span class="nx">avgSyllablesPerWord</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span><span class="p">;</span>
       <span class="k">return</span> <span class="nx">legacyRound</span><span class="p">(</span>
         <span class="mf">0.39</span> <span class="o">*</span> <span class="nx">sentenceLength</span> <span class="o">+</span>
         <span class="mf">11.8</span> <span class="o">*</span> <span class="nx">syllablesPerWord</span> <span class="o">-</span>
         <span class="mf">15.59</span><span class="p">,</span>
         <span class="mi">2</span>
-      <span class="p">);</span>
-    <span class="p">};</span>
+      <span class="p">)</span><span class="p">;</span>
+    <span class="p">}</span><span class="p">;</span>
     
     <span class="kd">var</span> <span class="nx">smogIndex</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span> <span class="p">{</span>
-      <span class="kd">var</span> <span class="nx">sentences</span> <span class="o">=</span> <span class="nx">sentenceCount</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
+      <span class="kd">var</span> <span class="nx">sentences</span> <span class="o">=</span> <span class="nx">sentenceCount</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="kc">true</span><span class="p">)</span><span class="p">;</span>
       <span class="k">if</span> <span class="p">(</span><span class="nx">sentences</span> <span class="o">&gt;=</span> <span class="mi">3</span><span class="p">)</span> <span class="p">{</span>
-        <span class="kd">var</span> <span class="nx">polySyllables</span> <span class="o">=</span> <span class="nx">polySyllableCount</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
-        <span class="kd">var</span> <span class="nx">smog</span> <span class="o">=</span> <span class="mf">1.043</span> <span class="o">*</span> <span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">pow</span><span class="p">(</span><span class="nx">polySyllables</span> <span class="o">*</span> <span class="p">(</span><span class="mi">30</span> <span class="o">/</span> <span class="nx">sentences</span><span class="p">),</span> <span class="mf">0.5</span><span class="p">))</span> <span class="o">+</span> <span class="mf">3.1291</span><span class="p">;</span>
-        <span class="k">return</span> <span class="nx">legacyRound</span><span class="p">(</span><span class="nx">smog</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+        <span class="kd">var</span> <span class="nx">polySyllables</span> <span class="o">=</span> <span class="nx">polySyllableCount</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="kc">true</span><span class="p">)</span><span class="p">;</span>
+        <span class="kd">var</span> <span class="nx">smog</span> <span class="o">=</span> <span class="mf">1.043</span> <span class="o">*</span> <span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">pow</span><span class="p">(</span><span class="nx">polySyllables</span> <span class="o">*</span> <span class="p">(</span><span class="mi">30</span> <span class="o">/</span> <span class="nx">sentences</span><span class="p">)</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span><span class="p">)</span> <span class="o">+</span> <span class="mf">3.1291</span><span class="p">;</span>
+        <span class="k">return</span> <span class="nx">legacyRound</span><span class="p">(</span><span class="nx">smog</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="p">;</span>
       <span class="p">}</span>
       <span class="k">return</span> <span class="mf">0.0</span><span class="p">;</span>
-    <span class="p">};</span>
+    <span class="p">}</span><span class="p">;</span>
     
     <span class="kd">var</span> <span class="nx">colemanLiauIndex</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span> <span class="p">{</span>
-      <span class="kd">var</span> <span class="nx">letters</span> <span class="o">=</span> <span class="nx">legacyRound</span><span class="p">(</span><span class="nx">avgLettersPerWord</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
-      <span class="kd">var</span> <span class="nx">sentences</span> <span class="o">=</span> <span class="nx">legacyRound</span><span class="p">(</span><span class="nx">avgSentencesPerWord</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+      <span class="kd">var</span> <span class="nx">letters</span> <span class="o">=</span> <span class="nx">legacyRound</span><span class="p">(</span><span class="nx">avgLettersPerWord</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="p">;</span>
+      <span class="kd">var</span> <span class="nx">sentences</span> <span class="o">=</span> <span class="nx">legacyRound</span><span class="p">(</span><span class="nx">avgSentencesPerWord</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="p">;</span>
       <span class="kd">var</span> <span class="nx">coleman</span> <span class="o">=</span> <span class="mf">0.0588</span> <span class="o">*</span> <span class="nx">letters</span> <span class="o">-</span> <span class="mf">0.296</span> <span class="o">*</span> <span class="nx">sentences</span> <span class="o">-</span> <span class="mf">15.8</span><span class="p">;</span>
-      <span class="k">return</span> <span class="nx">legacyRound</span><span class="p">(</span><span class="nx">coleman</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
-    <span class="p">};</span>
+      <span class="k">return</span> <span class="nx">legacyRound</span><span class="p">(</span><span class="nx">coleman</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="p">;</span>
+    <span class="p">}</span><span class="p">;</span>
     
     <span class="kd">var</span> <span class="nx">automatedReadabilityIndex</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span> <span class="p">{</span>
-      <span class="kd">var</span> <span class="nx">chars</span> <span class="o">=</span> <span class="nx">charCount</span><span class="p">(</span><span class="nx">text</span><span class="p">);</span>
-      <span class="kd">var</span> <span class="nx">words</span> <span class="o">=</span> <span class="nx">lexiconCount</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
-      <span class="kd">var</span> <span class="nx">sentences</span> <span class="o">=</span> <span class="nx">sentenceCount</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
+      <span class="kd">var</span> <span class="nx">chars</span> <span class="o">=</span> <span class="nx">charCount</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span><span class="p">;</span>
+      <span class="kd">var</span> <span class="nx">words</span> <span class="o">=</span> <span class="nx">lexiconCount</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="kc">true</span><span class="p">)</span><span class="p">;</span>
+      <span class="kd">var</span> <span class="nx">sentences</span> <span class="o">=</span> <span class="nx">sentenceCount</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="kc">true</span><span class="p">)</span><span class="p">;</span>
       <span class="kd">var</span> <span class="nx">a</span> <span class="o">=</span> <span class="nx">chars</span> <span class="o">/</span> <span class="nx">words</span><span class="p">;</span>
       <span class="kd">var</span> <span class="nx">b</span> <span class="o">=</span> <span class="nx">words</span> <span class="o">/</span> <span class="nx">sentences</span><span class="p">;</span>
       <span class="kd">var</span> <span class="nx">readability</span> <span class="o">=</span> <span class="p">(</span>
         <span class="mf">4.71</span> <span class="o">*</span> <span class="nx">legacyRound</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span>
         <span class="mf">0.5</span> <span class="o">*</span> <span class="nx">legacyRound</span><span class="p">(</span><span class="nx">b</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-</span>
         <span class="mf">21.43</span>
-      <span class="p">);</span>
-      <span class="k">return</span> <span class="nx">legacyRound</span><span class="p">(</span><span class="nx">readability</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span> 
-    <span class="p">};</span>
+      <span class="p">)</span><span class="p">;</span>
+      <span class="k">return</span> <span class="nx">legacyRound</span><span class="p">(</span><span class="nx">readability</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="p">;</span> 
+    <span class="p">}</span><span class="p">;</span>
     
     <span class="kd">var</span> <span class="nx">linsearWriteFormula</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span> <span class="p">{</span>
       <span class="kd">var</span> <span class="nx">easyWord</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
       <span class="kd">var</span> <span class="nx">difficultWord</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-      <span class="kd">var</span> <span class="nx">roughTextFirst100</span> <span class="o">=</span> <span class="nx">text</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">).</span><span class="nx">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">100</span><span class="p">).</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">);</span>
-      <span class="kd">var</span> <span class="nx">plainTextListFirst100</span> <span class="o">=</span> <span class="nx">getWords</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="kc">true</span><span class="p">).</span><span class="nx">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">100</span><span class="p">);</span>
+      <span class="kd">var</span> <span class="nx">roughTextFirst100</span> <span class="o">=</span> <span class="nx">text</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">100</span><span class="p">)</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span><span class="p">;</span>
+      <span class="kd">var</span> <span class="nx">plainTextListFirst100</span> <span class="o">=</span> <span class="nx">getWords</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="kc">true</span><span class="p">)</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">100</span><span class="p">)</span><span class="p">;</span>
       <span class="nx">plainTextListFirst100</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">word</span><span class="p">)</span> <span class="p">{</span>
         <span class="k">if</span> <span class="p">(</span><span class="nx">syllableCount</span><span class="p">(</span><span class="nx">word</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">)</span> <span class="p">{</span>
           <span class="nx">easyWord</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">;</span>
         <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
           <span class="nx">difficultWord</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">;</span>
         <span class="p">}</span>
-      <span class="p">});</span>
-      <span class="kd">var</span> <span class="nx">number</span> <span class="o">=</span> <span class="p">(</span><span class="nx">easyWord</span> <span class="o">+</span> <span class="nx">difficultWord</span> <span class="o">*</span> <span class="mi">3</span><span class="p">)</span> <span class="o">/</span> <span class="nx">sentenceCount</span><span class="p">(</span><span class="nx">roughTextFirst100</span><span class="p">);</span>
+      <span class="p">}</span><span class="p">)</span><span class="p">;</span>
+      <span class="kd">var</span> <span class="nx">number</span> <span class="o">=</span> <span class="p">(</span><span class="nx">easyWord</span> <span class="o">+</span> <span class="nx">difficultWord</span> <span class="o">*</span> <span class="mi">3</span><span class="p">)</span> <span class="o">/</span> <span class="nx">sentenceCount</span><span class="p">(</span><span class="nx">roughTextFirst100</span><span class="p">)</span><span class="p">;</span>
       <span class="k">if</span> <span class="p">(</span><span class="nx">number</span> <span class="o">&lt;=</span> <span class="mi">20</span><span class="p">)</span> <span class="p">{</span>
         <span class="nx">number</span> <span class="o">-=</span> <span class="mi">2</span><span class="p">;</span>
       <span class="p">}</span>
-      <span class="k">return</span> <span class="nx">legacyRound</span><span class="p">(</span><span class="nx">number</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
-    <span class="p">};</span>
+      <span class="k">return</span> <span class="nx">legacyRound</span><span class="p">(</span><span class="nx">number</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="p">;</span>
+    <span class="p">}</span><span class="p">;</span>
     
     <span class="kd">var</span> <span class="nx">rix</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span> <span class="p">{</span>
-      <span class="kd">var</span> <span class="nx">words</span> <span class="o">=</span> <span class="nx">getWords</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
+      <span class="kd">var</span> <span class="nx">words</span> <span class="o">=</span> <span class="nx">getWords</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="kc">true</span><span class="p">)</span><span class="p">;</span>
       <span class="kd">var</span> <span class="nx">longCount</span> <span class="o">=</span> <span class="nx">words</span><span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">word</span><span class="p">)</span> <span class="p">{</span>
         <span class="k">return</span> <span class="nx">word</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">6</span><span class="p">;</span>
-      <span class="p">}).</span><span class="nx">length</span><span class="p">;</span>
-      <span class="kd">var</span> <span class="nx">sentencesCount</span> <span class="o">=</span> <span class="nx">sentenceCount</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
-      <span class="k">return</span> <span class="nx">legacyRound</span><span class="p">(</span><span class="nx">longCount</span> <span class="o">/</span> <span class="nx">sentencesCount</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
-    <span class="p">};</span>
+      <span class="p">}</span><span class="p">)</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span>
+      <span class="kd">var</span> <span class="nx">sentencesCount</span> <span class="o">=</span> <span class="nx">sentenceCount</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="kc">true</span><span class="p">)</span><span class="p">;</span>
+      <span class="k">return</span> <span class="nx">legacyRound</span><span class="p">(</span><span class="nx">longCount</span> <span class="o">/</span> <span class="nx">sentencesCount</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="p">;</span>
+    <span class="p">}</span><span class="p">;</span>
     
     <span class="kd">var</span> <span class="nx">readingTime</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span> <span class="p">{</span>
       <span class="kd">var</span> <span class="nx">wordsPerSecond</span> <span class="o">=</span> <span class="mf">4.17</span><span class="p">;</span>
       <span class="c1">// To get full reading time, ignore cache and sample
-</span><span class="c1"></span>      <span class="k">return</span> <span class="nx">legacyRound</span><span class="p">(</span><span class="nx">lexiconCount</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="kc">false</span><span class="p">,</span> <span class="kc">true</span><span class="p">)</span> <span class="o">/</span> <span class="nx">wordsPerSecond</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
-    <span class="p">};</span>
+</span><span class="c1"></span>      <span class="k">return</span> <span class="nx">legacyRound</span><span class="p">(</span><span class="nx">lexiconCount</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="kc">false</span><span class="p">,</span> <span class="kc">true</span><span class="p">)</span> <span class="o">/</span> <span class="nx">wordsPerSecond</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="p">;</span>
+    <span class="p">}</span><span class="p">;</span>
     
     <span class="c1">// Build textStandard
-</span><span class="c1"></span>    <span class="kd">var</span> <span class="nx">grade</span> <span class="o">=</span> <span class="p">[];</span>
-    <span class="kd">var</span> <span class="nx">obj</span> <span class="o">=</span> <span class="p">{};</span>
-    <span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class="c1"></span>    <span class="kd">var</span> <span class="nx">grade</span> <span class="o">=</span> <span class="p">[</span><span class="p">]</span><span class="p">;</span>
+    <span class="kd">var</span> <span class="nx">obj</span> <span class="o">=</span> <span class="p">{</span><span class="p">}</span><span class="p">;</span>
+    <span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="p">)</span> <span class="p">{</span>
       
       <span class="c1">// FRE
-</span><span class="c1"></span>      <span class="kd">var</span> <span class="nx">fre</span> <span class="o">=</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">fleschReadingEase</span> <span class="o">=</span> <span class="nx">fleschReadingEase</span><span class="p">(</span><span class="nx">text</span><span class="p">);</span>
+</span><span class="c1"></span>      <span class="kd">var</span> <span class="nx">fre</span> <span class="o">=</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">fleschReadingEase</span> <span class="o">=</span> <span class="nx">fleschReadingEase</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span><span class="p">;</span>
       <span class="k">if</span> <span class="p">(</span><span class="nx">fre</span> <span class="o">&lt;</span> <span class="mi">100</span> <span class="o">&amp;&amp;</span> <span class="nx">fre</span> <span class="o">&gt;=</span> <span class="mi">90</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span>
+        <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="p">;</span>
       <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">fre</span> <span class="o">&lt;</span> <span class="mi">90</span> <span class="o">&amp;&amp;</span> <span class="nx">fre</span> <span class="o">&gt;=</span> <span class="mi">80</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="mi">6</span><span class="p">);</span>
+        <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="p">;</span>
       <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">fre</span> <span class="o">&lt;</span> <span class="mi">80</span> <span class="o">&amp;&amp;</span> <span class="nx">fre</span> <span class="o">&gt;=</span> <span class="mi">70</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="mi">7</span><span class="p">);</span>
+        <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span><span class="p">;</span>
       <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">fre</span> <span class="o">&lt;</span> <span class="mi">70</span> <span class="o">&amp;&amp;</span> <span class="nx">fre</span> <span class="o">&gt;=</span> <span class="mi">60</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="mi">8</span><span class="p">);</span>
-        <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="mi">9</span><span class="p">);</span>
+        <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span><span class="p">;</span>
+        <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="mi">9</span><span class="p">)</span><span class="p">;</span>
       <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">fre</span> <span class="o">&lt;</span> <span class="mi">60</span> <span class="o">&amp;&amp;</span> <span class="nx">fre</span> <span class="o">&gt;=</span> <span class="mi">50</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
+        <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="p">;</span>
       <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">fre</span> <span class="o">&lt;</span> <span class="mi">50</span> <span class="o">&amp;&amp;</span> <span class="nx">fre</span> <span class="o">&gt;=</span> <span class="mi">40</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="mi">11</span><span class="p">);</span>
+        <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="mi">11</span><span class="p">)</span><span class="p">;</span>
       <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">fre</span> <span class="o">&lt;</span> <span class="mi">40</span> <span class="o">&amp;&amp;</span> <span class="nx">fre</span> <span class="o">&gt;=</span> <span class="mi">30</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="mi">12</span><span class="p">);</span>
+        <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span><span class="p">;</span>
       <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-        <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="mi">13</span><span class="p">);</span>
+        <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="mi">13</span><span class="p">)</span><span class="p">;</span>
       <span class="p">}</span>
       
       <span class="c1">// FK
-</span><span class="c1"></span>      <span class="kd">var</span> <span class="nx">fk</span> <span class="o">=</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">fleschKincaidGrade</span> <span class="o">=</span> <span class="nx">fleschKincaidGrade</span><span class="p">(</span><span class="nx">text</span><span class="p">);</span>
-      <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nx">fk</span><span class="p">));</span>
-      <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">ceil</span><span class="p">(</span><span class="nx">fk</span><span class="p">));</span>
+</span><span class="c1"></span>      <span class="kd">var</span> <span class="nx">fk</span> <span class="o">=</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">fleschKincaidGrade</span> <span class="o">=</span> <span class="nx">fleschKincaidGrade</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span><span class="p">;</span>
+      <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nx">fk</span><span class="p">)</span><span class="p">)</span><span class="p">;</span>
+      <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">ceil</span><span class="p">(</span><span class="nx">fk</span><span class="p">)</span><span class="p">)</span><span class="p">;</span>
       
       <span class="c1">// SMOG
-</span><span class="c1"></span>      <span class="kd">var</span> <span class="nx">smog</span> <span class="o">=</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">smogIndex</span> <span class="o">=</span> <span class="nx">smogIndex</span><span class="p">(</span><span class="nx">text</span><span class="p">);</span>
-      <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nx">smog</span><span class="p">));</span>
-      <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">ceil</span><span class="p">(</span><span class="nx">smog</span><span class="p">));</span>
+</span><span class="c1"></span>      <span class="kd">var</span> <span class="nx">smog</span> <span class="o">=</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">smogIndex</span> <span class="o">=</span> <span class="nx">smogIndex</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span><span class="p">;</span>
+      <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nx">smog</span><span class="p">)</span><span class="p">)</span><span class="p">;</span>
+      <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">ceil</span><span class="p">(</span><span class="nx">smog</span><span class="p">)</span><span class="p">)</span><span class="p">;</span>
       
       <span class="c1">// CL
-</span><span class="c1"></span>      <span class="kd">var</span> <span class="nx">cl</span> <span class="o">=</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">colemanLiauIndex</span> <span class="o">=</span> <span class="nx">colemanLiauIndex</span><span class="p">(</span><span class="nx">text</span><span class="p">);</span>
-      <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nx">cl</span><span class="p">));</span>
-      <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">ceil</span><span class="p">(</span><span class="nx">cl</span><span class="p">));</span>
+</span><span class="c1"></span>      <span class="kd">var</span> <span class="nx">cl</span> <span class="o">=</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">colemanLiauIndex</span> <span class="o">=</span> <span class="nx">colemanLiauIndex</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span><span class="p">;</span>
+      <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nx">cl</span><span class="p">)</span><span class="p">)</span><span class="p">;</span>
+      <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">ceil</span><span class="p">(</span><span class="nx">cl</span><span class="p">)</span><span class="p">)</span><span class="p">;</span>
       
       <span class="c1">// ARI
-</span><span class="c1"></span>      <span class="kd">var</span> <span class="nx">ari</span> <span class="o">=</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">automatedReadabilityIndex</span> <span class="o">=</span> <span class="nx">automatedReadabilityIndex</span><span class="p">(</span><span class="nx">text</span><span class="p">);</span>
-      <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nx">ari</span><span class="p">));</span>
-      <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">ceil</span><span class="p">(</span><span class="nx">ari</span><span class="p">));</span>
+</span><span class="c1"></span>      <span class="kd">var</span> <span class="nx">ari</span> <span class="o">=</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">automatedReadabilityIndex</span> <span class="o">=</span> <span class="nx">automatedReadabilityIndex</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span><span class="p">;</span>
+      <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nx">ari</span><span class="p">)</span><span class="p">)</span><span class="p">;</span>
+      <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">ceil</span><span class="p">(</span><span class="nx">ari</span><span class="p">)</span><span class="p">)</span><span class="p">;</span>
       
       <span class="c1">// LWF
-</span><span class="c1"></span>      <span class="kd">var</span> <span class="nx">lwf</span> <span class="o">=</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">linsearWriteFormula</span> <span class="o">=</span> <span class="nx">linsearWriteFormula</span><span class="p">(</span><span class="nx">text</span><span class="p">);</span>
-      <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nx">lwf</span><span class="p">));</span>
-      <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">ceil</span><span class="p">(</span><span class="nx">lwf</span><span class="p">));</span>
+</span><span class="c1"></span>      <span class="kd">var</span> <span class="nx">lwf</span> <span class="o">=</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">linsearWriteFormula</span> <span class="o">=</span> <span class="nx">linsearWriteFormula</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span><span class="p">;</span>
+      <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nx">lwf</span><span class="p">)</span><span class="p">)</span><span class="p">;</span>
+      <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">ceil</span><span class="p">(</span><span class="nx">lwf</span><span class="p">)</span><span class="p">)</span><span class="p">;</span>
       
       <span class="c1">// RIX
-</span><span class="c1"></span>      <span class="kd">var</span> <span class="nx">rixScore</span> <span class="o">=</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">rix</span> <span class="o">=</span> <span class="nx">rix</span><span class="p">(</span><span class="nx">text</span><span class="p">);</span>
+</span><span class="c1"></span>      <span class="kd">var</span> <span class="nx">rixScore</span> <span class="o">=</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">rix</span> <span class="o">=</span> <span class="nx">rix</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span><span class="p">;</span>
       <span class="k">if</span> <span class="p">(</span><span class="nx">rixScore</span> <span class="o">&gt;=</span> <span class="mf">7.2</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="mi">13</span><span class="p">);</span>
+        <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="mi">13</span><span class="p">)</span><span class="p">;</span>
       <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">rixScore</span> <span class="o">&lt;</span> <span class="mf">7.2</span> <span class="o">&amp;&amp;</span> <span class="nx">rixScore</span> <span class="o">&gt;=</span> <span class="mf">6.2</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="mi">12</span><span class="p">);</span>
+        <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span><span class="p">;</span>
       <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">rixScore</span> <span class="o">&lt;</span> <span class="mf">6.2</span> <span class="o">&amp;&amp;</span> <span class="nx">rixScore</span> <span class="o">&gt;=</span> <span class="mf">5.3</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="mi">11</span><span class="p">);</span>
+        <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="mi">11</span><span class="p">)</span><span class="p">;</span>
       <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">rixScore</span> <span class="o">&lt;</span> <span class="mf">5.3</span> <span class="o">&amp;&amp;</span> <span class="nx">rixScore</span> <span class="o">&gt;=</span> <span class="mf">4.5</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
+        <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="p">;</span>
       <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">rixScore</span> <span class="o">&lt;</span> <span class="mf">4.5</span> <span class="o">&amp;&amp;</span> <span class="nx">rixScore</span> <span class="o">&gt;=</span> <span class="mf">3.7</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="mi">9</span><span class="p">);</span>
+        <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="mi">9</span><span class="p">)</span><span class="p">;</span>
       <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">rixScore</span> <span class="o">&lt;</span> <span class="mf">3.7</span> <span class="o">&amp;&amp;</span> <span class="nx">rixScore</span> <span class="o">&gt;=</span> <span class="mf">3.0</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="mi">8</span><span class="p">);</span>
+        <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span><span class="p">;</span>
       <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">rixScore</span> <span class="o">&lt;</span> <span class="mf">3.0</span> <span class="o">&amp;&amp;</span> <span class="nx">rixScore</span> <span class="o">&gt;=</span> <span class="mf">2.4</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="mi">7</span><span class="p">);</span>
+        <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span><span class="p">;</span>
       <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">rixScore</span> <span class="o">&lt;</span> <span class="mf">2.4</span> <span class="o">&amp;&amp;</span> <span class="nx">rixScore</span> <span class="o">&gt;=</span> <span class="mf">1.8</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="mi">6</span><span class="p">);</span>
+        <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="p">;</span>
       <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">rixScore</span> <span class="o">&lt;</span> <span class="mf">1.8</span> <span class="o">&amp;&amp;</span> <span class="nx">rixScore</span> <span class="o">&gt;=</span> <span class="mf">1.3</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span>
+        <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="p">;</span>
       <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">rixScore</span> <span class="o">&lt;</span> <span class="mf">1.3</span> <span class="o">&amp;&amp;</span> <span class="nx">rixScore</span> <span class="o">&gt;=</span> <span class="mf">0.8</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
+        <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="p">;</span>
       <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">rixScore</span> <span class="o">&lt;</span> <span class="mf">0.8</span> <span class="o">&amp;&amp;</span> <span class="nx">rixScore</span> <span class="o">&gt;=</span> <span class="mf">0.5</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>
+        <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="p">;</span>
       <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">rixScore</span> <span class="o">&lt;</span> <span class="mf">0.5</span> <span class="o">&amp;&amp;</span> <span class="nx">rixScore</span> <span class="o">&gt;=</span> <span class="mf">0.2</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+        <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="p">;</span>
       <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-        <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+        <span class="nx">grade</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="p">;</span>
       <span class="p">}</span>
       
       <span class="c1">// Find median grade
-</span><span class="c1"></span>      <span class="nx">grade</span> <span class="o">=</span> <span class="nx">grade</span><span class="p">.</span><span class="nx">sort</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">a</span> <span class="o">-</span> <span class="nx">b</span><span class="p">;</span> <span class="p">});</span>
-      <span class="kd">var</span> <span class="nx">midPoint</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nx">grade</span><span class="p">.</span><span class="nx">length</span> <span class="o">/</span> <span class="mi">2</span><span class="p">);</span>
+</span><span class="c1"></span>      <span class="nx">grade</span> <span class="o">=</span> <span class="nx">grade</span><span class="p">.</span><span class="nx">sort</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">a</span> <span class="o">-</span> <span class="nx">b</span><span class="p">;</span> <span class="p">}</span><span class="p">)</span><span class="p">;</span>
+      <span class="kd">var</span> <span class="nx">midPoint</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nx">grade</span><span class="p">.</span><span class="nx">length</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span><span class="p">;</span>
       <span class="kd">var</span> <span class="nx">medianGrade</span> <span class="o">=</span> <span class="nx">legacyRound</span><span class="p">(</span>
         <span class="nx">grade</span><span class="p">.</span><span class="nx">length</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">?</span> 
         <span class="nx">grade</span><span class="p">[</span><span class="nx">midPoint</span><span class="p">]</span> <span class="o">:</span> 
-        <span class="p">(</span><span class="nx">grade</span><span class="p">[</span><span class="nx">midPoint</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="nx">grade</span><span class="p">[</span><span class="nx">midPoint</span><span class="p">])</span> <span class="o">/</span> <span class="mf">2.0</span>
-      <span class="p">);</span>
+        <span class="p">(</span><span class="nx">grade</span><span class="p">[</span><span class="nx">midPoint</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="nx">grade</span><span class="p">[</span><span class="nx">midPoint</span><span class="p">]</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>
+      <span class="p">)</span><span class="p">;</span>
       <span class="nx">obj</span><span class="p">.</span><span class="nx">medianGrade</span> <span class="o">=</span> <span class="nx">medianGrade</span><span class="p">;</span>
       
-    <span class="p">})();</span>
+    <span class="p">}</span><span class="p">)</span><span class="p">(</span><span class="p">)</span><span class="p">;</span>
     
-    <span class="nx">obj</span><span class="p">.</span><span class="nx">readingTime</span> <span class="o">=</span> <span class="nx">readingTime</span><span class="p">(</span><span class="nx">text</span><span class="p">);</span>
+    <span class="nx">obj</span><span class="p">.</span><span class="nx">readingTime</span> <span class="o">=</span> <span class="nx">readingTime</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span><span class="p">;</span>
       
     <span class="k">return</span> <span class="nx">obj</span><span class="p">;</span>
-  <span class="p">};</span>
+  <span class="p">}</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div>
-
-<p>It&rsquo;s a mouthful, so let&rsquo;s go over each formula together with the code that relates to it.</p>
-
+<p>It's a mouthful, so let's go over each formula together with the code that relates to it.</p>
 <h4 id="setup">Setup</h4>
-
 <p>The first couple of steps in the variable establish much of what follows.</p>
-
 <div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">sampleLimit</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">;</span>
 </code></pre></div>
-
 <p>Running regular expressions can be <strong>slow</strong>. If you have an article of 5000 words, for example, counting the syllables of every single word can take a looooooong time, and can be hazardous if executed at page load.</p>
-
-<p>I&rsquo;ve introduced the <code>sampleLimit</code> variable, which basically establishes a maximum sample size to run the readability calculations against. If <code>sampleLimit</code> is set to the default of <code>1000</code>, the script will sample the first 1000 words of the input. The end result should be in the <em>ball park</em> of a score calculated against the full text, but this of course depends on what type of text is in question.</p>
-
+<p>I've introduced the <code>sampleLimit</code> variable, which basically establishes a maximum sample size to run the readability calculations against. If <code>sampleLimit</code> is set to the default of <code>1000</code>, the script will sample the first 1000 words of the input. The end result should be in the <em>ball park</em> of a score calculated against the full text, but this of course depends on what type of text is in question.</p>
 <p>If you want to avoid sampling, set <code>sampleLimit</code> to <code>0</code>.</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">sentenceRegex</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">RegExp</span><span class="p">(</span><span class="s1">&#39;[.?!]\\s[^a-z]&#39;</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">);</span>
-<span class="kd">var</span> <span class="nx">syllableRegex</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">RegExp</span><span class="p">(</span><span class="s1">&#39;[aiouy]+e*|e(?!d$|ly).|[td]ed|le$&#39;</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">);</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">sentenceRegex</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">RegExp</span><span class="p">(</span><span class="s1">&#39;[.?!]\\s[^a-z]&#39;</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">)</span><span class="p">;</span>
+<span class="kd">var</span> <span class="nx">syllableRegex</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">RegExp</span><span class="p">(</span><span class="s1">&#39;[aiouy]+e*|e(?!d$|ly).|[td]ed|le$&#39;</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">)</span><span class="p">;</span>
 </code></pre></div>
-
-<p>The first regular expression is used to split a chunk of text in <em>sentences</em>. <strong>No, it&rsquo;s not perfect</strong>.</p>
-
-<p>But that&rsquo;s OK - we&rsquo;re looking for abstractions and the more text you have the more the score will converge towards a norm.</p>
-
-<p>The second regular expression counts the number of <em>syllables</em> in a text. <strong>No, it&rsquo;s not perfect either</strong>. It&rsquo;s based on English, and perhaps other Germanic languages, but syllabification can change from language to language so if you want to analyze content in other languages, you need to modify the regex.</p>
-
+<p>The first regular expression is used to split a chunk of text in <em>sentences</em>. <strong>No, it's not perfect</strong>.</p>
+<p>But that's OK - we're looking for abstractions and the more text you have the more the score will converge towards a norm.</p>
+<p>The second regular expression counts the number of <em>syllables</em> in a text. <strong>No, it's not perfect either</strong>. It's based on English, and perhaps other Germanic languages, but syllabification can change from language to language so if you want to analyze content in other languages, you need to modify the regex.</p>
 <p>The rest of the setup steps are listed here.</p>
-
 <table>
 <thead>
 <tr>
@@ -1361,384 +1320,273 @@ on
 <th>Description</th>
 </tr>
 </thead>
-
 <tbody>
 <tr>
 <td><code>freBase</code></td>
 <td>The baseline numbers for calculating the Flesch Reading-Ease score in the English language.</td>
 </tr>
-
 <tr>
 <td><code>cache</code></td>
 <td>Utility that caches most of the calculations, so that the regexes are run just once for the cached items.</td>
 </tr>
-
 <tr>
 <td><code>punctuation</code></td>
 <td>List of punctuation symbols.</td>
 </tr>
-
 <tr>
 <td><code>legacyRound()</code></td>
 <td>Function to round the input number to the given precision.</td>
 </tr>
-
 <tr>
 <td><code>charCount()</code></td>
 <td>Count the characters in the input.</td>
 </tr>
-
 <tr>
 <td><code>removePunctuation()</code></td>
 <td>Remove all punctuation from the input.</td>
 </tr>
-
 <tr>
 <td><code>letterCount()</code></td>
 <td>Count the letters in the input.</td>
 </tr>
-
 <tr>
 <td><code>lexiconCount()</code></td>
 <td>Count the words in the input.</td>
 </tr>
-
 <tr>
 <td><code>getWords()</code></td>
 <td>Returns the words in the input.</td>
 </tr>
-
 <tr>
 <td><code>syllableCount()</code></td>
 <td>Count the syllables in the input.</td>
 </tr>
-
 <tr>
 <td><code>polySyllableCount()</code></td>
 <td>Count the number of words with three or more syllables in the input.</td>
 </tr>
-
 <tr>
 <td><code>sentenceCount()</code></td>
 <td>Count the number of sentences in the input.</td>
 </tr>
-
 <tr>
 <td><code>avgSentenceLength()</code></td>
 <td>Count the average length of sentences (number of words) in the input.</td>
 </tr>
-
 <tr>
 <td><code>avgSyllablesPerWord()</code></td>
 <td>Count the average number of syllables per word in the input.</td>
 </tr>
-
 <tr>
 <td><code>avgCharactersPerWord()</code></td>
 <td>Count the average number of characters per word in the input.</td>
 </tr>
-
 <tr>
 <td><code>avgLettersPerWord()</code></td>
 <td>Count the average number of letters per word in the input.</td>
 </tr>
-
 <tr>
 <td><code>avgSentencesPerWord()</code></td>
 <td>Count the average number of sentences per word in the input.</td>
 </tr>
 </tbody>
 </table>
-
 <p>These utilities are used to calculate the readability formulae.</p>
-
 <h4 id="1-flesch-reading-ease">1. Flesch Reading-Ease</h4>
-
-<p>The <a href="[https://en.wikipedia.org/wiki/Flesch%E2%80%93Kincaid_readability_tests#Flesch_reading_ease](https://en.wikipedia.org/wiki/Flesch–Kincaid_readability_tests#Flesch_reading_ease)">Flesch Reading-Ease</a> test is probably one of the better known readability tests. It&rsquo;s used by e.g. <a href="https://yoast.com/flesch-reading-ease-score/">Yoast</a> and <a href="https://www.grammarly.com/blog/readability-scores/">Grammarly</a> to calculate their readability scores.</p>
-
+<p>The <a href="%5Bhttps://en.wikipedia.org/wiki/Flesch%E2%80%93Kincaid_readability_tests#Flesch_reading_ease%5D(https://en.wikipedia.org/wiki/Flesch%E2%80%93Kincaid_readability_tests#Flesch_reading_ease)">Flesch Reading-Ease</a> test is probably one of the better known readability tests. It's used by e.g. <a href="https://yoast.com/flesch-reading-ease-score/">Yoast</a> and <a href="https://www.grammarly.com/blog/readability-scores/">Grammarly</a> to calculate their readability scores.</p>
 <p>For the English language, the algorithm is:</p>
-
 <p><code>206.835 - 1.015 x (words / sentences) - 84.6 x (syllables / words)</code></p>
-
 <p>This outputs a score between 1 and 100, where the higher the score, the easier to read the text is.</p>
-
 <p>A score between <strong>70 and 80</strong> would be considered easy to read for a 7th grader in the US.</p>
-
 <p>In the Custom JavaScript variable, Flesch Reading-Ease is generated like this:</p>
-
 <div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">fleschReadingEase</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span> <span class="p">{</span>
-  <span class="kd">var</span> <span class="nx">sentenceLength</span> <span class="o">=</span> <span class="nx">avgSentenceLength</span><span class="p">(</span><span class="nx">text</span><span class="p">);</span>
-  <span class="kd">var</span> <span class="nx">syllablesPerWord</span> <span class="o">=</span> <span class="nx">avgSyllablesPerWord</span><span class="p">(</span><span class="nx">text</span><span class="p">);</span>
+  <span class="kd">var</span> <span class="nx">sentenceLength</span> <span class="o">=</span> <span class="nx">avgSentenceLength</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span><span class="p">;</span>
+  <span class="kd">var</span> <span class="nx">syllablesPerWord</span> <span class="o">=</span> <span class="nx">avgSyllablesPerWord</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span><span class="p">;</span>
   <span class="k">return</span> <span class="nx">legacyRound</span><span class="p">(</span>
     <span class="nx">freBase</span><span class="p">.</span><span class="nx">base</span> <span class="o">-</span> 
     <span class="nx">freBase</span><span class="p">.</span><span class="nx">sentenceLength</span> <span class="o">*</span> <span class="nx">sentenceLength</span> <span class="o">-</span> 
     <span class="nx">freBase</span><span class="p">.</span><span class="nx">syllablesPerWord</span> <span class="o">*</span> <span class="nx">syllablesPerWord</span><span class="p">,</span>
     <span class="mi">2</span>
-  <span class="p">);</span>
-<span class="p">};</span>
+  <span class="p">)</span><span class="p">;</span>
+<span class="p">}</span><span class="p">;</span>
 </code></pre></div>
-
 <h4 id="2-flesch-kincaid-grade">2. Flesch-Kincaid Grade</h4>
-
-<p>The <a href="[https://en.wikipedia.org/wiki/Flesch%E2%80%93Kincaid_readability_tests#Flesch%E2%80%93Kincaid_grade_level](https://en.wikipedia.org/wiki/Flesch–Kincaid_readability_tests#Flesch–Kincaid_grade_level)">Flesch-Kincaid Grade Level</a> score outputs a number that corresponds to the U.S. grade level generally required to understand the text. If the score returns a number higher than 10, it can also be used to calculate the <strong>years of education</strong> required to understand the text.</p>
-
+<p>The <a href="%5Bhttps://en.wikipedia.org/wiki/Flesch%E2%80%93Kincaid_readability_tests#Flesch%E2%80%93Kincaid_grade_level%5D(https://en.wikipedia.org/wiki/Flesch%E2%80%93Kincaid_readability_tests#Flesch%E2%80%93Kincaid_grade_level)">Flesch-Kincaid Grade Level</a> score outputs a number that corresponds to the U.S. grade level generally required to understand the text. If the score returns a number higher than 10, it can also be used to calculate the <strong>years of education</strong> required to understand the text.</p>
 <p>The algorithm is:</p>
-
 <p><code>0.39 x (words / sentences) + 11.8 x (syllables / words) - 15.59</code></p>
-
 <p>In the Custom JavaScript variable, this translates to:</p>
-
 <div class="highlight"><pre class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="kd">var</span> <span class="nx">fleschKincaidGrade</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span> <span class="p">{</span>
-  <span class="kd">var</span> <span class="nx">sentenceLength</span> <span class="o">=</span> <span class="nx">avgSentenceLength</span><span class="p">(</span><span class="nx">text</span><span class="p">);</span>
-  <span class="kd">var</span> <span class="nx">syllablesPerWord</span> <span class="o">=</span> <span class="nx">avgSyllablesPerWord</span><span class="p">(</span><span class="nx">text</span><span class="p">);</span>
+  <span class="kd">var</span> <span class="nx">sentenceLength</span> <span class="o">=</span> <span class="nx">avgSentenceLength</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span><span class="p">;</span>
+  <span class="kd">var</span> <span class="nx">syllablesPerWord</span> <span class="o">=</span> <span class="nx">avgSyllablesPerWord</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span><span class="p">;</span>
   <span class="k">return</span> <span class="nx">legacyRound</span><span class="p">(</span>
     <span class="mf">0.39</span> <span class="o">*</span> <span class="nx">sentenceLength</span> <span class="o">+</span>
     <span class="mf">11.8</span> <span class="o">*</span> <span class="nx">syllablesPerWord</span> <span class="o">-</span>
     <span class="mf">15.59</span><span class="p">,</span>
     <span class="mi">2</span>
-  <span class="p">);</span>
-<span class="p">};</span>
+  <span class="p">)</span><span class="p">;</span>
+<span class="p">}</span><span class="p">;</span>
 </code></pre></div>
-
 <h4 id="3-smog-grade">3. SMOG grade</h4>
-
 <p>The <a href="https://en.wikipedia.org/wiki/SMOG">SMOG grade</a>, short for <strong>S</strong>imple <strong>M</strong>easure <strong>o</strong>f <strong>G</strong>obbledygook, estimates the years of education required to understand any given text. It is particularly preferred (over Flesch-Kincaid) in the healthcare industry for content design.</p>
-
 <p>The algorithm is:</p>
-
 <p><code>1.0430 x squareroot(polysyllables x (30 / sentences)) + 3.1291</code></p>
-
 <p>In the variable, this would be:</p>
-
 <div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">smogIndex</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span> <span class="p">{</span>
-  <span class="kd">var</span> <span class="nx">sentences</span> <span class="o">=</span> <span class="nx">sentenceCount</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
+  <span class="kd">var</span> <span class="nx">sentences</span> <span class="o">=</span> <span class="nx">sentenceCount</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="kc">true</span><span class="p">)</span><span class="p">;</span>
   <span class="k">if</span> <span class="p">(</span><span class="nx">sentences</span> <span class="o">&gt;=</span> <span class="mi">3</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kd">var</span> <span class="nx">polySyllables</span> <span class="o">=</span> <span class="nx">polySyllableCount</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
-    <span class="kd">var</span> <span class="nx">smog</span> <span class="o">=</span> <span class="mf">1.043</span> <span class="o">*</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">pow</span><span class="p">(</span><span class="nx">polySyllables</span> <span class="o">*</span> <span class="p">(</span><span class="mi">30</span> <span class="o">/</span> <span class="nx">sentences</span><span class="p">),</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">+</span> <span class="mf">3.1291</span><span class="p">;</span>
-    <span class="k">return</span> <span class="nx">legacyRound</span><span class="p">(</span><span class="nx">smog</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">polySyllables</span> <span class="o">=</span> <span class="nx">polySyllableCount</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="kc">true</span><span class="p">)</span><span class="p">;</span>
+    <span class="kd">var</span> <span class="nx">smog</span> <span class="o">=</span> <span class="mf">1.043</span> <span class="o">*</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">pow</span><span class="p">(</span><span class="nx">polySyllables</span> <span class="o">*</span> <span class="p">(</span><span class="mi">30</span> <span class="o">/</span> <span class="nx">sentences</span><span class="p">)</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">+</span> <span class="mf">3.1291</span><span class="p">;</span>
+    <span class="k">return</span> <span class="nx">legacyRound</span><span class="p">(</span><span class="nx">smog</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="p">;</span>
   <span class="p">}</span>
   <span class="k">return</span> <span class="mf">0.0</span><span class="p">;</span>
-<span class="p">};</span>
+<span class="p">}</span><span class="p">;</span>
 </code></pre></div>
-
 <p>Note that the formula ignores content that has three or fewer sentences, as the grade would lose any semblance of accuracy in those cases.</p>
-
 <p>Just a note on the JavaScript, using <code>Math.pow(x, y)</code> calculates <code>x</code> to the power of <code>y</code>. When you set <code>y</code> to <code>0.5</code>, you get the square root of <code>x</code>.</p>
-
 <h4 id="4-coleman-liau-index">4. Coleman-Liau index</h4>
-
-<p>The <a href="[https://en.wikipedia.org/wiki/Coleman%E2%80%93Liau_index](https://en.wikipedia.org/wiki/Coleman–Liau_index)">Coleman-Liau index</a> again outputs an approximation of the U.S. grade level required to understand the text. It&rsquo;s better suited for computer programs as it doesn&rsquo;t care about the complexity of <strong>syllables</strong> but rather relies on <strong>character counts</strong>.</p>
-
+<p>The <a href="%5Bhttps://en.wikipedia.org/wiki/Coleman%E2%80%93Liau_index%5D(https://en.wikipedia.org/wiki/Coleman%E2%80%93Liau_index)">Coleman-Liau index</a> again outputs an approximation of the U.S. grade level required to understand the text. It's better suited for computer programs as it doesn't care about the complexity of <strong>syllables</strong> but rather relies on <strong>character counts</strong>.</p>
 <p>The algorithm is:</p>
-
 <p><code>0.0588 x average_letters_per_100_words - 0.296 x average_sentences_per_100_words - 15.8</code></p>
-
 <p>In JavaScript, this would be:</p>
-
 <div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">colemanLiauIndex</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span> <span class="p">{</span>
-  <span class="kd">var</span> <span class="nx">letters</span> <span class="o">=</span> <span class="nx">legacyRound</span><span class="p">(</span><span class="nx">avgLettersPerWord</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
-  <span class="kd">var</span> <span class="nx">sentences</span> <span class="o">=</span> <span class="nx">legacyRound</span><span class="p">(</span><span class="nx">avgSentencesPerWord</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+  <span class="kd">var</span> <span class="nx">letters</span> <span class="o">=</span> <span class="nx">legacyRound</span><span class="p">(</span><span class="nx">avgLettersPerWord</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="p">;</span>
+  <span class="kd">var</span> <span class="nx">sentences</span> <span class="o">=</span> <span class="nx">legacyRound</span><span class="p">(</span><span class="nx">avgSentencesPerWord</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="p">;</span>
   <span class="kd">var</span> <span class="nx">coleman</span> <span class="o">=</span> <span class="mf">0.0588</span> <span class="o">*</span> <span class="nx">letters</span> <span class="o">-</span> <span class="mf">0.296</span> <span class="o">*</span> <span class="nx">sentences</span> <span class="o">-</span> <span class="mf">15.8</span><span class="p">;</span>
-  <span class="k">return</span> <span class="nx">legacyRound</span><span class="p">(</span><span class="nx">coleman</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
-<span class="p">};</span>
+  <span class="k">return</span> <span class="nx">legacyRound</span><span class="p">(</span><span class="nx">coleman</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="p">;</span>
+<span class="p">}</span><span class="p">;</span>
 </code></pre></div>
-
 <p>Now, you can see how abstract this is, again. It calculates the average number of letters in a word <em>from the entire text</em>, and multiplies this by 100 to get the average letters in a 100 word sample. Same thing for sentences. Thus, the number gets more accurate the larger the data sample.</p>
-
 <h4 id="5-automated-readability-index">5. Automated Readability Index</h4>
-
 <p>The <a href="https://en.wikipedia.org/wiki/Automated_readability_index">Automated Readability Index</a> returns yet again a U.S. grade level score thought to correspond with how readable the text is.</p>
-
 <p>The formula for ARI is:</p>
-
 <p><code>4.71 x (characters / words) + 0.5 x (words / sentences) - 21.43</code></p>
-
 <p>Similar to the Coleman-Liau index, ARI relies on characters rather than syllables, so is thus friendlier to machine calculation but can lead to a more diverse spread of scores compared to syllable-based systems.</p>
-
 <p>In JavaScript, ARI is calculated like this:</p>
-
 <div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">automatedReadabilityIndex</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span> <span class="p">{</span>
-  <span class="kd">var</span> <span class="nx">chars</span> <span class="o">=</span> <span class="nx">charCount</span><span class="p">(</span><span class="nx">text</span><span class="p">);</span>
-  <span class="kd">var</span> <span class="nx">words</span> <span class="o">=</span> <span class="nx">lexiconCount</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
-  <span class="kd">var</span> <span class="nx">sentences</span> <span class="o">=</span> <span class="nx">sentenceCount</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
+  <span class="kd">var</span> <span class="nx">chars</span> <span class="o">=</span> <span class="nx">charCount</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span><span class="p">;</span>
+  <span class="kd">var</span> <span class="nx">words</span> <span class="o">=</span> <span class="nx">lexiconCount</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="kc">true</span><span class="p">)</span><span class="p">;</span>
+  <span class="kd">var</span> <span class="nx">sentences</span> <span class="o">=</span> <span class="nx">sentenceCount</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="kc">true</span><span class="p">)</span><span class="p">;</span>
   <span class="kd">var</span> <span class="nx">a</span> <span class="o">=</span> <span class="nx">chars</span> <span class="o">/</span> <span class="nx">words</span><span class="p">;</span>
   <span class="kd">var</span> <span class="nx">b</span> <span class="o">=</span> <span class="nx">words</span> <span class="o">/</span> <span class="nx">sentences</span><span class="p">;</span>
   <span class="kd">var</span> <span class="nx">readability</span> <span class="o">=</span> <span class="p">(</span>
     <span class="mf">4.71</span> <span class="o">*</span> <span class="nx">legacyRound</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span>
     <span class="mf">0.5</span> <span class="o">*</span> <span class="nx">legacyRound</span><span class="p">(</span><span class="nx">b</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-</span>
     <span class="mf">21.43</span>
-  <span class="p">);</span>
-  <span class="k">return</span> <span class="nx">legacyRound</span><span class="p">(</span><span class="nx">readability</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
-<span class="p">};</span>
+  <span class="p">)</span><span class="p">;</span>
+  <span class="k">return</span> <span class="nx">legacyRound</span><span class="p">(</span><span class="nx">readability</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="p">;</span>
+<span class="p">}</span><span class="p">;</span>
 </code></pre></div>
-
 <h4 id="6-linsear-write">6. Linsear Write</h4>
-
 <p>The <a href="https://en.wikipedia.org/wiki/Linsear_Write">Linsear Write</a> metric uses a sample of 100 words to calculate the U.S. grade level required to understand the text. It also divides the text into &ldquo;easy words&rdquo; (two syllables or less) and &ldquo;difficult words&rdquo; (three syllables or more).</p>
-
 <p>The algorithm is:</p>
-
 <p><code>r = (count_of_easy_words + 3 x count_of_difficult_words) / sentences</code></p>
-
 <p><code>if r &gt; 20, result = r / 2</code></p>
-
 <p><code>if r &lt;= 20, result = r / 2 - 1</code></p>
-
 <p>In JavaScript, this would be:</p>
-
 <div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">linsearWriteFormula</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">easyWord</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
   <span class="kd">var</span> <span class="nx">difficultWord</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-  <span class="kd">var</span> <span class="nx">roughTextFirst100</span> <span class="o">=</span> <span class="nx">text</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">).</span><span class="nx">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">100</span><span class="p">).</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">);</span>
-  <span class="kd">var</span> <span class="nx">plainTextListFirst100</span> <span class="o">=</span> <span class="nx">getWords</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="kc">true</span><span class="p">).</span><span class="nx">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">100</span><span class="p">);</span>
+  <span class="kd">var</span> <span class="nx">roughTextFirst100</span> <span class="o">=</span> <span class="nx">text</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">100</span><span class="p">)</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span><span class="p">;</span>
+  <span class="kd">var</span> <span class="nx">plainTextListFirst100</span> <span class="o">=</span> <span class="nx">getWords</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="kc">true</span><span class="p">)</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">100</span><span class="p">)</span><span class="p">;</span>
   <span class="nx">plainTextListFirst100</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">word</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="nx">syllableCount</span><span class="p">(</span><span class="nx">word</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">)</span> <span class="p">{</span>
       <span class="nx">easyWord</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">;</span>
     <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
       <span class="nx">difficultWord</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">;</span>
     <span class="p">}</span>
-  <span class="p">});</span>
-  <span class="kd">var</span> <span class="nx">number</span> <span class="o">=</span> <span class="p">(</span><span class="nx">easyWord</span> <span class="o">+</span> <span class="nx">difficultWord</span> <span class="o">*</span> <span class="mi">3</span><span class="p">)</span> <span class="o">/</span> <span class="nx">sentenceCount</span><span class="p">(</span><span class="nx">roughTextFirst100</span><span class="p">);</span>
+  <span class="p">}</span><span class="p">)</span><span class="p">;</span>
+  <span class="kd">var</span> <span class="nx">number</span> <span class="o">=</span> <span class="p">(</span><span class="nx">easyWord</span> <span class="o">+</span> <span class="nx">difficultWord</span> <span class="o">*</span> <span class="mi">3</span><span class="p">)</span> <span class="o">/</span> <span class="nx">sentenceCount</span><span class="p">(</span><span class="nx">roughTextFirst100</span><span class="p">)</span><span class="p">;</span>
   <span class="k">if</span> <span class="p">(</span><span class="nx">number</span> <span class="o">&lt;=</span> <span class="mi">20</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">number</span> <span class="o">-=</span> <span class="mi">2</span><span class="p">;</span>
   <span class="p">}</span>
-  <span class="k">return</span> <span class="nx">legacyRound</span><span class="p">(</span><span class="nx">number</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
-<span class="p">};</span>
+  <span class="k">return</span> <span class="nx">legacyRound</span><span class="p">(</span><span class="nx">number</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="p">;</span>
+<span class="p">}</span><span class="p">;</span>
 </code></pre></div>
-
-<p>Yeah, it&rsquo;s a bit messy. The problem is that the &ldquo;easy words&rdquo; and &ldquo;difficult words&rdquo; need to be calculated from the lexicon without any punctuation, and the sentence count needs to be calculated from a sample with punctuation intact.</p>
-
+<p>Yeah, it's a bit messy. The problem is that the &ldquo;easy words&rdquo; and &ldquo;difficult words&rdquo; need to be calculated from the lexicon without any punctuation, and the sentence count needs to be calculated from a sample with punctuation intact.</p>
 <p>In any case, the end result is the Linsear Write score for the text input with decent accuracy.</p>
-
 <h4 id="7-rix">7. Rix</h4>
-
 <p><a href="https://readable.com/features/readability-formulas/#rix">Rix</a> is quite plainly the number of long words divided by the number of sentences in the text. A long word is a word with more than six characters.</p>
-
 <p>The resulting score can be <a href="https://readable.com/features/readability-formulas/#rix">converted to U.S. grade-level</a>.</p>
-
 <p>In JavaScript, you can calculate Rix like this:</p>
-
 <div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">rix</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span> <span class="p">{</span>
-  <span class="kd">var</span> <span class="nx">words</span> <span class="o">=</span> <span class="nx">getWords</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
+  <span class="kd">var</span> <span class="nx">words</span> <span class="o">=</span> <span class="nx">getWords</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="kc">true</span><span class="p">)</span><span class="p">;</span>
   <span class="kd">var</span> <span class="nx">longCount</span> <span class="o">=</span> <span class="nx">words</span><span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">word</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="nx">word</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">6</span><span class="p">;</span>
-  <span class="p">}).</span><span class="nx">length</span><span class="p">;</span>
-  <span class="kd">var</span> <span class="nx">sentencesCount</span> <span class="o">=</span> <span class="nx">sentenceCount</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
-  <span class="k">return</span> <span class="nx">legacyRound</span><span class="p">(</span><span class="nx">longCount</span> <span class="o">/</span> <span class="nx">sentencesCount</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
-<span class="p">};</span>
+  <span class="p">}</span><span class="p">)</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span>
+  <span class="kd">var</span> <span class="nx">sentencesCount</span> <span class="o">=</span> <span class="nx">sentenceCount</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="kc">true</span><span class="p">)</span><span class="p">;</span>
+  <span class="k">return</span> <span class="nx">legacyRound</span><span class="p">(</span><span class="nx">longCount</span> <span class="o">/</span> <span class="nx">sentencesCount</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="p">;</span>
+<span class="p">}</span><span class="p">;</span>
 </code></pre></div>
-
 <h4 id="8-reading-time">8. Reading time</h4>
-
 <p>To calculate reading time of the text, we use <a href="https://www.healthguidance.org/entry/13263/1/What-Is-the-Average-Reading-Speed-and-the-Best-Rate-of-Reading.html">the benchmark</a> of <strong>250 words per minute</strong> read by the average adult. This translates to <strong>4.17</strong> words per second.</p>
-
 <p>The algorithm is simple:</p>
-
 <div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript">    <span class="kd">var</span> <span class="nx">readingTime</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span> <span class="p">{</span>
       <span class="kd">var</span> <span class="nx">wordsPerSecond</span> <span class="o">=</span> <span class="mf">4.17</span><span class="p">;</span>
       <span class="c1">// To get full reading time, ignore cache and sample
-</span><span class="c1"></span>      <span class="k">return</span> <span class="nx">legacyRound</span><span class="p">(</span><span class="nx">lexiconCount</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="kc">false</span><span class="p">,</span> <span class="kc">true</span><span class="p">)</span> <span class="o">/</span> <span class="nx">wordsPerSecond</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
-    <span class="p">};</span>
+</span><span class="c1"></span>      <span class="k">return</span> <span class="nx">legacyRound</span><span class="p">(</span><span class="nx">lexiconCount</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="kc">false</span><span class="p">,</span> <span class="kc">true</span><span class="p">)</span> <span class="o">/</span> <span class="nx">wordsPerSecond</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="p">;</span>
+    <span class="p">}</span><span class="p">;</span>
 </code></pre></div>
-
 <p>This outputs a value in <strong>seconds</strong> corresponding to the time it would take for the average adult to read the text.</p>
-
 <h4 id="median-grade">Median grade</h4>
-
 <p>The median grade is calculated by pushing all the <strong>grades</strong> (both lower and upper bound integers for floating point values), and then taking the <strong>median</strong> grade.</p>
-
 <p>This is not a scientific result in any way. Heck, the whole concept of <strong>readability</strong> escapes scientific scrutiny (just look at the number of different tests with different values!). If you want to modify it, you could use the <strong>average</strong> grade as well (take both rounded down and rounded up to get the grade spread). Or you could find what grade is the <strong>most common</strong> in the whole spread and use that instead.</p>
-
-<p>Regardless, I&rsquo;ve chosen <strong>median</strong> as it excludes the outliers nicely and typically the grades would converge enough to have the median reflect the average anyway.</p>
-
+<p>Regardless, I've chosen <strong>median</strong> as it excludes the outliers nicely and typically the grades would converge enough to have the median reflect the average anyway.</p>
 <h3 id="how-to-use-the-utility-variable">How to use the utility variable</h3>
-
 <p>Once you create and save the Custom JavaScript variable, you can invoke it from other Custom JavaScript variables or Custom HTML tags.</p>
-
-<p>For example, let&rsquo;s say you have all the main content of any given page stored in an HTML element that can be accessed with the <a href="https://www.simoahava.com/amp/analytics/css-selector-guide-google-tag-manager/">CSS selector</a> <code>.post-content .main-content-wrap</code>.</p>
-
-<p>Here&rsquo;s what a handful of different Custom JavaScript variables would look like, each returning a different value from the <code>readabilityFunction</code> output.</p>
-
+<p>For example, let's say you have all the main content of any given page stored in an HTML element that can be accessed with the <a href="https://www.simoahava.com/amp/analytics/css-selector-guide-google-tag-manager/">CSS selector</a> <code>.post-content .main-content-wrap</code>.</p>
+<p>Here's what a handful of different Custom JavaScript variables would look like, each returning a different value from the <code>readabilityFunction</code> output.</p>
 <p>There are many ways to skin this cat, so feel free to get creative.</p>
-
 <h4 id="get-the-flesch-kincaid-score">Get the Flesch-Kincaid Score</h4>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-  <span class="kd">var</span> <span class="nx">el</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">&#39;.post-content .main-content-wrap&#39;</span><span class="p">).</span><span class="nx">textContent</span><span class="p">;</span>
-  <span class="k">return</span> <span class="p">{{</span><span class="nx">readabilityFunction</span><span class="p">}}(</span><span class="nx">el</span><span class="p">).</span><span class="nx">fleschKincaidGrade</span><span class="p">;</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span><span class="p">(</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">el</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">&#39;.post-content .main-content-wrap&#39;</span><span class="p">)</span><span class="p">.</span><span class="nx">textContent</span><span class="p">;</span>
+  <span class="k">return</span> <span class="p">{</span><span class="p">{</span><span class="nx">readabilityFunction</span><span class="p">}</span><span class="p">}</span><span class="p">(</span><span class="nx">el</span><span class="p">)</span><span class="p">.</span><span class="nx">fleschKincaidGrade</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div>
-
 <h4 id="get-the-median-grade">Get the median grade</h4>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-  <span class="kd">var</span> <span class="nx">el</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">&#39;.post-content .main-content-wrap&#39;</span><span class="p">).</span><span class="nx">textContent</span><span class="p">;</span>
-  <span class="k">return</span> <span class="p">{{</span><span class="nx">readabilityFunction</span><span class="p">}}(</span><span class="nx">el</span><span class="p">).</span><span class="nx">medianGrade</span><span class="p">;</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span><span class="p">(</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">el</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">&#39;.post-content .main-content-wrap&#39;</span><span class="p">)</span><span class="p">.</span><span class="nx">textContent</span><span class="p">;</span>
+  <span class="k">return</span> <span class="p">{</span><span class="p">{</span><span class="nx">readabilityFunction</span><span class="p">}</span><span class="p">}</span><span class="p">(</span><span class="nx">el</span><span class="p">)</span><span class="p">.</span><span class="nx">medianGrade</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div>
-
 <h4 id="get-the-reading-time-in-minutes-and-seconds">Get the reading time in minutes and seconds</h4>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-  <span class="kd">var</span> <span class="nx">el</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">&#39;.post-content .main-content-wrap&#39;</span><span class="p">).</span><span class="nx">textContent</span><span class="p">;</span>
-  <span class="kd">var</span> <span class="nx">readingTime</span> <span class="o">=</span> <span class="p">{{</span><span class="nx">readabilityFunction</span><span class="p">}}(</span><span class="nx">el</span><span class="p">).</span><span class="nx">readingTime</span><span class="p">;</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span><span class="p">(</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">el</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">&#39;.post-content .main-content-wrap&#39;</span><span class="p">)</span><span class="p">.</span><span class="nx">textContent</span><span class="p">;</span>
+  <span class="kd">var</span> <span class="nx">readingTime</span> <span class="o">=</span> <span class="p">{</span><span class="p">{</span><span class="nx">readabilityFunction</span><span class="p">}</span><span class="p">}</span><span class="p">(</span><span class="nx">el</span><span class="p">)</span><span class="p">.</span><span class="nx">readingTime</span><span class="p">;</span>
   <span class="k">return</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nx">readingTime</span> <span class="o">/</span> <span class="mi">60</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&#34;m&#34;</span> <span class="o">+</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">round</span><span class="p">(</span><span class="nx">readingTime</span> <span class="o">%</span> <span class="mi">60</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&#34;s&#34;</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div>
-
 <p>This would convert a reading time (in seconds) of <code>129.67</code> to <code>&quot;2m10s&quot;</code>.</p>
-
 <h3 id="google-analytics-setup">Google Analytics setup</h3>
-
 <p>Once you have the values you want to access, all you need to do is send them to Google Analytics.</p>
-
-<p>Here&rsquo;s a sample setup. It sends the <a href="#get-the-median-grade"><strong>median grade</strong></a> to Google Analytics as a Custom Metric, and it collects the <a href="#8-reading-time"><strong>reading time</strong></a> as another Custom Metric. To make results easier to scan at a glance, we&rsquo;ll also send the median grade as a Custom Dimension.</p>
-
-<p>But before we start, here&rsquo;s a caveat you need to be aware of.</p>
-
+<p>Here's a sample setup. It sends the <a href="#get-the-median-grade"><strong>median grade</strong></a> to Google Analytics as a Custom Metric, and it collects the <a href="#8-reading-time"><strong>reading time</strong></a> as another Custom Metric. To make results easier to scan at a glance, we'll also send the median grade as a Custom Dimension.</p>
+<p>But before we start, here's a caveat you need to be aware of.</p>
 <h4 id="dom-ready">DOM Ready</h4>
-
 <p>If you use <strong>DOM methods</strong> to check the readability of content from the web page, you might not be able to use a Google Analytics tag that fires on the <strong>All Pages</strong> trigger.</p>
-
 <p>This is because a potential <em>race condition</em> can emerge where the <strong>All Pages</strong> trigger can fire before your DOM content is available for Google Tag Manager.</p>
-
 <p>In this case, you are left with two options:</p>
-
 <ol>
 <li>Send the readability data with an event (or another pageview) where you set the <code>nonInteraction</code> field to <code>true</code>.</li>
 <li>Delay the Page View hit a bit to fire on a <strong>DOM Ready</strong> trigger instead.</li>
 </ol>
-
-<p>The main problem with (1) is that you won&rsquo;t be able to parse the data in your main Page View report (which is the logical place for it), and would need to join the data outside Google Analytics instead (or perhaps use a <strong>custom report</strong> creatively).</p>
-
+<p>The main problem with (1) is that you won't be able to parse the data in your main Page View report (which is the logical place for it), and would need to join the data outside Google Analytics instead (or perhaps use a <strong>custom report</strong> creatively).</p>
 <p>The main problem with (2) is that you risk missing a fraction of your pageviews because the hit is delayed a bit.</p>
-
-<p>If it&rsquo;s a <strong>single-page app</strong>, you are in luck as you can instruct the developers not to fire <a href="https://www.bounteous.com/insights/2018/03/30/single-page-applications-google-analytics/#page-paths-or-page-titles-are-incongruent-with-application-state">the virtual pageview event</a> until the content has been fully rendered on the page.</p>
-
+<p>If it's a <strong>single-page app</strong>, you are in luck as you can instruct the developers not to fire <a href="https://www.bounteous.com/insights/2018/03/30/single-page-applications-google-analytics/#page-paths-or-page-titles-are-incongruent-with-application-state">the virtual pageview event</a> until the content has been fully rendered on the page.</p>
 <h4 id="1-custom-javascript-variable-for-median-grade">1. Custom JavaScript variable for median grade</h4>
-
-<p>Remember to change the <code>el</code> variable assignment to match whatever content you want to evaluate. In this example, it&rsquo;s an HTML element accessible with the <a href="https://www.simoahava.com/amp/analytics/css-selector-guide-google-tag-manager/">CSS selector</a> <code>.post-content .main-content-wrap</code>.</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-  <span class="kd">var</span> <span class="nx">el</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">&#39;.post-content .main-content-wrap&#39;</span><span class="p">).</span><span class="nx">textContent</span><span class="p">;</span>
-  <span class="k">return</span> <span class="p">{{</span><span class="nx">readabilityFunction</span><span class="p">}}(</span><span class="nx">el</span><span class="p">).</span><span class="nx">medianGrade</span><span class="p">;</span>
+<p>Remember to change the <code>el</code> variable assignment to match whatever content you want to evaluate. In this example, it's an HTML element accessible with the <a href="https://www.simoahava.com/amp/analytics/css-selector-guide-google-tag-manager/">CSS selector</a> <code>.post-content .main-content-wrap</code>.</p>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span><span class="p">(</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">el</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">&#39;.post-content .main-content-wrap&#39;</span><span class="p">)</span><span class="p">.</span><span class="nx">textContent</span><span class="p">;</span>
+  <span class="k">return</span> <span class="p">{</span><span class="p">{</span><span class="nx">readabilityFunction</span><span class="p">}</span><span class="p">}</span><span class="p">(</span><span class="nx">el</span><span class="p">)</span><span class="p">.</span><span class="nx">medianGrade</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div>
-
 <h4 id="2-custom-javascript-variable-for-reading-time">2. Custom JavaScript variable for reading time</h4>
-
-<p>Remember to change the <code>el</code> variable assignment to match whatever content you want to evaluate. In this example, it&rsquo;s an HTML element accessible with the <a href="https://www.simoahava.com/amp/analytics/css-selector-guide-google-tag-manager/">CSS selector</a> <code>.post-content .main-content-wrap</code>.</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-  <span class="kd">var</span> <span class="nx">el</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">&#39;.post-content .main-content-wrap&#39;</span><span class="p">).</span><span class="nx">textContent</span><span class="p">;</span>
-  <span class="k">return</span> <span class="p">{{</span><span class="nx">readabilityFunction</span><span class="p">}}(</span><span class="nx">el</span><span class="p">).</span><span class="nx">readingTime</span><span class="p">;</span>
+<p>Remember to change the <code>el</code> variable assignment to match whatever content you want to evaluate. In this example, it's an HTML element accessible with the <a href="https://www.simoahava.com/amp/analytics/css-selector-guide-google-tag-manager/">CSS selector</a> <code>.post-content .main-content-wrap</code>.</p>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span><span class="p">(</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">el</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">&#39;.post-content .main-content-wrap&#39;</span><span class="p">)</span><span class="p">.</span><span class="nx">textContent</span><span class="p">;</span>
+  <span class="k">return</span> <span class="p">{</span><span class="p">{</span><span class="nx">readabilityFunction</span><span class="p">}</span><span class="p">}</span><span class="p">(</span><span class="nx">el</span><span class="p">)</span><span class="p">.</span><span class="nx">readingTime</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div>
-
-<h4 id="3-google-analytics-admin-custom-definitions">3. Google Analytics - Admin - Custom Definitions</h4>
-
-<p>Here&rsquo;s what the <strong>Custom Metric</strong> for Reading Time looks like in Google Analytics admin:</p>
-
+<h4 id="3-google-analytics---admin---custom-definitions">3. Google Analytics - Admin - Custom Definitions</h4>
+<p>Here's what the <strong>Custom Metric</strong> for Reading Time looks like in Google Analytics admin:</p>
 
 
     <a href="https://www.simoahava.com/amp/images/2019/10/custom-met-in-ga.jpg" title="Custom metric in GA">
@@ -1748,9 +1596,7 @@ on
     </a>
   
 
-
 <p>If you want, you can build a <strong>Calculated Metric</strong> to get the <em>average</em> reading time across pageviews.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2019/10/calculated-metric-in-ga.jpg" title="Calculated metric in GA">
@@ -1760,9 +1606,7 @@ on
     </a>
   
 
-
-<p>Here&rsquo;s what the <strong>Custom Metric</strong> for Median Grade looks like:</p>
-
+<p>Here's what the <strong>Custom Metric</strong> for Median Grade looks like:</p>
 
 
     <a href="https://www.simoahava.com/amp/images/2019/11/custom-metric-median.jpg" title="Custom Metric Median Grade">
@@ -1772,9 +1616,7 @@ on
     </a>
   
 
-
-<p>Here&rsquo;s what the <strong>Custom Dimension</strong> for Median Grade looks like in Google Analytics admin:</p>
-
+<p>Here's what the <strong>Custom Dimension</strong> for Median Grade looks like in Google Analytics admin:</p>
 
 
     <a href="https://www.simoahava.com/amp/images/2019/10/custom-dim-in-ga.jpg" title="Custom dimension in GA">
@@ -1784,11 +1626,8 @@ on
     </a>
   
 
-
 <h4 id="4-google-analytics-tag">4. Google Analytics tag</h4>
-
-<p>Finally, here&rsquo;s what a sample Page View tag would look like, modified.</p>
-
+<p>Finally, here's what a sample Page View tag would look like, modified.</p>
 
 
     <a href="https://www.simoahava.com/amp/images/2019/11/sample-ga-tag.jpg" title="Sample GA Tag">
@@ -1798,13 +1637,9 @@ on
     </a>
   
 
-
 <p>Just remember the <a href="#dom-ready">caveat</a> about <em>DOM ready triggering</em> I mentioned above.</p>
-
 <h4 id="5-how-to-access-the-results">5. How to access the results</h4>
-
 <p>The <strong>Custom Dimension</strong> will be available as a secondary dimension or in a custom report.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2019/11/custom-report.jpg" title="Custom report">
@@ -1814,17 +1649,11 @@ on
     </a>
   
 
-
 <p>The <strong>Custom Metrics</strong> (and the Calculated Metric if you opted to create one) will be available in custom reports as well.</p>
-
 <p>Note that instead of messing around with awkward custom reports, you might want to extract the data out of Google Analytics using e.g. the <a href="https://developers.google.com/analytics/solutions/google-analytics-spreadsheet-add-on">Google Sheets add-on</a> as this gives you far more flexibility in building your own reports.</p>
-
-<h3 id="google-analytics-app-web-setup">Google Analytics: App + Web setup</h3>
-
+<h3 id="google-analytics-app--web-setup">Google Analytics: App + Web setup</h3>
 <p>If you want to send the data to the new <a href="https://www.simoahava.com/amp/analytics/getting-started-with-google-analytics-app-web/">App + Web</a> then all the power to you! Setting it up is easy - just create a new <strong>App + Web event tag</strong> for your Page View (you might want to disable the default Page View from the <em>config</em> tag), and add the variables as new event parameters.</p>
-
 <p>Make sure this tag, too, triggers on DOM Ready.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2019/10/app-web-pageview.jpg" title="App&#43;Web Pageview">
@@ -1834,9 +1663,7 @@ on
     </a>
   
 
-
 <p>Once you do this, the events should start showing up in the App + Web streams:</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2019/11/parameter-in-real-time.jpg" title="App&#43;web real time">
@@ -1846,11 +1673,8 @@ on
     </a>
   
 
-
 <p>In order to build reports for these parameters, you need to <strong>include them in parameter reporting</strong>.</p>
-
-<p>Once you&rsquo;ve collected some data, head over to <strong>Events</strong> -&gt; <strong>All Events</strong>, and click the little action menu at the end of the row with the <code>page_view</code> event. Select <strong>Edit parameter reporting</strong> from this menu.</p>
-
+<p>Once you've collected some data, head over to <strong>Events</strong> -&gt; <strong>All Events</strong>, and click the little action menu at the end of the row with the <code>page_view</code> event. Select <strong>Edit parameter reporting</strong> from this menu.</p>
 
 
     <a href="https://www.simoahava.com/amp/images/2019/10/parameter-menu.jpg" title="Parameter menu">
@@ -1860,9 +1684,7 @@ on
     </a>
   
 
-
 <p>In the overlay that appears, find the two <code>readability_*</code> parameters to add them to the list of parameters included in reporting. Set the type of the <em>median grade</em> parameter to <strong>Text</strong>, and the type of the <em>reading time</em> parameter to <strong>Number / Seconds</strong>.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2019/11/parameter-reporting-setup.jpg" title="Parameter reporting setup">
@@ -1872,11 +1694,8 @@ on
     </a>
   
 
-
-<p>Once you&rsquo;ve done these, and once you&rsquo;ve accumulated some new data, you&rsquo;ll be able to find the two parameters as their own widgets when you select the <strong>page_view</strong> event in the event list, and when moving through the <strong>Analysis</strong> reports.</p>
-
-<p>Note that if you&rsquo;ve configured a <a href="https://www.simoahava.com/amp/analytics/enable-bigquery-export-google-analytics-app-web/">BigQuery export</a>, the parameters will be included whether or not you add them via the event parameter reporting user interface!</p>
-
+<p>Once you've done these, and once you've accumulated some new data, you'll be able to find the two parameters as their own widgets when you select the <strong>page_view</strong> event in the event list, and when moving through the <strong>Analysis</strong> reports.</p>
+<p>Note that if you've configured a <a href="https://www.simoahava.com/amp/analytics/enable-bigquery-export-google-analytics-app-web/">BigQuery export</a>, the parameters will be included whether or not you add them via the event parameter reporting user interface!</p>
 
 
     <a href="https://www.simoahava.com/amp/images/2019/11/bigquery-result.jpg" title="BigQuery result">
@@ -1886,23 +1705,14 @@ on
     </a>
   
 
-
 <h2 id="summary">Summary</h2>
-
-<p>Let&rsquo;s discuss the caveats first.</p>
-
-<p>The script itself is fairly simple, basically chopping down the text into constituent parts and then performing calculations with those parts. However, it can <strong>perform poorly</strong> if its fed a lot of content to process. Performance of regular expressions degrade in correlation with the amount of content, and with a large body of text the parsing can disrupt your page load. This is mitigated with the use of a <strong>cache</strong> and a <strong>sampling threshold</strong>, but you&rsquo;ll need to tinker with these to get the best accuracy and the best performance.</p>
-
+<p>Let's discuss the caveats first.</p>
+<p>The script itself is fairly simple, basically chopping down the text into constituent parts and then performing calculations with those parts. However, it can <strong>perform poorly</strong> if its fed a lot of content to process. Performance of regular expressions degrade in correlation with the amount of content, and with a large body of text the parsing can disrupt your page load. This is mitigated with the use of a <strong>cache</strong> and a <strong>sampling threshold</strong>, but you'll need to tinker with these to get the best accuracy and the best performance.</p>
 <p>The <strong>regular expressions are not perfect</strong>. Particularly parsing sentences turns out to be quite difficult to manage with clarity, and I have opted for a fairly simple algorithm in the script.</p>
-
 <p>All in all, <strong>readability scores</strong> need to be taken with a grain of salt. They abstract away much of what is gained with context, and they know nothing about the background of the reader. They count things like syllables, long words, and short words, and try to assign labels like &ldquo;easy&rdquo; and &ldquo;difficult&rdquo; based on these calculations.</p>
-
 <p>The grade-level abstractions are also calculated based on U.S. averages. Whether you want to draw any conclusions is totally up to you, but I do think how much different the levels would be in a country like Finland, where the education system is somewhat different.</p>
-
-<p>Having said all that, it&rsquo;s still a fun idea to play around with especially if you&rsquo;re in the business of creating content. <strong>Readability</strong> is a great concept to work towards, and the grades for my own content (almost categorically past college-level) have given me some pause. I think it&rsquo;s a great way to design content to be as readable as possible, and tools like this should give you some insight.</p>
-
+<p>Having said all that, it's still a fun idea to play around with especially if you're in the business of creating content. <strong>Readability</strong> is a great concept to work towards, and the grades for my own content (almost categorically past college-level) have given me some pause. I think it's a great way to design content to be as readable as possible, and tools like this should give you some insight.</p>
 <p>Whether or not Google Analytics is the right place to measure this remains to be seen. But I would imagine there to be benefits to correlating readability and reading time with overall engagement metrics. Something to optimize against, I think!</p>
-
 <p>Let me know in the comments what you think about this approach!</p>
 
     </section>

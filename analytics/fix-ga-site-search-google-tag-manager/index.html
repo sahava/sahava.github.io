@@ -53,7 +53,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.59.1 with theme Tranquilpeak 0.4.3-BETA">
+    <meta name="generator" content="Hugo 0.61.0 with theme Tranquilpeak 0.4.3-BETA">
     <title>Fix GA Site Search With Google Tag Manager | Simo Ahava's blog</title>
     
     <script>
@@ -319,10 +319,7 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              
-
-<p>Analyzing what people write in your <a href="https://support.google.com/analytics/answer/1012264?hl=en">site search field</a> is pretty much one of the smartest things you can do for your website tracking. If certain terms pop up over and over again in internal search reports, it means that your site is not providing the answers people are looking for, meaning you have an excellent opportunity to provide supply for the demand!</p>
-
+              <p>Analyzing what people write in your <a href="https://support.google.com/analytics/answer/1012264?hl=en">site search field</a> is pretty much one of the smartest things you can do for your website tracking. If certain terms pop up over and over again in internal search reports, it means that your site is not providing the answers people are looking for, meaning you have an excellent opportunity to provide supply for the demand!</p>
 
 
 
@@ -338,25 +335,15 @@
 </div>
 
 
-
 <p>However, not all site search applications are trackable out-of-the-box. In this post, I go over three scenarios, and I provide three solutions for tackling internal site search problems in <a href="http://www.google.com/tagmanager">Google Tag Manager</a>.</p>
-
 <p><strong>1) No query parameter in URL</strong></p>
-
 <p>Google Analytics&rsquo; site search settings require a query parameter in the URL, e.g. <code>https://www.simoahava.com/search?q=analytics</code>. Often, however, the site search tool does not apply a query parameter to the URL. Rather, the keyword might be as a typical URL folder, like <code>https://www.simoahava.com/search/analytics</code>.</p>
-
-<p>This is pretty commonplace. You might have seen this phenomenon in <a href="https://www.drupal.org/documentation/modules/search">Drupal</a> websites. It&rsquo;s easy to fix with a URL macro and the <strong>page</strong> field in your pageview tag.</p>
-
+<p>This is pretty commonplace. You might have seen this phenomenon in <a href="https://www.drupal.org/documentation/modules/search">Drupal</a> websites. It's easy to fix with a URL macro and the <strong>page</strong> field in your pageview tag.</p>
 <p><strong>2) No search term in URL</strong></p>
-
-<p>This is a bit more difficult, since you can&rsquo;t use the URL anymore. This means that the URL stays the same (or has some generic search path), and you need to look into on-page elements for information on what the user searched for. Some DOM scraping and the <strong>page</strong> field should do the trick.</p>
-
+<p>This is a bit more difficult, since you can't use the URL anymore. This means that the URL stays the same (or has some generic search path), and you need to look into on-page elements for information on what the user searched for. Some DOM scraping and the <strong>page</strong> field should do the trick.</p>
 <p><strong>3) Nothing on the page to use</strong></p>
-
-<p>This is the most difficult scenario to handle, since there&rsquo;s nothing on the page for you to latch on to. Perhaps the search term isn&rsquo;t iterated (stupid), or it&rsquo;s not contained in a DOM element (stupid, stupid). This time, we&rsquo;ll try to get the value of the search field in the form submit event, and pass that as a virtual pageview.</p>
-
+<p>This is the most difficult scenario to handle, since there's nothing on the page for you to latch on to. Perhaps the search term isn't iterated (stupid), or it's not contained in a DOM element (stupid, stupid). This time, we'll try to get the value of the search field in the form submit event, and pass that as a virtual pageview.</p>
 <h2 id="1-no-query-parameter-in-url">1) No query parameter in URL</h2>
-
 
 
 
@@ -372,27 +359,25 @@
 </div>
 
 
-
-<p>I see this pretty often. You have a search tool but it doesn&rsquo;t utilize a query parameter for the search term. Rather, it displays the keyword in a virtual folder in the URI. Nothing wrong with that, though every CMS should let you choose how the search terms are displayed in the URL.</p>
-
-<p>This is what you&rsquo;re going to do:</p>
-
+<p>I see this pretty often. You have a search tool but it doesn't utilize a query parameter for the search term. Rather, it displays the keyword in a virtual folder in the URI. Nothing wrong with that, though every CMS should let you choose how the search terms are displayed in the URL.</p>
+<p>This is what you're going to do:</p>
 <ol>
-<li><p>In your ordinary pageview tag, you click open the <strong>Fields to set</strong> setting, and you add a new field with <strong>page</strong> as the field name. Field value would be the reference to a Custom JavaScript Macro <code>{{search path}}</code>.</p></li>
-
-<li><p>This macro will look for the search term in the URL</p></li>
-
-<li><p>If it finds a search term, it will return the modified document path with the search term as a query parameter</p></li>
-
-<li><p>If no search term is found, the macro returns false, meaning the document path will not be modified, and the pageview will fire normally</p></li>
+<li>
+<p>In your ordinary pageview tag, you click open the <strong>Fields to set</strong> setting, and you add a new field with <strong>page</strong> as the field name. Field value would be the reference to a Custom JavaScript Macro <code>{{search path}}</code>.</p>
+</li>
+<li>
+<p>This macro will look for the search term in the URL</p>
+</li>
+<li>
+<p>If it finds a search term, it will return the modified document path with the search term as a query parameter</p>
+</li>
+<li>
+<p>If no search term is found, the macro returns false, meaning the document path will not be modified, and the pageview will fire normally</p>
+</li>
 </ol>
-
-<p>That&rsquo;s the beauty of GTM, again. Since the macro returns false for non-search pageviews, you&rsquo;ll just need the one, single, normal, ordinary pageview tag to cover all the searches as well. No need for extra tags, woohoo!</p>
-
-<p>So, let&rsquo;s say that the site search term is displayed like it&rsquo;s displayed on <a href="http://www.drupal.org">www.drupal.org</a>: /search/site/<strong>keyword</strong>. The <code>{{search path}}</code> macro should first check if the URI starts with /search/site/, and if it does, it should return whatever comes after, properly modified into a proper path.</p>
-
-<p>Here&rsquo;s the code for the <code>{{search path}}</code> macro:</p>
-
+<p>That's the beauty of GTM, again. Since the macro returns false for non-search pageviews, you'll just need the one, single, normal, ordinary pageview tag to cover all the searches as well. No need for extra tags, woohoo!</p>
+<p>So, let's say that the site search term is displayed like it's displayed on <a href="http://www.drupal.org">www.drupal.org</a>: /search/site/<strong>keyword</strong>. The <code>{{search path}}</code> macro should first check if the URI starts with /search/site/, and if it does, it should return whatever comes after, properly modified into a proper path.</p>
+<p>Here's the code for the <code>{{search path}}</code> macro:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
   <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">regex</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">/^\/search\/site\/(.*)/</span>;
   <span style="color:#66d9ef">if</span>(<span style="color:#a6e22e">regex</span>.<span style="color:#a6e22e">test</span>({{<span style="color:#a6e22e">url</span> <span style="color:#a6e22e">path</span>}})) {
@@ -401,11 +386,8 @@
   <span style="color:#66d9ef">return</span>;
 }
 </code></pre></div>
-
-<p>The regular expression looks at the <code>{{url path}}</code> macro (which stores the current URI of the page), and if the path starts with /search/site/, it returns a modified version of the URI with the search term appended as the value of the query parameter <strong>q</strong>. Change this parameter to reflect whatever you want to have in your Google Analytics view&rsquo;s site search settings.</p>
-
-<p>Finally, just edit your pageview tag, add a new field to <strong>Fields to set</strong>, set <strong>page</strong> as the field name, and add your macro as its value. That&rsquo;s all there is to it!</p>
-
+<p>The regular expression looks at the <code>{{url path}}</code> macro (which stores the current URI of the page), and if the path starts with /search/site/, it returns a modified version of the URI with the search term appended as the value of the query parameter <strong>q</strong>. Change this parameter to reflect whatever you want to have in your Google Analytics view's site search settings.</p>
+<p>Finally, just edit your pageview tag, add a new field to <strong>Fields to set</strong>, set <strong>page</strong> as the field name, and add your macro as its value. That's all there is to it!</p>
 
 
 
@@ -421,9 +403,7 @@
 </div>
 
 
-
-<p>Don&rsquo;t forget to do some Preview &amp; Debugging, and also check with a debugger like <a href="http://webanalyticssolutionprofiler.com/">WASP</a> to see if the path gets sent correctly for search terms (and correctly for all other pages as well!).</p>
-
+<p>Don't forget to do some Preview &amp; Debugging, and also check with a debugger like <a href="http://webanalyticssolutionprofiler.com/">WASP</a> to see if the path gets sent correctly for search terms (and correctly for all other pages as well!).</p>
 
 
 
@@ -439,11 +419,8 @@
 </div>
 
 
-
 <h2 id="2-no-search-term-in-url">2) No search term in URL</h2>
-
-<p>OK, this one is a bit trickier. In this case, there&rsquo;s no search term in the URL for you to use. This solution requires that the search term is explicitly presented in an HTML element we can grab onto. The best way is to have it in a <code>span</code> or <code>div</code> with a unique ID attribute. Since it&rsquo;s the best way, it&rsquo;s the one I&rsquo;ll be using in this example, with a <code>&lt;span&gt;</code> element as the wrapper. Feel free to get creative with the DOM if your search term is hidden deeper in the page.</p>
-
+<p>OK, this one is a bit trickier. In this case, there's no search term in the URL for you to use. This solution requires that the search term is explicitly presented in an HTML element we can grab onto. The best way is to have it in a <code>span</code> or <code>div</code> with a unique ID attribute. Since it's the best way, it's the one I'll be using in this example, with a <code>&lt;span&gt;</code> element as the wrapper. Feel free to get creative with the DOM if your search term is hidden deeper in the page.</p>
 
 
 
@@ -459,21 +436,22 @@
 </div>
 
 
-
 <p>For this to work, this is what happens:</p>
-
 <ol>
-<li><p>In your ordinary pageview tag, you click open the <strong>Fields to set</strong> setting, and you add a new field with <strong>page</strong> as the field name. Field value would be the reference to a Custom JavaScript Macro <code>{{search path}}</code></p></li>
-
-<li><p>This macro will look for the search term in the HTML element with the ID you specify, using a new DOM Element Macro <code>{{search term}}</code></p></li>
-
-<li><p>If it finds a search term, the <code>{{search path}}</code> macro will return the modified document path with the search term as a query parameter</p></li>
-
-<li><p>If no search term is found, the macro returns false, meaning the Document Path will not be modified, and the pageview will fire normally</p></li>
+<li>
+<p>In your ordinary pageview tag, you click open the <strong>Fields to set</strong> setting, and you add a new field with <strong>page</strong> as the field name. Field value would be the reference to a Custom JavaScript Macro <code>{{search path}}</code></p>
+</li>
+<li>
+<p>This macro will look for the search term in the HTML element with the ID you specify, using a new DOM Element Macro <code>{{search term}}</code></p>
+</li>
+<li>
+<p>If it finds a search term, the <code>{{search path}}</code> macro will return the modified document path with the search term as a query parameter</p>
+</li>
+<li>
+<p>If no search term is found, the macro returns false, meaning the Document Path will not be modified, and the pageview will fire normally</p>
+</li>
 </ol>
-
-<p>First, let&rsquo;s create the DOM Element Macro <code>{{search term}}</code>.</p>
-
+<p>First, let's create the DOM Element Macro <code>{{search term}}</code>.</p>
 
 
 
@@ -489,11 +467,8 @@
 </div>
 
 
-
 <p>Replace the <strong>Element ID</strong> field with whatever your page is using.</p>
-
-<p>Next, we&rsquo;ll need to edit the Custom JavaScript Macro <code>{{search path}}</code>:</p>
-
+<p>Next, we'll need to edit the Custom JavaScript Macro <code>{{search path}}</code>:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
   <span style="color:#66d9ef">if</span>({{<span style="color:#a6e22e">search</span> <span style="color:#a6e22e">term</span>}} <span style="color:#f92672">&amp;&amp;</span> {{<span style="color:#a6e22e">search</span> <span style="color:#a6e22e">term</span>}} <span style="color:#f92672">!==</span> <span style="color:#e6db74">&#39;null&#39;</span>) {
     <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;/search/site?q=&#34;</span> <span style="color:#f92672">+</span> {{<span style="color:#a6e22e">search</span> <span style="color:#a6e22e">term</span>}};
@@ -501,45 +476,42 @@
   <span style="color:#66d9ef">return</span>;
 }
 </code></pre></div>
-
 <p>So first we check if an element with the ID you specify exists. If it does, the macro returns <code>&quot;/search/site?q=&lt;keyword&gt;&quot;</code> as the document path, same as in the previous example. If no such element is found, the macro returns false, and the original document path (i.e. the URI of the page the visitor is on) is sent.</p>
-
 <p>The final step is the same as before: edit your pageview tag, add a new field to the <strong>Fields to set</strong>, set the field name to <strong>page</strong>, and add this <code>{{search path}}</code> macro as the field value.</p>
-
-<p>Oh, and don&rsquo;t forget to preview, debug, and test, test, test.</p>
-
+<p>Oh, and don't forget to preview, debug, and test, test, test.</p>
 <h2 id="3-nothing-on-the-page-to-use">3) Nothing on the page to use</h2>
-
-<p>This is bleak, but it happens. There&rsquo;s absolutely <em>nothing</em> in the document object model that you can use to grab the search term. The URL is blank, there&rsquo;s no search term printed on the page, no fairies whispering in your ear, NOTHING. I know, it sucks. Fire your developer. Just kidding. No, seriously, fire them. Yeah, I&rsquo;m just kidding.</p>
-
-<p>I&rsquo;ve chosen to fix this using <a href="https://www.simoahava.com/analytics/form-tracking-google-tag-manager/">form tracking</a>. It basically requires that your search field has some unique identifier you can grab hold of in the submit event. I hope you have a proper ID for the field (or at least a CLASS or NAME!). I&rsquo;m using ID here, again, but feel free to modify the script to get the value of the page.</p>
-
-<p>The thing is, you&rsquo;ll need to send a virtual pageview with the form submission, and it will have the search term in the Document Path as in the previous examples. However, if you send a new pageview with the search, you&rsquo;ll be double-counting your search views, since you&rsquo;ll be sending a pageview for when the search page loads as well! You don&rsquo;t want that. That&rsquo;s why this case is a bit more complex, as you&rsquo;ll be using a <em>browser cookie</em> to carry the search term into the search page pageview, so you can then use that as the document path.</p>
-
-<p>Here&rsquo;s what&rsquo;s happening:</p>
-
+<p>This is bleak, but it happens. There's absolutely <em>nothing</em> in the document object model that you can use to grab the search term. The URL is blank, there's no search term printed on the page, no fairies whispering in your ear, NOTHING. I know, it sucks. Fire your developer. Just kidding. No, seriously, fire them. Yeah, I'm just kidding.</p>
+<p>I've chosen to fix this using <a href="https://www.simoahava.com/analytics/form-tracking-google-tag-manager/">form tracking</a>. It basically requires that your search field has some unique identifier you can grab hold of in the submit event. I hope you have a proper ID for the field (or at least a CLASS or NAME!). I'm using ID here, again, but feel free to modify the script to get the value of the page.</p>
+<p>The thing is, you'll need to send a virtual pageview with the form submission, and it will have the search term in the Document Path as in the previous examples. However, if you send a new pageview with the search, you'll be double-counting your search views, since you'll be sending a pageview for when the search page loads as well! You don't want that. That's why this case is a bit more complex, as you'll be using a <em>browser cookie</em> to carry the search term into the search page pageview, so you can then use that as the document path.</p>
+<p>Here's what's happening:</p>
 <ol>
-<li><p>Have a Form Submit Listener tag firing on all pages</p></li>
-
-<li><p>Create a new Custom HTML Tag which fires upon <strong><code>{{event}}</code> equals gtm.formSubmit</strong>, i.e. when a form is submitted</p></li>
-
-<li><p>In this tag verify that a search was made, and retrieve the search term using a DOM Element Macro <code>{{search field value}}</code></p></li>
-
-<li><p>In the tag, save this search term in a new browser cookie named &ldquo;keyword&rdquo;</p></li>
-
-<li><p>Create a new 1st Party Cookie Macro <code>{{cookie search term}}</code>, which retrieves this cookie value</p></li>
-
-<li><p>In the <code>{{search path}}</code> Custom JavaScript Macro, check if cookie exists; if it does, use that as the virtual page path</p></li>
-
-<li><p>Utilize <code>{{search path}}</code> as the value of a new field in the <strong>Fields to set</strong> settings of the Tag. Set the field name to <strong>page</strong> and the macro as the field value.</p></li>
-
-<li><p>Create a new Custom JavaScript Macro <code>{{searchCallback}}</code>, which deletes the cookie in the callback function of the pageview tag</p></li>
+<li>
+<p>Have a Form Submit Listener tag firing on all pages</p>
+</li>
+<li>
+<p>Create a new Custom HTML Tag which fires upon <strong><code>{{event}}</code> equals gtm.formSubmit</strong>, i.e. when a form is submitted</p>
+</li>
+<li>
+<p>In this tag verify that a search was made, and retrieve the search term using a DOM Element Macro <code>{{search field value}}</code></p>
+</li>
+<li>
+<p>In the tag, save this search term in a new browser cookie named &ldquo;keyword&rdquo;</p>
+</li>
+<li>
+<p>Create a new 1st Party Cookie Macro <code>{{cookie search term}}</code>, which retrieves this cookie value</p>
+</li>
+<li>
+<p>In the <code>{{search path}}</code> Custom JavaScript Macro, check if cookie exists; if it does, use that as the virtual page path</p>
+</li>
+<li>
+<p>Utilize <code>{{search path}}</code> as the value of a new field in the <strong>Fields to set</strong> settings of the Tag. Set the field name to <strong>page</strong> and the macro as the field value.</p>
+</li>
+<li>
+<p>Create a new Custom JavaScript Macro <code>{{searchCallback}}</code>, which deletes the cookie in the callback function of the pageview tag</p>
+</li>
 </ol>
-
 <p>PHEW!</p>
-
 <p>First, the Form Submit Listener. This is easy, just create a new tag of type Form Submit Listener, and have it fire on all pages.</p>
-
 
 
 
@@ -555,9 +527,7 @@
 </div>
 
 
-
 <p>After that, create the DOM Element Macro <code>{{search field value}}</code>. Be sure to change the <strong>Element ID</strong> setting to the ID of the form field your webpage uses in site search.</p>
-
 
 
 
@@ -573,21 +543,15 @@
 </div>
 
 
-
 <p>Next, create a new Custom HTML Tag which fires upon <strong><code>{{event}}</code> equals gtm.formSubmit</strong>. Have the following code within:</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
   <span style="color:#66d9ef">if</span>({{<span style="color:#a6e22e">search</span> <span style="color:#a6e22e">field</span> <span style="color:#a6e22e">value</span>}} <span style="color:#f92672">&amp;&amp;</span> {{<span style="color:#a6e22e">search</span> <span style="color:#a6e22e">field</span> <span style="color:#a6e22e">value</span>}} <span style="color:#f92672">!==</span> <span style="color:#e6db74">&#39;null&#39;</span>) {
     document.<span style="color:#a6e22e">cookie</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;keyword=&#34;</span><span style="color:#f92672">+</span>{{<span style="color:#a6e22e">search</span> <span style="color:#a6e22e">field</span> <span style="color:#a6e22e">value</span>}}<span style="color:#f92672">+</span><span style="color:#e6db74">&#34;;path=/&#34;</span>;
   }
 &lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
-
 <p>Here we look for an HTML element with the ID &ldquo;search-field&rdquo;, and with a VALUE attribute. If this is found, then the content of this attribute is set into a new cookie named &ldquo;keyword&rdquo;. This is, in fact, whatever was typed into the search field at the time of form submission.</p>
-
-<p>(<strong>NOTE!</strong> If there are multiple forms on a page, you might want to enhance this tag with a check that it was actually the search form that was submitted. It&rsquo;s possible that another form is submitted with text in the search field, and this script would then falsely interpret this event as a submission of the site search form.)</p>
-
+<p>(<strong>NOTE!</strong> If there are multiple forms on a page, you might want to enhance this tag with a check that it was actually the search form that was submitted. It's possible that another form is submitted with text in the search field, and this script would then falsely interpret this event as a submission of the site search form.)</p>
 <p>Next, create a new 1st Party Cookie Macro, which retrieves the value from the &ldquo;keyword&rdquo; cookie. Call this <code>{{cookie search term}}</code>.</p>
-
 
 
 
@@ -603,9 +567,7 @@
 </div>
 
 
-
 <p>Next, modify the Custom JavaScript Macro <code>{{search path}}</code> to look like this:</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
   <span style="color:#66d9ef">if</span>({{<span style="color:#a6e22e">cookie</span> <span style="color:#a6e22e">search</span> <span style="color:#a6e22e">term</span>}}) {
     <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;/search/site?q=&#34;</span> <span style="color:#f92672">+</span> {{<span style="color:#a6e22e">cookie</span> <span style="color:#a6e22e">search</span> <span style="color:#a6e22e">term</span>}};
@@ -613,11 +575,8 @@
   <span style="color:#66d9ef">return</span>;
 }
 </code></pre></div>
-
 <p>So, first we check if the cookie exists. If it does, then its value is returned as a properly formatted Document Path for the pageview tag.</p>
-
 <p>Finally, create a new Custom JavaScript Macro <code>{{searchCallback}}</code>, which looks like this:</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
   <span style="color:#66d9ef">if</span>({{<span style="color:#a6e22e">cookie</span> <span style="color:#a6e22e">search</span> <span style="color:#a6e22e">term</span>}}) {
     <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">function</span>() {
@@ -627,11 +586,8 @@
   <span style="color:#66d9ef">return</span>;
 }
 </code></pre></div>
-
-<p>This looks for the &ldquo;keyword&rdquo; cookie, and if one is found, then the cookie is deleted. This is extremely important, since you don&rsquo;t want to keep on sending the virtual pageview with every single page load! Cookies are deleted by setting their expiration date to the past.</p>
-
+<p>This looks for the &ldquo;keyword&rdquo; cookie, and if one is found, then the cookie is deleted. This is extremely important, since you don't want to keep on sending the virtual pageview with every single page load! Cookies are deleted by setting their expiration date to the past.</p>
 <p>Put these all together in your pageview tag, utilizing the <strong>Fields to set</strong> with both <strong>hitCallback</strong> and <strong>page</strong> populated accordingly.</p>
-
 
 
 
@@ -647,23 +603,19 @@
 </div>
 
 
-
 <p>Why have the cookie deletion in the hitCallback and not in the macro which returns the document path? Well, two reasons:</p>
-
 <ol>
-<li><p>A macro shouldn&rsquo;t be used to set anything. The callback macro is obviously an exception, since it RETURNS a function which sets something.</p></li>
-
-<li><p>There&rsquo;s some weird race condition in play, and if you refer to the 1st Party Cookie macro in the same script which also deletes the cookie, the macro returns an undefined. I&rsquo;ll have to research this phenomenon a bit more.</p></li>
+<li>
+<p>A macro shouldn't be used to set anything. The callback macro is obviously an exception, since it RETURNS a function which sets something.</p>
+</li>
+<li>
+<p>There's some weird race condition in play, and if you refer to the 1st Party Cookie macro in the same script which also deletes the cookie, the macro returns an undefined. I'll have to research this phenomenon a bit more.</p>
+</li>
 </ol>
-
-<p>This was way more difficult than the other methods, and let&rsquo;s face it: If you need to resort to the form submission, you should probably flog your developer first. Make them create a site search engine that actually works with analytics, since it really is one of the best things you can measure.</p>
-
+<p>This was way more difficult than the other methods, and let's face it: If you need to resort to the form submission, you should probably flog your developer first. Make them create a site search engine that actually works with analytics, since it really is one of the best things you can measure.</p>
 <h2 id="conclusions">Conclusions</h2>
-
-<p>I was long overdue a traditional tutorial post, so I hope you&rsquo;ve enjoyed this one. I&rsquo;m still working on the JavaScript for GTM: Part 2 (<a href="https://www.simoahava.com/analytics/javascript-101-gtm-part-1/">check Part 1 here</a>), but now I&rsquo;m also dreaming about the mini-vacation that starts tomorrow.</p>
-
+<p>I was long overdue a traditional tutorial post, so I hope you've enjoyed this one. I'm still working on the JavaScript for GTM: Part 2 (<a href="https://www.simoahava.com/analytics/javascript-101-gtm-part-1/">check Part 1 here</a>), but now I'm also dreaming about the mini-vacation that starts tomorrow.</p>
 <p>However, if this post raises any questions, if you have other ideas for tracking site search, or if you have a problem you need help with, feel free to drop a line below in the comments! Nothing like a JavaScript challenge to make summer more fun.</p>
-
 <p>Have a great, warm, relaxing summer, my friends! Live life to the fullest, and dream of JavaScript and all things wonderful.</p>
 
               

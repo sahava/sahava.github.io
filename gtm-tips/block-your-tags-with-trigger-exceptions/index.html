@@ -53,7 +53,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.59.1 with theme Tranquilpeak 0.4.3-BETA">
+    <meta name="generator" content="Hugo 0.61.0 with theme Tranquilpeak 0.4.3-BETA">
     <title>#GTMTips: Block Your Tags With Trigger Exceptions | Simo Ahava's blog</title>
     
     <script>
@@ -319,20 +319,19 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              
-
-<p>To prevent a Tag from firing in <a href="https://tagmanager.google.com">Google Tag Manager</a>, you can:</p>
-
+              <p>To prevent a Tag from firing in <a href="https://tagmanager.google.com">Google Tag Manager</a>, you can:</p>
 <ol>
-<li><p>Delete the Tag</p></li>
-
-<li><p>Remove all Triggers from the Tag</p></li>
-
-<li><p>Add an <strong>Exception</strong> Trigger to the Tag</p></li>
+<li>
+<p>Delete the Tag</p>
+</li>
+<li>
+<p>Remove all Triggers from the Tag</p>
+</li>
+<li>
+<p>Add an <strong>Exception</strong> Trigger to the Tag</p>
+</li>
 </ol>
-
 <p>The third option is usually the best if the blocking is just temporary. Exceptions are what used to be called <em>blocking rules</em> in the first version of GTM. To add them is easy enough. In the <strong>Fire On</strong> step of Tag creation, you can click <strong>Create Exceptions</strong>, and choose the Trigger that will block this Tag from firing.</p>
-
 
 
 
@@ -348,11 +347,8 @@
 </div>
 
 
-
-<p>However, creating an Exception can lead to confusion, as you have to pick a <strong>Trigger type</strong> for the exception! But you just wanted to block a Tag from firing; what&rsquo;s with this Trigger type nonsense?!</p>
-
+<p>However, creating an Exception can lead to confusion, as you have to pick a <strong>Trigger type</strong> for the exception! But you just wanted to block a Tag from firing; what's with this Trigger type nonsense?!</p>
 <h2 id="tip-29-event-of-an-exception-must-match-event-of-the-tag">Tip 29: Event of an Exception must match Event of the Tag</h2>
-
 
 
 
@@ -368,21 +364,15 @@
 </div>
 
 
-
 <p>Every single Tag needs an Event to fire. An Event, in the GTM world, is a special <code>event</code> key that is pushed into <code>dataLayer</code>, either automatically by Google Tag Manager, or manually by the website developer:</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
   <span style="color:#e6db74">&#39;event&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;triggerSomeTag&#39;</span>,
   <span style="color:#e6db74">&#39;money&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;lots&#39;</span>
 });
 </code></pre></div>
-
 <p>When an <code>event</code> key is pushed into <code>dataLayer</code>, GTM goes through <strong>all</strong> Triggers attached to Tags, and looks for Triggers which respond to this Event.</p>
-
 <p>If such a Trigger is found, and if any other Trigger conditions pass, then the Tag can happily fire.</p>
-
-<p>If you want to <strong>block</strong> a Tag from firing, you will essentially need to create an Exception for <strong>every single Event</strong> you want to prevent the Tag from firing on - individually. So let&rsquo;s say you have a Tag which fires on Page View, Click, and Form, and you want to block it from firing on Page View and Click, but you still want it to respond to a Form submission. The Trigger you&rsquo;d need to create as an Exception looks like this:</p>
-
+<p>If you want to <strong>block</strong> a Tag from firing, you will essentially need to create an Exception for <strong>every single Event</strong> you want to prevent the Tag from firing on - individually. So let's say you have a Tag which fires on Page View, Click, and Form, and you want to block it from firing on Page View and Click, but you still want it to respond to a Form submission. The Trigger you'd need to create as an Exception looks like this:</p>
 
 
 
@@ -398,21 +388,20 @@
 </div>
 
 
-
 <p>Now, when you add this Trigger as an <strong>Exception</strong> to a Tag, the following will happen:</p>
-
 <ol>
-<li><p>Upon Page View (i.e. when the container snippet loads), GTM finds the Event name <strong>gtm.js</strong> (Page View Event) in the Exception Trigger and prevents the Tag from firing.</p></li>
-
-<li><p>Upon a Click Event, GTM finds the Event name <strong>gtm.click</strong> in the Exception Trigger and prevents the Tag from firing.</p></li>
-
-<li><p>Upon a Form Submit Event, GTM does not find the Event name <strong>gtm.formSubmit</strong> in the Exception Trigger, and the Tag fires</p></li>
+<li>
+<p>Upon Page View (i.e. when the container snippet loads), GTM finds the Event name <strong>gtm.js</strong> (Page View Event) in the Exception Trigger and prevents the Tag from firing.</p>
+</li>
+<li>
+<p>Upon a Click Event, GTM finds the Event name <strong>gtm.click</strong> in the Exception Trigger and prevents the Tag from firing.</p>
+</li>
+<li>
+<p>Upon a Form Submit Event, GTM does not find the Event name <strong>gtm.formSubmit</strong> in the Exception Trigger, and the Tag fires</p>
+</li>
 </ol>
-
 <p>So as you can see, an Exception always wins against the corresponding Trigger. The Custom Event Trigger type combined with RegEx matching is a very powerful way of blocking multiple Events at once.</p>
-
-<p>If you want to create a comprehensive, universal, block-all Trigger Exception, all you need to do is set the Event name field to <strong>.</strong>* in the Exception Trigger. This means that whenever <em>any</em> Event is registered by GTM, the Exception will block every single one of these, as they are all covered by the wildcard pattern in the regular expression.</p>
-
+<p>If you want to create a comprehensive, universal, block-all Trigger Exception, all you need to do is set the Event name field to <strong>.</strong>* in the Exception Trigger. This means that whenever _any_ Event is registered by GTM, the Exception will block every single one of these, as they are all covered by the wildcard pattern in the regular expression.</p>
 <p>Key takeaway here is this: the Exception Event must match the Trigger Event. For example, if you want to block a Click Trigger, you need to have a Click Trigger blocking it. Indeed, an easy way to block a single Trigger is to add the very same Trigger as the Exception!</p>
 
               

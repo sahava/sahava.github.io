@@ -53,7 +53,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.59.1 with theme Tranquilpeak 0.4.3-BETA">
+    <meta name="generator" content="Hugo 0.61.0 with theme Tranquilpeak 0.4.3-BETA">
     <title>#GTMTips: Remove Email Addresses From URL Parameters | Simo Ahava's blog</title>
     
     <script>
@@ -319,14 +319,9 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              
-
-<p>PII (Personally Identifiable Information) is something we need to actively combat against when using Google Analytics, as the platform <a href="https://support.google.com/analytics/answer/2795983">explicitly forbids</a> sending PII to Google Analytics properties in any size, form, or shape.</p>
-
-<p>One of the most common ways of accidentally passing PII to a property is via query parameters. Many email platforms out there, for example, see no problem in including the user&rsquo;s email address in the query string, especially when the user follows a link in a newsletter. This is, however, a definite no-no in Google Analytics. Thus, I wanted to create a blanket solution for proactively weeding out potential PII in your Google Analytics Tags deployed via Google Tag Manager.</p>
-
+              <p>PII (Personally Identifiable Information) is something we need to actively combat against when using Google Analytics, as the platform <a href="https://support.google.com/analytics/answer/2795983">explicitly forbids</a> sending PII to Google Analytics properties in any size, form, or shape.</p>
+<p>One of the most common ways of accidentally passing PII to a property is via query parameters. Many email platforms out there, for example, see no problem in including the user's email address in the query string, especially when the user follows a link in a newsletter. This is, however, a definite no-no in Google Analytics. Thus, I wanted to create a blanket solution for proactively weeding out potential PII in your Google Analytics Tags deployed via Google Tag Manager.</p>
 <h2 id="tip-25-remove-email-addresses-from-url-parameters">Tip 25: Remove email addresses from URL parameters</h2>
-
 
 
 
@@ -342,9 +337,7 @@
 </div>
 
 
-
-<p>For this solution to work, you&rsquo;ll need to create a new user-defined variable in GTM, which returns the URL Query string. In this example, the variable is called <strong>{{URL Query}}</strong>, and it looks like this:</p>
-
+<p>For this solution to work, you'll need to create a new user-defined variable in GTM, which returns the URL Query string. In this example, the variable is called <strong>{{URL Query}}</strong>, and it looks like this:</p>
 
 
 
@@ -360,9 +353,7 @@
 </div>
 
 
-
-<p>After this, you need to create the Custom JavaScript Variable itself. Let&rsquo;s name it <strong>{{Return URL Query without email}}</strong>, and it looks like this:</p>
-
+<p>After this, you need to create the Custom JavaScript Variable itself. Let's name it <strong>{{Return URL Query without email}}</strong>, and it looks like this:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
   <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">q</span> <span style="color:#f92672">=</span> {{<span style="color:#a6e22e">URL</span> <span style="color:#a6e22e">Query</span>}}.<span style="color:#a6e22e">length</span> <span style="color:#f92672">?</span> <span style="color:#e6db74">&#39;&amp;&#39;</span> <span style="color:#f92672">+</span> {{<span style="color:#a6e22e">URL</span> <span style="color:#a6e22e">Query</span>}} <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;&#39;</span>;  
   <span style="color:#75715e">// q = decodeURIComponent(q);
@@ -370,19 +361,13 @@
   <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">newQ</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">&lt;=</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">?</span> <span style="color:#e6db74">&#39;&#39;</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">newQ</span>;
 }
 </code></pre></div>
-
-<p>Thanks to Phil Pearce and David Vallejo for pointing out some errors in the original script. Also thanks to Steven J in the comments of this post for suggesting to check if the new query string just has one character (&lsquo;?&rsquo;).</p>
-
-<p>Uncomment the commented line if your URL Query strings tend to have HTML encoded characters (e.g. %3D for &lsquo;=&rsquo;, and %26 for &lsquo;&amp;&lsquo;).</p>
-
+<p>Thanks to Phil Pearce and David Vallejo for pointing out some errors in the original script. Also thanks to Steven J in the comments of this post for suggesting to check if the new query string just has one character ('?').</p>
+<p>Uncomment the commented line if your URL Query strings tend to have HTML encoded characters (e.g. %3D for &lsquo;=&rsquo;, and %26 for &lsquo;&amp;').</p>
 <p>The JavaScript function above is a very simple regular expression search-and-replace, which looks for an email address in the URL query string. If it finds one (or more), it simply removes the offending key-value pair(s) from the query string, and returns the stripped result.</p>
-
-<p>To implement this in your Tags, you&rsquo;ll need to add the following to <em>every single</em> Google Analytics Tag in <strong>Fields to Set</strong>.</p>
-
-<p>Field name: <strong>page</strong><br />
+<p>To implement this in your Tags, you'll need to add the following to <em>every single</em> Google Analytics Tag in <strong>Fields to Set</strong>.</p>
+<p>Field name: <strong>page</strong><br>
 Value: <strong>{{Page Path}}{{Return URL Query without email}}</strong></p>
-
-<p>It&rsquo;s not perfect, it&rsquo;s a bit cumbersome as you need to implement it in all Tags, but especially with large websites that invite a lot of traffic, it might save you from data loss due to Terms of Service infringement.</p>
+<p>It's not perfect, it's a bit cumbersome as you need to implement it in all Tags, but especially with large websites that invite a lot of traffic, it might save you from data loss due to Terms of Service infringement.</p>
 
               
 

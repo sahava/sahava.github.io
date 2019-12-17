@@ -53,7 +53,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.59.1 with theme Tranquilpeak 0.4.3-BETA">
+    <meta name="generator" content="Hugo 0.61.0 with theme Tranquilpeak 0.4.3-BETA">
     <title>Troubleshooting Cross-Domain Tracking In Google Analytics | Simo Ahava's blog</title>
     
     <script>
@@ -319,12 +319,8 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              
-
-<p><a href="https://support.google.com/analytics/answer/1034342?hl=en">Cross-domain tracking</a>, in <a href="https://analytics.google.com/">Google Analytics</a>, is the process of passing information stored in browser cookies from one domain to another. Due to web browsers&rsquo; <a href="https://en.wikipedia.org/wiki/Same-origin_policy">same-origin policy</a>, a browser cookie is only available to the domain it is written on and all its subdomains (by default). Since Google Analytics uses cookies to persist the <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/cookies-user-id">Client ID</a>, once the user moves from domain to domain it&rsquo;s important to somehow pass this Client ID, too.</p>
-
-<p>Cross-domain tracking isn&rsquo;t the easiest thing to implement, though. At its easiest, especially if you use <a href="https://tagmanager.google.com/">Google Tag Manager</a>, it&rsquo;s a question of configuring a couple of fields in your Google Analytics trackers and snippets. However, issues typically arise when your website uses unconventional link redirects, or when you want to <a href="https://www.simoahava.com/analytics/iframe-cross-domain-tracking-in-google-tag-manager/">persist the Client ID in an iframe</a> loaded from another domain.</p>
-
+              <p><a href="https://support.google.com/analytics/answer/1034342?hl=en">Cross-domain tracking</a>, in <a href="https://analytics.google.com/">Google Analytics</a>, is the process of passing information stored in browser cookies from one domain to another. Due to web browsers&rsquo; <a href="https://en.wikipedia.org/wiki/Same-origin_policy">same-origin policy</a>, a browser cookie is only available to the domain it is written on and all its subdomains (by default). Since Google Analytics uses cookies to persist the <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/cookies-user-id">Client ID</a>, once the user moves from domain to domain it's important to somehow pass this Client ID, too.</p>
+<p>Cross-domain tracking isn't the easiest thing to implement, though. At its easiest, especially if you use <a href="https://tagmanager.google.com/">Google Tag Manager</a>, it's a question of configuring a couple of fields in your Google Analytics trackers and snippets. However, issues typically arise when your website uses unconventional link redirects, or when you want to <a href="https://www.simoahava.com/analytics/iframe-cross-domain-tracking-in-google-tag-manager/">persist the Client ID in an iframe</a> loaded from another domain.</p>
 
 
 
@@ -340,25 +336,15 @@
 </div>
 
 
-
-<p>In this article, I thought I&rsquo;d provide a short <strong>checklist</strong> to go through when issues with cross-domain tracking arise.</p>
-
+<p>In this article, I thought I'd provide a short <strong>checklist</strong> to go through when issues with cross-domain tracking arise.</p>
 <h2 id="how-to-test-if-cross-domain-tracking-is-working">How to test if cross-domain tracking is working</h2>
-
 <p>If cross-domain tracking <strong>is working</strong>, all traffic from one domain to another should be part of the same session, and thus attributed to the same <strong>Source / Medium</strong> dimensions.</p>
-
-<p><strong>You should not use Google Analytics&rsquo; Real Time Reports to analyze the cross-domain pattern!</strong> Real Time Reports show each hit only with the dimensions and parameters carried by the hit itself. This means that you won&rsquo;t be able to debug session-scoped stuff like Source and Medium using only what you see in the Real Time Reports.</p>
-
-<p>In other words, you&rsquo;ll need to wait for the hits to populate in the standard reports.</p>
-
+<p><strong>You should not use Google Analytics&rsquo; Real Time Reports to analyze the cross-domain pattern!</strong> Real Time Reports show each hit only with the dimensions and parameters carried by the hit itself. This means that you won't be able to debug session-scoped stuff like Source and Medium using only what you see in the Real Time Reports.</p>
+<p>In other words, you'll need to wait for the hits to populate in the standard reports.</p>
 <p>The easiest way to verify if cross-domain tracking is working in Google Analytics, is to browse to the first domain using custom <a href="https://support.google.com/analytics/answer/1033867">UTM parameters</a>, for example:</p>
-
-<p><strong>www.domainA.com/?utm_source=xdom_test&amp;utm_medium=xdom_test&amp;utm_campaign=xdom_test</strong></p>
-
+<p><strong><a href="http://www.domainA.com/?utm_source=xdom_test&amp;utm_medium=xdom_test&amp;utm_campaign=xdom_test">www.domainA.com/?utm_source=xdom_test&amp;utm_medium=xdom_test&amp;utm_campaign=xdom_test</a></strong></p>
 <p>Then, while still browsing the first domain, click a link or open a page with the iframe to the second domain.</p>
-
 <p>After this is done, in the Google Analytics View which shows data from both domains, you can apply a segment to only include your custom campaign traffic:</p>
-
 
 
 
@@ -374,33 +360,28 @@
 </div>
 
 
-
 <p>Once the data hits the Google Analytics reports, you should find your single session when applying the segment. After that, go to the <strong>Behavior &gt; Site Content &gt; All Pages</strong> report. If cross-domain tracking is working properly, you should see both the pageview(s) from the source domain and the pageview(s) from the target domain in the report.</p>
-
-<p>If cross-domain tracking isn&rsquo;t working, you&rsquo;ll only see the pageview(s) from the source domain. The following checklist should help in this case.</p>
-
+<p>If cross-domain tracking isn't working, you'll only see the pageview(s) from the source domain. The following checklist should help in this case.</p>
 <h2 id="the-checklist">The Checklist</h2>
-
 <p>For cross-domain tracking to work on your website and Google Analytics Property, the following things need to all be in place.</p>
-
 <ol>
-<li><p>All domains included in cross-domain tracking must collect data to the <strong>same Google Analytics Property</strong> - Jump to details</p></li>
-
-<li><p>All domains that are the <em>source</em> of cross-domain traffic, i.e. the traffic departs <em>from</em> these domains, need to be in the <strong>Referral Exclusion List</strong> of the Google Analytics Property settings - Jump to details</p></li>
-
-<li><p>When entering the target domain via a link in the source domain or an iframe, the URL of the page loaded in the web browser must have the <strong>_ga=1.234567.234567.234567</strong> URL query parameter in place - Jump to details</p></li>
-
-<li><p>Any Google Analytics trackers or tags firing on the target domain need to have the <strong>allowLinker</strong> field set to <strong>true</strong> - Jump to details</p></li>
+<li>
+<p>All domains included in cross-domain tracking must collect data to the <strong>same Google Analytics Property</strong> - Jump to details</p>
+</li>
+<li>
+<p>All domains that are the <em>source</em> of cross-domain traffic, i.e. the traffic departs <em>from</em> these domains, need to be in the <strong>Referral Exclusion List</strong> of the Google Analytics Property settings - Jump to details</p>
+</li>
+<li>
+<p>When entering the target domain via a link in the source domain or an iframe, the URL of the page loaded in the web browser must have the <strong>_ga=1.234567.234567.234567</strong> URL query parameter in place - Jump to details</p>
+</li>
+<li>
+<p>Any Google Analytics trackers or tags firing on the target domain need to have the <strong>allowLinker</strong> field set to <strong>true</strong> - Jump to details</p>
+</li>
 </ol>
-
-<p>These are the four basic steps you need to make cross-domain tracking work on your site. Note that steps (3) and (4) have complicated workarounds for when query parameters or the <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/linker">linker plugin</a> won&rsquo;t work, but in the majority of cases these four steps are enough.</p>
-
-<p>In the following chapters, I&rsquo;ll examine each step in more detail.</p>
-
+<p>These are the four basic steps you need to make cross-domain tracking work on your site. Note that steps (3) and (4) have complicated workarounds for when query parameters or the <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/linker">linker plugin</a> won't work, but in the majority of cases these four steps are enough.</p>
+<p>In the following chapters, I'll examine each step in more detail.</p>
 <h2 id="1-collect-all-data-to-the-same-google-analytics-property">1. Collect all data to the same Google Analytics Property</h2>
-
 <p>A <a href="https://support.google.com/analytics/answer/2649554?hl=en">Property</a> in Google Analytics is a tracking configuration that collects data from your digital applications such as your website. Each Property in Google Analytics has a unique identifier, known as the Tracking ID:</p>
-
 
 
 
@@ -416,17 +397,11 @@
 </div>
 
 
-
 <p>Every Property has its own table of data, which comprises all the hits that are sent to that particular Property. Thus, each Property has its own users, sessions, and aggregation buckets, and these data sets are unique to each Property.</p>
-
-<p>Because of this, it&rsquo;s important that when you collect cross-domain traffic across two separate domains, both domains <strong>will need to collect data to the same Google Analytics Property</strong>. There is no such thing as <em>cross-domain traffic across Google Analytics properties</em>, and the only way to even approach something like that would be to utilize the <a href="https://support.google.com/analytics/answer/6033415">Roll-up Reporting</a> feature of Google Analytics Premium.</p>
-
+<p>Because of this, it's important that when you collect cross-domain traffic across two separate domains, both domains <strong>will need to collect data to the same Google Analytics Property</strong>. There is no such thing as <em>cross-domain traffic across Google Analytics properties</em>, and the only way to even approach something like that would be to utilize the <a href="https://support.google.com/analytics/answer/6033415">Roll-up Reporting</a> feature of Google Analytics Premium.</p>
 <h2 id="2-domains-in-the-referral-exclusion-list">2. Domains in the Referral Exclusion List</h2>
-
-<p>Universal Analytics starts a new session whenever a new referral is detected as a traffic source. Thus, if you first enter a site via Google&rsquo;s organic search (<strong>google / organic</strong>), and then follow a cross-domain link from the source domain to the target domain, the target domain hit would be recorded as having originated from <strong>sourceDomain.com / referral</strong>, marking the start of a new session. And this is even if you have cross-domain tracking otherwise in place!</p>
-
-<p>By utilizing the Referral Exclusion List, you&rsquo;re telling Google Analytics to disregard referral traffic from the source domain, and to treat it as Direct traffic instead. Universal Analytics relies on Direct traffic for campaign attribution as well as session stitching. Each hit in the session, after the initial acquisition, is actually a &ldquo;Direct&rdquo; hit, and this is how Google Analytics knows that the session should still be kept alive.</p>
-
+<p>Universal Analytics starts a new session whenever a new referral is detected as a traffic source. Thus, if you first enter a site via Google's organic search (<strong>google / organic</strong>), and then follow a cross-domain link from the source domain to the target domain, the target domain hit would be recorded as having originated from <strong>sourceDomain.com / referral</strong>, marking the start of a new session. And this is even if you have cross-domain tracking otherwise in place!</p>
+<p>By utilizing the Referral Exclusion List, you're telling Google Analytics to disregard referral traffic from the source domain, and to treat it as Direct traffic instead. Universal Analytics relies on Direct traffic for campaign attribution as well as session stitching. Each hit in the session, after the initial acquisition, is actually a &ldquo;Direct&rdquo; hit, and this is how Google Analytics knows that the session should still be kept alive.</p>
 
 
 
@@ -442,23 +417,14 @@
 </div>
 
 
-
 <p>So, Referral Exclusion List keeps the traffic from the source domain to the target domain part of the same session, which is crucial for you to make sense of cross-domain traffic. Thus make sure that you have all the possible source domains, i.e. domains that send traffic to other domains, in the Referral Exclusion List of your Google Analytics property settings.</p>
-
 <h2 id="3-linker-parameter-in-the-url">3. Linker parameter in the URL</h2>
-
 <p>As I said in the very beginning of this article, Google Analytics relies on the Client ID to assign hits to specific sessions and users. The Client ID is stored in a browser cookie named <strong>_ga</strong>, which is, by default, written on the highest possible domain name the website has access to. On my website, for example, the <strong>_ga</strong> cookie would be written on <strong>simoahava.com</strong>, and thus it is available to simoahava.com and all its possible subdomains.</p>
-
 <p>When you move from domain to domain, this Client ID needs to somehow travel with the user, but due to the restrictions of the web browsers&rsquo; same-origin policy, the target domain cannot simply fetch the cookie written on the source domain.</p>
-
 <p>For this reason, Google Analytics has introduced the <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/linker">linker</a> plugin. When you invoke the plugin, it returns a URL query parameter which includes the Client ID as well as a <strong>signature</strong> which is valid for <strong>2 minutes</strong>. So, if you visit a different domain URL with the query parameter within the two minute window, cross-domain traffic could be setup between the two domains.</p>
-
 <p>The two minute window exists to prevent linker parameters from persisting in shared links and browser history entries. Otherwise every time someone would follow a link with the linker parameter in place, they would be considered the original user who created the link. This would lead into a horrible mess, as it would be almost impossible to distinguish users from each other.</p>
-
 <p>A typical way of loading the linker plugin is by using the <strong><a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/linker#autolink">autoLink</a></strong> feature of the plugin. When you use autoLink, you provide it with domain names that you want to automatically decorate with the linker parameters. Then when the user clicks a link or invokes a form redirection that has the given domain name as its target, autoLink automatically decorates the URL with the linker parameters.</p>
-
-<p>In Google Tag Manager, you&rsquo;d edit the Auto Link Domains field:</p>
-
+<p>In Google Tag Manager, you'd edit the Auto Link Domains field:</p>
 
 
 
@@ -474,9 +440,7 @@
 </div>
 
 
-
-<p>You&rsquo;ll know its working when you see the <strong>_ga=1.234567.234567.234567</strong> query parameter in the URL.</p>
-
+<p>You'll know its working when you see the <strong>_ga=1.234567.234567.234567</strong> query parameter in the URL.</p>
 
 
 
@@ -492,23 +456,14 @@
 </div>
 
 
-
-<p>If you don&rsquo;t see the parameter in the URL, it means that for some reason the autoLink plugin failed. Instead, you&rsquo;ll need to manually decorate the URLs. This is particularly the case when working with <strong>iframes</strong>, as the <a href="https://www.simoahava.com/analytics/iframe-cross-domain-tracking-in-google-tag-manager/">iframe must be loaded with the linker parameters</a> in its <code>src</code> attribute, if you want cross-domain traffic to work between the parent page and the framed document.</p>
-
+<p>If you don't see the parameter in the URL, it means that for some reason the autoLink plugin failed. Instead, you'll need to manually decorate the URLs. This is particularly the case when working with <strong>iframes</strong>, as the <a href="https://www.simoahava.com/analytics/iframe-cross-domain-tracking-in-google-tag-manager/">iframe must be loaded with the linker parameters</a> in its <code>src</code> attribute, if you want cross-domain traffic to work between the parent page and the framed document.</p>
 <p>To manually decorate the URLs, you or your web developer needs to write a piece of code which <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/linker#manually_adding_linker_parameters">takes the linker parameter and appends it to the URL</a> of the link or the iframe just before the document is loaded.</p>
-
 <p>So, remember that for a basic cross-domain setup to work, the URL of the target page, whether opened by a link, redirected by a form, or loaded in an iframe, needs to have the linker parameter <strong>_ga=1.234567.234567.234567</strong> in the URL.</p>
-
 <h2 id="4-allowlinker-in-the-target-domain">4. allowLinker in the target domain</h2>
-
-<p>Now you&rsquo;ve got the URL query parameters in place, the Referral Exclusion List has all the necessary source domains, and you&rsquo;re collecting data from both the source and target domain to the same Google Analytics Property.</p>
-
+<p>Now you've got the URL query parameters in place, the Referral Exclusion List has all the necessary source domains, and you're collecting data from both the source and target domain to the same Google Analytics Property.</p>
 <p>Just one thing missing.</p>
-
 <p>For the trackers in the target domain to respect the <strong>_ga=1.234567.234567.234567</strong> linker parameter in the URL, you need to tell the trackers to allow the linker parameter to reset the Client ID on the target domain.</p>
-
-<p>You do this by configuring the <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/linker#configuring_a_site_to_accept_linker_parameters">allowLinker field in the tracker object</a>. In GTM, you&rsquo;d simply add a new field:</p>
-
+<p>You do this by configuring the <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/linker#configuring_a_site_to_accept_linker_parameters">allowLinker field in the tracker object</a>. In GTM, you'd simply add a new field:</p>
 
 
 
@@ -524,11 +479,8 @@
 </div>
 
 
-
 <p>This setting tells the tracker to use the Client ID embedded in the linker parameter rather than the one created by the tracker on the target domain.</p>
-
-<p>You can verify that it&rsquo;s working by opening the <strong>Network</strong> Tab in your web browser&rsquo;s developer tools, and loading a page both on the source domain as well as on the target domain after following a cross-domain link, for example. All requests to <strong>/collect</strong> should have the parameter <strong>&cid;</strong> use the same value. This tells you that the Client ID is the same across the domains.</p>
-
+<p>You can verify that it's working by opening the <strong>Network</strong> Tab in your web browser's developer tools, and loading a page both on the source domain as well as on the target domain after following a cross-domain link, for example. All requests to <strong>/collect</strong> should have the parameter <strong>&amp;cid;</strong> use the same value. This tells you that the Client ID is the same across the domains.</p>
 
 
 
@@ -544,21 +496,22 @@
 </div>
 
 
-
 <h2 id="summary">Summary</h2>
-
 <p>There are many ways in which cross-domain tracking can malfunction, but there are actually only four moving parts to it:</p>
-
 <ol>
-<li><p>All domains need to collect data to the same Google Analytics Property</p></li>
-
-<li><p>All source domains need to be listed in the Referral Exclusion List of the Google Analytics Property</p></li>
-
-<li><p>The target domain URLs opened via the source domain need to be decorated with linker parameters</p></li>
-
-<li><p>The target domain Google Analytics trackers need to have the allowLinker field configured</p></li>
+<li>
+<p>All domains need to collect data to the same Google Analytics Property</p>
+</li>
+<li>
+<p>All source domains need to be listed in the Referral Exclusion List of the Google Analytics Property</p>
+</li>
+<li>
+<p>The target domain URLs opened via the source domain need to be decorated with linker parameters</p>
+</li>
+<li>
+<p>The target domain Google Analytics trackers need to have the allowLinker field configured</p>
+</li>
 </ol>
-
 <p>Once all four of these pass inspection, cross-domain tracking should work without a hitch.</p>
 
               
