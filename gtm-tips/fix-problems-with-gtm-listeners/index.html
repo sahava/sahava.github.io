@@ -53,7 +53,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.59.1 with theme Tranquilpeak 0.4.3-BETA">
+    <meta name="generator" content="Hugo 0.61.0 with theme Tranquilpeak 0.4.3-BETA">
     <title>#GTMtips: Fix Problems With GTM Listeners | Simo Ahava's blog</title>
     
     <script>
@@ -319,12 +319,8 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              
-
-<p>I&rsquo;ve written about this before <a href="https://www.simoahava.com/analytics/google-analytics-page-load/">here</a> and <a href="https://www.simoahava.com/analytics/dont-gtm-listeners-work/">here</a>, but this issue remains probably the biggest problem users have when implementing Google Tag Manager.</p>
-
-<h2 id="tip-10-resolve-conflicts-with-gtm-s-listeners">Tip 10: Resolve conflicts with GTM&rsquo;s listeners</h2>
-
+              <p>I've written about this before <a href="https://www.simoahava.com/analytics/google-analytics-page-load/">here</a> and <a href="https://www.simoahava.com/analytics/dont-gtm-listeners-work/">here</a>, but this issue remains probably the biggest problem users have when implementing Google Tag Manager.</p>
+<h2 id="tip-10-resolve-conflicts-with-gtms-listeners">Tip 10: Resolve conflicts with GTM's listeners</h2>
 
 
 
@@ -340,13 +336,9 @@
 </div>
 
 
-
-<p>The tip title is actually wrong. You&rsquo;re not fixing <a href="http://tagmanager.google.com">Google Tag Manager</a> listeners. Rather, you&rsquo;re resolving conflicts that <em>other</em> scripts on your page might introduce.</p>
-
-<p>GTM&rsquo;s event listening is based on something called <strong>event delegation</strong>. Event delegation makes use of the document object model (DOM) and its tree-like hierarchy.</p>
-
-<p>When a click occurs on a node, such as a link element, the click event begins to <strong>bubble</strong> up the DOM tree. It passes through every single ancestral node on its way to the top. This means that instead of attaching a listener to every single link element, GTM attaches the listener on the top-most document node (the <code>document</code> itself). This way it will capture the event once it has bubbled up all the way to the top. It&rsquo;s much more economical to listen for events this way, as you don&rsquo;t have to pollute the elements with individual handlers.</p>
-
+<p>The tip title is actually wrong. You're not fixing <a href="http://tagmanager.google.com">Google Tag Manager</a> listeners. Rather, you're resolving conflicts that <em>other</em> scripts on your page might introduce.</p>
+<p>GTM's event listening is based on something called <strong>event delegation</strong>. Event delegation makes use of the document object model (DOM) and its tree-like hierarchy.</p>
+<p>When a click occurs on a node, such as a link element, the click event begins to <strong>bubble</strong> up the DOM tree. It passes through every single ancestral node on its way to the top. This means that instead of attaching a listener to every single link element, GTM attaches the listener on the top-most document node (the <code>document</code> itself). This way it will capture the event once it has bubbled up all the way to the top. It's much more economical to listen for events this way, as you don't have to pollute the elements with individual handlers.</p>
 
 
 
@@ -362,17 +354,11 @@
 </div>
 
 
-
-<p>A conflict occurs when somewhere along this way up, the event&rsquo;s path is obstructed. The term we use here is that its <strong>propagation is stopped</strong>. If this happens, GTM&rsquo;s listeners never capture the event, and thus they will never work with your tags.</p>
-
+<p>A conflict occurs when somewhere along this way up, the event's path is obstructed. The term we use here is that its <strong>propagation is stopped</strong>. If this happens, GTM's listeners never capture the event, and thus they will never work with your tags.</p>
 <p>The most common way that propagation is stopped is:</p>
-
 <p><strong><code>return false;</code> in a jQuery event handler</strong></p>
-
-<p>If there&rsquo;s a <code>return false;</code> in your jQuery event handler, propagation is stopped. The <code>return false;</code> statement in jQuery combines both <code>preventDefault()</code> AND <code>stopPropagation()</code> on the event object. There&rsquo;s an easy fix to this: invoke ONLY <code>preventDefault()</code>. This should work almost always, unless there&rsquo;s a specific reason you want propagation to stop.</p>
-
+<p>If there's a <code>return false;</code> in your jQuery event handler, propagation is stopped. The <code>return false;</code> statement in jQuery combines both <code>preventDefault()</code> AND <code>stopPropagation()</code> on the event object. There's an easy fix to this: invoke ONLY <code>preventDefault()</code>. This should work almost always, unless there's a specific reason you want propagation to stop.</p>
 <p>For example:</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#75715e">// Before - propagation stopped
 </span><span style="color:#75715e"></span><span style="color:#a6e22e">$</span>(<span style="color:#e6db74">&#39;a#toTop&#39;</span>).<span style="color:#a6e22e">on</span>(<span style="color:#e6db74">&#39;click&#39;</span>, <span style="color:#66d9ef">function</span>() {
   <span style="color:#75715e">// some code
@@ -384,18 +370,12 @@
   <span style="color:#75715e">// some code
 </span><span style="color:#75715e"></span>});
 </code></pre></div>
-
-<p><code>preventDefault()</code> prevents the default action of the click but it doesn&rsquo;t stop propagation. I&rsquo;d say around 95% of the time, this is enough for your dynamic scripts.</p>
-
+<p><code>preventDefault()</code> prevents the default action of the click but it doesn't stop propagation. I'd say around 95% of the time, this is enough for your dynamic scripts.</p>
 <p>There are other ways to stop propagation (such as an explicit call to <code>e.stopPropagation()</code>), but the jQuery scenario is by far the most common one.</p>
-
 <h2 id="fix-it">Fix it!</h2>
-
-<p>The first thing you want to try is to <strong>uncheck Check Validation</strong> in your link click or form submit trigger. If Check Validation is on, it means that GTM&rsquo;s handlers will not fire even with a proper <code>preventDefault()</code>. The listener will only fire if an uninterrupted / untouched event object propagates to the document node.</p>
-
-<p>The second thing is to look through your scripts and try to find the offending jQuery / other handlers. Look for hints of propagation being stopped. Fix them yourself or ask your developers to fix them. Look for custom <strong>AJAX</strong> functions as well, especially with forms. With forms, it&rsquo;s possible that a <code>submit()</code> is never called. Instead, an AJAX POST request is sent to a backend validator or something.</p>
-
-<p>The third thing you should try is the best: <strong>talk to your developers</strong>. Educate them. Tell them that GTM&rsquo;s listeners require that clicks and form submits propagate to the document node. If they get that, they should be able to fix it. If they don&rsquo;t understand this, make them learn the basics of JavaScript again.</p>
+<p>The first thing you want to try is to <strong>uncheck Check Validation</strong> in your link click or form submit trigger. If Check Validation is on, it means that GTM's handlers will not fire even with a proper <code>preventDefault()</code>. The listener will only fire if an uninterrupted / untouched event object propagates to the document node.</p>
+<p>The second thing is to look through your scripts and try to find the offending jQuery / other handlers. Look for hints of propagation being stopped. Fix them yourself or ask your developers to fix them. Look for custom <strong>AJAX</strong> functions as well, especially with forms. With forms, it's possible that a <code>submit()</code> is never called. Instead, an AJAX POST request is sent to a backend validator or something.</p>
+<p>The third thing you should try is the best: <strong>talk to your developers</strong>. Educate them. Tell them that GTM's listeners require that clicks and form submits propagate to the document node. If they get that, they should be able to fix it. If they don't understand this, make them learn the basics of JavaScript again.</p>
 
               
 
@@ -503,7 +483,7 @@
         </article>
         <footer id="footer" class="main-content-wrap">
   <span class="copyrights">
-    &copy; 2019 Simo Ahava. All Rights Reserved
+    &copy; 2020 Simo Ahava. All Rights Reserved
   </span>
 </footer>
 

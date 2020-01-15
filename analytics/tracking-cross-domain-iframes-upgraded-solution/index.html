@@ -53,7 +53,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.59.1 with theme Tranquilpeak 0.4.3-BETA">
+    <meta name="generator" content="Hugo 0.61.0 with theme Tranquilpeak 0.4.3-BETA">
     <title>Tracking Cross-domain Iframes - Upgraded Solution | Simo Ahava's blog</title>
     
     <script>
@@ -319,14 +319,9 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              
-
-<p>Some years ago, I wrote a post on <a href="https://www.simoahava.com/analytics/iframe-cross-domain-tracking-in-google-tag-manager/">how to track cross-domain iframes</a> when using <a href="https://tagmanager.google.com">Google Tag Manager</a> and <a href="https://analytics.google.com">Google Analytics</a>. That solution relied on <a href="https://www.simoahava.com/gtm-tips/hitcallback-eventcallback/"><code>hitCallback</code></a> to decorate the iframe, and now that I look back on it, it has its shortcomings.</p>
-
-<p>For one, the older solution used <code>hitCallback</code> which, while being reliable in that Google Analytics has definitely loaded with the linker plugin when the method is called, doesn&rsquo;t take into account the possible race condition of the script running before the iframe has been loaded.</p>
-
+              <p>Some years ago, I wrote a post on <a href="https://www.simoahava.com/analytics/iframe-cross-domain-tracking-in-google-tag-manager/">how to track cross-domain iframes</a> when using <a href="https://tagmanager.google.com">Google Tag Manager</a> and <a href="https://analytics.google.com">Google Analytics</a>. That solution relied on <a href="https://www.simoahava.com/gtm-tips/hitcallback-eventcallback/"><code>hitCallback</code></a> to decorate the iframe, and now that I look back on it, it has its shortcomings.</p>
+<p>For one, the older solution used <code>hitCallback</code> which, while being reliable in that Google Analytics has definitely loaded with the linker plugin when the method is called, doesn't take into account the possible race condition of the script running before the iframe has been loaded.</p>
 <p>An additional problem was that the older solution simply grabbed the linker from the first Google Analytics tracker object on the page. But this might not be the one we want to use for the cross-domain tracking.</p>
-
 
 
 
@@ -342,9 +337,7 @@
 </div>
 
 
-
-<p>In this solution, we&rsquo;ll use the wonderful <a href="https://www.simoahava.com/analytics/customtask-the-guide/"><code>customTask</code></a> to decorate the target iframe. The <code>customTask</code> leverages a <code>setInterval()</code> script which polls the page periodically until the target iframe is found or a timeout is reached.</p>
-
+<p>In this solution, we'll use the wonderful <a href="https://www.simoahava.com/analytics/customtask-the-guide/"><code>customTask</code></a> to decorate the target iframe. The <code>customTask</code> leverages a <code>setInterval()</code> script which polls the page periodically until the target iframe is found or a timeout is reached.</p>
 
 
 
@@ -360,13 +353,9 @@
 </div>
 
 
-
 <p>Naturally, this script has been added to my <a href="https://www.simoahava.com/tools/customtask-builder/">customTask Builder tool</a>.</p>
-
 <h2 id="the-customtask-itself">The customTask itself</h2>
-
 <p>This is what the <code>customTask</code> looks like. To deploy it, make sure you read the instructions in the <a href="https://www.simoahava.com/tools/customtask-builder/">customTask Builder tool</a> before copy-pasting the required code into your page JavaScript (if using the <a href="https://www.simoahava.com/tools/customtask-builder/#deployment-with-analytics-js">Universal Analytics on-page snippet</a>) or a Custom JavaScript variable (if using <a href="https://www.simoahava.com/tools/customtask-builder/#deployment-with-google-tag-manager">Google Tag Manager</a>).</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
   <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">iframeDecorator</span> <span style="color:#f92672">=</span> {
     <span style="color:#a6e22e">selector</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;iframe#decorateMe&#39;</span>,
@@ -409,9 +398,7 @@
   };
 }
 </code></pre></div>
-
 <p>To begin with, make sure to edit the configuration object <code>iframeDecorator</code>. Set the parameters to their correct values.</p>
-
 <table>
 <thead>
 <tr>
@@ -420,26 +407,22 @@
 <th>Description</th>
 </tr>
 </thead>
-
 <tbody>
 <tr>
 <td>selector</td>
 <td><code>&quot;#decorateMe&quot;</code></td>
 <td>String with the <a href="https://www.simoahava.com/gtm-tips/10-useful-css-selectors/">CSS selector</a> that matches the iframe you want to decorate.</td>
 </tr>
-
 <tr>
 <td>attempts</td>
 <td><code>10</code></td>
 <td>Number denoting how many times the page is polled for the iframe until the script stops trying.</td>
 </tr>
-
 <tr>
 <td>intervalMs</td>
 <td><code>1000</code></td>
 <td>Milliseconds between each attempt to find the iframe on the page.</td>
 </tr>
-
 <tr>
 <td>useAnchor</td>
 <td><code>false</code></td>
@@ -447,41 +430,24 @@
 </tr>
 </tbody>
 </table>
-
-<p>Once you&rsquo;ve edited these, you&rsquo;ll need to add this <code>customTask</code> to your trackers or tags.</p>
-
-<p>Make sure to add this <code>customTask</code> to a hit or tag that fires after (or shortly before) the iframe element has been added to the page. The script has a timeout which is <code>attempts * intervalMs</code> milliseconds, so if the script doesn&rsquo;t find the iframe by this timeout, the script will no longer poll the page, and the iframe will remain undecorated.</p>
-
-<p><strong>For example</strong>, if the iframe is in the page HTML template itself, it&rsquo;s typically enough to add this <code>customTask</code> to the Page View hit that fires as soon as the page starts to load (so <strong>All Pages</strong> trigger in GTM, or the on-page snippet if using Universal Analytics).</p>
-
-<p>But if the iframe is added in a modal upon the click of a button, for example, you&rsquo;ll want to fire a Google Analytics hit <em>with</em> that click, and then make sure to include this <code>customTask</code> in the hit.</p>
-
+<p>Once you've edited these, you'll need to add this <code>customTask</code> to your trackers or tags.</p>
+<p>Make sure to add this <code>customTask</code> to a hit or tag that fires after (or shortly before) the iframe element has been added to the page. The script has a timeout which is <code>attempts * intervalMs</code> milliseconds, so if the script doesn't find the iframe by this timeout, the script will no longer poll the page, and the iframe will remain undecorated.</p>
+<p><strong>For example</strong>, if the iframe is in the page HTML template itself, it's typically enough to add this <code>customTask</code> to the Page View hit that fires as soon as the page starts to load (so <strong>All Pages</strong> trigger in GTM, or the on-page snippet if using Universal Analytics).</p>
+<p>But if the iframe is added in a modal upon the click of a button, for example, you'll want to fire a Google Analytics hit <em>with</em> that click, and then make sure to include this <code>customTask</code> in the hit.</p>
 <h2 id="how-it-works">How it works</h2>
-
-<p>When the hit to Google Analytics is generated, this <code>customTask</code> repeatedly asks the page: &ldquo;Is there an iframe that matches the given CSS selector?&rdquo;. If this iframe is found before the timeout (<code>attempts * intervalMs</code>), then the iframe path is decorated with the <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/linker">cross-domain linker parameter</a>.</p>
-
+<p>When the hit to Google Analytics is generated, this <code>customTask</code> repeatedly asks the page: &ldquo;Is there an iframe that matches the given CSS selector?&quot;. If this iframe is found before the timeout (<code>attempts * intervalMs</code>), then the iframe path is decorated with the <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/linker">cross-domain linker parameter</a>.</p>
 <p>This, in turn, means that when the page within the iframe loads, the URL of the page will have the <code>_ga=</code> cross-domain linker parameter, which is then utilized by the first tag that fires in the iframe with the <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/linker#configuring_a_site_to_accept_linker_parameters"><code>allowLinker</code></a> flag set to <code>true</code>.</p>
-
 <h2 id="caveats">Caveats</h2>
-
-<p>Note that this <strong>only decorates the iframe <code>src</code> path</strong>. This is the only thing you can do from the source site, so if it doesn&rsquo;t work, you&rsquo;re out of luck with this solution. Some iframes might introduce a redirect when the original <code>src</code> is loaded, which often eliminates the query parameter from the URL. If this is the case, you can try setting the <code>useAnchor</code> parameter to <code>true</code>, which might be more resilient to redirects.</p>
-
+<p>Note that this <strong>only decorates the iframe <code>src</code> path</strong>. This is the only thing you can do from the source site, so if it doesn't work, you're out of luck with this solution. Some iframes might introduce a redirect when the original <code>src</code> is loaded, which often eliminates the query parameter from the URL. If this is the case, you can try setting the <code>useAnchor</code> parameter to <code>true</code>, which might be more resilient to redirects.</p>
 <blockquote>
-<p>If you&rsquo;re interested in a viable alternative to the linker parameter, take a look at the <code>postMessage API</code> introduced in <a href="https://www.bounteous.com/insights/2015/11/24/tracking-complex-interactions-in-iframes-embedded-server-side-google-analytics-iframes-pt-4/">this great article</a> by Dan Wilkerson from Bounteous.</p>
+<p>If you're interested in a viable alternative to the linker parameter, take a look at the <code>postMessage API</code> introduced in <a href="https://www.bounteous.com/insights/2015/11/24/tracking-complex-interactions-in-iframes-embedded-server-side-google-analytics-iframes-pt-4/">this great article</a> by Dan Wilkerson from Bounteous.</p>
 </blockquote>
-
-<p>Be wary, also, that this <code>customTask</code> uses the cookie configuration of the hit that the <code>customTask</code> was added to. So if this hit has an exceptional cookie configuration, it&rsquo;s possible the linker is built with the wrong Client ID.</p>
-
+<p>Be wary, also, that this <code>customTask</code> uses the cookie configuration of the hit that the <code>customTask</code> was added to. So if this hit has an exceptional cookie configuration, it's possible the linker is built with the wrong Client ID.</p>
 <p>In other words, make sure you are aware of any modifications to the default cookie settings in the tracker, hit or tag to which the <code>customTask</code> is added.</p>
-
 <p>There is no real penalty to adding this <code>customTask</code> directly to the tracker or all your Universal Analytics tags. If the iframe already has a cross-domain parameter in the <code>src</code> value, the script simply stops attempting to decorate the iframe.</p>
-
 <h2 id="summary">Summary</h2>
-
-<p>This is an alternative approach to my <a href="https://www.simoahava.com/analytics/iframe-cross-domain-tracking-in-google-tag-manager/">original solution</a> of using <code>hitCallback</code> to decorate the iframe. In my humble opinion, I think this <code>customTask</code> wipes the floor with my original idea, so I&rsquo;m fully recommending using this instead.</p>
-
-<p>My feelings on iframes haven&rsquo;t really changed since writing the original article, so I&rsquo;ll just include the relevant excerpt here for you to sympathize with.</p>
-
+<p>This is an alternative approach to my <a href="https://www.simoahava.com/analytics/iframe-cross-domain-tracking-in-google-tag-manager/">original solution</a> of using <code>hitCallback</code> to decorate the iframe. In my humble opinion, I think this <code>customTask</code> wipes the floor with my original idea, so I'm fully recommending using this instead.</p>
+<p>My feelings on iframes haven't really changed since writing the original article, so I'll just include the relevant excerpt here for you to sympathize with.</p>
 
 
 
@@ -495,7 +461,6 @@
   
   
 </div>
-
 
 
 <p>If you want to vent, please let me know what you think about iframes in the comments of this article.</p>
@@ -606,7 +571,7 @@
         </article>
         <footer id="footer" class="main-content-wrap">
   <span class="copyrights">
-    &copy; 2019 Simo Ahava. All Rights Reserved
+    &copy; 2020 Simo Ahava. All Rights Reserved
   </span>
 </footer>
 

@@ -53,7 +53,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.59.1 with theme Tranquilpeak 0.4.3-BETA">
+    <meta name="generator" content="Hugo 0.61.0 with theme Tranquilpeak 0.4.3-BETA">
     <title>Persist dataLayer In Google Tag Manager | Simo Ahava's blog</title>
     
     <script>
@@ -319,20 +319,12 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              
-
-<p>(Update 19 November 2018: See <a href="https://www.simoahava.com/analytics/persist-datalayer-across-pages/">this article</a> for a more elegant solution.)</p>
-
+              <p>(Update 19 November 2018: See <a href="https://www.simoahava.com/analytics/persist-datalayer-across-pages/">this article</a> for a more elegant solution.)</p>
 <p>If you know your <a href="https://www.simoahava.com/analytics/javascript-101-gtm-part-1/">JavaScript</a>, you know that all variables, functions, objects, resources, and data in the document get rewritten with every page load. In other words, every single page refresh builds the page from scratch, and the state of the document before the page refresh is left drifting in the ocean of oblivion.</p>
-
-<p><a href="http://www.google.com/tagmanager">Google Tag Manager</a>&rsquo;s dataLayer is also one such entity. It gets rewritten with every page load, so it&rsquo;s not possible to have a dataLayer variable <em>persist</em> from one page to the other without using cookies or, as I&rsquo;m going to show in this guide, the <a href="http://www.w3schools.com/html/html5_webstorage.asp">HTML5 Web Storage API</a>. For web analytics, this is a bit of a shame. It forces us to think of things in the scope of a single page, when rarely anything worth mentioning has a lifespan that short.</p>
-
-<p>Before we begin, <a href="http://blog.intlock.com/google-tag-manager-persistent-data-layer-per-session-and-per-visitor/">take a look</a> at what Shay Sharon expertly wrote two years ago about the persistent dataLayer. In his solution, cookies are used to carry the dataLayer across page refreshes. It&rsquo;s a good patch, and it performs the task admirably. However, the thing with cookies is that they can be deleted (and usually are). Also, the length of the cookie string is limited (though 4KB is still plenty), and there&rsquo;s always the fact that cookies are resolved with every single page load (since they are part of the document object).</p>
-
-<p>Data in browser storage, on the other hand, is actually pretty difficult to delete on a granular level, it has a huge quota, and it&rsquo;s only retrieved and stored on demand. Also, using <code>localStorage</code> (more about this soon), you have the data stored indefinitely, so <em>user-level</em> storage is very easy to implement.</p>
-
-<p>(<strong>UPDATE</strong>: Remember that browser local storage should be treated the same as cookies when observing the <a href="http://www.cookielaw.org/">cookie laws</a> of your country. Thanks to Martijn Visser for pointing this out (he&rsquo;s from the Netherlands, and they have pretty much the strictest interpretation of the cookie law in place.))</p>
-
+<p><a href="http://www.google.com/tagmanager">Google Tag Manager</a>&lsquo;s dataLayer is also one such entity. It gets rewritten with every page load, so it's not possible to have a dataLayer variable <em>persist</em> from one page to the other without using cookies or, as I'm going to show in this guide, the <a href="http://www.w3schools.com/html/html5_webstorage.asp">HTML5 Web Storage API</a>. For web analytics, this is a bit of a shame. It forces us to think of things in the scope of a single page, when rarely anything worth mentioning has a lifespan that short.</p>
+<p>Before we begin, <a href="http://blog.intlock.com/google-tag-manager-persistent-data-layer-per-session-and-per-visitor/">take a look</a> at what Shay Sharon expertly wrote two years ago about the persistent dataLayer. In his solution, cookies are used to carry the dataLayer across page refreshes. It's a good patch, and it performs the task admirably. However, the thing with cookies is that they can be deleted (and usually are). Also, the length of the cookie string is limited (though 4KB is still plenty), and there's always the fact that cookies are resolved with every single page load (since they are part of the document object).</p>
+<p>Data in browser storage, on the other hand, is actually pretty difficult to delete on a granular level, it has a huge quota, and it's only retrieved and stored on demand. Also, using <code>localStorage</code> (more about this soon), you have the data stored indefinitely, so <em>user-level</em> storage is very easy to implement.</p>
+<p>(<strong>UPDATE</strong>: Remember that browser local storage should be treated the same as cookies when observing the <a href="http://www.cookielaw.org/">cookie laws</a> of your country. Thanks to Martijn Visser for pointing this out (he's from the Netherlands, and they have pretty much the strictest interpretation of the cookie law in place.))</p>
 
 
 
@@ -348,21 +340,13 @@
 </div>
 
 
-
-<p>In this guide, I&rsquo;ll give you an API of sorts to save, load, replace, and delete items from the local storage. I use a 30 minute expiration for data in <code>localStorage</code> to mimic session-length storage.</p>
-
+<p>In this guide, I'll give you an API of sorts to save, load, replace, and delete items from the local storage. I use a 30 minute expiration for data in <code>localStorage</code> to mimic session-length storage.</p>
 <h2 id="introducing-localstorage">Introducing localStorage</h2>
-
-<p><code>localStorage</code> stores data indefinitely in your browser&rsquo;s own storage compartment. It has a larger-than-needed size limit (around 5MB), and data is handled more securely than with cookies. Cookies, you see, are written on the document every time you load a page, and this introduces potential security risks.</p>
-
-<p>Items in <code>localStorage</code>, on the other hand, are retrieved only when called. This way all the data you store will be picked up on demand, and all you need to do is make sure your script handles the data correctly (which is what I&rsquo;ll do for you in this guide).</p>
-
+<p><code>localStorage</code> stores data indefinitely in your browser's own storage compartment. It has a larger-than-needed size limit (around 5MB), and data is handled more securely than with cookies. Cookies, you see, are written on the document every time you load a page, and this introduces potential security risks.</p>
+<p>Items in <code>localStorage</code>, on the other hand, are retrieved only when called. This way all the data you store will be picked up on demand, and all you need to do is make sure your script handles the data correctly (which is what I'll do for you in this guide).</p>
 <p>In <code>localStorage</code>, data is written as key-value pairs, but unlike with dataLayer, both the key and the value need to be of String type. This means that in order to save stuff from dataLayer, which can hold any types of values, to <code>localStorage</code>, some object serialization and type conversion needs to take place (Object =&gt; String). Similarly, the reverse needs to take place when loading data from <code>localStorage</code> and pushing it to dataLayer.</p>
-
 <h2 id="the-persistent-datalayer-api">The Persistent dataLayer API</h2>
-
 <p>Without further ado, allow me to introduce the Persistent dataLayer API. Copy the following code into a Custom HTML Tag, and read on.</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
   (<span style="color:#66d9ef">function</span>() {
     <span style="color:#75715e">// Declare some utility variables
@@ -434,52 +418,46 @@
     }
   })();
 &lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
-
 <p>The tag will need the following firing rule:</p>
-
 <p><strong>{{event}} matches RegEx ^(gtm.js|persist(Save|Replace|Delete))</strong></p>
-
-<p>Here&rsquo;s a rundown of how the API works, before I go into the technical stuff:</p>
-
+<p>Here's a rundown of how the API works, before I go into the technical stuff:</p>
 <ol>
-<li><p><strong>With every page load</strong>, dataLayer variables stored in <code>localStorage</code> are retrieved and pushed into dataLayer.</p></li>
-
-<li><p><strong>When pushing an object with &lsquo;event&rsquo;: &lsquo;persistSave&rsquo;</strong>, all variables in the same push (e.g. &lsquo;pageCount&rsquo; and &lsquo;author&rsquo; in <code>dataLayer.push({'event': 'persistSave', 'pageCount': '5', 'author': 'Simo-Ahava'});</code>) are saved to <code>localStorage</code>. If a variable with the same name already exists in <code>localStorage</code>, it is updated with the new value.</p></li>
-
-<li><p><strong>When pushing an object with &lsquo;event&rsquo;: &lsquo;persistDelete&rsquo;</strong>, all dataLayer variables in <code>localStorage</code> are deleted.</p></li>
-
-<li><p><strong>When pushing an object with &lsquo;event&rsquo;: &lsquo;persistReplace&rsquo;</strong>, all existing dataLayer variables in <code>localstorage</code> are deleted, and all variables in the <code>dataLayer.push()</code> are saved.</p></li>
+<li>
+<p><strong>With every page load</strong>, dataLayer variables stored in <code>localStorage</code> are retrieved and pushed into dataLayer.</p>
+</li>
+<li>
+<p><strong>When pushing an object with &lsquo;event&rsquo;: &lsquo;persistSave&rsquo;</strong>, all variables in the same push (e.g. &lsquo;pageCount&rsquo; and &lsquo;author&rsquo; in <code>dataLayer.push({'event': 'persistSave', 'pageCount': '5', 'author': 'Simo-Ahava'});</code>) are saved to <code>localStorage</code>. If a variable with the same name already exists in <code>localStorage</code>, it is updated with the new value.</p>
+</li>
+<li>
+<p><strong>When pushing an object with &lsquo;event&rsquo;: &lsquo;persistDelete&rsquo;</strong>, all dataLayer variables in <code>localStorage</code> are deleted.</p>
+</li>
+<li>
+<p><strong>When pushing an object with &lsquo;event&rsquo;: &lsquo;persistReplace&rsquo;</strong>, all existing dataLayer variables in <code>localstorage</code> are deleted, and all variables in the <code>dataLayer.push()</code> are saved.</p>
+</li>
 </ol>
-
 <p>So remember the following commands:</p>
-
 <p><code>dataLayer.push({'var1': 'value1', 'var2': 'value2', **'event': 'persistSave'**});</code> stores &lsquo;var1&rsquo; and &lsquo;var2&rsquo; (with values) to <code>localStorage</code>.</p>
-
-<p><code>dataLayer.push({'var1': 'value1', 'var2': 'value2', **'event': 'persistDelete'**});</code> deletes all saved dataLayer variables in <code>localStorage</code>; doesn&rsquo;t store anything.</p>
-
+<p><code>dataLayer.push({'var1': 'value1', 'var2': 'value2', **'event': 'persistDelete'**});</code> deletes all saved dataLayer variables in <code>localStorage</code>; doesn't store anything.</p>
 <p><code>dataLayer.push({'var1': 'value1', 'var2': 'value2', **'event': 'persistReplace'**});</code> deletes all saved dataLayer variables in <code>localStorage</code>; stores &lsquo;var1&rsquo; and &lsquo;var2&rsquo; (with values) to localStorage.</p>
-
 <p>A few additional details:</p>
-
 <ul>
-<li><p>With every page load, variables are loaded from <code>localStorage</code> and pushed to dataLayer. Even though the tag itself fires on <strong>{{event}} equals gtm.js</strong>, there&rsquo;s a slight delay when processing data through the Storage API. This means that usually the variables appear in dataLayer after <strong>gtm.dom</strong> but before <strong>gtm.load</strong>.</p></li>
-
-<li><p>Every interaction with <code>localStorage</code>, resets the 30 minute expiration timer. If a page load occurs so that the last interaction was over 30 minutes ago, all saved dataLayer variables in <code>localStorage</code> are deleted.</p></li>
-
-<li><p>Before saving the data, dataLayer variables are serialized into a String. When loading from <code>localStorage</code>, they are parsed from JSON back to their original types. Thus Arrays, objects, and primitive values are restored to their original types before pushed back into dataLayer.</p></li>
+<li>
+<p>With every page load, variables are loaded from <code>localStorage</code> and pushed to dataLayer. Even though the tag itself fires on <strong>{{event}} equals gtm.js</strong>, there's a slight delay when processing data through the Storage API. This means that usually the variables appear in dataLayer after <strong>gtm.dom</strong> but before <strong>gtm.load</strong>.</p>
+</li>
+<li>
+<p>Every interaction with <code>localStorage</code>, resets the 30 minute expiration timer. If a page load occurs so that the last interaction was over 30 minutes ago, all saved dataLayer variables in <code>localStorage</code> are deleted.</p>
+</li>
+<li>
+<p>Before saving the data, dataLayer variables are serialized into a String. When loading from <code>localStorage</code>, they are parsed from JSON back to their original types. Thus Arrays, objects, and primitive values are restored to their original types before pushed back into dataLayer.</p>
+</li>
 </ul>
-
 <h2 id="technical-stuff">Technical stuff</h2>
-
-<p>Let&rsquo;s go over the code (almost) line-by-line.</p>
-
+<p>Let's go over the code (almost) line-by-line.</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">(<span style="color:#66d9ef">function</span>() {
 ...
 })();
 </code></pre></div>
-
-<p>The function is wrapped in an IIFE (immediately invoked function expression). This is because I want to avoid using the global scope when utilizing so many different variables. Scoping the variables to this function ensures that I don&rsquo;t mess with global variables of some other library, for example.</p>
-
+<p>The function is wrapped in an IIFE (immediately invoked function expression). This is because I want to avoid using the global scope when utilizing so many different variables. Scoping the variables to this function ensures that I don't mess with global variables of some other library, for example.</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">retrievedDL</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;&#39;</span>,
 <span style="color:#a6e22e">getDL</span> <span style="color:#f92672">=</span> {},
 <span style="color:#a6e22e">saveDL</span> <span style="color:#f92672">=</span> {},
@@ -488,20 +466,15 @@
 <span style="color:#a6e22e">timeStorage</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;&#39;</span>,
 <span style="color:#a6e22e">persistTime</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1000</span><span style="color:#f92672">*</span><span style="color:#ae81ff">60</span><span style="color:#f92672">*</span><span style="color:#ae81ff">30</span>; <span style="color:#75715e">// Expiration in milliseconds; set to null to never expire
 </span></code></pre></div>
-
 <p>Here I introduce a bunch of utility variables. If you want to have the storage persist for ever and ever, set <code>persistTime = null;</code>.</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">if</span>(<span style="color:#66d9ef">typeof</span>(<span style="color:#a6e22e">Storage</span>)<span style="color:#f92672">!==</span><span style="color:#e6db74">&#39;undefined&#39;</span>) {
   <span style="color:#a6e22e">retrievedDL</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">localStorage</span>.<span style="color:#a6e22e">getItem</span>(<span style="color:#e6db74">&#39;persistDL&#39;</span>);
   <span style="color:#a6e22e">timeStorage</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">localStorage</span>.<span style="color:#a6e22e">getItem</span>(<span style="color:#e6db74">&#39;persistTime&#39;</span>);
   ...
 }
 </code></pre></div>
-
-<p>Only run the API if the browser supports HTML5 Web Storage. It&rsquo;s basically only a problem with IE versions older than 8. I saw no reason to provide an alternative for them, since if you&rsquo;re still using IE7 or older, you deserve a horrible browsing experience.</p>
-
-<p>Check Shay Sharon&rsquo;s excellent post I linked to in the beginning for a cookie-solution to the persistent dataLayer. That should work with your crappy, out-of-date browser.</p>
-
+<p>Only run the API if the browser supports HTML5 Web Storage. It's basically only a problem with IE versions older than 8. I saw no reason to provide an alternative for them, since if you're still using IE7 or older, you deserve a horrible browsing experience.</p>
+<p>Check Shay Sharon's excellent post I linked to in the beginning for a cookie-solution to the persistent dataLayer. That should work with your crappy, out-of-date browser.</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">loadDL</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>() {
   <span style="color:#66d9ef">if</span>(<span style="color:#a6e22e">retrievedDL</span>) {
     <span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(<span style="color:#a6e22e">retrievedDL</span>));
@@ -519,21 +492,13 @@
   }
   <span style="color:#66d9ef">break</span>;
 </code></pre></div>
-
 <p>With every page load, parse the dataLayer variables in <code>localStorage</code> back to their original types, and push them into dataLayer as a single object. If you want to set a trigger event to fire your tags after the variables have been loaded from <code>localStorage</code>, uncomment the line with &lsquo;event&rsquo;: &lsquo;DLLoaded&rsquo;. This way you can have your dependent tags fire on <strong>{{event}} equals DLLoaded</strong> to ensure that they have access to the stored variables.</p>
-
-<p>Also, if the variables in storage expire (default is 30 minutes since last interaction), no data is loaded and the variables are deleted from <code>localStorage</code>. If you&rsquo;ve set <code>persistTime = null;</code>, then there&rsquo;s no expiration for the data in storage, and the variables are stored until they are manually deleted.</p>
-
+<p>Also, if the variables in storage expire (default is 30 minutes since last interaction), no data is loaded and the variables are deleted from <code>localStorage</code>. If you've set <code>persistTime = null;</code>, then there's no expiration for the data in storage, and the variables are stored until they are manually deleted.</p>
 <p>When a <code>dataLayer.push();</code> is made so that the object that is pushed contains the property &lsquo;event&rsquo;: &lsquo;persistSave&rsquo;, the function <code>storeDL()</code> is run.</p>
-
-<p>First, the function removes the &lsquo;event&rsquo; property from the object that was pushed into dataLayer. This is done because you don&rsquo;t want to store the trigger event itself in <code>localStorage</code>. (Another possibility is to just skip the &lsquo;event&rsquo; property when storing properties into <code>localStorage</code>.)</p>
-
+<p>First, the function removes the &lsquo;event&rsquo; property from the object that was pushed into dataLayer. This is done because you don't want to store the trigger event itself in <code>localStorage</code>. (Another possibility is to just skip the &lsquo;event&rsquo; property when storing properties into <code>localStorage</code>.)</p>
 <p>Next, each property in this dataLayer object is pushed into the object that was found in <code>localStorage</code>. Thus, all variables that were already stored are updated with new values, and new variables are appended.</p>
-
 <p>Finally, the object, now serialized into a string of keys and values, is stored in <code>localStorage</code>, waiting to be loaded with a new page refresh.</p>
-
 <p>If the &lsquo;event&rsquo; was &lsquo;persistReplace&rsquo;, then this the <code>storeDL()</code> is run as well, but all dataLayer variables in storage are replaced with the new variables.</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">deleteDL</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>() {
   <span style="color:#a6e22e">localStorage</span>.<span style="color:#a6e22e">removeItem</span>(<span style="color:#e6db74">&#39;persistDL&#39;</span>);
 }
@@ -542,20 +507,13 @@
   <span style="color:#a6e22e">deleteDL</span>();
   <span style="color:#66d9ef">break</span>;
 </code></pre></div>
-
 <p>If the trigger event was &lsquo;persistDelete&rsquo;, all dataLayer variables in <code>localStorage</code> are deleted.</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">localStorage</span>.<span style="color:#a6e22e">setItem</span>(<span style="color:#e6db74">&#39;persistTime&#39;</span>, <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">timeNow</span>));
 </code></pre></div>
-
 <p>Finally, every time the script is run, the current time is saved as a timestamp in <code>localStorage</code>.</p>
-
 <h2 id="conclusions">Conclusions</h2>
-
-<p>I&rsquo;ve noticed that many people have been aching for a persistent dataLayer. I&rsquo;m pretty sure this post will become obsolete as soon as the GTM team choose to deploy such a feature into the product itself, but until then, this should serve you well.</p>
-
+<p>I've noticed that many people have been aching for a persistent dataLayer. I'm pretty sure this post will become obsolete as soon as the GTM team choose to deploy such a feature into the product itself, but until then, this should serve you well.</p>
 <p>And if nothing else, at least you got to learn about yet another really cool JavaScript API!</p>
-
 <p>Do you have suggestions for the API? Or maybe you have a sweet use case for persistent variables that you might want to share with others?</p>
 
               
@@ -666,7 +624,7 @@
         </article>
         <footer id="footer" class="main-content-wrap">
   <span class="copyrights">
-    &copy; 2019 Simo Ahava. All Rights Reserved
+    &copy; 2020 Simo Ahava. All Rights Reserved
   </span>
 </footer>
 

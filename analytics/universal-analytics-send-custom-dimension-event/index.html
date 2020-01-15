@@ -53,7 +53,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.59.1 with theme Tranquilpeak 0.4.3-BETA">
+    <meta name="generator" content="Hugo 0.61.0 with theme Tranquilpeak 0.4.3-BETA">
     <title>Universal Analytics: Send Custom Dimension With Event | Simo Ahava's blog</title>
     
     <script>
@@ -319,31 +319,18 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              
-
-<p>(Last updated March 2014)
+              <p>(Last updated March 2014)
 This post is the final chapter of a trilogy. The ultimate refinement, if you will. It all started with my foray into the murky waters of context, when I tested how <a href="https://www.simoahava.com/web-development/universal-analytics-weather-custom-dimension/">weather data</a> could be used to provide extra information about site visits. When I wrote that post, I had two trepidations: 1) does sending the API call with every single page view affect site performance negatively, and 2) does forcing the page view call to wait for the API call to complete affect the quality of visit metrics.</p>
-
 <p>I fixed (1) to my satisfaction in a later post on <a href="https://www.simoahava.com/analytics/universal-analytics-fire-script-just-per-session/">utilizing a custom cookie</a> to make the API call just once per session. This meant that site performance improved, since the API call (which might take up to 500ms) is done just once per visit. Also, it has a positive effect on visit calculation, since the possibility of the page view call failing to complete due to problems in the chain of events is minimized.</p>
-
-<p>However, I was still not happy with having <strong>any</strong> code executed before the page view, because page views are something you don&rsquo;t want to compromise due to, for example, problems with a third-party API (such as the weather API).</p>
-
+<p>However, I was still not happy with having <strong>any</strong> code executed before the page view, because page views are something you don't want to compromise due to, for example, problems with a third-party API (such as the weather API).</p>
 <p>So I did what I should have been doing all along.</p>
-
 <h2 id="custom-dimensions-can-be-sent-with-events-as-well">Custom dimensions can be sent with events as well</h2>
-
-<p>Here&rsquo;s a little background. I have a script which polls a weather API, with the visitor&rsquo;s location as the parameter. The script collects the weather conditions of said location, and passes them to a <em>visit-scope</em> custom dimension, which is then sent to Google Analytics.</p>
-
-<p>A custom dimension scoped for visits (or sessions) means that you just have to <a href="https://developers.google.com/analytics/devguides/platform/customdimsmets#scope">send it once per visit.</a> All subsequent and previous hits (page views, events, transactions) of the visit are annotated with the dimension as well. Naturally, it&rsquo;s a no-brainer to thus send the dimension just once per session, hence the need for a custom cookie (again, see <a href="https://www.simoahava.com/analytics/universal-analytics-fire-script-just-per-session/">this post</a>).</p>
-
+<p>Here's a little background. I have a script which polls a weather API, with the visitor's location as the parameter. The script collects the weather conditions of said location, and passes them to a <em>visit-scope</em> custom dimension, which is then sent to Google Analytics.</p>
+<p>A custom dimension scoped for visits (or sessions) means that you just have to <a href="https://developers.google.com/analytics/devguides/platform/customdimsmets#scope">send it once per visit.</a> All subsequent and previous hits (page views, events, transactions) of the visit are annotated with the dimension as well. Naturally, it's a no-brainer to thus send the dimension just once per session, hence the need for a custom cookie (again, see <a href="https://www.simoahava.com/analytics/universal-analytics-fire-script-just-per-session/">this post</a>).</p>
 <p>Also, since you can send the same custom dimension <strong>with an event</strong>, why even use a page view? A non-interaction event does the same thing PLUS you can compare the number of weather events and visits from the same time period to see if there are discrepancies which indicate problems with the API call.</p>
-
-<p>Another perk, if using GTM, is that you don&rsquo;t need separate, confusing page view tags (one with the weather dimension, one without), but rather you can have your basic page view tag for tracking and an event tag for sending the weather data (which fires only when the API call is made).</p>
-
+<p>Another perk, if using GTM, is that you don't need separate, confusing page view tags (one with the weather dimension, one without), but rather you can have your basic page view tag for tracking and an event tag for sending the weather data (which fires only when the API call is made).</p>
 <h2 id="implementation">Implementation</h2>
-
-<p>Well, I need to refer back to the code from my previous two posts. Here&rsquo;s what the NEW custom HTML tag should look like (remember, you need to load <a href="http://jquery.com">jQuery</a> and <a href="http://www.geoplugin.com">the geoPlugin service</a> for this to work).</p>
-
+<p>Well, I need to refer back to the code from my previous two posts. Here's what the NEW custom HTML tag should look like (remember, you need to load <a href="http://jquery.com">jQuery</a> and <a href="http://www.geoplugin.com">the geoPlugin service</a> for this to work).</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
   <span style="color:#66d9ef">if</span> (<span style="color:#66d9ef">typeof</span>({{<span style="color:#a6e22e">Session</span> <span style="color:#a6e22e">alive</span>}}) <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;undefined&#34;</span>) {
     <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">lat</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">geoplugin_latitude</span>();
@@ -374,27 +361,27 @@ This post is the final chapter of a trilogy. The ultimate refinement, if you wil
   document.<span style="color:#a6e22e">cookie</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;session=1; &#34;</span><span style="color:#f92672">+</span><span style="color:#a6e22e">expires</span><span style="color:#f92672">+</span><span style="color:#e6db74">&#34;; path=/&#34;</span>;    
          
 &lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
-
-<p>Here&rsquo;s the order of events:</p>
-
+<p>Here's the order of events:</p>
 <ol>
-<li><p>Check if a cookie named &ldquo;session&rdquo; exists</p></li>
-
-<li><p>If cookie <strong>doesn&rsquo;t</strong> exist, use the visitor&rsquo;s location to query the weather conditions at said location</p></li>
-
-<li><p>Save weather conditions in data layer variable &ldquo;weather&rdquo;</p></li>
-
-<li><p>Push event &ldquo;weatherDone&rdquo; to data layer whether or not the API call is successful</p></li>
-
-<li><p>Finally (regardless of whether the cookie existed or not) reset the &ldquo;session&rdquo; cookie to expire in 30 minutes</p></li>
+<li>
+<p>Check if a cookie named &ldquo;session&rdquo; exists</p>
+</li>
+<li>
+<p>If cookie <strong>doesn't</strong> exist, use the visitor's location to query the weather conditions at said location</p>
+</li>
+<li>
+<p>Save weather conditions in data layer variable &ldquo;weather&rdquo;</p>
+</li>
+<li>
+<p>Push event &ldquo;weatherDone&rdquo; to data layer whether or not the API call is successful</p>
+</li>
+<li>
+<p>Finally (regardless of whether the cookie existed or not) reset the &ldquo;session&rdquo; cookie to expire in 30 minutes</p>
+</li>
 </ol>
-
 <p>So no need for a second event &ldquo;noWeather&rdquo; for the weatherless page view. You can just have the normal page view sent with every page load, and then use &ldquo;weatherDone&rdquo; as the trigger rule for the event (remember to make it a non-interaction hit) which sends the &ldquo;weather&rdquo; variable as a custom dimension. Dead simple.</p>
-
-<p>Finally, you&rsquo;ll need to set up your event tag. Remember, you need to create the custom dimension in Google Analytics&rsquo; admin section (see <a href="https://support.google.com/analytics/answer/2709829">here</a> for a guide). Make note of the index number assigned to your new, session-level custom dimension.</p>
-
-<p>Next, create a new event tag. Now, you can have whatever you want as your event fields, but make sure that <strong>Non-Interaction Hit</strong> is set to <em>True</em>. In this example, I send my custom weather type and temperature (they&rsquo;re data layer variable macros), but as you can see, <strong>Non-Interaction Hit</strong> is <em>True</em>. This is important, because then this weather event <em>won&rsquo;t</em> affect bounce rate calculation (because it doesn&rsquo;t tell anything about engagement now, does it?).</p>
-
+<p>Finally, you'll need to set up your event tag. Remember, you need to create the custom dimension in Google Analytics&rsquo; admin section (see <a href="https://support.google.com/analytics/answer/2709829">here</a> for a guide). Make note of the index number assigned to your new, session-level custom dimension.</p>
+<p>Next, create a new event tag. Now, you can have whatever you want as your event fields, but make sure that <strong>Non-Interaction Hit</strong> is set to <em>True</em>. In this example, I send my custom weather type and temperature (they're data layer variable macros), but as you can see, <strong>Non-Interaction Hit</strong> is <em>True</em>. This is important, because then this weather event <em>won't</em> affect bounce rate calculation (because it doesn't tell anything about engagement now, does it?).</p>
 
 
 
@@ -410,9 +397,7 @@ This post is the final chapter of a trilogy. The ultimate refinement, if you wil
 </div>
 
 
-
-<p>And here&rsquo;s what the custom dimension settings look like. You set them in the end of the tag, under <strong>More settings</strong>.</p>
-
+<p>And here's what the custom dimension settings look like. You set them in the end of the tag, under <strong>More settings</strong>.</p>
 
 
 
@@ -428,20 +413,20 @@ This post is the final chapter of a trilogy. The ultimate refinement, if you wil
 </div>
 
 
-
 <h2 id="conclusion">Conclusion</h2>
-
-<p>I think I&rsquo;ve got the whole thing pinned down now. I have come up with a method to</p>
-
+<p>I think I've got the whole thing pinned down now. I have come up with a method to</p>
 <ol>
-<li><p>poll external APIs for contextual information</p></li>
-
-<li><p>send this information just once per visit</p></li>
-
-<li><p>use a non-interaction event to annotate the visit hits with this dimension</p></li>
+<li>
+<p>poll external APIs for contextual information</p>
+</li>
+<li>
+<p>send this information just once per visit</p>
+</li>
+<li>
+<p>use a non-interaction event to annotate the visit hits with this dimension</p>
+</li>
 </ol>
-
-<p>Next steps would be to make sure the API is reliable and fast. Also, maybe some sort of timeout trigger for the API call should be in place, with a &ldquo;weather&rdquo;: &ldquo;Undefined&rdquo; value sent if the API call doesn&rsquo;t complete.</p>
+<p>Next steps would be to make sure the API is reliable and fast. Also, maybe some sort of timeout trigger for the API call should be in place, with a &ldquo;weather&rdquo;: &ldquo;Undefined&rdquo; value sent if the API call doesn't complete.</p>
 
               
 
@@ -545,7 +530,7 @@ This post is the final chapter of a trilogy. The ultimate refinement, if you wil
         </article>
         <footer id="footer" class="main-content-wrap">
   <span class="copyrights">
-    &copy; 2019 Simo Ahava. All Rights Reserved
+    &copy; 2020 Simo Ahava. All Rights Reserved
   </span>
 </footer>
 

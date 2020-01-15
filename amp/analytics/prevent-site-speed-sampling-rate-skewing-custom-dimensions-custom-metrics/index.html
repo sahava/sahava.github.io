@@ -123,8 +123,6 @@
 
 <meta itemprop="name" content="Prevent Site Speed Sampling Rate From Skewing Custom Dimensions And Custom Metrics">
 <meta itemprop="description" content="Use customTask to prevent your automatically collected site speed metrics from skewing your Google Analytics custom dimensions and metrics.">
-
-
 <meta itemprop="datePublished" content="2017-09-26T14:09:49&#43;00:00" />
 <meta itemprop="dateModified" content="2017-09-26T14:09:49&#43;00:00" />
 <meta itemprop="wordCount" content="692">
@@ -132,7 +130,6 @@
 
 
 <meta itemprop="keywords" content="customtask,data quality,page timings,universal analytics," />
-
 <script type="application/ld+json">
 {
     "@context": "http://schema.org",
@@ -913,10 +910,7 @@ on
     </header>
 
     <section class="post-content">
-      
-
-<p><a href="https://analytics.google.com">Universal Analytics</a> can collect <a href="https://support.google.com/analytics/answer/1205784">Page Timing</a> data from users that load your pages. This data is populated in to the <strong>Behavior</strong> -&gt; <strong>Site Speed</strong> -&gt; <strong>Page Timings</strong> report, and it&rsquo;s a very useful feature for optimizing your website.</p>
-
+      <p><a href="https://analytics.google.com">Universal Analytics</a> can collect <a href="https://support.google.com/analytics/answer/1205784">Page Timing</a> data from users that load your pages. This data is populated in to the <strong>Behavior</strong> -&gt; <strong>Site Speed</strong> -&gt; <strong>Page Timings</strong> report, and it's a very useful feature for optimizing your website.</p>
 
 
     <a href="https://www.simoahava.com/amp/images/2017/09/page-timings.jpg" title="Page Timings in Universal Analytics">
@@ -926,9 +920,7 @@ on
     </a>
   
 
-
-<p>However, there&rsquo;s a murky underside to this generous feature. The way Page Timings collection works is that when <strong>Pageview</strong> hits are sent from the site, a sample of these (1% by default) are automatically followed by a <code>timing</code> hit which includes page performance data grabbed from the Navigation Timing API.</p>
-
+<p>However, there's a murky underside to this generous feature. The way Page Timings collection works is that when <strong>Pageview</strong> hits are sent from the site, a sample of these (1% by default) are automatically followed by a <code>timing</code> hit which includes page performance data grabbed from the Navigation Timing API.</p>
 
 
     <a href="https://www.simoahava.com/amp/images/2017/09/pageview-timing.jpg" title="Pageview and timing hit in network">
@@ -938,11 +930,8 @@ on
     </a>
   
 
-
-<p>So far so good. This is how it&rsquo;s supposed to work. If you&rsquo;ve set <code>siteSpeedSampleRate</code> to 100, the first pageview request of every page will be automatically followed by this timing hit.</p>
-
+<p>So far so good. This is how it's supposed to work. If you've set <code>siteSpeedSampleRate</code> to 100, the first pageview request of every page will be automatically followed by this timing hit.</p>
 <p>However, the timing hit copies its information from the pageview hit. Basically, all the Custom Dimensions and Custom Metrics are copied from the pageview. Luckily, things like Enhanced Ecommerce metadata are not copied into the timing hit.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2017/09/pageview-timing-compared.jpg" title="Pageview and Timing compared">
@@ -952,37 +941,25 @@ on
     </a>
   
 
-
-<p>As you can see, the timing hit below the pageview has the same Custom Dimension and the same Custom Metric as the Pageview hit. This is annoying, especially if you use hit-scoped Custom Dimensions or pretty much any type of Custom Metrics. This is data inflation that you can&rsquo;t control.</p>
-
+<p>As you can see, the timing hit below the pageview has the same Custom Dimension and the same Custom Metric as the Pageview hit. This is annoying, especially if you use hit-scoped Custom Dimensions or pretty much any type of Custom Metrics. This is data inflation that you can't control.</p>
 <p>So we need a way to reset Custom Dimensions and Custom Metrics for the timing hit.</p>
-
 <p>I am grateful to <strong>Clément Simon</strong> for helping me come up with the following solution.</p>
-
 <h2 id="solution-customtask">Solution: customTask</h2>
-
-<p>If you&rsquo;ve been reading my recent articles, you might have seen this coming. I consider <code>customTask</code> to be one of the most versatile features recently added to analytics.js.</p>
-
-<p>We&rsquo;ll use <code>customTask</code> to check if the hit type is a timing hit, and if it is, we&rsquo;ll make sure no Custom Dimensions and Custom Metrics are sent with the hit.</p>
-
-<h3 id="analytics-js">analytics.js</h3>
-
+<p>If you've been reading my recent articles, you might have seen this coming. I consider <code>customTask</code> to be one of the most versatile features recently added to analytics.js.</p>
+<p>We'll use <code>customTask</code> to check if the hit type is a timing hit, and if it is, we'll make sure no Custom Dimensions and Custom Metrics are sent with the hit.</p>
+<h3 id="analyticsjs">analytics.js</h3>
 <p>This is what the situation is with analytics.js <strong>before</strong> you make the change:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">ga</span><span class="p">(</span><span class="s1">&#39;create&#39;</span><span class="p">,</span> <span class="s1">&#39;UA-12345-1&#39;</span><span class="p">,</span> <span class="p">{</span><span class="nx">siteSpeedSampleRate</span><span class="o">:</span> <span class="mi">100</span><span class="p">});</span>
-<span class="nx">ga</span><span class="p">(</span><span class="s1">&#39;set&#39;</span><span class="p">,</span> <span class="s1">&#39;dimension1&#39;</span><span class="p">,</span> <span class="s1">&#39;My Value&#39;</span><span class="p">);</span>
-<span class="nx">ga</span><span class="p">(</span><span class="s1">&#39;send&#39;</span><span class="p">,</span> <span class="s1">&#39;pageview&#39;</span><span class="p">,</span> <span class="p">{</span><span class="nx">metric1</span><span class="o">:</span> <span class="mi">20</span><span class="p">);</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">ga</span><span class="p">(</span><span class="s1">&#39;create&#39;</span><span class="p">,</span> <span class="s1">&#39;UA-12345-1&#39;</span><span class="p">,</span> <span class="p">{</span><span class="nx">siteSpeedSampleRate</span><span class="o">:</span> <span class="mi">100</span><span class="p">}</span><span class="p">)</span><span class="p">;</span>
+<span class="nx">ga</span><span class="p">(</span><span class="s1">&#39;set&#39;</span><span class="p">,</span> <span class="s1">&#39;dimension1&#39;</span><span class="p">,</span> <span class="s1">&#39;My Value&#39;</span><span class="p">)</span><span class="p">;</span>
+<span class="nx">ga</span><span class="p">(</span><span class="s1">&#39;send&#39;</span><span class="p">,</span> <span class="s1">&#39;pageview&#39;</span><span class="p">,</span> <span class="p">{</span><span class="nx">metric1</span><span class="o">:</span> <span class="mi">20</span><span class="p">)</span><span class="p">;</span>
 </code></pre></div>
-
-<p>This creates a tracker, sets a Custom Dimension, and then sends a pageview request with a Custom Metric. Since you&rsquo;re sampling Page Timings at 100%, the pageview hit will be instantly followed by a timing hit that contains these two custom definitions, too.</p>
-
-<p>To fix it, this is what you&rsquo;ll do:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">ga</span><span class="p">(</span><span class="s1">&#39;create&#39;</span><span class="p">,</span> <span class="s1">&#39;UA-12345-1&#39;</span><span class="p">,</span> <span class="p">{</span><span class="nx">siteSpeedSampleRate</span><span class="o">:</span> <span class="mi">100</span><span class="p">});</span>
-<span class="nx">ga</span><span class="p">(</span><span class="s1">&#39;set&#39;</span><span class="p">,</span> <span class="s1">&#39;dimension1&#39;</span><span class="p">,</span> <span class="s1">&#39;My Value&#39;</span><span class="p">);</span>
+<p>This creates a tracker, sets a Custom Dimension, and then sends a pageview request with a Custom Metric. Since you're sampling Page Timings at 100%, the pageview hit will be instantly followed by a timing hit that contains these two custom definitions, too.</p>
+<p>To fix it, this is what you'll do:</p>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">ga</span><span class="p">(</span><span class="s1">&#39;create&#39;</span><span class="p">,</span> <span class="s1">&#39;UA-12345-1&#39;</span><span class="p">,</span> <span class="p">{</span><span class="nx">siteSpeedSampleRate</span><span class="o">:</span> <span class="mi">100</span><span class="p">}</span><span class="p">)</span><span class="p">;</span>
+<span class="nx">ga</span><span class="p">(</span><span class="s1">&#39;set&#39;</span><span class="p">,</span> <span class="s1">&#39;dimension1&#39;</span><span class="p">,</span> <span class="s1">&#39;My Value&#39;</span><span class="p">)</span><span class="p">;</span>
 
 <span class="nx">ga</span><span class="p">(</span><span class="s1">&#39;set&#39;</span><span class="p">,</span> <span class="s1">&#39;customTask&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">model</span><span class="p">)</span> <span class="p">{</span>
-  <span class="kd">var</span> <span class="nx">tempFieldObject</span> <span class="o">=</span> <span class="p">{};</span>
+  <span class="kd">var</span> <span class="nx">tempFieldObject</span> <span class="o">=</span> <span class="p">{</span><span class="p">}</span><span class="p">;</span>
   <span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
   <span class="k">if</span><span class="p">(</span><span class="nx">model</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;hitType&#39;</span><span class="p">)</span> <span class="o">===</span> <span class="s1">&#39;timing&#39;</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">while</span> <span class="p">(</span><span class="nx">i</span> <span class="o">!==</span> <span class="mi">201</span><span class="p">)</span> <span class="p">{</span>
@@ -990,24 +967,19 @@ on
       <span class="nx">tempFieldObject</span><span class="p">[</span><span class="s1">&#39;metric&#39;</span> <span class="o">+</span> <span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="kc">undefined</span><span class="p">;</span>
       <span class="nx">i</span><span class="o">++</span><span class="p">;</span>
     <span class="p">}</span>
-    <span class="nx">model</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="nx">tempFieldObject</span><span class="p">);</span>
+    <span class="nx">model</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="nx">tempFieldObject</span><span class="p">)</span><span class="p">;</span>
   <span class="p">}</span>
-<span class="p">});</span>
+<span class="p">}</span><span class="p">)</span><span class="p">;</span>
 
-<span class="nx">ga</span><span class="p">(</span><span class="s1">&#39;send&#39;</span><span class="p">,</span> <span class="s1">&#39;pageview&#39;</span><span class="p">,</span> <span class="p">{</span><span class="nx">metric1</span><span class="o">:</span> <span class="mi">20</span><span class="p">});</span>
+<span class="nx">ga</span><span class="p">(</span><span class="s1">&#39;send&#39;</span><span class="p">,</span> <span class="s1">&#39;pageview&#39;</span><span class="p">,</span> <span class="p">{</span><span class="nx">metric1</span><span class="o">:</span> <span class="mi">20</span><span class="p">}</span><span class="p">)</span><span class="p">;</span>
 </code></pre></div>
-
 <p>This clears all the possible Custom Dimensions and Custom Metrics from the timing hit, and thus data inflation is avoided.</p>
-
 <h3 id="google-tag-manager">Google Tag Manager</h3>
-
-<p>To fix this in <a href="https://tagmanager.google.com/">Google Tag Manager</a>, you&rsquo;ll need a <strong>Custom JavaScript Variable</strong>, and you&rsquo;ll need to add a new field in your Page View tag.</p>
-
+<p>To fix this in <a href="https://tagmanager.google.com/">Google Tag Manager</a>, you'll need a <strong>Custom JavaScript Variable</strong>, and you'll need to add a new field in your Page View tag.</p>
 <p>The Custom JavaScript Variable has the following code:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span><span class="p">(</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">return</span> <span class="kd">function</span><span class="p">(</span><span class="nx">model</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kd">var</span> <span class="nx">tempFieldObject</span> <span class="o">=</span> <span class="p">{};</span>
+    <span class="kd">var</span> <span class="nx">tempFieldObject</span> <span class="o">=</span> <span class="p">{</span><span class="p">}</span><span class="p">;</span>
     <span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
     <span class="k">if</span><span class="p">(</span><span class="nx">model</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;hitType&#39;</span><span class="p">)</span> <span class="o">===</span> <span class="s1">&#39;timing&#39;</span><span class="p">)</span> <span class="p">{</span>
       <span class="k">while</span> <span class="p">(</span><span class="nx">i</span> <span class="o">!==</span> <span class="mi">201</span><span class="p">)</span> <span class="p">{</span>
@@ -1015,14 +987,12 @@ on
         <span class="nx">tempFieldObject</span><span class="p">[</span><span class="s1">&#39;metric&#39;</span> <span class="o">+</span> <span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="kc">undefined</span><span class="p">;</span>
         <span class="nx">i</span><span class="o">++</span><span class="p">;</span>
       <span class="p">}</span>
-      <span class="nx">model</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="nx">tempFieldObject</span><span class="p">);</span>
+      <span class="nx">model</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="nx">tempFieldObject</span><span class="p">)</span><span class="p">;</span>
     <span class="p">}</span>
-  <span class="p">};</span>
+  <span class="p">}</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div>
-
 <p>And then you add it to your tag like this:</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2017/09/google-tag-manager-tag.jpg" title="Google Tag Manager tag">
@@ -1032,16 +1002,11 @@ on
     </a>
   
 
-
 <p>Whichever method you use, the <code>customTask</code> implementation will purge all Custom Dimensions and Custom Metrics from the automatically generated timing hit.</p>
-
 <h2 id="summary">Summary</h2>
-
-<p>This was just a quick tip to fix a potential data integrity issue on your site. Granted, it&rsquo;s rare for you to run into problems with the Custom Dimension duplication (unless you use it against the <code>ga:hits</code> metric), but on an aggregate level the Custom Metrics inflation can be troublesome.</p>
-
-<p>This isn&rsquo;t the only thing where the Site Speed Sample Rate can wreak havoc on your data. With Google Tag Manager and &ldquo;virtual&rdquo; pageviews, you might be inflating your page timing data by a great deal, and I&rsquo;ve written about how to solve this issue <a href="https://www.simoahava.com/amp/analytics/site-speed-sample-rate-multiple-page-views/">here</a>.</p>
-
-<p>Note also that these are client-side fixes to something that, in my opinion, should be prevented by analytics.js to start with. I don&rsquo;t understand why the Page Timing hit just copies everything from the pageview. I&rsquo;d want it to be configurable, at the very least.</p>
+<p>This was just a quick tip to fix a potential data integrity issue on your site. Granted, it's rare for you to run into problems with the Custom Dimension duplication (unless you use it against the <code>ga:hits</code> metric), but on an aggregate level the Custom Metrics inflation can be troublesome.</p>
+<p>This isn't the only thing where the Site Speed Sample Rate can wreak havoc on your data. With Google Tag Manager and &ldquo;virtual&rdquo; pageviews, you might be inflating your page timing data by a great deal, and I've written about how to solve this issue <a href="https://www.simoahava.com/amp/analytics/site-speed-sample-rate-multiple-page-views/">here</a>.</p>
+<p>Note also that these are client-side fixes to something that, in my opinion, should be prevented by analytics.js to start with. I don't understand why the Page Timing hit just copies everything from the pageview. I'd want it to be configurable, at the very least.</p>
 
     </section>
 

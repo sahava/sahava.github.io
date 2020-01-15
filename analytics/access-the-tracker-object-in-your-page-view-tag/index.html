@@ -53,7 +53,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.59.1 with theme Tranquilpeak 0.4.3-BETA">
+    <meta name="generator" content="Hugo 0.61.0 with theme Tranquilpeak 0.4.3-BETA">
     <title>Access The Tracker Object In Your Page View Tag | Simo Ahava's blog</title>
     
     <script>
@@ -319,12 +319,8 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              
-
-<p>If you read my <a href="https://www.simoahava.com/analytics/improve-data-collection-with-four-custom-dimensions/">previous post</a> on fetching the <em>Client ID</em> from the Universal Analytics tracker object with <a href="http://tagmanager.google.com">Google Tag Manager</a>, you might have agreed with me that it sucks you can&rsquo;t access the tracker object interface in real time using Google Tag Manager. This is because all of the <code>set</code> commands you add to a Universal Analytics tag template take place before the <strong>analytics.js</strong> is loaded and the tracker object is properly created.</p>
-
-<p>The other issue with the tag template is that there&rsquo;s no set way to access the tracker object anyway. I mean, you can use the <code>set</code> command, sure, but you can&rsquo;t really use <code>get</code> or, for that matter, make use of any other interface methods you&rsquo;d want to such as plugins (more on them in <a href="https://www.simoahava.com/analytics/universal-analytics-plugins-explained/">this post</a>).</p>
-
+              <p>If you read my <a href="https://www.simoahava.com/analytics/improve-data-collection-with-four-custom-dimensions/">previous post</a> on fetching the <em>Client ID</em> from the Universal Analytics tracker object with <a href="http://tagmanager.google.com">Google Tag Manager</a>, you might have agreed with me that it sucks you can't access the tracker object interface in real time using Google Tag Manager. This is because all of the <code>set</code> commands you add to a Universal Analytics tag template take place before the <strong>analytics.js</strong> is loaded and the tracker object is properly created.</p>
+<p>The other issue with the tag template is that there's no set way to access the tracker object anyway. I mean, you can use the <code>set</code> command, sure, but you can't really use <code>get</code> or, for that matter, make use of any other interface methods you'd want to such as plugins (more on them in <a href="https://www.simoahava.com/analytics/universal-analytics-plugins-explained/">this post</a>).</p>
 
 
 
@@ -340,35 +336,29 @@
 </div>
 
 
-
 <p>So, in this post I want to show a method you can use to actually mine the tracker object for whatever information you want, and at the same time ensure that the data is usable by the time your all-important Page View Tag fires. This is a notable improvement to the method I talked about in the previous post, which was to basically use a Window Loaded Trigger to fire a non-interactive Event Tag with the Client ID.</p>
-
 <p>This article was inspired and intellectually fuelled by the amazing <a href="http://www.mardiros.net/">Carmen Mardiros</a> (follow her: <a href="https://twitter.com/carmenmardiros/">@carmenmardiros</a>).</p>
-
 <h2 id="the-method">The method</h2>
-
-<p>You&rsquo;ll have to use Custom HTML for this. I know, I know! It&rsquo;s a huge step backwards from the awesome, templated world you&rsquo;re used to. Using a Custom HTML Tag is necessary precisely for the reasons I listed in the beginning. Until the Tag Template supports adding arbitrary JavaScript code between the <code>create</code> and <code>send</code> commands in the template, you&rsquo;ll have to use a workaround.</p>
-
-<p>The upside is that all you need the Custom HTML code for is to setup the tracker object, and then push an initialization event in to <code>dataLayer</code>, which will subsequently fire your actual Page View Tag. So, you&rsquo;ll end up with one extra Tag and a very slight delay to your Page View Tag, but the delay is so minimal it doesn&rsquo;t really make a difference.</p>
-
-<p>Here&rsquo;s what will take place:</p>
-
+<p>You'll have to use Custom HTML for this. I know, I know! It's a huge step backwards from the awesome, templated world you're used to. Using a Custom HTML Tag is necessary precisely for the reasons I listed in the beginning. Until the Tag Template supports adding arbitrary JavaScript code between the <code>create</code> and <code>send</code> commands in the template, you'll have to use a workaround.</p>
+<p>The upside is that all you need the Custom HTML code for is to setup the tracker object, and then push an initialization event in to <code>dataLayer</code>, which will subsequently fire your actual Page View Tag. So, you'll end up with one extra Tag and a very slight delay to your Page View Tag, but the delay is so minimal it doesn't really make a difference.</p>
+<p>Here's what will take place:</p>
 <ol>
-<li><p>Tracker object for your UA-code is created</p></li>
-
-<li><p>The Client ID is extracted from the tracker object as soon as it&rsquo;s available</p></li>
-
-<li><p>When the Client ID has been extracted, it&rsquo;s pushed into <code>dataLayer</code> together with the initialization event</p></li>
-
-<li><p>This event fires your Page View Tag, and you can use a normal Data Layer Variable to retrieve the Client ID</p></li>
+<li>
+<p>Tracker object for your UA-code is created</p>
+</li>
+<li>
+<p>The Client ID is extracted from the tracker object as soon as it's available</p>
+</li>
+<li>
+<p>When the Client ID has been extracted, it's pushed into <code>dataLayer</code> together with the initialization event</p>
+</li>
+<li>
+<p>This event fires your Page View Tag, and you can use a normal Data Layer Variable to retrieve the Client ID</p>
+</li>
 </ol>
-
 <h2 id="the-custom-html-tag">The Custom HTML Tag</h2>
-
 <p>So, start by creating a new <strong>Custom HTML Tag</strong>, and make sure it fires on the earliest possible Trigger - usually the All Pages Trigger.</p>
-
-<p>As for the code within, you&rsquo;ll get that from your Google Analytics Admin, under <strong>Property Settings</strong> -&gt; <strong>Tracking Info</strong> -&gt; <strong>Tracking Code</strong>.</p>
-
+<p>As for the code within, you'll get that from your Google Analytics Admin, under <strong>Property Settings</strong> -&gt; <strong>Tracking Info</strong> -&gt; <strong>Tracking Code</strong>.</p>
 
 
 
@@ -384,24 +374,16 @@
 </div>
 
 
-
-<p>Copy-paste that into your Custom HTML Tag. Now, proceed to remove the line which says <code>ga('send', 'pageview');</code>. We&rsquo;re removing this because we still want to use the actual tag template for sending the pageview hit.</p>
-
+<p>Copy-paste that into your Custom HTML Tag. Now, proceed to remove the line which says <code>ga('send', 'pageview');</code>. We're removing this because we still want to use the actual tag template for sending the pageview hit.</p>
 <p>Now, if there are any modifications you need to do, such as adding additional trackers, you can set them up here. This guide has been written with a fairly basic setup in mind.</p>
-
 <p><strong>NOTE!</strong> Any modifications to the tracker, such as <code>allowLinker : true</code>, custom cookie settings, and so forth need to be setup on this Custom HTML tracker, so that the Client ID you will be fetching from this custom tracker matches the one used by your main Page View Tag.</p>
-
-<p>The next part is important. The <strong>analytics.js</strong> library is loaded <em>asynchronously</em>, which means that you don&rsquo;t actually know when the tracker object has been created and its <code>get</code> method can be invoked. So, the library lets you pass a callback function to the <code>ga</code> object, which will be executed once the library has loaded and the tracker has been created. As I mention in the beginning: <strong>this feature is not available in the default tag template</strong>, which is why we need this workaround.</p>
-
+<p>The next part is important. The <strong>analytics.js</strong> library is loaded <em>asynchronously</em>, which means that you don't actually know when the tracker object has been created and its <code>get</code> method can be invoked. So, the library lets you pass a callback function to the <code>ga</code> object, which will be executed once the library has loaded and the tracker has been created. As I mention in the beginning: <strong>this feature is not available in the default tag template</strong>, which is why we need this workaround.</p>
 <p>To add the callback, you add the following rows of code after the <code>ga('create', ...);</code> expression:</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">ga</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">tracker</span>) {
   ...<span style="color:#a6e22e">any</span> <span style="color:#a6e22e">methods</span> <span style="color:#a6e22e">which</span> <span style="color:#a6e22e">need</span> <span style="color:#a6e22e">the</span> <span style="color:#a6e22e">tracker</span> <span style="color:#a6e22e">object</span>
 });
 </code></pre></div>
-
-<p>Any code within the callback function will be executed only once the library has been loaded, the tracker has been created, and the tracker object responds to interface methods. In this callback function, we&rsquo;ll first fetch the Client ID, and then push it into <code>dataLayer</code> together with an initialization event:</p>
-
+<p>Any code within the callback function will be executed only once the library has been loaded, the tracker has been created, and the tracker object responds to interface methods. In this callback function, we'll first fetch the Client ID, and then push it into <code>dataLayer</code> together with an initialization event:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">ga</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">tracker</span>) {
   window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
     <span style="color:#e6db74">&#39;event&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;trackerReady&#39;</span>,
@@ -409,11 +391,8 @@
   });
 });
 </code></pre></div>
-
-<p>As you can see, I&rsquo;m invoking the <code>get</code> command of the tracker object, and asking to retrieve the Client ID from the tracker. This wouldn&rsquo;t be possible without the <code>ga(function(tracker) {})</code> call.</p>
-
+<p>As you can see, I'm invoking the <code>get</code> command of the tracker object, and asking to retrieve the Client ID from the tracker. This wouldn't be possible without the <code>ga(function(tracker) {})</code> call.</p>
 <p>My personal, finished example for the Custom HTML Tag looks like this. Remember, any customizations you need for the tracker object need to go here as well, so be sure to read up on how to set up <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/advanced">advanced configurations</a> for your Universal Analytics tracking code.</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
   (<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">i</span>,<span style="color:#a6e22e">s</span>,<span style="color:#a6e22e">o</span>,<span style="color:#a6e22e">g</span>,<span style="color:#a6e22e">r</span>,<span style="color:#a6e22e">a</span>,<span style="color:#a6e22e">m</span>){<span style="color:#a6e22e">i</span>[<span style="color:#e6db74">&#39;GoogleAnalyticsObject&#39;</span>]<span style="color:#f92672">=</span><span style="color:#a6e22e">r</span>;<span style="color:#a6e22e">i</span>[<span style="color:#a6e22e">r</span>]<span style="color:#f92672">=</span><span style="color:#a6e22e">i</span>[<span style="color:#a6e22e">r</span>]<span style="color:#f92672">||</span><span style="color:#66d9ef">function</span>(){
   (<span style="color:#a6e22e">i</span>[<span style="color:#a6e22e">r</span>].<span style="color:#a6e22e">q</span><span style="color:#f92672">=</span><span style="color:#a6e22e">i</span>[<span style="color:#a6e22e">r</span>].<span style="color:#a6e22e">q</span><span style="color:#f92672">||</span>[]).<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">arguments</span>)},<span style="color:#a6e22e">i</span>[<span style="color:#a6e22e">r</span>].<span style="color:#a6e22e">l</span><span style="color:#f92672">=</span><span style="color:#ae81ff">1</span><span style="color:#f92672">*</span><span style="color:#66d9ef">new</span> Date();<span style="color:#a6e22e">a</span><span style="color:#f92672">=</span><span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">createElement</span>(<span style="color:#a6e22e">o</span>),
@@ -429,21 +408,18 @@
       });
   });
 &lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
-
 <p>Just a few comments on the customizations:</p>
-
 <ul>
-<li><p><strong>{{GA Tracking Code}}</strong> is a <a href="https://www.simoahava.com/analytics/variable-guide-google-tag-manager/">Lookup Table Variable</a> which returns the property ID depending on a few conditions.</p></li>
-
-<li><p><code>ga('require', 'simoPlugin');</code> is where you would load any plugins you want to use with your Tags. This is missing from the tag templates, and I really hope we&rsquo;ll get the chance to load plugins soon.</p></li>
+<li>
+<p><strong>{{GA Tracking Code}}</strong> is a <a href="https://www.simoahava.com/analytics/variable-guide-google-tag-manager/">Lookup Table Variable</a> which returns the property ID depending on a few conditions.</p>
+</li>
+<li>
+<p><code>ga('require', 'simoPlugin');</code> is where you would load any plugins you want to use with your Tags. This is missing from the tag templates, and I really hope we'll get the chance to load plugins soon.</p>
+</li>
 </ul>
-
-<p>That&rsquo;s it for the Custom HTML Tag. The rest is very simple stuff.</p>
-
+<p>That's it for the Custom HTML Tag. The rest is very simple stuff.</p>
 <h2 id="data-layer-variable-and-custom-event-trigger">Data Layer Variable and Custom Event Trigger</h2>
-
-<p>The two other things you&rsquo;ll need are a <strong>Data Layer Variable</strong> for the Client ID, and a <strong>Custom Event Trigger</strong> for the <code>trackerReady</code> event.</p>
-
+<p>The two other things you'll need are a <strong>Data Layer Variable</strong> for the Client ID, and a <strong>Custom Event Trigger</strong> for the <code>trackerReady</code> event.</p>
 
 
 
@@ -459,9 +435,7 @@
 </div>
 
 
-
 <p>Nothing complicated about this. The Trigger is really simple as well:</p>
-
 
 
 
@@ -477,11 +451,8 @@
 </div>
 
 
-
 <p>Once you have these two setup, all you need to do is modify your existing Page View Tag to accommodate these changes.</p>
-
-<p>My Tag, for example, now has the Client ID as a Custom Dimension, and it&rsquo;s set to fire with the <strong>Event - trackerReady</strong> Trigger we just created.</p>
-
+<p>My Tag, for example, now has the Client ID as a Custom Dimension, and it's set to fire with the <strong>Event - trackerReady</strong> Trigger we just created.</p>
 
 
 
@@ -497,14 +468,10 @@
 </div>
 
 
-
 <h2 id="summary">Summary</h2>
-
 <p>This is one of those articles that I hope becomes obsolete soon. The current Universal Analytics tag templates do not let you run arbitrary JavaScript (e.g. load plugins) or access the tracker object after it has been created, but <em>before</em> the &lsquo;pageview&rsquo; hit is sent.</p>
-
-<p>That&rsquo;s why you need this workaround. On the other hand, this isn&rsquo;t exactly a very complex thing to do, as you&rsquo;re only creating one additional Tag to set up the tracker and channel all the subsequent tags to not fire until the tracker object callback function has been executed.</p>
-
-<p>Time will tell when the Universal Analytics tag template supports these features. Personally, I hope soon. Google Tag Manager is already the <em>de facto</em> implementation mechanism for Universal Analytics, but if it doesn&rsquo;t support advanced configuration of the tracker object, larger organizations especially might be deterred from migrating until such features are supported out-of-the-box.</p>
+<p>That's why you need this workaround. On the other hand, this isn't exactly a very complex thing to do, as you're only creating one additional Tag to set up the tracker and channel all the subsequent tags to not fire until the tracker object callback function has been executed.</p>
+<p>Time will tell when the Universal Analytics tag template supports these features. Personally, I hope soon. Google Tag Manager is already the <em>de facto</em> implementation mechanism for Universal Analytics, but if it doesn't support advanced configuration of the tracker object, larger organizations especially might be deterred from migrating until such features are supported out-of-the-box.</p>
 
               
 
@@ -610,7 +577,7 @@
         </article>
         <footer id="footer" class="main-content-wrap">
   <span class="copyrights">
-    &copy; 2019 Simo Ahava. All Rights Reserved
+    &copy; 2020 Simo Ahava. All Rights Reserved
   </span>
 </footer>
 

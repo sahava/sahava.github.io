@@ -127,8 +127,6 @@
 
 <meta itemprop="name" content="#GTMTips: Use customTask To Access Tracker Values In Google Tag Manager">
 <meta itemprop="description" content="Set the Client ID, for example, in all your Google Analytics hits as a Custom Dimension. You can do this with Google Tag Manager and customTask.">
-
-
 <meta itemprop="datePublished" content="2017-06-13T08:27:38&#43;00:00" />
 <meta itemprop="dateModified" content="2017-06-13T08:27:38&#43;00:00" />
 <meta itemprop="wordCount" content="431">
@@ -136,7 +134,6 @@
 
 
 <meta itemprop="keywords" content="client id,Google Tag Manager,gtmtips,tasks,universal analytics,customtask," />
-
 <script type="application/ld+json">
 {
     "@context": "http://schema.org",
@@ -921,18 +918,11 @@ on
     </header>
 
     <section class="post-content">
-      
-
-<p>One of the things I&rsquo;ve recommended from the get-go is to <a href="https://www.simoahava.com/amp/analytics/improve-data-collection-with-four-custom-dimensions/">always send the Client ID</a> to <a href="https://analytics.google.com">Google Analytics</a> with your users&rsquo; hits. This is very useful for adding a level of granularity to your tracking. At first, I recommended using an Event tag to do this. Then I modified my approach a little so that you could send it with your initial <a href="https://www.simoahava.com/amp/analytics/access-the-tracker-object-in-your-page-view-tag/">Page View</a> (thus not inflating your hit counts).</p>
-
-<p>However, Universal Analytics recently released a new <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/tasks">task API</a>, <code>customTask</code>, which lets you access the model object mid-tag, thus letting you modify the payload that is dispatched to Google Analytics. In this article, I&rsquo;ll show you how this works by using the classic example of sending the Client ID to Google Analytics.</p>
-
+      <p>One of the things I've recommended from the get-go is to <a href="https://www.simoahava.com/amp/analytics/improve-data-collection-with-four-custom-dimensions/">always send the Client ID</a> to <a href="https://analytics.google.com">Google Analytics</a> with your users&rsquo; hits. This is very useful for adding a level of granularity to your tracking. At first, I recommended using an Event tag to do this. Then I modified my approach a little so that you could send it with your initial <a href="https://www.simoahava.com/amp/analytics/access-the-tracker-object-in-your-page-view-tag/">Page View</a> (thus not inflating your hit counts).</p>
+<p>However, Universal Analytics recently released a new <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/tasks">task API</a>, <code>customTask</code>, which lets you access the model object mid-tag, thus letting you modify the payload that is dispatched to Google Analytics. In this article, I'll show you how this works by using the classic example of sending the Client ID to Google Analytics.</p>
 <h2 id="tip-59-access-the-model-object-mid-tag-in-google-tag-manager">Tip 59: Access the model object mid-tag in Google Tag Manager</h2>
-
-<p>The setup is really simple. You need a <strong>Custom Dimension</strong> setup in Universal Analytics, and then you simply need to add a new <strong>Field to set</strong> in your Page View tag (or whatever you want to use to send the data to GA). Remember to read <a href="https://www.simoahava.com/amp/analytics/improve-data-collection-with-four-custom-dimensions/">my article</a> on sending this type of metadata to Google Analytics, if you&rsquo;re unsure why you would want to do this in the first place.</p>
-
+<p>The setup is really simple. You need a <strong>Custom Dimension</strong> setup in Universal Analytics, and then you simply need to add a new <strong>Field to set</strong> in your Page View tag (or whatever you want to use to send the data to GA). Remember to read <a href="https://www.simoahava.com/amp/analytics/improve-data-collection-with-four-custom-dimensions/">my article</a> on sending this type of metadata to Google Analytics, if you're unsure why you would want to do this in the first place.</p>
 <p>The tag setup would look like this:</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2017/06/customtask-fields-to-set.jpg" title="customTask in Fields to set">
@@ -942,24 +932,18 @@ on
     </a>
   
 
-
 <p>Field name should be set to <strong>customTask</strong>, and as its value you need to use a <strong>Custom JavaScript Variable</strong>. The variable looks like this:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span><span class="p">(</span><span class="p">)</span> <span class="p">{</span>
   <span class="c1">// Modify customDimensionIndex to match the index number you want to send the data to
 </span><span class="c1"></span>  <span class="kd">var</span> <span class="nx">customDimensionIndex</span> <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
   <span class="k">return</span> <span class="kd">function</span><span class="p">(</span><span class="nx">model</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nx">model</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&#39;dimension&#39;</span> <span class="o">+</span> <span class="nx">customDimensionIndex</span><span class="p">,</span> <span class="nx">model</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;clientId&#39;</span><span class="p">));</span>
+    <span class="nx">model</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&#39;dimension&#39;</span> <span class="o">+</span> <span class="nx">customDimensionIndex</span><span class="p">,</span> <span class="nx">model</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;clientId&#39;</span><span class="p">)</span><span class="p">)</span><span class="p">;</span>
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-
 <p>What happens is that once Google Tag Manager starts executing the tag code, it first encounters the <strong>customTask</strong> field. It resolves the variable to a <em>closure</em>, which is basically a function that automatically receives a <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/model-object-reference">model object</a> as a parameter. The model object can be manipulated using the <code>get</code> and <code>set</code> methods.</p>
-
 <p>Next, we <strong>set</strong> the Custom Dimension at index 5 (as determined by the value of <code>customDimensionIndex</code>) to the Client ID, which we retrieve with the <strong>get</strong> method of the model object.</p>
-
-<p>This little trick means that we can tell the GA tag to fetch the Client ID from the tracker object and send it in a Custom Dimension without any extra hacks or workarounds that we had to employ previously. The fact that <code>customTask</code> has no other function in Universal Analytics means that we don&rsquo;t have to mind the fact that we&rsquo;re overwriting a task method with this tag.</p>
-
+<p>This little trick means that we can tell the GA tag to fetch the Client ID from the tracker object and send it in a Custom Dimension without any extra hacks or workarounds that we had to employ previously. The fact that <code>customTask</code> has no other function in Universal Analytics means that we don't have to mind the fact that we're overwriting a task method with this tag.</p>
 <p>You can use this for <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/field-reference">any fields</a> in the model/tracker object if you wish.</p>
 
     </section>

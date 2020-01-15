@@ -53,7 +53,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.59.1 with theme Tranquilpeak 0.4.3-BETA">
+    <meta name="generator" content="Hugo 0.61.0 with theme Tranquilpeak 0.4.3-BETA">
     <title>Site Speed Sample Rate And Multiple Page Views | Simo Ahava's blog</title>
     
     <script>
@@ -319,12 +319,8 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              
-
-<p><a href="https://analytics.google.com/">Google Analytics&rsquo;</a> <a href="https://support.google.com/analytics/answer/1205784?hl=en">Site Speed reports</a> are pretty darn great. They report automatically on various milestones in the process the browser undertakes when rendering content. These reports leverage the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Navigation_timing_API">Navigation Timing API</a> of the web browser, and they are (typically) collected on the first Page View hit of a page.</p>
-
-<p>And this is all fine. As I said, it&rsquo;s a great feature of Google Analytics, and lends itself handily to spotting issues in the quite complex client-server negotiation that goes on when your web browser requests content from the web server.</p>
-
+              <p><a href="https://analytics.google.com/">Google Analytics&rsquo;</a> <a href="https://support.google.com/analytics/answer/1205784?hl=en">Site Speed reports</a> are pretty darn great. They report automatically on various milestones in the process the browser undertakes when rendering content. These reports leverage the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Navigation_timing_API">Navigation Timing API</a> of the web browser, and they are (typically) collected on the first Page View hit of a page.</p>
+<p>And this is all fine. As I said, it's a great feature of Google Analytics, and lends itself handily to spotting issues in the quite complex client-server negotiation that goes on when your web browser requests content from the web server.</p>
 
 
 
@@ -340,9 +336,7 @@
 </div>
 
 
-
-<p>However, there&rsquo;s a glitch. These automatic page timings are collected once <em>per tracker instance per page</em>, meaning if you have multiple trackers on the page, each set to collect site speed samples, you might inadvertently send <strong>the same page speed data multiple times</strong>. This will naturally inflate the numbers that Google Analytics reports on, and your data will be ruined, as deduplication is really difficult.</p>
-
+<p>However, there's a glitch. These automatic page timings are collected once <em>per tracker instance per page</em>, meaning if you have multiple trackers on the page, each set to collect site speed samples, you might inadvertently send <strong>the same page speed data multiple times</strong>. This will naturally inflate the numbers that Google Analytics reports on, and your data will be ruined, as deduplication is really difficult.</p>
 
 
 
@@ -358,80 +352,55 @@
 </div>
 
 
-
 <p>So if you have any of the following in place, you might be in the risk group:</p>
-
 <ol>
-<li><p>Single-page site where you send &ldquo;virtual&rdquo; Page Views to Google Analytics</p></li>
-
-<li><p>Multiple trackers on the page, each collecting to the same Universal Analytics property (UA-XXXXX-Y)</p></li>
-
-<li><p>Manually set site speed sample rate (e.g. at 100%)</p></li>
-
-<li><p>Google Tag Manager with a Page View Tag that has multiple Triggers attached to it</p></li>
+<li>
+<p>Single-page site where you send &ldquo;virtual&rdquo; Page Views to Google Analytics</p>
+</li>
+<li>
+<p>Multiple trackers on the page, each collecting to the same Universal Analytics property (UA-XXXXX-Y)</p>
+</li>
+<li>
+<p>Manually set site speed sample rate (e.g. at 100%)</p>
+</li>
+<li>
+<p>Google Tag Manager with a Page View Tag that has multiple Triggers attached to it</p>
+</li>
 </ol>
-
 <p>If any of these rang true, you might have a data quality issue that should be fixed immediately.</p>
-
 <h2 id="framing-the-problem">Framing the problem</h2>
-
 <p><a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/field-reference#siteSpeedSampleRate">By default</a>, 1% of Page View hits are sampled for page timings. So if you have the following code on the site:</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">ga</span>(<span style="color:#e6db74">&#39;send&#39;</span>, <span style="color:#e6db74">&#39;pageview&#39;</span>);
 </code></pre></div>
-
-<p>There&rsquo;s a <sup>1</sup>&frasl;<sub>100</sub> chance that upon the first time command is executed, this particular request will grab the available Navigation Timing data and send it to Google Analytics. And, again, this is fine. That&rsquo;s what we want. Now if you have the following code:</p>
-
+<p>There's a 1/100 chance that upon the first time command is executed, this particular request will grab the available Navigation Timing data and send it to Google Analytics. And, again, this is fine. That's what we want. Now if you have the following code:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">ga</span>(<span style="color:#e6db74">&#39;send&#39;</span>, <span style="color:#e6db74">&#39;pageview&#39;</span>);
 <span style="color:#a6e22e">ga</span>(<span style="color:#e6db74">&#39;send&#39;</span>, <span style="color:#e6db74">&#39;pageview&#39;</span>, {<span style="color:#a6e22e">page</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;/some-custom-page/&#39;</span>});
 </code></pre></div>
-
-<p>That&rsquo;s two separate Page View hits firing on the same page, you&rsquo;re still fine. Since they use the same tracker object (the <em>default tracker</em>), even if you win the odds and manage to hit the <sup>1</sup>&frasl;<sub>100</sub> twice on the same page, the page timing data is only sent once, since Universal Analytics only sends timing data once per tracker per page.</p>
-
+<p>That's two separate Page View hits firing on the same page, you're still fine. Since they use the same tracker object (the <em>default tracker</em>), even if you win the odds and manage to hit the 1/100 twice on the same page, the page timing data is only sent once, since Universal Analytics only sends timing data once per tracker per page.</p>
 <p>However, if you have this:</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">ga</span>(<span style="color:#e6db74">&#39;send&#39;</span>, <span style="color:#e6db74">&#39;pageview&#39;</span>);
 <span style="color:#a6e22e">ga</span>(<span style="color:#e6db74">&#39;secondTracker.send&#39;</span>, <span style="color:#e6db74">&#39;pageview&#39;</span>, {<span style="color:#a6e22e">page</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;/some-custom-page/&#39;</span>});
 </code></pre></div>
-
-<p>If both these trackers collect to the same Google Analytics property (UA-XXXXXX-Y), and if both trackers manage to somehow make the <sup>1</sup>&frasl;<sub>100</sub> cut, you will be sending the same page timing data <em>twice</em>, just for different page paths. And that will warp your data!</p>
-
+<p>If both these trackers collect to the same Google Analytics property (UA-XXXXXX-Y), and if both trackers manage to somehow make the 1/100 cut, you will be sending the same page timing data <em>twice</em>, just for different page paths. And that will warp your data!</p>
 <p>It gets worse&hellip;</p>
-
 <h2 id="the-problem-with-google-tag-manager">The problem with Google Tag Manager</h2>
-
-<p><a href="https://tagmanager.google.com/">Google Tag Manager</a>, for all the good it does, has one complication that makes a lot of things difficult: it assigns a unique tracker object for every single tag that fires - even if it&rsquo;s the same tag firing multiple times.</p>
-
+<p><a href="https://tagmanager.google.com/">Google Tag Manager</a>, for all the good it does, has one complication that makes a lot of things difficult: it assigns a unique tracker object for every single tag that fires - even if it's the same tag firing multiple times.</p>
 <p>Take another look at the image at the beginning of this article. There you have a Page View Tag which has the <code>siteSpeedSampleRate</code> set to 100%, which means that every single time the Page View hit is sent, it should be used to sample page timing data. It also has a Trigger which fires whenever a Custom Event is pushed into <code>dataLayer</code>. So this is your typical &ldquo;virtual&rdquo; Page View (man I hate that term - all Page Views are virtual!) Tag, set to fire with a custom page path whenever the event triggers.</p>
-
-<p>Now, here&rsquo;s the issue: because it has <code>siteSpeedSampleRate</code> set to 100, and because it will fire multiple times on the page, and because each time it fires it will have a unique tracker name:</p>
-
+<p>Now, here's the issue: because it has <code>siteSpeedSampleRate</code> set to 100, and because it will fire multiple times on the page, and because each time it fires it will have a unique tracker name:</p>
 <p><strong>Every single time this Page View Tag fires, it will send the same page timing data to Google Analytics!</strong></p>
-
-<p>That&rsquo;s multiplication on a grand level! It&rsquo;s even more confusing since the <em>same</em> page timing data is sent to multiple page paths, making deduplication in the reports really difficult to do.</p>
-
+<p>That's multiplication on a grand level! It's even more confusing since the <em>same</em> page timing data is sent to multiple page paths, making deduplication in the reports really difficult to do.</p>
 <h2 id="fixes">Fixes</h2>
-
 <p>Here are some obvious fixes to this issue.</p>
-
 <h3 id="1-only-sample-a-single-tracker">1. Only sample a single tracker</h3>
-
-<p>This is pretty easy if you&rsquo;re using the Universal Analytics snippet. Set <code>siteSpeedSampleRate</code> to a proper value in only one tracker, and set all other trackers to 0.</p>
-
+<p>This is pretty easy if you're using the Universal Analytics snippet. Set <code>siteSpeedSampleRate</code> to a proper value in only one tracker, and set all other trackers to 0.</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">ga</span>(<span style="color:#e6db74">&#39;create&#39;</span>, <span style="color:#e6db74">&#39;UA-12345-1&#39;</span>, {<span style="color:#a6e22e">siteSpeedSampleRate</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">100</span>});
 <span style="color:#a6e22e">ga</span>(<span style="color:#e6db74">&#39;create&#39;</span>, <span style="color:#e6db74">&#39;UA-12345-1&#39;</span>, {<span style="color:#a6e22e">name</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;secondTracker&#39;</span>, <span style="color:#a6e22e">siteSpeedSampleRate</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">0</span>});
 </code></pre></div>
-
 <p>This would ensure that only a single set of page timings is sent per page.</p>
-
 <p>In GTM, by default, this would be impossible, because each tag has its own unique tracker name.</p>
-
 <h3 id="2-only-sample-the-first-pageview">2. Only sample the first pageview</h3>
-
 <p>This is irrelevant in Universal Analytics, as only the first pageview per tracker is sampled anyway. In Google Tag Manager, however, this might just fix the issue for you.</p>
-
-<p>For this to work, you need to fire the first Page View hit of a page using a unique trigger. Typically, you&rsquo;d have the &ldquo;All Pages&rdquo; Trigger on the Page View Tag, and then another Trigger for the custom Page View. Thus, a single-page app might have the following Tag catering for all Page Views:</p>
-
+<p>For this to work, you need to fire the first Page View hit of a page using a unique trigger. Typically, you'd have the &ldquo;All Pages&rdquo; Trigger on the Page View Tag, and then another Trigger for the custom Page View. Thus, a single-page app might have the following Tag catering for all Page Views:</p>
 
 
 
@@ -447,18 +416,13 @@
 </div>
 
 
-
 <p>Now, this Tag <em>will</em> be problematic if left like this, since the Page Timing sample will be sent every single time the Tag fires - once for the All Pages Trigger, and each time the Custom Event Trigger fires.</p>
-
 <p>To fix this, use this Custom JavaScript Variable as the value of the <code>siteSpeedSampleRate</code> field:</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
   <span style="color:#66d9ef">return</span> {{<span style="color:#a6e22e">Event</span>}} <span style="color:#f92672">===</span> <span style="color:#e6db74">&#39;gtm.js&#39;</span> <span style="color:#f92672">?</span> <span style="color:#ae81ff">100</span> <span style="color:#f92672">:</span> <span style="color:#ae81ff">0</span>;
 }
 </code></pre></div>
-
 <p>So your Tag looks like this:</p>
-
 
 
 
@@ -474,17 +438,11 @@
 </div>
 
 
-
-<p>This JavaScript returns <code>100</code> for the All Pages Event (that&rsquo;s the <strong>gtm.js</strong> event name), and <code>0</code> for all other Triggers.</p>
-
+<p>This JavaScript returns <code>100</code> for the All Pages Event (that's the <strong>gtm.js</strong> event name), and <code>0</code> for all other Triggers.</p>
 <p>In other words, only the All Pages Trigger will send the site speed sample, ensuring it is only sent once on the page.</p>
-
-<p>If you don&rsquo;t have the means to distinguish the first Page View from all the subsequent triggerings, you could also add <a href="https://www.simoahava.com/gtm-tips/hitcallback-eventcallback/">hitCallback</a> to your Page View Tag, which sets a global flag (or even a <code>dataLayer</code> variable) to <code>true</code>, indicating that the tag has fired (at least) once. Then you can use this flag as a condition for the <code>siteSpeedSampleRate</code> field, only sending the <code>100</code> value if this flag is false.</p>
-
+<p>If you don't have the means to distinguish the first Page View from all the subsequent triggerings, you could also add <a href="https://www.simoahava.com/gtm-tips/hitcallback-eventcallback/">hitCallback</a> to your Page View Tag, which sets a global flag (or even a <code>dataLayer</code> variable) to <code>true</code>, indicating that the tag has fired (at least) once. Then you can use this flag as a condition for the <code>siteSpeedSampleRate</code> field, only sending the <code>100</code> value if this flag is false.</p>
 <h3 id="3-set-the-tracker-name-in-your-gtm-tag">3. Set the Tracker Name in your GTM Tag</h3>
-
-<p>This is the most risky but also the most effective way to fix it. Remember how GTM uses a unique tracker name for every instance of a Tag? Well you can always set the <strong>Tracker Name</strong> field with some value to make sure that every time the Tag fires it uses the same tracker object. Thus the page timing sample is only sent once. To do this, you&rsquo;d have to configure one of the settings in the Page View Tag:</p>
-
+<p>This is the most risky but also the most effective way to fix it. Remember how GTM uses a unique tracker name for every instance of a Tag? Well you can always set the <strong>Tracker Name</strong> field with some value to make sure that every time the Tag fires it uses the same tracker object. Thus the page timing sample is only sent once. To do this, you'd have to configure one of the settings in the Page View Tag:</p>
 
 
 
@@ -500,15 +458,10 @@
 </div>
 
 
-
-<p>You can set it to whatever value you wish, though I advice against leaving it blank. If you do leave it blank, it uses the default Universal Analytics tracker and can lead to issues, unless you are really on top of your site&rsquo;s GA implementation.</p>
-
+<p>You can set it to whatever value you wish, though I advice against leaving it blank. If you do leave it blank, it uses the default Universal Analytics tracker and can lead to issues, unless you are really on top of your site's GA implementation.</p>
 <p>There are risks when setting the Tracker Name field, and I recommend you read <a href="https://www.simoahava.com/gtm-tips/be-careful-with-the-tracker-name-setting/">my article on the topic</a> before proceeding with the method.</p>
-
 <h2 id="summary">Summary</h2>
-
-<p>The Site Speed reports are really great, but you might want to go over your Universal Analytics implementation to make sure you&rsquo;re not involuntarily collecting bogus data.</p>
-
+<p>The Site Speed reports are really great, but you might want to go over your Universal Analytics implementation to make sure you're not involuntarily collecting bogus data.</p>
 <p>As long as you keep in mind that the page speed sample is collected <em>once per page per tracker</em>, you should be able to identify if there are issues in your setup. In this article, I have outlined three different things you can try, but there are other methods you can employ too, with just a little creativity.</p>
 
               
@@ -615,7 +568,7 @@
         </article>
         <footer id="footer" class="main-content-wrap">
   <span class="copyrights">
-    &copy; 2019 Simo Ahava. All Rights Reserved
+    &copy; 2020 Simo Ahava. All Rights Reserved
   </span>
 </footer>
 

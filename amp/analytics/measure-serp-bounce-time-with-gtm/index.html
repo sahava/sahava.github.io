@@ -127,8 +127,6 @@
 
 <meta itemprop="name" content="Measure SERP Bounce Time With GTM">
 <meta itemprop="description" content="How to measure the dwell time of users who visit your site via SERP before bouncing back to the SERP page. Using Google Tag Manager, of course.">
-
-
 <meta itemprop="datePublished" content="2015-09-28T12:28:30&#43;00:00" />
 <meta itemprop="dateModified" content="2015-09-28T12:28:30&#43;00:00" />
 <meta itemprop="wordCount" content="2072">
@@ -136,7 +134,6 @@
 
 
 <meta itemprop="keywords" content="google analytics,Google Tag Manager,Guide,SEO,serp,timings," />
-
 <script type="application/ld+json">
 {
     "@context": "http://schema.org",
@@ -921,10 +918,7 @@ on
     </header>
 
     <section class="post-content">
-      
-
-<p>Here&rsquo;s an interesting and hacky use case for you. It&rsquo;s all about uncovering <strong>bounce</strong> metrics for visits which originate from organic Google search results. In particular, the metric we&rsquo;re interested in is how long user <em>dwelled</em> on the landing page after arriving from organic Google search <strong>AND</strong> returned to the search engine results page (SERP) using the browser&rsquo;s back button.</p>
-
+      <p>Here's an interesting and hacky use case for you. It's all about uncovering <strong>bounce</strong> metrics for visits which originate from organic Google search results. In particular, the metric we're interested in is how long user <em>dwelled</em> on the landing page after arriving from organic Google search <strong>AND</strong> returned to the search engine results page (SERP) using the browser's back button.</p>
 
 
     <a href="https://www.simoahava.com/amp/images/2015/09/dwell-time-landing-page.jpg" title="Dwell time landing page">
@@ -934,56 +928,39 @@ on
     </a>
   
 
-
-<p>The inspiration for this post came from an audience question at the Best Internet Conference in Lithuania, which I recently attended as a speaker. They were concerned that Google is using Bounce Rate as a search ranking signal, and I was fairly strongly opinionated that it&rsquo;s simply not possible, as all the &ldquo;native&rdquo; GA metrics are really easy to manipulate. However, Dr. Pete from Moz wrote about <a href="https://moz.com/blog/the-2-user-metrics-that-matter-for-seo"><em>dwell time</em></a> in 2012, and it makes a lot of sense. Google should be <strong>very</strong> interested how long the visitor stays out of the SERP when following a link. If users tend to immediately return to the SERP, it&rsquo;s very likely the result was not relevant for them.</p>
-
-<p>So, inspired by this question, I wanted to see if I can get some metrics from how long people dwell on these landing pages before returning to the SERP. I got my results, but it&rsquo;s definitely not an easy problem to solve. As usual, we&rsquo;re using a combination of <a href="https://tagmanager.google.com">Google Tag Manager</a> and <a href="https://analytics.google.com">Google Analytics</a> to perform the operation.</p>
-
-<p>(<strong>UPDATE 17 April 2016</strong> I updated this article, as I had to make some modifications to the code. It&rsquo;s slightly more robust now, and it lends itself better to e.g. Custom Metrics, if you prefer to use those instead of User Timings.)</p>
-
-<p>The result is a list of User Timings, where each landing page can be scrutinized against the time users spent on there before clicking the browser&rsquo;s back button.</p>
-
+<p>The inspiration for this post came from an audience question at the Best Internet Conference in Lithuania, which I recently attended as a speaker. They were concerned that Google is using Bounce Rate as a search ranking signal, and I was fairly strongly opinionated that it's simply not possible, as all the &ldquo;native&rdquo; GA metrics are really easy to manipulate. However, Dr. Pete from Moz wrote about <a href="https://moz.com/blog/the-2-user-metrics-that-matter-for-seo"><em>dwell time</em></a> in 2012, and it makes a lot of sense. Google should be <strong>very</strong> interested how long the visitor stays out of the SERP when following a link. If users tend to immediately return to the SERP, it's very likely the result was not relevant for them.</p>
+<p>So, inspired by this question, I wanted to see if I can get some metrics from how long people dwell on these landing pages before returning to the SERP. I got my results, but it's definitely not an easy problem to solve. As usual, we're using a combination of <a href="https://tagmanager.google.com">Google Tag Manager</a> and <a href="https://analytics.google.com">Google Analytics</a> to perform the operation.</p>
+<p>(<strong>UPDATE 17 April 2016</strong> I updated this article, as I had to make some modifications to the code. It's slightly more robust now, and it lends itself better to e.g. Custom Metrics, if you prefer to use those instead of User Timings.)</p>
+<p>The result is a list of User Timings, where each landing page can be scrutinized against the time users spent on there before clicking the browser's back button.</p>
 <h2 id="the-mystery-of-the-history">The mystery of the history</h2>
-
-<p>The difficulty is that when the user clicks the browser&rsquo;s back button, we have no knowledge of where the user is taken to. That&rsquo;s browser security for you. It would be highly questionable if the website had access to the history of the web browser. Makes sense, right?</p>
-
-<p>Another difficulty is the actual browser back button. It&rsquo;s not part of the browser object model, so we can&rsquo;t actually measure clicks on it. Instead, we can <em>infer</em> a back button click from how people navigate with URL hashes! When a <em>hash change</em> is recorded, we can infer that it was due to browser back <strong>if</strong> we implement a little hack, where the hash is unique to organic Google search.</p>
-
-<p>You see, by creating a new browser history entry for people landing from organic Google search, the back button click doesn&rsquo;t take them to the SERP, but rather to the original landing page that existed <strong>before</strong> we redirected the user to the new history state. Using that as an indicator, we can extrapolate that the hash change occurred due to a browser back button click (or the backspace).</p>
-
+<p>The difficulty is that when the user clicks the browser's back button, we have no knowledge of where the user is taken to. That's browser security for you. It would be highly questionable if the website had access to the history of the web browser. Makes sense, right?</p>
+<p>Another difficulty is the actual browser back button. It's not part of the browser object model, so we can't actually measure clicks on it. Instead, we can <em>infer</em> a back button click from how people navigate with URL hashes! When a <em>hash change</em> is recorded, we can infer that it was due to browser back <strong>if</strong> we implement a little hack, where the hash is unique to organic Google search.</p>
+<p>You see, by creating a new browser history entry for people landing from organic Google search, the back button click doesn't take them to the SERP, but rather to the original landing page that existed <strong>before</strong> we redirected the user to the new history state. Using that as an indicator, we can extrapolate that the hash change occurred due to a browser back button click (or the backspace).</p>
 <h2 id="the-process">The process</h2>
-
 <p>The process is as follows:</p>
-
 <ol>
-<li><p>If the user lands on the site through organic Google search, create a new <strong>browser history entry</strong> with the hash <strong>#gref</strong></p></li>
-
-<li><p>Later, if a <strong>hash change</strong> is registered, and the user is still on the landing page, and the hash change is from <strong>#gref</strong> to a blank string, fire a Google Analytics <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/user-timings?hl=en">timing</a> event, after which programmatically invoke the &ldquo;Back&rdquo; event in the browser history</p></li>
+<li>
+<p>If the user lands on the site through organic Google search, create a new <strong>browser history entry</strong> with the hash <strong>#gref</strong></p>
+</li>
+<li>
+<p>Later, if a <strong>hash change</strong> is registered, and the user is still on the landing page, and the hash change is from <strong>#gref</strong> to a blank string, fire a Google Analytics <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/user-timings?hl=en">timing</a> event, after which programmatically invoke the &ldquo;Back&rdquo; event in the browser history</p>
+</li>
 </ol>
-
-<p>Looks simple (actually, doesn&rsquo;t look simple at all), but it&rsquo;s very hacky indeed. You see, we&rsquo;re <strong>manipulating browser history</strong> by creating a new, fictional entry called <strong>#gref</strong>. Then, when the user clicks browser back, instead of taking them back to Google search, it actually takes them to the previous state, which is the URL <strong>without</strong> the #gref.</p>
-
-<p>THAT&rsquo;S how we know both that the user clicked browser back AND that they were trying to return to the SERP. All we have to do is send the Google Analytics timing hit, and then move the user manually to the previous entry in the history (i.e. the SERP).</p>
-
-<p>Why is it hacky? Well, you&rsquo;re manipulating browser history, for one. You&rsquo;re creating a custom state, and you&rsquo;re forcing the user to adopt that state if they land from organic search. Next, you&rsquo;re intercepting a legitimate browser back event, and instead of letting the user directly leave the site, you&rsquo;re forcing them to send the GA timing hit first, before manually whisking them back to the SERP.</p>
-
-<p>Whew! Lots of things that can go wrong. Luckily the JavaScript is solid and beautiful, but don&rsquo;t forget to test thoroughly!</p>
-
-<p>Wait, let me repeat that: <strong>test thoroughly</strong>. Also, if you&rsquo;re running a single-page website, I can almost promise you that this won&rsquo;t work out-of-the-box.</p>
-
+<p>Looks simple (actually, doesn't look simple at all), but it's very hacky indeed. You see, we're <strong>manipulating browser history</strong> by creating a new, fictional entry called <strong>#gref</strong>. Then, when the user clicks browser back, instead of taking them back to Google search, it actually takes them to the previous state, which is the URL <strong>without</strong> the #gref.</p>
+<p>THAT'S how we know both that the user clicked browser back AND that they were trying to return to the SERP. All we have to do is send the Google Analytics timing hit, and then move the user manually to the previous entry in the history (i.e. the SERP).</p>
+<p>Why is it hacky? Well, you're manipulating browser history, for one. You're creating a custom state, and you're forcing the user to adopt that state if they land from organic search. Next, you're intercepting a legitimate browser back event, and instead of letting the user directly leave the site, you're forcing them to send the GA timing hit first, before manually whisking them back to the SERP.</p>
+<p>Whew! Lots of things that can go wrong. Luckily the JavaScript is solid and beautiful, but don't forget to test thoroughly!</p>
+<p>Wait, let me repeat that: <strong>test thoroughly</strong>. Also, if you're running a single-page website, I can almost promise you that this won't work out-of-the-box.</p>
 <h2 id="the-custom-html-tag">The Custom HTML Tag</h2>
-
-<p>At the heart of this solution is a single Custom HTML Tag. It&rsquo;s fired by two different events, to which we&rsquo;ll return shortly.</p>
-
-<p>First of all, here&rsquo;s the code:</p>
-
+<p>At the heart of this solution is a single Custom HTML Tag. It's fired by two different events, to which we'll return shortly.</p>
+<p>First of all, here's the code:</p>
 <div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="o">&lt;</span><span class="nx">script</span><span class="o">&gt;</span>
-  <span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+  <span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">s</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">location</span><span class="p">.</span><span class="nx">search</span><span class="p">;</span>
     <span class="kd">var</span> <span class="nx">h</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">location</span><span class="p">.</span><span class="nx">hash</span><span class="p">;</span>
-    <span class="kd">var</span> <span class="nx">e</span> <span class="o">=</span> <span class="p">{{</span><span class="nx">Event</span><span class="p">}};</span>
-    <span class="kd">var</span> <span class="nx">n</span> <span class="o">=</span> <span class="p">{{</span><span class="nx">New</span> <span class="nx">History</span> <span class="nx">Fragment</span><span class="p">}};</span>
-    <span class="kd">var</span> <span class="nx">o</span> <span class="o">=</span> <span class="p">{{</span><span class="nx">Old</span> <span class="nx">History</span> <span class="nx">Fragment</span><span class="p">}};</span>
+    <span class="kd">var</span> <span class="nx">e</span> <span class="o">=</span> <span class="p">{</span><span class="p">{</span><span class="nx">Event</span><span class="p">}</span><span class="p">}</span><span class="p">;</span>
+    <span class="kd">var</span> <span class="nx">n</span> <span class="o">=</span> <span class="p">{</span><span class="p">{</span><span class="nx">New</span> <span class="nx">History</span> <span class="nx">Fragment</span><span class="p">}</span><span class="p">}</span><span class="p">;</span>
+    <span class="kd">var</span> <span class="nx">o</span> <span class="o">=</span> <span class="p">{</span><span class="p">{</span><span class="nx">Old</span> <span class="nx">History</span> <span class="nx">Fragment</span><span class="p">}</span><span class="p">}</span><span class="p">;</span>
     
     <span class="c1">// Only run if the History API is supported
 </span><span class="c1"></span>    <span class="k">if</span> <span class="p">(</span><span class="nb">window</span><span class="p">.</span><span class="nx">history</span><span class="p">)</span> <span class="p">{</span>
@@ -995,7 +972,7 @@ on
           <span class="nx">s</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="s1">&#39;utm_&#39;</span><span class="p">)</span> <span class="o">===</span> <span class="o">-</span><span class="mi">1</span> <span class="o">&amp;&amp;</span>
           <span class="nx">h</span> <span class="o">!==</span> <span class="s1">&#39;#gref&#39;</span><span class="p">)</span> <span class="p">{</span>
         <span class="nb">window</span><span class="p">.</span><span class="nx">oldFragment</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
-        <span class="nb">window</span><span class="p">.</span><span class="nx">history</span><span class="p">.</span><span class="nx">pushState</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span><span class="kc">null</span><span class="p">,</span><span class="s1">&#39;#gref&#39;</span><span class="p">);</span>
+        <span class="nb">window</span><span class="p">.</span><span class="nx">history</span><span class="p">.</span><span class="nx">pushState</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span><span class="kc">null</span><span class="p">,</span><span class="s1">&#39;#gref&#39;</span><span class="p">)</span><span class="p">;</span>
       <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">e</span> <span class="o">===</span> <span class="s1">&#39;gtm.js&#39;</span><span class="p">)</span> <span class="p">{</span>
         <span class="nb">window</span><span class="p">.</span><span class="nx">oldFragment</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
       <span class="p">}</span>
@@ -1006,107 +983,92 @@ on
 </span><span class="c1"></span>      <span class="k">if</span> <span class="p">(</span><span class="nx">e</span> <span class="o">===</span> <span class="s1">&#39;gtm.historyChange&#39;</span> <span class="o">&amp;&amp;</span> 
           <span class="nx">n</span> <span class="o">===</span> <span class="s1">&#39;&#39;</span> <span class="o">&amp;&amp;</span> 
           <span class="nx">o</span> <span class="o">===</span> <span class="s1">&#39;gref&#39;</span><span class="p">)</span> <span class="p">{</span>
-        <span class="kd">var</span> <span class="nx">time</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">().</span><span class="nx">getTime</span><span class="p">()</span> <span class="o">-</span> <span class="p">{{</span><span class="nx">DLV</span> <span class="o">-</span> <span class="nx">gtm</span><span class="p">.</span><span class="nx">start</span><span class="p">}};</span>
+        <span class="kd">var</span> <span class="nx">time</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="p">)</span><span class="p">.</span><span class="nx">getTime</span><span class="p">(</span><span class="p">)</span> <span class="o">-</span> <span class="p">{</span><span class="p">{</span><span class="nx">DLV</span> <span class="o">-</span> <span class="nx">gtm</span><span class="p">.</span><span class="nx">start</span><span class="p">}</span><span class="p">}</span><span class="p">;</span>
         <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">window</span><span class="p">.</span><span class="nx">oldFragment</span><span class="p">)</span> <span class="p">{</span>
-          <span class="nx">dataLayer</span><span class="p">.</span><span class="nx">push</span><span class="p">({</span>
+          <span class="nx">dataLayer</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="p">{</span>
             <span class="s1">&#39;event&#39;</span> <span class="o">:</span> <span class="s1">&#39;returnToSerp&#39;</span><span class="p">,</span>
             <span class="s1">&#39;timeToSerp&#39;</span> <span class="o">:</span> <span class="nx">time</span><span class="p">,</span>
-            <span class="s1">&#39;eventCallback&#39;</span> <span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-              <span class="nb">window</span><span class="p">.</span><span class="nx">history</span><span class="p">.</span><span class="nx">go</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+            <span class="s1">&#39;eventCallback&#39;</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="p">)</span> <span class="p">{</span>
+              <span class="nb">window</span><span class="p">.</span><span class="nx">history</span><span class="p">.</span><span class="nx">go</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="p">;</span>
             <span class="p">}</span>
-          <span class="p">});</span>
+          <span class="p">}</span><span class="p">)</span><span class="p">;</span>
         <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-          <span class="nb">window</span><span class="p">.</span><span class="nx">history</span><span class="p">.</span><span class="nx">go</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+          <span class="nb">window</span><span class="p">.</span><span class="nx">history</span><span class="p">.</span><span class="nx">go</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="p">;</span>
         <span class="p">}</span>
       <span class="p">}</span>
     <span class="p">}</span>
-  <span class="p">})();</span>
-<span class="o">&lt;</span><span class="err">/script&gt;</span>
+  <span class="p">}</span><span class="p">)</span><span class="p">(</span><span class="p">)</span><span class="p">;</span>
+<span class="o">&lt;</span><span class="err">/</span><span class="err">s</span><span class="err">c</span><span class="err">r</span><span class="err">i</span><span class="err">p</span><span class="err">t</span><span class="err">&gt;</span>
 </code></pre></div>
-
-<p>Let&rsquo;s quickly walk through this code. First of all, the whole block is encased in an immediately invoked function expression (IIFE) <code>(function() {...})();</code>, which protects the global namespace. Also, the whole solution only works if the user&rsquo;s browser supports the History API: <code>if (window.history) {...}</code>.</p>
-
+<p>Let's quickly walk through this code. First of all, the whole block is encased in an immediately invoked function expression (IIFE) <code>(function() {...})();</code>, which protects the global namespace. Also, the whole solution only works if the user's browser supports the History API: <code>if (window.history) {...}</code>.</p>
 <p>The first important code block is this:</p>
-
 <div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">if</span> <span class="p">(</span><span class="nx">e</span> <span class="o">===</span> <span class="s1">&#39;gtm.js&#39;</span> <span class="o">&amp;&amp;</span> 
     <span class="nb">document</span><span class="p">.</span><span class="nx">referrer</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="s1">&#39;www.google.&#39;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span> <span class="o">&amp;&amp;</span> 
     <span class="nx">s</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="s1">&#39;gclid&#39;</span><span class="p">)</span> <span class="o">===</span> <span class="o">-</span><span class="mi">1</span> <span class="o">&amp;&amp;</span>
     <span class="nx">s</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="s1">&#39;utm_&#39;</span><span class="p">)</span> <span class="o">===</span> <span class="o">-</span><span class="mi">1</span> <span class="o">&amp;&amp;</span>
     <span class="nx">h</span> <span class="o">!==</span> <span class="s1">&#39;#gref&#39;</span><span class="p">)</span> <span class="p">{</span>
   <span class="nb">window</span><span class="p">.</span><span class="nx">oldFragment</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
-  <span class="nb">window</span><span class="p">.</span><span class="nx">history</span><span class="p">.</span><span class="nx">pushState</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span><span class="kc">null</span><span class="p">,</span><span class="s1">&#39;#gref&#39;</span><span class="p">);</span>
+  <span class="nb">window</span><span class="p">.</span><span class="nx">history</span><span class="p">.</span><span class="nx">pushState</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span><span class="kc">null</span><span class="p">,</span><span class="s1">&#39;#gref&#39;</span><span class="p">)</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div>
-
 <p>This code checks the following:</p>
-
 <ol>
-<li><p>Was the Tag fired due to the Page View Trigger (i.e. a page load)?</p></li>
-
-<li><p>Did the user land from a Google site (<code>referrer</code> contains <strong>www.google.</strong>)?</p></li>
-
-<li><p>If they did, make sure it&rsquo;s not from an AdWords ad (check that the URL does not have <strong>?gclid</strong>) or custom campaign.</p></li>
-
-<li><p>Make sure also that the URL does not already contain #gref, which would imply the user followed a link with that hash or that the user already had a history entry with #gref, meaning they&rsquo;ve navigated somewhere else within or outside the site after landing on it in the first place from the SERP.</p></li>
+<li>
+<p>Was the Tag fired due to the Page View Trigger (i.e. a page load)?</p>
+</li>
+<li>
+<p>Did the user land from a Google site (<code>referrer</code> contains <strong>www.google.</strong>)?</p>
+</li>
+<li>
+<p>If they did, make sure it's not from an AdWords ad (check that the URL does not have <strong>?gclid</strong>) or custom campaign.</p>
+</li>
+<li>
+<p>Make sure also that the URL does not already contain #gref, which would imply the user followed a link with that hash or that the user already had a history entry with #gref, meaning they've navigated somewhere else within or outside the site after landing on it in the first place from the SERP.</p>
+</li>
 </ol>
-
 <p>If these checks pass, then a new global variable <code>oldFragment</code> is initialized with the value <code>false</code>. This means simply that this is a brand new landing on the site through organic Google search, and we check against this when we push the payload to <code>dataLayer</code>. We only want to send the Timing hit for landing page bounces.</p>
-
 <p>Finally, a new browser history state is created, where the URL is appended with <strong>#gref</strong> to show that the user landed from organic Google search.</p>
-
 <p>The next code block is:</p>
-
 <div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">e</span> <span class="o">===</span> <span class="s1">&#39;gtm.js&#39;</span><span class="p">)</span> <span class="p">{</span>
   <span class="nb">window</span><span class="p">.</span><span class="nx">oldFragment</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div>
-
-<p>Here, we check if the event is a page load again, but the URL already has <strong>#gref</strong>. In this case, we set the global variable to <code>true</code>, since obviously this entry is not a direct landing from the SERP but something else. This way, we&rsquo;ll block the Timing hit from happening, as we only want to measure true landing page bounces.</p>
-
+<p>Here, we check if the event is a page load again, but the URL already has <strong>#gref</strong>. In this case, we set the global variable to <code>true</code>, since obviously this entry is not a direct landing from the SERP but something else. This way, we'll block the Timing hit from happening, as we only want to measure true landing page bounces.</p>
 <p>The final code block is:</p>
-
 <div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">if</span> <span class="p">(</span><span class="nx">e</span> <span class="o">===</span> <span class="s1">&#39;gtm.historyChange&#39;</span> <span class="o">&amp;&amp;</span> 
     <span class="nx">n</span> <span class="o">===</span> <span class="s1">&#39;&#39;</span> <span class="o">&amp;&amp;</span> 
     <span class="nx">o</span> <span class="o">===</span> <span class="s1">&#39;gref&#39;</span><span class="p">)</span> <span class="p">{</span>
-  <span class="kd">var</span> <span class="nx">time</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">().</span><span class="nx">getTime</span><span class="p">()</span> <span class="o">-</span> <span class="p">{{</span><span class="nx">DLV</span> <span class="o">-</span> <span class="nx">gtm</span><span class="p">.</span><span class="nx">start</span><span class="p">}};</span>
+  <span class="kd">var</span> <span class="nx">time</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="p">)</span><span class="p">.</span><span class="nx">getTime</span><span class="p">(</span><span class="p">)</span> <span class="o">-</span> <span class="p">{</span><span class="p">{</span><span class="nx">DLV</span> <span class="o">-</span> <span class="nx">gtm</span><span class="p">.</span><span class="nx">start</span><span class="p">}</span><span class="p">}</span><span class="p">;</span>
   <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">window</span><span class="p">.</span><span class="nx">oldFragment</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nx">dataLayer</span><span class="p">.</span><span class="nx">push</span><span class="p">({</span>
+    <span class="nx">dataLayer</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="p">{</span>
       <span class="s1">&#39;event&#39;</span> <span class="o">:</span> <span class="s1">&#39;returnToSerp&#39;</span><span class="p">,</span>
       <span class="s1">&#39;timeToSerp&#39;</span> <span class="o">:</span> <span class="nx">time</span><span class="p">,</span>
-      <span class="s1">&#39;eventCallback&#39;</span> <span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-        <span class="nb">window</span><span class="p">.</span><span class="nx">history</span><span class="p">.</span><span class="nx">go</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+      <span class="s1">&#39;eventCallback&#39;</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nb">window</span><span class="p">.</span><span class="nx">history</span><span class="p">.</span><span class="nx">go</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="p">;</span>
       <span class="p">}</span>
-    <span class="p">});</span>
+    <span class="p">}</span><span class="p">)</span><span class="p">;</span>
   <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-    <span class="nb">window</span><span class="p">.</span><span class="nx">history</span><span class="p">.</span><span class="nx">go</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+    <span class="nb">window</span><span class="p">.</span><span class="nx">history</span><span class="p">.</span><span class="nx">go</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="p">;</span>
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-
-<p>Again, there&rsquo;s a checklist of things:</p>
-
+<p>Again, there's a checklist of things:</p>
 <ol>
-<li><p>Is the event a browser history event?</p></li>
-
-<li><p>Is the old hash <strong>#gref</strong> and the new hash a blank string?</p></li>
+<li>
+<p>Is the event a browser history event?</p>
+</li>
+<li>
+<p>Is the old hash <strong>#gref</strong> and the new hash a blank string?</p>
+</li>
 </ol>
-
-<p>If all these checks pass, it means that the user tried to go back in browser history to the SERP. Due to our manually imposed history state, they&rsquo;re actually taken to the <strong>#gref</strong>-less landing page.</p>
-
+<p>If all these checks pass, it means that the user tried to go back in browser history to the SERP. Due to our manually imposed history state, they're actually taken to the <strong>#gref</strong>-less landing page.</p>
 <p>Next, we check the dwell time on the page, using the difference between the current time and the time when the GTM container snippet was first loaded. This is a reasonable description of dwell time, but you can use something else for start time if you wish.</p>
-
-<p>Finally, we check if <code>oldFragment</code> is false, meaning we&rsquo;re still on the landing page. If it is, the payload is pushed into <code>dataLayer</code>. The &lsquo;eventCallback&rsquo; key has the actual return to SERP command, and it will only be executed after any Tags that use the <strong>returnToSerp</strong> event have fired.</p>
-
+<p>Finally, we check if <code>oldFragment</code> is false, meaning we're still on the landing page. If it is, the payload is pushed into <code>dataLayer</code>. The &lsquo;eventCallback&rsquo; key has the actual return to SERP command, and it will only be executed after any Tags that use the <strong>returnToSerp</strong> event have fired.</p>
 <p>Hacky-dy-hack-hack! I love it!</p>
-
-<h2 id="all-the-other-stuff-you-ll-need">All the other stuff you&rsquo;ll need</h2>
-
-<p>Here&rsquo;s a list of the assets you need to create for this to work. Feel free to improvise, if you wish!</p>
-
+<h2 id="all-the-other-stuff-youll-need">All the other stuff you'll need</h2>
+<p>Here's a list of the assets you need to create for this to work. Feel free to improvise, if you wish!</p>
 <h3 id="1-built-in-variables">1. Built-in Variables</h3>
-
-<p>First, make sure the following Built-in Variables are checked in your container&rsquo;s Variables settings.</p>
-
+<p>First, make sure the following Built-in Variables are checked in your container's Variables settings.</p>
 
 
     <a href="https://www.simoahava.com/amp/images/2015/09/built-ins.jpg" title="Required built-ins">
@@ -1116,17 +1078,11 @@ on
     </a>
   
 
-
-<p>So that&rsquo;s <strong>Page URL</strong>, <strong>Event</strong>, <strong>History Source</strong>, <strong>New / Old History Fragment</strong>.</p>
-
+<p>So that's <strong>Page URL</strong>, <strong>Event</strong>, <strong>History Source</strong>, <strong>New / Old History Fragment</strong>.</p>
 <h3 id="2-the-triggers-for-the-custom-html-tag">2. The Triggers for the Custom HTML Tag</h3>
-
 <p>The Custom HTML Tag runs on two Triggers.</p>
-
 <p>The first one is the default <strong>All Pages</strong> Trigger.</p>
-
 <p>The second one is a <strong>History Change</strong> Trigger which looks like this:</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2015/09/history-change-trigger.jpg" title="History Change Trigger with popstate">
@@ -1136,13 +1092,9 @@ on
     </a>
   
 
-
 <p>This Trigger only launches when a browser history event is detected which is also a <code>popstate</code>, and the new history fragment is empty.</p>
-
 <h3 id="3-the-variables">3. The Variables</h3>
-
 <p>Create the following Data Layer Variables:</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2015/09/dlv-gtm.start_.jpg" title="dlv-gtm.start">
@@ -1152,9 +1104,7 @@ on
     </a>
   
 
-
 <p>This one stores the time when the GTM container snippet was executed.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2015/09/dlv-timetoserp.jpg" title="DLV - timetoserp">
@@ -1164,13 +1114,9 @@ on
     </a>
   
 
-
 <p>This is where the time spent on the landing page is stored.</p>
-
 <h3 id="4-the-trigger-for-the-timing-tag">4. The Trigger for the Timing Tag</h3>
-
-<p>The Trigger you&rsquo;ll attach to the Timing Tag (created next) looks like this:</p>
-
+<p>The Trigger you'll attach to the Timing Tag (created next) looks like this:</p>
 
 
     <a href="https://www.simoahava.com/amp/images/2015/09/trigger-returntoserp.jpg" title="returntoserp Trigger">
@@ -1180,13 +1126,9 @@ on
     </a>
   
 
-
-<p>This Trigger fires when the <strong>returnToSerp</strong> <code>dataLayer</code> event is pushed via the Custom HTML Tag. It also checks that the dwell time pushed into <code>dataLayer</code> is less than 30 minutes. This way a new session won&rsquo;t be started with the event, if the visitor stays on the page for an exceptionally long time.</p>
-
+<p>This Trigger fires when the <strong>returnToSerp</strong> <code>dataLayer</code> event is pushed via the Custom HTML Tag. It also checks that the dwell time pushed into <code>dataLayer</code> is less than 30 minutes. This way a new session won't be started with the event, if the visitor stays on the page for an exceptionally long time.</p>
 <h3 id="5-the-timing-tag">5. The Timing Tag</h3>
-
-<p>And here&rsquo;s the Universal Analytics Timing Tag you&rsquo;ll need:</p>
-
+<p>And here's the Universal Analytics Timing Tag you'll need:</p>
 
 
     <a href="https://www.simoahava.com/amp/images/2015/09/timing-tag.jpg" title="Universal Analytics Timing Tag">
@@ -1196,13 +1138,9 @@ on
     </a>
   
 
-
-<p>We&rsquo;re sending <strong>SERP Bounce</strong> as the Timing Category, the full <strong>Page URL</strong> as the Timing Variable, and the <strong>time spent</strong> on the landing page as the value. As mentioned above, this Tag is fired by the Trigger you created in step (4) above.</p>
-
+<p>We're sending <strong>SERP Bounce</strong> as the Timing Category, the full <strong>Page URL</strong> as the Timing Variable, and the <strong>time spent</strong> on the landing page as the value. As mentioned above, this Tag is fired by the Trigger you created in step (4) above.</p>
 <h2 id="viewing-the-results">Viewing the results</h2>
-
-<p>Once you implement this, you&rsquo;ll find the results under <strong>Site Content &gt; Site Speed &gt; User Timings</strong> under the Timing Category labelled <strong>SERP Bounce</strong>.</p>
-
+<p>Once you implement this, you'll find the results under <strong>Site Content &gt; Site Speed &gt; User Timings</strong> under the Timing Category labelled <strong>SERP Bounce</strong>.</p>
 
 
     <a href="https://www.simoahava.com/amp/images/2015/09/user-timings-ga.jpg" title="User Timings in GA">
@@ -1212,9 +1150,7 @@ on
     </a>
   
 
-
-<p>To drill into the data, it&rsquo;s useful to view the Timing Variable as the primary dimension, as that&rsquo;s the one where the landing pages are. Try to find landing pages with an abnormally small average dwell time:</p>
-
+<p>To drill into the data, it's useful to view the Timing Variable as the primary dimension, as that's the one where the landing pages are. Try to find landing pages with an abnormally small average dwell time:</p>
 
 
     <a href="https://www.simoahava.com/amp/images/2015/09/average-timings.jpg" title="Average timings">
@@ -1224,11 +1160,8 @@ on
     </a>
   
 
-
 <p>These pages have a very short dwell time compared to site average. Just make sure that the <strong>timing sample</strong> is large enough for you to draw conclusions from. Pages with an abnormally short dwell time from the SERP <strong>MIGHT</strong> indicate a poor experience or lack or relevant content.</p>
-
 <p>Also, the <strong>Distribution</strong> view is useful if you want to drill down to individual page performance:</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2015/09/distribution.jpg" title="Timing distribution">
@@ -1238,14 +1171,10 @@ on
     </a>
   
 
-
 <p>This report lets you view the timing buckets. As you can see, there are some anomalies here, though the sample is quite small.</p>
-
 <h2 id="summary">Summary</h2>
-
-<p>I hope I&rsquo;ve convinced you by now that this is a very hacky solution. Remember to test thoroughly. I can also promise that you will have problems if you try to implement this on a single-page application (e.g. AJAX site), which rely on the browser history API for navigation.</p>
-
-<p>Nevertheless, it&rsquo;s an interesting way of uncovering potential issues with your landing pages. It would be interesting to align this data with keyword data, but that&rsquo;s up to you to solve, since that data is difficult to come by these days, and User Timings don&rsquo;t align well with acquisition dimensions like Keyword.</p>
+<p>I hope I've convinced you by now that this is a very hacky solution. Remember to test thoroughly. I can also promise that you will have problems if you try to implement this on a single-page application (e.g. AJAX site), which rely on the browser history API for navigation.</p>
+<p>Nevertheless, it's an interesting way of uncovering potential issues with your landing pages. It would be interesting to align this data with keyword data, but that's up to you to solve, since that data is difficult to come by these days, and User Timings don't align well with acquisition dimensions like Keyword.</p>
 
     </section>
 

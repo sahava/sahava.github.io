@@ -53,7 +53,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.59.1 with theme Tranquilpeak 0.4.3-BETA">
+    <meta name="generator" content="Hugo 0.61.0 with theme Tranquilpeak 0.4.3-BETA">
     <title>Track Browsing Behavior In Google Analytics | Simo Ahava's blog</title>
     
     <script>
@@ -319,14 +319,10 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              
-
-<blockquote>
+              <blockquote>
 <p><strong>Last updated 22 May 2019</strong>: Added expiration of currently open tabs.</p>
 </blockquote>
-
-<p>In this article, <a href="https://github.com/jethron">Jethro Nederhof</a> of <a href="https://www.snowflake-analytics.com/about/">Snowflake Analytics</a> fame and I will introduce you to some pretty neat web browser APIs. The purpose of these APIs is to find out more about <strong>how the user navigated to the current page</strong>, and <strong>what&rsquo;s going on with their browser tabs</strong>.</p>
-
+<p>In this article, <a href="https://github.com/jethron">Jethro Nederhof</a> of <a href="https://www.snowflake-analytics.com/about/">Snowflake Analytics</a> fame and I will introduce you to some pretty neat web browser APIs. The purpose of these APIs is to find out more about <strong>how the user navigated to the current page</strong>, and <strong>what's going on with their browser tabs</strong>.</p>
 
 
 
@@ -342,17 +338,12 @@
 </div>
 
 
-
 <p>There are so many things you can do with this new information. You can build <em>proper</em> navigational path reports, rather than rely on the fuzzy and often incoherent flow reports in Google Analytics. You can identify how visitors interact with your content using browser tabs - a crucial bit of information if you want to make heads or tails of Google Analytics&rsquo; <a href="https://www.branded3.com/blog/understanding-google-analytics-time-page-session-duration/">time on page</a> metrics, for example. You can see how many redirects were involved in the current navigation action.</p>
-
 <p>The origins of this article are in a number of places, including an impromptu challenge thrown by <a href="http://www.analytics-ninja.com/">Yehoshua Coren</a> in Twitter (with great contributions from Marek Lecián, too):</p>
-
 <blockquote class="twitter-tweet"><p lang="en" dir="ltr">New <a href="https://twitter.com/hashtag/GTM?src=hash&amp;ref_src=twsrc%5Etfw">#GTM</a> challenge for <a href="https://twitter.com/SimoAhava?ref_src=twsrc%5Etfw">@SimoAhava</a> .  Can you track how many browser tabs I have open on your site right now?  ;)</p>&mdash; Official🥇 (@AnalyticsNinja) <a href="https://twitter.com/AnalyticsNinja/status/984406406173544448?ref_src=twsrc%5Etfw">April 12, 2018</a></blockquote>
 <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 
-
 <p>However, the main source of inspiration came from <a href="https://www.measure.chat/">Measure Slack</a>, where a similar discussion around tabbed browser was being had:</p>
-
 
 
 
@@ -368,61 +359,48 @@
 </div>
 
 
-
-<p>Jethro&rsquo;s idea got the ball rolling in my mind, so I contacted him immediately and asked if he wanted to co-author this article. As it turns out, he&rsquo;d been mulling around lots of different ideas for navigation behavior tracking, so we quickly sketched the outline of this article, and what you are reading now is the final product.</p>
-
-<p>I consider the enhancements introduced in this article just as necessary as those I introduced way back when in my article <a href="https://www.simoahava.com/analytics/improve-data-collection-with-four-custom-dimensions/">Improve Data Collection With Four Custom Dimensions</a>. Once you&rsquo;re done implementing these scripts, I&rsquo;m sure you&rsquo;ll agree.</p>
-
+<p>Jethro's idea got the ball rolling in my mind, so I contacted him immediately and asked if he wanted to co-author this article. As it turns out, he'd been mulling around lots of different ideas for navigation behavior tracking, so we quickly sketched the outline of this article, and what you are reading now is the final product.</p>
+<p>I consider the enhancements introduced in this article just as necessary as those I introduced way back when in my article <a href="https://www.simoahava.com/analytics/improve-data-collection-with-four-custom-dimensions/">Improve Data Collection With Four Custom Dimensions</a>. Once you're done implementing these scripts, I'm sure you'll agree.</p>
 <p>As said, this article is co-authored by Jethro and me. Since I am the editor, all mistakes and errors are entirely my fault, and any snarky comments should be directed at me and not my generous partner in crime (naturally, all snarky comments will be deleted, but I will read them and promise to be insulted).</p>
-
 <h1 id="table-of-contents">Table of Contents</h1><nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li><a href="#1-the-why-and-how-theory">1. The why and how (theory)</a>
-<ul>
-<li><a href="#1-1-the-performancenavigation-api">1.1. The PerformanceNavigation API</a></li>
-<li><a href="#1-2-browser-storage">1.2. Browser storage</a></li>
-</ul></li>
-<li><a href="#2-caveats">2. Caveats</a>
-<ul>
-<li><a href="#2-1-cross-domain-browsing">2.1. Cross-domain browsing</a></li>
-<li><a href="#2-2-firefox-and-chrome-go-rogue">2.2. Firefox and Chrome go rogue</a></li>
-<li><a href="#2-3-firefox-and-its-client-side-refresh-dilemma">2.3. Firefox and its client-side refresh dilemma</a></li>
-<li><a href="#2-4-browser-support">2.4. Browser support</a></li>
-<li><a href="#2-5-single-page-apps">2.5. Single-page apps</a></li>
-</ul></li>
-<li><a href="#3-solutions">3. Solutions</a>
-<ul>
-<li><a href="#3-1-the-custom-html-tag">3.1. The Custom HTML tag</a></li>
-<li><a href="#3-2-create-the-custom-dimensions-in-google-analyitcs">3.2. Create the Custom Dimensions in Google Analyitcs</a></li>
-<li><a href="#3-3-create-the-data-layer-variables-in-google-tag-manager">3.3. Create the Data Layer variables in Google Tag Manager</a></li>
-<li><a href="#3-4-add-the-data-layer-variables-to-your-page-view-tag">3.4. Add the Data Layer variables to your Page View tag</a></li>
-<li><a href="#3-5-test-it">3.5. Test it!</a></li>
-<li><a href="#3-6-custom-report-in-google-analytics">3.6. Custom Report in Google Analytics</a></li>
-<li><a href="#3-7-other-data-stores">3.7. Other data stores</a></li>
-</ul></li>
-<li><a href="#4-summary">4. Summary</a></li>
-</ul></li>
-</ul>
+  <ul>
+    <li><a href="#1-the-why-and-how-theory">1. The why and how (theory)</a>
+      <ul>
+        <li><a href="#11-the-performancenavigation-api">1.1. The PerformanceNavigation API</a></li>
+        <li><a href="#12-browser-storage">1.2. Browser storage</a></li>
+      </ul>
+    </li>
+    <li><a href="#2-caveats">2. Caveats</a>
+      <ul>
+        <li><a href="#21-cross-domain-browsing">2.1. Cross-domain browsing</a></li>
+        <li><a href="#22-firefox-and-chrome-go-rogue">2.2. Firefox and Chrome go rogue</a></li>
+        <li><a href="#23-firefox-and-its-client-side-refresh-dilemma">2.3. Firefox and its client-side refresh dilemma</a></li>
+        <li><a href="#24-browser-support">2.4. Browser support</a></li>
+        <li><a href="#25-single-page-apps">2.5. Single-page apps</a></li>
+      </ul>
+    </li>
+    <li><a href="#3-solutions">3. Solutions</a>
+      <ul>
+        <li><a href="#31-the-custom-html-tag">3.1. The Custom HTML tag</a></li>
+        <li><a href="#32-create-the-custom-dimensions-in-google-analyitcs">3.2. Create the Custom Dimensions in Google Analyitcs</a></li>
+        <li><a href="#33-create-the-data-layer-variables-in-google-tag-manager">3.3. Create the Data Layer variables in Google Tag Manager</a></li>
+        <li><a href="#34-add-the-data-layer-variables-to-your-page-view-tag">3.4. Add the Data Layer variables to your Page View tag</a></li>
+        <li><a href="#35-test-it">3.5. Test it!</a></li>
+        <li><a href="#36-custom-report-in-google-analytics">3.6. Custom Report in Google Analytics</a></li>
+        <li><a href="#37-other-data-stores">3.7. Other data stores</a></li>
+      </ul>
+    </li>
+    <li><a href="#4-summary">4. Summary</a></li>
+  </ul>
 </nav>
-
 <p>You can skip directly to the Solutions chapter, but I do recommend reading the Theory first. At the very least, make sure you read the Caveats chapter, because there are a couple of gotchas you need to be aware of if implementing this solution.</p>
-
 <p>Ah, damn it. Just read the whole thing, will you?</p>
-
 <h2 id="1-the-why-and-how-theory">1. The why and how (theory)</h2>
-
-<p>The web, by default, is <strong>stateless</strong>. Your browsing behavior is confined to the current page only, and it&rsquo;s difficult to programmatically peer into the past (never mind into the future).</p>
-
+<p>The web, by default, is <strong>stateless</strong>. Your browsing behavior is confined to the current page only, and it's difficult to programmatically peer into the past (never mind into the future).</p>
 <p>Tools like <a href="https://analytics.google.com/">Google Analytics</a> try to make sense of this stateless mess by collecting information in a chronological order. You send a <strong>pageview</strong>, then you send another <strong>pageview</strong>. Google Analytics interprets this as navigational behavior where you first viewed the first page and then the second page. Makes sense, right?</p>
-
 <p>But what about if you opened the second page <strong>in a tab</strong> and never even glanced at it? GA still interprets it as a page being viewed.</p>
-
 <p>What about if you <strong>reloaded</strong> the current page? GA still interprets it as a navigational step.</p>
-
-<p>What about if you pressed the <strong>back button</strong> of the browser to return to the previous page? Google Analytics makes no distinction - it doesn&rsquo;t know if you clicked a link, typed the URL in the address bar, or used the back button. It&rsquo;s all the same.</p>
-
+<p>What about if you pressed the <strong>back button</strong> of the browser to return to the previous page? Google Analytics makes no distinction - it doesn't know if you clicked a link, typed the URL in the address bar, or used the back button. It's all the same.</p>
 
 
 
@@ -438,11 +416,8 @@
 </div>
 
 
-
-<p>The <a href="https://support.google.com/analytics/answer/2785577?hl=en">flow reports</a> try to make sense of this mess by aligning everything into a navigational pattern (the &ldquo;flow&rdquo;). But the reports are quite difficult to interpret, as they sometimes show sequences that you are certain shouldn&rsquo;t be possible, lack necessary detail, and they don&rsquo;t really give you a robust way to query the information or to build a proper flow report yourself.</p>
-
+<p>The <a href="https://support.google.com/analytics/answer/2785577?hl=en">flow reports</a> try to make sense of this mess by aligning everything into a navigational pattern (the &ldquo;flow&rdquo;). But the reports are quite difficult to interpret, as they sometimes show sequences that you are certain shouldn't be possible, lack necessary detail, and they don't really give you a robust way to query the information or to build a proper flow report yourself.</p>
 <p>And tabbed browsing is <strong>still</strong> a problem. Each tab initiates a new &ldquo;session&rdquo; in the browser (not to be confused with a Google Analytics session). Thus when GA tries to explain to you that everything is part of a linear navigational flow, the truth is actually more complex: each tab initiates a new <strong>branch</strong> of navigation!</p>
-
 
 
 
@@ -458,9 +433,7 @@
 </div>
 
 
-
 <p>Add to this the fact that in Google Analytics, &ldquo;Referral&rdquo; is a reserved term for campaign attribution. Thus when you are navigating around the site, the referring page is not sent when navigating in-site. This would be really helpful when deciphering navigational paths, since the <strong>Previous Page Path</strong> dimension does <strong>not</strong> necessarily represent the previous page viewed (just the previous page for which a pageview was sent). To make some sense out of the mess, sending the referral string in a Custom Dimension is a good practice.</p>
-
 
 
 
@@ -476,24 +449,15 @@
 </div>
 
 
-
-<p>There are other, more granular tracking solutions out there, of course. <a href="https://www.simoahava.com/analytics/snowplow-full-setup-with-google-analytics-tracking/">Snowplow</a>, for example, lets you track hit-level data in any way you like. You can include referral information, if you wish. However, since you&rsquo;re approaching Snowplow with the limitations of SQL queries, as soon as the navigation journey starts looping or has multiple pages, the joins you&rsquo;d need to make become frustratingly complex and, as a result, quite unwieldy over large amounts of data.</p>
-
-<p>So, we&rsquo;ve had this problem of analytics tools imposing a linear sequence on a non-linear navigational pattern for a couple of decades, ever since tabbed browsing was introduced around the turn of the millennium.</p>
-
-<p>What we&rsquo;re proposing in this article is to add another layer to the taxonomy of Google Analytics&rsquo; rather rigid schema for browsing behavior.</p>
-
-<p><strong>FROM:</strong> <code>Users</code> &gt; <code>Sessions</code> &gt; <code>Hits</code><br />
+<p>There are other, more granular tracking solutions out there, of course. <a href="https://www.simoahava.com/analytics/snowplow-full-setup-with-google-analytics-tracking/">Snowplow</a>, for example, lets you track hit-level data in any way you like. You can include referral information, if you wish. However, since you're approaching Snowplow with the limitations of SQL queries, as soon as the navigation journey starts looping or has multiple pages, the joins you'd need to make become frustratingly complex and, as a result, quite unwieldy over large amounts of data.</p>
+<p>So, we've had this problem of analytics tools imposing a linear sequence on a non-linear navigational pattern for a couple of decades, ever since tabbed browsing was introduced around the turn of the millennium.</p>
+<p>What we're proposing in this article is to add another layer to the taxonomy of Google Analytics&rsquo; rather rigid schema for browsing behavior.</p>
+<p><strong>FROM:</strong> <code>Users</code> &gt; <code>Sessions</code> &gt; <code>Hits</code><br>
 <strong>TO:</strong> <code>Users</code> &gt; <code>Sessions</code> &gt; <code>Tabs</code> &gt; <code>Hits</code></p>
-
-<p>This browsing behavior would be encoded directly into <strong>Custom Dimensions</strong>, so you don&rsquo;t have to infer behavior from GA&rsquo;s pageview model - rather, you can query the navigational information directly!</p>
-
-<h3 id="1-1-the-performancenavigation-api">1.1. The PerformanceNavigation API</h3>
-
-<p>The API we&rsquo;re going to use to identify browsing behavior is called <code>PerformanceNavigation</code>. It comes with two read-only properties: <code>performance.navigation.type</code> and <code>performance.navigation.redirectCount</code>.</p>
-
+<p>This browsing behavior would be encoded directly into <strong>Custom Dimensions</strong>, so you don't have to infer behavior from GA's pageview model - rather, you can query the navigational information directly!</p>
+<h3 id="11-the-performancenavigation-api">1.1. The PerformanceNavigation API</h3>
+<p>The API we're going to use to identify browsing behavior is called <code>PerformanceNavigation</code>. It comes with two read-only properties: <code>performance.navigation.type</code> and <code>performance.navigation.redirectCount</code>.</p>
 <p>The origin story of this API is firmly rooted in the difficulty of measuring performance of any given web page load. Redirects, network lag, and cached resources (locally, server-side, in CDNs) all contribute to the complexity of what the aggregate <strong>performance</strong> of any given page load is.</p>
-
 
 
 
@@ -509,9 +473,7 @@
 </div>
 
 
-
 <p>To help understand this complexity, web browsers implement the <code>PerformanceNavigation</code> API. The two properties exposed by the API can be found under the global <code>window.performance.navigation</code> interface, and they contain the following information:</p>
-
 <table>
 <thead>
 <tr>
@@ -520,56 +482,44 @@
 <th>Description</th>
 </tr>
 </thead>
-
 <tbody>
 <tr>
 <td><code>redirectCount</code></td>
 <td>-</td>
 <td>The number of <code>3XX</code> HTTP redirects the browser went through when loading the page.</td>
 </tr>
-
 <tr>
 <td><code>type</code></td>
 <td>-</td>
 <td>An integer representing how the page was loaded.</td>
 </tr>
-
 <tr>
-<td>&nbsp;</td>
+<td> </td>
 <td>0</td>
 <td>Normal navigation, typing the URL, clicking a link, opening a bookmark, entering via an app link, etc.</td>
 </tr>
-
 <tr>
-<td>&nbsp;</td>
+<td> </td>
 <td>1</td>
 <td>Page was refreshed / reloaded while already open in the browser tab.</td>
 </tr>
-
 <tr>
-<td>&nbsp;</td>
+<td> </td>
 <td>2</td>
 <td>The page was retrieved from the browser history by using the Back or Forward button.</td>
 </tr>
-
 <tr>
-<td>&nbsp;</td>
+<td> </td>
 <td>255</td>
 <td>Any other way to navigate to the page.</td>
 </tr>
 </tbody>
 </table>
-
 <p>The <strong>255</strong> value is interesting, because it is quite undocumented. In tests, it seems to only emerge with the Firefox browser, when the page goes through a <strong>client-side</strong> refresh, either using <code>window.location.replace()</code> or <code>&lt;meta name=&quot;refresh&quot;&gt;</code>. Note that this goes against the W3C specification, which <a href="https://www.w3.org/TR/navigation-timing/#dom-performancenavigation-type">clearly states</a> that client-side redirects <em>should</em> be contained within one of the regular navigation types.</p>
-
 <p>Now, even though we mention how this API was probably conceived to give more information about the performance timing metrics, where it <strong>really</strong> shines is uncovering the navigational paths the users take through your site.</p>
-
-<h3 id="1-2-browser-storage">1.2. Browser storage</h3>
-
-<p>Ever since browser tabs were introduced to the delight of site visitors and web browser users, they&rsquo;ve been a source of annoyance for web analysts.</p>
-
-<p>In Google Analytics, for example, we simply don&rsquo;t know (by default) what the tab situation is of any given page. We don&rsquo;t know if the page was opened in a new tab, for one, since you can&rsquo;t attach listeners to the right-click context menu, and tracking just middle mouse button clicks doesn&rsquo;t give a comprehensive idea of the scope of the phenomenon.</p>
-
+<h3 id="12-browser-storage">1.2. Browser storage</h3>
+<p>Ever since browser tabs were introduced to the delight of site visitors and web browser users, they've been a source of annoyance for web analysts.</p>
+<p>In Google Analytics, for example, we simply don't know (by default) what the tab situation is of any given page. We don't know if the page was opened in a new tab, for one, since you can't attach listeners to the right-click context menu, and tracking just middle mouse button clicks doesn't give a comprehensive idea of the scope of the phenomenon.</p>
 
 
 
@@ -585,15 +535,10 @@
 </div>
 
 
-
-<p>The beauty of web analytics is that when we can&rsquo;t track things <em>directly</em> (whether a user submitted a form, for example), we can track them <em>indirectly</em> (page load of a &ldquo;thank you&rdquo; page). So maybe we can use this same indirect approach with browser tabs, too?</p>
-
+<p>The beauty of web analytics is that when we can't track things <em>directly</em> (whether a user submitted a form, for example), we can track them <em>indirectly</em> (page load of a &ldquo;thank you&rdquo; page). So maybe we can use this same indirect approach with browser tabs, too?</p>
 <p>If we can assign an identifier to every tab the user opens in the current website, we can identify individual navigation sequences! This can be achieved by checking against a common data store whether the given tab ID exists already, in which case the page load happened in a tab that was already open, and vice versa.</p>
-
-<p>However, thanks again to the statelessness of the web, there is the problem of persistence. We can&rsquo;t simply use a global JavaScript property to store the tab ID, because that gets demolished when the user unloads the page by reloading or navigating to another page.</p>
-
+<p>However, thanks again to the statelessness of the web, there is the problem of persistence. We can't simply use a global JavaScript property to store the tab ID, because that gets demolished when the user unloads the page by reloading or navigating to another page.</p>
 <p>Cookies and <code>localStorage</code> are &ldquo;too&rdquo; persistent, because they are only reset when they are manually cleared (<code>localStorage</code>) or when they expire (cookies). We only want to store the ID of a tab for as long as that tab exists.</p>
-
 
 
 
@@ -609,27 +554,16 @@
 </div>
 
 
-
-<p>Enter <code>sessionStorage</code>! It&rsquo;s a browser storage API that is unique to each tab in your web browser. By storing the tab ID in <code>sessionStorage</code>, we can always check if the tab already has an ID (existing tab), or if we need to generate a new one (new tab).</p>
-
+<p>Enter <code>sessionStorage</code>! It's a browser storage API that is unique to each tab in your web browser. By storing the tab ID in <code>sessionStorage</code>, we can always check if the tab already has an ID (existing tab), or if we need to generate a new one (new tab).</p>
 <p>Combine this with some <code>localStorage</code> logic, where we keep a running tally of how many tab IDs have been generated, remembering to remove any tab ID once that tab is closed, and we can also get a fairly reliable count of tabs open on your website at any given time.</p>
-
 <p>So, now we are getting close to having all the bits and pieces at hand. Once we combine the tabbed browsing metadata with that provided by the <code>PerformanceNavigation</code> API, we can get a nice set of Custom Dimensions that expose a great deal of interesting information about how your visitors navigate your site.</p>
-
 <h2 id="2-caveats">2. Caveats</h2>
-
 <p>Oh, there are <strong>plenty</strong> of caveats. The solutions below rely on a number of fragile components, which can get easily messed up due to how browsers act differently in certain circumstances.</p>
-
-<h3 id="2-1-cross-domain-browsing">2.1. Cross-domain browsing</h3>
-
-<p>If your tracking crosses multiple domains, then each domain will get their own tab ID. That&rsquo;s because <code>sessionStorage</code> and <code>localStorage</code> are confined to the current domain only. And if your current domain sails between HTTP and HTTPS protocols, then <em>those</em> will get their own storages, too. You could fix this by using URL parameters on the domain boundaries to pass the metadata from one domain to the next, but this is something you&rsquo;ll need to figure out by yourself.</p>
-
-<h3 id="2-2-firefox-and-chrome-go-rogue">2.2. Firefox and Chrome go rogue</h3>
-
+<h3 id="21-cross-domain-browsing">2.1. Cross-domain browsing</h3>
+<p>If your tracking crosses multiple domains, then each domain will get their own tab ID. That's because <code>sessionStorage</code> and <code>localStorage</code> are confined to the current domain only. And if your current domain sails between HTTP and HTTPS protocols, then <em>those</em> will get their own storages, too. You could fix this by using URL parameters on the domain boundaries to pass the metadata from one domain to the next, but this is something you'll need to figure out by yourself.</p>
+<h3 id="22-firefox-and-chrome-go-rogue">2.2. Firefox and Chrome go rogue</h3>
 <p>An additional point of concern is that Firefox and Chrome do not respect the specification that session cookies and <code>sessionStorage</code> should only exist for as long as the tab is alive. Once the browser is closed, these session stores should be purged.</p>
-
-<p>On Chrome and Firefox, however, if you open the browser and you have the <strong>Show your windows and tabs from last time</strong> (Firefox) or <strong>Continue where you left off</strong> (Chrome) settings turned on, the session stores are restored, too! So even though the tab <em>did</em> close, by restoring the tab it&rsquo;s as if the tab was never closed.</p>
-
+<p>On Chrome and Firefox, however, if you open the browser and you have the <strong>Show your windows and tabs from last time</strong> (Firefox) or <strong>Continue where you left off</strong> (Chrome) settings turned on, the session stores are restored, too! So even though the tab <em>did</em> close, by restoring the tab it's as if the tab was never closed.</p>
 
 
 
@@ -645,19 +579,12 @@
 </div>
 
 
-
 <p>That sucks. Not much we can do about that.</p>
-
 <p>Also, and this is interesting, when you do restore tabs or continue where you left off, the browser claims that the navigation type was <code>BACK/FORWARD</code>, meaning it equates restoring tabs with using the back or forward button of the browser.</p>
-
-<p>This sucks, too. And there&rsquo;s not much we can do about this, either.</p>
-
-<h3 id="2-3-firefox-and-its-client-side-refresh-dilemma">2.3. Firefox and its client-side refresh dilemma</h3>
-
-<p>Then there&rsquo;s the problem with Firefox implementing <code>OTHER</code> as the navigation type if a client-side refresh is done. This is unfortunate, but doesn&rsquo;t luckily mess things up too bad, because this behavior is contained within this particular navigation type alone.</p>
-
+<p>This sucks, too. And there's not much we can do about this, either.</p>
+<h3 id="23-firefox-and-its-client-side-refresh-dilemma">2.3. Firefox and its client-side refresh dilemma</h3>
+<p>Then there's the problem with Firefox implementing <code>OTHER</code> as the navigation type if a client-side refresh is done. This is unfortunate, but doesn't luckily mess things up too bad, because this behavior is contained within this particular navigation type alone.</p>
 <p>In addition to all of these, because the whole granularity of distinguishing between <code>BACK</code> and <code>FORWARD</code> needs to be coded using a programmatically maintained path of pages the user has visited, all it takes is for them to manually clear the <code>sessionStorage</code> to break the whole setup (at least, for as long as the tab is open).</p>
-
 
 
 
@@ -673,29 +600,17 @@
 </div>
 
 
-
-<p>That&rsquo;s why in the beginning of the solution you have the option of NOT tracking the back and forward button presses with detail. In this case, the string <code>BACK/FORWARD</code> is sent to Google Analytics in case either button is pressed. It&rsquo;s not as detailed but it does still tell you whether the user navigated using these buttons (or, as mentioned above, if the tabs were restored after restarting the browser).</p>
-
+<p>That's why in the beginning of the solution you have the option of NOT tracking the back and forward button presses with detail. In this case, the string <code>BACK/FORWARD</code> is sent to Google Analytics in case either button is pressed. It's not as detailed but it does still tell you whether the user navigated using these buttons (or, as mentioned above, if the tabs were restored after restarting the browser).</p>
 <p>Our hypothesis is that with more data the averages will converge towards a more reliable dataset. So idiosyncrasies such as tabs being restored or users clearing storage will disappear into the data as more and more page views are accumulated.</p>
-
-<h3 id="2-4-browser-support">2.4. Browser support</h3>
-
-<p>There&rsquo;s also the matter of browser support, but unlike some <a href="https://developer.mozilla.org/en-US/docs/Web/API/PerformanceNavigation">online resources</a> claim, support for <code>PerformanceNavigation</code> is pretty well supported in <a href="https://developer.mozilla.org/en-US/docs/Web/API/Performance/navigation">Chrome and Safari</a>.</p>
-
-<h3 id="2-5-single-page-apps">2.5. Single-page apps</h3>
-
+<h3 id="24-browser-support">2.4. Browser support</h3>
+<p>There's also the matter of browser support, but unlike some <a href="https://developer.mozilla.org/en-US/docs/Web/API/PerformanceNavigation">online resources</a> claim, support for <code>PerformanceNavigation</code> is pretty well supported in <a href="https://developer.mozilla.org/en-US/docs/Web/API/Performance/navigation">Chrome and Safari</a>.</p>
+<h3 id="25-single-page-apps">2.5. Single-page apps</h3>
 <p>You could implement this solution for single-page apps, but in that case you should add an additional, custom navigation type called <code>VIRTUAL</code>, or something similar, if the navigation was a single-page transition and not a proper page load.</p>
-
-<p>Do note that <code>window.performance.navigation.type</code> does <strong>not</strong> update when the user uses the browser&rsquo;s Back / Forward buttons and the transition is from one single-page app state to another. So you&rsquo;d need to code the logic for Back / Forward use when no page load is recorded.</p>
-
+<p>Do note that <code>window.performance.navigation.type</code> does <strong>not</strong> update when the user uses the browser's Back / Forward buttons and the transition is from one single-page app state to another. So you'd need to code the logic for Back / Forward use when no page load is recorded.</p>
 <h2 id="3-solutions">3. Solutions</h2>
-
-<p>OK, let&rsquo;s get to the good stuff! In this chapter, we&rsquo;ll introduce the technical solution in <a href="https://tagmanager.google.com">Google Tag Manager</a> (Custom HTML tag) that orchestrates the whole thing. In addition to that, each sub-section will detail how to send the respective piece of information to Google Analytics as a Custom Dimension. Basically, all you&rsquo;ll need to edit is your main Page View tag, since that&rsquo;s the only one that will be sending this data to Google Analytics.</p>
-
-<h3 id="3-1-the-custom-html-tag">3.1. The Custom HTML tag</h3>
-
+<p>OK, let's get to the good stuff! In this chapter, we'll introduce the technical solution in <a href="https://tagmanager.google.com">Google Tag Manager</a> (Custom HTML tag) that orchestrates the whole thing. In addition to that, each sub-section will detail how to send the respective piece of information to Google Analytics as a Custom Dimension. Basically, all you'll need to edit is your main Page View tag, since that's the only one that will be sending this data to Google Analytics.</p>
+<h3 id="31-the-custom-html-tag">3.1. The Custom HTML tag</h3>
 <p>First, <strong>create a new Custom HTML tag</strong>, and add the following code within.</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#f92672">&lt;</span><span style="color:#a6e22e">script</span><span style="color:#f92672">&gt;</span>
   (<span style="color:#66d9ef">function</span>() {
     
@@ -707,7 +622,7 @@
 </span><span style="color:#75715e"></span>    <span style="color:#75715e">// 72 hours (259200000 ms). Set to 0 if you don&#39;t want to expire the tab count.
 </span><span style="color:#75715e"></span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">expireTabs</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">259200000</span>;
     
-    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!!</span>window.<span style="color:#a6e22e">Storage</span>) {
+    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#f92672">!</span>window.<span style="color:#a6e22e">Storage</span>) {
 
       <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">openTabs</span>  <span style="color:#f92672">=</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(<span style="color:#a6e22e">localStorage</span>.<span style="color:#a6e22e">getItem</span>(<span style="color:#e6db74">&#39;_tab_ids&#39;</span>)) <span style="color:#f92672">||</span> [],
           <span style="color:#a6e22e">tabId</span>     <span style="color:#f92672">=</span> <span style="color:#a6e22e">sessionStorage</span>.<span style="color:#a6e22e">getItem</span>(<span style="color:#e6db74">&#39;_tab_id&#39;</span>),
@@ -839,7 +754,7 @@
 
       <span style="color:#a6e22e">tabCount</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">openTabs</span>.<span style="color:#a6e22e">length</span>;
 
-      <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!!</span>window.<span style="color:#a6e22e">PerformanceNavigation</span>) {
+      <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#f92672">!</span>window.<span style="color:#a6e22e">PerformanceNavigation</span>) {
         <span style="color:#a6e22e">navPath</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">navPath</span> <span style="color:#f92672">||</span> [];
         <span style="color:#a6e22e">redirectCount</span> <span style="color:#f92672">=</span> window.<span style="color:#a6e22e">performance</span>.<span style="color:#a6e22e">navigation</span>.<span style="color:#a6e22e">redirectCount</span>;
         <span style="color:#75715e">// Only track new tabs if type is NAVIGATE or OTHER
@@ -903,13 +818,10 @@
     }
   
   })();
-<span style="color:#f92672">&lt;</span><span style="color:#960050;background-color:#1e0010">/script&gt;</span>
+<span style="color:#f92672">&lt;</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#960050;background-color:#1e0010">s</span><span style="color:#960050;background-color:#1e0010">c</span><span style="color:#960050;background-color:#1e0010">r</span><span style="color:#960050;background-color:#1e0010">i</span><span style="color:#960050;background-color:#1e0010">p</span><span style="color:#960050;background-color:#1e0010">t</span><span style="color:#960050;background-color:#1e0010">&gt;</span>
 </code></pre></div>
-
 <p>Do not add any triggers to this tag. Instead, open your <strong>Page View</strong> tag, and add this Custom HTML tag into its <a href="https://www.simoahava.com/analytics/understanding-tag-sequencing-in-google-tag-manager/">tag sequence</a> by making the Custom HTML tag fire <strong>before</strong> the Page View tag.</p>
-
-<p>Accessing GTM&rsquo;s data model directly with <code>dataLayer.set</code> is necessary if you want to modify Data Layer keys within a tag sequence. However, for the sake of transparency, we&rsquo;ll also push a <code>dataLayer</code> object with a custom event (<code>custom.navigation</code>) and the browsing behavior payload.</p>
-
+<p>Accessing GTM's data model directly with <code>dataLayer.set</code> is necessary if you want to modify Data Layer keys within a tag sequence. However, for the sake of transparency, we'll also push a <code>dataLayer</code> object with a custom event (<code>custom.navigation</code>) and the browsing behavior payload.</p>
 
 
 
@@ -925,47 +837,45 @@
 </div>
 
 
-
 <p>The code in the Custom HTML tag does a number of things.</p>
-
 <ol>
-<li><p>It generates a <strong>tab ID</strong> for the page, which is stored in <code>sessionStorage</code>. If a new tab ID is thus generated, the page is marked as being in a new browser tab. If a tab ID was already in storage, then the page is flagged as being in an existing tab.</p></li>
-
-<li><p>This tab ID is also stored in an array within <code>localStorage</code>, where all tab IDs generated on the site are stored. The length of this array is the count of currently open tabs on the domain.</p></li>
-
-<li><p>If the user leaves the page, or closes the browser tab, or closes the browser, the tab ID is removed from the array in <code>localStorage</code> (thus keeping the count of open tabs accurate).</p></li>
-
-<li><p>If the page was loaded by navigating to the URL, navigation type is set to <code>NAVIGATE</code>, and the current page is pushed into an array representing the navigation path, stored in <code>sessionStorage</code>.</p></li>
-
-<li><p>If the page was reloaded, navigation type is set to <code>RELOAD</code>, and the navigation path is kept as it is.</p></li>
-
-<li><p>If the Back or Forward button was pressed, the script checks if the current page is the penultimate page in the navigation path, in which case navigation type is set to <code>BACK</code>. In other cases, navigation type is set to <code>FORWARD</code>.</p></li>
-
-<li><p>Count of tabs, count of redirects, navigation type, tab ID, and whether the tab was new or existing are all added to Google Tag Manager&rsquo;s data model, so that the Page View tag can grab these values with Data Layer variables.</p></li>
+<li>
+<p>It generates a <strong>tab ID</strong> for the page, which is stored in <code>sessionStorage</code>. If a new tab ID is thus generated, the page is marked as being in a new browser tab. If a tab ID was already in storage, then the page is flagged as being in an existing tab.</p>
+</li>
+<li>
+<p>This tab ID is also stored in an array within <code>localStorage</code>, where all tab IDs generated on the site are stored. The length of this array is the count of currently open tabs on the domain.</p>
+</li>
+<li>
+<p>If the user leaves the page, or closes the browser tab, or closes the browser, the tab ID is removed from the array in <code>localStorage</code> (thus keeping the count of open tabs accurate).</p>
+</li>
+<li>
+<p>If the page was loaded by navigating to the URL, navigation type is set to <code>NAVIGATE</code>, and the current page is pushed into an array representing the navigation path, stored in <code>sessionStorage</code>.</p>
+</li>
+<li>
+<p>If the page was reloaded, navigation type is set to <code>RELOAD</code>, and the navigation path is kept as it is.</p>
+</li>
+<li>
+<p>If the Back or Forward button was pressed, the script checks if the current page is the penultimate page in the navigation path, in which case navigation type is set to <code>BACK</code>. In other cases, navigation type is set to <code>FORWARD</code>.</p>
+</li>
+<li>
+<p>Count of tabs, count of redirects, navigation type, tab ID, and whether the tab was new or existing are all added to Google Tag Manager's data model, so that the Page View tag can grab these values with Data Layer variables.</p>
+</li>
 </ol>
-
 <blockquote>
-<p><strong>UPDATE 22 May 2019</strong>: I added some extra code to handle expiration. By default, the expiration is 72 hours, so if the storage isn&rsquo;t interacted with in 72 hours, the current count of open tabs is cleared.</p>
+<p><strong>UPDATE 22 May 2019</strong>: I added some extra code to handle expiration. By default, the expiration is 72 hours, so if the storage isn't interacted with in 72 hours, the current count of open tabs is cleared.</p>
 </blockquote>
-
 <p>There are some nuances to the steps listed above, mainly to account for edge cases, such as when navigating <code>BACK</code> or <code>FORWARD</code> from an external domain. Even with these precautions, there are situations where the solution will fail (see the <a href="https://www.simoahava.com/analytics/track-browsing-behavior-in-google-analytics/#2-caveats">Caveats</a> chapter).</p>
-
-<p>And now that we are adding all this information into Data Layer, it&rsquo;s time to pick up the metadata and send it to Google Analytics!</p>
-
-<h3 id="3-2-create-the-custom-dimensions-in-google-analyitcs">3.2. Create the Custom Dimensions in Google Analyitcs</h3>
-
-<p>First, you&rsquo;ll need to create some Custom Dimensions in Google Analytics.</p>
-
+<p>And now that we are adding all this information into Data Layer, it's time to pick up the metadata and send it to Google Analytics!</p>
+<h3 id="32-create-the-custom-dimensions-in-google-analyitcs">3.2. Create the Custom Dimensions in Google Analyitcs</h3>
+<p>First, you'll need to create some Custom Dimensions in Google Analytics.</p>
 <p>Create the following Custom Dimensions in Google Analytics&rsquo; Property Settings, all in <strong>hit scope</strong>, and make note of the index numbers assigned to them.</p>
-
 <ul>
-<li><strong>Redirect count</strong><br /></li>
-<li><strong>Navigation type</strong><br /></li>
-<li><strong>Tab type</strong><br /></li>
-<li><strong>Tabs open</strong><br /></li>
+<li><strong>Redirect count</strong></li>
+<li><strong>Navigation type</strong></li>
+<li><strong>Tab type</strong></li>
+<li><strong>Tabs open</strong></li>
 <li><strong>Tab ID</strong></li>
 </ul>
-
 
 
 
@@ -981,11 +891,8 @@
 </div>
 
 
-
-<h3 id="3-3-create-the-data-layer-variables-in-google-tag-manager">3.3. Create the Data Layer variables in Google Tag Manager</h3>
-
-<p>Next, create the corresponding Data Layer variables in Google Tag Manager. Here&rsquo;s my setup:</p>
-
+<h3 id="33-create-the-data-layer-variables-in-google-tag-manager">3.3. Create the Data Layer variables in Google Tag Manager</h3>
+<p>Next, create the corresponding Data Layer variables in Google Tag Manager. Here's my setup:</p>
 <table>
 <thead>
 <tr>
@@ -993,37 +900,30 @@
 <th>Value for <strong>Data Layer Variable name</strong> field</th>
 </tr>
 </thead>
-
 <tbody>
 <tr>
 <td>{{DLV - browsingBehavior.redirectCount}}</td>
 <td><code>browsingBehavior.redirectCount</code></td>
 </tr>
-
 <tr>
 <td>{{DLV - browsingBehavior.navigationType}}</td>
 <td><code>browsingBehavior.navigationType</code></td>
 </tr>
-
 <tr>
 <td>{{DLV - browsingBehavior.newTab}}</td>
 <td><code>browsingBehavior.newTab</code></td>
 </tr>
-
 <tr>
 <td>{{DLV - browsingBehavior.tabCount}}</td>
 <td><code>browsingBehavior.tabCount</code></td>
 </tr>
-
 <tr>
 <td>{{DLV - browsingBehavior.tabId }}</td>
 <td><code>browsingBehavior.tabId</code></td>
 </tr>
 </tbody>
 </table>
-
-<p>Here&rsquo;s an example of what one of the variables would look like:</p>
-
+<p>Here's an example of what one of the variables would look like:</p>
 
 
 
@@ -1039,11 +939,8 @@
 </div>
 
 
-
-<h3 id="3-4-add-the-data-layer-variables-to-your-page-view-tag">3.4. Add the Data Layer variables to your Page View tag</h3>
-
+<h3 id="34-add-the-data-layer-variables-to-your-page-view-tag">3.4. Add the Data Layer variables to your Page View tag</h3>
 <p>Now, open the Page View tag which you have already edited for the Tag Sequence stuff in the beginning of this chapter. Either in a <a href="https://www.simoahava.com/analytics/google-analytics-settings-variable-in-gtm/">Google Analytics Settings variable</a> or by directly editing the tag fields, add the Data Layer variables to their respective indices in the Custom Dimensions list. This is what my setup looks like:</p>
-
 
 
 
@@ -1059,17 +956,11 @@
 </div>
 
 
-
-<h3 id="3-5-test-it">3.5. Test it!</h3>
-
+<h3 id="35-test-it">3.5. Test it!</h3>
 <p>Now, save the tag, go to Preview mode, and enter your site.</p>
-
-<p><strong>Note!</strong> You can&rsquo;t really use Preview mode to test if the Data Layer variables are populating correctly. Because you are updating the data model in a tag sequence, the method used does not expose the dynamic changes to the Preview mode user interface.</p>
-
-<p>You&rsquo;ll need to either look at the Network requests directly, or use a tool such as <a href="https://support.google.com/analytics/answer/6277302?hl=en">Google Tag Assistant recordings</a> or <a href="https://chrome.google.com/webstore/detail/google-analytics-debugger/jnkmfdileelhofjcijamephohjechhna?hl=en">Google Analytics Debugger</a> to check if the data is being sent correctly.</p>
-
+<p><strong>Note!</strong> You can't really use Preview mode to test if the Data Layer variables are populating correctly. Because you are updating the data model in a tag sequence, the method used does not expose the dynamic changes to the Preview mode user interface.</p>
+<p>You'll need to either look at the Network requests directly, or use a tool such as <a href="https://support.google.com/analytics/answer/6277302?hl=en">Google Tag Assistant recordings</a> or <a href="https://chrome.google.com/webstore/detail/google-analytics-debugger/jnkmfdileelhofjcijamephohjechhna?hl=en">Google Analytics Debugger</a> to check if the data is being sent correctly.</p>
 <p>In any case, <strong>if</strong> everything is working, then with your Page View tag you should see the Custom Dimensions being populated with the relevant information.</p>
-
 
 
 
@@ -1085,11 +976,8 @@
 </div>
 
 
-
-<h3 id="3-6-custom-report-in-google-analytics">3.6. Custom Report in Google Analytics</h3>
-
+<h3 id="36-custom-report-in-google-analytics">3.6. Custom Report in Google Analytics</h3>
 <p>A handy way to pull it all together is to create a Custom Report in Google Analytics with these settings, for example:</p>
-
 
 
 
@@ -1105,9 +993,7 @@
 </div>
 
 
-
 <p>This report will contain interesting information about how users navigated to the different pages on your site.</p>
-
 
 
 
@@ -1123,13 +1009,9 @@
 </div>
 
 
-
 <p>Couple this with things like <a href="https://www.simoahava.com/analytics/improve-data-collection-with-four-custom-dimensions/#3-session-id">Session ID</a> and <a href="https://www.simoahava.com/analytics/improve-data-collection-with-four-custom-dimensions/#4-hit-timestamp">Hit Timestamp</a>, and you can really start digging into how users move from one page to the other on your site.</p>
-
-<h3 id="3-7-other-data-stores">3.7. Other data stores</h3>
-
-<p>If you&rsquo;ve taken the time to <a href="https://www.simoahava.com/analytics/snowplow-full-setup-with-google-analytics-tracking/">duplicate your Google Analytics data to Snowplow</a>, you&rsquo;ll naturally have access to a far more granular, raw hit stream resource for querying against. For example, here&rsquo;s a simple SQL query output with all the relevant dimensions included:</p>
-
+<h3 id="37-other-data-stores">3.7. Other data stores</h3>
+<p>If you've taken the time to <a href="https://www.simoahava.com/analytics/snowplow-full-setup-with-google-analytics-tracking/">duplicate your Google Analytics data to Snowplow</a>, you'll naturally have access to a far more granular, raw hit stream resource for querying against. For example, here's a simple SQL query output with all the relevant dimensions included:</p>
 
 
 
@@ -1145,19 +1027,12 @@
 </div>
 
 
-
-<p>Do note that Snowplow doesn&rsquo;t differentiate between different <em>scopes</em> of Custom Dimensions, since scope is a concept applied in Google Analytics processing. So if you are sending an identifier into a session-scoped Custom Dimension (e.g. Session ID), the hit stream to Snowplow will interpret this as hit-scoped data, and thus the identifier is pretty useless.</p>
-
+<p>Do note that Snowplow doesn't differentiate between different <em>scopes</em> of Custom Dimensions, since scope is a concept applied in Google Analytics processing. So if you are sending an identifier into a session-scoped Custom Dimension (e.g. Session ID), the hit stream to Snowplow will interpret this as hit-scoped data, and thus the identifier is pretty useless.</p>
 <h2 id="4-summary">4. Summary</h2>
-
-<p>First of all, I&rsquo;m hugely indebted to Jethro Nederhof for agreeing to draft this solution with me. I really love the community of analytics developers - seems like everyone is giddy with excitement when figuring out new solutions to age-old questions, and the amount of knowledge being shared across blogs, Slack channels, and social media is a testament to the selflessness of these good men and women.</p>
-
+<p>First of all, I'm hugely indebted to Jethro Nederhof for agreeing to draft this solution with me. I really love the community of analytics developers - seems like everyone is giddy with excitement when figuring out new solutions to age-old questions, and the amount of knowledge being shared across blogs, Slack channels, and social media is a testament to the selflessness of these good men and women.</p>
 <p>In my humble opinion, anyone interested in proper page navigation analysis should try out this solution. Understanding things like browser tab usage and Back / Forward browsing can help you figure out where the information architecture blind spots of your site are or whether you need to fix the navigation options you offer your visitors, for example.</p>
-
 <p>But, as always on this particular blog, this is a technical solution first and foremost. Jethro and I wanted to highlight some cool tricks you can do with the web browser, and we fully expect others to refine these methods even further.</p>
-
-<p>It would be cool if the APIs were developed even further, such as by automatically distinguishing between Back and Forward of the browser. Right now, they&rsquo;re bunched together which is why we need the workaround of managing the navigation path in <code>sessionStorage</code>, and that&rsquo;s a fragile solution indeed.</p>
-
+<p>It would be cool if the APIs were developed even further, such as by automatically distinguishing between Back and Forward of the browser. Right now, they're bunched together which is why we need the workaround of managing the navigation path in <code>sessionStorage</code>, and that's a fragile solution indeed.</p>
 <p>Let us know in the comments what you think of this trick, and whether you have suggestions on how to improve it!</p>
 
               
@@ -1264,7 +1139,7 @@
         </article>
         <footer id="footer" class="main-content-wrap">
   <span class="copyrights">
-    &copy; 2019 Simo Ahava. All Rights Reserved
+    &copy; 2020 Simo Ahava. All Rights Reserved
   </span>
 </footer>
 

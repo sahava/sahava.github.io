@@ -123,16 +123,13 @@
 
 <meta itemprop="name" content="#GTMTips: Fix Missing Page View Event And Broken Triggers">
 <meta itemprop="description" content="If you can&#39;t see the Page View event in your Preview mode list, and GTM&#39;s triggers work erratically, you most likely have a broken dataLayer implementation.">
-
-
 <meta itemprop="datePublished" content="2018-02-09T09:18:42&#43;02:00" />
 <meta itemprop="dateModified" content="2018-02-09T09:18:42&#43;02:00" />
-<meta itemprop="wordCount" content="554">
+<meta itemprop="wordCount" content="552">
 
 
 
 <meta itemprop="keywords" content="google tag manager,gtmtips,triggers,datalayer," />
-
 <script type="application/ld+json">
 {
     "@context": "http://schema.org",
@@ -913,14 +910,9 @@ on
     </header>
 
     <section class="post-content">
-      
-
-<p><a href="https://tagmanager.google.com/">Google Tag Manager</a> should be relatively easy to implement. Just paste the <a href="https://www.simoahava.com/amp/analytics/container-snippet-gtm-secrets-revealed/">container snippet</a> to the <code>&lt;head&gt;</code> of the page and you&rsquo;re good to go! However, at some point you&rsquo;ll want to configure the <code>dataLayer</code> structure, too (read more about <code>dataLayer</code> <a href="https://www.simoahava.com/amp/analytics/data-layer/">here</a>). There are two ways to do it: the <a href="https://www.simoahava.com/amp/gtm-tips/datalayer-declaration-vs-push/">right way and the wrong way</a>.</p>
-
-<p>In this article, we&rsquo;ll see what happens if you do it the wrong way, how to identify the issue, and how to fix it.</p>
-
-<h2 id="tip-71-page-view-event-missing-and-gtm-s-triggers-don-t-work">Tip 71: Page View event missing, and GTM&rsquo;s triggers don&rsquo;t work?</h2>
-
+      <p><a href="https://tagmanager.google.com/">Google Tag Manager</a> should be relatively easy to implement. Just paste the <a href="https://www.simoahava.com/amp/analytics/container-snippet-gtm-secrets-revealed/">container snippet</a> to the <code>&lt;head&gt;</code> of the page and you're good to go! However, at some point you'll want to configure the <code>dataLayer</code> structure, too (read more about <code>dataLayer</code> <a href="https://www.simoahava.com/amp/analytics/data-layer/">here</a>). There are two ways to do it: the <a href="https://www.simoahava.com/amp/gtm-tips/datalayer-declaration-vs-push/">right way and the wrong way</a>.</p>
+<p>In this article, we'll see what happens if you do it the wrong way, how to identify the issue, and how to fix it.</p>
+<h2 id="tip-71-page-view-event-missing-and-gtms-triggers-dont-work">Tip 71: Page View event missing, and GTM's triggers don't work?</h2>
 
 
     <a href="https://www.simoahava.com/amp/images/2018/02/missing-page-view-event-broken-triggers.jpg" title="Fix missing page view event and broken triggers">
@@ -930,52 +922,45 @@ on
     </a>
   
 
-
 <p>If you open <strong>Preview</strong> mode on your site, and look at the list of events in the left-hand side navigation, you should <strong>always</strong> see the following three GTM <a href="https://www.simoahava.com/amp/analytics/trigger-guide-google-tag-manager/#2-technical-overview">default events</a>:</p>
-
 <ol>
-<li><p><strong>Page View</strong> - This is the event pushed into <code>dataLayer</code> in Google Tag Manager&rsquo;s container snippet (event name is <code>gtm.js</code>).</p></li>
-
-<li><p><strong>DOM Ready</strong> - This is the event pushed into <code>dataLayer</code> once the page HTML has been rendered by the browser (event name is <code>gtm.dom</code>).</p></li>
-
-<li><p><strong>Window Loaded</strong> - This is the event pushed into <code>dataLayer</code> once the page and all linked resources have completed load, execution, and render (event name is <code>gtm.load</code>).</p></li>
+<li>
+<p><strong>Page View</strong> - This is the event pushed into <code>dataLayer</code> in Google Tag Manager's container snippet (event name is <code>gtm.js</code>).</p>
+</li>
+<li>
+<p><strong>DOM Ready</strong> - This is the event pushed into <code>dataLayer</code> once the page HTML has been rendered by the browser (event name is <code>gtm.dom</code>).</p>
+</li>
+<li>
+<p><strong>Window Loaded</strong> - This is the event pushed into <code>dataLayer</code> once the page and all linked resources have completed load, execution, and render (event name is <code>gtm.load</code>).</p>
+</li>
 </ol>
-
-<p>You should always see (2) and (3) - there&rsquo;s very little you can do to mess these up. But it&rsquo;s possible you won&rsquo;t see the <strong>Page View</strong> event. If you don&rsquo;t it means you&rsquo;ve <strong>messed up the <code>dataLayer</code> implementation</strong>.</p>
-
+<p>You should always see (2) and (3) - there's very little you can do to mess these up. But it's possible you won't see the <strong>Page View</strong> event. If you don't it means you've <strong>messed up the <code>dataLayer</code> implementation</strong>.</p>
 <p>Google Tag Manager establishes the <code>dataLayer</code> construct with its own <code>.push()</code> method in the JavaScript library that represents your container. The <code>gtm.js</code> event is pushed into <code>dataLayer</code> in the container snippet, and it is used to trigger any tags that use the Page View or All Pages triggers.</p>
-
 <p>The main reason for not seeing the <strong>Page View</strong> events is simple. You have <strong>overwritten the <code>dataLayer</code> modified in the container snippet with a brand new array</strong>. You do it like this:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html">  <span class="c">&lt;!-- Google Tag Manager container snippet here --&gt;</span>
+<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html">  <span class="c">&lt;!--</span><span class="c"> Google Tag Manager container snippet here </span><span class="c">--&gt;</span>
   (function...)
-  <span class="c">&lt;!-- Google Tag Manager container snippet ends --&gt;</span>
-<span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
-<span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
-  <span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
-    <span class="kd">var</span> <span class="nx">dataLayer</span> <span class="o">=</span> <span class="p">[{</span>
+  <span class="c">&lt;!--</span><span class="c"> Google Tag Manager container snippet ends </span><span class="c">--&gt;</span>
+<span class="p">&lt;</span><span class="p">/</span><span class="nt">head</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">body</span><span class="p"></span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">script</span><span class="p"></span><span class="p">&gt;</span>
+    <span class="kd">var</span> <span class="nx">dataLayer</span> <span class="o">=</span> <span class="p">[</span><span class="p">{</span>
       <span class="nx">someVariable</span><span class="o">:</span> <span class="s1">&#39;someValue&#39;</span>
-    <span class="p">}];</span>
-  <span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span></code></pre></div>
-
-<p>See the problem? By using the syntax <code>var dataLayer = ...</code>, you are resetting the <code>dataLayer</code> variable to a new Array, thus overwriting anything that was in it before (such as Google Tag Manager&rsquo;s own listener). Since you overwrite <code>dataLayer</code>, it no longer works properly with GTM, and a typical symptom is that <strong>GTM&rsquo;s triggers don&rsquo;t work anymore</strong>, either. So if you have a Click / All Elements trigger on the site and nothing is pushed to <code>dataLayer</code> when you click around, chances are you&rsquo;ve overwritten GTM&rsquo;s <code>dataLayer</code> with your reinitialization.</p>
-
+    <span class="p">}</span><span class="p">]</span><span class="p">;</span>
+  <span class="p">&lt;</span><span class="p">/</span><span class="nt">script</span><span class="p">&gt;</span></code></pre></div>
+<p>See the problem? By using the syntax <code>var dataLayer = ...</code>, you are resetting the <code>dataLayer</code> variable to a new Array, thus overwriting anything that was in it before (such as Google Tag Manager's own listener). Since you overwrite <code>dataLayer</code>, it no longer works properly with GTM, and a typical symptom is that <strong>GTM's triggers don't work anymore</strong>, either. So if you have a Click / All Elements trigger on the site and nothing is pushed to <code>dataLayer</code> when you click around, chances are you've overwritten GTM's <code>dataLayer</code> with your reinitialization.</p>
 <p>How to fix it? Simple. Always check for the existence of <code>dataLayer</code> before adding items to it, and always add items to <code>dataLayer</code> only with the <code>push()</code> command.</p>
-
 <div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="c1">// WRONG! NEVER USE THIS:
-</span><span class="c1"></span><span class="kd">var</span> <span class="nx">dataLayer</span> <span class="o">=</span> <span class="p">[{</span>
+</span><span class="c1"></span><span class="kd">var</span> <span class="nx">dataLayer</span> <span class="o">=</span> <span class="p">[</span><span class="p">{</span>
   <span class="nx">pageType</span><span class="o">:</span> <span class="s1">&#39;home&#39;</span>
-<span class="p">}];</span>
+<span class="p">}</span><span class="p">]</span><span class="p">;</span>
 
 <span class="c1">// CORRECT! ALWAYS USE THIS:
-</span><span class="c1"></span><span class="nb">window</span><span class="p">.</span><span class="nx">dataLayer</span> <span class="o">=</span> <span class="nb">window</span><span class="p">.</span><span class="nx">dataLayer</span> <span class="o">||</span> <span class="p">[];</span>
-<span class="nb">window</span><span class="p">.</span><span class="nx">dataLayer</span><span class="p">.</span><span class="nx">push</span><span class="p">({</span>
+</span><span class="c1"></span><span class="nb">window</span><span class="p">.</span><span class="nx">dataLayer</span> <span class="o">=</span> <span class="nb">window</span><span class="p">.</span><span class="nx">dataLayer</span> <span class="o">||</span> <span class="p">[</span><span class="p">]</span><span class="p">;</span>
+<span class="nb">window</span><span class="p">.</span><span class="nx">dataLayer</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="p">{</span>
   <span class="nx">pageType</span><span class="o">:</span> <span class="s1">&#39;home&#39;</span>
-<span class="p">});</span>
+<span class="p">}</span><span class="p">)</span><span class="p">;</span>
 </code></pre></div>
-
-<p>This is a popular topic on this blog and many others simply because it&rsquo;s so easy to screw it up. It doesn&rsquo;t help that somewhere in GTM&rsquo;s documentation there are still instructions to use the <em>declarative</em> method for setting up <code>dataLayer</code>.</p>
-
+<p>This is a popular topic on this blog and many others simply because it's so easy to screw it up. It doesn't help that somewhere in GTM's documentation there are still instructions to use the <em>declarative</em> method for setting up <code>dataLayer</code>.</p>
 <p>Any other typical Google Tag Manager mistakes you can think of, which have been around for a long time, and probably will surface for a long time to come?</p>
 
     </section>

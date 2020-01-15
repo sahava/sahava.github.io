@@ -125,16 +125,13 @@
 
 <meta itemprop="name" content="DIY Google Ads Account Monitor With R, AdWords API, And Slack API">
 <meta itemprop="description" content="Use the AdWords API and Slack API together with R to build a poweful monitoring system for your Google Ads accounts.">
-
-
 <meta itemprop="datePublished" content="2019-04-17T09:00:00&#43;03:00" />
 <meta itemprop="dateModified" content="2019-04-17T09:00:00&#43;03:00" />
-<meta itemprop="wordCount" content="2403">
+<meta itemprop="wordCount" content="2400">
 
 
 
 <meta itemprop="keywords" content="adwords,api,r,slack,guest post," />
-
 <script type="application/ld+json">
 {
     "@context": "http://schema.org",
@@ -917,14 +914,9 @@ on
     </header>
 
     <section class="post-content">
-      
-
-<p>Every now and then I&rsquo;m fortunate enough to be able to publish <a href="https://www.simoahava.com/amp/tags/guest-post/">guest posts</a> by illustrious people in the analytics and digital marketing industries. This time, I get to work with an old colleague of mine who&rsquo;s a veritable wizard when it comes to building solutions that make our daily work in the digital industry so much smoother.</p>
-
-<p><strong>Erik Grönroos</strong> works as an analyst in <a href="https://markkinointiakatemia.fi/">MarkkinointiAkatemia</a>, a Finnish digital customer acquisition agency. Erik&rsquo;s job is to utilize data and analytics to help grow the agency as well as the companies of the clients he works with.</p>
-
+      <p>Every now and then I'm fortunate enough to be able to publish <a href="https://www.simoahava.com/amp/tags/guest-post/">guest posts</a> by illustrious people in the analytics and digital marketing industries. This time, I get to work with an old colleague of mine who's a veritable wizard when it comes to building solutions that make our daily work in the digital industry so much smoother.</p>
+<p><strong>Erik Grönroos</strong> works as an analyst in <a href="https://markkinointiakatemia.fi/">MarkkinointiAkatemia</a>, a Finnish digital customer acquisition agency. Erik's job is to utilize data and analytics to help grow the agency as well as the companies of the clients he works with.</p>
 <p>In this guide, Erik will share with you how to build an application which helps you automate the monitoring of your <a href="https://ads.google.com/">Google Ads</a> accounts using the <a href="https://www.r-project.org/">R programming language</a>, the <a href="https://developers.google.com/adwords/api/docs/guides/start">AdWords API</a> and the <a href="https://api.slack.com/">Slack API</a>.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2019/04/article-header.jpg" title="Google Ads account monitor">
@@ -934,35 +926,20 @@ on
     </a>
   
 
-
-<p>I&rsquo;m particularly excited to publish this article, as it&rsquo;s the first time (if I recall correctly) that Google Ads and R are covered in the blog.</p>
-
+<p>I'm particularly excited to publish this article, as it's the first time (if I recall correctly) that Google Ads and R are covered in the blog.</p>
 <p>Anyway, as the editor, all the mistake and errors that you can find in the article are 100% <em>mea culpa</em>, so let me know in the comments if errors persisted to the final draft. Thank you!</p>
-
-<!-- toc -->
-
+<!-- raw HTML omitted -->
 <h2 id="introduction">Introduction</h2>
-
-<p>In this article I&rsquo;ll show you how to implement an <strong>automated monitoring application</strong> for keeping an eye on your Google Ads accounts. Since the nature of the implementation is a Proof of Concept (PoC), I&rsquo;ll try to keep it simple by using just one practical use case for demonstrating the end-to-end pipeline:</p>
-
+<p>In this article I'll show you how to implement an <strong>automated monitoring application</strong> for keeping an eye on your Google Ads accounts. Since the nature of the implementation is a Proof of Concept (PoC), I'll try to keep it simple by using just one practical use case for demonstrating the end-to-end pipeline:</p>
 <p><strong>Zero-cost detection in Ads accounts, for monitoring credit card expirations or other issues that prevent your ads from rolling.</strong></p>
-
 <p>This implementation utilizes <strong>R</strong> and the <strong>Google AdWords API</strong> for checking the data, <strong>Slack API</strong> for realtime alerting via your Slack bot if something critical is detected, and good ol&rsquo; <code>cron</code> for scheduling the script.</p>
-
-<p>If you&rsquo;re a marketing agency, a typical situation is that you have plenty of Google Ads accounts to take care of. When the number of accounts breaches the hundreds or the thousands, manually managing, monitoring, and maintaining them isn&rsquo;t really an option anymore.</p>
-
-<p>What you can do, of course, is set up Google Ads&rsquo; <a href="https://support.google.com/google-ads/answer/1704338?hl=en">built-in alerts</a> one by one for each of your accounts. You could even manage these alerts via the <a href="https://developers.google.com/google-ads/api/reference/rpc/">Google Ads API</a> or utilize <a href="https://developers.google.com/google-ads/scripts/">Google Ads scripts</a>. But the problem with these is that they involve email alerts by default. Hey, it&rsquo;s 2019. Email is probably not the only channel you should use for building automation on.</p>
-
+<p>If you're a marketing agency, a typical situation is that you have plenty of Google Ads accounts to take care of. When the number of accounts breaches the hundreds or the thousands, manually managing, monitoring, and maintaining them isn't really an option anymore.</p>
+<p>What you can do, of course, is set up Google Ads&rsquo; <a href="https://support.google.com/google-ads/answer/1704338?hl=en">built-in alerts</a> one by one for each of your accounts. You could even manage these alerts via the <a href="https://developers.google.com/google-ads/api/reference/rpc/">Google Ads API</a> or utilize <a href="https://developers.google.com/google-ads/scripts/">Google Ads scripts</a>. But the problem with these is that they involve email alerts by default. Hey, it's 2019. Email is probably not the only channel you should use for building automation on.</p>
 <p>So, we decided to harness the force of APIs and, as a result, saved the galaxy!</p>
-
 <h2 id="how-the-solution-works">How the solution works</h2>
-
 <p>The script is populated with the list of <strong>Google Ads account IDs</strong> we want to monitor. The monitoring system itself queries the <strong>cost data</strong> of each ID using the <strong>Google AdWords API</strong>, and parses the results for those accounts that have accumulated no cost at all, signalling potential issues with your budgets or your configurations.</p>
-
 <p>When this information has been parsed, the account IDs that were flagged are written to a <strong>database</strong> for further analysis, and a notification is dispatched to the <strong>Slack bot</strong> so that the team responsible can be immediately notified when problems arise.</p>
-
 <h2 id="requirements">Requirements</h2>
-
 <ul>
 <li><a href="https://cran.r-project.org/mirrors.html">R CLI</a> on a Linux server (for <code>cron</code> to run your R script)</li>
 <li><a href="https://www.rstudio.com/">RStudio</a> for developing
@@ -973,24 +950,18 @@ on
 <li>Slack webhook URL</li>
 <li>Crontab access (on the same Linux server)</li>
 </ul>
-
 <h2 id="about-r">About R</h2>
-
-<p>R is a statistical programming language that today supports pretty much the same Machine Learning (ML) tricks that Python does. R vs. Python is a long-standing debate, so it really boils down to language preference: which one do you want to use for cool data stuff! Okay, I&rsquo;ll put my pants back on, hold on.</p>
-
-<p>We don&rsquo;t need ML in this simple monitoring example, but we do use it for more advanced solutions. That&rsquo;s why R is the tool of choice for us.</p>
-
-<p>RStudio is an IDE for R, it makes R easier to use. Quote from RStudio&rsquo;s website:</p>
-
+<p>R is a statistical programming language that today supports pretty much the same Machine Learning (ML) tricks that Python does. R vs. Python is a long-standing debate, so it really boils down to language preference: which one do you want to use for cool data stuff! Okay, I'll put my pants back on, hold on.</p>
+<p>We don't need ML in this simple monitoring example, but we do use it for more advanced solutions. That's why R is the tool of choice for us.</p>
+<p>RStudio is an IDE for R, it makes R easier to use. Quote from RStudio's website:</p>
 <blockquote>
-<p>RStudio is an integrated development environment (IDE) for R. It includes a console, syntax-highlighting editor that supports direct code execution, as well as tools for plotting, history, debugging and workspace management.<br />
-&nbsp;</p>
-
+<p>RStudio is an integrated development environment (IDE) for R. It includes a console, syntax-highlighting editor that supports direct code execution, as well as tools for plotting, history, debugging and workspace management.<br>
+ </p>
+</blockquote>
+<blockquote>
 <p>RStudio is available in open source and commercial editions and runs on the desktop (Windows, Mac, and Linux) or in a browser connected to RStudio Server or RStudio Server Pro (Debian/Ubuntu, RedHat/CentOS, and SUSE Linux).</p>
 </blockquote>
-
-<p>If you don&rsquo;t have RStudio installed yet, grab yours from <a href="https://www.rstudio.com/products/rstudio/download/">RStudio downloads</a>.</p>
-
+<p>If you don't have RStudio installed yet, grab yours from <a href="https://www.rstudio.com/products/rstudio/download/">RStudio downloads</a>.</p>
 
 
     <a href="https://www.simoahava.com/amp/images/2019/04/r-studio.jpg" title="R Studio">
@@ -1000,42 +971,27 @@ on
     </a>
   
 
-
-<p>We won&rsquo;t get into the RStudio installation details in this article. RStudio&rsquo;s website provides comprehensive documentation and step-by-step how-to&rsquo;s for that.</p>
-
-<p>Once you have your RStudio setup up and running, let&rsquo;s script!</p>
-
+<p>We won't get into the RStudio installation details in this article. RStudio's website provides comprehensive documentation and step-by-step how-to's for that.</p>
+<p>Once you have your RStudio setup up and running, let's script!</p>
 <h2 id="episode-i-an-r-script">Episode I: An R script</h2>
-
 <p>We are using <strong>MariaDB</strong> to store the Google Ads Customer IDs of our clients, where they can be retrieved from for several other integration and automation purposes we need.</p>
-
-<p>If you&rsquo;re using some other database server, you need to modify the DB part of the code to suit your needs. R has comprehensive support for a wide variety of databases, perhaps even all of them. Basically, if it&rsquo;s something to do with data, R can read from it.</p>
-
-<p>If you&rsquo;re not using a database, you can skip the DB part. Optionally, R can also read the IDs from e.g. Google Sheets or a CSV file. How to do this in R is your homework!</p>
-
-<p>You&rsquo;re probably thinking &ldquo;But why aren&rsquo;t you reading the IDs directly from AdWords API&rdquo;?</p>
-
-<p>Well, the unfortunate thing is that <strong>RAdwords</strong>, the R AdWords package, implements the Adwords API Reporting Service only, and the Reporting Service does not support querying Google Ads Customer IDs on the Manager Account level (formerly known as <em>My Client Center</em> or <em>Google MCC</em>). Instead, you&rsquo;d need access to AdWords API Managed Customer Service to do that.</p>
-
-<p>In our case, this isn&rsquo;t a problem though, because we want to persist the IDs in our own custom environment and have different classifications and levels for different sort of contracts and clients. This way we are able to do the desired actions to those clients that need them, and we can also add monitoring capabilities to the setup.</p>
-
+<p>If you're using some other database server, you need to modify the DB part of the code to suit your needs. R has comprehensive support for a wide variety of databases, perhaps even all of them. Basically, if it's something to do with data, R can read from it.</p>
+<p>If you're not using a database, you can skip the DB part. Optionally, R can also read the IDs from e.g. Google Sheets or a CSV file. How to do this in R is your homework!</p>
+<p>You're probably thinking &ldquo;But why aren't you reading the IDs directly from AdWords API&rdquo;?</p>
+<p>Well, the unfortunate thing is that <strong>RAdwords</strong>, the R AdWords package, implements the Adwords API Reporting Service only, and the Reporting Service does not support querying Google Ads Customer IDs on the Manager Account level (formerly known as <em>My Client Center</em> or <em>Google MCC</em>). Instead, you'd need access to AdWords API Managed Customer Service to do that.</p>
+<p>In our case, this isn't a problem though, because we want to persist the IDs in our own custom environment and have different classifications and levels for different sort of contracts and clients. This way we are able to do the desired actions to those clients that need them, and we can also add monitoring capabilities to the setup.</p>
 <p>If you need to read the IDs directly from the AdWords API, you can access the Managed Customer Service via a newer R package called <a href="https://cran.r-project.org/web/packages/adwordsR/index.html">adwordsR</a>.</p>
-
-<h3 id="now-let-s-script-for-real">Now, let&rsquo;s script for real!</h3>
-
+<h3 id="now-lets-script-for-real">Now, let's script for real!</h3>
 <p>Create a new R file in your RStudio with the following content, set up your DB user and pass, and save the file as <code>db_credentials.R</code> in <code>/YOUR_R_USER_ROOT_DIR/auth/</code>. This is your DB auth file.</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">db_username</span> <span class="o">=</span> <span class="s">&#34;YOUR_USERNAME&#34;</span>
-<span class="n">db_password</span> <span class="o">=</span> <span class="s">&#34;YOUR_PASSWORD&#34;</span></code></pre></div>
-
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">db_username</span> <span class="o">=</span> <span class="s">&#34;</span><span class="s">YOUR_USERNAME&#34;</span>
+<span class="n">db_password</span> <span class="o">=</span> <span class="s">&#34;</span><span class="s">YOUR_PASSWORD&#34;</span></code></pre></div>
 <p>Create another file including the following code and save the file as <code>connect_db.R</code> in <code>/YOUR_R_USER_ROOT_DIR/</code>. This is your DB connector.</p>
-
 <div class="highlight"><pre class="chroma"><code class="language-R" data-lang="R"><span class="c1"># Include DB credentials from your /auth/ dir</span>
-<span class="nf">source</span><span class="p">(</span><span class="s">&#34;~/auth/db_credentials.R&#34;</span><span class="p">)</span>
+<span class="nf">source</span><span class="p">(</span><span class="s">&#34;</span><span class="s">~/auth/db_credentials.R&#34;</span><span class="p">)</span>
 
 <span class="c1"># Check if the required packages are installed, install if not</span>
-<span class="nf">if</span><span class="p">(</span><span class="o">!</span><span class="nf">require</span><span class="p">(</span><span class="n">DBI</span><span class="p">))</span> <span class="nf">install.packages</span><span class="p">(</span><span class="s">&#34;DBI&#34;</span><span class="p">)</span> 
-<span class="nf">if</span><span class="p">(</span><span class="o">!</span><span class="nf">require</span><span class="p">(</span><span class="n">RMariaDB</span><span class="p">))</span> <span class="nf">install.packages</span><span class="p">(</span><span class="s">&#34;RMariaDB&#34;</span><span class="p">)</span>
+<span class="nf">if</span><span class="p">(</span><span class="o">!</span><span class="nf">require</span><span class="p">(</span><span class="n">DBI</span><span class="p">)</span><span class="p">)</span> <span class="nf">install.packages</span><span class="p">(</span><span class="s">&#34;</span><span class="s">DBI&#34;</span><span class="p">)</span> 
+<span class="nf">if</span><span class="p">(</span><span class="o">!</span><span class="nf">require</span><span class="p">(</span><span class="n">RMariaDB</span><span class="p">)</span><span class="p">)</span> <span class="nf">install.packages</span><span class="p">(</span><span class="s">&#34;</span><span class="s">RMariaDB&#34;</span><span class="p">)</span>
 
 <span class="c1"># Load packages</span>
 <span class="nf">library</span><span class="p">(</span><span class="n">DBI</span><span class="p">)</span>
@@ -1043,30 +999,28 @@ on
 
 <span class="c1"># Create a DB connection handle</span>
 <span class="n">con</span> <span class="o">&lt;-</span> <span class="nf">dbConnect</span><span class="p">(</span>
-  <span class="n">drv</span> <span class="o">=</span> <span class="n">RMariaDB</span><span class="o">::</span><span class="nf">MariaDB</span><span class="p">(),</span>
+  <span class="n">drv</span> <span class="o">=</span> <span class="n">RMariaDB</span><span class="o">::</span><span class="nf">MariaDB</span><span class="p">(</span><span class="p">)</span><span class="p">,</span>
   <span class="n">username</span> <span class="o">=</span> <span class="n">db_username</span><span class="p">,</span>
   <span class="n">password</span> <span class="o">=</span> <span class="n">db_password</span><span class="p">,</span>
-  <span class="n">host</span> <span class="o">=</span> <span class="s">&#34;YOUR_DB_HOST&#34;</span><span class="p">,</span>
+  <span class="n">host</span> <span class="o">=</span> <span class="s">&#34;</span><span class="s">YOUR_DB_HOST&#34;</span><span class="p">,</span>
   <span class="n">port</span> <span class="o">=</span> <span class="m">3306</span><span class="p">,</span>
-  <span class="s">&#34;YOUR_DB_NAME&#34;</span>
+  <span class="s">&#34;</span><span class="s">YOUR_DB_NAME&#34;</span>
 <span class="p">)</span></code></pre></div>
-
 <p>And finally the actual Ads R script, include the following code and save it as <code>google-ads-zero-cost-monitor.R</code> in <code>/YOUR_R_USER_ROOT_DIR/</code>.</p>
-
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="c1"># Init the DB connection</span>
-<span class="nf">source</span><span class="p">(</span><span class="s">&#34;~/connect_db.R&#34;</span><span class="p">)</span>
+<span class="nf">source</span><span class="p">(</span><span class="s">&#34;</span><span class="s">~/connect_db.R&#34;</span><span class="p">)</span>
 
 <span class="c1"># Check if the required packages are installed, install if not</span>
-<span class="nf">if</span><span class="p">(</span><span class="o">!</span><span class="nf">require</span><span class="p">(</span><span class="n">RAdwords</span><span class="p">))</span> <span class="nf">install.packages</span><span class="p">(</span><span class="s">&#34;RAdwords&#34;</span><span class="p">)</span>
+<span class="nf">if</span><span class="p">(</span><span class="o">!</span><span class="nf">require</span><span class="p">(</span><span class="n">RAdwords</span><span class="p">)</span><span class="p">)</span> <span class="nf">install.packages</span><span class="p">(</span><span class="s">&#34;</span><span class="s">RAdwords&#34;</span><span class="p">)</span>
 
 <span class="c1"># Load packages</span>
 <span class="nf">library</span><span class="p">(</span><span class="n">RAdwords</span><span class="p">)</span>
 
 <span class="c1"># Define the file path where your AdWords API OAuth RData file should be stored to, we&#39;ll need this next</span>
-<span class="n">google_ads_auth_file</span> <span class="o">&lt;-</span> <span class="s">&#34;~/auth/google_ads_auth.RData&#34;</span>
+<span class="n">google_ads_auth_file</span> <span class="o">&lt;-</span> <span class="s">&#34;</span><span class="s">~/auth/google_ads_auth.RData&#34;</span>
 
 <span class="c1"># Check if the google_auth RData file already exists, create if not</span>
-<span class="nf">if</span><span class="p">(</span><span class="o">!</span><span class="nf">file.exists</span><span class="p">(</span><span class="n">google_ads_auth_file</span><span class="p">))</span> <span class="p">{</span>
+<span class="nf">if</span><span class="p">(</span><span class="o">!</span><span class="nf">file.exists</span><span class="p">(</span><span class="n">google_ads_auth_file</span><span class="p">)</span><span class="p">)</span> <span class="p">{</span>
   <span class="c1"># Auth steps:</span>
   <span class="c1"># 1) You&#39;ll need Google API Client ID, Client Secret and AdWords Developer Token here for authenticating, see https://github.com/jburkhardt/RAdwords for details</span>
   <span class="c1"># 2) Once you&#39;ve provided those in your R console when R requests them, you&#39;ll get redirected to OAuth screen in your browser</span>
@@ -1082,11 +1036,11 @@ on
 <span class="nf">load</span><span class="p">(</span><span class="n">file</span> <span class="o">=</span> <span class="n">google_ads_auth_file</span><span class="p">)</span>
 
 <span class="c1"># Init date vars</span>
-<span class="n">dayBeforeYesterday</span> <span class="o">&lt;-</span> <span class="nf">Sys.Date</span><span class="p">()</span> <span class="o">-</span> <span class="m">2</span>
-<span class="n">yesterday</span> <span class="o">&lt;-</span> <span class="nf">Sys.Date</span><span class="p">()</span> <span class="o">-</span> <span class="m">1</span>
+<span class="n">dayBeforeYesterday</span> <span class="o">&lt;-</span> <span class="nf">Sys.Date</span><span class="p">(</span><span class="p">)</span> <span class="o">-</span> <span class="m">2</span>
+<span class="n">yesterday</span> <span class="o">&lt;-</span> <span class="nf">Sys.Date</span><span class="p">(</span><span class="p">)</span> <span class="o">-</span> <span class="m">1</span>
 
 <span class="c1"># Fetch Google Ads Customer IDs from your DB</span>
-<span class="n">ads_accounts</span> <span class="o">&lt;-</span> <span class="nf">dbGetQuery</span><span class="p">(</span><span class="n">con</span><span class="p">,</span> <span class="s">&#34;SELECT ads_customer_id FROM ads_accounts&#34;</span><span class="p">)</span>
+<span class="n">ads_accounts</span> <span class="o">&lt;-</span> <span class="nf">dbGetQuery</span><span class="p">(</span><span class="n">con</span><span class="p">,</span> <span class="s">&#34;</span><span class="s">SELECT ads_customer_id FROM ads_accounts&#34;</span><span class="p">)</span>
 
 <span class="c1"># Create a list of the IDs for later looping</span>
 <span class="n">account_list</span> <span class="o">&lt;-</span> <span class="n">ads_accounts</span><span class="o">$</span><span class="n">ads_customer_id</span>
@@ -1096,13 +1050,13 @@ on
 
 <span class="c1"># Init AdWords API request</span>
 <span class="c1"># We&#39;re checking the cost data from two previous days</span>
-<span class="n">body</span> <span class="o">&lt;-</span> <span class="nf">statement</span><span class="p">(</span><span class="n">select</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#39;Cost&#39;</span><span class="p">),</span>
-                  <span class="n">report</span> <span class="o">=</span> <span class="s">&#34;ACCOUNT_PERFORMANCE_REPORT&#34;</span><span class="p">,</span>
+<span class="n">body</span> <span class="o">&lt;-</span> <span class="nf">statement</span><span class="p">(</span><span class="n">select</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#39;</span><span class="s">Cost&#39;</span><span class="p">)</span><span class="p">,</span>
+                  <span class="n">report</span> <span class="o">=</span> <span class="s">&#34;</span><span class="s">ACCOUNT_PERFORMANCE_REPORT&#34;</span><span class="p">,</span>
                   <span class="n">start</span>  <span class="o">=</span> <span class="n">dayBeforeYesterday</span><span class="p">,</span>
                   <span class="n">end</span>    <span class="o">=</span> <span class="n">yesterday</span><span class="p">)</span>
 
 <span class="c1"># Init a data frame for collecting the data and and an index variable for keeping track of progressing during the for loop</span>
-<span class="n">adsdata</span> <span class="o">&lt;-</span> <span class="nf">data.frame</span><span class="p">()</span>
+<span class="n">adsdata</span> <span class="o">&lt;-</span> <span class="nf">data.frame</span><span class="p">(</span><span class="p">)</span>
 <span class="n">progressIndex</span> <span class="o">&lt;-</span> <span class="m">0</span>
 
 <span class="c1"># Get the Ads cost data</span>
@@ -1114,10 +1068,10 @@ on
                               <span class="n">statement</span>        <span class="o">=</span> <span class="n">body</span><span class="p">)</span>
 
   <span class="c1"># Proceed only if the API doesn&#39;t return an error (happens when there&#39;s no data to return or when the API fails), this is for dropping off false zero cost alerts</span>
-  <span class="nf">if</span><span class="p">(</span><span class="o">!</span><span class="nf">is.null</span><span class="p">(</span><span class="nf">dim</span><span class="p">(</span><span class="n">ads_api_response</span><span class="p">)))</span> <span class="p">{</span>
+  <span class="nf">if</span><span class="p">(</span><span class="o">!</span><span class="nf">is.null</span><span class="p">(</span><span class="nf">dim</span><span class="p">(</span><span class="n">ads_api_response</span><span class="p">)</span><span class="p">)</span><span class="p">)</span> <span class="p">{</span>
    
     <span class="c1"># Init empty data frame</span>
-    <span class="n">adsdata_temp</span> <span class="o">&lt;-</span> <span class="nf">setNames</span><span class="p">(</span><span class="nf">data.frame</span><span class="p">(</span><span class="nf">matrix</span><span class="p">(</span><span class="n">ncol</span> <span class="o">=</span> <span class="m">2</span><span class="p">,</span> <span class="n">nrow</span> <span class="o">=</span> <span class="m">1</span><span class="p">)),</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;Cost&#34;</span><span class="p">,</span> <span class="s">&#34;Account&#34;</span><span class="p">))</span>
+    <span class="n">adsdata_temp</span> <span class="o">&lt;-</span> <span class="nf">setNames</span><span class="p">(</span><span class="nf">data.frame</span><span class="p">(</span><span class="nf">matrix</span><span class="p">(</span><span class="n">ncol</span> <span class="o">=</span> <span class="m">2</span><span class="p">,</span> <span class="n">nrow</span> <span class="o">=</span> <span class="m">1</span><span class="p">)</span><span class="p">)</span><span class="p">,</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;</span><span class="s">Cost&#34;</span><span class="p">,</span> <span class="s">&#34;</span><span class="s">Account&#34;</span><span class="p">)</span><span class="p">)</span>
     
     <span class="c1"># Include account id</span>
     <span class="n">adsdata_temp</span><span class="o">$</span><span class="n">Account</span> <span class="o">&lt;-</span> <span class="n">account</span>
@@ -1125,10 +1079,10 @@ on
     <span class="c1"># Include cost data</span>
     <span class="c1"># If there&#39;s no data, the result is doubled for some reason</span>
     <span class="c1"># Fix this by always reading the 1st value only with [1]</span>
-    <span class="n">adsdata_temp</span><span class="o">$</span><span class="n">Cost</span> <span class="o">&lt;-</span> <span class="n">ads_api_response</span><span class="o">$</span><span class="n">Cost[1]</span>
+    <span class="n">adsdata_temp</span><span class="o">$</span><span class="n">Cost</span> <span class="o">&lt;-</span> <span class="n">ads_api_response</span><span class="o">$</span><span class="n">Cost</span><span class="n">[1</span><span class="n">]</span>
     
     <span class="c1"># If cost is zero, NA is returned, replace it with zero</span>
-    <span class="nf">if</span><span class="p">(</span><span class="nf">is.na</span><span class="p">(</span><span class="n">adsdata_temp</span><span class="o">$</span><span class="n">Cost</span><span class="p">))</span> <span class="n">adsdata_temp</span><span class="o">$</span><span class="n">Cost</span> <span class="o">&lt;-</span> <span class="m">0</span>
+    <span class="nf">if</span><span class="p">(</span><span class="nf">is.na</span><span class="p">(</span><span class="n">adsdata_temp</span><span class="o">$</span><span class="n">Cost</span><span class="p">)</span><span class="p">)</span> <span class="n">adsdata_temp</span><span class="o">$</span><span class="n">Cost</span> <span class="o">&lt;-</span> <span class="m">0</span>
     
     <span class="c1"># Collect during each iteration</span>
     <span class="n">adsdata</span> <span class="o">&lt;-</span> <span class="nf">rbind</span><span class="p">(</span><span class="n">adsdata</span><span class="p">,</span> <span class="n">adsdata_temp</span><span class="p">,</span> <span class="n">stringsAsFactors</span> <span class="o">=</span> <span class="kc">FALSE</span><span class="p">)</span>
@@ -1137,7 +1091,7 @@ on
   
   <span class="c1"># Print progress to R console</span>
   <span class="n">progressIndex</span> <span class="o">&lt;-</span> <span class="n">progressIndex</span> <span class="o">+</span> <span class="m">1</span>
-  <span class="nf">cat</span><span class="p">(</span><span class="nf">paste</span><span class="p">(</span><span class="s">&#34;Query &#34;</span><span class="p">,</span> <span class="n">progressIndex</span><span class="p">,</span> <span class="s">&#34; of &#34;</span><span class="p">,</span> <span class="nf">NROW</span><span class="p">(</span><span class="n">account_list</span><span class="p">),</span> <span class="s">&#34; done\r\n&#34;</span><span class="p">,</span> <span class="n">sep</span> <span class="o">=</span> <span class="s">&#34;&#34;</span><span class="p">))</span>
+  <span class="nf">cat</span><span class="p">(</span><span class="nf">paste</span><span class="p">(</span><span class="s">&#34;</span><span class="s">Query &#34;</span><span class="p">,</span> <span class="n">progressIndex</span><span class="p">,</span> <span class="s">&#34;</span><span class="s"> of &#34;</span><span class="p">,</span> <span class="nf">NROW</span><span class="p">(</span><span class="n">account_list</span><span class="p">)</span><span class="p">,</span> <span class="s">&#34;</span><span class="s"> done\r\n&#34;</span><span class="p">,</span> <span class="n">sep</span> <span class="o">=</span> <span class="s">&#34;</span><span class="s">&#34;</span><span class="p">)</span><span class="p">)</span>
 
 <span class="p">}</span>
 
@@ -1157,27 +1111,27 @@ on
 
 <span class="nf">if</span><span class="p">(</span><span class="n">nbr_of_accounts_with_alerts</span> <span class="o">&gt;</span> <span class="m">0</span><span class="p">)</span> <span class="p">{</span>
   
-  <span class="nf">for </span><span class="p">(</span><span class="n">i</span> <span class="n">in</span> <span class="m">1</span><span class="o">:</span><span class="nf">nrow</span><span class="p">(</span><span class="n">ads_accounts_with_zero_cost</span><span class="p">))</span> <span class="p">{</span>
-    <span class="n">row</span> <span class="o">&lt;-</span> <span class="n">ads_accounts_with_zero_cost[i</span><span class="p">,</span> <span class="n">]</span>
+  <span class="nf">for </span><span class="p">(</span><span class="n">i</span> <span class="n">in</span> <span class="m">1</span><span class="o">:</span><span class="nf">nrow</span><span class="p">(</span><span class="n">ads_accounts_with_zero_cost</span><span class="p">)</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">row</span> <span class="o">&lt;-</span> <span class="n">ads_accounts_with_zero_cost</span><span class="n">[i</span><span class="p">,</span> <span class="n">]</span>
     
     <span class="n">ads_customer_id</span> <span class="o">&lt;-</span> <span class="n">row</span><span class="o">$</span><span class="n">ads_customer_id</span>
-    <span class="n">category</span> <span class="o">&lt;-</span> <span class="s">&#34;ALERT_ZERO_COST&#34;</span> <span class="c1"># For categorizing different types of alerts</span>
+    <span class="n">category</span> <span class="o">&lt;-</span> <span class="s">&#34;</span><span class="s">ALERT_ZERO_COST&#34;</span> <span class="c1"># For categorizing different types of alerts</span>
     <span class="n">status_id</span> <span class="o">&lt;-</span> <span class="m">0</span> <span class="c1"># To be set to eg. 1 when the alert is handled via a custom UI</span>
     
     <span class="c1"># Save each item to db</span>
-    <span class="n">query</span> <span class="o">&lt;-</span> <span class="nf">paste</span><span class="p">(</span><span class="s">&#34;INSERT INTO alerts (
+    <span class="n">query</span> <span class="o">&lt;-</span> <span class="nf">paste</span><span class="p">(</span><span class="s">&#34;</span><span class="s">INSERT INTO alerts (
 </span><span class="s">                    ads_customer_id,
 </span><span class="s">                    category,
 </span><span class="s">                    status_id,
 </span><span class="s">                    created_at,
 </span><span class="s">                    updated_at)
 </span><span class="s">                   VALUES (&#34;</span><span class="p">,</span>
-                    <span class="s">&#34;&#39;&#34;</span><span class="p">,</span> <span class="n">ads_customer_id</span><span class="p">,</span> <span class="s">&#34;&#39;, &#34;</span><span class="p">,</span>
-                    <span class="s">&#34;&#39;&#34;</span><span class="p">,</span> <span class="n">category</span><span class="p">,</span> <span class="s">&#34;&#39;, &#34;</span><span class="p">,</span>
-                    <span class="n">status_id</span><span class="p">,</span> <span class="s">&#34;, &#34;</span><span class="p">,</span>
-                    <span class="s">&#34;now(), &#34;</span><span class="p">,</span>
-                    <span class="s">&#34;now())&#34;</span><span class="p">,</span>
-                   <span class="n">sep</span> <span class="o">=</span> <span class="s">&#34;&#34;</span>
+                    <span class="s">&#34;</span><span class="s">&#39;&#34;</span><span class="p">,</span> <span class="n">ads_customer_id</span><span class="p">,</span> <span class="s">&#34;</span><span class="s">&#39;, &#34;</span><span class="p">,</span>
+                    <span class="s">&#34;</span><span class="s">&#39;&#34;</span><span class="p">,</span> <span class="n">category</span><span class="p">,</span> <span class="s">&#34;</span><span class="s">&#39;, &#34;</span><span class="p">,</span>
+                    <span class="n">status_id</span><span class="p">,</span> <span class="s">&#34;</span><span class="s">, &#34;</span><span class="p">,</span>
+                    <span class="s">&#34;</span><span class="s">now(), &#34;</span><span class="p">,</span>
+                    <span class="s">&#34;</span><span class="s">now())&#34;</span><span class="p">,</span>
+                   <span class="n">sep</span> <span class="o">=</span> <span class="s">&#34;</span><span class="s">&#34;</span>
     <span class="p">)</span>
     <span class="nf">dbExecute</span><span class="p">(</span><span class="n">con</span><span class="p">,</span> <span class="n">query</span><span class="p">)</span>
   <span class="p">}</span>
@@ -1187,25 +1141,22 @@ on
 <span class="c1"># View(db_alerts)</span>
   
 <span class="p">}</span></code></pre></div>
-
 <p>Now you have your Ads zero cost monitor script ready and you can move on to setting up your Slack bot.</p>
-
 <h2 id="episode-ii-the-slack-bot-strikes-back">Episode II: The Slack bot strikes back</h2>
-
-<p>Because the guys at Slack are awesome, they have written an excellent guide on how to set up your bot. They even serve you virtual cookies! Slack&rsquo;s guides are a textbook example about how documentation should be written - they&rsquo;re always a pleasure to read and follow! Thanks guys!</p>
-
+<p>Because the guys at Slack are awesome, they have written an excellent guide on how to set up your bot. They even serve you virtual cookies! Slack's guides are a textbook example about how documentation should be written - they're always a pleasure to read and follow! Thanks guys!</p>
 <p>So, follow the <a href="https://api.slack.com/bot-users">Slack bot users guide</a>. The required steps for our alert notifications are:</p>
-
 <ol>
-<li><p>Create your Slack app</p></li>
-
-<li><p>Create your bot user</p></li>
-
-<li><p>Install your bot to your Slack workspace</p></li>
+<li>
+<p>Create your Slack app</p>
+</li>
+<li>
+<p>Create your bot user</p>
+</li>
+<li>
+<p>Install your bot to your Slack workspace</p>
+</li>
 </ol>
-
-<p>Once you manage to get your bot installed into your Slack workspace, you will get a <strong>webhook URL</strong> that you&rsquo;ll need in the following script.</p>
-
+<p>Once you manage to get your bot installed into your Slack workspace, you will get a <strong>webhook URL</strong> that you'll need in the following script.</p>
 
 
     <a href="https://www.simoahava.com/amp/images/2019/04/slack-bot-token.jpg" title="Webhook URL">
@@ -1215,17 +1166,15 @@ on
     </a>
   
 
-
 <p>The bot script part is here:</p>
-
 <div class="highlight"><pre class="chroma"><code class="language-R" data-lang="R"><span class="c1">### SLACK NOTIFICATIONS ###</span>
 
 <span class="c1"># Replace the default value with the webhook URL you got from Slack</span>
-<span class="n">webhook_url</span> <span class="o">&lt;-</span> <span class="s">&#34;https://hooks.slack.com/services/12345&#34;</span>
+<span class="n">webhook_url</span> <span class="o">&lt;-</span> <span class="s">&#34;</span><span class="s">https://hooks.slack.com/services/12345&#34;</span>
 
 <span class="c1"># Check if the required packages are installed, install if not</span>
-<span class="nf">if</span><span class="p">(</span><span class="o">!</span><span class="nf">require</span><span class="p">(</span><span class="n">jsonlite</span><span class="p">))</span> <span class="nf">install.packages</span><span class="p">(</span><span class="s">&#34;jsonlite&#34;</span><span class="p">)</span> 
-<span class="nf">if</span><span class="p">(</span><span class="o">!</span><span class="nf">require</span><span class="p">(</span><span class="n">httr</span><span class="p">))</span> <span class="nf">install.packages</span><span class="p">(</span><span class="s">&#34;httr&#34;</span><span class="p">)</span>
+<span class="nf">if</span><span class="p">(</span><span class="o">!</span><span class="nf">require</span><span class="p">(</span><span class="n">jsonlite</span><span class="p">)</span><span class="p">)</span> <span class="nf">install.packages</span><span class="p">(</span><span class="s">&#34;</span><span class="s">jsonlite&#34;</span><span class="p">)</span> 
+<span class="nf">if</span><span class="p">(</span><span class="o">!</span><span class="nf">require</span><span class="p">(</span><span class="n">httr</span><span class="p">)</span><span class="p">)</span> <span class="nf">install.packages</span><span class="p">(</span><span class="s">&#34;</span><span class="s">httr&#34;</span><span class="p">)</span>
 
 <span class="c1"># Load packages</span>
 <span class="nf">library</span><span class="p">(</span><span class="n">jsonlite</span><span class="p">)</span>
@@ -1235,48 +1184,45 @@ on
 <span class="n">nbr_of_accounts</span> <span class="o">&lt;-</span> <span class="nf">NROW</span><span class="p">(</span><span class="n">account_list</span><span class="p">)</span>
 
 <span class="c1"># Setup the message you want to send to Slack</span>
-<span class="n">msg_desc</span> <span class="o">&lt;-</span> <span class="nf">paste</span><span class="p">(</span><span class="s">&#34;Number of Google Ads accounts checked: &#34;</span><span class="p">,</span>
+<span class="n">msg_desc</span> <span class="o">&lt;-</span> <span class="nf">paste</span><span class="p">(</span><span class="s">&#34;</span><span class="s">Number of Google Ads accounts checked: &#34;</span><span class="p">,</span>
                   <span class="n">nbr_of_accounts</span><span class="p">,</span>
-                  <span class="n">sep</span> <span class="o">=</span> <span class="s">&#34;&#34;</span><span class="p">)</span>
+                  <span class="n">sep</span> <span class="o">=</span> <span class="s">&#34;</span><span class="s">&#34;</span><span class="p">)</span>
 
-<span class="n">msg_title</span> <span class="o">&lt;-</span> <span class="nf">paste</span><span class="p">(</span><span class="s">&#34;ALERT - Number of zero cost accounts detected: &#34;</span><span class="p">,</span>
+<span class="n">msg_title</span> <span class="o">&lt;-</span> <span class="nf">paste</span><span class="p">(</span><span class="s">&#34;</span><span class="s">ALERT - Number of zero cost accounts detected: &#34;</span><span class="p">,</span>
                    <span class="n">nbr_of_accounts_with_alerts</span><span class="p">,</span>
-                   <span class="n">sep</span> <span class="o">=</span> <span class="s">&#34;&#34;</span><span class="p">)</span>
+                   <span class="n">sep</span> <span class="o">=</span> <span class="s">&#34;</span><span class="s">&#34;</span><span class="p">)</span>
 
 <span class="c1"># This places a channel ping if there were occurrences with zero cost, and if not, defaults to empty message</span>
 <span class="nf">if</span><span class="p">(</span><span class="n">nbr_of_accounts_with_alerts</span> <span class="o">&gt;</span> <span class="m">0</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">msg_body</span> <span class="o">&lt;-</span> <span class="s">&#34;Alerts saved to database! &lt;!channel&gt;&#34;</span>
+  <span class="n">msg_body</span> <span class="o">&lt;-</span> <span class="s">&#34;</span><span class="s">Alerts saved to database! &lt;!channel&gt;&#34;</span>
 <span class="p">}</span> <span class="n">else</span> <span class="p">{</span>
-  <span class="n">msg_body</span> <span class="o">&lt;-</span> <span class="s">&#34;&#34;</span>
+  <span class="n">msg_body</span> <span class="o">&lt;-</span> <span class="s">&#34;</span><span class="s">&#34;</span>
 <span class="p">}</span>
 
 <span class="c1"># Alert to Slack - POST the msg</span>
 <span class="n">request</span> <span class="o">&lt;-</span> <span class="nf">POST</span><span class="p">(</span><span class="n">webhook_url</span><span class="p">,</span>
                 <span class="n">body</span> <span class="o">=</span> <span class="nf">paste</span><span class="p">(</span>
-                  <span class="s">&#39;{&#34;attachments&#34;: [{&#39;</span><span class="p">,</span>
+                  <span class="s">&#39;</span><span class="s">{&#34;attachments&#34;: [{&#39;</span><span class="p">,</span>
                   
-                  <span class="s">&#39;&#34;title&#34;: &#34;&#39;</span><span class="p">,</span>
+                  <span class="s">&#39;</span><span class="s">&#34;title&#34;: &#34;&#39;</span><span class="p">,</span>
                   <span class="n">msg_title</span><span class="p">,</span>
-                  <span class="s">&#39;&#34;,&#39;</span><span class="p">,</span>
+                  <span class="s">&#39;</span><span class="s">&#34;,&#39;</span><span class="p">,</span>
                   
-                  <span class="s">&#39;&#34;pretext&#34;: &#34;&#39;</span><span class="p">,</span>
+                  <span class="s">&#39;</span><span class="s">&#34;pretext&#34;: &#34;&#39;</span><span class="p">,</span>
                   <span class="n">msg_desc</span><span class="p">,</span>
-                  <span class="s">&#39;&#34;,&#39;</span><span class="p">,</span>
+                  <span class="s">&#39;</span><span class="s">&#34;,&#39;</span><span class="p">,</span>
                   
-                  <span class="s">&#39;&#34;text&#34;: &#34;&#39;</span><span class="p">,</span>
+                  <span class="s">&#39;</span><span class="s">&#34;text&#34;: &#34;&#39;</span><span class="p">,</span>
                   <span class="n">msg_body</span><span class="p">,</span>
-                  <span class="s">&#39;&#34;, &#34;color&#34;: &#34;#ee0000&#34;&#39;</span><span class="p">,</span>
+                  <span class="s">&#39;</span><span class="s">&#34;, &#34;color&#34;: &#34;#ee0000&#34;&#39;</span><span class="p">,</span>
                   
-                  <span class="s">&#39;}]}&#39;</span><span class="p">,</span>
+                  <span class="s">&#39;</span><span class="s">}]}&#39;</span><span class="p">,</span>
                   
-                  <span class="n">sep</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+                  <span class="n">sep</span> <span class="o">=</span> <span class="s">&#39;</span><span class="s">&#39;</span>
                 <span class="p">)</span>
 <span class="p">)</span></code></pre></div>
-
-<p>Once you&rsquo;ve set this up, include the above Slack part into your google-ads-zero-cost-monitor.R script. Your monitoring script is now done!</p>
-
+<p>Once you've set this up, include the above Slack part into your google-ads-zero-cost-monitor.R script. Your monitoring script is now done!</p>
 <p>This is what a sample notification would look like in Slack:</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2019/04/slack-alert.jpg" title="Slack alert sample">
@@ -1286,27 +1232,17 @@ on
     </a>
   
 
-
-<p>Test it carefully in your RStudio and make sure everything is working correctly. After that, you&rsquo;re ready to move your script to production by scheduling it via <code>cron</code>.</p>
-
+<p>Test it carefully in your RStudio and make sure everything is working correctly. After that, you're ready to move your script to production by scheduling it via <code>cron</code>.</p>
 <h2 id="episode-iii-return-of-the-cron-job">Episode III: Return of the cron job</h2>
-
 <p>Open <code>crontab</code> in your Linux shell for editing:</p>
-
 <div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">crontab -e</code></pre></div>
-
-<p>Add a cron job that suits your needs. Here&rsquo;s an example syntax with a scheduler that runs the R monitoring script daily at 10 AM.</p>
-
+<p>Add a cron job that suits your needs. Here's an example syntax with a scheduler that runs the R monitoring script daily at 10 AM.</p>
 <div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="c1"># Daily at 10 AM</span>
 <span class="m">0</span> <span class="m">10</span> * * * Rscript /home/YOUR_USERNAME/google-ads-zero-cost-monitor.R</code></pre></div>
-
 <h2 id="summary">Summary</h2>
-
 <p>You have now created a potentially powerful Google Ads monitoring pipeline that has endless opportunities for extending. Other useful use cases for utilizing the pipeline are for example anomaly detection, high spend tracking, campaign-level stuff, automation of ads placement optimizing, and so forth.</p>
-
 <p>It goes without saying that automation is absolutely necessary in this day and age when it can save you and your team from countless hours of manual labor. By automating trivial processes such as monitoring and anomaly detection, you are freeing up your most valuable resources (people) to work on more ambitious tasks.</p>
-
-<p>As always, we&rsquo;re looking forward to your comments and questions. Let us know what you think of the solution, if it could be improved, and if you already have extensions in mind!</p>
+<p>As always, we're looking forward to your comments and questions. Let us know what you think of the solution, if it could be improved, and if you already have extensions in mind!</p>
 
     </section>
 

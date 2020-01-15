@@ -53,7 +53,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.59.1 with theme Tranquilpeak 0.4.3-BETA">
+    <meta name="generator" content="Hugo 0.61.0 with theme Tranquilpeak 0.4.3-BETA">
     <title>Send Event Hits Before Pageview Hits In Google Analytics | Simo Ahava's blog</title>
     
     <script>
@@ -319,10 +319,7 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              
-
-<p>One of the myths surrounding <a href="https://analytics.google.com/">Google Analytics</a> is that the first hit of a <strong>session</strong> <a href="https://support.google.com/analytics/answer/6277326#EVENTS_BEFORE_PAGEVIEWS">should always be a <strong>pageview</strong></a>. It makes sense - sessions are initialized with a landing <strong>page</strong>, and thus need a <strong>page</strong> view to have one.</p>
-
+              <p>One of the myths surrounding <a href="https://analytics.google.com/">Google Analytics</a> is that the first hit of a <strong>session</strong> <a href="https://support.google.com/analytics/answer/6277326#EVENTS_BEFORE_PAGEVIEWS">should always be a <strong>pageview</strong></a>. It makes sense - sessions are initialized with a landing <strong>page</strong>, and thus need a <strong>page</strong> view to have one.</p>
 
 
 
@@ -338,21 +335,20 @@
 </div>
 
 
-
 <p>However, in this article I want to show you empirically how this myth is just that - a myth.</p>
-
 <p>There is <strong>little discernible impact</strong> if the first hit of a session is an event, and GA is more than capable of stitching the first event together with the subsequent pageview into a <strong>session</strong> entity.</p>
-
 <p>The three repercussions I could find were:</p>
-
 <ol>
-<li><p><strong>Entrances</strong> and <strong>Sessions</strong> not matching up with the <strong>Page</strong> dimension. See <a href="https://support.google.com/analytics/answer/2956047">here</a> for some details, too.</p></li>
-
-<li><p><strong>Behavior Flow</strong> report attributes the event page as the &ldquo;Landing Page&rdquo; and the page sent with the pageview as the &ldquo;Starting Page&rdquo;.</p></li>
-
-<li><p><strong>Goal Completion Location</strong> for an event goal set for the event in question shows <code>(entrance)</code> if the event was the first hit of the session.</p></li>
+<li>
+<p><strong>Entrances</strong> and <strong>Sessions</strong> not matching up with the <strong>Page</strong> dimension. See <a href="https://support.google.com/analytics/answer/2956047">here</a> for some details, too.</p>
+</li>
+<li>
+<p><strong>Behavior Flow</strong> report attributes the event page as the &ldquo;Landing Page&rdquo; and the page sent with the pageview as the &ldquo;Starting Page&rdquo;.</p>
+</li>
+<li>
+<p><strong>Goal Completion Location</strong> for an event goal set for the event in question shows <code>(entrance)</code> if the event was the first hit of the session.</p>
+</li>
 </ol>
-
 
 
 
@@ -368,55 +364,42 @@
 </div>
 
 
-
-<p>I&rsquo;ll explore these later on in the article.</p>
-
+<p>I'll explore these later on in the article.</p>
 <h2 id="test-setup">Test setup</h2>
-
-<p>Here&rsquo;s how I tested this. I created <strong>four</strong> test cases. Each pair of event-pageview hits was contained in its own session (using the <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/field-reference#sessionControl"><code>sessionControl</code></a> parameter).</p>
-
-<p>All events were sent from page <code>/</code>, where as the pageview hits always had a different page parameter. This was mainly to see the impact of the event&rsquo;s <code>page</code> parameter on the Goal Completion Location (there was none).</p>
-
+<p>Here's how I tested this. I created <strong>four</strong> test cases. Each pair of event-pageview hits was contained in its own session (using the <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/field-reference#sessionControl"><code>sessionControl</code></a> parameter).</p>
+<p>All events were sent from page <code>/</code>, where as the pageview hits always had a different page parameter. This was mainly to see the impact of the event's <code>page</code> parameter on the Goal Completion Location (there was none).</p>
 <p>I also created an <strong>Event goal</strong> which matched all the events sent with this test.</p>
-
 <p>Here are the test cases:</p>
-
 <ol>
-<li><p><strong><a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/field-reference#nonInteraction">Non-interactive</a> event</strong> as the 1st hit, <strong>pageview</strong> on <code>/test-event-1</code> as the 2nd hit.</p></li>
-
-<li><p><strong>Interactive event</strong> as the 1st hit, <strong>pageview</strong> on <code>/test-event-3</code> as the 2nd hit.</p></li>
-
-<li><p><strong>Pageview</strong> on <code>/test-event-5</code> as the 1st hit, <strong>non-interactive event</strong> as the 2nd hit.</p></li>
-
-<li><p><strong>Pageview</strong> on <code>/test-event-7</code> as the 1st hit, <strong>interactive event</strong> as the 2nd hit.</p></li>
+<li>
+<p><strong><a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/field-reference#nonInteraction">Non-interactive</a> event</strong> as the 1st hit, <strong>pageview</strong> on <code>/test-event-1</code> as the 2nd hit.</p>
+</li>
+<li>
+<p><strong>Interactive event</strong> as the 1st hit, <strong>pageview</strong> on <code>/test-event-3</code> as the 2nd hit.</p>
+</li>
+<li>
+<p><strong>Pageview</strong> on <code>/test-event-5</code> as the 1st hit, <strong>non-interactive event</strong> as the 2nd hit.</p>
+</li>
+<li>
+<p><strong>Pageview</strong> on <code>/test-event-7</code> as the 1st hit, <strong>interactive event</strong> as the 2nd hit.</p>
+</li>
 </ol>
-
-<p>Here&rsquo;s what a sample command looked like. This is for the <strong>first</strong> test case:</p>
-
+<p>Here's what a sample command looked like. This is for the <strong>first</strong> test case:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">ga</span>(<span style="color:#e6db74">&#39;create&#39;</span>, <span style="color:#e6db74">&#39;UA-XXXXXX&#39;</span>, {<span style="color:#a6e22e">name</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;test&#39;</span>});
 <span style="color:#a6e22e">ga</span>(<span style="color:#e6db74">&#39;test.send&#39;</span>, <span style="color:#e6db74">&#39;event&#39;</span>, <span style="color:#e6db74">&#39;eventFirstHit&#39;</span>, <span style="color:#e6db74">&#39;nonInteractive&#39;</span>, <span style="color:#e6db74">&#39;noPath&#39;</span>, {<span style="color:#a6e22e">nonInteraction</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span>, <span style="color:#a6e22e">sessionControl</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;start&#39;</span>, <span style="color:#a6e22e">campaignSource</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;test_event_1&#39;</span>, <span style="color:#a6e22e">campaignMedium</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;test_event_1&#39;</span>});
 <span style="color:#a6e22e">ga</span>(<span style="color:#e6db74">&#39;test.send&#39;</span>, <span style="color:#e6db74">&#39;pageview&#39;</span>, {<span style="color:#a6e22e">page</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;/test-event-1&#39;</span>});
 </code></pre></div>
-
 <p>The first line creates the tracker.</p>
-
 <p>The second line dispatches the event. You can ignore the <code>noPath</code> label and the <code>campaignSource/Medium</code> parameters - they were just used to control the test analysis in GA.</p>
-
 <p>This is what the <strong>fourth</strong> test case code looked like:</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">ga</span>(<span style="color:#e6db74">&#39;create&#39;</span>, <span style="color:#e6db74">&#39;UA-XXXXXX&#39;</span>, {<span style="color:#a6e22e">name</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;test&#39;</span>});
 <span style="color:#a6e22e">ga</span>(<span style="color:#e6db74">&#39;test.send&#39;</span>, <span style="color:#e6db74">&#39;pageview&#39;</span>, {<span style="color:#a6e22e">sessionControl</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;start&#39;</span>, <span style="color:#a6e22e">page</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;/test-event-7&#39;</span>, <span style="color:#a6e22e">campaignSource</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;test_event_7&#39;</span>, <span style="color:#a6e22e">campaignMedium</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;test_event_7&#39;</span>});
 <span style="color:#a6e22e">ga</span>(<span style="color:#e6db74">&#39;test.send&#39;</span>, <span style="color:#e6db74">&#39;event&#39;</span>, <span style="color:#e6db74">&#39;eventNotFirstHit&#39;</span>, <span style="color:#e6db74">&#39;Interactive&#39;</span>, <span style="color:#e6db74">&#39;noPath&#39;</span>);
 </code></pre></div>
-
 <h2 id="results">Results</h2>
-
 <p>Here are the results of the test.</p>
-
-<p>The first thing to note is that <strong>not one of the test cases produced a session with Landing Page <code>(not set)</code></strong>. That&rsquo;s a red herring I&rsquo;ll discuss this briefly in the <a href="#landing-page-not-set">next chapter</a>.</p>
-
+<p>The first thing to note is that <strong>not one of the test cases produced a session with Landing Page <code>(not set)</code></strong>. That's a red herring I'll discuss this briefly in the <a href="#landing-page-not-set">next chapter</a>.</p>
 <h3 id="test-case-1">Test case 1</h3>
-
 <table>
 <thead>
 <tr>
@@ -424,40 +407,33 @@
 <th>Description</th>
 </tr>
 </thead>
-
 <tbody>
 <tr>
 <td>1st hit</td>
 <td>Non-interactive event on <code>/</code></td>
 </tr>
-
 <tr>
 <td>2nd hit</td>
 <td>Pageview on <code>/test-event-1</code></td>
 </tr>
-
 <tr>
 <td>Landing Page</td>
 <td><code>/test-event-1</code></td>
 </tr>
-
 <tr>
 <td>Goal Completion Location</td>
 <td><code>(entrance)</code></td>
 </tr>
-
 <tr>
 <td>Sessions metric</td>
 <td><code>/test-event-1</code>: 0, <code>/</code>: 1</td>
 </tr>
-
 <tr>
 <td>Entrances metric</td>
 <td><code>/test-event-1</code>: 1, <code>/</code>: 0</td>
 </tr>
 </tbody>
 </table>
-
 
 
 
@@ -473,9 +449,7 @@
 </div>
 
 
-
 <h3 id="test-case-2">Test case 2</h3>
-
 <table>
 <thead>
 <tr>
@@ -483,40 +457,33 @@
 <th>Description</th>
 </tr>
 </thead>
-
 <tbody>
 <tr>
 <td>1st hit</td>
 <td>Interactive event on <code>/</code></td>
 </tr>
-
 <tr>
 <td>2nd hit</td>
 <td>Pageview on <code>/test-event-3</code></td>
 </tr>
-
 <tr>
 <td>Landing Page</td>
 <td><code>/test-event-3</code></td>
 </tr>
-
 <tr>
 <td>Goal Completion Location</td>
 <td><code>(entrance)</code></td>
 </tr>
-
 <tr>
 <td>Sessions metric</td>
 <td><code>/test-event-3</code>: 0, <code>/</code>: 1</td>
 </tr>
-
 <tr>
 <td>Entrances metric</td>
 <td><code>/test-event-3</code>: 1, <code>/</code>: 0</td>
 </tr>
 </tbody>
 </table>
-
 
 
 
@@ -532,9 +499,7 @@
 </div>
 
 
-
 <h3 id="test-case-3">Test case 3</h3>
-
 <table>
 <thead>
 <tr>
@@ -542,40 +507,33 @@
 <th>Description</th>
 </tr>
 </thead>
-
 <tbody>
 <tr>
 <td>1st hit</td>
 <td>Pageview on <code>/test-event-5</code></td>
 </tr>
-
 <tr>
 <td>2nd hit</td>
 <td>Non-interactive event on <code>/</code></td>
 </tr>
-
 <tr>
 <td>Landing Page</td>
 <td><code>/test-event-5</code></td>
 </tr>
-
 <tr>
 <td>Goal Completion Location</td>
 <td><code>/test-event-5</code></td>
 </tr>
-
 <tr>
 <td>Sessions metric</td>
 <td><code>/test-event-5</code>: 1</td>
 </tr>
-
 <tr>
 <td>Entrances metric</td>
 <td><code>/test-event-5</code>: 1</td>
 </tr>
 </tbody>
 </table>
-
 
 
 
@@ -591,9 +549,7 @@
 </div>
 
 
-
 <h3 id="test-case-4">Test case 4</h3>
-
 <table>
 <thead>
 <tr>
@@ -601,40 +557,33 @@
 <th>Description</th>
 </tr>
 </thead>
-
 <tbody>
 <tr>
 <td>1st hit</td>
 <td>Pageview on <code>/test-event-7</code></td>
 </tr>
-
 <tr>
 <td>2nd hit</td>
 <td>Interactive event on <code>/</code></td>
 </tr>
-
 <tr>
 <td>Landing Page</td>
 <td><code>/test-event-7</code></td>
 </tr>
-
 <tr>
 <td>Goal Completion Location</td>
 <td><code>/test-event-7</code></td>
 </tr>
-
 <tr>
 <td>Sessions metric</td>
 <td><code>/test-event-7</code>: 1</td>
 </tr>
-
 <tr>
 <td>Entrances metric</td>
 <td><code>/test-event-7</code>: 1</td>
 </tr>
 </tbody>
 </table>
-
 
 
 
@@ -650,25 +599,22 @@
 </div>
 
 
-
 <h3 id="results-overview">Results overview</h3>
-
-<p>As you can see, even if the event was sent as the <strong>first hit of a session</strong>, it didn&rsquo;t cause the cosmos to implode. Google Analytics is able to build the session nevertheless, treating the event as the <strong>first hit</strong> of the session, and adding subsequent hits (other events, pageview) to the session normally.</p>
-
+<p>As you can see, even if the event was sent as the <strong>first hit of a session</strong>, it didn't cause the cosmos to implode. Google Analytics is able to build the session nevertheless, treating the event as the <strong>first hit</strong> of the session, and adding subsequent hits (other events, pageview) to the session normally.</p>
 <p>The main impacts of sending an event as the first hit of a session are:</p>
-
 <ol>
-<li><p>The <strong>Landing Page</strong> is associated with the <strong>first pageview</strong> of the session. The page sent with the event hit cannot be the Landing Page.</p></li>
-
-<li><p>When querying against the <strong>Page</strong> dimension, the <strong>Entrance</strong> is always incremented for the page sent with the <strong>pageview</strong>, but the <strong>Sessions</strong> metric is incremented for the first hit - non-interactive or interactive.</p></li>
-
-<li><p><strong>Goal Completion Location</strong> will always be the URI of the most recent <strong>page view</strong> sent before the event goal was completed. If the event is the first hit of the session, there is no preceding pageview, so the goal completion happens at <code>(entrance)</code>.</p></li>
+<li>
+<p>The <strong>Landing Page</strong> is associated with the <strong>first pageview</strong> of the session. The page sent with the event hit cannot be the Landing Page.</p>
+</li>
+<li>
+<p>When querying against the <strong>Page</strong> dimension, the <strong>Entrance</strong> is always incremented for the page sent with the <strong>pageview</strong>, but the <strong>Sessions</strong> metric is incremented for the first hit - non-interactive or interactive.</p>
+</li>
+<li>
+<p><strong>Goal Completion Location</strong> will always be the URI of the most recent <strong>page view</strong> sent before the event goal was completed. If the event is the first hit of the session, there is no preceding pageview, so the goal completion happens at <code>(entrance)</code>.</p>
+</li>
 </ol>
-
 <h2 id="landing-page-not-set">Landing page (not set)</h2>
-
 <p>One red herring surrounding events and pageviews is that sending an event as the first hit of a session results in the <strong>Landing Page</strong> dimension showing <code>(not set)</code>. This is something that Google Tag Assistant <a href="https://support.google.com/analytics/answer/6277326#EVENTS_BEFORE_PAGEVIEWS">warns about</a>.</p>
-
 
 
 
@@ -684,23 +630,14 @@
 </div>
 
 
-
-<p>Landing Page will be <code>(not set)</code> <strong>only if the session didn&rsquo;t have ANY page views</strong>. Since the Landing Page is always the URI of the first pageview sent in the session, a session with no pageviews will have no Landing Page.</p>
-
+<p>Landing Page will be <code>(not set)</code> <strong>only if the session didn't have ANY page views</strong>. Since the Landing Page is always the URI of the first pageview sent in the session, a session with no pageviews will have no Landing Page.</p>
 <p>Sending an event as the first hit of a session <strong>does not automatically imply that the session will have no pageviews</strong>. Claiming otherwise is a <em>non sequitur</em>.</p>
-
-<p>Note that if you have <strong>any</strong> events firing on your page, you will always risk having sessions with <strong>only events</strong>. All it takes is for the user to take a break of 30 minutes after the pageview was dispatched, and then scroll down the page, firing a <strong>scroll event</strong> you&rsquo;ve configured.</p>
-
-<p>This will start its own session (since the previous one expired after the <a href="https://support.google.com/analytics/answer/2795871?hl=en">30 minute timeout</a> was reached). If this scroll event isn&rsquo;t followed by a pageview within the session timeout period, the event will be contained in its own session with landing page <code>(not set)</code>.</p>
-
+<p>Note that if you have <strong>any</strong> events firing on your page, you will always risk having sessions with <strong>only events</strong>. All it takes is for the user to take a break of 30 minutes after the pageview was dispatched, and then scroll down the page, firing a <strong>scroll event</strong> you've configured.</p>
+<p>This will start its own session (since the previous one expired after the <a href="https://support.google.com/analytics/answer/2795871?hl=en">30 minute timeout</a> was reached). If this scroll event isn't followed by a pageview within the session timeout period, the event will be contained in its own session with landing page <code>(not set)</code>.</p>
 <p>But, if the event is followed by a pageview before the session timeout expires, the landing page will be the path of the pageview. Remember that.</p>
-
 <h2 id="session-with-only-non-interactive-events">Session with only non-interactive events</h2>
-
 <p>Similarly, a session with <strong>only non-interactive events</strong> will have a Landing Page of <code>(not set)</code>.</p>
-
-<p>However, unlike sessions with just interactive events (or a mix of interactive and non-interactive), sessions with just non-interactive events will <strong>not</strong> increment the <strong>Sessions</strong> metric, as that requires an interactive hit. They <strong>do</strong> increment the <strong>Users</strong> metric, which is why you&rsquo;ll sometimes see more Users than Sessions.</p>
-
+<p>However, unlike sessions with just interactive events (or a mix of interactive and non-interactive), sessions with just non-interactive events will <strong>not</strong> increment the <strong>Sessions</strong> metric, as that requires an interactive hit. They <strong>do</strong> increment the <strong>Users</strong> metric, which is why you'll sometimes see more Users than Sessions.</p>
 
 
 
@@ -716,25 +653,15 @@
 </div>
 
 
-
 <p>But still, this is unrelated to having events fire before the pageview when a session starts.</p>
-
 <h2 id="summary">Summary</h2>
-
-<p>As my tests above show, it&rsquo;s <strong>OK to have an event precede the pageview hit</strong> when a session starts. You don&rsquo;t have to rush to <a href="https://www.simoahava.com/analytics/understanding-tag-sequencing-in-google-tag-manager/">tag sequencing</a> in <a href="https://tagmanager.google.com/">Google Tag Manager</a> to fix this &ldquo;problem&rdquo; - the implications are not severe at all.</p>
-
-<p>So why is this still being warned about? Well, apart from misunderstanding how sessions work, there is a seed of truth in being cautious if you have events that can fire before the pageview on any given page. It&rsquo;s potentially hazardous if <strong>you set campaign parameters with the pageview hit that are missing from the event hit</strong>.</p>
-
-<p>Since the <strong>pageview</strong> is the nexus of Google Analytics&rsquo; session, it follows that most care is put into making sure the pageview hit has all the necessary session, campaign, and cookie modifications. This lopsided focus can be problematic in Google Tag Manager, where each hit has its own unique <a href="https://www.simoahava.com/analytics/100-google-tag-manager-learnings/#39-gtm-creates-a-new-tracker-with-every-tag-instance">tracker object</a>, and thus the hits don&rsquo;t <strong>inherit</strong> anything from a common tracker, as with <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/">analytics.js</a> and <a href="https://developers.google.com/analytics/devguides/collection/gtagjs/">gtag.js</a>.</p>
-
+<p>As my tests above show, it's <strong>OK to have an event precede the pageview hit</strong> when a session starts. You don't have to rush to <a href="https://www.simoahava.com/analytics/understanding-tag-sequencing-in-google-tag-manager/">tag sequencing</a> in <a href="https://tagmanager.google.com/">Google Tag Manager</a> to fix this &ldquo;problem&rdquo; - the implications are not severe at all.</p>
+<p>So why is this still being warned about? Well, apart from misunderstanding how sessions work, there is a seed of truth in being cautious if you have events that can fire before the pageview on any given page. It's potentially hazardous if <strong>you set campaign parameters with the pageview hit that are missing from the event hit</strong>.</p>
+<p>Since the <strong>pageview</strong> is the nexus of Google Analytics&rsquo; session, it follows that most care is put into making sure the pageview hit has all the necessary session, campaign, and cookie modifications. This lopsided focus can be problematic in Google Tag Manager, where each hit has its own unique <a href="https://www.simoahava.com/analytics/100-google-tag-manager-learnings/#39-gtm-creates-a-new-tracker-with-every-tag-instance">tracker object</a>, and thus the hits don't <strong>inherit</strong> anything from a common tracker, as with <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/">analytics.js</a> and <a href="https://developers.google.com/analytics/devguides/collection/gtagjs/">gtag.js</a>.</p>
 <p>In other words, you might modify your pageview hit to include campaign-defining fields such as <code>campaignSource</code> and <code>campaignMedium</code>, or you might modify its Document Location field to have <strong>UTM parameters</strong> manually appended to the URL string. Or, you might even rewrite the <code>clientId</code> field in the pageview hit alone.</p>
-
 <p>The key thing here is <strong>consistency</strong>. Any modifications to campaign- or session-parameters in individual hits or tags should be applied to all hits or tags that can fire on the same page.</p>
-
-<p>Since an event hit is <strong>capable of creating and populating a session on its own</strong>, it&rsquo;s vital to have that event hit mirror the campaign settings of the pageview hit, and vice versa.</p>
-
-<p>If you do that, you&rsquo;ll avoid having rogue sessions starting simply because an event hit had totally different campaign settings from the pageview hit. In Google Tag Manager, the best way to mitigate this is to use the <a href="https://www.simoahava.com/analytics/google-analytics-settings-variable-in-gtm/">Google Analytics Settings variable</a>.</p>
-
+<p>Since an event hit is <strong>capable of creating and populating a session on its own</strong>, it's vital to have that event hit mirror the campaign settings of the pageview hit, and vice versa.</p>
+<p>If you do that, you'll avoid having rogue sessions starting simply because an event hit had totally different campaign settings from the pageview hit. In Google Tag Manager, the best way to mitigate this is to use the <a href="https://www.simoahava.com/analytics/google-analytics-settings-variable-in-gtm/">Google Analytics Settings variable</a>.</p>
 <p>Do you think I missed something crucial in this test? Please let me know in the comments.</p>
 
               
@@ -839,7 +766,7 @@
         </article>
         <footer id="footer" class="main-content-wrap">
   <span class="copyrights">
-    &copy; 2019 Simo Ahava. All Rights Reserved
+    &copy; 2020 Simo Ahava. All Rights Reserved
   </span>
 </footer>
 

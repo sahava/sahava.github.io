@@ -123,8 +123,6 @@
 
 <meta itemprop="name" content="#GTMTips: Use Enhanced Ecommerce Data Layer With Facebook Pixel">
 <meta itemprop="description" content="Use the Enhanced Ecommerce object in the dataLayer to populate the required variables of a Facebook pixel in Google Tag Manager.">
-
-
 <meta itemprop="datePublished" content="2019-02-07T13:45:00&#43;02:00" />
 <meta itemprop="dateModified" content="2019-02-07T13:45:00&#43;02:00" />
 <meta itemprop="wordCount" content="836">
@@ -132,7 +130,6 @@
 
 
 <meta itemprop="keywords" content="google tag manager,gtmtips,facebook,enhanced ecommerce," />
-
 <script type="application/ld+json">
 {
     "@context": "http://schema.org",
@@ -913,20 +910,13 @@ on
     </header>
 
     <section class="post-content">
-      
-
-<p>A recurring question in the <a href="https://tagmanager.google.com/">Google Tag Manager</a> communities (e.g. <a href="https://productforums.google.com/forum/#!categories/tag-manager">product forums</a>) is <strong>how to use an Enhanced Ecommerce <code>dataLayer</code> object with the <a href="https://www.facebook.com/business/help/651294705016616">Facebook pixel code</a></strong>? It&rsquo;s a common question since running a Facebook conversion pixel on a site that also collects data from the store into Google Analytics&rsquo; <a href="https://www.simoahava.com/amp/analytics/enhanced-ecommerce-guide-for-google-tag-manager/">Enhanced Ecommerce</a> reports is probably a very typical scenario.</p>
-
+      <p>A recurring question in the <a href="https://tagmanager.google.com/">Google Tag Manager</a> communities (e.g. <a href="https://productforums.google.com/forum/#!categories/tag-manager">product forums</a>) is <strong>how to use an Enhanced Ecommerce <code>dataLayer</code> object with the <a href="https://www.facebook.com/business/help/651294705016616">Facebook pixel code</a></strong>? It's a common question since running a Facebook conversion pixel on a site that also collects data from the store into Google Analytics&rsquo; <a href="https://www.simoahava.com/amp/analytics/enhanced-ecommerce-guide-for-google-tag-manager/">Enhanced Ecommerce</a> reports is probably a very typical scenario.</p>
 <blockquote>
-<p>Side note: Since Google+ is about to go the way of the dodo, I&rsquo;ve created an <a href="https://gtm-archive.firebaseapp.com/">archive of the entire community</a> which you can browse and make text searches against.</p>
+<p>Side note: Since Google+ is about to go the way of the dodo, I've created an <a href="https://gtm-archive.firebaseapp.com/">archive of the entire community</a> which you can browse and make text searches against.</p>
 </blockquote>
-
-<p>I&rsquo;ve shared a tip on this <a href="https://www.simoahava.com/amp/gtm-tips/create-string-multiple-object-properties/">before</a>, but I think I need to be even more specific and give concrete examples how to populate the various properties of the Facebook pixel object.</p>
-
-<p>For a guide on how to implement the Facebook pixel, check out Yehoshua&rsquo;s amazing <a href="http://www.analytics-ninja.com/blog/2017/05/guide-facebook-pixel-google-tag-manager.html">Facebook Pixel with Google Tag Manager guide</a>.</p>
-
+<p>I've shared a tip on this <a href="https://www.simoahava.com/amp/gtm-tips/create-string-multiple-object-properties/">before</a>, but I think I need to be even more specific and give concrete examples how to populate the various properties of the Facebook pixel object.</p>
+<p>For a guide on how to implement the Facebook pixel, check out Yehoshua's amazing <a href="http://www.analytics-ninja.com/blog/2017/05/guide-facebook-pixel-google-tag-manager.html">Facebook Pixel with Google Tag Manager guide</a>.</p>
 <h2 id="tip-95-use-the-facebook-pixel-with-an-enhanced-ecommerce-data-layer">Tip 95: Use the Facebook Pixel with an Enhanced Ecommerce Data Layer</h2>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2019/02/enhanced-ecommerce-facebook-pixel.jpg" title="Enhanced Ecommerce with the Facebook Pixel">
@@ -936,61 +926,57 @@ on
     </a>
   
 
-
 <p>The solution here is to create an <strong>API</strong> that you can pass your Enhanced Ecommerce products array to, and it will return the array all reduced and converted to the various formats required by the Facebook Pixel.</p>
-
 <p>First things first, you need to <strong>create the Custom JavaScript variable</strong>.</p>
-
 <ol>
-<li><p>Create a new <strong>Custom JavaScript variable</strong> in the GTM UI.</p></li>
-
-<li><p>Name it <code>{{EECFB API}}</code> (or something less of an abomination, if you wish).</p></li>
-
-<li><p>Add the following code within:</p></li>
+<li>
+<p>Create a new <strong>Custom JavaScript variable</strong> in the GTM UI.</p>
+</li>
+<li>
+<p>Name it <code>{{EECFB API}}</code> (or something less of an abomination, if you wish).</p>
+</li>
+<li>
+<p>Add the following code within:</p>
+</li>
 </ol>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span><span class="p">(</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">return</span> <span class="kd">function</span><span class="p">(</span><span class="nx">products</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">Array</span><span class="p">.</span><span class="nx">isArray</span><span class="p">(</span><span class="nx">products</span><span class="p">))</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">Array</span><span class="p">.</span><span class="nx">isArray</span><span class="p">(</span><span class="nx">products</span><span class="p">)</span><span class="p">)</span> <span class="p">{</span>
       <span class="k">return</span><span class="p">;</span>
     <span class="p">}</span>
     
     <span class="kd">var</span> <span class="nx">idList</span> <span class="o">=</span> <span class="nx">products</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">prod</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">return</span> <span class="o">!!</span><span class="nx">prod</span><span class="p">.</span><span class="nx">id</span> <span class="o">&amp;&amp;</span> <span class="nx">prod</span><span class="p">.</span><span class="nx">id</span><span class="p">.</span><span class="nx">toString</span><span class="p">();</span>
-    <span class="p">});</span>
+      <span class="k">return</span> <span class="o">!</span><span class="o">!</span><span class="nx">prod</span><span class="p">.</span><span class="nx">id</span> <span class="o">&amp;&amp;</span> <span class="nx">prod</span><span class="p">.</span><span class="nx">id</span><span class="p">.</span><span class="nx">toString</span><span class="p">(</span><span class="p">)</span><span class="p">;</span>
+    <span class="p">}</span><span class="p">)</span><span class="p">;</span>
     
     <span class="kd">var</span> <span class="nx">totalValue</span> <span class="o">=</span> <span class="nx">products</span><span class="p">.</span><span class="nx">reduce</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">acc</span><span class="p">,</span> <span class="nx">cur</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">return</span> <span class="o">!!</span><span class="nx">cur</span><span class="p">.</span><span class="nx">price</span> <span class="o">&amp;&amp;</span> <span class="o">!!</span><span class="nx">cur</span><span class="p">.</span><span class="nx">quantity</span> <span class="o">?</span> <span class="nx">acc</span> <span class="o">+</span> <span class="p">(</span><span class="nx">cur</span><span class="p">.</span><span class="nx">price</span> <span class="o">*</span> <span class="nx">cur</span><span class="p">.</span><span class="nx">quantity</span><span class="p">)</span> <span class="o">:</span> <span class="nx">acc</span><span class="p">;</span>
-    <span class="p">},</span> <span class="mi">0</span><span class="p">);</span>
+      <span class="k">return</span> <span class="o">!</span><span class="o">!</span><span class="nx">cur</span><span class="p">.</span><span class="nx">price</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="o">!</span><span class="nx">cur</span><span class="p">.</span><span class="nx">quantity</span> <span class="o">?</span> <span class="nx">acc</span> <span class="o">+</span> <span class="p">(</span><span class="nx">cur</span><span class="p">.</span><span class="nx">price</span> <span class="o">*</span> <span class="nx">cur</span><span class="p">.</span><span class="nx">quantity</span><span class="p">)</span> <span class="o">:</span> <span class="nx">acc</span><span class="p">;</span>
+    <span class="p">}</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="p">;</span>
     
     <span class="kd">var</span> <span class="nx">totalQuantity</span> <span class="o">=</span> <span class="nx">products</span><span class="p">.</span><span class="nx">reduce</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">acc</span><span class="p">,</span> <span class="nx">cur</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">return</span> <span class="o">!!</span><span class="nx">cur</span><span class="p">.</span><span class="nx">quantity</span> <span class="o">?</span> <span class="nx">acc</span> <span class="o">+</span> <span class="nb">parseInt</span><span class="p">(</span><span class="nx">cur</span><span class="p">.</span><span class="nx">quantity</span><span class="p">)</span> <span class="o">:</span> <span class="nx">acc</span><span class="p">;</span>
-    <span class="p">},</span> <span class="mi">0</span><span class="p">);</span>
+      <span class="k">return</span> <span class="o">!</span><span class="o">!</span><span class="nx">cur</span><span class="p">.</span><span class="nx">quantity</span> <span class="o">?</span> <span class="nx">acc</span> <span class="o">+</span> <span class="nb">parseInt</span><span class="p">(</span><span class="nx">cur</span><span class="p">.</span><span class="nx">quantity</span><span class="p">)</span> <span class="o">:</span> <span class="nx">acc</span><span class="p">;</span>
+    <span class="p">}</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="p">;</span>
     
     <span class="kd">var</span> <span class="nx">contentsArray</span> <span class="o">=</span> <span class="nx">products</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">prod</span><span class="p">)</span> <span class="p">{</span>
       <span class="k">return</span> <span class="p">{</span>
-        <span class="nx">id</span><span class="o">:</span> <span class="o">!!</span><span class="nx">prod</span><span class="p">.</span><span class="nx">id</span> <span class="o">?</span> <span class="nx">prod</span><span class="p">.</span><span class="nx">id</span><span class="p">.</span><span class="nx">toString</span><span class="p">()</span> <span class="o">:</span> <span class="kc">undefined</span><span class="p">,</span>
-        <span class="nx">item_price</span><span class="o">:</span> <span class="o">!!</span><span class="nx">prod</span><span class="p">.</span><span class="nx">price</span> <span class="o">?</span> <span class="nb">parseFloat</span><span class="p">(</span><span class="nx">prod</span><span class="p">.</span><span class="nx">price</span><span class="p">)</span> <span class="o">:</span> <span class="kc">undefined</span><span class="p">,</span>
-        <span class="nx">quantity</span><span class="o">:</span> <span class="o">!!</span><span class="nx">prod</span><span class="p">.</span><span class="nx">quantity</span> <span class="o">?</span> <span class="nb">parseInt</span><span class="p">(</span><span class="nx">prod</span><span class="p">.</span><span class="nx">quantity</span><span class="p">)</span> <span class="o">:</span> <span class="kc">undefined</span>
-      <span class="p">};</span>
-    <span class="p">});</span>
+        <span class="nx">id</span><span class="o">:</span> <span class="o">!</span><span class="o">!</span><span class="nx">prod</span><span class="p">.</span><span class="nx">id</span> <span class="o">?</span> <span class="nx">prod</span><span class="p">.</span><span class="nx">id</span><span class="p">.</span><span class="nx">toString</span><span class="p">(</span><span class="p">)</span> <span class="o">:</span> <span class="kc">undefined</span><span class="p">,</span>
+        <span class="nx">item_price</span><span class="o">:</span> <span class="o">!</span><span class="o">!</span><span class="nx">prod</span><span class="p">.</span><span class="nx">price</span> <span class="o">?</span> <span class="nb">parseFloat</span><span class="p">(</span><span class="nx">prod</span><span class="p">.</span><span class="nx">price</span><span class="p">)</span> <span class="o">:</span> <span class="kc">undefined</span><span class="p">,</span>
+        <span class="nx">quantity</span><span class="o">:</span> <span class="o">!</span><span class="o">!</span><span class="nx">prod</span><span class="p">.</span><span class="nx">quantity</span> <span class="o">?</span> <span class="nb">parseInt</span><span class="p">(</span><span class="nx">prod</span><span class="p">.</span><span class="nx">quantity</span><span class="p">)</span> <span class="o">:</span> <span class="kc">undefined</span>
+      <span class="p">}</span><span class="p">;</span>
+    <span class="p">}</span><span class="p">)</span><span class="p">;</span>
     
     <span class="k">return</span> <span class="p">{</span>
       <span class="nx">content_ids</span><span class="o">:</span> <span class="nx">idList</span><span class="p">,</span>
       <span class="nx">value</span><span class="o">:</span> <span class="nx">totalValue</span><span class="p">,</span>
       <span class="nx">num_items</span><span class="o">:</span> <span class="nx">totalQuantity</span><span class="p">,</span>
       <span class="nx">contents</span><span class="o">:</span> <span class="nx">contentsArray</span>
-    <span class="p">};</span>
-  <span class="p">};</span>
+    <span class="p">}</span><span class="p">;</span>
+  <span class="p">}</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div>
-
-<p>This code actually <strong>returns</strong> a function, so it&rsquo;s basically a wrapper for a <strong>closure</strong>, which you can then call in your other tags using a parameter.</p>
-
-<p>When you invoke this API in a Custom HTML tag, for example, you need to have a variable reference to the <code>products</code> array at hand to pass to this API as a parameter (I&rsquo;ll show you an example soon).</p>
-
+<p>This code actually <strong>returns</strong> a function, so it's basically a wrapper for a <strong>closure</strong>, which you can then call in your other tags using a parameter.</p>
+<p>When you invoke this API in a Custom HTML tag, for example, you need to have a variable reference to the <code>products</code> array at hand to pass to this API as a parameter (I'll show you an example soon).</p>
 <p>The API returns an object with four properties:</p>
-
 <table>
 <thead>
 <tr>
@@ -999,26 +985,22 @@ on
 <th>Sample output</th>
 </tr>
 </thead>
-
 <tbody>
 <tr>
 <td><code>content_ids</code></td>
 <td>Array of all the Product IDs.</td>
 <td><code>['id123', 'id234', 'id345']</code></td>
 </tr>
-
 <tr>
 <td><code>value</code></td>
 <td>The sum of all the product prices multiplied by their respective quantities.</td>
 <td><code>63.55</code></td>
 </tr>
-
 <tr>
 <td><code>num_items</code></td>
 <td>The sum of all the quantities in the array.</td>
 <td><code>5</code></td>
 </tr>
-
 <tr>
 <td><code>contents</code></td>
 <td>The products array converted to the format Facebook requires.</td>
@@ -1026,48 +1008,46 @@ on
 </tr>
 </tbody>
 </table>
-
 <h3 id="how-to-put-it-all-together">How to put it all together</h3>
-
-<p>Let&rsquo;s take the Facebook <strong>Purchase</strong> event as an example. Here&rsquo;s what you&rsquo;d need to do.</p>
-
-<p>First, let&rsquo;s say this is what your Enhanced Ecommerce <strong>purchase</strong> object looks like:</p>
-
+<p>Let's take the Facebook <strong>Purchase</strong> event as an example. Here's what you'd need to do.</p>
+<p>First, let's say this is what your Enhanced Ecommerce <strong>purchase</strong> object looks like:</p>
 <div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">ecommerce</span><span class="o">:</span> <span class="p">{</span>
   <span class="nx">purchase</span><span class="o">:</span> <span class="p">{</span>
     <span class="nx">products</span><span class="o">:</span> <span class="p">{</span>
-	  <span class="nx">actionField</span><span class="o">:</span> <span class="p">{...},</span>
-	  <span class="nx">products</span><span class="o">:</span> <span class="p">[{</span>
+	  <span class="nx">actionField</span><span class="o">:</span> <span class="p">{</span><span class="p">...</span><span class="p">}</span><span class="p">,</span>
+	  <span class="nx">products</span><span class="o">:</span> <span class="p">[</span><span class="p">{</span>
         <span class="nx">id</span><span class="o">:</span> <span class="s1">&#39;shirt1&#39;</span><span class="p">,</span> 
         <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;T-Shirt&#39;</span><span class="p">,</span> 
         <span class="nx">price</span><span class="o">:</span> <span class="s1">&#39;15.99&#39;</span><span class="p">,</span> 
         <span class="nx">quantity</span><span class="o">:</span> <span class="mi">2</span>
-      <span class="p">},{</span>
+      <span class="p">}</span><span class="p">,</span><span class="p">{</span>
         <span class="nx">id</span><span class="o">:</span> <span class="s1">&#39;pants2&#39;</span><span class="p">,</span> 
         <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;Pants&#39;</span><span class="p">,</span> 
         <span class="nx">price</span><span class="o">:</span> <span class="s1">&#39;9.99&#39;</span><span class="p">,</span> 
         <span class="nx">quantity</span><span class="o">:</span> <span class="mi">3</span>
-      <span class="p">}]</span>
+      <span class="p">}</span><span class="p">]</span>
     <span class="p">}</span>
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-
 <ol>
-<li><p>First, create a Data Layer variable for variable name <code>ecommerce.purchase.products</code> and name it <code>{{ecommerce.purchase.products}}</code>. This is the reference to the products in your Enhanced Ecommerce purchase object.</p></li>
-
-<li><p>Create a Custom HTML tag that fires after your Facebook pixel has been initialized.</p></li>
-
-<li><p>This is what the contents might look like:</p></li>
+<li>
+<p>First, create a Data Layer variable for variable name <code>ecommerce.purchase.products</code> and name it <code>{{ecommerce.purchase.products}}</code>. This is the reference to the products in your Enhanced Ecommerce purchase object.</p>
+</li>
+<li>
+<p>Create a Custom HTML tag that fires after your Facebook pixel has been initialized.</p>
+</li>
+<li>
+<p>This is what the contents might look like:</p>
+</li>
 </ol>
-
-<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
-  <span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">script</span><span class="p"></span><span class="p">&gt;</span>
+  <span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="p">)</span> <span class="p">{</span>
     <span class="c1">// Get reference to the Enhanced Ecommerce products
-</span><span class="c1"></span>	<span class="kd">var</span> <span class="nx">prods</span> <span class="o">=</span> <span class="p">{{</span><span class="nx">ecommerce</span><span class="p">.</span><span class="nx">purchase</span><span class="p">.</span><span class="nx">products</span><span class="p">}};</span>
+</span><span class="c1"></span>	<span class="kd">var</span> <span class="nx">prods</span> <span class="o">=</span> <span class="p">{</span><span class="p">{</span><span class="nx">ecommerce</span><span class="p">.</span><span class="nx">purchase</span><span class="p">.</span><span class="nx">products</span><span class="p">}</span><span class="p">}</span><span class="p">;</span>
 	
 	<span class="c1">// Poll the custom Facebook API with this array
-</span><span class="c1"></span>	<span class="kd">var</span> <span class="nx">fbObj</span> <span class="o">=</span> <span class="p">{{</span><span class="nx">EECFB</span> <span class="nx">API</span><span class="p">}}(</span><span class="nx">prods</span><span class="p">);</span>
+</span><span class="c1"></span>	<span class="kd">var</span> <span class="nx">fbObj</span> <span class="o">=</span> <span class="p">{</span><span class="p">{</span><span class="nx">EECFB</span> <span class="nx">API</span><span class="p">}</span><span class="p">}</span><span class="p">(</span><span class="nx">prods</span><span class="p">)</span><span class="p">;</span>
 	
 	<span class="c1">// Create the FB pixel call
 </span><span class="c1"></span>	<span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nb">window</span><span class="p">.</span><span class="nx">fbq</span> <span class="o">===</span> <span class="s1">&#39;function&#39;</span><span class="p">)</span> <span class="p">{</span>
@@ -1076,41 +1056,32 @@ on
         <span class="nx">content_ids</span><span class="o">:</span> <span class="nx">fbObj</span><span class="p">.</span><span class="nx">content_ids</span><span class="p">,</span>
         <span class="nx">contents</span><span class="o">:</span> <span class="nx">fbObj</span><span class="p">.</span><span class="nx">contents</span><span class="p">,</span>
         <span class="nx">num_items</span><span class="o">:</span> <span class="nx">fbObj</span><span class="p">.</span><span class="nx">num_items</span>
-	  <span class="p">});</span>
+	  <span class="p">}</span><span class="p">)</span><span class="p">;</span>
 	<span class="p">}</span>
-  <span class="p">})();</span>
-<span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span></code></pre></div>
-
-<p>It&rsquo;s an imaginary situation - you wouldn&rsquo;t typically send the Facebook Purchase event with that payload.</p>
-
+  <span class="p">}</span><span class="p">)</span><span class="p">(</span><span class="p">)</span><span class="p">;</span>
+<span class="p">&lt;</span><span class="p">/</span><span class="nt">script</span><span class="p">&gt;</span></code></pre></div>
+<p>It's an imaginary situation - you wouldn't typically send the Facebook Purchase event with that payload.</p>
 <p>Anyway, what happens here is that first you fetch a reference to the <code>products</code> array in the Enhanced Ecommerce purchase object. Then, you call the <code>{{EECFB API}}</code> passing that array as the parameter. The API returns an object, which you store in the <code>fbObj</code> local variable.</p>
-
-<p>Then, you simply access the properties of this object (listed in the table earlier in this article) in the <code>fbq()</code> call. That&rsquo;s how you build the required pixel call with all the necessary parameters.</p>
-
+<p>Then, you simply access the properties of this object (listed in the table earlier in this article) in the <code>fbq()</code> call. That's how you build the required pixel call with all the necessary parameters.</p>
 <p>So, the <code>window.fbq()</code> method is <strong>actually</strong> called with these values:</p>
-
 <div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nb">window</span><span class="p">.</span><span class="nx">fbq</span><span class="p">(</span><span class="s1">&#39;track&#39;</span><span class="p">,</span> <span class="s1">&#39;Purchase&#39;</span><span class="p">,</span> <span class="p">{</span>
   <span class="nx">value</span><span class="o">:</span> <span class="mf">61.95</span><span class="p">,</span>
-  <span class="nx">content_ids</span><span class="o">:</span> <span class="p">[</span><span class="s1">&#39;shirt1&#39;</span><span class="p">,</span> <span class="s1">&#39;pants2&#39;</span><span class="p">],</span>
-  <span class="nx">contents</span><span class="o">:</span> <span class="p">[{</span>
+  <span class="nx">content_ids</span><span class="o">:</span> <span class="p">[</span><span class="s1">&#39;shirt1&#39;</span><span class="p">,</span> <span class="s1">&#39;pants2&#39;</span><span class="p">]</span><span class="p">,</span>
+  <span class="nx">contents</span><span class="o">:</span> <span class="p">[</span><span class="p">{</span>
     <span class="nx">id</span><span class="o">:</span> <span class="s1">&#39;shirt1&#39;</span><span class="p">,</span> 
     <span class="nx">item_price</span><span class="o">:</span> <span class="mf">15.99</span><span class="p">,</span> 
     <span class="nx">quantity</span><span class="o">:</span> <span class="mi">2</span>
-  <span class="p">},{</span>
+  <span class="p">}</span><span class="p">,</span><span class="p">{</span>
     <span class="nx">id</span><span class="o">:</span> <span class="s1">&#39;pants2&#39;</span><span class="p">,</span> 
     <span class="nx">item_price</span><span class="o">:</span> <span class="mf">9.99</span><span class="p">,</span> 
     <span class="nx">quantity</span><span class="o">:</span> <span class="mi">3</span>
-  <span class="p">}],</span>
+  <span class="p">}</span><span class="p">]</span><span class="p">,</span>
   <span class="nx">num_items</span><span class="o">:</span> <span class="mi">5</span>
-<span class="p">});</span>
+<span class="p">}</span><span class="p">)</span><span class="p">;</span>
 </code></pre></div>
-
 <h2 id="summary">Summary</h2>
-
-<p>What you&rsquo;re creating here is a <strong>helper</strong> function that automatically chews up your Enhanced Ecommerce products and spits out the values in a format required by the Facebook pixel.</p>
-
+<p>What you're creating here is a <strong>helper</strong> function that automatically chews up your Enhanced Ecommerce products and spits out the values in a format required by the Facebook pixel.</p>
 <p>You can freely extend the variable with other properties, and adapting it to other source object formats should be quite simple to do, too.</p>
-
 <p>In any case, let me know in the comments if you think the API needs some other properties, or if you need help in extending it!</p>
 
     </section>

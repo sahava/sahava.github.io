@@ -53,7 +53,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.59.1 with theme Tranquilpeak 0.4.3-BETA">
+    <meta name="generator" content="Hugo 0.61.0 with theme Tranquilpeak 0.4.3-BETA">
     <title>#GTMTips: Tag Sequencing With Custom HTML Tags | Simo Ahava's blog</title>
     
     <script>
@@ -319,16 +319,10 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              
-
-<p><a href="https://www.simoahava.com/analytics/understanding-tag-sequencing-in-google-tag-manager/">Tag sequencing</a> was introdced to <a href="https://tagmanager.google.com/">Google Tag Manager</a> in late 2015. Its main purpose was to facilitate the <em>sequential</em> firing of tags that have dependencies with each other. Due to the <a href="https://www.pluralsight.com/guides/introduction-to-asynchronous-javascript">asynchronous</a> nature of third-party libraries like Google Tag Manager, it&rsquo;s difficult to establish an order of completion with tags that compete for their chance to fire.</p>
-
+              <p><a href="https://www.simoahava.com/analytics/understanding-tag-sequencing-in-google-tag-manager/">Tag sequencing</a> was introdced to <a href="https://tagmanager.google.com/">Google Tag Manager</a> in late 2015. Its main purpose was to facilitate the <em>sequential</em> firing of tags that have dependencies with each other. Due to the <a href="https://www.pluralsight.com/guides/introduction-to-asynchronous-javascript">asynchronous</a> nature of third-party libraries like Google Tag Manager, it's difficult to establish an order of completion with tags that compete for their chance to fire.</p>
 <p>Tag sequencing changed this, as it allows you to establish <strong>setup</strong> and <strong>cleanup</strong> tags - the former firing <em>before</em> the main tag, and the latter <em>after</em>.</p>
-
 <p>Setting up tag sequencing is relatively easy, at least once you understand how it works. However, Custom HTML tags have some exceptional behavior, as you need to utilize certain specific commands to signal the sequence once the Custom HTML tag has completed its execution. This <a href="https://www.simoahava.com/tags/gtmtips/">#GTMTips</a> article aims to guide you with setting up Custom HTML tags in a tag sequence.</p>
-
 <h2 id="tip-83-setting-up-custom-html-tags-in-a-tag-sequence">Tip 83: Setting up Custom HTML tags in a tag sequence</h2>
-
 
 
 
@@ -344,11 +338,8 @@
 </div>
 
 
-
 <h3 id="lesson-1-sequence-is-managed-with-the-success-and-failure-callbacks">Lesson 1: Sequence is managed with the success and failure callbacks</h3>
-
 <p>The two callbacks, <code>onHtmlSuccess()</code> and <code>onHtmlFailure()</code> are what tag sequencing with Custom HTML tags really pivots around. The first is used to denote a place in the code when the code has finished running <em>successfully</em>, and execution can move to the next tag in the sequence. The second is used to signal when a <em>failure</em> happens, and here execution is also passed to the next tag in the sequence <strong>unless</strong> it has the <strong>failure toggle</strong> on:</p>
-
 
 
 
@@ -364,13 +355,10 @@
 </div>
 
 
-
-<p>Just to recap (but be sure to read <a href="https://www.simoahava.com/analytics/understanding-tag-sequencing-in-google-tag-manager/">my guide</a> for a more thorough treatment), here&rsquo;s how you would set up a regular Custom HTML tag in a tag sequence, where both <em>success</em> and <em>failure</em> criteria are established.</p>
-
+<p>Just to recap (but be sure to read <a href="https://www.simoahava.com/analytics/understanding-tag-sequencing-in-google-tag-manager/">my guide</a> for a more thorough treatment), here's how you would set up a regular Custom HTML tag in a tag sequence, where both <em>success</em> and <em>failure</em> criteria are established.</p>
 <blockquote>
 <p><strong>NOTE!</strong> Remember to enable the <strong>Container ID</strong> and <strong>HTML ID</strong> <a href="https://www.simoahava.com/analytics/variable-guide-google-tag-manager/#utilities">built-in variables</a> for this.</p>
 </blockquote>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">(<span style="color:#66d9ef">function</span>() {
   <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">gtm</span> <span style="color:#f92672">=</span> window.<span style="color:#a6e22e">google_tag_manager</span>[{{<span style="color:#a6e22e">Container</span> <span style="color:#a6e22e">ID</span>}}]; <span style="color:#75715e">// Required
 </span><span style="color:#75715e"></span>	  
@@ -382,38 +370,27 @@
 </span><span style="color:#75715e"></span>  }
 })();
 </code></pre></div>
-
-<h3 id="lesson-2-the-success-and-failure-callbacks-aren-t-always-necessary">Lesson 2: The success and failure callbacks aren&rsquo;t always necessary</h3>
-
-<p>Here&rsquo;s something I think most guides have missed: you don&rsquo;t <em>need</em> <code>onHtmlSuccess()</code> and <code>onHtmlFailure()</code> in your Custom HTML tag! The web browser executes all the code it finds in a Custom HTML tag from top-to-bottom before moving to the next item in the sequence.</p>
-
-<p>For example, if you&rsquo;ve setup the <a href="http://www.analytics-ninja.com/blog/2017/05/guide-facebook-pixel-google-tag-manager.html">Facebook pixel</a> with Custom HTML tags, you don&rsquo;t need <code>onHtmlSuccess()</code> in the base pixel tag.</p>
-
+<h3 id="lesson-2-the-success-and-failure-callbacks-arent-always-necessary">Lesson 2: The success and failure callbacks aren't always necessary</h3>
+<p>Here's something I think most guides have missed: you don't <em>need</em> <code>onHtmlSuccess()</code> and <code>onHtmlFailure()</code> in your Custom HTML tag! The web browser executes all the code it finds in a Custom HTML tag from top-to-bottom before moving to the next item in the sequence.</p>
+<p>For example, if you've setup the <a href="http://www.analytics-ninja.com/blog/2017/05/guide-facebook-pixel-google-tag-manager.html">Facebook pixel</a> with Custom HTML tags, you don't need <code>onHtmlSuccess()</code> in the base pixel tag.</p>
 <p><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#f92672">!</span><span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">f</span>,<span style="color:#a6e22e">b</span>,<span style="color:#a6e22e">e</span>,<span style="color:#a6e22e">v</span>,<span style="color:#a6e22e">n</span>,<span style="color:#a6e22e">t</span>,<span style="color:#a6e22e">s</span>){<span style="color:#66d9ef">if</span>(<span style="color:#a6e22e">f</span>.<span style="color:#a6e22e">fbq</span>)<span style="color:#66d9ef">return</span>;<span style="color:#a6e22e">n</span><span style="color:#f92672">=</span><span style="color:#a6e22e">f</span>.<span style="color:#a6e22e">fbq</span><span style="color:#f92672">=</span><span style="color:#66d9ef">function</span>(){<span style="color:#a6e22e">n</span>.<span style="color:#a6e22e">callMethod</span><span style="color:#f92672">?</span>
 <span style="color:#a6e22e">n</span>.<span style="color:#a6e22e">callMethod</span>.<span style="color:#a6e22e">apply</span>(<span style="color:#a6e22e">n</span>,<span style="color:#a6e22e">arguments</span>)<span style="color:#f92672">:</span><span style="color:#a6e22e">n</span>.<span style="color:#a6e22e">queue</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">arguments</span>)};<span style="color:#66d9ef">if</span>(<span style="color:#f92672">!</span><span style="color:#a6e22e">f</span>.<span style="color:#a6e22e">_fbq</span>)<span style="color:#a6e22e">f</span>.<span style="color:#a6e22e">_fbq</span><span style="color:#f92672">=</span><span style="color:#a6e22e">n</span>;
-<span style="color:#a6e22e">n</span>.<span style="color:#a6e22e">push</span><span style="color:#f92672">=</span><span style="color:#a6e22e">n</span>;<span style="color:#a6e22e">n</span>.<span style="color:#a6e22e">loaded</span><span style="color:#f92672">=!</span><span style="color:#ae81ff">0</span>;<span style="color:#a6e22e">n</span>.<span style="color:#a6e22e">version</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#39;2.0&#39;</span>;<span style="color:#a6e22e">n</span>.<span style="color:#a6e22e">queue</span><span style="color:#f92672">=</span>[];<span style="color:#a6e22e">t</span><span style="color:#f92672">=</span><span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">createElement</span>(<span style="color:#a6e22e">e</span>);<span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">async</span><span style="color:#f92672">=!</span><span style="color:#ae81ff">0</span>;
+<span style="color:#a6e22e">n</span>.<span style="color:#a6e22e">push</span><span style="color:#f92672">=</span><span style="color:#a6e22e">n</span>;<span style="color:#a6e22e">n</span>.<span style="color:#a6e22e">loaded</span><span style="color:#f92672">=</span><span style="color:#f92672">!</span><span style="color:#ae81ff">0</span>;<span style="color:#a6e22e">n</span>.<span style="color:#a6e22e">version</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#39;2.0&#39;</span>;<span style="color:#a6e22e">n</span>.<span style="color:#a6e22e">queue</span><span style="color:#f92672">=</span>[];<span style="color:#a6e22e">t</span><span style="color:#f92672">=</span><span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">createElement</span>(<span style="color:#a6e22e">e</span>);<span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">async</span><span style="color:#f92672">=</span><span style="color:#f92672">!</span><span style="color:#ae81ff">0</span>;
 <span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">src</span><span style="color:#f92672">=</span><span style="color:#a6e22e">v</span>;<span style="color:#a6e22e">s</span><span style="color:#f92672">=</span><span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">getElementsByTagName</span>(<span style="color:#a6e22e">e</span>)[<span style="color:#ae81ff">0</span>];<span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">parentNode</span>.<span style="color:#a6e22e">insertBefore</span>(<span style="color:#a6e22e">t</span>,<span style="color:#a6e22e">s</span>)}(window,
 document,<span style="color:#e6db74">&#39;script&#39;</span>,<span style="color:#e6db74">&#39;https://connect.facebook.net/en_US/fbevents.js&#39;</span>);
  
 <span style="color:#a6e22e">fbq</span>(<span style="color:#e6db74">&#39;init&#39;</span>, {{<span style="color:#a6e22e">Facebook</span> <span style="color:#a6e22e">Pixel</span> <span style="color:#a6e22e">ID</span>}});
 
 <span style="color:#75715e">// The following line is NOT necessary:
-</span><span style="color:#75715e">// window.google_tag_manager[{{Container ID}}].onHtmlSuccess({{HTML ID}}); 
+</span><span style="color:#75715e"></span><span style="color:#75715e">// window.google_tag_manager[{{Container ID}}].onHtmlSuccess({{HTML ID}}); 
 </span></code></pre></div>
-Why is the last line not necessary? Because GTM would pass execution to the next tag <em>in any case</em> when it reaches the last line of this tag. The web browser runs code synchronously - there&rsquo;s no way it will stop in the middle of this tag and start working on the next tag.</p>
-
+Why is the last line not necessary? Because GTM would pass execution to the next tag <em>in any case</em> when it reaches the last line of this tag. The web browser runs code synchronously - there's no way it will stop in the middle of this tag and start working on the next tag.</p>
 <p>So the lesson is:</p>
-
-<p><strong>If you have code that is always run from top-to-bottom before moving to the next tag, you don&rsquo;t need <code>onHtmlSuccess()</code> and <code>onHtmlFailure()</code>.</strong></p>
-
-<p>But, and there&rsquo;s always a &ldquo;but&rdquo;, you&rsquo;ll want to check the next lesson, too.</p>
-
-<h3 id="lesson-3-if-you-have-onhtmlfailure-you-ll-always-want-to-have-onhtmlsuccess-too">Lesson 3: If you have <code>onHtmlFailure()</code>, you&rsquo;ll always want to have <code>onHtmlSuccess()</code>, too</h3>
-
+<p><strong>If you have code that is always run from top-to-bottom before moving to the next tag, you don't need <code>onHtmlSuccess()</code> and <code>onHtmlFailure()</code>.</strong></p>
+<p>But, and there's always a &ldquo;but&rdquo;, you'll want to check the next lesson, too.</p>
+<h3 id="lesson-3-if-you-have-onhtmlfailure-youll-always-want-to-have-onhtmlsuccess-too">Lesson 3: If you have <code>onHtmlFailure()</code>, you'll always want to have <code>onHtmlSuccess()</code>, too</h3>
 <p>If you use <code>onHtmlFailure()</code> to signal that at some point in the code an error is met and sequence should <em>not</em> proceed with the next tag (since you have the failure toggle on), you should also add <code>onHtmlSuccess()</code> somewhere in the code.</p>
-
 <p>This is because when you use the failure callback, GTM will not automatically proceed to the next tag anymore when it reaches the last line of the Custom HTML tag, even if you have the failure toggle turned off. By using <code>onHtmlFailure()</code>, you are telling Google Tag Manager to wait for either the <code>onHtmlFailure()</code> or <code>onHtmlSuccess()</code> before deciding whether to move to the next tag.</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">(<span style="color:#66d9ef">function</span>() {
   <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">gtm</span> <span style="color:#f92672">=</span> window.<span style="color:#a6e22e">google_tag_manager</span>[{{<span style="color:#a6e22e">Container</span> <span style="color:#a6e22e">ID</span>}}];
   
@@ -424,11 +401,8 @@ Why is the last line not necessary? Because GTM would pass execution to the next
   }
 })();
 </code></pre></div>
-
-<p>In the above example, sequence will <strong>never</strong> proceed to the next tag. You have <code>onHtmlFailure()</code> which is <em>never</em> met (because <code>true</code> is always <code>true</code>), but you don&rsquo;t have <code>onHtmlSuccess()</code> anywhere. So only this first tag is run, and the sequence is never continued.</p>
-
+<p>In the above example, sequence will <strong>never</strong> proceed to the next tag. You have <code>onHtmlFailure()</code> which is <em>never</em> met (because <code>true</code> is always <code>true</code>), but you don't have <code>onHtmlSuccess()</code> anywhere. So only this first tag is run, and the sequence is never continued.</p>
 <p>This is one way it <strong>would</strong> work:</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">if</span> (<span style="color:#66d9ef">true</span>) {
   <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#39;Worked&#39;</span>);
   <span style="color:#a6e22e">gtm</span>.<span style="color:#a6e22e">onHtmlSuccess</span>({{<span style="color:#a6e22e">HTML</span> <span style="color:#a6e22e">ID</span>}});
@@ -436,9 +410,7 @@ Why is the last line not necessary? Because GTM would pass execution to the next
   <span style="color:#a6e22e">gtm</span>.<span style="color:#a6e22e">onHtmlFailure</span>({{<span style="color:#a6e22e">HTML</span> <span style="color:#a6e22e">ID</span>}});
 }
 </code></pre></div>
-
-<p>This would also work (though it&rsquo;s not a good pattern), if the next tag in the sequence had the failure toggle off:</p>
-
+<p>This would also work (though it's not a good pattern), if the next tag in the sequence had the failure toggle off:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">if</span> (<span style="color:#66d9ef">true</span>) {
   <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#39;Worked&#39;</span>);
   <span style="color:#a6e22e">gtm</span>.<span style="color:#a6e22e">onHtmlFailure</span>({{<span style="color:#a6e22e">HTML</span> <span style="color:#a6e22e">ID</span>}});
@@ -446,22 +418,16 @@ Why is the last line not necessary? Because GTM would pass execution to the next
   <span style="color:#a6e22e">gtm</span>.<span style="color:#a6e22e">onHtmlFailure</span>({{<span style="color:#a6e22e">HTML</span> <span style="color:#a6e22e">ID</span>}});
 }
 </code></pre></div>
-
-<p>And since it&rsquo;s synchronous code, you can leave both callbacks out, and the sequence will proceed normally after logging <code>Worked</code> to the console in this case, too:</p>
-
+<p>And since it's synchronous code, you can leave both callbacks out, and the sequence will proceed normally after logging <code>Worked</code> to the console in this case, too:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">(<span style="color:#66d9ef">function</span>() {
   <span style="color:#66d9ef">if</span> (<span style="color:#66d9ef">true</span>) {
     <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#39;Worked&#39;</span>);
   }
 })();
 </code></pre></div>
-
 <h3 id="lesson-4-the-callbacks-are-at-their-best-in-asynchronous-operations">Lesson 4: The callbacks are at their best in asynchronous operations</h3>
-
 <p>In my view, the <em>purpose</em> of tag sequencing is to establish order when the previous tag has an asynchronous operation. In other words, you want the browser to wait for the operation to complete before telling the next tag to start firing.</p>
-
 <p>For example, here we load the <a href="https://jquery.com">jQuery</a> library asynchronously, waiting for it to have completely loaded before moving to the next tag:</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">(<span style="color:#66d9ef">function</span>() {
   <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">gtm</span> <span style="color:#f92672">=</span> window.<span style="color:#a6e22e">google_tag_manager</span>[{{<span style="color:#a6e22e">Container</span> <span style="color:#a6e22e">ID</span>}}];
   
@@ -474,15 +440,10 @@ Why is the last line not necessary? Because GTM would pass execution to the next
   document.<span style="color:#a6e22e">head</span>.<span style="color:#a6e22e">appendChild</span>(<span style="color:#a6e22e">el</span>);
 })();
 </code></pre></div>
-
 <p>As you can see, <code>onHtmlSuccess()</code> is embedded in the callback of the <a href="https://www.simoahava.com/gtm-tips/add-load-listener-script-elements/"><code>load</code> listener</a>, which is invoked only after the library has downloaded and the browser has executed the code within.</p>
-
 <h2 id="summary">Summary</h2>
-
-<p>Working with Custom HTML tags in a tag sequence has some <em>gotchas</em> you should be aware of, but there&rsquo;s really very little game-breaking. The biggest &ldquo;mistake&rdquo; I see people doing is adding the <code>onHtmlSuccess()</code> callback to the end of a synchronously executed block of code - this is not necessary <em>unless you have <code>onHtmlFailure()</code> somewhere in the code, too</em>.</p>
-
+<p>Working with Custom HTML tags in a tag sequence has some <em>gotchas</em> you should be aware of, but there's really very little game-breaking. The biggest &ldquo;mistake&rdquo; I see people doing is adding the <code>onHtmlSuccess()</code> callback to the end of a synchronously executed block of code - this is not necessary <em>unless you have <code>onHtmlFailure()</code> somewhere in the code, too</em>.</p>
 <p>I hope that this article has clarified how Custom HTML tags and tag sequencing work together.</p>
-
 <p>Let me know in the comments if you have futher questions!</p>
 
               
@@ -589,7 +550,7 @@ Why is the last line not necessary? Because GTM would pass execution to the next
         </article>
         <footer id="footer" class="main-content-wrap">
   <span class="copyrights">
-    &copy; 2019 Simo Ahava. All Rights Reserved
+    &copy; 2020 Simo Ahava. All Rights Reserved
   </span>
 </footer>
 

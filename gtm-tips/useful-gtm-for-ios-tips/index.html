@@ -53,7 +53,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.59.1 with theme Tranquilpeak 0.4.3-BETA">
+    <meta name="generator" content="Hugo 0.61.0 with theme Tranquilpeak 0.4.3-BETA">
     <title>#GTMTips: Useful GTM For iOS Tips | Simo Ahava's blog</title>
     
     <script>
@@ -319,16 +319,10 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              
-
-<p>A while ago I wrote a blog post about how to install <a href="https://tagmanager.google.com">Google Tag Manager</a> for iOS using the Swift programming language (you can read the article <a href="https://www.simoahava.com/analytics/setup-google-tag-manager-ios-with-swift/">here</a>). I&rsquo;ve been doing a lot of work with Swift lately, and I&rsquo;m more and more convinced that GTM is actually a very powerful utility for running in your iOS app instead of the <a href="https://developers.google.com/analytics/devguides/collection/ios/v3/">Google Analytics SDK</a>.</p>
-
-<p>Why? Because it abstracts a lot of the nitty-gritty you&rsquo;d otherwise need to explicitly manage in your GA installation. Also, by using the <code>TAGDataLayer</code> interface, you&rsquo;re abstracting stuff <em>yourself</em>, not forced to adopt any specific syntax or semantic structure in your tracking. Instead, you&rsquo;ll be leveraging generic key-value pairs and an object structure, which you&rsquo;re probably already familiar with if you&rsquo;ve worked with GTM for the web.</p>
-
-<p>In any case, here&rsquo;s a bunch of tips I&rsquo;ve discovered while working with the SDK. Some of them might be quite evident, but they&rsquo;re useful nevertheless. Also, I&rsquo;ve learned that nothing is 100% self-evident in the world of GTM.</p>
-
+              <p>A while ago I wrote a blog post about how to install <a href="https://tagmanager.google.com">Google Tag Manager</a> for iOS using the Swift programming language (you can read the article <a href="https://www.simoahava.com/analytics/setup-google-tag-manager-ios-with-swift/">here</a>). I've been doing a lot of work with Swift lately, and I'm more and more convinced that GTM is actually a very powerful utility for running in your iOS app instead of the <a href="https://developers.google.com/analytics/devguides/collection/ios/v3/">Google Analytics SDK</a>.</p>
+<p>Why? Because it abstracts a lot of the nitty-gritty you'd otherwise need to explicitly manage in your GA installation. Also, by using the <code>TAGDataLayer</code> interface, you're abstracting stuff <em>yourself</em>, not forced to adopt any specific syntax or semantic structure in your tracking. Instead, you'll be leveraging generic key-value pairs and an object structure, which you're probably already familiar with if you've worked with GTM for the web.</p>
+<p>In any case, here's a bunch of tips I've discovered while working with the SDK. Some of them might be quite evident, but they're useful nevertheless. Also, I've learned that nothing is 100% self-evident in the world of GTM.</p>
 <h2 id="tip-35-bunch-of-gtm4ios-tips">Tip 35: Bunch of GTM4iOS tips!</h2>
-
 
 
 
@@ -344,29 +338,30 @@
 </div>
 
 
-
 <p>The tips are:</p>
-
 <ol>
-<li><p>Dispatch the Tag Manager / GA queue when the application is entering background / terminating</p></li>
-
-<li><p>Log verbosely and set dispatch interval to 1 second only when debugging</p></li>
-
-<li><p>Purge <code>dataLayer</code> in between pushes</p></li>
-
-<li><p>Use the <code>dryRun</code> of the <code>GAI.sharedInstance()</code> to avoid sending data to GA</p></li>
-
-<li><p>Get the Google Analytics Client ID from the tracker instance</p></li>
-
-<li><p>Switch IDFA on in your Tags</p></li>
+<li>
+<p>Dispatch the Tag Manager / GA queue when the application is entering background / terminating</p>
+</li>
+<li>
+<p>Log verbosely and set dispatch interval to 1 second only when debugging</p>
+</li>
+<li>
+<p>Purge <code>dataLayer</code> in between pushes</p>
+</li>
+<li>
+<p>Use the <code>dryRun</code> of the <code>GAI.sharedInstance()</code> to avoid sending data to GA</p>
+</li>
+<li>
+<p>Get the Google Analytics Client ID from the tracker instance</p>
+</li>
+<li>
+<p>Switch IDFA on in your Tags</p>
+</li>
 </ol>
-
-<h3 id="1-dispatch-the-tag-manager-ga-queue-when-the-application-is-entering-background-terminating">1. Dispatch the Tag Manager / GA queue when the application is entering background / terminating</h3>
-
-<p>One of the rather ugly default features of the Google Analytics and Google Tag Manager SDKs is that they have a <strong>120 second</strong> batch interval. It makes a lot of sense when the app is running, as it preserves battery et cetera, but it&rsquo;s nasty when the app is in the background. Basically, it forces the app to &ldquo;wake up&rdquo; after 120 seconds of down time, just for the queue to dispatch.</p>
-
+<h3 id="1-dispatch-the-tag-manager--ga-queue-when-the-application-is-entering-background--terminating">1. Dispatch the Tag Manager / GA queue when the application is entering background / terminating</h3>
+<p>One of the rather ugly default features of the Google Analytics and Google Tag Manager SDKs is that they have a <strong>120 second</strong> batch interval. It makes a lot of sense when the app is running, as it preserves battery et cetera, but it's nasty when the app is in the background. Basically, it forces the app to &ldquo;wake up&rdquo; after 120 seconds of down time, just for the queue to dispatch.</p>
 <p>In <strong>AppDelegate</strong>, you have a bunch of useful functions, which you can use to run commands when the app is ready to do something. Also, the <code>TAGManager</code> implementation has the method <code>dispatch()</code>, which lets you send all the hits that are currently in the dispatch queue. So, by combining these two, you can empty the queue whenever the app is about to enter the background or terminate!</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">applicationDidEnterBackground</span>(application: UIApplication) {
     tagManager.dispatch()
 }
@@ -374,22 +369,15 @@
 <span style="color:#66d9ef">func</span> <span style="color:#a6e22e">applicationWillTerminate</span>(application: UIApplication) {
     tagManager.dispatch()
 }</code></pre></div>
-
 <h3 id="2-log-verbosely-and-set-dispatch-interval-to-1-second-only-when-debugging">2. Log verbosely and set dispatch interval to 1 second only when debugging</h3>
-
-<p>If you&rsquo;ve set <a href="https://developer.apple.com/library/prerelease/ios/documentation/Swift/Conceptual/BuildingCocoaApps/InteractingWithCAPIs.html#//apple_ref/doc/uid/TP40014216-CH8-XID_13">preprocessor macros</a> (you should!), you can execute code only when in a certain environment, such as QA, staging, or production.</p>
-
-<p>GTM also provides verbose logging, and you can set the dispatch interval of the request queue (see the previous tip) manually. Now, combine all these in a bowl, stir well, and you&rsquo;ll get some really powerful debugging tools.</p>
-
+<p>If you've set <a href="https://developer.apple.com/library/prerelease/ios/documentation/Swift/Conceptual/BuildingCocoaApps/InteractingWithCAPIs.html#//apple_ref/doc/uid/TP40014216-CH8-XID_13">preprocessor macros</a> (you should!), you can execute code only when in a certain environment, such as QA, staging, or production.</p>
+<p>GTM also provides verbose logging, and you can set the dispatch interval of the request queue (see the previous tip) manually. Now, combine all these in a bowl, stir well, and you'll get some really powerful debugging tools.</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="color:#75715e">#if</span> <span style="color:#f92672">!</span><span style="color:#75715e">ENV_PROD</span>
     tagManager.logger.setLogLevel(kTAGLoggerLogLevelVerbose)
     tagManager.dispatchInterval = NSTimeInterval(<span style="color:#ae81ff">1.0</span>)
 <span style="color:#75715e">#endif</span></code></pre></div>
-
 <p>The first command sets the logging level to verbose, and the second one sets the dispatch interval to just one second. Both commands are only executed if the environment <strong>is not</strong> ENV_PROD, thus covering ENV_QA, ENV_TEST, ENV_DEBUG etc. These are, of course, just examples, and your setup probably uses some other names.</p>
-
-<p>You can utilize the <code>#if DEBUG</code> further in the <code>containerAvailable</code> callback, which is invoked when a container is first opened. Now, if you&rsquo;re debugging the GTM implementation, it&rsquo;s possible you&rsquo;re also updating the container in Google Tag Manager as well, and you might want to see changes immediately rather than having to <a href="https://developers.google.com/tag-manager/ios/v3/#containerOpener">wait the 12 hours</a> for the container to go stale. So, modify the callback accordingly:</p>
-
+<p>You can utilize the <code>#if DEBUG</code> further in the <code>containerAvailable</code> callback, which is invoked when a container is first opened. Now, if you're debugging the GTM implementation, it's possible you're also updating the container in Google Tag Manager as well, and you might want to see changes immediately rather than having to <a href="https://developers.google.com/tag-manager/ios/v3/#containerOpener">wait the 12 hours</a> for the container to go stale. So, modify the callback accordingly:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">containerAvailable</span>(container: TAGContainer) -&gt; Void {
     dispatch_async(dispatch_get_main_queue(), {
         <span style="color:#66d9ef">self</span>.container = container;
@@ -398,51 +386,31 @@
         <span style="color:#75715e">#endif</span>
     });
 }</code></pre></div>
-
-<p>See that <code>container.refresh()</code> there? That fetches a container over the network every single time, as long as you&rsquo;re not in an environment named ENV_PROD.</p>
-
+<p>See that <code>container.refresh()</code> there? That fetches a container over the network every single time, as long as you're not in an environment named ENV_PROD.</p>
 <h3 id="3-purge-datalayer-in-between-pushes">3. Purge <code>dataLayer</code> in between pushes</h3>
-
-<p>In my <strong>Analytics.swift</strong> module (see <a href="https://www.simoahava.com/analytics/setup-google-tag-manager-ios-with-swift/">this article</a> for more information), I call the following function just after <code>dataLayer.push()</code> where content or hit-scoped custom dimensions are passed. To keep things consistent, I&rsquo;ve created a <code>dataLayer</code> syntax, where all content data is stored under the key <code>contentData</code>, and all eCommerce data is stored under the key <code>ecommerce</code>. I have other collections as well, such as <code>metaData</code> and <code>userData</code>, but these I want to persist, so the purge is not called after they are used.</p>
-
+<p>In my <strong>Analytics.swift</strong> module (see <a href="https://www.simoahava.com/analytics/setup-google-tag-manager-ios-with-swift/">this article</a> for more information), I call the following function just after <code>dataLayer.push()</code> where content or hit-scoped custom dimensions are passed. To keep things consistent, I've created a <code>dataLayer</code> syntax, where all content data is stored under the key <code>contentData</code>, and all eCommerce data is stored under the key <code>ecommerce</code>. I have other collections as well, such as <code>metaData</code> and <code>userData</code>, but these I want to persist, so the purge is not called after they are used.</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="color:#66d9ef">private</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">func</span> <span style="color:#a6e22e">purgeDataLayer</span>() -&gt; Void {
     dataLayer.push([
-        <span style="color:#e6db74">&#34;contentData&#34;</span>: <span style="color:#e6db74">&#34;&#34;</span>,
-        <span style="color:#e6db74">&#34;ecommerce&#34;</span> : <span style="color:#e6db74">&#34;&#34;</span>
+        <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">contentData</span><span style="color:#e6db74">&#34;</span>: <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">&#34;</span>,
+        <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">ecommerce</span><span style="color:#e6db74">&#34;</span> : <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">&#34;</span>
     ])
 }</code></pre></div>
-
 <p>Yes, pushing blank strings is a clumsy way to purge the structure but it works. Basically, every time after content data and ecommerce data have been pushed into <code>dataLayer</code> and subsequently processed by GTM, I call <code>purgeDataLayer()</code> to ensure that this hit-scoped information does not persist.</p>
-
-<h3 id="4-use-the-dryrun-of-the-gai-sharedinstance-to-avoid-sending-data-to-ga">4. Use the <code>dryRun</code> of the <code>GAI.sharedInstance()</code> to avoid sending data to GA</h3>
-
-<p>I&rsquo;m actually not sure why you&rsquo;d want to do this, since you can just send your debug hits to a secondary Google Analytics property. But if you do want to avoid sending any data to Google Analytics, and just look at the verbose logs to see if things are working, you can set this flag in the Google Analytics tracker instance.</p>
-
-<p>Yes, I&rsquo;m aware this isn&rsquo;t GTM-specific, but it works with GTM-created trackers as well!</p>
-
+<h3 id="4-use-the-dryrun-of-the-gaisharedinstance-to-avoid-sending-data-to-ga">4. Use the <code>dryRun</code> of the <code>GAI.sharedInstance()</code> to avoid sending data to GA</h3>
+<p>I'm actually not sure why you'd want to do this, since you can just send your debug hits to a secondary Google Analytics property. But if you do want to avoid sending any data to Google Analytics, and just look at the verbose logs to see if things are working, you can set this flag in the Google Analytics tracker instance.</p>
+<p>Yes, I'm aware this isn't GTM-specific, but it works with GTM-created trackers as well!</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift">GAI.sharedInstance().dryRun = <span style="color:#66d9ef">true</span></code></pre></div>
-
 <p>A simple tip, no doubt.</p>
-
 <h3 id="5-get-the-google-analytics-client-id-from-the-tracker-instance">5. Get the Google Analytics Client ID from the tracker instance</h3>
-
 <p>Again, this is more Google Analytics than Google Tag Manager, but it works in the latter as well. All trackers created via the GA or GTM SDKs have the same Client ID, which persists until you clear all settings and content in the app.</p>
-
 <p>To get the Client ID, run the following commands:</p>
-
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="color:#66d9ef">let</span> tracker = GAI.sharedInstance().trackerWithTrackingId(<span style="color:#e6db74">&#34;UA-12345-1&#34;</span>)
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="color:#66d9ef">let</span> tracker = GAI.sharedInstance().trackerWithTrackingId(<span style="color:#e6db74">&#34;</span><span style="color:#e6db74">UA-12345-1</span><span style="color:#e6db74">&#34;</span>)
 <span style="color:#66d9ef">let</span> clientId = tracker.<span style="color:#66d9ef">get</span>(kGAIClientId)</code></pre></div>
-
 <p>Now <code>clientId</code> has the GA Client ID, and you can do whatever you wish with it. In other words, you can actually use the string <strong>&ldquo;UA-12345-1&rdquo;</strong> if you wish, since it would have the same Client ID as the actual tracker (with the real Universal Analytics property ID).</p>
-
 <h3 id="6-switch-idfa-on-in-your-tags">6. Switch IDFA on in your Tags</h3>
-
-<p>This is a very simple tip, as there&rsquo;s really almost no customization required. All you need to make sure is that the following Pod is loaded in your Podfile:</p>
-
+<p>This is a very simple tip, as there's really almost no customization required. All you need to make sure is that the following Pod is loaded in your Podfile:</p>
 <p><code>pod 'GoogleIDFASupport'</code></p>
-
-<p>This loads the IDFA library, and you won&rsquo;t need to do anything else in your Swift app. The only other thing you&rsquo;ll need to do is switch on the <strong>Enable Advertising ID Features</strong> in your GTM Tags.</p>
-
+<p>This loads the IDFA library, and you won't need to do anything else in your Swift app. The only other thing you'll need to do is switch on the <strong>Enable Advertising ID Features</strong> in your GTM Tags.</p>
 
 
 
@@ -458,13 +426,9 @@
 </div>
 
 
-
-<p>Now your app will be sending the <strong>&idfa;</strong> parameter with your device&rsquo;s IDFA identifier, and you can set on your <a href="https://support.google.com/analytics/answer/2799357?hl=en">demographics reports</a> and your <a href="https://developers.google.com/analytics/devguides/collection/ios/v3/campaigns#ios-install">iTunes install campaign tracking</a> and whatnot via GA.</p>
-
+<p>Now your app will be sending the <strong>&amp;idfa;</strong> parameter with your device's IDFA identifier, and you can set on your <a href="https://support.google.com/analytics/answer/2799357?hl=en">demographics reports</a> and your <a href="https://developers.google.com/analytics/devguides/collection/ios/v3/campaigns#ios-install">iTunes install campaign tracking</a> and whatnot via GA.</p>
 <h2 id="summary">Summary</h2>
-
-<p>That&rsquo;s it for this group of tips! I have lots more to share around Google Tag Manager for iOS, but I can&rsquo;t extinguish my entire tip collection in one single post.</p>
-
+<p>That's it for this group of tips! I have lots more to share around Google Tag Manager for iOS, but I can't extinguish my entire tip collection in one single post.</p>
 <p>I hope you found these useful! Do you have other tricks up your sleeve?</p>
 
               
@@ -571,7 +535,7 @@
         </article>
         <footer id="footer" class="main-content-wrap">
   <span class="copyrights">
-    &copy; 2019 Simo Ahava. All Rights Reserved
+    &copy; 2020 Simo Ahava. All Rights Reserved
   </span>
 </footer>
 

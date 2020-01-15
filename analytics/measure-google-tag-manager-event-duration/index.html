@@ -53,7 +53,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.59.1 with theme Tranquilpeak 0.4.3-BETA">
+    <meta name="generator" content="Hugo 0.61.0 with theme Tranquilpeak 0.4.3-BETA">
     <title>Measure Google Tag Manager Event Duration | Simo Ahava's blog</title>
     
     <script>
@@ -319,10 +319,7 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              
-
-<p><a href="https://tagmanager.google.com/">Google Tag Manager</a> is a great tool. Yeah, you came all the way to this article to read that truism. It also performs really well, loading at a sweet, swift pace even on a slow connection, thanks to pretty decent response times from Google servers. On top of that, the library itself loads <em>asynchronously</em>, meaning the container download doesn&rsquo;t interrupt the browser as it tries to make sense of your messy HTML.</p>
-
+              <p><a href="https://tagmanager.google.com/">Google Tag Manager</a> is a great tool. Yeah, you came all the way to this article to read that truism. It also performs really well, loading at a sweet, swift pace even on a slow connection, thanks to pretty decent response times from Google servers. On top of that, the library itself loads <em>asynchronously</em>, meaning the container download doesn't interrupt the browser as it tries to make sense of your messy HTML.</p>
 
 
 
@@ -338,11 +335,8 @@
 </div>
 
 
-
-<p>However, after the container has downloaded, the rest is up to you. The <a href="https://www.simoahava.com/analytics/trigger-guide-google-tag-manager/">Triggers</a> you attach to Tags, the <a href="https://www.simoahava.com/analytics/variable-guide-google-tag-manager/">Variables</a> you resolve in both Tags and Triggers, and all sorts of things like <a href="https://support.google.com/tagmanager/answer/2772421?hl=en">Tag Firing Priority</a> can potentially bog down your site simply because they all represent complex JavaScript operations. Just because code is executed in the Google Tag Manager container doesn&rsquo;t guarantee fast performance. The browser still needs to execute it line-by-line, using asynchronous requests where possible (such as when a call is made to the Google Analytics endpoint), but also relying on quite expensive operations such as DOM insertion.</p>
-
-<p>Anyway, being the experimenter that I aspire to be (how&rsquo;s that for a circular statement), I wanted to measure just how much time it takes for GTM events to resolve. Here&rsquo;s the result:</p>
-
+<p>However, after the container has downloaded, the rest is up to you. The <a href="https://www.simoahava.com/analytics/trigger-guide-google-tag-manager/">Triggers</a> you attach to Tags, the <a href="https://www.simoahava.com/analytics/variable-guide-google-tag-manager/">Variables</a> you resolve in both Tags and Triggers, and all sorts of things like <a href="https://support.google.com/tagmanager/answer/2772421?hl=en">Tag Firing Priority</a> can potentially bog down your site simply because they all represent complex JavaScript operations. Just because code is executed in the Google Tag Manager container doesn't guarantee fast performance. The browser still needs to execute it line-by-line, using asynchronous requests where possible (such as when a call is made to the Google Analytics endpoint), but also relying on quite expensive operations such as DOM insertion.</p>
+<p>Anyway, being the experimenter that I aspire to be (how's that for a circular statement), I wanted to measure just how much time it takes for GTM events to resolve. Here's the result:</p>
 
 
 
@@ -358,9 +352,7 @@
 </div>
 
 
-
-<p>Interesting stuff! Out of the largest timing samples, it&rsquo;s the most basic of events, <strong>gtm.js</strong>, which takes the longest time to complete! 2.5 seconds on average, phew! Here are the Tags on my site which fire on <strong>gtm.js</strong>:</p>
-
+<p>Interesting stuff! Out of the largest timing samples, it's the most basic of events, <strong>gtm.js</strong>, which takes the longest time to complete! 2.5 seconds on average, phew! Here are the Tags on my site which fire on <strong>gtm.js</strong>:</p>
 
 
 
@@ -376,23 +368,14 @@
 </div>
 
 
-
-<p>There&rsquo;s a <a href="https://www.simoahava.com/analytics/access-the-tracker-object-in-your-page-view-tag/">tracker setup</a> Tag, a little <a href="https://www.simoahava.com/gtm-tips/add-konami-code-to-your-site/">Konami code</a> surprise, as well as some code to measure the <a href="https://www.simoahava.com/analytics/measure-serp-bounce-time-with-gtm/">SERP bounce time</a> on my site. Each one of them has some <code>dataLayer.push()</code> methods executed, and the tracker setup does load the <strong>analytics.js</strong> library, so it&rsquo;s not like it&rsquo;s lightweight stuff. But still, 2.5 seconds? That&rsquo;s a lifetime in Internet time!</p>
-
-<p>Anyway, this measurement has been quite eye-opening. It&rsquo;s a good idea to be aware of what happens behind the scenes. Even asynchronous operations can be harmful to page performance, especially if there are many of them running one after the another. The reason for this is that the <code>load</code> event for the <code>window</code> object is delayed until the page and all its related resources (e.g. scripts and images) have completely loaded. This might lead to problems with frameworks like <a href="https://facebook.github.io/react/">React</a>, where many operations are executed only after the <code>window.onload</code> event has been dispatched in the browser.</p>
-
-<p>Let me quickly walk you through how I setup this measurement. It&rsquo;s not a walk in the park, and if you want to try it yourself I <em>urge</em> you to test it in a staging environment first!</p>
-
-<h2 id="let-s-hack-the-data-layer">Let&rsquo;s hack the Data Layer</h2>
-
+<p>There's a <a href="https://www.simoahava.com/analytics/access-the-tracker-object-in-your-page-view-tag/">tracker setup</a> Tag, a little <a href="https://www.simoahava.com/gtm-tips/add-konami-code-to-your-site/">Konami code</a> surprise, as well as some code to measure the <a href="https://www.simoahava.com/analytics/measure-serp-bounce-time-with-gtm/">SERP bounce time</a> on my site. Each one of them has some <code>dataLayer.push()</code> methods executed, and the tracker setup does load the <strong>analytics.js</strong> library, so it's not like it's lightweight stuff. But still, 2.5 seconds? That's a lifetime in Internet time!</p>
+<p>Anyway, this measurement has been quite eye-opening. It's a good idea to be aware of what happens behind the scenes. Even asynchronous operations can be harmful to page performance, especially if there are many of them running one after the another. The reason for this is that the <code>load</code> event for the <code>window</code> object is delayed until the page and all its related resources (e.g. scripts and images) have completely loaded. This might lead to problems with frameworks like <a href="https://facebook.github.io/react/">React</a>, where many operations are executed only after the <code>window.onload</code> event has been dispatched in the browser.</p>
+<p>Let me quickly walk you through how I setup this measurement. It's not a walk in the park, and if you want to try it yourself I <em>urge</em> you to test it in a staging environment first!</p>
+<h2 id="lets-hack-the-data-layer">Let's hack the Data Layer</h2>
 <p>To make it work, we need to hack the Data Layer.</p>
-
 <p>Queue ominous music.</p>
-
-<p>That&rsquo;s right, we need to do what Google Tag Manager <a href="https://www.simoahava.com/analytics/google-tag-manager-data-model/">has already done</a> and hijack the <code>dataLayer.push</code> method to overwrite it with our own.</p>
-
+<p>That's right, we need to do what Google Tag Manager <a href="https://www.simoahava.com/analytics/google-tag-manager-data-model/">has already done</a> and hijack the <code>dataLayer.push</code> method to overwrite it with our own.</p>
 <p>So, the following code needs to end up on your page template <em>before</em> the Google Tag Manager container snippet:</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
   window.<span style="color:#a6e22e">dataLayer</span> <span style="color:#f92672">=</span> window.<span style="color:#a6e22e">dataLayer</span> <span style="color:#f92672">||</span> [];
   <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">oldPush</span> <span style="color:#f92672">=</span> window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>;
@@ -421,33 +404,33 @@
 
   }
 &lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
-
-<p>Wow. That&rsquo;s a beast. I&rsquo;m not going to walk you through it line-by-line, but here&rsquo;s how it works:</p>
-
+<p>Wow. That's a beast. I'm not going to walk you through it line-by-line, but here's how it works:</p>
 <ul>
-<li><p>When a <code>dataLayer.push()</code> happens, this code is first executed.</p></li>
-
-<li><p>It takes the object that was pushed, and if it contains an <code>'event'</code> key and if it matches some other conditions, the following code is then run:</p>
-
+<li>
+<p>When a <code>dataLayer.push()</code> happens, this code is first executed.</p>
+</li>
+<li>
+<p>It takes the object that was pushed, and if it contains an <code>'event'</code> key and if it matches some other conditions, the following code is then run:</p>
 <ul>
-<li><p>A timer is started (the time when the event execution began) and stored in the key <code>eventStartTime</code></p></li>
-
-<li><p>The <code>[eventCallback](/gtm-tips/hitcallback-eventcallback/)</code> of this object is set to a function, which basically pushes <em>another</em> <code>dataLayer</code> object, where a new timer calculates the difference between the event execution start and end times</p></li>
-
-<li><p>Finally, whatever was processed by this script (whether it be the modified object or the new &ldquo;perfTime&rdquo; object) is returned to the original <code>dataLayer.push</code> method, so that GTM can pick it up</p></li>
-</ul></li>
+<li>
+<p>A timer is started (the time when the event execution began) and stored in the key <code>eventStartTime</code></p>
+</li>
+<li>
+<p>The <code>[eventCallback](/gtm-tips/hitcallback-eventcallback/)</code> of this object is set to a function, which basically pushes <em>another</em> <code>dataLayer</code> object, where a new timer calculates the difference between the event execution start and end times</p>
+</li>
+<li>
+<p>Finally, whatever was processed by this script (whether it be the modified object or the new &ldquo;perfTime&rdquo; object) is returned to the original <code>dataLayer.push</code> method, so that GTM can pick it up</p>
+</li>
 </ul>
-
-<p>Ah, that IS a beast. Perhaps it&rsquo;s easier if I show you an example. When this code is running (i.e. before the page has completely loaded), a simple <code>dataLayer.push()</code> like this:</p>
-
+</li>
+</ul>
+<p>Ah, that IS a beast. Perhaps it's easier if I show you an example. When this code is running (i.e. before the page has completely loaded), a simple <code>dataLayer.push()</code> like this:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
   <span style="color:#e6db74">&#39;event&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;testing&#39;</span>,
   <span style="color:#e6db74">&#39;someVar&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;someVal&#39;</span>
 });
 </code></pre></div>
-
 <p>&hellip;is automatically turned into:</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
   <span style="color:#e6db74">&#39;event&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;testing&#39;</span>,
   <span style="color:#e6db74">&#39;someVar&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;someVal&#39;</span>,
@@ -455,9 +438,7 @@
   <span style="color:#e6db74">&#39;eventCallback&#39;</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e</span>) {...}
 });
 </code></pre></div>
-
 <p>And when all Tags which fire on <code>'event' : 'testing'</code> have completed their execution, the following is, again, automatically pushed into <code>dataLayer</code>:</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
   <span style="color:#a6e22e">event</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;perfTime&#39;</span>,
   <span style="color:#e6db74">&#39;perfEvent.event&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;testing&#39;</span>,
@@ -465,29 +446,26 @@
   <span style="color:#e6db74">&#39;perfEvent.containerId&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;GTM-W92WQQ&#39;</span>
 });
 </code></pre></div>
-
-<p>So my little hack is automatically measuring the time any <code>'event'</code> takes to complete, as long as it happens before the page has loaded (as that&rsquo;s the only performance I&rsquo;m interested in).</p>
-
-<p>By the way, you don&rsquo;t really need to add the <code>eventStartTime</code> into the object, as you already have a locally scoped variable <code>t</code> which stores the start time in a closure. However, I prefer to keep it there in case I want to do further debugging, since with the start time I can also build a waterfall model out of the performance times, to see how much execution of these different pre-load events overlap.</p>
-
-<p><strong>NOTE!!</strong> The script automatically excludes <strong>gtm.linkClick</strong>, <strong>gtm.timer</strong> and <strong>gtm.formSubmit</strong>, as these have their own uses for <code>eventCallback</code> (the <strong>Wait for Tags</strong> option). Similarly, if you&rsquo;re already using <code>eventCallback</code> with some events, be sure to add them to the Array of excluded events, or you might break your site!</p>
-
+<p>So my little hack is automatically measuring the time any <code>'event'</code> takes to complete, as long as it happens before the page has loaded (as that's the only performance I'm interested in).</p>
+<p>By the way, you don't really need to add the <code>eventStartTime</code> into the object, as you already have a locally scoped variable <code>t</code> which stores the start time in a closure. However, I prefer to keep it there in case I want to do further debugging, since with the start time I can also build a waterfall model out of the performance times, to see how much execution of these different pre-load events overlap.</p>
+<p><strong>NOTE!!</strong> The script automatically excludes <strong>gtm.linkClick</strong>, <strong>gtm.timer</strong> and <strong>gtm.formSubmit</strong>, as these have their own uses for <code>eventCallback</code> (the <strong>Wait for Tags</strong> option). Similarly, if you're already using <code>eventCallback</code> with some events, be sure to add them to the Array of excluded events, or you might break your site!</p>
 <p>Remember to test first, please!</p>
-
 <p>The setup in GTM requires the following:</p>
-
 <ol>
-<li><p>A <strong>Data Layer Variable</strong> named <strong>DLV - perfEvent.event</strong>, pointing to variable name <code>perfEvent.event</code></p></li>
-
-<li><p>A <strong>Data Layer Variable</strong> named <strong>DLV - perfEvent.totalTime</strong>, pointing to variable name <code>perfEvent.totalTime</code></p></li>
-
-<li><p>A <strong>Custom Event Trigger</strong> named <strong>Event - perfTime</strong>, with Event name set to <code>perfTime</code></p></li>
-
-<li><p>A <strong>Universal Analytics Tag</strong> of type <strong>Timing</strong> (see below)</p></li>
+<li>
+<p>A <strong>Data Layer Variable</strong> named <strong>DLV - perfEvent.event</strong>, pointing to variable name <code>perfEvent.event</code></p>
+</li>
+<li>
+<p>A <strong>Data Layer Variable</strong> named <strong>DLV - perfEvent.totalTime</strong>, pointing to variable name <code>perfEvent.totalTime</code></p>
+</li>
+<li>
+<p>A <strong>Custom Event Trigger</strong> named <strong>Event - perfTime</strong>, with Event name set to <code>perfTime</code></p>
+</li>
+<li>
+<p>A <strong>Universal Analytics Tag</strong> of type <strong>Timing</strong> (see below)</p>
+</li>
 </ol>
-
-<p>Here&rsquo;s the Tag:</p>
-
+<p>Here's the Tag:</p>
 
 
 
@@ -503,16 +481,11 @@
 </div>
 
 
-
-<p>And this Tag will send your hits as User Timings, after which you&rsquo;ll find the report in Google Analytics, under <strong>Behavior -&gt; Site Speed -&gt; User Timings</strong>.</p>
-
-<p>I&rsquo;ve given User Timings a <a href="https://www.simoahava.com/analytics/track-content-engagement-part-2/">thrashing</a> before, since they&rsquo;re really useless for timing ALL the hits on the site. But if you&rsquo;re fine with just a sample, such as in this case, they work really well.</p>
-
+<p>And this Tag will send your hits as User Timings, after which you'll find the report in Google Analytics, under <strong>Behavior -&gt; Site Speed -&gt; User Timings</strong>.</p>
+<p>I've given User Timings a <a href="https://www.simoahava.com/analytics/track-content-engagement-part-2/">thrashing</a> before, since they're really useless for timing ALL the hits on the site. But if you're fine with just a sample, such as in this case, they work really well.</p>
 <h2 id="summary">Summary</h2>
-
-<p>Remember kids, good performance is good. Bad performance can kill&hellip; your site&rsquo;s user experience, and other stuff, too!</p>
-
-<p>However you want to do it, it&rsquo;s a good idea to keep an eye on the processes that take place before the <code>window</code> object has completely loaded on your site. You can use <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/user-timings">User Timings</a> to measure all sorts of important milestones, such as just how long it takes for that awesome font library you paid hundreds of bucks for to download. Or how long your favorite JavaScript framework (rhymes with &ldquo;lay brewery&rdquo;) hinders your page load times. Or how long it takes for you to reach the end of these articles of mine. Well, the last one might need some creativity, but I&rsquo;ll leave it in your capable hands!</p>
+<p>Remember kids, good performance is good. Bad performance can kill&hellip; your site's user experience, and other stuff, too!</p>
+<p>However you want to do it, it's a good idea to keep an eye on the processes that take place before the <code>window</code> object has completely loaded on your site. You can use <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/user-timings">User Timings</a> to measure all sorts of important milestones, such as just how long it takes for that awesome font library you paid hundreds of bucks for to download. Or how long your favorite JavaScript framework (rhymes with &ldquo;lay brewery&rdquo;) hinders your page load times. Or how long it takes for you to reach the end of these articles of mine. Well, the last one might need some creativity, but I'll leave it in your capable hands!</p>
 
               
 
@@ -618,7 +591,7 @@
         </article>
         <footer id="footer" class="main-content-wrap">
   <span class="copyrights">
-    &copy; 2019 Simo Ahava. All Rights Reserved
+    &copy; 2020 Simo Ahava. All Rights Reserved
   </span>
 </footer>
 

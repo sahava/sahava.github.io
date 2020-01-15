@@ -121,8 +121,6 @@
 
 <meta itemprop="name" content="Google Analytics Endpoint Debugger">
 <meta itemprop="description" content="Guide to using the Google Analytics collection endpoint debugger.">
-
-
 <meta itemprop="datePublished" content="2016-02-24T09:59:19&#43;00:00" />
 <meta itemprop="dateModified" content="2016-02-24T09:59:19&#43;00:00" />
 <meta itemprop="wordCount" content="725">
@@ -130,7 +128,6 @@
 
 
 <meta itemprop="keywords" content="debug,google analytics,measurement protocol," />
-
 <script type="application/ld+json">
 {
     "@context": "http://schema.org",
@@ -909,10 +906,7 @@ on
     </header>
 
     <section class="post-content">
-      
-
-<p>This is a really cool feature for <a href="https://analytics.google.com">Google Analytics</a> data collection, of which I&rsquo;ve heard very, very little buzz. It&rsquo;s a way to debug any and all hits sent to the Google Analytics endpoint at <code>https://www.google-analytics.com/collect</code>.</p>
-
+      <p>This is a really cool feature for <a href="https://analytics.google.com">Google Analytics</a> data collection, of which I've heard very, very little buzz. It's a way to debug any and all hits sent to the Google Analytics endpoint at <code>https://www.google-analytics.com/collect</code>.</p>
 
 
     <a href="https://www.simoahava.com/amp/images/2016/02/debug-ga.jpg" title="Debug Google Analytics hits">
@@ -922,22 +916,14 @@ on
     </a>
   
 
-
 <p>In all simplicity, you just need to copy the entire URL of the HTTP request to your clipboard, paste it into a web browser, and add <code>/debug</code> between the hostname and <code>/collect</code>.</p>
-
 <h2 id="a-few-words-on-the-measurement-protocol">A few words on the Measurement Protocol</h2>
-
-<p>Let&rsquo;s take a quick step back and remind ourselves of one important thing. <strong>Every single time you&rsquo;re sending a hit to Google Analytics</strong>, whether it be via mobile app SDKs, analytics.js on your website, or by using arbitrary HTTP requests, <strong>you&rsquo;re using the &ldquo;<a href="https://developers.google.com/analytics/devguides/collection/protocol/v1/">Measurement Protocol</a>&ldquo;</strong>. In other words, MP is not a discrete, isolated method of data transfer, but rather the underlying protocol that <strong>all</strong> the SDKs and libraries use as the method of dispatching payload data to GA.</p>
-
+<p>Let's take a quick step back and remind ourselves of one important thing. <strong>Every single time you're sending a hit to Google Analytics</strong>, whether it be via mobile app SDKs, analytics.js on your website, or by using arbitrary HTTP requests, <strong>you're using the &ldquo;<a href="https://developers.google.com/analytics/devguides/collection/protocol/v1/">Measurement Protocol</a>&quot;</strong>. In other words, MP is not a discrete, isolated method of data transfer, but rather the underlying protocol that <strong>all</strong> the SDKs and libraries use as the method of dispatching payload data to GA.</p>
 <p>So, when you hear a discussion along the lines of:</p>
-
-<p>JANE: Let&rsquo;s just configure the <code>ga('send'...)</code> commands on the page to incorporate that feature.
-JACK: Nah, let&rsquo;s use Measurement Protocol instead.</p>
-
-<p>They&rsquo;re actually talking about the same thing. However, what Jack is <em>probably</em> referring to is a manually built HTTP request to the <code>/collect</code> endpoint, using any of the zillions of different ways to do so. When you use the <code>ga('send'...)</code> syntax, you&rsquo;re communicating with the <strong>analytics.js</strong> library, and abstracting the HTTP request build process with a simplified shorthand syntax.</p>
-
-<p>You can verify this by browsing to a Universal-Analytics-enabled website, opening the browser&rsquo;s debugging tools, and looking at the network requests the site is sending:</p>
-
+<p>JANE: Let's just configure the <code>ga('send'...)</code> commands on the page to incorporate that feature.
+JACK: Nah, let's use Measurement Protocol instead.</p>
+<p>They're actually talking about the same thing. However, what Jack is <em>probably</em> referring to is a manually built HTTP request to the <code>/collect</code> endpoint, using any of the zillions of different ways to do so. When you use the <code>ga('send'...)</code> syntax, you're communicating with the <strong>analytics.js</strong> library, and abstracting the HTTP request build process with a simplified shorthand syntax.</p>
+<p>You can verify this by browsing to a Universal-Analytics-enabled website, opening the browser's debugging tools, and looking at the network requests the site is sending:</p>
 
 
     <a href="https://www.simoahava.com/amp/images/2016/02/measurement-protocol.jpg" title="Measurement Protocol">
@@ -947,21 +933,13 @@ JACK: Nah, let&rsquo;s use Measurement Protocol instead.</p>
     </a>
   
 
-
 <p>Why is this significant? Why am I quibbling on semantics? Well, for one, I <em>love</em> to nitpick. But also, especially with the whole phenomenon of <a href="http://help.analyticsedge.com/spam-filter/definitive-guide-to-removing-google-analytics-spam/">referral spam</a>, people have been condemning Measurement Protocol as it introduces an open, unauthenticated venue for spamming a Google Analytics reporting profile.</p>
-
-<p>Well, the reason it&rsquo;s open and unauthenticated is because your website relies on the same protocol. If you were to add a layer of authentication there, it would need to happen server-side, as a spammer would be able to just visit your site, copy the payload request, and spam it until the authentication expires. Also, authentication would add latency, and that would affect Real Time reporting as well as the time for data to enter your reports.</p>
-
-<p>But I&rsquo;m sidetracking. Let&rsquo;s get back on topic.</p>
-
+<p>Well, the reason it's open and unauthenticated is because your website relies on the same protocol. If you were to add a layer of authentication there, it would need to happen server-side, as a spammer would be able to just visit your site, copy the payload request, and spam it until the authentication expires. Also, authentication would add latency, and that would affect Real Time reporting as well as the time for data to enter your reports.</p>
+<p>But I'm sidetracking. Let's get back on topic.</p>
 <h2 id="using-the-debugger">Using the debugger</h2>
-
-<p>As I mentioned, this hasn&rsquo;t really been advertised, for some odd reason, but it is there. In fact, there&rsquo;s even a <a href="https://developers.google.com/analytics/devguides/collection/protocol/v1/validating-hits">support page</a> for this feature.</p>
-
-<p>So let&rsquo;s go back to the example of the browser&rsquo;s developer tool, and inspecting the network request to <code>/collect</code>. Copy the entire request URL (in Chrome it&rsquo;s <strong>right-click =&gt; Copy Link Address</strong> on the request), and paste it into a new browser window.</p>
-
+<p>As I mentioned, this hasn't really been advertised, for some odd reason, but it is there. In fact, there's even a <a href="https://developers.google.com/analytics/devguides/collection/protocol/v1/validating-hits">support page</a> for this feature.</p>
+<p>So let's go back to the example of the browser's developer tool, and inspecting the network request to <code>/collect</code>. Copy the entire request URL (in Chrome it's <strong>right-click =&gt; Copy Link Address</strong> on the request), and paste it into a new browser window.</p>
 <p>If you now press Enter, your browser will simply send the request to GA. However, before you press Enter, add <strong>/debug</strong> into the URL, between the hostname and <code>/collect</code>, so it looks like this:</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2016/02/debug.jpg" title="debug">
@@ -971,9 +949,7 @@ JACK: Nah, let&rsquo;s use Measurement Protocol instead.</p>
     </a>
   
 
-
 <p>And now press Enter. You should see the response in your web browser:</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2016/02/hit-valid.jpg" title="Valid hit">
@@ -983,16 +959,11 @@ JACK: Nah, let&rsquo;s use Measurement Protocol instead.</p>
     </a>
   
 
-
-<p>Since you&rsquo;re copying a request sent by your website, you should hope it&rsquo;s valid. If it isn&rsquo;t, start working on a fix!</p>
-
-<h2 id="why-it-s-useful">Why it&rsquo;s useful</h2>
-
-<p>Well, for one, you can debug your hits and see if there&rsquo;s something wrong with them. Common mistakes include when you&rsquo;ve got a field value wrong in your code, or when you&rsquo;ve forgotten to add a field which is required. For example, setting <strong>Event Value</strong> to a blank string or a decimal number would return an error, as if the field is in the request, it always needs to be an integer.</p>
-
-<p>Another good use case is for when you&rsquo;re actually using the Measurement Protocol in your custom setups. The debugger <strong>returns</strong> a response object, meaning you can debug your setup without actually sending data to Google Analytics! By parsing the response, you can easily identify if your custom payload is working or not.</p>
-
-<p>I know I&rsquo;m in the geek camp with this, but this feature is definitely packing a kiloton worth of awesome in a small space. This is a <strong>perfect</strong> way to test your setups without sending actual data to Google Analytics, and the response object has lots of information, all missing from the actual request to <code>/collect</code>.</p>
+<p>Since you're copying a request sent by your website, you should hope it's valid. If it isn't, start working on a fix!</p>
+<h2 id="why-its-useful">Why it's useful</h2>
+<p>Well, for one, you can debug your hits and see if there's something wrong with them. Common mistakes include when you've got a field value wrong in your code, or when you've forgotten to add a field which is required. For example, setting <strong>Event Value</strong> to a blank string or a decimal number would return an error, as if the field is in the request, it always needs to be an integer.</p>
+<p>Another good use case is for when you're actually using the Measurement Protocol in your custom setups. The debugger <strong>returns</strong> a response object, meaning you can debug your setup without actually sending data to Google Analytics! By parsing the response, you can easily identify if your custom payload is working or not.</p>
+<p>I know I'm in the geek camp with this, but this feature is definitely packing a kiloton worth of awesome in a small space. This is a <strong>perfect</strong> way to test your setups without sending actual data to Google Analytics, and the response object has lots of information, all missing from the actual request to <code>/collect</code>.</p>
 
     </section>
 

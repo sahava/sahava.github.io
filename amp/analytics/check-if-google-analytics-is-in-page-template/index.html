@@ -119,8 +119,6 @@
 
 <meta itemprop="name" content="Check If Google Analytics Is In The Page Template">
 <meta itemprop="description" content="Guide for creating a variable which checks if Google Analytics is hard-coded in the page. This is useful if you want to check for duplicate implementations via Google Tag Manager.">
-
-
 <meta itemprop="datePublished" content="2014-11-28T08:33:27&#43;00:00" />
 <meta itemprop="dateModified" content="2014-11-28T08:33:27&#43;00:00" />
 <meta itemprop="wordCount" content="837">
@@ -128,7 +126,6 @@
 
 
 <meta itemprop="keywords" content="Google Tag Manager,Guide," />
-
 <script type="application/ld+json">
 {
     "@context": "http://schema.org",
@@ -905,14 +902,9 @@ on
     </header>
 
     <section class="post-content">
-      
-
-<p>One of the recurring problems in migrating to Google Tag Manager is how to make the transition as smooth as possible. Usually it requires that we agree with the developers on a time when the old code is removed, and at that moment we need to make sure the GTM tags point to the right UA code. This is, of course, only one use case for migrations, as some people do the entire migration in a staging environment, and some just don&rsquo;t care if they lose a little bit of data along the way.</p>
-
+      <p>One of the recurring problems in migrating to Google Tag Manager is how to make the transition as smooth as possible. Usually it requires that we agree with the developers on a time when the old code is removed, and at that moment we need to make sure the GTM tags point to the right UA code. This is, of course, only one use case for migrations, as some people do the entire migration in a staging environment, and some just don't care if they lose a little bit of data along the way.</p>
 <p>However, the most seamless way to do the transition is to automate it. Make GTM somehow check for the existence of on-page GA, and if it finds it, the tags will not fire. As soon as the on-page GA is no longer found, GTM can go rampart.</p>
-
-<p>This is a recurring discussion in our Google+ <a href="https://plus.google.com/communities/104865292981489764063">GTM Community</a>, but this time it began in Twitter. Here&rsquo;s the gist of it:</p>
-
+<p>This is a recurring discussion in our Google+ <a href="https://plus.google.com/communities/104865292981489764063">GTM Community</a>, but this time it began in Twitter. Here's the gist of it:</p>
 <amp-twitter width="375"
              height="472"
              layout="responsive"
@@ -923,62 +915,54 @@ on
 </amp-twitter>
 
 
-
 <p>In this post, I wanted to take a shot at what my good friend Peter is looking for, with what I think is the best way to do this.</p>
-
 <p>Now, there are a number of ways you could go about checking for on-page GA, including:</p>
-
 <ul>
-<li><p>Check for existence of GA cookies</p>
-
+<li>
+<p>Check for existence of GA cookies</p>
 <ul>
 <li>Very unreliable as cookies persist after removing on-page code, and if migration is to the same version of GA, the cookies are the same</li>
-</ul></li>
-
-<li><p>Serialize page template, and regex match for script loaders or calls to the tracking objects</p>
-
+</ul>
+</li>
+<li>
+<p>Serialize page template, and regex match for script loaders or calls to the tracking objects</p>
 <ul>
-<li>Crazy solution (that I just came up with), and isn&rsquo;t very reliable. Fails completely if scripts are loaded in external JS files</li>
-</ul></li>
-
-<li><p>Ask developers to add <code>dataLayer.push()</code> that tells the status of on-page GA</p>
-
+<li>Crazy solution (that I just came up with), and isn't very reliable. Fails completely if scripts are loaded in external JS files</li>
+</ul>
+</li>
+<li>
+<p>Ask developers to add <code>dataLayer.push()</code> that tells the status of on-page GA</p>
 <ul>
 <li>By far the most reliable solution out there, but the reason most people are looking for a solution like this is to <em>minimize</em> developer intervention</li>
-</ul></li>
-
-<li><p>Check for existence of <code>ga</code> or <code>_gaq</code> objects</p>
-
-<ul>
-<li>Works well if you can bear the wait for the tracking library to load AND execute, as the objects are created in the library code. On some sites, this might be a too long wait, especially if the library is loaded asynchronously. Also, you can rename the <code>ga</code> object, so you&rsquo;d need to identify it first.</li>
-</ul></li>
 </ul>
-
-<p>But I want to show you what I think is the best way to do it. Feel free to disagree, and I find myself disagreeing with me as well, especially on a complex site! In my opinion, the following solution does the check as early as possible, and it&rsquo;s as reliable as it can be, even though there are some caveats.</p>
-
+</li>
+<li>
+<p>Check for existence of <code>ga</code> or <code>_gaq</code> objects</p>
+<ul>
+<li>Works well if you can bear the wait for the tracking library to load AND execute, as the objects are created in the library code. On some sites, this might be a too long wait, especially if the library is loaded asynchronously. Also, you can rename the <code>ga</code> object, so you'd need to identify it first.</li>
+</ul>
+</li>
+</ul>
+<p>But I want to show you what I think is the best way to do it. Feel free to disagree, and I find myself disagreeing with me as well, especially on a complex site! In my opinion, the following solution does the check as early as possible, and it's as reliable as it can be, even though there are some caveats.</p>
 <h2 id="solution-look-for-the-script-elements">Solution: look for the <code>&lt;script&gt;</code> elements</h2>
-
 <p>This solution looks for the existence of <code>&lt;script&gt;</code> elements, where either ga.js, analytics.js, or dc.js are loaded.</p>
-
-<p>I think it&rsquo;s pretty reliable, as if the script element is injected in proper form, it means that the libraries have loaded or have begun to load.</p>
-
-<p>Here&rsquo;s the Custom JavaScript Macro for this. It returns &ldquo;true&rdquo; if it finds any of the libraries you specify.</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-  <span class="kd">var</span> <span class="nx">scripts</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementsByTagName</span><span class="p">(</span><span class="s1">&#39;script&#39;</span><span class="p">),</span>
+<p>I think it's pretty reliable, as if the script element is injected in proper form, it means that the libraries have loaded or have begun to load.</p>
+<p>Here's the Custom JavaScript Macro for this. It returns &ldquo;true&rdquo; if it finds any of the libraries you specify.</p>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span><span class="p">(</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">scripts</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementsByTagName</span><span class="p">(</span><span class="s1">&#39;script&#39;</span><span class="p">)</span><span class="p">,</span>
       <span class="nx">ga</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="c1">// set to false if you don&#39;t want to check for ga.js
 </span><span class="c1"></span>      <span class="nx">ua</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span> <span class="c1">// set to false if you don&#39;t want to check for analytics.js
 </span><span class="c1"></span>      <span class="nx">dc</span> <span class="o">=</span> <span class="kc">false</span><span class="p">,</span> <span class="c1">// set to false if you don&#39;t want to check for dc.js
 </span><span class="c1"></span>      <span class="nx">i</span> <span class="o">=</span> <span class="nx">len</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
   <span class="k">if</span> <span class="p">(</span><span class="nx">ga</span> <span class="o">||</span> <span class="nx">ua</span> <span class="o">||</span> <span class="nx">dc</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">for</span> <span class="p">(</span><span class="nx">i</span><span class="p">,</span> <span class="nx">len</span> <span class="o">=</span> <span class="nx">scripts</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">len</span><span class="p">;</span> <span class="nx">i</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">if</span> <span class="p">(</span><span class="nx">ga</span> <span class="o">&amp;&amp;</span> <span class="sr">/www\.google-analytics\.com\/ga\.js/</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">scripts</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">src</span><span class="p">))</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">ga</span> <span class="o">&amp;&amp;</span> <span class="sr">/www\.google-analytics\.com\/ga\.js/</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">scripts</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span><span class="p">.</span><span class="nx">src</span><span class="p">)</span><span class="p">)</span> <span class="p">{</span>
         <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
       <span class="p">}</span>
-      <span class="k">if</span> <span class="p">(</span><span class="nx">ua</span> <span class="o">&amp;&amp;</span> <span class="sr">/www\.google-analytics\.com\/analytics\.js/</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">scripts</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">src</span><span class="p">))</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">ua</span> <span class="o">&amp;&amp;</span> <span class="sr">/www\.google-analytics\.com\/analytics\.js/</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">scripts</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span><span class="p">.</span><span class="nx">src</span><span class="p">)</span><span class="p">)</span> <span class="p">{</span>
         <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
       <span class="p">}</span>
-      <span class="k">if</span> <span class="p">(</span><span class="nx">dc</span> <span class="o">&amp;&amp;</span> <span class="sr">/stats\.g\.doubleclick\.net\/dc\.js/</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">scripts</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">src</span><span class="p">))</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">dc</span> <span class="o">&amp;&amp;</span> <span class="sr">/stats\.g\.doubleclick\.net\/dc\.js/</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">scripts</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span><span class="p">.</span><span class="nx">src</span><span class="p">)</span><span class="p">)</span> <span class="p">{</span>
         <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
       <span class="p">}</span>
     <span class="p">}</span>
@@ -986,20 +970,13 @@ on
   <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div>
-
 <p>So now you can add <strong>{{check for scripts}} equals true</strong> as a blocking trigger in your GTM GA tags.</p>
-
 <p>There are some shortcomings to this method. For example, the page can load the libraries but not do any tracking. This can be true for legacy setups, where only the <code>_gaq.push()</code> commands have been removed, but the library load remains. So naturally, you will have to audit the site before implementing this solution.</p>
-
 <p>I tested this out a couple of times on my own blog, using it as the blocking rule of my pageview tag, and it seemed to work fine.</p>
-
 <p>Naturally, since the ga.js snippet is added to the end of the page (stupid, synchronous script), you might need to wait for gtm.dom before checking the blocking rule, especially on heavy pages.</p>
-
 <h2 id="summary">Summary</h2>
-
 <p>Remember, this simple solution is only for the transition from on-page GA to GTM. The only thing it does is prevent you from having to sit in front of a computer, constantly refreshing the page to see if the on-page code has been removed.</p>
-
-<p>A migration requires vigilance, so even if you manage to automate the transition with this solution, you will still need to be alert throughout the process. But you knew this already (didn&rsquo;t mean to sound condescending).</p>
+<p>A migration requires vigilance, so even if you manage to automate the transition with this solution, you will still need to be alert throughout the process. But you knew this already (didn't mean to sound condescending).</p>
 
     </section>
 

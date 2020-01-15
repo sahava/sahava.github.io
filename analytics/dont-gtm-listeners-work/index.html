@@ -53,7 +53,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.59.1 with theme Tranquilpeak 0.4.3-BETA">
+    <meta name="generator" content="Hugo 0.61.0 with theme Tranquilpeak 0.4.3-BETA">
     <title>Why Don&#39;t My GTM Listeners Work? | Simo Ahava's blog</title>
     
     <script>
@@ -319,34 +319,26 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              
-
-<p>Ever so often I come across a Google Tag Manager setup where <a href="https://www.simoahava.com/analytics/auto-event-tracking-google-tag-manager/">GTM&rsquo;s own auto-event listeners</a> don&rsquo;t perform the task they were supposed to. Listener problems seem to be a hot topic in <a href="https://plus.google.com/u/0/communities/104865292981489764063">Google+</a> and the <a href="https://productforums.google.com/forum/#!forum/tag-manager">Product Forums</a> as well.</p>
-
-<p>There may be many reasons why your listeners don&rsquo;t work, but a very common trend is that you have conflicting JavaScript libraries or scripts running on your page.</p>
-
-<p>Let&rsquo;s explore how listeners work before tackling the problem. You see, when you attach an event listener to an element in your Document Object Model (the collection of all elements on your page), the listener waits for the element to produce the action it is listening for.</p>
-
+              <p>Ever so often I come across a Google Tag Manager setup where <a href="https://www.simoahava.com/analytics/auto-event-tracking-google-tag-manager/">GTM's own auto-event listeners</a> don't perform the task they were supposed to. Listener problems seem to be a hot topic in <a href="https://plus.google.com/u/0/communities/104865292981489764063">Google+</a> and the <a href="https://productforums.google.com/forum/#!forum/tag-manager">Product Forums</a> as well.</p>
+<p>There may be many reasons why your listeners don't work, but a very common trend is that you have conflicting JavaScript libraries or scripts running on your page.</p>
+<p>Let's explore how listeners work before tackling the problem. You see, when you attach an event listener to an element in your Document Object Model (the collection of all elements on your page), the listener waits for the element to produce the action it is listening for.</p>
 <ul>
-<li><p>With a <strong>link click listener</strong>, the handler waits for a link (<code>&lt;a/&gt;</code>) element to fire a click event.</p></li>
-
-<li><p>With a <strong>click listener</strong>, the handler waits for any element to fire a click event.</p></li>
-
-<li><p>With a <strong>form submit listener</strong>, the handler waits for a form (<code>&lt;form/&gt;</code>) element to fire a submit event.</p></li>
+<li>
+<p>With a <strong>link click listener</strong>, the handler waits for a link (<code>&lt;a/&gt;</code>) element to fire a click event.</p>
+</li>
+<li>
+<p>With a <strong>click listener</strong>, the handler waits for any element to fire a click event.</p>
+</li>
+<li>
+<p>With a <strong>form submit listener</strong>, the handler waits for a form (<code>&lt;form/&gt;</code>) element to fire a submit event.</p>
+</li>
 </ul>
-
 <p>Now this should still be easy to follow. You set up a link click listener, and when someone clicks a link, the listener pushes the event <strong>gtm.linkClick</strong> into the dataLayer object. Run-of-the-mill stuff.</p>
-
 <h2 id="competing-listeners">Competing listeners</h2>
-
-<p>Here&rsquo;s the gist. If you have another listener ALSO waiting for the same event, there&rsquo;s a chance that it will interrupt the event from ever reaching the GTM listener, meaning that your link click listener never fires.</p>
-
+<p>Here's the gist. If you have another listener ALSO waiting for the same event, there's a chance that it will interrupt the event from ever reaching the GTM listener, meaning that your link click listener never fires.</p>
 <p>How is this possible?</p>
-
-<p>Well, a GTM link click listener, for example, is not actually primed on every single link element on your page. Rather, it&rsquo;s attached to the highest possible DOM element node: the document itself. It utilizes a JavaScript feature called <strong>event delegation</strong>. This means that when a click event occurs on a link, the event starts to <strong>bubble</strong> (yes, that&rsquo;s an official term) up the DOM tree, until it reaches the topmost node. Any elements along this bubbly path with listeners attached to them will fire when the event reaches them. This is also called <strong>event propagation</strong>.</p>
-
-<p>The picture below clarifies the difference between a listener on the link node and a listener on the document node. In the example, I have a single link element with a classic <strong>onClick=&ldquo;&rdquo;</strong> attribute. In reality, this attribute is also an event listener. It waits for a click event on this specific tag. Also, I have GTM&rsquo;s own click listener primed and ready. As you can see, the onClick listener is attached to the link node itself, whereas the click listener is attached to the document node.</p>
-
+<p>Well, a GTM link click listener, for example, is not actually primed on every single link element on your page. Rather, it's attached to the highest possible DOM element node: the document itself. It utilizes a JavaScript feature called <strong>event delegation</strong>. This means that when a click event occurs on a link, the event starts to <strong>bubble</strong> (yes, that's an official term) up the DOM tree, until it reaches the topmost node. Any elements along this bubbly path with listeners attached to them will fire when the event reaches them. This is also called <strong>event propagation</strong>.</p>
+<p>The picture below clarifies the difference between a listener on the link node and a listener on the document node. In the example, I have a single link element with a classic <strong>onClick=&rdquo;&quot;</strong> attribute. In reality, this attribute is also an event listener. It waits for a click event on this specific tag. Also, I have GTM's own click listener primed and ready. As you can see, the onClick listener is attached to the link node itself, whereas the click listener is attached to the document node.</p>
 
 
 
@@ -362,61 +354,45 @@
 </div>
 
 
-
 <h2 id="a-practical-example">A practical example</h2>
-
-<p>Let&rsquo;s say you have a very simple page with a source code that looks something like this:</p>
-
+<p>Let's say you have a very simple page with a source code that looks something like this:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">html</span>&gt;
  &lt;<span style="color:#f92672">head</span>&gt;
   &lt;<span style="color:#f92672">title</span>&gt;My Page&lt;/<span style="color:#f92672">title</span>&gt;
  &lt;/<span style="color:#f92672">head</span>&gt;
  &lt;<span style="color:#f92672">body</span>&gt;
-  <span style="color:#75715e">&lt;!-- Google Tag Manager Container here --&gt;</span>
+  <span style="color:#75715e">&lt;!--</span><span style="color:#75715e"> Google Tag Manager Container here </span><span style="color:#75715e">--&gt;</span>
   &lt;<span style="color:#f92672">div</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;main&#34;</span>&gt;
    &lt;<span style="color:#f92672">a</span> <span style="color:#a6e22e">href</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;http://www.google.com&#34;</span>&gt;Google&lt;/<span style="color:#f92672">a</span>&gt;
   &lt;/<span style="color:#f92672">div</span>&gt;
  &lt;/<span style="color:#f92672">body</span>&gt;
 &lt;/<span style="color:#f92672">html</span>&gt;</code></pre></div>
-
 <p>If I now add a link click listener to my GTM container, it will be attached to the document node, which is a top-level parent to all the elements you see in the code above.</p>
-
 <p>Now, when someone clicks the link, the following happens:</p>
-
 <ol>
-<li><p>Any listener attached to the <code>&lt;a/&gt;</code> element itself (e.g. <strong>onClick</strong>) will be fired first, because it is closest to the event occurrence</p></li>
-
-<li><p>Any listener attached to the <code>&lt;div/&gt;</code> element will fire next, because it is the immediate parent to the element where the event occurred</p></li>
-
-<li><p>And so on until the event <strong>bubbles</strong> up all the way to the top of the DOM tree and reaches the <strong>document</strong> node where GTM&rsquo;s link click listener is waiting</p></li>
+<li>
+<p>Any listener attached to the <code>&lt;a/&gt;</code> element itself (e.g. <strong>onClick</strong>) will be fired first, because it is closest to the event occurrence</p>
+</li>
+<li>
+<p>Any listener attached to the <code>&lt;div/&gt;</code> element will fire next, because it is the immediate parent to the element where the event occurred</p>
+</li>
+<li>
+<p>And so on until the event <strong>bubbles</strong> up all the way to the top of the DOM tree and reaches the <strong>document</strong> node where GTM's link click listener is waiting</p>
+</li>
 </ol>
-
-<p>Here&rsquo;s the thing. If <em>at any point</em> during the event&rsquo;s bubbly journey to the top of the mountain its process is halted by a conflicting script, for example, the event will never reach GTM&rsquo;s listener!</p>
-
+<p>Here's the thing. If <em>at any point</em> during the event's bubbly journey to the top of the mountain its process is halted by a conflicting script, for example, the event will never reach GTM's listener!</p>
 <p>The most common culprit is a competing jQuery listener which contains the following, ominous line of code:</p>
-
 <p><code>return false;</code></p>
-
-<p>This effectively halts the progress of the event listener, and returns the action to the link element with a &ldquo;don&rsquo;t do what you were supposed to do in the first place&rdquo; type of statement.</p>
-
-<p>A very common occurrence is when you are using jQuery to animate in-page scrolling to anchor links (i.e. <strong>smooth scrolling</strong>). I&rsquo;ve seen a bunch of scripts which hijack the link click event, animate the transition to the correct part of the page, and <strong>return false;</strong>, because, naturally, they don&rsquo;t want the link to perform its default action of instantly transporting you to the correct part of the page.</p>
-
-<h2 id="what-s-the-cure">What&rsquo;s the cure?</h2>
-
-<p>You&rsquo;ll have to talk to your developers about this. Tell them that you need event propagation to work all the way up to the document node. Usually this can be done by replacing</p>
-
+<p>This effectively halts the progress of the event listener, and returns the action to the link element with a &ldquo;don't do what you were supposed to do in the first place&rdquo; type of statement.</p>
+<p>A very common occurrence is when you are using jQuery to animate in-page scrolling to anchor links (i.e. <strong>smooth scrolling</strong>). I've seen a bunch of scripts which hijack the link click event, animate the transition to the correct part of the page, and <strong>return false;</strong>, because, naturally, they don't want the link to perform its default action of instantly transporting you to the correct part of the page.</p>
+<h2 id="whats-the-cure">What's the cure?</h2>
+<p>You'll have to talk to your developers about this. Tell them that you need event propagation to work all the way up to the document node. Usually this can be done by replacing</p>
 <p><code>return false;</code></p>
-
 <p>with</p>
-
 <p><code>event.preventDefault();</code></p>
-
-<p>Of course, you&rsquo;ll need to pass the click event to the handler function as a parameter (<strong>event</strong> in event.preventDefault();) for this to work. There might also be cross-browser concerns, so do some research before making any changes.</p>
-
-<p>.preventDefault() also prevents the default action of the link click event, but it doesn&rsquo;t stop event propagation from continuing up the DOM tree. You&rsquo;ll have to test it, of course, since replacing the code might disrupt the functionality of your script.</p>
-
-<p>NOTE! If you use <strong>event.preventDefault();</strong> OR <strong>return false;</strong>, you&rsquo;ll need to uncheck the <strong>Check validation</strong> option in your link click listener. If this is left checked, the listener won&rsquo;t fire even if the event bubbles up all the way to the document node.</p>
-
+<p>Of course, you'll need to pass the click event to the handler function as a parameter (<strong>event</strong> in event.preventDefault();) for this to work. There might also be cross-browser concerns, so do some research before making any changes.</p>
+<p>.preventDefault() also prevents the default action of the link click event, but it doesn't stop event propagation from continuing up the DOM tree. You'll have to test it, of course, since replacing the code might disrupt the functionality of your script.</p>
+<p>NOTE! If you use <strong>event.preventDefault();</strong> OR <strong>return false;</strong>, you'll need to uncheck the <strong>Check validation</strong> option in your link click listener. If this is left checked, the listener won't fire even if the event bubbles up all the way to the document node.</p>
 
 
 
@@ -432,14 +408,10 @@
 </div>
 
 
-
 <h2 id="conclusions">Conclusions</h2>
-
-<p>Understanding event propagation and how GTM&rsquo;s listeners work is one of the things you <em>should not</em> have to worry about when using GTM. After all, tag managers are advertised as a be-all and end-all solution to all your data collection woes with punchlines like: &ldquo;Forget IT&rdquo; or &ldquo;No more development needed&rdquo;.</p>
-
-<p>The harsh reality is that a tag manager like GTM is just one more library in the client&rsquo;s often congested resource jungle. Conflicts are bound to happen, especially when external resources like jQuery are used to add functionality to the site.</p>
-
-<p>For one, whenever I work with a complex website, I will never, EVER, disregard the client&rsquo;s development or IT unit. Rather, I will talk to them about GTM, and work together with them to come up with the best possible implementation plan, without compromising the current front-end deployment.</p>
+<p>Understanding event propagation and how GTM's listeners work is one of the things you <em>should not</em> have to worry about when using GTM. After all, tag managers are advertised as a be-all and end-all solution to all your data collection woes with punchlines like: &ldquo;Forget IT&rdquo; or &ldquo;No more development needed&rdquo;.</p>
+<p>The harsh reality is that a tag manager like GTM is just one more library in the client's often congested resource jungle. Conflicts are bound to happen, especially when external resources like jQuery are used to add functionality to the site.</p>
+<p>For one, whenever I work with a complex website, I will never, EVER, disregard the client's development or IT unit. Rather, I will talk to them about GTM, and work together with them to come up with the best possible implementation plan, without compromising the current front-end deployment.</p>
 
               
 
@@ -543,7 +515,7 @@
         </article>
         <footer id="footer" class="main-content-wrap">
   <span class="copyrights">
-    &copy; 2019 Simo Ahava. All Rights Reserved
+    &copy; 2020 Simo Ahava. All Rights Reserved
   </span>
 </footer>
 

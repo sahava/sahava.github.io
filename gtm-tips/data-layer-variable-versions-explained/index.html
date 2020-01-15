@@ -53,7 +53,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.59.1 with theme Tranquilpeak 0.4.3-BETA">
+    <meta name="generator" content="Hugo 0.61.0 with theme Tranquilpeak 0.4.3-BETA">
     <title>#GTMTips: Data Layer Variable Versions Explained | Simo Ahava's blog</title>
     
     <script>
@@ -319,14 +319,9 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              
-
-<p><a href="https://tagmanager.google.com/">Google Tag Manager</a>&rsquo;s <a href="https://www.simoahava.com/analytics/data-layer/">Data Layer</a> is something I&rsquo;ve touched upon in pretty much all of my articles. It&rsquo;s such an integral part of what makes a tag management solution great and applicable to a host of business scenarios. I&rsquo;ve also talked at length about the internal data model of Google Tag Manager, and this <a href="https://www.simoahava.com/categories/gtm-tips/">#GTMTips</a> post is very much related to this rather murky concept.</p>
-
-<p>In this post, we&rsquo;ll go over the <strong>Data Layer Variable Version</strong> selection, and I&rsquo;ll try to explain just what this selector does.</p>
-
+              <p><a href="https://tagmanager.google.com/">Google Tag Manager</a>&lsquo;s <a href="https://www.simoahava.com/analytics/data-layer/">Data Layer</a> is something I've touched upon in pretty much all of my articles. It's such an integral part of what makes a tag management solution great and applicable to a host of business scenarios. I've also talked at length about the internal data model of Google Tag Manager, and this <a href="https://www.simoahava.com/categories/gtm-tips/">#GTMTips</a> post is very much related to this rather murky concept.</p>
+<p>In this post, we'll go over the <strong>Data Layer Variable Version</strong> selection, and I'll try to explain just what this selector does.</p>
 <h2 id="tip-40-the-two-faces-of-the-data-layer-variable">Tip 40: The two faces of the Data Layer Variable</h2>
-
 
 
 
@@ -342,9 +337,7 @@
 </div>
 
 
-
-<p>Let&rsquo;s start by taking a step back. As a technical construct, the &ldquo;Data Layer&rdquo; in GTM is a <strong>JavaScript Array</strong>, which usually comprises a number of <strong>plain objects</strong> that have been pushed into its innards on a web page.</p>
-
+<p>Let's start by taking a step back. As a technical construct, the &ldquo;Data Layer&rdquo; in GTM is a <strong>JavaScript Array</strong>, which usually comprises a number of <strong>plain objects</strong> that have been pushed into its innards on a web page.</p>
 
 
 
@@ -360,19 +353,12 @@
 </div>
 
 
-
-<p>As you&rsquo;ve learned from my <a href="https://www.simoahava.com/analytics/google-tag-manager-data-model/">data model article</a>, GTM doesn&rsquo;t actually access this Array when you create your Data Layer Variables. Instead, when an object is pushed into <code>dataLayer</code>, it&rsquo;s made available to the data model of Google Tag Manager, and any Data Layer Variables you create will refer to these instances in the data model rather than directly accessing the Array itself.</p>
-
+<p>As you've learned from my <a href="https://www.simoahava.com/analytics/google-tag-manager-data-model/">data model article</a>, GTM doesn't actually access this Array when you create your Data Layer Variables. Instead, when an object is pushed into <code>dataLayer</code>, it's made available to the data model of Google Tag Manager, and any Data Layer Variables you create will refer to these instances in the data model rather than directly accessing the Array itself.</p>
 <p>Why? To decouple the Array from the internal mechanisms of the connected platform (GTM in this case). This is quite important, as the less GTM needs to rely on the abstract structure of <code>dataLayer</code>, which could be manipulated at any time by either sloppy code or another connected platform, the better.</p>
-
-<p>Now, when you select the <strong>Version</strong> of the Data Layer Variable, you&rsquo;re instructing GTM to treat the values in the data model in two different ways.</p>
-
+<p>Now, when you select the <strong>Version</strong> of the Data Layer Variable, you're instructing GTM to treat the values in the data model in two different ways.</p>
 <h3 id="version-1">Version 1</h3>
-
-<p>Version 1 of the Data Layer Variable has a very limited reach. Basically, the key-value pair that is pushed into <code>dataLayer</code> needs to be in the root of the object, as Version 1 doesn&rsquo;t let you access nested keys.</p>
-
-<p>Here&rsquo;s an example of what would happen with a Version 1 Data Layer Variable that points to key name <code>'product.price'</code>:</p>
-
+<p>Version 1 of the Data Layer Variable has a very limited reach. Basically, the key-value pair that is pushed into <code>dataLayer</code> needs to be in the root of the object, as Version 1 doesn't let you access nested keys.</p>
+<p>Here's an example of what would happen with a Version 1 Data Layer Variable that points to key name <code>'product.price'</code>:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#75715e">// Works because the dots are in the key name, and the key is in the root:
 </span><span style="color:#75715e"></span>window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
   <span style="color:#e6db74">&#39;product.price&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;11.99&#39;</span>
@@ -384,11 +370,8 @@
   }
 });
 </code></pre></div>
-
 <p>You could, though, access the nested object indirectly with a Version 1 Data Layer Variable by creating the variable for the key <code>'product'</code>, and then manipulating the returned object in a Custom HTML Tag or a Custom JavaScript Variable.</p>
-
-<p>And&hellip;yeah. That&rsquo;s all that Version 1 does. There&rsquo;s no merging, no special data model functions, no nothing that you can use to further manipulate the retrieved object. So let&rsquo;s take a look at what happens when I push two different values for the same key (<code>'product'</code>):</p>
-
+<p>And&hellip;yeah. That's all that Version 1 does. There's no merging, no special data model functions, no nothing that you can use to further manipulate the retrieved object. So let's take a look at what happens when I push two different values for the same key (<code>'product'</code>):</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
   <span style="color:#e6db74">&#39;product&#39;</span> <span style="color:#f92672">:</span> {
     <span style="color:#e6db74">&#39;price&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;11.99&#39;</span>
@@ -400,19 +383,12 @@ window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">
   }
 });
 </code></pre></div>
-
 <p>In the example above, if I had my Version 1 Data Layer Variable pointing to <code>'product'</code>, it would return a plain object with <code>{'price' : '11.99'}</code> after the first push, and a plain object with <code>{'name' : 'Tim Duncan Fan Club Membership'}</code> after the second.</p>
-
 <p>In essence, any information in the first push <strong>is completely overwritten</strong> (for this particular Data Layer Variable) by the second push with the same key name (<code>'product'</code>).</p>
-
 <h3 id="version-2">Version 2</h3>
-
-<p>If you want more flexibility, use Version 2 of the Data Layer Variable. This treats objects more like you&rsquo;d expect if you&rsquo;re familiar with how JavaScript works.</p>
-
+<p>If you want more flexibility, use Version 2 of the Data Layer Variable. This treats objects more like you'd expect if you're familiar with how JavaScript works.</p>
 <p>Instead of bulldozing over existing keys, Version 2 first checks whether a key with that name already exists in the data model. If it does, it <strong>recursively merges</strong> information in the new push with information in the existing object.</p>
-
-<p>Let&rsquo;s see an example:</p>
-
+<p>Let's see an example:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
   <span style="color:#e6db74">&#39;product&#39;</span> <span style="color:#f92672">:</span> {
     <span style="color:#e6db74">&#39;price&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;119.99&#39;</span>,
@@ -426,46 +402,35 @@ window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">
   }
 });
 </code></pre></div>
-
-<p>So, let&rsquo;s say you&rsquo;re using Version 2 of the Data Layer Variable, and you&rsquo;re yet again pointing to the key with name <code>'product'</code>.</p>
-
+<p>So, let's say you're using Version 2 of the Data Layer Variable, and you're yet again pointing to the key with name <code>'product'</code>.</p>
 <p>After the first <code>dataLayer.push()</code>, the variable would return a plain object with:</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">{ 
   <span style="color:#e6db74">&#39;price&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;119.99&#39;</span>, 
   <span style="color:#e6db74">&#39;category&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;Membership&#39;</span>
 }
 </code></pre></div>
-
 <p>After the second push, the contents would be:</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">{
   <span style="color:#e6db74">&#39;price&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;1199.99&#39;</span>, 
   <span style="color:#e6db74">&#39;category&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;Membership&#39;</span>, 
   <span style="color:#e6db74">&#39;name&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;Tim Duncan Fan Club Membership&#39;</span>
 }
 </code></pre></div>
-
 <p>Can you see what happened here? Another object with the same key name (<code>'product'</code>) is pushed. Version 2 of the Data Layer Variable finds an instance of this key within the data model. Then, it recursively checks each key within this object to see if there are conflicts.</p>
-
-<p>First, it finds that <code>'price'</code> is in both objects, so there&rsquo;s a clash. Next, it checks if <code>'price'</code> is also a plain object or an Array to see if it should perform yet another merge deeper in the structure. However, the value of <code>'price'</code> is a String, which means that no recursive merge is performed, and the new value overwrites the old one.</p>
-
+<p>First, it finds that <code>'price'</code> is in both objects, so there's a clash. Next, it checks if <code>'price'</code> is also a plain object or an Array to see if it should perform yet another merge deeper in the structure. However, the value of <code>'price'</code> is a String, which means that no recursive merge is performed, and the new value overwrites the old one.</p>
 <p>Next, it sees that <code>'category'</code> does not have any conflicts, so it leaves it be in the object. Finally, it finds a completely new key in the second push, <code>'name'</code>, and it merges this key into the existing object in the data model.</p>
-
 <p>So using Version 2 of the Data Layer Variable, resolution of conflicts in object key names is first attempted via a merge of the two objects, but if there are new &ldquo;primitive&rdquo; values for any pre-existing keys, their values are overwritten just as they would be with Version 1 of the Data Layer Variable.</p>
-
 <h2 id="so-what">So what?</h2>
-
-<p>This information could lead to a number of conclusions, but I&rsquo;m guessing many have the following two questions pop into their minds:</p>
-
+<p>This information could lead to a number of conclusions, but I'm guessing many have the following two questions pop into their minds:</p>
 <ol>
-<li><p>Why does the Version 1 still exist? Its numbering alone would mean that it&rsquo;s inferior.</p></li>
-
-<li><p>What on earth do I need recursive merge for?</p></li>
+<li>
+<p>Why does the Version 1 still exist? Its numbering alone would mean that it's inferior.</p>
+</li>
+<li>
+<p>What on earth do I need recursive merge for?</p>
+</li>
 </ol>
-
-<p>One of the best use cases for Version 1 is with <a href="https://www.simoahava.com/analytics/enhanced-ecommerce-with-a-custom-javascript-variable/">Enhanced Ecommerce</a>. If you&rsquo;re using the <strong>Custom JavaScript Variable</strong> method, which I seem to use almost exclusively, you probably want to use Version 1 of the Data Layer when interacting with the <code>'ecommerce'</code> key. This way, GTM will only access the <em>most recent push</em> into <code>dataLayer</code>. And why is this significant? Take a look at the example below:</p>
-
+<p>One of the best use cases for Version 1 is with <a href="https://www.simoahava.com/analytics/enhanced-ecommerce-with-a-custom-javascript-variable/">Enhanced Ecommerce</a>. If you're using the <strong>Custom JavaScript Variable</strong> method, which I seem to use almost exclusively, you probably want to use Version 1 of the Data Layer when interacting with the <code>'ecommerce'</code> key. This way, GTM will only access the <em>most recent push</em> into <code>dataLayer</code>. And why is this significant? Take a look at the example below:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
   <span style="color:#e6db74">&#39;ecommerce&#39;</span> <span style="color:#f92672">:</span> {
     <span style="color:#e6db74">&#39;impressions&#39;</span> <span style="color:#f92672">:</span> [{ ... <span style="color:#a6e22e">impressions</span> ... }]
@@ -484,23 +449,21 @@ window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">
   }
 });
 </code></pre></div>
-
-<p>If you used <strong>Version 2</strong> of the Data Layer Variable to send the Enhanced Ecommerce payload using the Custom JavaScript Variable method, you&rsquo;ll end up with <strong>three</strong> Impression payloads, <strong>two</strong> Product Detail Views, and <strong>one</strong> Add to Cart action. This is because of the <em>recursive merge</em> of the <code>'ecommerce'</code> object! I&rsquo;m guessing your intent is to only send each payload once.</p>
-
-<p>So, if you instead use <strong>Version 1</strong> of the Data Layer Variable to access the <code>'ecommerce'</code> object, GTM will only access the payload that was most recently pushed into <code>dataLayer</code>. This way you&rsquo;ll end up avoiding the payload multiplication problem.</p>
-
-<p>As for the second point of what recursive merge is good for, there&rsquo;s a whole universe of possibilities when it comes to merging of objects instead of overwriting previous instances. Examples include:</p>
-
+<p>If you used <strong>Version 2</strong> of the Data Layer Variable to send the Enhanced Ecommerce payload using the Custom JavaScript Variable method, you'll end up with <strong>three</strong> Impression payloads, <strong>two</strong> Product Detail Views, and <strong>one</strong> Add to Cart action. This is because of the <em>recursive merge</em> of the <code>'ecommerce'</code> object! I'm guessing your intent is to only send each payload once.</p>
+<p>So, if you instead use <strong>Version 1</strong> of the Data Layer Variable to access the <code>'ecommerce'</code> object, GTM will only access the payload that was most recently pushed into <code>dataLayer</code>. This way you'll end up avoiding the payload multiplication problem.</p>
+<p>As for the second point of what recursive merge is good for, there's a whole universe of possibilities when it comes to merging of objects instead of overwriting previous instances. Examples include:</p>
 <ul>
-<li><p>Updating an object as more information is revealed, e.g. collecting a history of interactions on a single page.</p></li>
-
-<li><p>Updating an object as more information becomes available, e.g. updating a &ldquo;user&rdquo; object as certain API calls complete.</p></li>
-
-<li><p>Making a valid merge of two Enhanced Ecommerce payloads, such as combining <code>'impressions'</code> with an <code>'add'</code> object.</p></li>
+<li>
+<p>Updating an object as more information is revealed, e.g. collecting a history of interactions on a single page.</p>
+</li>
+<li>
+<p>Updating an object as more information becomes available, e.g. updating a &ldquo;user&rdquo; object as certain API calls complete.</p>
+</li>
+<li>
+<p>Making a valid merge of two Enhanced Ecommerce payloads, such as combining <code>'impressions'</code> with an <code>'add'</code> object.</p>
+</li>
 </ul>
-
 <p>There are a host of other things you can do with Version 2 of the Data Layer Variable, and those are all detailed in my <a href="https://www.simoahava.com/analytics/google-tag-manager-data-model/">data model article</a>.</p>
-
 <p>I hope this has been illuminating, and I hope it helps you understand the rationale of having both versions available for the Data Layer Variable.</p>
 
               
@@ -607,7 +570,7 @@ window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">
         </article>
         <footer id="footer" class="main-content-wrap">
   <span class="copyrights">
-    &copy; 2019 Simo Ahava. All Rights Reserved
+    &copy; 2020 Simo Ahava. All Rights Reserved
   </span>
 </footer>
 

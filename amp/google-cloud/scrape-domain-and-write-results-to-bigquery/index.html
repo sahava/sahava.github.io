@@ -121,8 +121,6 @@
 
 <meta itemprop="name" content="Scrape The URLs Of A Domain And Write The Results To BigQuery">
 <meta itemprop="description" content="Use a Google Compute Engine virtual machine to scrape all the internal (and external) links of a given domain, and write the results to a BigQuery table.">
-
-
 <meta itemprop="datePublished" content="2018-12-31T11:14:06&#43;02:00" />
 <meta itemprop="dateModified" content="2018-12-31T11:14:06&#43;02:00" />
 <meta itemprop="wordCount" content="1687">
@@ -130,7 +128,6 @@
 
 
 <meta itemprop="keywords" content="google cloud,bigquery,nodejs," />
-
 <script type="application/ld+json">
 {
     "@context": "http://schema.org",
@@ -909,10 +906,7 @@ on
     </header>
 
     <section class="post-content">
-      
-
-<p>In my intense love affair with the <a href="https://cloud.google.com/">Google Cloud Platform</a>, I&rsquo;ve never felt more inspired to write content and try things out. After starting with a <a href="https://www.simoahava.com/amp/analytics/install-snowplow-on-the-google-cloud-platform/">Snowplow Analytics setup guide</a>, and continuing with a <a href="https://www.simoahava.com/amp/google-cloud/lighthouse-bigquery-google-cloud-platform/">Lighthouse audit automation tutorial</a>, I&rsquo;m going to show you yet another cool thing you can do with GCP.</p>
-
+      <p>In my intense love affair with the <a href="https://cloud.google.com/">Google Cloud Platform</a>, I've never felt more inspired to write content and try things out. After starting with a <a href="https://www.simoahava.com/amp/analytics/install-snowplow-on-the-google-cloud-platform/">Snowplow Analytics setup guide</a>, and continuing with a <a href="https://www.simoahava.com/amp/google-cloud/lighthouse-bigquery-google-cloud-platform/">Lighthouse audit automation tutorial</a>, I'm going to show you yet another cool thing you can do with GCP.</p>
 
 
     <a href="https://www.simoahava.com/amp/images/2018/12/bigquery-status-codes.jpg" title="BigQuery status codes">
@@ -922,15 +916,10 @@ on
     </a>
   
 
-
-<p>In this guide, I&rsquo;ll show you how to use an <a href="https://github.com/yujiosaka/headless-chrome-crawler">open-source web crawler</a> running in a <a href="https://cloud.google.com/compute/">Google Compute Engine</a> virtual machine (VM) instance to scrape all the internal and external links of a given domain, and write the results into a <a href="https://cloud.google.com/bigquery/">BigQuery table</a>. With this setup, you can audit and monitor the links in any website, looking for bad status codes or missing titles, and fix them to improve your site&rsquo;s logical architecture.</p>
-
-<!-- toc -->
-
+<p>In this guide, I'll show you how to use an <a href="https://github.com/yujiosaka/headless-chrome-crawler">open-source web crawler</a> running in a <a href="https://cloud.google.com/compute/">Google Compute Engine</a> virtual machine (VM) instance to scrape all the internal and external links of a given domain, and write the results into a <a href="https://cloud.google.com/bigquery/">BigQuery table</a>. With this setup, you can audit and monitor the links in any website, looking for bad status codes or missing titles, and fix them to improve your site's logical architecture.</p>
+<!-- raw HTML omitted -->
 <h2 id="how-it-works">How it works</h2>
-
-<p>The idea is fairly simple. You&rsquo;re using a <strong>Google Compute Engine</strong> VM instance to run the crawler script. The purpose here is that you can scale the instance up as much as you like (and can afford) to get the extra power you might not have with your local machine.</p>
-
+<p>The idea is fairly simple. You're using a <strong>Google Compute Engine</strong> VM instance to run the crawler script. The purpose here is that you can scale the instance up as much as you like (and can afford) to get the extra power you might not have with your local machine.</p>
 
 
     <a href="https://www.simoahava.com/amp/images/2018/12/compute-engine-instance.jpg" title="Compute engine instance">
@@ -940,45 +929,32 @@ on
     </a>
   
 
-
 <p>The crawler runs through the pages of the domain you specify in the <strong>configuration</strong>, and writes the results into a <strong>BigQuery</strong> table.</p>
-
-<p>There are only a few moving parts here. Whenever you want to run the crawl again, all you need to do is just start the instance again. You won&rsquo;t be charged for the time the instance is stopped (the script auto-stops the instance once the crawl is done), so you can simply leave the instance in its stopped state until you need to do a recrawl.</p>
-
+<p>There are only a few moving parts here. Whenever you want to run the crawl again, all you need to do is just start the instance again. You won't be charged for the time the instance is stopped (the script auto-stops the instance once the crawl is done), so you can simply leave the instance in its stopped state until you need to do a recrawl.</p>
 <p>You could even create a <a href="https://cloud.google.com/functions/">Google Cloud Function</a> that starts the instance with a trigger (an HTTP request or a <a href="https://cloud.google.com/pubsub/docs/">Pub/Sub message</a>, for example). There are many ways to skin this cat, too!</p>
-
 <p>The configuration also has a setting for utilizing a <a href="https://redis.io/">Redis</a> cache by way of <a href="https://cloud.google.com/memorystore/">GCP Memorystore</a>, for example. The cache is useful if you have a huuuuuuge domain to crawl and you want to be able to pause/resume the crawl, or even utilize more than one VM instance to do the crawl.</p>
-
 <p>The <strong>cost</strong> of running this setup really depends on how big the crawl is and how much power you dedicate to the VM instance.</p>
-
-<p>On my own site, the ~7500 links and images being crawled take about 10 minutes on a 16 CPU, 60 GB instance (without Redis) VM instance. This translates to around 50 cents per crawl. I could scale down the instance for a lower cost, and I&rsquo;m sure there are other ways of optimizing it, too.</p>
-
+<p>On my own site, the ~7500 links and images being crawled take about 10 minutes on a 16 CPU, 60 GB instance (without Redis) VM instance. This translates to around 50 cents per crawl. I could scale down the instance for a lower cost, and I'm sure there are other ways of optimizing it, too.</p>
 <h2 id="preparations">Preparations</h2>
-
 <p>The preparations are almost the same as in my <a href="https://www.simoahava.com/amp/google-cloud/lighthouse-bigquery-google-cloud-platform/">earlier articles</a>, but with some simplifications.</p>
-
 <h3 id="install-command-line-tools">Install command line tools</h3>
-
 <p>Start by installing the following CLI tools:</p>
-
 <ol>
-<li><p><a href="https://cloud.google.com/sdk/">Google Cloud SDK</a></p></li>
-
-<li><p><a href="https://git-scm.com/downloads">Git</a></p></li>
+<li>
+<p><a href="https://cloud.google.com/sdk/">Google Cloud SDK</a></p>
+</li>
+<li>
+<p><a href="https://git-scm.com/downloads">Git</a></p>
+</li>
 </ol>
-
 <p>To verify you have these up and running, run the following commands in your terminal:</p>
-
 <div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">$ gcloud -v
-Google Cloud SDK <span class="m">228</span>.0.0
+Google Cloud SDK 228.0.0
 
 $ git --version
-git version <span class="m">2</span>.19.2</code></pre></div>
-
+git version 2.19.2</code></pre></div>
 <h3 id="set-up-a-new-google-cloud-platform-project-with-billing">Set up a new Google Cloud Platform project with Billing</h3>
-
-<p>Follow the steps <a href="https://www.simoahava.com/amp/google-cloud/lighthouse-bigquery-google-cloud-platform/#set-up-a-new-google-cloud-platform-project-with-billing">here</a>, and make sure you write down the Project ID since you&rsquo;ll need it in a number of places. I&rsquo;ll use my example of <code>web-scraper-gcp</code> in this guide.</p>
-
+<p>Follow the steps <a href="https://www.simoahava.com/amp/google-cloud/lighthouse-bigquery-google-cloud-platform/#set-up-a-new-google-cloud-platform-project-with-billing">here</a>, and make sure you write down the Project ID since you'll need it in a number of places. I'll use my example of <code>web-scraper-gcp</code> in this guide.</p>
 
 
     <a href="https://www.simoahava.com/amp/images/2018/12/web-scraper-gcp-project.jpg" title="New project">
@@ -988,21 +964,18 @@ git version <span class="m">2</span>.19.2</code></pre></div>
     </a>
   
 
-
 <h3 id="clone-the-github-repo-and-edit-the-configuration">Clone the Github repo and edit the configuration</h3>
-
-<p>Before getting things up and running in GCP, you&rsquo;ll need to create a <strong>configuration</strong> file first.</p>
-
+<p>Before getting things up and running in GCP, you'll need to create a <strong>configuration</strong> file first.</p>
 <p>The easiest way to access the necessary files is to clone the <a href="https://www.github.com/">Github</a> repo for this project.</p>
-
 <ol>
-<li><p>Browse to a local directory where you want to write the contents of the repo to.</p></li>
-
-<li><p>Run the following command to write the files into a new folder named <code>web-scraper-gcp/</code>:</p></li>
+<li>
+<p>Browse to a local directory where you want to write the contents of the repo to.</p>
+</li>
+<li>
+<p>Run the following command to write the files into a new folder named <code>web-scraper-gcp/</code>:</p>
+</li>
 </ol>
-
 <div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">$ git clone https://github.com/sahava/web-scraper-gcp.git</code></pre></div>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/12/web-scraper-dir.jpg" title="Web scraper directory">
@@ -1012,11 +985,8 @@ git version <span class="m">2</span>.19.2</code></pre></div>
     </a>
   
 
-
 <p>Next, run the command <code>mv config.json.sample config.json</code> while in the <code>web-scraper-gcp/</code> directory.</p>
-
-<p>Finally, open the file <code>config.json</code> for editing in your favorite text editor. Here&rsquo;s what the sample file looks like:</p>
-
+<p>Finally, open the file <code>config.json</code> for editing in your favorite text editor. Here's what the sample file looks like:</p>
 <div class="highlight"><pre class="chroma"><code class="language-json" data-lang="json"><span class="p">{</span>
   <span class="nt">&#34;domain&#34;</span><span class="p">:</span> <span class="s2">&#34;www.gtmtools.com&#34;</span><span class="p">,</span>
   <span class="nt">&#34;startUrl&#34;</span><span class="p">:</span> <span class="s2">&#34;https://www.gtmtools.com/&#34;</span><span class="p">,</span>
@@ -1024,16 +994,14 @@ git version <span class="m">2</span>.19.2</code></pre></div>
   <span class="nt">&#34;bigQuery&#34;</span><span class="p">:</span> <span class="p">{</span>
     <span class="nt">&#34;datasetId&#34;</span><span class="p">:</span> <span class="s2">&#34;web_scraper_gcp&#34;</span><span class="p">,</span>
     <span class="nt">&#34;tableId&#34;</span><span class="p">:</span> <span class="s2">&#34;crawl_results&#34;</span>
-  <span class="p">},</span>
+  <span class="p">}</span><span class="p">,</span>
   <span class="nt">&#34;redis&#34;</span><span class="p">:</span> <span class="p">{</span>
     <span class="nt">&#34;active&#34;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
     <span class="nt">&#34;host&#34;</span><span class="p">:</span> <span class="s2">&#34;10.0.0.3&#34;</span><span class="p">,</span>
     <span class="nt">&#34;port&#34;</span><span class="p">:</span> <span class="mi">6379</span>
   <span class="p">}</span>
 <span class="p">}</span></code></pre></div>
-
-<p>Here&rsquo;s an explanation of what the fields are and what you&rsquo;ll need to do.</p>
-
+<p>Here's an explanation of what the fields are and what you'll need to do.</p>
 <table>
 <thead>
 <tr>
@@ -1042,50 +1010,42 @@ git version <span class="m">2</span>.19.2</code></pre></div>
 <th>Description</th>
 </tr>
 </thead>
-
 <tbody>
 <tr>
 <td><code>&quot;domain&quot;</code></td>
 <td><code>&quot;gtmtools.com&quot;</code></td>
 <td>This is used for determining what is an <strong>internal</strong> and what is an <strong>external</strong> URL. The check will be a pattern match, so if the crawled URL <em>includes</em> this string, it will be considered an internal URL.</td>
 </tr>
-
 <tr>
 <td><code>&quot;startUrl&quot;</code></td>
 <td><code>&quot;https://www.gtmtools.com/&quot;</code></td>
 <td>A fully qualified URL address that represents the entry point of the crawl.</td>
 </tr>
-
 <tr>
 <td><code>&quot;projectId&quot;</code></td>
 <td><code>&quot;web-scraper-gcp&quot;</code></td>
 <td>The Google Cloud Platform project ID.</td>
 </tr>
-
 <tr>
 <td><code>&quot;bigQuery.datasetId&quot;</code></td>
 <td><code>&quot;web_scraper_gcp&quot;</code></td>
 <td>The ID of the BigQuery dataset the script will attempt to create. You must follow the <a href="https://cloud.google.com/bigquery/docs/datasets#create-dataset">naming rules</a>.</td>
 </tr>
-
 <tr>
 <td><code>&quot;bigQuery.tableId&quot;</code></td>
 <td><code>&quot;crawl_results&quot;</code></td>
 <td>The ID of the table the script will attempt to create. You must follow the <a href="https://cloud.google.com/bigquery/docs/tables#create-table">naming rules</a>.</td>
 </tr>
-
 <tr>
 <td><code>&quot;redis.active&quot;</code></td>
 <td><code>false</code></td>
 <td>Set to <code>true</code> if you want to use a <strong>Redis</strong> cache to persist the crawl queue.</td>
 </tr>
-
 <tr>
 <td><code>&quot;redis.host&quot;</code></td>
 <td><code>&quot;10.0.0.3&quot;</code></td>
 <td>Set to the IP address via which the script can connect to the Redis instance.</td>
 </tr>
-
 <tr>
 <td><code>&quot;redis.port&quot;</code></td>
 <td><code>6379</code></td>
@@ -1093,13 +1053,9 @@ git version <span class="m">2</span>.19.2</code></pre></div>
 </tr>
 </tbody>
 </table>
-
-<p>Once you&rsquo;ve edited the configuration, you&rsquo;ll need to upload it to a Google Cloud Storage bucket.</p>
-
+<p>Once you've edited the configuration, you'll need to upload it to a Google Cloud Storage bucket.</p>
 <h3 id="upload-the-configuration-to-gcs">Upload the configuration to GCS</h3>
-
 <p>Browse to <a href="https://console.cloud.google.com/storage/browser">https://console.cloud.google.com/storage/browser</a> and make sure you have the correct project selected.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/12/gcs-correct-project.jpg" title="GCS correct project">
@@ -1109,9 +1065,7 @@ git version <span class="m">2</span>.19.2</code></pre></div>
     </a>
   
 
-
 <p>Next, <strong>create a new bucket</strong> in a region nearby, and give it an easy-to-remember name.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/12/new-gcs-bucket-nearline.jpg" title="New GCS bucket">
@@ -1121,9 +1075,7 @@ git version <span class="m">2</span>.19.2</code></pre></div>
     </a>
   
 
-
 <p>Once done, enter the bucket, choose <strong>Upload files</strong>, and locate the <code>config.json</code> file from your local computer and upload it into the bucket.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/12/config-json-in-bucket.jpg" title="Upload file to GCS">
@@ -1133,59 +1085,52 @@ git version <span class="m">2</span>.19.2</code></pre></div>
     </a>
   
 
-
 <h3 id="edit-the-install-script">Edit the install script</h3>
-
-<p>The Git repo you downloaded comes with a file named <code>gce-install.sh</code>. This script will be used to fire up the VM instance with the correct settings (and it will initiate the crawl when started). However, you&rsquo;ll need to edit the file so that it knows where to fetch your configuration file from. So, <strong>open</strong> the <code>gce-install.sh</code> file for editing.</p>
-
+<p>The Git repo you downloaded comes with a file named <code>gce-install.sh</code>. This script will be used to fire up the VM instance with the correct settings (and it will initiate the crawl when started). However, you'll need to edit the file so that it knows where to fetch your configuration file from. So, <strong>open</strong> the <code>gce-install.sh</code> file for editing.</p>
 <p>Edit the following line:</p>
-
 <div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell"><span class="nv">bucket</span><span class="o">=</span><span class="s1">&#39;gs://web-scraper-config/config.json&#39;</span></code></pre></div>
-
-<p>Change the <code>web-scraper-config</code> part to the name of the bucket you just created. So if you named the bucket <code>my-configuration-bucket</code>, you&rsquo;d change the line to this:</p>
-
+<p>Change the <code>web-scraper-config</code> part to the name of the bucket you just created. So if you named the bucket <code>my-configuration-bucket</code>, you'd change the line to this:</p>
 <div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell"><span class="nv">bucket</span><span class="o">=</span><span class="s1">&#39;gs://my-configuration-bucket/config.json&#39;</span></code></pre></div>
-
 <h3 id="make-sure-the-required-services-have-been-enabled-in-google-cloud-platform">Make sure the required services have been enabled in Google Cloud Platform</h3>
-
 <p>Final preparatory step is to make sure you have the required services enabled in Google Cloud Platform.</p>
-
 <ol>
-<li><p>Browse <a href="https://console.cloud.google.com/apis/api/compute.googleapis.com">here</a>, and make sure the Compute Engine API has been enabled.</p></li>
-
-<li><p>Browse <a href="https://console.cloud.google.com/apis/api/bigquery-json.googleapis.com">here</a>, and make sure the BigQuery API has been enabled.</p></li>
-
-<li><p>Browse <a href="https://console.cloud.google.com/apis/api/storage-component.googleapis.com">here</a>, and make sure the Google Cloud Storage API has been enabled.</p></li>
+<li>
+<p>Browse <a href="https://console.cloud.google.com/apis/api/compute.googleapis.com">here</a>, and make sure the Compute Engine API has been enabled.</p>
+</li>
+<li>
+<p>Browse <a href="https://console.cloud.google.com/apis/api/bigquery-json.googleapis.com">here</a>, and make sure the BigQuery API has been enabled.</p>
+</li>
+<li>
+<p>Browse <a href="https://console.cloud.google.com/apis/api/storage-component.googleapis.com">here</a>, and make sure the Google Cloud Storage API has been enabled.</p>
+</li>
 </ol>
-
 <h2 id="create-the-gce-vm-instance">Create the GCE VM instance</h2>
-
-<p>Now you&rsquo;re ready to create the Google Compute Engine instance, firing it up with your install script. Here&rsquo;s what&rsquo;s going to happen when you do so:</p>
-
+<p>Now you're ready to create the Google Compute Engine instance, firing it up with your install script. Here's what's going to happen when you do so:</p>
 <ol>
-<li><p>Once the instance is created, it will run the <code>gce-install.sh</code> script. In fact, it will run this script whenever you start the instance again.</p></li>
-
-<li><p>The script will install all the required dependencies to run the web crawler. There&rsquo;s quite a few of them because running a headless Chrome browser in a virtual machine isn&rsquo;t the most trivial operation.</p></li>
-
-<li><p>The penultimate step of the install script is to run the Node app containing the code I&rsquo;ve written to perform the crawl task.</p></li>
-
-<li><p>The Node app will grab the <code>startUrl</code> and BigQuery information from the configuration file (downloaded from the GCS bucket), and will crawl the domain, writing the results into BigQuery.</p></li>
-
-<li><p>Once the crawl is complete, the VM instance will shut itself down.</p></li>
+<li>
+<p>Once the instance is created, it will run the <code>gce-install.sh</code> script. In fact, it will run this script whenever you start the instance again.</p>
+</li>
+<li>
+<p>The script will install all the required dependencies to run the web crawler. There's quite a few of them because running a headless Chrome browser in a virtual machine isn't the most trivial operation.</p>
+</li>
+<li>
+<p>The penultimate step of the install script is to run the Node app containing the code I've written to perform the crawl task.</p>
+</li>
+<li>
+<p>The Node app will grab the <code>startUrl</code> and BigQuery information from the configuration file (downloaded from the GCS bucket), and will crawl the domain, writing the results into BigQuery.</p>
+</li>
+<li>
+<p>Once the crawl is complete, the VM instance will shut itself down.</p>
+</li>
 </ol>
-
-<p>To create the instance, you&rsquo;ll need to run this command:</p>
-
+<p>To create the instance, you'll need to run this command:</p>
 <div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">$ gcloud compute instances create web-scraper-gcp <span class="se">\
 </span><span class="se"></span>      --metadata-from-file<span class="o">=</span>startup-script<span class="o">=</span>./gce-install.sh <span class="se">\
 </span><span class="se"></span>      --scopes<span class="o">=</span>bigquery,cloud-platform <span class="se">\
 </span><span class="se"></span>      --machine-type<span class="o">=</span>n1-standard-16 <span class="se">\
 </span><span class="se"></span>      --zone<span class="o">=</span>europe-north1-a</code></pre></div>
-
 <p>Edit the <code>machine-type</code> and <code>zone</code> if you want to have the instance run on a different CPU/memory profile, and/or if you want to run it in a different zone. You can find a list of the machine types <a href="https://cloud.google.com/compute/docs/machine-types">here</a>, and a list of zones <a href="https://cloud.google.com/compute/docs/regions-zones/">here</a>.</p>
-
 <p>Once done, you should see something like this:</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/12/gce-create-command.jpg" title="GCE Create command">
@@ -1195,11 +1140,8 @@ git version <span class="m">2</span>.19.2</code></pre></div>
     </a>
   
 
-
 <h2 id="check-to-see-if-it-works">Check to see if it works</h2>
-
 <p>First, head on over to the <a href="https://console.cloud.google.com/compute/instances">instance list</a>, and make sure you see the instance running (you should see a green checkmark next to it):</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/12/vm-instance-running.jpg" title="VM instance running">
@@ -1209,11 +1151,8 @@ git version <span class="m">2</span>.19.2</code></pre></div>
     </a>
   
 
-
-<p>Naturally, the fact that it&rsquo;s running doesn&rsquo;t really tell you much, yet.</p>
-
+<p>Naturally, the fact that it's running doesn't really tell you much, yet.</p>
 <p>Next, head on over to <a href="https://console.cloud.google.com/bigquery">BigQuery</a>. You should see your project in the navigator, so click it open. Under the project, you should see a dataset and a table.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/12/dataset-table.jpg" title="Dataset and table">
@@ -1223,9 +1162,7 @@ git version <span class="m">2</span>.19.2</code></pre></div>
     </a>
   
 
-
 <p>If you see them, the next step is to run a simple query in the <strong>query editor</strong>. Click the table name in the navigator, and then click the <strong>QUERY TABLE</strong> link. The Query editor should be pre-filled with a table query, so between the <code>SELECT</code> and <code>FROM</code> keywords, type: <code>count(*)</code>. This is what the query should end up looking like:</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/12/select-count.jpg" title="Select count(*)">
@@ -1235,11 +1172,8 @@ git version <span class="m">2</span>.19.2</code></pre></div>
     </a>
   
 
-
 <p>Finally, click the <strong>Run</strong> button.</p>
-
 <p>This will run the query against the BigQuery table. The crawl is still probably running, but thanks to <strong>streaming inserts</strong> it is constantly adding rows to the table. The query should return a result that shows you how many rows there are in the table currently:</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2018/12/test-query.jpg" title="Test the query">
@@ -1249,9 +1183,7 @@ git version <span class="m">2</span>.19.2</code></pre></div>
     </a>
   
 
-
-<p>If you see a result, it means the whole thing is working! Keep on monitoring the size of the table. Once the crawl finishes, the virtual machine instance will shut down, and you&rsquo;ll be able to see it in its stopped state.</p>
-
+<p>If you see a result, it means the whole thing is working! Keep on monitoring the size of the table. Once the crawl finishes, the virtual machine instance will shut down, and you'll be able to see it in its stopped state.</p>
 
 
     <a href="https://www.simoahava.com/amp/images/2018/12/stopped-instance.jpg" title="Stopped instance">
@@ -1261,24 +1193,22 @@ git version <span class="m">2</span>.19.2</code></pre></div>
     </a>
   
 
-
 <h2 id="final-thoughts">Final thoughts</h2>
-
-<p>First of all, this was an <strong>exercise</strong>. I&rsquo;m fully aware of awesome crawling tools such as <a href="https://www.screamingfrog.co.uk/seo-spider/">Screaming Frog</a>, which you can use to achieve very much the same thing.</p>
-
+<p>First of all, this was an <strong>exercise</strong>. I'm fully aware of awesome crawling tools such as <a href="https://www.screamingfrog.co.uk/seo-spider/">Screaming Frog</a>, which you can use to achieve very much the same thing.</p>
 <p>However, this setup has some cool features:</p>
-
 <ol>
-<li><p>You can modify the crawler with additional <a href="https://github.com/yujiosaka/headless-chrome-crawler/blob/master/docs/API.md">options</a>, AND you can pass <a href="https://github.com/GoogleChrome/puppeteer/blob/v1.11.0/docs/api.md">flags</a> to the <a href="https://github.com/GoogleChrome/puppeteer">Puppeteer</a> instance running in the background.</p></li>
-
-<li><p>Since this crawler uses a headless browser, it works better on dynamically generated sites than a regular HTTP request crawler. It actually generates the JavaScript and crawls the dynamic links, too.</p></li>
-
-<li><p>Because it writes the data to BigQuery, you can monitor the status codes and link integrity of your website in tools like Google Data Studio.</p></li>
+<li>
+<p>You can modify the crawler with additional <a href="https://github.com/yujiosaka/headless-chrome-crawler/blob/master/docs/API.md">options</a>, AND you can pass <a href="https://github.com/GoogleChrome/puppeteer/blob/v1.11.0/docs/api.md">flags</a> to the <a href="https://github.com/GoogleChrome/puppeteer">Puppeteer</a> instance running in the background.</p>
+</li>
+<li>
+<p>Since this crawler uses a headless browser, it works better on dynamically generated sites than a regular HTTP request crawler. It actually generates the JavaScript and crawls the dynamic links, too.</p>
+</li>
+<li>
+<p>Because it writes the data to BigQuery, you can monitor the status codes and link integrity of your website in tools like Google Data Studio.</p>
+</li>
 </ol>
-
-<p>Anyway, I didn&rsquo;t set out to create a tool that replaces some of the stuff already out there. Instead, I wanted to show you how easy it is to run scripts and perform tasks in the Google Cloud.</p>
-
-<p>Let me know in the comments if you&rsquo;re having trouble with this setup! I&rsquo;m happy to see where the problem might lie.</p>
+<p>Anyway, I didn't set out to create a tool that replaces some of the stuff already out there. Instead, I wanted to show you how easy it is to run scripts and perform tasks in the Google Cloud.</p>
+<p>Let me know in the comments if you're having trouble with this setup! I'm happy to see where the problem might lie.</p>
 
     </section>
 

@@ -123,8 +123,6 @@
 
 <meta itemprop="name" content="#GTMTips: Get Latest Exchange Rates For Client-side Conversions">
 <meta itemprop="description" content="Get the latest currency rates in Google Tag Manager using the exchangeratesapi.io service.">
-
-
 <meta itemprop="datePublished" content="2019-08-07T13:00:43&#43;03:00" />
 <meta itemprop="dateModified" content="2019-08-07T13:00:43&#43;03:00" />
 <meta itemprop="wordCount" content="865">
@@ -132,7 +130,6 @@
 
 
 <meta itemprop="keywords" content="google tag manager,api,gtmtips,custom html," />
-
 <script type="application/ld+json">
 {
     "@context": "http://schema.org",
@@ -913,14 +910,9 @@ on
     </header>
 
     <section class="post-content">
-      
-
-<p>It&rsquo;s been a while since I&rsquo;ve last written a bona fide <a href="https://tagmanager.google.com/">Google Tag Manager</a> <strong>trick</strong>, so here comes. This was inspired by Bart Gibby&rsquo;s question in <a href="https://www.measure.chat/">Measure Slack</a>.</p>
-
-<p>The purpose is to fetch the latest currency exchange rates from the <a href="https://exchangeratesapi.io">exchangeratesapi.io</a> service, cache them using <code>sessionStorage</code>, and push the results into <code>dataLayer</code>. From <code>dataLayer</code>, they can then be utilized in Custom JavaScript variables and custom variable templates to perform client-side conversions. I&rsquo;ll show you how!</p>
-
+      <p>It's been a while since I've last written a bona fide <a href="https://tagmanager.google.com/">Google Tag Manager</a> <strong>trick</strong>, so here comes. This was inspired by Bart Gibby's question in <a href="https://www.measure.chat/">Measure Slack</a>.</p>
+<p>The purpose is to fetch the latest currency exchange rates from the <a href="https://exchangeratesapi.io">exchangeratesapi.io</a> service, cache them using <code>sessionStorage</code>, and push the results into <code>dataLayer</code>. From <code>dataLayer</code>, they can then be utilized in Custom JavaScript variables and custom variable templates to perform client-side conversions. I'll show you how!</p>
 <h2 id="tip-103-get-latest-currency-exchange-rates-in-gtm">Tip 103: Get latest currency exchange rates in GTM</h2>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2019/08/get-latest-currency-rates-gtm.jpg" title="Get latest currency rates in GTM">
@@ -930,62 +922,56 @@ on
     </a>
   
 
-
 <p>The API request itself is run in a <strong>Custom HTML tag</strong> (as custom templates do not support arbitrary HTTP requests yet), so go ahead and create one. In the tag, add the following code:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
-  <span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">script</span><span class="p"></span><span class="p">&gt;</span>
+  <span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="p">)</span> <span class="p">{</span>
     <span class="c1">// Set expiration to stored cache. Default 24 hours.
 </span><span class="c1"></span>    <span class="kd">var</span> <span class="nx">cacheExpiresHours</span> <span class="o">=</span> <span class="mi">24</span><span class="p">;</span>
     <span class="c1">// Set currency to get rates against
 </span><span class="c1"></span>    <span class="kd">var</span> <span class="nx">base</span> <span class="o">=</span> <span class="s1">&#39;EUR&#39;</span><span class="p">;</span>
     
     <span class="c1">// Do not edit below
-</span><span class="c1"></span>    <span class="kd">var</span> <span class="nx">rates</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nb">window</span><span class="p">.</span><span class="nx">sessionStorage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="s1">&#39;currencyRates&#39;</span><span class="p">)</span> <span class="o">||</span> <span class="s1">&#39;{}&#39;</span><span class="p">);</span>
-    <span class="kd">var</span> <span class="nx">now</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">().</span><span class="nx">getTime</span><span class="p">();</span>
+</span><span class="c1"></span>    <span class="kd">var</span> <span class="nx">rates</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nb">window</span><span class="p">.</span><span class="nx">sessionStorage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="s1">&#39;currencyRates&#39;</span><span class="p">)</span> <span class="o">||</span> <span class="s1">&#39;{}&#39;</span><span class="p">)</span><span class="p">;</span>
+    <span class="kd">var</span> <span class="nx">now</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="p">)</span><span class="p">.</span><span class="nx">getTime</span><span class="p">(</span><span class="p">)</span><span class="p">;</span>
     <span class="kd">var</span> <span class="nx">xhr</span><span class="p">;</span>
     <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">rates</span><span class="p">.</span><span class="nx">timestamp</span> <span class="o">||</span> <span class="nx">rates</span><span class="p">.</span><span class="nx">timestamp</span> <span class="o">+</span> <span class="nx">cacheExpiresHours</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">1000</span> <span class="o">&lt;=</span> <span class="nx">now</span><span class="p">)</span> <span class="p">{</span>
-      <span class="nx">xhr</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">XMLHttpRequest</span><span class="p">();</span>
-      <span class="nx">xhr</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="s1">&#39;https://api.exchangeratesapi.io/latest?base=&#39;</span> <span class="o">+</span> <span class="nx">base</span><span class="p">);</span>
-      <span class="nx">xhr</span><span class="p">.</span><span class="nx">onreadystatechange</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+      <span class="nx">xhr</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">XMLHttpRequest</span><span class="p">(</span><span class="p">)</span><span class="p">;</span>
+      <span class="nx">xhr</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="s1">&#39;https://api.exchangeratesapi.io/latest?base=&#39;</span> <span class="o">+</span> <span class="nx">base</span><span class="p">)</span><span class="p">;</span>
+      <span class="nx">xhr</span><span class="p">.</span><span class="nx">onreadystatechange</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="p">)</span> <span class="p">{</span>
         <span class="k">if</span><span class="p">(</span><span class="nx">xhr</span><span class="p">.</span><span class="nx">readyState</span> <span class="o">===</span> <span class="nx">XMLHttpRequest</span><span class="p">.</span><span class="nx">DONE</span><span class="p">)</span> <span class="p">{</span>
-          <span class="nx">rates</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">xhr</span><span class="p">.</span><span class="nx">responseText</span><span class="p">).</span><span class="nx">rates</span><span class="p">;</span>
+          <span class="nx">rates</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">xhr</span><span class="p">.</span><span class="nx">responseText</span><span class="p">)</span><span class="p">.</span><span class="nx">rates</span><span class="p">;</span>
           <span class="nx">rates</span><span class="p">.</span><span class="nx">timestamp</span> <span class="o">=</span> <span class="nx">now</span><span class="p">;</span>
-          <span class="nx">sessionStorage</span><span class="p">.</span><span class="nx">setItem</span><span class="p">(</span><span class="s1">&#39;currencyRates&#39;</span><span class="p">,</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">rates</span><span class="p">));</span>
-          <span class="nb">window</span><span class="p">.</span><span class="nx">dataLayer</span><span class="p">.</span><span class="nx">push</span><span class="p">({</span>
+          <span class="nx">sessionStorage</span><span class="p">.</span><span class="nx">setItem</span><span class="p">(</span><span class="s1">&#39;currencyRates&#39;</span><span class="p">,</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">rates</span><span class="p">)</span><span class="p">)</span><span class="p">;</span>
+          <span class="nb">window</span><span class="p">.</span><span class="nx">dataLayer</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="p">{</span>
 		    <span class="nx">event</span><span class="o">:</span> <span class="s1">&#39;exchangeRates&#39;</span><span class="p">,</span>
 		    <span class="nx">rates</span><span class="o">:</span> <span class="nx">rates</span><span class="p">,</span>
             <span class="nx">ratesType</span><span class="o">:</span> <span class="s1">&#39;fresh&#39;</span>
-          <span class="p">});</span>
+          <span class="p">}</span><span class="p">)</span><span class="p">;</span>
         <span class="p">}</span>
-      <span class="p">};</span>
-      <span class="nx">xhr</span><span class="p">.</span><span class="nx">send</span><span class="p">();</span>
+      <span class="p">}</span><span class="p">;</span>
+      <span class="nx">xhr</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="p">)</span><span class="p">;</span>
     <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-      <span class="nb">window</span><span class="p">.</span><span class="nx">dataLayer</span><span class="p">.</span><span class="nx">push</span><span class="p">({</span>
+      <span class="nb">window</span><span class="p">.</span><span class="nx">dataLayer</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="p">{</span>
       	<span class="nx">event</span><span class="o">:</span> <span class="s1">&#39;exchangeRates&#39;</span><span class="p">,</span>
         <span class="nx">rates</span><span class="o">:</span> <span class="nx">rates</span><span class="p">,</span>
         <span class="nx">ratesType</span><span class="o">:</span> <span class="s1">&#39;cached&#39;</span>
-      <span class="p">});</span>
+      <span class="p">}</span><span class="p">)</span><span class="p">;</span>
     <span class="p">}</span>
-  <span class="p">})();</span>
-<span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span></code></pre></div>
-
-<p>Modify the <code>cacheExpiresHours</code> to determine how long the currency rates should be cached in the browser for. If you don&rsquo;t want to cache them, set it to <code>0</code>. This would fetch the latest rates with every page load.</p>
-
-<p>I would recommend using a cache. The API is a free service, and it&rsquo;s free for as long as it&rsquo;s not abused. It makes no sense to continually fetch the latest rates, so set the cache to something you can live with.</p>
-
-<p>You&rsquo;ll also need to set a base currency against which the rates are calculated. In the example, I&rsquo;m using <code>'EUR'</code> as I want the rates to be calculated against euros.</p>
-
+  <span class="p">}</span><span class="p">)</span><span class="p">(</span><span class="p">)</span><span class="p">;</span>
+<span class="p">&lt;</span><span class="p">/</span><span class="nt">script</span><span class="p">&gt;</span></code></pre></div>
+<p>Modify the <code>cacheExpiresHours</code> to determine how long the currency rates should be cached in the browser for. If you don't want to cache them, set it to <code>0</code>. This would fetch the latest rates with every page load.</p>
+<p>I would recommend using a cache. The API is a free service, and it's free for as long as it's not abused. It makes no sense to continually fetch the latest rates, so set the cache to something you can live with.</p>
+<p>You'll also need to set a base currency against which the rates are calculated. In the example, I'm using <code>'EUR'</code> as I want the rates to be calculated against euros.</p>
 <p>The rest of the code follows this pattern:</p>
-
 <ol>
-<li><p>If the currency rates are found in browser storage, and the cache expiration duration has not been met yet, then fetch the rates from storage and push them into <code>dataLayer</code>.</p></li>
-
-<li><p>If the rates are not found in browser storage, or if the cache expiration duration has been met, fetch the latest rates using an HTTP request to <code>https://api.exchangeratesapi.io/latest</code>, using the base currency rate you provided in the script configuration. Push the results into <code>dataLayer</code>. Cache the results in browser storage.</p></li>
+<li>
+<p>If the currency rates are found in browser storage, and the cache expiration duration has not been met yet, then fetch the rates from storage and push them into <code>dataLayer</code>.</p>
+</li>
+<li>
+<p>If the rates are not found in browser storage, or if the cache expiration duration has been met, fetch the latest rates using an HTTP request to <code>https://api.exchangeratesapi.io/latest</code>, using the base currency rate you provided in the script configuration. Push the results into <code>dataLayer</code>. Cache the results in browser storage.</p>
+</li>
 </ol>
-
 <p>I also included a key to reflect whether or not the results were cached (<code>ratesType: 'fresh/cached'</code>), which you can use to determine the reliability of the results. This is what the <code>dataLayer</code> would look like:</p>
-
 <div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="p">{</span>
   <span class="nx">event</span><span class="o">:</span> <span class="s2">&#34;exchangeRates&#34;</span><span class="p">,</span>
   <span class="nx">rates</span><span class="o">:</span> <span class="p">{</span>
@@ -1000,17 +986,13 @@ on
     <span class="nx">GBP</span><span class="o">:</span> <span class="mf">0.9183</span><span class="p">,</span>
     <span class="p">...</span>
     <span class="nx">timestamp</span><span class="o">:</span> <span class="mi">1565172369394</span>
-  <span class="p">},</span>
+  <span class="p">}</span><span class="p">,</span>
   <span class="nx">ratesType</span><span class="o">:</span> <span class="s1">&#39;fresh&#39;</span>
 <span class="p">}</span>
 </code></pre></div>
-
 <p><strong>Set this tag to fire on the All Pages trigger</strong>. That way it will fire as soon as the GTM container has loaded.</p>
-
 <p>Now that the data is in <code>dataLayer</code>, you can create some variables that will let you use the results.</p>
-
-<p>To start off, a <strong>Data Layer variable</strong> for <code>rates</code> will fetch the corresponding object from GTM&rsquo;s data model.</p>
-
+<p>To start off, a <strong>Data Layer variable</strong> for <code>rates</code> will fetch the corresponding object from GTM's data model.</p>
 
 
     <a href="https://www.simoahava.com/amp/images/2019/08/dlv-rates.jpg" title="DLV - rates">
@@ -1020,29 +1002,23 @@ on
     </a>
   
 
-
 <p>Now, to perform a conversion, you need the source variable (the value you want to convert) and this Data Layer variable. For example, if your source value is in Australian dollars, you can convert that to euros with a Custom JavaScript variable that has the following code:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span><span class="p">(</span><span class="p">)</span> <span class="p">{</span>
   <span class="c1">// Update these if necessary
 </span><span class="c1"></span>  <span class="kd">var</span> <span class="nx">convertFrom</span> <span class="o">=</span> <span class="s1">&#39;AUD&#39;</span><span class="p">;</span>
-  <span class="kd">var</span> <span class="nx">sourceVariable</span> <span class="o">=</span> <span class="p">{{</span><span class="nx">Source</span> <span class="nx">value</span> <span class="k">in</span> <span class="nx">AUD</span><span class="p">}};</span>
-  <span class="kd">var</span> <span class="nx">rates</span> <span class="o">=</span> <span class="p">{{</span><span class="nx">DLV</span> <span class="o">-</span> <span class="nx">rates</span><span class="p">}};</span>
+  <span class="kd">var</span> <span class="nx">sourceVariable</span> <span class="o">=</span> <span class="p">{</span><span class="p">{</span><span class="nx">Source</span> <span class="nx">value</span> <span class="k">in</span> <span class="nx">AUD</span><span class="p">}</span><span class="p">}</span><span class="p">;</span>
+  <span class="kd">var</span> <span class="nx">rates</span> <span class="o">=</span> <span class="p">{</span><span class="p">{</span><span class="nx">DLV</span> <span class="o">-</span> <span class="nx">rates</span><span class="p">}</span><span class="p">}</span><span class="p">;</span>
   
   <span class="c1">// Don&#39;t change anything below
-</span><span class="c1"></span>  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">rates</span> <span class="o">||</span> <span class="o">!</span><span class="nx">rates</span><span class="p">[</span><span class="nx">convertFrom</span><span class="p">]</span> <span class="o">||</span> <span class="nb">isNaN</span><span class="p">(</span><span class="nx">sourceVariable</span><span class="p">))</span> <span class="p">{</span>
+</span><span class="c1"></span>  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">rates</span> <span class="o">||</span> <span class="o">!</span><span class="nx">rates</span><span class="p">[</span><span class="nx">convertFrom</span><span class="p">]</span> <span class="o">||</span> <span class="nb">isNaN</span><span class="p">(</span><span class="nx">sourceVariable</span><span class="p">)</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="nx">sourceVariable</span><span class="p">;</span>
   <span class="p">}</span>
-  <span class="k">return</span> <span class="nx">sourceVariable</span> <span class="o">/</span> <span class="nx">rates</span><span class="p">[</span><span class="nx">convertFrom</span><span class="p">];</span>
+  <span class="k">return</span> <span class="nx">sourceVariable</span> <span class="o">/</span> <span class="nx">rates</span><span class="p">[</span><span class="nx">convertFrom</span><span class="p">]</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div>
-
-<p>This variable pulls in the source value and the <code>rates</code> object. In case the <code>rates</code> object doesn&rsquo;t exist, OR it doesn&rsquo;t contain the currency symbol you want to convert from, OR the source variable does not return a number, the source variable is returned untouched.</p>
-
+<p>This variable pulls in the source value and the <code>rates</code> object. In case the <code>rates</code> object doesn't exist, OR it doesn't contain the currency symbol you want to convert from, OR the source variable does not return a number, the source variable is returned untouched.</p>
 <p>Otherwise, the variable divides the source variable with the exchange rate to give you the source variable value in the base currency you configured in the Custom HTML tag.</p>
-
 <p>You can also create a <a href="https://www.simoahava.com/amp/analytics/custom-templates-guide-for-google-tag-manager/#variable-template-walkthrough">custom variable template</a> where the user indicates which source variable to use and what the currency symbol would be. The template would then return the result of the conversion.</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2019/08/currency-convert-template.jpg" title="Currency conversion template">
@@ -1052,14 +1028,11 @@ on
     </a>
   
 
-
 <p>You can download the template I created <a href="https://www.gtmtemplates.com/template/5754435435233280/currency-conversion">here</a>.</p>
-
 <blockquote>
 <p><strong>NOTE</strong>: The currency conversion will only work if the source variable is available when then conversion is made AND if the exchange rates have been successfully fetched. The request for the exchange rates is asynchronous, so you need to be careful not to fall into a race condition. You can use the <code>exchangeRates</code> event name in a Custom Event trigger if you want to fire a tag only after the exchange rates have been successfully retrieved.</p>
 </blockquote>
-
-<p>I hope this tip proves useful to someone, or at the very least gives you ideas for how to pull in data from public APIs, through GTM, into the user&rsquo;s web browser.</p>
+<p>I hope this tip proves useful to someone, or at the very least gives you ideas for how to pull in data from public APIs, through GTM, into the user's web browser.</p>
 
     </section>
 

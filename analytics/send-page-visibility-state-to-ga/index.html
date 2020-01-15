@@ -53,7 +53,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.59.1 with theme Tranquilpeak 0.4.3-BETA">
+    <meta name="generator" content="Hugo 0.61.0 with theme Tranquilpeak 0.4.3-BETA">
     <title>#GTMTips: Send Page Visibility State To Google Analytics | Simo Ahava's blog</title>
     
     <script>
@@ -319,20 +319,12 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              
-
-<p>One of my pet peeves about <a href="https://analytics.google.com">Google Analytics</a> has to do with nomenclature. For example, a <strong>User</strong> isn&rsquo;t really a user but a <strong>browser instance</strong>, and <strong>Direct</strong> traffic isn&rsquo;t necessarily &ldquo;direct&rdquo; at all, but rather just traffic that has no discernible source. But being so invested in <strong>content</strong> analytics, my biggest gripe has to do with <strong>Pageviews</strong>.</p>
-
+              <p>One of my pet peeves about <a href="https://analytics.google.com">Google Analytics</a> has to do with nomenclature. For example, a <strong>User</strong> isn't really a user but a <strong>browser instance</strong>, and <strong>Direct</strong> traffic isn't necessarily &ldquo;direct&rdquo; at all, but rather just traffic that has no discernible source. But being so invested in <strong>content</strong> analytics, my biggest gripe has to do with <strong>Pageviews</strong>.</p>
 <p>A <strong>Pageview</strong> in Google Analytics is collected when a hit with the hit type <code>pageview</code> is received successfully by the Google Analytics endpoint. This hit is dispatched most often with a JavaScript library such as <a href="https://tagmanager.google.com">Google Tag Manager</a> or <a href="https://developers.google.com/analytics/devguides/collection/gtagjs/">gtag.js</a>.</p>
-
-<p>The problem with the name is that it doesn&rsquo;t really tell you at all <strong>whether the page was <em>viewed</em> or not</strong>. It just tells you that a line of JavaScript was executed on the page.</p>
-
-<p>Luckily, pageviews aren&rsquo;t typically at the top of the list of Most Actionable KPIs, but you still see them being referenced especially in journals that rely on clicks rather than engagement.</p>
-
+<p>The problem with the name is that it doesn't really tell you at all <strong>whether the page was <em>viewed</em> or not</strong>. It just tells you that a line of JavaScript was executed on the page.</p>
+<p>Luckily, pageviews aren't typically at the top of the list of Most Actionable KPIs, but you still see them being referenced especially in journals that rely on clicks rather than engagement.</p>
 <p>With this <a href="https://www.simoahava.com/categories/gtm-tips/">#GTMTips</a> post (my <strong>one hundredth!</strong>), I want to show you an extremely simple way of adding this crucial metadata of page visibility to your Google Analytics hits, so that you can segment your data for <em>qualified</em> pageviews, and maybe even <em>ignore</em> events that happen when the page is not visible.</p>
-
 <h2 id="tip-100-send-page-visibility-state-as-a-custom-dimension-to-ga">Tip 100: Send page visibility state as a custom dimension to GA</h2>
-
 
 
 
@@ -348,19 +340,19 @@
 </div>
 
 
-
 <p>The steps are simple:</p>
-
 <ol>
-<li><p><a href="https://support.google.com/analytics/answer/2709829?hl=en">Create a <strong>Hit-scoped Custom Dimension</strong> in Google Analytics</a>, and make note of its index.</p></li>
-
-<li><p>In Google Tag Manager, create a new <strong>JavaScript</strong> variable for <code>document.hidden</code> (see below).</p></li>
-
-<li><p>Then, still in GTM, edit your <a href="https://www.simoahava.com/analytics/google-analytics-settings-variable-in-gtm/">Google Analytics Settings variable</a>, and add a new Custom Dimension with the index from step (1) and the variable from step (2).</p></li>
+<li>
+<p><a href="https://support.google.com/analytics/answer/2709829?hl=en">Create a <strong>Hit-scoped Custom Dimension</strong> in Google Analytics</a>, and make note of its index.</p>
+</li>
+<li>
+<p>In Google Tag Manager, create a new <strong>JavaScript</strong> variable for <code>document.hidden</code> (see below).</p>
+</li>
+<li>
+<p>Then, still in GTM, edit your <a href="https://www.simoahava.com/analytics/google-analytics-settings-variable-in-gtm/">Google Analytics Settings variable</a>, and add a new Custom Dimension with the index from step (1) and the variable from step (2).</p>
+</li>
 </ol>
-
 <p>This is what the <strong>JavaScript variable</strong> looks like:</p>
-
 
 
 
@@ -376,13 +368,9 @@
 </div>
 
 
-
 <p>Note the <a href="https://www.simoahava.com/analytics/format-value-option-in-google-tag-manager-variables/">Format Value</a> settings. You need to <em>cast</em> the Boolean <code>true</code> and <code>value</code> (returned by <code>document.hidden</code>) into their string counterparts <code>&quot;true&quot;</code> and <code>&quot;false&quot;</code>. Otherwise analytics.js has the annoying habit of converting Booleans to <code>1</code> and <code>0</code> which makes the reports difficult to intepret.</p>
-
 <p>The <code>document.hidden</code> property is nicely <a href="https://developer.mozilla.org/en-US/docs/Web/API/Document/hidden#Browser_compatibility">supported by all the major browsers</a>.</p>
-
-<p>You don&rsquo;t have to add the Custom Dimension to all your hits, but I personally think it makes sense. Why qualify just the pageviews? Events can happen &ldquo;off-viewport&rdquo; too, and it might make sense to focus only on the ones that happen in an active browser window. This is what the Google Analytics Settings variable would look like, assuming the index of the Custom Dimension is <code>13</code> and the variable name is <strong>{{document.hidden}}</strong>:</p>
-
+<p>You don't have to add the Custom Dimension to all your hits, but I personally think it makes sense. Why qualify just the pageviews? Events can happen &ldquo;off-viewport&rdquo; too, and it might make sense to focus only on the ones that happen in an active browser window. This is what the Google Analytics Settings variable would look like, assuming the index of the Custom Dimension is <code>13</code> and the variable name is <strong>{{document.hidden}}</strong>:</p>
 
 
 
@@ -398,10 +386,8 @@
 </div>
 
 
-
-<p>Finally, I&rsquo;m not illusioned enough to think that this somehow &ldquo;fixes&rdquo; anything. Collecting <em>visibility state</em> doesn&rsquo;t guarantee that the user is actually <em>viewing</em> anything, as they might be fetching their cup of coffee or dozing off in front of the screen. But I&rsquo;m pretty convinced that this is an <em>improvement</em> especially when you want to consider page<strong>views</strong> to be true to their name.</p>
-
-<p>So, that&rsquo;s <strong>one hundred GTM tips</strong> all done. And it took me almost five years. I promise to get the next hundred done much, much faster!</p>
+<p>Finally, I'm not illusioned enough to think that this somehow &ldquo;fixes&rdquo; anything. Collecting <em>visibility state</em> doesn't guarantee that the user is actually <em>viewing</em> anything, as they might be fetching their cup of coffee or dozing off in front of the screen. But I'm pretty convinced that this is an <em>improvement</em> especially when you want to consider page<strong>views</strong> to be true to their name.</p>
+<p>So, that's <strong>one hundred GTM tips</strong> all done. And it took me almost five years. I promise to get the next hundred done much, much faster!</p>
 
               
 
@@ -505,7 +491,7 @@
         </article>
         <footer id="footer" class="main-content-wrap">
   <span class="copyrights">
-    &copy; 2019 Simo Ahava. All Rights Reserved
+    &copy; 2020 Simo Ahava. All Rights Reserved
   </span>
 </footer>
 

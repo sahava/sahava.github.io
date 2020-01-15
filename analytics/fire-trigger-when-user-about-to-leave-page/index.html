@@ -53,7 +53,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.59.1 with theme Tranquilpeak 0.4.3-BETA">
+    <meta name="generator" content="Hugo 0.61.0 with theme Tranquilpeak 0.4.3-BETA">
     <title>#GTMTips: Fire Trigger When User Is About To Leave The Page | Simo Ahava's blog</title>
     
     <script>
@@ -319,14 +319,9 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              
-
-<p>One of the great ways to leverage <a href="https://tagmanager.google.com/">Google Tag Manager</a> in your web analytics tracking is to make use of all the possible <a href="https://www.simoahava.com/analytics/simple-custom-event-listeners-gtm/">custom events</a> that the browser has to offer. One such event is <a href="https://developer.mozilla.org/en-US/docs/Web/Events/beforeunload"><code>beforeunload</code></a>. It&rsquo;s dispatched in the browser when the user is about to <em>unload</em> the page. This means, typically, that the user is about to leave the page after clicking a link, or they are about to exit the browser by either closing the tab or the entire window.</p>
-
-<p>We can use this event for many things, but in this article I&rsquo;ll show you how to setup the listener, and then use it to send an event to <a href="https://analytics.google.com">Google Analytics</a> which contains the <strong>deepest</strong> <a href="https://www.simoahava.com/analytics/scroll-depth-trigger-google-tag-manager/">scroll depth threshold</a> the user crossed on the page. So if they scrolled all the way to 75% of the document, this event would send that threshold to Google Analytics. Why? Because sometimes we simply want to know the <strong>farthest</strong> the user scrolled to any given page, rather than <strong>all</strong> the thresholds they crossed on the way there.</p>
-
+              <p>One of the great ways to leverage <a href="https://tagmanager.google.com/">Google Tag Manager</a> in your web analytics tracking is to make use of all the possible <a href="https://www.simoahava.com/analytics/simple-custom-event-listeners-gtm/">custom events</a> that the browser has to offer. One such event is <a href="https://developer.mozilla.org/en-US/docs/Web/Events/beforeunload"><code>beforeunload</code></a>. It's dispatched in the browser when the user is about to <em>unload</em> the page. This means, typically, that the user is about to leave the page after clicking a link, or they are about to exit the browser by either closing the tab or the entire window.</p>
+<p>We can use this event for many things, but in this article I'll show you how to setup the listener, and then use it to send an event to <a href="https://analytics.google.com">Google Analytics</a> which contains the <strong>deepest</strong> <a href="https://www.simoahava.com/analytics/scroll-depth-trigger-google-tag-manager/">scroll depth threshold</a> the user crossed on the page. So if they scrolled all the way to 75% of the document, this event would send that threshold to Google Analytics. Why? Because sometimes we simply want to know the <strong>farthest</strong> the user scrolled to any given page, rather than <strong>all</strong> the thresholds they crossed on the way there.</p>
 <h2 id="tip-82-fire-a-trigger-on-the-beforeunload-event">Tip 82: Fire a trigger on the <code>beforeunload</code> event</h2>
-
 
 
 
@@ -342,17 +337,12 @@
 </div>
 
 
-
-<p>First of all, let&rsquo;s create the event listener for <code>beforeunload</code>, so that the impatient readers can go right ahead and start working on their own solutions around this trigger.</p>
-
+<p>First of all, let's create the event listener for <code>beforeunload</code>, so that the impatient readers can go right ahead and start working on their own solutions around this trigger.</p>
 <blockquote>
 <p>One <strong>important</strong> thing to note is that if you use a <code>beforeunload</code> listener, you invalidate the <strong>Back-Forward Cache</strong> of some browsers (e.g. Firefox). On some websites this might break user experience, so be sure to consult with your developers before implementing this, particularly on pages with forms.</p>
 </blockquote>
-
 <p>The tag is a simple <strong>Custom HTML tag</strong> that fires on the <strong>All Pages</strong> trigger. Feel free to use a more restrictive trigger, if you want the listener to be active only on specific pages.</p>
-
 <p>Here are the contents:</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
   window.<span style="color:#a6e22e">addEventListener</span>(<span style="color:#e6db74">&#39;beforeunload&#39;</span>, <span style="color:#66d9ef">function</span>() {
     window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
@@ -360,11 +350,8 @@
 	});
   });
 &lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
-
 <p>All this tag does is create the listener. The listener has a callback which pushes the <code>beforeunload</code> custom event into <code>dataLayer</code>.</p>
-
 <p>Now if you go to Preview mode, by clicking a link away from any page, you should <em>just</em> see the <strong>beforeunload</strong> text appear in the Preview mode event list before you are whisked away. If you see it, it means the listener works.</p>
-
 
 
 
@@ -380,9 +367,7 @@
 </div>
 
 
-
 <p>Next thing to do is to create a <strong>Custom Event trigger</strong> with the following settings:</p>
-
 
 
 
@@ -398,30 +383,18 @@
 </div>
 
 
-
 <p>If you add this trigger to a tag, that tag will fire <em>just</em> when the user is about to leave the page.</p>
-
 <h3 id="set-the-transport-field-in-google-analytics-tags">Set the <code>transport</code> field in Google Analytics tags</h3>
-
-<p>Because the trigger fires on the threshold of unloading the page, there is a very real risk that the page is unloaded <strong>before</strong> the asynchronous request initiated by the tag (firing on the trigger) has time to complete. To let your requests complete in time, you can use the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Beacon_API">Beacon API</a> - another cool browser feature that&rsquo;s almost essential to web analytics tracking.</p>
-
-<p>Thankfully, if you are using Google Analytics tags, you don&rsquo;t need to build the beacon utility yourself. The Universal Analytics library, <strong>analytics.js</strong>, has a special field called <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/field-reference#transport"><code>transport</code></a>, which you can set to the value <code>beacon</code> in case you want to leverate the Beacon API with your Google Analytics hits.</p>
-
+<p>Because the trigger fires on the threshold of unloading the page, there is a very real risk that the page is unloaded <strong>before</strong> the asynchronous request initiated by the tag (firing on the trigger) has time to complete. To let your requests complete in time, you can use the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Beacon_API">Beacon API</a> - another cool browser feature that's almost essential to web analytics tracking.</p>
+<p>Thankfully, if you are using Google Analytics tags, you don't need to build the beacon utility yourself. The Universal Analytics library, <strong>analytics.js</strong>, has a special field called <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/field-reference#transport"><code>transport</code></a>, which you can set to the value <code>beacon</code> in case you want to leverate the Beacon API with your Google Analytics hits.</p>
 <p>To add this field, either use a <a href="https://www.simoahava.com/analytics/google-analytics-settings-variable-in-gtm/">Google Analytics Settings variable</a>, or override the settings of your tag. Scroll down to <strong>Fields to set</strong>, and add a new field:</p>
-
-<p><strong>Field name</strong>: <code>transport</code><br />
+<p><strong>Field name</strong>: <code>transport</code><br>
 <strong>Value</strong>: <code>beacon</code></p>
-
-<p>With this setting, the tag now utilizes the Beacon API to dispatch the asynchronous request <em>even if</em> the browser has unloaded the page. The cool thing about this implementation is that if the browser doesn&rsquo;t support this API, the tag automatically falls back to either GET or POST, just like it would normally do.</p>
-
-<p>One &ldquo;side effect&rdquo; of using the Beacon API is that the request is automatically turned into a POST request. This means that if you&rsquo;re using the Network tab of your browser&rsquo;s developer tools, the request parameters won&rsquo;t be outlined as nicely as they would with a GET request. For this reason, I strongly recommend you use the <a href="https://chrome.google.com/webstore/detail/google-analytics-debugger/jnkmfdileelhofjcijamephohjechhna?hl=en">Google Analytics Debugger</a> to analyze the requests.</p>
-
+<p>With this setting, the tag now utilizes the Beacon API to dispatch the asynchronous request <em>even if</em> the browser has unloaded the page. The cool thing about this implementation is that if the browser doesn't support this API, the tag automatically falls back to either GET or POST, just like it would normally do.</p>
+<p>One &ldquo;side effect&rdquo; of using the Beacon API is that the request is automatically turned into a POST request. This means that if you're using the Network tab of your browser's developer tools, the request parameters won't be outlined as nicely as they would with a GET request. For this reason, I strongly recommend you use the <a href="https://chrome.google.com/webstore/detail/google-analytics-debugger/jnkmfdileelhofjcijamephohjechhna?hl=en">Google Analytics Debugger</a> to analyze the requests.</p>
 <h3 id="send-the-deepest-scroll-depth-threshold">Send the deepest Scroll Depth threshold</h3>
-
 <p>To send the deepest (or farthest) the user has scrolled on any given page, you need the following components.</p>
-
 <p><strong>A Scroll Depth trigger with the thresholds configured</strong></p>
-
 
 
 
@@ -437,13 +410,9 @@
 </div>
 
 
-
 <p>Note that you <strong>do not</strong> need to add this trigger to any tag. Its sole purpose is to push the threshold values into <code>dataLayer</code>.</p>
-
 <p><strong>A Google Analytics tag which fires on the <code>beforeunload</code> trigger</strong></p>
-
-<p>The tag needs to fire on the <code>beforeunload</code> trigger, and it needs to send the value of the <a href="https://www.simoahava.com/analytics/variable-guide-google-tag-manager/#scrolling"><strong>{{Scroll Depth Threshold}}</strong> Built-in variable</a> to Google Analytics. Don&rsquo;t forget to add the <code>transport</code> field there, too!</p>
-
+<p>The tag needs to fire on the <code>beforeunload</code> trigger, and it needs to send the value of the <a href="https://www.simoahava.com/analytics/variable-guide-google-tag-manager/#scrolling"><strong>{{Scroll Depth Threshold}}</strong> Built-in variable</a> to Google Analytics. Don't forget to add the <code>transport</code> field there, too!</p>
 
 
 
@@ -459,19 +428,12 @@
 </div>
 
 
-
-<p>Again, feel free to add trigger exceptions or to modify the Custom Event trigger to restrict this tag to fire only on relevant pages. It doesn&rsquo;t make sense to collect scrolling data on pages where that information is not relevant.</p>
-
+<p>Again, feel free to add trigger exceptions or to modify the Custom Event trigger to restrict this tag to fire only on relevant pages. It doesn't make sense to collect scrolling data on pages where that information is not relevant.</p>
 <h2 id="summary">Summary</h2>
-
-<p>Once you&rsquo;ve created the Custom HTML tag for the listener, the Custom Event trigger, the Scroll Depth trigger, and the Google Analytics tag, you&rsquo;re good to go. When the user is about to leave any page, the <code>beforeunload</code> event triggers your Google Analytics tag. This tag grabs the latest value from <strong>{{Scroll Depth Threshold}}</strong> and sends it with the event to GA.</p>
-
-<p>So if the user scrolled all the way down to 70% of the page (if you&rsquo;ve set it up as a vertical threshold in the trigger settings), the value <code>70</code> would get sent with the tag.</p>
-
-<p>This way you&rsquo;ll preserve your hit quota (remember there&rsquo;s a <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/limits-quotas#universal_properties">500 hits per session</a> limit in Google Analytics), and you&rsquo;ll avoid sending a lot of noisy information about the intermediate thresholds to Google Analytics.</p>
-
+<p>Once you've created the Custom HTML tag for the listener, the Custom Event trigger, the Scroll Depth trigger, and the Google Analytics tag, you're good to go. When the user is about to leave any page, the <code>beforeunload</code> event triggers your Google Analytics tag. This tag grabs the latest value from <strong>{{Scroll Depth Threshold}}</strong> and sends it with the event to GA.</p>
+<p>So if the user scrolled all the way down to 70% of the page (if you've set it up as a vertical threshold in the trigger settings), the value <code>70</code> would get sent with the tag.</p>
+<p>This way you'll preserve your hit quota (remember there's a <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/limits-quotas#universal_properties">500 hits per session</a> limit in Google Analytics), and you'll avoid sending a lot of noisy information about the intermediate thresholds to Google Analytics.</p>
 <p>The scroll depth trick was just a tangent, though. The <code>beforeunload</code> listener can be used for a million different things, such as <a href="https://www.simoahava.com/analytics/track-form-abandonment-with-google-tag-manager/">form abandonment</a> and <a href="https://www.simoahava.com/analytics/track-content-engagement-part-2/">content engagement</a> tracking.</p>
-
 <p>Do you have other cool uses for the <code>beforeunload</code> listener? Let us know in the comments!</p>
 
               
@@ -576,7 +538,7 @@
         </article>
         <footer id="footer" class="main-content-wrap">
   <span class="copyrights">
-    &copy; 2019 Simo Ahava. All Rights Reserved
+    &copy; 2020 Simo Ahava. All Rights Reserved
   </span>
 </footer>
 

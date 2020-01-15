@@ -125,8 +125,6 @@
 
 <meta itemprop="name" content="Node Relationships And GTM">
 <meta itemprop="description" content="Simple variable to check whether or not two nodes are &#34;related&#34; in the document object model. You can do this via Google Tag Manager.">
-
-
 <meta itemprop="datePublished" content="2014-08-29T13:25:46&#43;00:00" />
 <meta itemprop="dateModified" content="2014-08-29T13:25:46&#43;00:00" />
 <meta itemprop="wordCount" content="1123">
@@ -134,7 +132,6 @@
 
 
 <meta itemprop="keywords" content="auto-event tracking,event listener,Google Tag Manager,Guide,JavaScript," />
-
 <script type="application/ld+json">
 {
     "@context": "http://schema.org",
@@ -917,29 +914,17 @@ on
     </header>
 
     <section class="post-content">
-      
-
-<p><em>There&rsquo;s a much easier, native-to-GTM way to do this now: the <a href="https://www.simoahava.com/amp/analytics/matches-css-selector-operator-in-gtm-triggers/">Matches CSS Selector</a>.</em></p>
-
-<p>Behind this tragically boring title is a simple solution to many problems with Google Tag Manager&rsquo;s auto-event tracking. The common denominator to these problems is poor website markup. Selectors are used sparingly, and element hierarchy is messy. This disregard for proper node relationships means you have to resort to Data Layer Variable Macros which look like</p>
-
+      <p><em>There's a much easier, native-to-GTM way to do this now: the <a href="https://www.simoahava.com/amp/analytics/matches-css-selector-operator-in-gtm-triggers/">Matches CSS Selector</a>.</em></p>
+<p>Behind this tragically boring title is a simple solution to many problems with Google Tag Manager's auto-event tracking. The common denominator to these problems is poor website markup. Selectors are used sparingly, and element hierarchy is messy. This disregard for proper node relationships means you have to resort to Data Layer Variable Macros which look like</p>
 <p><code>gtm.element.parentElement.parentElement.id</code></p>
-
-<p>to identify the element that was the target of the event. In other words, there&rsquo;s no robust, unique identifier with which you could identify the targeted element, so you have to go either up or down the Document Object Model to find something you can latch on to.</p>
-
+<p>to identify the element that was the target of the event. In other words, there's no robust, unique identifier with which you could identify the targeted element, so you have to go either up or down the Document Object Model to find something you can latch on to.</p>
 <p>This is <em>not</em> a stable solution.</p>
-
-<p>The more steps there are in your selector chain, the more chances there are of you either miscalculating the required steps, or some code on some page template producing a hierarchy which you didn&rsquo;t account for, resulting in a loss of hits.</p>
-
+<p>The more steps there are in your selector chain, the more chances there are of you either miscalculating the required steps, or some code on some page template producing a hierarchy which you didn't account for, resulting in a loss of hits.</p>
 <p>In this guide I introduce a pretty simple solution. It explores the concept of node relationships by using a simple DOM function to do so. The whole thing is still a workaround, and you should definitely try to talk with your developers about how to mark up your elements with proper identifiers.</p>
-
 <p>(By the way, for markup ideas, here are two excellent articles about using data attributes as identifiers:</p>
-
-<p><a href="https://www.bounteous.com/insights/2014/05/08/tracking-clicks-custom-data-attributes-google-tag-manager-google-analytics/">Tracking Clicks Using Custom Data Attributes</a> - Bounteous<br />
+<p><a href="https://www.bounteous.com/insights/2014/05/08/tracking-clicks-custom-data-attributes-google-tag-manager-google-analytics/">Tracking Clicks Using Custom Data Attributes</a> - Bounteous<br>
 <a href="http://www.swellpath.com/2014/08/google-tag-manager-events-using-html5-data-attributes/">Google Tag Manager Events Using HTML5 Data Attributes</a> - SwellPath)</p>
-
 <p>Anyway, this guide will demonstrate a pretty simple DOM (Document Object Model) function with which to check whether a given element (e.g. {{element}}) is an ancestor of some other element (e.g. a top-level menu wrapper). The rule will look something like this:</p>
-
 
 
     <a href="https://www.simoahava.com/amp/images/2014/08/rule-example.jpg" title="Example of a contains rule">
@@ -949,97 +934,70 @@ on
     </a>
   
 
-
-<p>As usual, there&rsquo;s the easy method and then there&rsquo;s the advanced method (which isn&rsquo;t really that advanced at all).</p>
-
+<p>As usual, there's the easy method and then there's the advanced method (which isn't really that advanced at all).</p>
 <h2 id="the-easy-method">The easy method</h2>
-
 <p>The easy method is really just about checking the node relationship between a given element, such as {{element}}, and a specific parent element. This is useful if you only have one or two cases where this is an issue.</p>
-
-<p>The DOM method we&rsquo;ll be using is <a href="https://developer.mozilla.org/en-US/docs/Web/API/Node.contains">Node.contains</a>.</p>
-
-<p>Here&rsquo;s the <strong>Custom JavaScript Macro</strong>, which is the motor of the solution, in all its simplicity:</p>
-
+<p>The DOM method we'll be using is <a href="https://developer.mozilla.org/en-US/docs/Web/API/Node.contains">Node.contains</a>.</p>
+<p>Here's the <strong>Custom JavaScript Macro</strong>, which is the motor of the solution, in all its simplicity:</p>
 <p><strong>{{node contains element}}</strong></p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-  <span class="kd">var</span> <span class="nx">controlElement</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">&#39;#parentId&#39;</span><span class="p">);</span>
-  <span class="k">return</span> <span class="nx">controlElement</span> <span class="o">&amp;&amp;</span> <span class="nx">controlElement</span> <span class="o">!==</span> <span class="p">{{</span><span class="nx">element</span><span class="p">}}</span> <span class="o">?</span> <span class="nx">controlElement</span><span class="p">.</span><span class="nx">contains</span><span class="p">({{</span><span class="nx">element</span><span class="p">}})</span> <span class="o">:</span> <span class="kc">false</span><span class="p">;</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span><span class="p">(</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">controlElement</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">&#39;#parentId&#39;</span><span class="p">)</span><span class="p">;</span>
+  <span class="k">return</span> <span class="nx">controlElement</span> <span class="o">&amp;&amp;</span> <span class="nx">controlElement</span> <span class="o">!==</span> <span class="p">{</span><span class="p">{</span><span class="nx">element</span><span class="p">}</span><span class="p">}</span> <span class="o">?</span> <span class="nx">controlElement</span><span class="p">.</span><span class="nx">contains</span><span class="p">(</span><span class="p">{</span><span class="p">{</span><span class="nx">element</span><span class="p">}</span><span class="p">}</span><span class="p">)</span> <span class="o">:</span> <span class="kc">false</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div>
-
 <p>And then your firing rule will be something like:</p>
-
-<p><strong>{{node contains element}} equals true<br />
+<p><strong>{{node contains element}} equals true<br>
 {{event}} equals gtm.linkClick</strong></p>
-
 <p>Feel free to use any other <a href="https://www.simoahava.com/amp/analytics/auto-event-tracking-google-tag-manager/">auto-event tracking</a> type you wish.</p>
-
 <p>This will only fire the tag if a click occurs on a link which is a direct ancestor of an element with ID <strong>parentId</strong>. A cousin or a long-lost blood brother will not do; the nodes must have a direct ancestral relationship.</p>
-
 <p>So that was easy, right? What about when you have multiple ancestor-descendant-relationships you want to explore? You could create a rule and macro for each, but a far more robust way is to use a Lookup Table or a Custom JavaScript macro.</p>
-
 <h2 id="the-advanced-method">The advanced method</h2>
-
 <p>The idea with the advanced method is to vary the the node against which you control the event element, depending on some parameter. In this particular example I use <strong>{{url path}}</strong> to determine which control node to choose, and a Custom JavaScript macro to return the new query selector.</p>
-
-<p>So let&rsquo;s say I have three page templates:</p>
-
+<p>So let's say I have three page templates:</p>
 <ol>
-<li><p>Home page (url path === &lsquo;/&rsquo;), where I want to track clicks on links in the main navigation (id === &lsquo;#mainNav&rsquo;)</p></li>
-
-<li><p>Product pages (url path === &lsquo;/products/*&lsquo;), where I want to track clicks in any of the three Call-to-action page elements (class === &lsquo;call-to-action&rsquo;)</p></li>
-
-<li><p>All other pages, where I want to track clicks on links in the footer (tag name === &lsquo;footer&rsquo;)</p></li>
+<li>
+<p>Home page (url path === &lsquo;/'), where I want to track clicks on links in the main navigation (id === &lsquo;#mainNav&rsquo;)</p>
+</li>
+<li>
+<p>Product pages (url path === &lsquo;/products/*'), where I want to track clicks in any of the three Call-to-action page elements (class === &lsquo;call-to-action&rsquo;)</p>
+</li>
+<li>
+<p>All other pages, where I want to track clicks on links in the footer (tag name === &lsquo;footer&rsquo;)</p>
+</li>
 </ol>
-
-<p>Now, to complement the Custom JavaScript macro above, I want the query selector to be dynamic, depending on which of the above conditions is true. So let&rsquo;s modify the macro just a little bit:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-  <span class="kd">var</span> <span class="nx">controlElement</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">({{</span><span class="nx">get</span> <span class="nx">query</span> <span class="nx">selector</span><span class="p">}});</span>
-  <span class="k">return</span> <span class="nx">controlElement</span> <span class="o">&amp;&amp;</span> <span class="nx">controlElement</span> <span class="o">!==</span> <span class="p">{{</span><span class="nx">element</span><span class="p">}}</span> <span class="o">?</span> <span class="nx">controlElement</span><span class="p">.</span><span class="nx">contains</span><span class="p">({{</span><span class="nx">element</span><span class="p">}})</span> <span class="o">:</span> <span class="kc">false</span><span class="p">;</span>
+<p>Now, to complement the Custom JavaScript macro above, I want the query selector to be dynamic, depending on which of the above conditions is true. So let's modify the macro just a little bit:</p>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span><span class="p">(</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">controlElement</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="p">{</span><span class="p">{</span><span class="nx">get</span> <span class="nx">query</span> <span class="nx">selector</span><span class="p">}</span><span class="p">}</span><span class="p">)</span><span class="p">;</span>
+  <span class="k">return</span> <span class="nx">controlElement</span> <span class="o">&amp;&amp;</span> <span class="nx">controlElement</span> <span class="o">!==</span> <span class="p">{</span><span class="p">{</span><span class="nx">element</span><span class="p">}</span><span class="p">}</span> <span class="o">?</span> <span class="nx">controlElement</span><span class="p">.</span><span class="nx">contains</span><span class="p">(</span><span class="p">{</span><span class="p">{</span><span class="nx">element</span><span class="p">}</span><span class="p">}</span><span class="p">)</span> <span class="o">:</span> <span class="kc">false</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div>
-
-<p>So it&rsquo;s the same, but the <code>document.querySelector()</code> fetches the query string from a macro called <strong>{{get query selector}}</strong>.</p>
-
-<p>And what does this macro look like? Well, to satisfy the three requirements I listed above, this is what you&rsquo;ll get:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+<p>So it's the same, but the <code>document.querySelector()</code> fetches the query string from a macro called <strong>{{get query selector}}</strong>.</p>
+<p>And what does this macro look like? Well, to satisfy the three requirements I listed above, this is what you'll get:</p>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span><span class="p">(</span><span class="p">)</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">homeRegex</span> <span class="o">=</span> <span class="sr">/^\/$/</span><span class="p">,</span>
       <span class="nx">productRegex</span> <span class="o">=</span> <span class="sr">/^\/products\//</span><span class="p">;</span>
-  <span class="k">if</span><span class="p">(</span><span class="nx">homeRegex</span><span class="p">.</span><span class="nx">test</span><span class="p">({{</span><span class="nx">url</span> <span class="nx">path</span><span class="p">}}))</span> <span class="p">{</span>
+  <span class="k">if</span><span class="p">(</span><span class="nx">homeRegex</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="p">{</span><span class="p">{</span><span class="nx">url</span> <span class="nx">path</span><span class="p">}</span><span class="p">}</span><span class="p">)</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="s1">&#39;#mainNav&#39;</span><span class="p">;</span>
-  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">productRegex</span><span class="p">.</span><span class="nx">test</span><span class="p">({{</span><span class="nx">url</span> <span class="nx">path</span><span class="p">}}))</span> <span class="p">{</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">productRegex</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="p">{</span><span class="p">{</span><span class="nx">url</span> <span class="nx">path</span><span class="p">}</span><span class="p">}</span><span class="p">)</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="s1">&#39;.call-to-action&#39;</span><span class="p">;</span>
   <span class="p">}</span>
   <span class="k">return</span> <span class="s1">&#39;footer&#39;</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div>
-
 <p>This returns a different string every time, depending on which condition is satisfied by the URL path of the document.</p>
-
 <p>You can now create a unique tag for each of these three variations, still referencing the same macro in the rule, because it will return true/false depending on which condition is satisfied. If you want a more verbose check than just Boolean true/false, you can modify the original macro to return the query selector itself, after which you can modify the rule accordingly:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-  <span class="kd">var</span> <span class="nx">controlElement</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">({{</span><span class="nx">get</span> <span class="nx">query</span> <span class="nx">selector</span><span class="p">}});</span>
-  <span class="k">return</span> <span class="nx">controlElement</span> <span class="o">&amp;&amp;</span> <span class="nx">controlElement</span> <span class="o">!==</span> <span class="p">{{</span><span class="nx">element</span><span class="p">}}</span> <span class="o">&amp;&amp;</span> <span class="nx">controlElement</span><span class="p">.</span><span class="nx">contains</span><span class="p">({{</span><span class="nx">element</span><span class="p">}})</span> <span class="o">?</span> <span class="p">{{</span><span class="nx">get</span> <span class="nx">query</span> <span class="nx">selector</span><span class="p">}}</span> <span class="o">:</span> <span class="kc">false</span><span class="p">;</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span><span class="p">(</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">controlElement</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="p">{</span><span class="p">{</span><span class="nx">get</span> <span class="nx">query</span> <span class="nx">selector</span><span class="p">}</span><span class="p">}</span><span class="p">)</span><span class="p">;</span>
+  <span class="k">return</span> <span class="nx">controlElement</span> <span class="o">&amp;&amp;</span> <span class="nx">controlElement</span> <span class="o">!==</span> <span class="p">{</span><span class="p">{</span><span class="nx">element</span><span class="p">}</span><span class="p">}</span> <span class="o">&amp;&amp;</span> <span class="nx">controlElement</span><span class="p">.</span><span class="nx">contains</span><span class="p">(</span><span class="p">{</span><span class="p">{</span><span class="nx">element</span><span class="p">}</span><span class="p">}</span><span class="p">)</span> <span class="o">?</span> <span class="p">{</span><span class="p">{</span><span class="nx">get</span> <span class="nx">query</span> <span class="nx">selector</span><span class="p">}</span><span class="p">}</span> <span class="o">:</span> <span class="kc">false</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div>
-
 <p>This piece of code returns &ldquo;#mainNav&rdquo; if the click occurred on the home page navigation, &lsquo;.call-to-action&rsquo; if the click occurred on any of the three call-to-action elements on the home page, or &lsquo;footer&rsquo; for all other cases. Then, if you have a tag which should only fire on clicks on the product page calls-to-action, the rule would look like this:</p>
-
-<p><strong>{{event equals gtm.linkClick}}<br />
+<p><strong>{{event equals gtm.linkClick}}<br>
 {{node contains element}} equals .call-to-action</strong></p>
-
-<p>And that&rsquo;s it for the advanced method. Remember that one of the huge perks of using a tag management solution is the opportunity to consolidate your tags and make the whole setup so much leaner. Using Custom JavaScript macros for advanced lookups or the Lookup Table macro for simple value retrievals is usually the key to reducing the weight of your implementation.</p>
-
+<p>And that's it for the advanced method. Remember that one of the huge perks of using a tag management solution is the opportunity to consolidate your tags and make the whole setup so much leaner. Using Custom JavaScript macros for advanced lookups or the Lookup Table macro for simple value retrievals is usually the key to reducing the weight of your implementation.</p>
 <h2 id="conclusions">Conclusions</h2>
-
 <p>This was a very basic guide on a sweet little method of the DOM Node object not many seem to be aware of. The point here is that instead of building vast selector chains, where each link is weaker than the one before it, you can just use an all-encompassing ancestor lookup, which reduces the chance of error.</p>
-
-<p>If you want to get real flashy, there&rsquo;s always the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Node.compareDocumentPosition">Node.compareDocumentPosition()</a> method, which returns a bitmask representing the relationship between two nodes. It doesn&rsquo;t take just ancestry into account, it also looks for descendant relationships, which might be useful in some cases. However, it&rsquo;s not in the scope of this guide, and I&rsquo;m pretty sure that most of the problems can be solved with the ancestor lookup.</p>
-
+<p>If you want to get real flashy, there's always the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Node.compareDocumentPosition">Node.compareDocumentPosition()</a> method, which returns a bitmask representing the relationship between two nodes. It doesn't take just ancestry into account, it also looks for descendant relationships, which might be useful in some cases. However, it's not in the scope of this guide, and I'm pretty sure that most of the problems can be solved with the ancestor lookup.</p>
 <p>JavaScript is fun! Google Tag Manager is fun-ner!</p>
 
     </section>

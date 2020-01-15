@@ -53,7 +53,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="Hugo 0.59.1 with theme Tranquilpeak 0.4.3-BETA">
+    <meta name="generator" content="Hugo 0.61.0 with theme Tranquilpeak 0.4.3-BETA">
     <title>Fun With Google Tag Manager: Part 2 | Simo Ahava's blog</title>
     
     <script>
@@ -319,36 +319,33 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              
-
-<p>Apologies for leaving you hanging. It&rsquo;s now almost three weeks since I published the <a href="https://www.simoahava.com/analytics/fun-with-google-tag-manager-part-1/">first part of this post</a>, and I&rsquo;m sure you&rsquo;ve been holding your breath ever since.</p>
-
-<p>There&rsquo;s been a lot going on since the last post. First, my favorite sports team in the world, San Antonio Spurs, <a href="http://nba.si.com/2014/06/15/spurs-win-title-heat-2014-nba-finals/">won their fifth NBA championship</a> from the defending champs, Miami Heat. Next, my wife and I moved to our new house, and we&rsquo;ve been remodeling ever since. It&rsquo;s been hectic with work and life getting mixed up in a potpourri of saw dust and web analytics, but now it&rsquo;s time to return back to the wonderful world of Google Tag Manager!</p>
-
-<p>I promised you four new tips in this one, but I&rsquo;m going to top myself and give you six gems from the world of tag management. Here&rsquo;s what you&rsquo;ll get:</p>
-
+              <p>Apologies for leaving you hanging. It's now almost three weeks since I published the <a href="https://www.simoahava.com/analytics/fun-with-google-tag-manager-part-1/">first part of this post</a>, and I'm sure you've been holding your breath ever since.</p>
+<p>There's been a lot going on since the last post. First, my favorite sports team in the world, San Antonio Spurs, <a href="http://nba.si.com/2014/06/15/spurs-win-title-heat-2014-nba-finals/">won their fifth NBA championship</a> from the defending champs, Miami Heat. Next, my wife and I moved to our new house, and we've been remodeling ever since. It's been hectic with work and life getting mixed up in a potpourri of saw dust and web analytics, but now it's time to return back to the wonderful world of Google Tag Manager!</p>
+<p>I promised you four new tips in this one, but I'm going to top myself and give you six gems from the world of tag management. Here's what you'll get:</p>
 <ol>
-<li><p>dataLayer declaration and push</p></li>
-
-<li><p>Using eventCallback in dataLayer.push()</p></li>
-
-<li><p>Stopping a Timer Listener</p></li>
-
-<li><p>Naming and version control conventions</p></li>
-
-<li><p>Fire a single tag multiple times</p></li>
-
-<li><p>{{true}} and {{false}}</p></li>
+<li>
+<p>dataLayer declaration and push</p>
+</li>
+<li>
+<p>Using eventCallback in dataLayer.push()</p>
+</li>
+<li>
+<p>Stopping a Timer Listener</p>
+</li>
+<li>
+<p>Naming and version control conventions</p>
+</li>
+<li>
+<p>Fire a single tag multiple times</p>
+</li>
+<li>
+<p>{{true}} and {{false}}</p>
+</li>
 </ol>
-
 <h2 id="datalayer-declaration-and-push">dataLayer declaration and push</h2>
-
 <p><a href="https://developers.google.com/tag-manager/devguide">Google Tag Manager</a> uses <code>dataLayer</code> as its own proprietary data model. <code>dataLayer</code> is a JavaScript object of Array type. This means that it has some methods unique to Arrays, such as <code>push()</code>.</p>
-
 <p>(See my comment to this post <a href="https://www.simoahava.com/analytics/fun-google-tag-manager-part-2/">here</a> for an overview of how to access Array objects vs. object properties.)</p>
-
-<p>The thing is, you can&rsquo;t use <code>dataLayer.push()</code> if you haven&rsquo;t declared <code>dataLayer</code> as an array first. The repercussions of this are that if you try to use <code>dataLayer.push()</code> before <code>dataLayer</code> has been declared as an Array, or if it&rsquo;s been declared as something different (such as a normal object or string), you&rsquo;ll get some errors:</p>
-
+<p>The thing is, you can't use <code>dataLayer.push()</code> if you haven't declared <code>dataLayer</code> as an array first. The repercussions of this are that if you try to use <code>dataLayer.push()</code> before <code>dataLayer</code> has been declared as an Array, or if it's been declared as something different (such as a normal object or string), you'll get some errors:</p>
 
 
 
@@ -364,46 +361,28 @@
 </div>
 
 
-
-<p>So here&rsquo;s the first tip:</p>
-
+<p>So here's the first tip:</p>
 <p><strong>You need to declare <code>dataLayer</code> as an Array before you can use its push() method.</strong></p>
-
 <p>To turn <code>dataLayer</code> into an array, you need the following code <em>before the container snippet</em>:</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">dataLayer</span> <span style="color:#f92672">=</span> [];
 </code></pre></div>
-
-<p>If you don&rsquo;t declare it with this explicit statement, then <strong><a href="https://www.simoahava.com/analytics/container-snippet-gtm-secrets-revealed/">GTM will declare dataLayer</a> for you</strong>. This is very important, since it ensures that you will always have <code>dataLayer</code> available for your tags.</p>
-
-<p>The thing with JavaScript objects and primitives (numbers, strings, etc.) is that if you <strong>redefine</strong> a JavaScript entity, its previous state will be overwritten! JavaScript entities are dynamic, so you can redefine a string as an object, an Array as a number, and so forth without any difficulty. There&rsquo;s also no way of protecting a global variable such as <code>dataLayer</code> from being redefined as a different type, so precautions must be taken so that you don&rsquo;t mess things up.</p>
-
-<p>Why is this important? Well, if you have more than one <code>dataLayer</code> declaration on your page template OR in your GTM tags, you will <strong>erase all previous information in the structure</strong>! Oops. Here&rsquo;s an example:</p>
-
+<p>If you don't declare it with this explicit statement, then <strong><a href="https://www.simoahava.com/analytics/container-snippet-gtm-secrets-revealed/">GTM will declare dataLayer</a> for you</strong>. This is very important, since it ensures that you will always have <code>dataLayer</code> available for your tags.</p>
+<p>The thing with JavaScript objects and primitives (numbers, strings, etc.) is that if you <strong>redefine</strong> a JavaScript entity, its previous state will be overwritten! JavaScript entities are dynamic, so you can redefine a string as an object, an Array as a number, and so forth without any difficulty. There's also no way of protecting a global variable such as <code>dataLayer</code> from being redefined as a different type, so precautions must be taken so that you don't mess things up.</p>
+<p>Why is this important? Well, if you have more than one <code>dataLayer</code> declaration on your page template OR in your GTM tags, you will <strong>erase all previous information in the structure</strong>! Oops. Here's an example:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">dataLayer</span> <span style="color:#f92672">=</span> [{<span style="color:#e6db74">&#39;pageCategory&#39;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;home&#39;</span>, <span style="color:#e6db74">&#39;logged-in&#39;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;true&#39;</span>}];
 ...
 <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">dataLayer</span> <span style="color:#f92672">=</span> [{<span style="color:#e6db74">&#39;event&#39;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;allDone&#39;</span>}];
 </code></pre></div>
-
 <p>After the first line of code, <code>dataLayer</code> has a single object with two properties: <code>pageCategory</code> and <code>logged-in</code>. A little on further down the code is the second declaration. Now, after this code is run, <code>dataLayer</code> will still only have one object, but with just the <code>event</code> property! Can you see how harmful this is? None of the previous information is recoverable after this.</p>
-
 <p>The safest way to prevent this is to preface the ONLY <code>dataLayer</code> declaration on the page with the following line:</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">window.<span style="color:#a6e22e">dataLayer</span> <span style="color:#f92672">=</span> window.<span style="color:#a6e22e">dataLayer</span> <span style="color:#f92672">||</span> [];
 </code></pre></div>
-
-<p>And then only use <strong>dataLayer.push()</strong> to add objects to the Array. This line ensures that if <code>dataLayer</code> has already been declared, it won&rsquo;t be overwritten. It&rsquo;s not foolproof, since it doesn&rsquo;t test whether the global variable <code>dataLayer</code> is of type Array or not, but I think it&rsquo;s good enough. If you have another JavaScript library which HAPPENS to use a variable called <code>dataLayer</code> as well, you might be in trouble. But this is what testing and debugging is for.</p>
-
-<p>So here&rsquo;s my final tip for this section:</p>
-
+<p>And then only use <strong>dataLayer.push()</strong> to add objects to the Array. This line ensures that if <code>dataLayer</code> has already been declared, it won't be overwritten. It's not foolproof, since it doesn't test whether the global variable <code>dataLayer</code> is of type Array or not, but I think it's good enough. If you have another JavaScript library which HAPPENS to use a variable called <code>dataLayer</code> as well, you might be in trouble. But this is what testing and debugging is for.</p>
+<p>So here's my final tip for this section:</p>
 <p><strong>Declare dataLayer JUST ONCE and use dataLayer.push() for all interactions afterwards.</strong></p>
-
-<p>In your GTM tags you can just use <code>dataLayer.push()</code>, and you don&rsquo;t need to check whether <code>dataLayer</code> exists or not, since GTM declares it for you in the container snippet. But when working on the page template, you need to be extra careful not to overwrite the Array.</p>
-
-<h2 id="using-eventcallback-in-datalayer-push">Using eventCallback in dataLayer.push()</h2>
-
-<p>You can use the <code>eventCallback</code> dataLayer variable in the <code>push()</code> method to execute code after all dependent tags have fired. I know, that was a mouthful but it&rsquo;s really simple. Take this example:</p>
-
+<p>In your GTM tags you can just use <code>dataLayer.push()</code>, and you don't need to check whether <code>dataLayer</code> exists or not, since GTM declares it for you in the container snippet. But when working on the page template, you need to be extra careful not to overwrite the Array.</p>
+<h2 id="using-eventcallback-in-datalayerpush">Using eventCallback in dataLayer.push()</h2>
+<p>You can use the <code>eventCallback</code> dataLayer variable in the <code>push()</code> method to execute code after all dependent tags have fired. I know, that was a mouthful but it's really simple. Take this example:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
   <span style="color:#e6db74">&#39;event&#39;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;fireEvent&#39;</span>,
   <span style="color:#e6db74">&#39;eventCallback&#39;</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">function</span>() {
@@ -411,17 +390,11 @@
   }
 });
 </code></pre></div>
-
-<p>Well, it&rsquo;s a pretty lousy example, but it does what it&rsquo;s meant to. After all tags that fire upon <strong>{{event}} equals fireEvent</strong> have completed, the eventCallback function will execute and you should see the text in the JavaScript console.</p>
-
+<p>Well, it's a pretty lousy example, but it does what it's meant to. After all tags that fire upon <strong>{{event}} equals fireEvent</strong> have completed, the eventCallback function will execute and you should see the text in the JavaScript console.</p>
 <p><code>eventCallback</code> is, in essence, a shorthand for the proprietary <strong><a href="https://www.simoahava.com/analytics/macro-magic-google-tag-manager/">hitCallback</a></strong> feature that you can invoke in your Google Analytics tags.</p>
-
 <p>You can use this for a quick callback, such as waiting for all tags to fire before a link redirects or pushing a second event as the callback to impose a rudimentary tag firing order.</p>
-
 <h2 id="stopping-a-timer-listener">Stopping a Timer Listener</h2>
-
 <p>You know of the <a href="https://support.google.com/tagmanager/answer/3415369?hl=en#TimerListener">Timer Listener</a>, right? You can use it to have an event push every X milliseconds. You can limit the number of times the timer fires, or you can just let it fire from here to eternity.</p>
-
 
 
 
@@ -437,13 +410,9 @@
 </div>
 
 
-
-<p>The thing is, you might want to halt the listener before the limit is reached. For example, if you&rsquo;re using the Timer Listener to send pulses reflecting the time the user has spent digesting content, for example, you might want to halt it once the reader reaches the end of the page to keep your events from being cluttered with timer hits.</p>
-
+<p>The thing is, you might want to halt the listener before the limit is reached. For example, if you're using the Timer Listener to send pulses reflecting the time the user has spent digesting content, for example, you might want to halt it once the reader reaches the end of the page to keep your events from being cluttered with timer hits.</p>
 <p>To halt a timer, you need to use the <code>window.clearInterval()</code> method. It requires a parameter, namely the ID of the timer that is firing.</p>
-
-<p>GTM&rsquo;s timer listener is your run-of-the-mill JavaScript <code>setInterval()</code> timer, and its ID is stored in, what else, a dataLayer variable called <code>gtm.timerId</code>. So to halt the timer, you need to send the content of <code>gtm.timerId</code> as the parameter of <code>window.clearInterval()</code>. For this to work, you&rsquo;ll need to create a new Data Layer Variable Macro which refers to gtm.timerId:</p>
-
+<p>GTM's timer listener is your run-of-the-mill JavaScript <code>setInterval()</code> timer, and its ID is stored in, what else, a dataLayer variable called <code>gtm.timerId</code>. So to halt the timer, you need to send the content of <code>gtm.timerId</code> as the parameter of <code>window.clearInterval()</code>. For this to work, you'll need to create a new Data Layer Variable Macro which refers to gtm.timerId:</p>
 
 
 
@@ -459,34 +428,23 @@
 </div>
 
 
-
 <p>After this, whenever you want to halt a timer, all you have to do is have the following line of JavaScript in your Custom HTML tag or your Custom JavaScript macro:</p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">window.<span style="color:#a6e22e">clearInterval</span>({{<span style="color:#a6e22e">timer</span> <span style="color:#a6e22e">id</span>}});
 </code></pre></div>
-
 <p>This will halt the most recently fired timer. So if you have multiple timers, you might have to edit the code somewhat to find the proper timer (easiest way to do this is to use <strong>{{event}} equals your_timer_event</strong> as one of the rule conditions of the tag that stops the timer).</p>
-
 <h2 id="naming-and-version-control-conventions">Naming and version control conventions</h2>
-
-<p>GTM doesn&rsquo;t exactly shine when it comes to managing a bucketload of tags, macros, and rules (TMRs). Because of this, it&rsquo;s really important to adopt a good naming convention so that you can make sense of what you have in your container.</p>
-
-<p>For alternative approaches (more explicit naming to satisfy the in-tool search), check Doug Hall&rsquo;s original, <a href="http://online-behavior.com/analytics/tag-manager-conventions">excellent post on online-behavior</a>. A <a href="http://www.analyticspros.com/blog/tag-management/naming-conventions-for-process-optimization/">more recent post by Justin Goodman</a> covers similar ground.</p>
-
-<p>I use a very simple naming convention in all my TMRs. It scales pretty nicely, as it works in large enterprise implementations as well as in smaller containers. Also, the most important thing is that it&rsquo;s readable.</p>
-
-<p>Here&rsquo;s what I use.</p>
-
-<p><strong>TAGS</strong><br />
-<em>Tag type - purpose</em><br />
-HTML - Weather API Call<br />
-HTML - Social Share Tracking<br />
-UA - Page View Tracking<br />
-Listener - Link Click<br />
+<p>GTM doesn't exactly shine when it comes to managing a bucketload of tags, macros, and rules (TMRs). Because of this, it's really important to adopt a good naming convention so that you can make sense of what you have in your container.</p>
+<p>For alternative approaches (more explicit naming to satisfy the in-tool search), check Doug Hall's original, <a href="http://online-behavior.com/analytics/tag-manager-conventions">excellent post on online-behavior</a>. A <a href="http://www.analyticspros.com/blog/tag-management/naming-conventions-for-process-optimization/">more recent post by Justin Goodman</a> covers similar ground.</p>
+<p>I use a very simple naming convention in all my TMRs. It scales pretty nicely, as it works in large enterprise implementations as well as in smaller containers. Also, the most important thing is that it's readable.</p>
+<p>Here's what I use.</p>
+<p><strong>TAGS</strong><br>
+<em>Tag type - purpose</em><br>
+HTML - Weather API Call<br>
+HTML - Social Share Tracking<br>
+UA - Page View Tracking<br>
+Listener - Link Click<br>
 Listener - Click</p>
-
 <p>Having the tag type is pretty redundant since you can see that in the second column of the tag list. However, I enjoy that it makes the list look a bit less cluttered.</p>
-
 
 
 
@@ -502,28 +460,21 @@ Listener - Click</p>
 </div>
 
 
-
-<p><strong>RULES</strong><br />
-<em>Key macro - trigger</em><br />
-Event - gtm.js<br />
-Event - Outbound Link Click<br />
+<p><strong>RULES</strong><br>
+<em>Key macro - trigger</em><br>
+Event - gtm.js<br>
+Event - Outbound Link Click<br>
 URL - Thank you page</p>
-
-<p>The key macro is what drives the rule. Most often its an <strong>{{event}}</strong>, but every now and then you might have the same event across many rules, and then you&rsquo;ll need to use some other macro to express the difference between the two rules. An example of this is the URL rule above. It&rsquo;s underlying <strong>{{event}}</strong> is gtm.js, so I have to use the URL condition to make it different from all the other gtm.js rules.</p>
-
-<p><strong>MACROS</strong><br />
-<em>What is returned</em><br />
-Random Number<br />
-Debug Mode Status<br />
-Element URL<br />
+<p>The key macro is what drives the rule. Most often its an <strong>{{event}}</strong>, but every now and then you might have the same event across many rules, and then you'll need to use some other macro to express the difference between the two rules. An example of this is the URL rule above. It's underlying <strong>{{event}}</strong> is gtm.js, so I have to use the URL condition to make it different from all the other gtm.js rules.</p>
+<p><strong>MACROS</strong><br>
+<em>What is returned</em><br>
+Random Number<br>
+Debug Mode Status<br>
+Element URL<br>
 URL Hostname</p>
-
-<p>With macros, we&rsquo;re only interested in what they return, since that&rsquo;s what macros are used for. So in the macro name, it&rsquo;s important to express just what is returned when the macro is called.</p>
-
+<p>With macros, we're only interested in what they return, since that's what macros are used for. So in the macro name, it's important to express just what is returned when the macro is called.</p>
 <p>As for version control, my tip is this:</p>
-
 <p><strong>Name your versions AND add notes!</strong></p>
-
 
 
 
@@ -539,21 +490,13 @@ URL Hostname</p>
 </div>
 
 
-
-<p>That&rsquo;s it. It&rsquo;s so important to annotate your container versions with information what was updated and what changed. This is the only way to stay on top of your game, especially if you&rsquo;re dealing with a huge version history. Be pedantic about this and make sure it&rsquo;s part of your quality assurance process for tag management!</p>
-
+<p>That's it. It's so important to annotate your container versions with information what was updated and what changed. This is the only way to stay on top of your game, especially if you're dealing with a huge version history. Be pedantic about this and make sure it's part of your quality assurance process for tag management!</p>
 <h2 id="fire-a-single-tag-multiple-times">Fire a single tag multiple times</h2>
-
-<p>Here&rsquo;s a common problem: You have multiple trackers firing on the same domain, but you want to use just one tag for them. Well, currently GTM doesn&rsquo;t have a switch with which you can fire the same tag multiple times with different parameters, so you&rsquo;d need to create a separate tag for each tracker.</p>
-
-<p>However, there&rsquo;s a workaround. You can use <code>hitCallback</code>, the Lookup Table Macro and a global JavaScript variable to fire your tag multiple times with different values in the fields!</p>
-
-<p>(<strong>Note:</strong> GTM&rsquo;s Debug mode doesn&rsquo;t let you push items into <code>dataLayer</code>, even if you&rsquo;re doing it from a returned function (which is totally valid). Unfortunately this means that you won&rsquo;t be able to test this solution in the Debug mode, and you&rsquo;ll have to publish the container to test it.)</p>
-
-<p>Here&rsquo;s what you need:</p>
-
+<p>Here's a common problem: You have multiple trackers firing on the same domain, but you want to use just one tag for them. Well, currently GTM doesn't have a switch with which you can fire the same tag multiple times with different parameters, so you'd need to create a separate tag for each tracker.</p>
+<p>However, there's a workaround. You can use <code>hitCallback</code>, the Lookup Table Macro and a global JavaScript variable to fire your tag multiple times with different values in the fields!</p>
+<p>(<strong>Note:</strong> GTM's Debug mode doesn't let you push items into <code>dataLayer</code>, even if you're doing it from a returned function (which is totally valid). Unfortunately this means that you won't be able to test this solution in the Debug mode, and you'll have to publish the container to test it.)</p>
+<p>Here's what you need:</p>
 <p>JAVASCRIPT VARIABLE MACRO {{tag callback counter}}:</p>
-
 
 
 
@@ -569,9 +512,7 @@ URL Hostname</p>
 </div>
 
 
-
 <p>LOOKUP TABLE MACRO {{tracker name}}:</p>
-
 
 
 
@@ -587,9 +528,7 @@ URL Hostname</p>
 </div>
 
 
-
 <p>HITCALLBACK MACRO {{tag callback function}}:</p>
-
 
 
 
@@ -605,15 +544,10 @@ URL Hostname</p>
 </div>
 
 
-
-<p>So, before we check how the tag is set up, let&rsquo;s go over these macros. The <strong>{{tag callback counter}}</strong> is a JavaScript variable macro which refers to the global JS variable you set up later in <strong>{{tag callback function}}</strong>. The idea here is that the <strong>{{tracker name}}</strong> Lookup Table macro returns a different string, depending on what the counter is. Every time the callback is executed, the counter goes up by 1.</p>
-
-<p>The key is to use your first tracker as the <strong>default value of the Lookup Table macro</strong>. This is because when the tag first fires (on <strong>{{event}} equals gtm.js</strong>), the JavaScript variable that <strong>{{tag callback counter}}</strong> refers to will not exist yet (since it&rsquo;s defined in the CALLBACK of this tag).</p>
-
-<p>When the callback is executed, a GTM event is pushed into dataLayer and the counter value is increased by one. You define the maximum number of times the tag should fire with the <code>maxRepeat</code> variable in the callback function. Just remember to have a row for each iteration in the Lookup Table, otherwise the tracker in the Default Value field of the Lookup Table will be returned for each iteration that doesn&rsquo;t have a row in the table!</p>
-
+<p>So, before we check how the tag is set up, let's go over these macros. The <strong>{{tag callback counter}}</strong> is a JavaScript variable macro which refers to the global JS variable you set up later in <strong>{{tag callback function}}</strong>. The idea here is that the <strong>{{tracker name}}</strong> Lookup Table macro returns a different string, depending on what the counter is. Every time the callback is executed, the counter goes up by 1.</p>
+<p>The key is to use your first tracker as the <strong>default value of the Lookup Table macro</strong>. This is because when the tag first fires (on <strong>{{event}} equals gtm.js</strong>), the JavaScript variable that <strong>{{tag callback counter}}</strong> refers to will not exist yet (since it's defined in the CALLBACK of this tag).</p>
+<p>When the callback is executed, a GTM event is pushed into dataLayer and the counter value is increased by one. You define the maximum number of times the tag should fire with the <code>maxRepeat</code> variable in the callback function. Just remember to have a row for each iteration in the Lookup Table, otherwise the tracker in the Default Value field of the Lookup Table will be returned for each iteration that doesn't have a row in the table!</p>
 <p>In your tag, add the following in the Fields to Set:</p>
-
 
 
 
@@ -629,11 +563,8 @@ URL Hostname</p>
 </div>
 
 
-
 <p>This will ensure that the callback function is executed every time the tag has fired.</p>
-
 <p>Now that you have your Lookup Table, you can use it in the Tracker Name field of your tag:</p>
-
 
 
 
@@ -649,17 +580,11 @@ URL Hostname</p>
 </div>
 
 
-
 <p>Using the macro here makes it so that with every iteration of the tag, a different value is set as the Tracker Name, thanks to the Lookup Table and the counter that increases by 1 with every pass.</p>
-
-<p>Finally, you need to add TWO rules to the tag. That&rsquo;s two rules, not two conditions. The rules are</p>
-
+<p>Finally, you need to add TWO rules to the tag. That's two rules, not two conditions. The rules are</p>
 <p><strong>{{event}} equals gtm.js</strong></p>
-
 <p>and</p>
-
 <p><strong>{{event}} equals tagCallback</strong></p>
-
 
 
 
@@ -675,65 +600,60 @@ URL Hostname</p>
 </div>
 
 
-
-<p>Having two rules means that the tag will fire when and if either one is matched. So first it will fire upon <strong>{{event}} equals gtm.js</strong>, since that&rsquo;s the event that is pushed when GTM is first loaded. Next, it will fire every time <strong>{{event}} equals tagCallback</strong>, so twice in my example. Thus, the tag fires three times with three different tracker names.</p>
-
-<p>You could use this also if you have different properties you want to track to. Just replace the tracker names with UA-XXXXX-Y codes and you&rsquo;re set!</p>
-
-<p>Here&rsquo;s a quick recap of what happens:</p>
-
+<p>Having two rules means that the tag will fire when and if either one is matched. So first it will fire upon <strong>{{event}} equals gtm.js</strong>, since that's the event that is pushed when GTM is first loaded. Next, it will fire every time <strong>{{event}} equals tagCallback</strong>, so twice in my example. Thus, the tag fires three times with three different tracker names.</p>
+<p>You could use this also if you have different properties you want to track to. Just replace the tracker names with UA-XXXXX-Y codes and you're set!</p>
+<p>Here's a quick recap of what happens:</p>
 <ol>
-<li><p>Tag is fired upon <strong>{{event}} equals gtm.js</strong>. Since <strong>{{tag callback counter}}</strong> can&rsquo;t find the global variable, the Lookup Table macro <strong>{{tracker name}}</strong> returns the default value, which is localTrackerA</p></li>
-
-<li><p>When the tag has fired, the counter is created with value 0, and the tagCallback event is pushed into dataLayer</p></li>
-
-<li><p>tagCallback triggers the tag again, and this time the Lookup Table finds the counter with value 0, and returns localTrackerB</p></li>
-
-<li><p>When the tag has fired, the counter number is increased to 1, and the tagCallback event is pushed into dataLayer</p></li>
-
-<li><p>tagCallback triggers the tag for the third time, and again the Lookup Table finds the counter with value 1, thus rollupTracker is returned</p></li>
-
-<li><p>The hitCallback is fired again, but this time the maximum number of repeats is reached and the function just returns an undefined value. Thus, no callback event is pushed into dataLayer, and the tag does not fire again.</p></li>
+<li>
+<p>Tag is fired upon <strong>{{event}} equals gtm.js</strong>. Since <strong>{{tag callback counter}}</strong> can't find the global variable, the Lookup Table macro <strong>{{tracker name}}</strong> returns the default value, which is localTrackerA</p>
+</li>
+<li>
+<p>When the tag has fired, the counter is created with value 0, and the tagCallback event is pushed into dataLayer</p>
+</li>
+<li>
+<p>tagCallback triggers the tag again, and this time the Lookup Table finds the counter with value 0, and returns localTrackerB</p>
+</li>
+<li>
+<p>When the tag has fired, the counter number is increased to 1, and the tagCallback event is pushed into dataLayer</p>
+</li>
+<li>
+<p>tagCallback triggers the tag for the third time, and again the Lookup Table finds the counter with value 1, thus rollupTracker is returned</p>
+</li>
+<li>
+<p>The hitCallback is fired again, but this time the maximum number of repeats is reached and the function just returns an undefined value. Thus, no callback event is pushed into dataLayer, and the tag does not fire again.</p>
+</li>
 </ol>
-
 <p>I think this is an amazing feat of strength from dynamic macros and the callback function. This should make any enterprise setup much, MUCH leaner.</p>
-
 <h2 id="true-and-false">{{true}} and {{false}}</h2>
-
-<p>This one&rsquo;s a quicky but pretty important. Create two Custom JavaScript macros:</p>
-
+<p>This one's a quicky but pretty important. Create two Custom JavaScript macros:</p>
 <p><strong>{{true}}</strong></p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() { <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">true</span>; }
 </code></pre></div>
-
 <p><strong>{{false}}</strong></p>
-
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() { <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span>; }
 </code></pre></div>
-
-<p>Why, you ask? Well, let&rsquo;s say you want to set the Anonymize IP setting to <em>true</em> for one domain and <em>false</em> for two other domains (this idea came from Carmen Mardiros, by the way!). You want to use a Lookup Table Macro to achieve this, but when your Lookup Table aligns domains with the return value of &ldquo;true&rdquo; and &ldquo;false&rdquo;, you notice that things don&rsquo;t work as you&rsquo;d like them to. The problem is that if you add text to a field in GTM, it is always cast to string type. Anonymize IP requires <em>Boolean</em> type, otherwise it fails.</p>
-
-<p>To circumvent this problem, instead of typing &ldquo;true&rdquo; and &ldquo;false&rdquo; into GTM&rsquo;s fields, use the macros you just created. They return <em>true</em> and <em>false</em> in proper Boolean type! This way you will be able to pass the correct value types to the settings which require Boolean values.</p>
-
+<p>Why, you ask? Well, let's say you want to set the Anonymize IP setting to <em>true</em> for one domain and <em>false</em> for two other domains (this idea came from Carmen Mardiros, by the way!). You want to use a Lookup Table Macro to achieve this, but when your Lookup Table aligns domains with the return value of &ldquo;true&rdquo; and &ldquo;false&rdquo;, you notice that things don't work as you'd like them to. The problem is that if you add text to a field in GTM, it is always cast to string type. Anonymize IP requires <em>Boolean</em> type, otherwise it fails.</p>
+<p>To circumvent this problem, instead of typing &ldquo;true&rdquo; and &ldquo;false&rdquo; into GTM's fields, use the macros you just created. They return <em>true</em> and <em>false</em> in proper Boolean type! This way you will be able to pass the correct value types to the settings which require Boolean values.</p>
 <p>Naturally, this should be fixed by adding Boolean true and false as possible values in all GTM fields.</p>
-
 <h2 id="conclusions">Conclusions</h2>
-
-<p>Well there you have it! Another round of GTM magic. I can&rsquo;t wait to experiment more and uncover even more cool stuff to share with you. Be sure to join our amazing <a href="https://plus.google.com/u/0/communities/104865292981489764063">Google+ community</a> which has served as inspiration for most of these tips.</p>
-
+<p>Well there you have it! Another round of GTM magic. I can't wait to experiment more and uncover even more cool stuff to share with you. Be sure to join our amazing <a href="https://plus.google.com/u/0/communities/104865292981489764063">Google+ community</a> which has served as inspiration for most of these tips.</p>
 <p>Also, if you happen to be in any of the following upcoming conferences, come say hi to me:</p>
-
 <ul>
-<li><p><a href="http://www.outfox.com/googleanalyticsconference/">Google Analytics conference in Stockholm</a> (August 2014)</p></li>
-
-<li><p>Web Analytics Wednesday in Copenhagen (September 2014)</p></li>
-
-<li><p><a href="http://conversionconference.co.uk/">Conversion Conference</a> in London (October 2014)</p></li>
-
-<li><p><a href="http://www.emetrics.org/london/2014/">eMetrics</a> in London (October 2014)</p></li>
-
-<li><p><a href="http://www.marketingfestival.cz/en">Marketing Festival</a> in Brno (October-November 2014)</p></li>
+<li>
+<p><a href="http://www.outfox.com/googleanalyticsconference/">Google Analytics conference in Stockholm</a> (August 2014)</p>
+</li>
+<li>
+<p>Web Analytics Wednesday in Copenhagen (September 2014)</p>
+</li>
+<li>
+<p><a href="http://conversionconference.co.uk/">Conversion Conference</a> in London (October 2014)</p>
+</li>
+<li>
+<p><a href="http://www.emetrics.org/london/2014/">eMetrics</a> in London (October 2014)</p>
+</li>
+<li>
+<p><a href="http://www.marketingfestival.cz/en">Marketing Festival</a> in Brno (October-November 2014)</p>
+</li>
 </ul>
 
               
@@ -838,7 +758,7 @@ URL Hostname</p>
         </article>
         <footer id="footer" class="main-content-wrap">
   <span class="copyrights">
-    &copy; 2019 Simo Ahava. All Rights Reserved
+    &copy; 2020 Simo Ahava. All Rights Reserved
   </span>
 </footer>
 
