@@ -373,44 +373,44 @@
 </ul>
 <p>The <strong>gtm.timerId</strong> Data Layer Variable is definitely the most useful one. With that, you can <strong>stop</strong> a Timer even before it's <strong>Limit</strong> is reached.</p>
 <p>To do this, you need to run the following JavaScript command:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">timerId</span> <span style="color:#f92672">=</span> {{<span style="color:#a6e22e">DLV</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">gtm</span>.<span style="color:#a6e22e">timerId</span>}};
-window.<span style="color:#a6e22e">clearInterval</span>(<span style="color:#a6e22e">timerId</span>);
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">var</span> timerId = {{DLV - gtm.timerId}};
+<span style="color:#0aa">window</span>.clearInterval(timerId);
 </code></pre></div>
 <p>So executing <code>window.clearInterval</code> on the Data Layer Variable that points to <strong>gtm.timerId</strong> lets you halt the Timer. There's no way to restart it once it's halted on the page, though. The only way it starts again is with a page reload.</p>
 <p>This is very useful on single-page apps, for example, where you might want to stop the Timer when a new page is loaded, but there's no actual page refresh.</p>
 <p>Now, in case you DO want a timer to fire when the user does something (e.g. click), you'll need to use a <strong>Custom HTML Tag</strong> with custom code. Here's one way to do it:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
-  (<span style="color:#66d9ef">function</span>() {
-    <span style="color:#75715e">// CHANGE THESE THREE:
-</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">eventName</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;custom.timer&#39;</span>; <span style="color:#75715e">// The event name that is pushed into dataLayer
-</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">interval</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">5000</span>; <span style="color:#75715e">// The interval in milliseconds
-</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">limit</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>; <span style="color:#75715e">// The number of times the timer fires
-</span><span style="color:#75715e"></span>
-    <span style="color:#75715e">// OTHER SETTINGS:
-</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">timerNumber</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">startTime</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Date().<span style="color:#a6e22e">getTime</span>();
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+  (<span style="color:#00a">function</span>() {
+    <span style="color:#aaa;font-style:italic">// CHANGE THESE THREE:
+</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">var</span> eventName = <span style="color:#a50">&#39;custom.timer&#39;</span>; <span style="color:#aaa;font-style:italic">// The event name that is pushed into dataLayer
+</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">var</span> interval = <span style="color:#099">5000</span>; <span style="color:#aaa;font-style:italic">// The interval in milliseconds
+</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">var</span> limit = <span style="color:#099">1</span>; <span style="color:#aaa;font-style:italic">// The number of times the timer fires
+</span><span style="color:#aaa;font-style:italic"></span>
+    <span style="color:#aaa;font-style:italic">// OTHER SETTINGS:
+</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">var</span> timerNumber = <span style="color:#099">1</span>;
+    <span style="color:#00a">var</span> startTime = <span style="color:#00a">new</span> <span style="color:#0aa">Date</span>().getTime();
 
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">fireTimer</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>() {
-      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">timeNow</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Date().<span style="color:#a6e22e">getTime</span>();
-      window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
-        <span style="color:#e6db74">&#39;event&#39;</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">eventName</span>,
-        <span style="color:#e6db74">&#39;custom.timerCurrentTime&#39;</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">timeNow</span>,
-        <span style="color:#e6db74">&#39;custom.timerElapsedTime&#39;</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">timeNow</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">startTime</span>,
-        <span style="color:#e6db74">&#39;custom.timerStartTime&#39;</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">startTime</span>,
-        <span style="color:#e6db74">&#39;custom.timerEventNumber&#39;</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">timerNumber</span>,
-        <span style="color:#e6db74">&#39;custom.timerId&#39;</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">timerId</span>,
-        <span style="color:#e6db74">&#39;custom.timerInterval&#39;</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">interval</span>,
-        <span style="color:#e6db74">&#39;custom.timerLimit&#39;</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">limit</span>
+    <span style="color:#00a">var</span> fireTimer = <span style="color:#00a">function</span>() {
+      <span style="color:#00a">var</span> timeNow = <span style="color:#00a">new</span> <span style="color:#0aa">Date</span>().getTime();
+      <span style="color:#0aa">window</span>.dataLayer.push({
+        <span style="color:#a50">&#39;event&#39;</span> : eventName,
+        <span style="color:#a50">&#39;custom.timerCurrentTime&#39;</span> : timeNow,
+        <span style="color:#a50">&#39;custom.timerElapsedTime&#39;</span> : timeNow - startTime,
+        <span style="color:#a50">&#39;custom.timerStartTime&#39;</span> : startTime,
+        <span style="color:#a50">&#39;custom.timerEventNumber&#39;</span> : timerNumber,
+        <span style="color:#a50">&#39;custom.timerId&#39;</span> : timerId,
+        <span style="color:#a50">&#39;custom.timerInterval&#39;</span> : interval,
+        <span style="color:#a50">&#39;custom.timerLimit&#39;</span> : limit
       });
-      <span style="color:#a6e22e">timerNumber</span> <span style="color:#f92672">+=</span> <span style="color:#ae81ff">1</span>;
-      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">limit</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">timerNumber</span>) { 
-        window.<span style="color:#a6e22e">clearInterval</span>(<span style="color:#a6e22e">timerId</span>);
+      timerNumber += <span style="color:#099">1</span>;
+      <span style="color:#00a">if</span> (limit &lt; timerNumber) { 
+        <span style="color:#0aa">window</span>.clearInterval(timerId);
       }
     };
 
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">timerId</span> <span style="color:#f92672">=</span> window.<span style="color:#a6e22e">setInterval</span>(<span style="color:#a6e22e">fireTimer</span>, <span style="color:#a6e22e">interval</span>);
+    <span style="color:#00a">var</span> timerId = <span style="color:#0aa">window</span>.setInterval(fireTimer, interval);
   })();
-&lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
+&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
 <p>It's a very simple script, and it does pretty much exactly the same thing as the Timer Trigger. The difference is that you can use <strong>any Trigger you want</strong> to fire this custom Trigger. Also, the keys pushed into <code>dataLayer</code> differ in that the prefix is not <strong>gtm.</strong> but <strong>custom.</strong>. So <strong>gtm.timerId</strong> becomes <strong>custom.timerId</strong> and so forth.</p>
 <p>That's all for the Timer tips. I hope they were useful! Remember to test thoroughly whenever using custom scripts on your page. Accidentally setting the interval to 1 millisecond and the limit to 10000 can quickly destroy your page performance. Yes, this is something that happened to me&hellip;sorry, my anonymous friend.</p>
 

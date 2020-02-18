@@ -356,18 +356,38 @@
   <ul>
     <li><a href="#1-amp-overview">1. AMP Overview</a>
       <ul>
-        <li></li>
+        <li>
+          <ul>
+            <li><a href="#creating-an-amp-site">Creating an AMP site</a></li>
+            <li><a href="#amp-and-google-search">AMP and Google search</a></li>
+          </ul>
+        </li>
       </ul>
     </li>
     <li><a href="#2-amp-analytics">2. AMP Analytics</a>
       <ul>
-        <li></li>
-        <li><a href="#21-client-id">2.1. Client ID</a></li>
+        <li>
+          <ul>
+            <li><a href="#add-amp-analytics-to-your-website">Add amp-analytics to your website</a></li>
+            <li><a href="#load-the-json-configuration-object-as-an-external-resource">Load the JSON configuration object as an external resource</a></li>
+          </ul>
+        </li>
+        <li><a href="#21-client-id">2.1. Client ID</a>
+          <ul>
+            <li><a href="#client-id-and-amp">Client ID and AMP</a></li>
+            <li><a href="#hacking-to-create-a-single-unified-client-id">Hacking to create a single, unified Client ID</a></li>
+          </ul>
+        </li>
       </ul>
     </li>
     <li><a href="#3-create-and-implement-gtmamp-container">3. Create and implement GTM/AMP container</a>
       <ul>
-        <li></li>
+        <li>
+          <ul>
+            <li><a href="#deploying-the-amp-container">Deploying the AMP container</a></li>
+            <li><a href="#do-not-forget-gtmurl">Do not forget gtm.url</a></li>
+          </ul>
+        </li>
       </ul>
     </li>
     <li><a href="#4-triggers">4. Triggers</a>
@@ -382,8 +402,23 @@
     <li><a href="#5-variables">5. Variables</a>
       <ul>
         <li><a href="#51-built-in-variables">5.1. Built-In Variables</a></li>
-        <li><a href="#52-user-defined-variables">5.2. User-Defined variables</a></li>
-        <li><a href="#53-amp-variables">5.3. AMP variables</a></li>
+        <li><a href="#52-user-defined-variables">5.2. User-Defined variables</a>
+          <ul>
+            <li><a href="#url">URL</a></li>
+            <li><a href="#amp-variable">AMP variable</a></li>
+            <li><a href="#constant">Constant</a></li>
+            <li><a href="#environment-name">Environment Name</a></li>
+            <li><a href="#lookup-table">Lookup Table</a></li>
+            <li><a href="#random-number">Random Number</a></li>
+            <li><a href="#container-id">Container ID</a></li>
+            <li><a href="#container-version">Container Version</a></li>
+          </ul>
+        </li>
+        <li><a href="#53-amp-variables">5.3. AMP variables</a>
+          <ul>
+            <li><a href="#creating-custom-amp-variables">Creating custom AMP variables</a></li>
+          </ul>
+        </li>
       </ul>
     </li>
     <li><a href="#6-other-google-tag-manager-quirks">6. Other Google Tag Manager quirks</a></li>
@@ -419,37 +454,37 @@
 <p>Even though the <a href="https://www.ampproject.org/docs/reference/components/amp-analytics">amp-analytics documentation</a> isn't particularly long or complex, there's still many things to consider when configuring a custom tracking scheme. That's why it's very useful to have pre-built templates for a number of analytics vendors (e.g. Google Analytics, Adobe Analytics, Snowplow Analytics).</p>
 <h4 id="add-amp-analytics-to-your-website">Add amp-analytics to your website</h4>
 <p>To add support for the analytics component on your site, you need to add the following line of code into the <code>&lt;head&gt;</code> of your document:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span> <span style="color:#a6e22e">async</span> <span style="color:#a6e22e">custom-element</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;amp-analytics&#34;</span> <span style="color:#a6e22e">src</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;https://cdn.ampproject.org/v0/amp-analytics-0.1.js&#34;</span>&gt;&lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">script</span> <span style="color:#1e90ff">async</span> <span style="color:#1e90ff">custom-element</span>=<span style="color:#a50">&#34;amp-analytics&#34;</span> <span style="color:#1e90ff">src</span>=<span style="color:#a50">&#34;https://cdn.ampproject.org/v0/amp-analytics-0.1.js&#34;</span>&gt;&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
 <p>This loads the AMP analytics library, and instructs the page to look for an element named <code>&lt;amp-analytics&gt;</code>. This custom element is where you introduce the <em>JSON configuration object</em> that will eventually govern how the site is tracked.</p>
 <p>Google Analytics has a great <a href="https://developers.google.com/analytics/devguides/collection/amp-analytics/">developer guide</a> for setting up the <em>JSON configuration object</em> manually. For example, to send a Page View hit to Google Analytics when the page is loaded, you'd add the following element to the <code>&lt;body&gt;</code> of the site:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">amp-analytics</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;googleanalytics&#34;</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;analytics1&#34;</span>&gt;
-&lt;<span style="color:#f92672">script</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;application/json&#34;</span>&gt;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">amp-analytics</span> <span style="color:#1e90ff">type</span>=<span style="color:#a50">&#34;googleanalytics&#34;</span> <span style="color:#1e90ff">id</span>=<span style="color:#a50">&#34;analytics1&#34;</span>&gt;
+&lt;<span style="color:#1e90ff;font-weight:bold">script</span> <span style="color:#1e90ff">type</span>=<span style="color:#a50">&#34;application/json&#34;</span>&gt;
 {
-  <span style="color:#e6db74">&#34;vars&#34;</span><span style="color:#f92672">:</span> {
-    <span style="color:#e6db74">&#34;account&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;UA-XXXXX-Y&#34;</span>
+  <span style="color:#a50">&#34;vars&#34;</span>: {
+    <span style="color:#a50">&#34;account&#34;</span>: <span style="color:#a50">&#34;UA-XXXXX-Y&#34;</span>
   },
-  <span style="color:#e6db74">&#34;triggers&#34;</span><span style="color:#f92672">:</span> {
-    <span style="color:#e6db74">&#34;trackPageview&#34;</span><span style="color:#f92672">:</span> {
-      <span style="color:#e6db74">&#34;on&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;visible&#34;</span>,
-      <span style="color:#e6db74">&#34;request&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;pageview&#34;</span>
+  <span style="color:#a50">&#34;triggers&#34;</span>: {
+    <span style="color:#a50">&#34;trackPageview&#34;</span>: {
+      <span style="color:#a50">&#34;on&#34;</span>: <span style="color:#a50">&#34;visible&#34;</span>,
+      <span style="color:#a50">&#34;request&#34;</span>: <span style="color:#a50">&#34;pageview&#34;</span>
     }
   }
 }
-&lt;/<span style="color:#f92672">script</span>&gt;
-&lt;/<span style="color:#f92672">amp-analytics</span>&gt;</code></pre></div>
+&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+&lt;/<span style="color:#1e90ff;font-weight:bold">amp-analytics</span>&gt;</code></pre></div>
 <p>As you can see, you're using the custom element <code>&lt;amp-analytics&gt;</code> that you specified when adding the initial script loader to the <code>&lt;head&gt;</code> of your page. The <code>type</code> parameter of the element specifies that you are using the built-in <code>googleanalytics</code> vendor template.</p>
 <p>Be sure to check out <a href="https://www.bounteous.com/insights/2015/12/08/google-analytics-using-amp/">Bounteous&rsquo; excellent guide</a> for Google Analytics and AMP integration!</p>
 <h4 id="load-the-json-configuration-object-as-an-external-resource">Load the JSON configuration object as an external resource</h4>
 <p>You can also load the <em>JSON configuration object</em> from an external source (as long as the request adheres to <a href="https://github.com/ampproject/amphtml/blob/master/spec/amp-cors-requests.md">AMP CORS security guidelines</a>). For example, the Google Tag Manager &ldquo;container&rdquo; is actually a request to an external config file that you specify like this:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">amp-analytics</span> <span style="color:#a6e22e">config</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;https://www.googletagmanager.com/amp.json?id=GTM-XXXXXX&amp;amp;gtm.url=SOURCE_URL&#34;</span> <span style="color:#a6e22e">data-credentials</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;include&#34;</span>&gt;
-  &lt;<span style="color:#f92672">script</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;application/json&#34;</span>&gt;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">amp-analytics</span> <span style="color:#1e90ff">config</span>=<span style="color:#a50">&#34;https://www.googletagmanager.com/amp.json?id=GTM-XXXXXX&amp;amp;gtm.url=SOURCE_URL&#34;</span> <span style="color:#1e90ff">data-credentials</span>=<span style="color:#a50">&#34;include&#34;</span>&gt;
+  &lt;<span style="color:#1e90ff;font-weight:bold">script</span> <span style="color:#1e90ff">type</span>=<span style="color:#a50">&#34;application/json&#34;</span>&gt;
   {
-    <span style="color:#e6db74">&#34;vars&#34;</span><span style="color:#f92672">:</span> {
-      <span style="color:#e6db74">&#34;someCustomAmpVar&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;someValue&#34;</span>
+    <span style="color:#a50">&#34;vars&#34;</span>: {
+      <span style="color:#a50">&#34;someCustomAmpVar&#34;</span>: <span style="color:#a50">&#34;someValue&#34;</span>
     }
   }
-  &lt;/<span style="color:#f92672">script</span>&gt;
-&lt;/<span style="color:#f92672">amp-analytics</span>&gt;</code></pre></div>
+  &lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+&lt;/<span style="color:#1e90ff;font-weight:bold">amp-analytics</span>&gt;</code></pre></div>
 <p>This downloads a file named <code>amp.json</code>, specified by using your container ID, and the <code>data-credentials</code> attribute allows the resource request to read and write cookies as needed. The <code>&lt;script&gt;</code> block within the <code>amp-analytics</code> element can be used to use your own custom AMP variables on the page.</p>
 <p><strong>Note that the external config file download will only begin if the page is visible in the viewport!</strong> For example, if you open an AMP page with a remote configuration link in a new browser window without making that window active, the configuration file download will wait until such a moment that the page becomes visible. This means that your analytics tracking will not commence until the page is visible in the browser.</p>
 <p>Anyway, back to the <em>JSON configuration object</em>. It details what interactions and events are tracked to the analytics endpoint of your choosing, when they are tracked, and how. I recommend you read through the <a href="https://www.ampproject.org/docs/reference/components/amp-analytics">AMP Analytics documentation</a>, as it sheds quite a bit of light on how the GTM AMP container works, too.</p>
@@ -519,15 +554,15 @@
 <h2 id="3-create-and-implement-gtmamp-container">3. Create and implement GTM/AMP container</h2>
 <p>As mentioned earlier, the Google Tag Manager AMP container is essentially a remote <em>JSON configuration object</em> that AMP Analytics uses for tracking interactions on your page.</p>
 <p>Also, there is no <code>dataLayer</code>. Any custom variables you want to pass from the page to the <em>JSON configuration object</em> need to be included in the <code>&lt;script&gt;</code> block within the <code>amp-analytics</code> element:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">amp-analytics</span> <span style="color:#a6e22e">config</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;https://www.googletagmanager.com/amp.json?id=GTM-5BH2HM&amp;amp;gtm.url=SOURCE_URL&#34;</span> <span style="color:#a6e22e">data-credentials</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;include&#34;</span>&gt;
-  &lt;<span style="color:#f92672">script</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;application/json&#34;</span>&gt;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">amp-analytics</span> <span style="color:#1e90ff">config</span>=<span style="color:#a50">&#34;https://www.googletagmanager.com/amp.json?id=GTM-5BH2HM&amp;amp;gtm.url=SOURCE_URL&#34;</span> <span style="color:#1e90ff">data-credentials</span>=<span style="color:#a50">&#34;include&#34;</span>&gt;
+  &lt;<span style="color:#1e90ff;font-weight:bold">script</span> <span style="color:#1e90ff">type</span>=<span style="color:#a50">&#34;application/json&#34;</span>&gt;
   {
-    <span style="color:#e6db74">&#34;vars&#34;</span><span style="color:#f92672">:</span> {
-      <span style="color:#e6db74">&#34;gaTrackingId&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;UA-12345-1&#34;</span>
+    <span style="color:#a50">&#34;vars&#34;</span>: {
+      <span style="color:#a50">&#34;gaTrackingId&#34;</span>: <span style="color:#a50">&#34;UA-12345-1&#34;</span>
     }
   }
-  &lt;/<span style="color:#f92672">script</span>&gt;
-&lt;/<span style="color:#f92672">amp-analytics</span>&gt;</code></pre></div>
+  &lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+&lt;/<span style="color:#1e90ff;font-weight:bold">amp-analytics</span>&gt;</code></pre></div>
 
 
 
@@ -581,21 +616,21 @@
 <h4 id="deploying-the-amp-container">Deploying the AMP container</h4>
 <p>AMP Analytics consists of two parts: the amp-analytics JavaScript library and the <em>JSON configuration object</em>. To deploy AMP Analytics via Google Tag Manager, you will need to implement both in your page templates.</p>
 <p>First, the library. In AMP, it's actually called an <a href="https://github.com/ampproject/amphtml/blob/master/extensions/README.md">Extended Component</a> of the AMP HTML schema. For AMP Analytics to work, you <strong>must</strong> deploy the following in the <code>&lt;head&gt;</code> of your website:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span> <span style="color:#a6e22e">async</span> <span style="color:#a6e22e">custom-element</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;amp-analytics&#34;</span> <span style="color:#a6e22e">src</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;https://cdn.ampproject.org/v0/amp-analytics-0.1.js&#34;</span>&gt;&lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">script</span> <span style="color:#1e90ff">async</span> <span style="color:#1e90ff">custom-element</span>=<span style="color:#a50">&#34;amp-analytics&#34;</span> <span style="color:#1e90ff">src</span>=<span style="color:#a50">&#34;https://cdn.ampproject.org/v0/amp-analytics-0.1.js&#34;</span>&gt;&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
 <p>This loads the AMP Analytics library asynchronously. As you can see, you are also foreshadowing the existence of a custom AMP HTML element named <code>amp-analytics</code>.</p>
 <p>The next thing you need to do is tell the page where to load the remote <em>JSON configuration object</em> from. If you recall, this is your Google Tag Manager AMP container, so you <strong>must</strong> add the following code into the <strong><body></strong> of your website:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">amp-analytics</span> <span style="color:#a6e22e">config</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;https://www.googletagmanager.com/amp.json?id=GTM-5BH2HM&amp;amp;gtm.url=SOURCE_URL&#34;</span> <span style="color:#a6e22e">data-credentials</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;include&#34;</span>&gt;
-  &lt;<span style="color:#f92672">script</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;application/json&#34;</span>&gt;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">amp-analytics</span> <span style="color:#1e90ff">config</span>=<span style="color:#a50">&#34;https://www.googletagmanager.com/amp.json?id=GTM-5BH2HM&amp;amp;gtm.url=SOURCE_URL&#34;</span> <span style="color:#1e90ff">data-credentials</span>=<span style="color:#a50">&#34;include&#34;</span>&gt;
+  &lt;<span style="color:#1e90ff;font-weight:bold">script</span> <span style="color:#1e90ff">type</span>=<span style="color:#a50">&#34;application/json&#34;</span>&gt;
   {
-    <span style="color:#e6db74">&#34;vars&#34;</span><span style="color:#f92672">:</span> {
-      <span style="color:#e6db74">&#34;someAmpVariable&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;someValue&#34;</span>
+    <span style="color:#a50">&#34;vars&#34;</span>: {
+      <span style="color:#a50">&#34;someAmpVariable&#34;</span>: <span style="color:#a50">&#34;someValue&#34;</span>
     }
   }
-  &lt;/<span style="color:#f92672">script</span>&gt;
-&lt;/<span style="color:#f92672">amp-analytics</span>&gt;</code></pre></div>
+  &lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+&lt;/<span style="color:#1e90ff;font-weight:bold">amp-analytics</span>&gt;</code></pre></div>
 <p>This is the custom <code>amp-analytics</code> element we were just talking about. The value of the <code>config</code> attribute is a reference to your GTM container, and the <code>data-credentials=&quot;include&quot;</code> part is important, as it gives permission for the downloaded configuration to read and write cookies on your domain. You can pass custom AMP variables to the <em>JSON configuration object</em> by using the embedded <code>&lt;script&gt;</code> block as shown.</p>
 <p>Note that if you went ahead and implemented the Client ID hack I introduced earlier (if even possible from my crazy complicated description), you'd need to replace the reference to Google Tag Manager's servers with your own custom endpoint, e.g.:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">amp-analytics</span> <span style="color:#a6e22e">config</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;https://www.simoahava.com/wp-json/amp-gtm/amp.json?id=GTM-5BH2HM&amp;amp;gtm.url=SOURCE_URL&#34;</span> <span style="color:#a6e22e">data-credentials</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;include&#34;</span>&gt;&lt;/<span style="color:#f92672">amp-analytics</span>&gt;</code></pre></div>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">amp-analytics</span> <span style="color:#1e90ff">config</span>=<span style="color:#a50">&#34;https://www.simoahava.com/wp-json/amp-gtm/amp.json?id=GTM-5BH2HM&amp;amp;gtm.url=SOURCE_URL&#34;</span> <span style="color:#1e90ff">data-credentials</span>=<span style="color:#a50">&#34;include&#34;</span>&gt;&lt;/<span style="color:#1e90ff;font-weight:bold">amp-analytics</span>&gt;</code></pre></div>
 <h4 id="do-not-forget-gtmurl">Do not forget <code>gtm.url</code></h4>
 <p>The <code>&amp;gtm.url</code> parameter is important. By adding <strong>SOURCE_URL</strong> as its value, you are instructing AMP to resolve a <a href="https://github.com/ampproject/amphtml/blob/master/spec/amp-var-substitutions.md#source-url">platform variable</a> as the value of the <code>gtm.url</code> parameter. This particular platform variable is automatically substituted with the URL of the website from which the request was made. If the page is served from a known proxy, such as the AMP Cache, it will still resolve to the actual URL of the website whose content is being served.</p>
 <p>This parameter is significant, as it provides a <em>source URL</em> for the GTM container, which you can then utilize the enable triggers only on certain pages of your site.</p>
@@ -669,12 +704,12 @@
 
 <p>The <strong>SOURCE_URL</strong> AMP variable is resolved to the actual URL of the page when the request for the container JSON is made. Without this parameter, server-side validation against the Page Hostname, Page Path, and Page URL variables will not most likely not work as you expect them to.</p>
 <p>If at least one trigger that you have added to the tag passes server-side validation, the end result is something like this in the <em>JSON configuration object</em>:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json"><span style="color:#e6db74">&#34;5&#34;</span><span style="color:#960050;background-color:#1e0010">:</span> {
-  <span style="color:#f92672">&#34;request&#34;</span>: <span style="color:#e6db74">&#34;2&#34;</span>,
-  <span style="color:#f92672">&#34;vars&#34;</span>: {
-    <span style="color:#f92672">&#34;gtm.event&#34;</span>: <span style="color:#e6db74">&#34;gtm.pageview&#34;</span>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json"><span style="color:#a50">&#34;5&#34;</span><span style="color:#f00;background-color:#faa">:</span> {
+  <span style="color:#1e90ff;font-weight:bold">&#34;request&#34;</span>: <span style="color:#a50">&#34;2&#34;</span>,
+  <span style="color:#1e90ff;font-weight:bold">&#34;vars&#34;</span>: {
+    <span style="color:#1e90ff;font-weight:bold">&#34;gtm.event&#34;</span>: <span style="color:#a50">&#34;gtm.pageview&#34;</span>
   },
-  <span style="color:#f92672">&#34;on&#34;</span>: <span style="color:#e6db74">&#34;visible&#34;</span>
+  <span style="color:#1e90ff;font-weight:bold">&#34;on&#34;</span>: <span style="color:#a50">&#34;visible&#34;</span>
 }</code></pre></div>
 <p>This simply means that on the initial page load, this trigger should fire request number &ldquo;2&rdquo;, which is the Page View tag turned into a request to GA. As you can see, there's nothing about trigger conditions in this JSON block.</p>
 <p>In fact, all the five (at the time of writing) available trigger types have the same binary setting:</p>
@@ -722,18 +757,18 @@
 <p><strong>Tel: Link Clicks</strong><br>
 <code>a[href^=&quot;tel:&quot;], a[href^=&quot;tel:&quot;] *</code></p>
 <p>When you add a tag that fires on a click to a container, this is what the ensuing JSON looks like:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json"><span style="color:#e6db74">&#34;triggers&#34;</span><span style="color:#960050;background-color:#1e0010">:</span> {
-    <span style="color:#f92672">&#34;11&#34;</span>: {
-        <span style="color:#f92672">&#34;request&#34;</span>: <span style="color:#e6db74">&#34;2&#34;</span>,
-        <span style="color:#f92672">&#34;selector&#34;</span>: <span style="color:#e6db74">&#34;:not(*)${gtm_css_2_0}&#34;</span>,
-        <span style="color:#f92672">&#34;vars&#34;</span>: {
-            <span style="color:#f92672">&#34;gtm.event&#34;</span>: <span style="color:#e6db74">&#34;gtm.click&#34;</span>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json"><span style="color:#a50">&#34;triggers&#34;</span><span style="color:#f00;background-color:#faa">:</span> {
+    <span style="color:#1e90ff;font-weight:bold">&#34;11&#34;</span>: {
+        <span style="color:#1e90ff;font-weight:bold">&#34;request&#34;</span>: <span style="color:#a50">&#34;2&#34;</span>,
+        <span style="color:#1e90ff;font-weight:bold">&#34;selector&#34;</span>: <span style="color:#a50">&#34;:not(*)${gtm_css_2_0}&#34;</span>,
+        <span style="color:#1e90ff;font-weight:bold">&#34;vars&#34;</span>: {
+            <span style="color:#1e90ff;font-weight:bold">&#34;gtm.event&#34;</span>: <span style="color:#a50">&#34;gtm.click&#34;</span>
         },
-        <span style="color:#f92672">&#34;on&#34;</span>: <span style="color:#e6db74">&#34;click&#34;</span>
+        <span style="color:#1e90ff;font-weight:bold">&#34;on&#34;</span>: <span style="color:#a50">&#34;click&#34;</span>
     }
-}<span style="color:#960050;background-color:#1e0010">,</span>
-<span style="color:#e6db74">&#34;vars&#34;</span><span style="color:#960050;background-color:#1e0010">:</span> {
-    <span style="color:#f92672">&#34;gtm_css_2_0&#34;</span>: <span style="color:#e6db74">&#34;,a:not([href*=\&#34;simoahava.com\&#34;]), a:not([href*=\&#34;simoahava.com\&#34;]) *&#34;</span>
+}<span style="color:#f00;background-color:#faa">,</span>
+<span style="color:#a50">&#34;vars&#34;</span><span style="color:#f00;background-color:#faa">:</span> {
+    <span style="color:#1e90ff;font-weight:bold">&#34;gtm_css_2_0&#34;</span>: <span style="color:#a50">&#34;,a:not([href*=\&#34;simoahava.com\&#34;]), a:not([href*=\&#34;simoahava.com\&#34;]) *&#34;</span>
 }</code></pre></div>
 <p>The selector is included in the trigger JSON with the following syntax: <code>:not(*)${gtm_css_2_0}</code>. The part in the curly brackets is an <a href="https://github.com/ampproject/amphtml/blob/master/spec/amp-var-substitutions.md">AMP variable substitution</a>, which refers to a key in the <code>&quot;vars&quot;</code> object further down the JSON. So, if you replace <code>${gtm_css_2_0}</code> with the value of <code>vars.gtm_css_2_0</code>, you get the following string:</p>
 <p><code>:not(*),a:not([href*=&quot;simoahava.com&quot;]), a:not([href*=&quot;simoahava.com&quot;]) *</code></p>
@@ -756,13 +791,13 @@
 
 
 <p>When the trigger passes server-side validation, it is added to the <em>JSON configuration object</em> like this:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json"><span style="color:#e6db74">&#34;triggers&#34;</span><span style="color:#960050;background-color:#1e0010">:</span> {
-    <span style="color:#f92672">&#34;5&#34;</span>: {
-        <span style="color:#f92672">&#34;request&#34;</span>: <span style="color:#e6db74">&#34;2&#34;</span>,
-        <span style="color:#f92672">&#34;vars&#34;</span>: {
-            <span style="color:#f92672">&#34;gtm.event&#34;</span>: <span style="color:#e6db74">&#34;gtm.pageview&#34;</span>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json"><span style="color:#a50">&#34;triggers&#34;</span><span style="color:#f00;background-color:#faa">:</span> {
+    <span style="color:#1e90ff;font-weight:bold">&#34;5&#34;</span>: {
+        <span style="color:#1e90ff;font-weight:bold">&#34;request&#34;</span>: <span style="color:#a50">&#34;2&#34;</span>,
+        <span style="color:#1e90ff;font-weight:bold">&#34;vars&#34;</span>: {
+            <span style="color:#1e90ff;font-weight:bold">&#34;gtm.event&#34;</span>: <span style="color:#a50">&#34;gtm.pageview&#34;</span>
         },
-        <span style="color:#f92672">&#34;on&#34;</span>: <span style="color:#e6db74">&#34;visible&#34;</span>
+        <span style="color:#1e90ff;font-weight:bold">&#34;on&#34;</span>: <span style="color:#a50">&#34;visible&#34;</span>
     }
 }</code></pre></div>
 <p>The <code>&quot;on&quot;: &quot;visible&quot;</code> is quite literal - if the page is visible in the current browser window, the trigger will fire as soon as the AMP analytics JavaScript has loaded. Otherwise, the trigger will wait until such a moment as the page <em>becomes</em> visible. Some time ago, I wrote a <a href="https://www.simoahava.com/analytics/use-page-visibility-api-google-tag-manager/">custom visibility trigger setup</a> for regular Google Tag Manager, so I'm <strong>very</strong> happy to see it on by default in AMP containers.</p>
@@ -787,17 +822,17 @@
 
 <p>It's very simple to set up. A single Scroll trigger can handle all the thresholds that you indicate with a comma-separated list of percentages. For example, to fire the Scroll trigger for each 25% increment of vertical scrolling, you would add <strong>25, 50, 75, 100</strong> into the respective field. This will naturally work for both mobile and desktop browsing.</p>
 <p>When you add a scroll trigger, it looks like this in the <em>JSON configuration object</em>:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json"><span style="color:#e6db74">&#34;triggers&#34;</span><span style="color:#960050;background-color:#1e0010">:</span> {
-    <span style="color:#f92672">&#34;3&#34;</span>: {
-        <span style="color:#f92672">&#34;request&#34;</span>: <span style="color:#e6db74">&#34;2&#34;</span>,
-        <span style="color:#f92672">&#34;scrollSpec&#34;</span>: {
-            <span style="color:#f92672">&#34;verticalBoundaries&#34;</span>: [<span style="color:#ae81ff">25</span>, <span style="color:#ae81ff">50</span>, <span style="color:#ae81ff">75</span>, <span style="color:#ae81ff">100</span>],
-            <span style="color:#f92672">&#34;horizontalBoundaries&#34;</span>: [<span style="color:#ae81ff">100</span>]
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json"><span style="color:#a50">&#34;triggers&#34;</span><span style="color:#f00;background-color:#faa">:</span> {
+    <span style="color:#1e90ff;font-weight:bold">&#34;3&#34;</span>: {
+        <span style="color:#1e90ff;font-weight:bold">&#34;request&#34;</span>: <span style="color:#a50">&#34;2&#34;</span>,
+        <span style="color:#1e90ff;font-weight:bold">&#34;scrollSpec&#34;</span>: {
+            <span style="color:#1e90ff;font-weight:bold">&#34;verticalBoundaries&#34;</span>: [<span style="color:#099">25</span>, <span style="color:#099">50</span>, <span style="color:#099">75</span>, <span style="color:#099">100</span>],
+            <span style="color:#1e90ff;font-weight:bold">&#34;horizontalBoundaries&#34;</span>: [<span style="color:#099">100</span>]
         },
-        <span style="color:#f92672">&#34;vars&#34;</span>: {
-            <span style="color:#f92672">&#34;gtm.event&#34;</span>: <span style="color:#e6db74">&#34;gtm.scroll&#34;</span>
+        <span style="color:#1e90ff;font-weight:bold">&#34;vars&#34;</span>: {
+            <span style="color:#1e90ff;font-weight:bold">&#34;gtm.event&#34;</span>: <span style="color:#a50">&#34;gtm.scroll&#34;</span>
         },
-        <span style="color:#f92672">&#34;on&#34;</span>: <span style="color:#e6db74">&#34;scroll&#34;</span>
+        <span style="color:#1e90ff;font-weight:bold">&#34;on&#34;</span>: <span style="color:#a50">&#34;scroll&#34;</span>
     }
 }</code></pre></div>
 <p>The problem with the Scroll trigger is that there are no dynamic variables in the AMP GTM container that you can use to detect which increment triggered the tag. So if you have a single Scroll tracker for 25%, 50%, 75%, and 100%, your tag will trigger four times on the page, but you can't simply use a variable to tell you directly <em>which increment</em> it was that triggered the tag.</p>
@@ -840,17 +875,17 @@
 <p>The Fire Immediately When Triggered setting governs whether or not the first iteration of the trigger should fire as soon as the container is downloaded (checked), or whether the trigger should wait for one interval before firing (unchecked).</p>
 <p>Note that the same caveat about visibility that applied to the Page View trigger is relevant here, too. The Timer trigger will only fire a request <strong>if the page is visible</strong>. However, the timer will <em>not pause</em> while the page is not visible. Thus, all the timer hits that should have fired within the limitations of the Interval and Limit settings, but were deferred due to the page not being visible, will be fired the moment the page becomes visible again.</p>
 <p>When you create a Timer trigger, it will look like this in the <em>JSON configuration object</em>:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json"><span style="color:#e6db74">&#34;triggers&#34;</span><span style="color:#960050;background-color:#1e0010">:</span> {
-    <span style="color:#f92672">&#34;3&#34;</span>: {
-        <span style="color:#f92672">&#34;request&#34;</span>: <span style="color:#e6db74">&#34;2&#34;</span>,
-        <span style="color:#f92672">&#34;timerSpec&#34;</span>: {
-            <span style="color:#f92672">&#34;interval&#34;</span>: <span style="color:#ae81ff">10</span>,
-            <span style="color:#f92672">&#34;maxTimerLength&#34;</span>: <span style="color:#ae81ff">20</span>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json"><span style="color:#a50">&#34;triggers&#34;</span><span style="color:#f00;background-color:#faa">:</span> {
+    <span style="color:#1e90ff;font-weight:bold">&#34;3&#34;</span>: {
+        <span style="color:#1e90ff;font-weight:bold">&#34;request&#34;</span>: <span style="color:#a50">&#34;2&#34;</span>,
+        <span style="color:#1e90ff;font-weight:bold">&#34;timerSpec&#34;</span>: {
+            <span style="color:#1e90ff;font-weight:bold">&#34;interval&#34;</span>: <span style="color:#099">10</span>,
+            <span style="color:#1e90ff;font-weight:bold">&#34;maxTimerLength&#34;</span>: <span style="color:#099">20</span>
         },
-        <span style="color:#f92672">&#34;vars&#34;</span>: {
-            <span style="color:#f92672">&#34;gtm.event&#34;</span>: <span style="color:#e6db74">&#34;gtm.timer&#34;</span>
+        <span style="color:#1e90ff;font-weight:bold">&#34;vars&#34;</span>: {
+            <span style="color:#1e90ff;font-weight:bold">&#34;gtm.event&#34;</span>: <span style="color:#a50">&#34;gtm.timer&#34;</span>
         },
-        <span style="color:#f92672">&#34;on&#34;</span>: <span style="color:#e6db74">&#34;timer&#34;</span>
+        <span style="color:#1e90ff;font-weight:bold">&#34;on&#34;</span>: <span style="color:#a50">&#34;timer&#34;</span>
     }
 }</code></pre></div>
 <p>If you left the &ldquo;Fire Immediately When Triggered&rdquo; unchecked, under <code>&quot;maxTimerLength&quot;: 20</code> you would have the setting <code>&quot;immediate&quot;: false</code>.</p>
@@ -879,19 +914,19 @@
 <p>All of these conditions stack. So, let's say you have a trigger that looks like the one in the screenshot above. What it translates to is this:</p>
 <p>An element with ID <strong>AMP_2</strong> must have at least <strong>10 percent</strong> of its total area in the browser viewport for at least <strong>5 seconds altogether</strong>. Also, the trigger will only fire if the element is in the viewport <em>without interruption</em> for at least <strong>1 second</strong>.</p>
 <p>When you publish a trigger like this, it will translate into the following JSON:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json"><span style="color:#e6db74">&#34;triggers&#34;</span><span style="color:#960050;background-color:#1e0010">:</span> {
-    <span style="color:#f92672">&#34;3&#34;</span>: {
-        <span style="color:#f92672">&#34;request&#34;</span>: <span style="color:#e6db74">&#34;2&#34;</span>,
-        <span style="color:#f92672">&#34;visibilitySpec&#34;</span>: {
-            <span style="color:#f92672">&#34;selector&#34;</span>: <span style="color:#e6db74">&#34;#AMP_2&#34;</span>,
-            <span style="color:#f92672">&#34;visiblePercentageMin&#34;</span>: <span style="color:#ae81ff">10</span>,
-            <span style="color:#f92672">&#34;continuousTimeMin&#34;</span>: <span style="color:#ae81ff">1000</span>,
-            <span style="color:#f92672">&#34;totalTimeMin&#34;</span>: <span style="color:#ae81ff">5000</span>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json"><span style="color:#a50">&#34;triggers&#34;</span><span style="color:#f00;background-color:#faa">:</span> {
+    <span style="color:#1e90ff;font-weight:bold">&#34;3&#34;</span>: {
+        <span style="color:#1e90ff;font-weight:bold">&#34;request&#34;</span>: <span style="color:#a50">&#34;2&#34;</span>,
+        <span style="color:#1e90ff;font-weight:bold">&#34;visibilitySpec&#34;</span>: {
+            <span style="color:#1e90ff;font-weight:bold">&#34;selector&#34;</span>: <span style="color:#a50">&#34;#AMP_2&#34;</span>,
+            <span style="color:#1e90ff;font-weight:bold">&#34;visiblePercentageMin&#34;</span>: <span style="color:#099">10</span>,
+            <span style="color:#1e90ff;font-weight:bold">&#34;continuousTimeMin&#34;</span>: <span style="color:#099">1000</span>,
+            <span style="color:#1e90ff;font-weight:bold">&#34;totalTimeMin&#34;</span>: <span style="color:#099">5000</span>
         },
-        <span style="color:#f92672">&#34;vars&#34;</span>: {
-            <span style="color:#f92672">&#34;gtm.event&#34;</span>: <span style="color:#e6db74">&#34;gtm.visible&#34;</span>
+        <span style="color:#1e90ff;font-weight:bold">&#34;vars&#34;</span>: {
+            <span style="color:#1e90ff;font-weight:bold">&#34;gtm.event&#34;</span>: <span style="color:#a50">&#34;gtm.visible&#34;</span>
         },
-        <span style="color:#f92672">&#34;on&#34;</span>: <span style="color:#e6db74">&#34;visible&#34;</span>
+        <span style="color:#1e90ff;font-weight:bold">&#34;on&#34;</span>: <span style="color:#a50">&#34;visible&#34;</span>
     }
 }</code></pre></div>
 <p>I hope that support for other CSS selectors than just IDs would become available for selecting the element. I guess the reasoning is that such a complex trigger would be difficult to maintain consistently if it matched multiple elements on the page.</p>
@@ -1113,24 +1148,24 @@
 
 
 <p>An AMP variable added like this to a Custom Dimension field in a GA tag would look like this in the <em>JSON configuration object</em>:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json"><span style="color:#e6db74">&#34;requests&#34;</span><span style="color:#960050;background-color:#1e0010">:</span> {
-    <span style="color:#f92672">&#34;4&#34;</span>: <span style="color:#e6db74">&#34;https://www.google-analytics.com/r/collect?...&amp;cd1=${backgroundState}&#34;</span>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json"><span style="color:#a50">&#34;requests&#34;</span><span style="color:#f00;background-color:#faa">:</span> {
+    <span style="color:#1e90ff;font-weight:bold">&#34;4&#34;</span>: <span style="color:#a50">&#34;https://www.google-analytics.com/r/collect?...&amp;cd1=${backgroundState}&#34;</span>
 }</code></pre></div>
 <p>As you can see, the variable name is still in the request itself, meaning that it isn't resolved when the <em>JSON configuration object</em> is downloaded. Only once the actual request dispatches will the AMP variable be resolved, which means, in turn, that its value is generated dynamically.</p>
 <p>Most of the useful AMP variables are already available as Built-In variables in GTM. In fact, I find it curious that Built-In variables don't simply include all the pre-defined AMP variables, as that would cut down time required to configure the container.</p>
 <h4 id="creating-custom-amp-variables">Creating custom AMP variables</h4>
 <p>If you want to create your own AMP variables, you can. It's sort of similar to working with <code>dataLayer</code>, in the sense that you are passing semantic information from the page to Google Tag Manager. However, the difference is that you won't be able to utilize these Variables <em>within GTM itself</em>. So you can't create trigger conditions based on AMP variables, nor can you use Lookup Tables with AMP variables as the input variable.</p>
 <p>To create custom AMP variables, you include them like this:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">amp-analytics</span> <span style="color:#a6e22e">config</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;https://www.googletagmanager.com/amp.json?id=GTM-XXXXXX&amp;gtm.url=SOURCE_URL&#34;</span> <span style="color:#a6e22e">data-credentials</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;include&#34;</span>&gt;
-  &lt;<span style="color:#f92672">script</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;application/json&#34;</span>&gt;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">amp-analytics</span> <span style="color:#1e90ff">config</span>=<span style="color:#a50">&#34;https://www.googletagmanager.com/amp.json?id=GTM-XXXXXX&amp;gtm.url=SOURCE_URL&#34;</span> <span style="color:#1e90ff">data-credentials</span>=<span style="color:#a50">&#34;include&#34;</span>&gt;
+  &lt;<span style="color:#1e90ff;font-weight:bold">script</span> <span style="color:#1e90ff">type</span>=<span style="color:#a50">&#34;application/json&#34;</span>&gt;
   {
-    <span style="color:#e6db74">&#34;vars&#34;</span><span style="color:#f92672">:</span> {
-      <span style="color:#e6db74">&#34;someAmpVar&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;someValue&#34;</span>,
-      <span style="color:#e6db74">&#34;someOtherAmpVar&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;someValue&#34;</span>
+    <span style="color:#a50">&#34;vars&#34;</span>: {
+      <span style="color:#a50">&#34;someAmpVar&#34;</span>: <span style="color:#a50">&#34;someValue&#34;</span>,
+      <span style="color:#a50">&#34;someOtherAmpVar&#34;</span>: <span style="color:#a50">&#34;someValue&#34;</span>
     }
   }
-  &lt;/<span style="color:#f92672">script</span>&gt;
-&lt;/<span style="color:#f92672">amp-analytics</span>&gt;</code></pre></div>
+  &lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+&lt;/<span style="color:#1e90ff;font-weight:bold">amp-analytics</span>&gt;</code></pre></div>
 <p>So you include them in the <code>&quot;vars&quot;</code> block as key-value pairs. Once you've done this, you can create AMP variables for these keys, and then include the custom AMP variables in tag fields.</p>
 
 

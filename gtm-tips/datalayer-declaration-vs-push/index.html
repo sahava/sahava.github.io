@@ -340,27 +340,27 @@
 <p>Let's put it simply: if you redefine <code>dataLayer</code> after the GTM container snippet, you will break GTM's proprietary functions. No, I'm not trying to be dramatic, it's the truth. You cause havoc because GTM <a href="https://www.simoahava.com/analytics/google-tag-manager-data-model/">modifies the native <code>push()</code> method</a> that all Arrays have, adding stuff of little importance such as <strong>a listener which fires tags when an &lsquo;event&rsquo; key is pushed!</strong>.</p>
 <p>By redefining <code>dataLayer</code> your tags will no longer fire. Oops!</p>
 <p>But hey, we're <a href="https://developers.google.com/tag-manager/devguide">often instructed</a> to use variable assignment when creating <code>dataLayer</code> <em>before</em> the container snippet. Right? Well, yes, that's what we're instructed to do but that's not necessarily the best practice. Having just one declaration there works like a charm, but what about:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">  &lt;<span style="color:#f92672">script</span>&gt;
-    <span style="color:#a6e22e">dataLayer</span> <span style="color:#f92672">=</span> [{
-      <span style="color:#e6db74">&#39;businessCriticalVar&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;businessCriticalVal&#39;</span>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">  &lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+    dataLayer = [{
+      <span style="color:#a50">&#39;businessCriticalVar&#39;</span> : <span style="color:#a50">&#39;businessCriticalVal&#39;</span>
     }];
-  &lt;/<span style="color:#f92672">script</span>&gt;
+  &lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
   ... some other code ...
-  &lt;<span style="color:#f92672">script</span>&gt;
-    <span style="color:#a6e22e">dataLayer</span> <span style="color:#f92672">=</span> [{
-      <span style="color:#e6db74">&#39;anotherCriticalVar&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;anotherCriticalVal&#39;</span>
+  &lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+    dataLayer = [{
+      <span style="color:#a50">&#39;anotherCriticalVar&#39;</span> : <span style="color:#a50">&#39;anotherCriticalVal&#39;</span>
     }];
-  &lt;/<span style="color:#f92672">script</span>&gt;
-&lt;/<span style="color:#f92672">head</span>&gt;
-&lt;<span style="color:#f92672">body</span>&gt;
-<span style="color:#75715e">&lt;!--</span><span style="color:#75715e"> GTM Container Snippet </span><span style="color:#75715e">--&gt;</span></code></pre></div>
+  &lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+&lt;/<span style="color:#1e90ff;font-weight:bold">head</span>&gt;
+&lt;<span style="color:#1e90ff;font-weight:bold">body</span>&gt;
+<span style="color:#aaa;font-style:italic">&lt;!--</span><span style="color:#aaa;font-style:italic"> GTM Container Snippet </span><span style="color:#aaa;font-style:italic">--&gt;</span></code></pre></div>
 <p>Well, you might have guessed it. The second assignment overwrites the first one, and <code>dataLayer</code> only has <strong>anotherCriticalVar</strong> available for the benefit of your tags.</p>
 <p>So how to avoid this?</p>
 <p>Simple: use <strong>only</strong> <code>push()</code> when interacting with <code>dataLayer</code>. That way you'll never overwrite anything in the Array, you'll just add new stuff to the end.</p>
 <p>In GTM tags (Custom HTML, for example), you can just go ahead and use <code>dataLayer.push()</code>, since you can be 100 % sure that <code>dataLayer</code> is an Array with a <code>push()</code> function (the container snippet takes care of this for you). But when you're working on the page template, where it's not necessarily a given that <code>dataLayer</code> has been defined as an Array, always use the following syntax to safeguard against problems:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">window.<span style="color:#a6e22e">dataLayer</span> <span style="color:#f92672">=</span> window.<span style="color:#a6e22e">dataLayer</span> <span style="color:#f92672">||</span> [];
-window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
-  <span style="color:#e6db74">&#39;someVar&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;someVal&#39;</span>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#0aa">window</span>.dataLayer = <span style="color:#0aa">window</span>.dataLayer || [];
+<span style="color:#0aa">window</span>.dataLayer.push({
+  <span style="color:#a50">&#39;someVar&#39;</span> : <span style="color:#a50">&#39;someVal&#39;</span>
 });
 </code></pre></div>
 <p>The first line basically checks if a global variable called <code>dataLayer</code> has already been declared. If it has, it's left alone and execution proceeds to the <code>push()</code> block. If, however, <code>dataLayer</code> has NOT been defined, the first line then assigns a new, empty Array to it. This ensures that the following <code>push()</code> will always work.</p>

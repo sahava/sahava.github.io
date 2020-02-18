@@ -415,35 +415,35 @@
 <p>In this chapter, Philipp and Sebastian will walk you through the steps of creating a PHP endpoint for verifying the reCAPTCHA requests. They'll also show you how to create the Custom HTML tag in Google Tag Manager for loading the reCAPTCHA JavaScript API and ascertaining the &ldquo;bot-ness&rdquo; of the user.</p>
 <h3 id="custom-html-tag">Custom HTML tag</h3>
 <p>First things first - let's setup Google Tag Manager. In GTM, create a new <strong>Custom HTML Tag</strong>.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">style</span>&gt;
-  <span style="color:#75715e">/* hides the recaptcha badge */</span>
-  .<span style="color:#a6e22e">grecaptcha-badge</span> {
-    <span style="color:#66d9ef">display</span>: <span style="color:#66d9ef">none</span> <span style="color:#75715e">!important</span>;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">style</span>&gt;
+  <span style="color:#aaa;font-style:italic">/* hides the recaptcha badge */</span>
+  .<span style="color:#0a0;text-decoration:underline">grecaptcha-badge</span> {
+    <span style="color:#00a">display</span>: <span style="color:#00a">none</span> <span style="color:#4c8317">!important</span>;
   }
-&lt;/<span style="color:#f92672">style</span>&gt;
-&lt;<span style="color:#f92672">script</span> <span style="color:#a6e22e">src</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;https://www.google.com/recaptcha/api.js?render=_reCAPTCHA_site_key_&#34;</span>&gt;&lt;/<span style="color:#f92672">script</span>&gt;
-&lt;<span style="color:#f92672">script</span>&gt;
-  <span style="color:#a6e22e">grecaptcha</span>.<span style="color:#a6e22e">ready</span>(<span style="color:#66d9ef">function</span>() {
-    <span style="color:#a6e22e">grecaptcha</span>.<span style="color:#a6e22e">execute</span>(<span style="color:#e6db74">&#39;_reCAPTCHA_site_key_&#39;</span>, {
-      <span style="color:#a6e22e">action</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;homepage&#39;</span>
-    }).<span style="color:#a6e22e">then</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">token</span>) {
-      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">xhr</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">XMLHttpRequest</span>();
-      <span style="color:#a6e22e">xhr</span>.<span style="color:#a6e22e">onload</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>() {
-        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">xhr</span>.<span style="color:#a6e22e">response</span> <span style="color:#f92672">!==</span> <span style="color:#e6db74">&#39;noChange&#39;</span>) {
-          <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">greResult</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(<span style="color:#a6e22e">xhr</span>.<span style="color:#a6e22e">response</span>);
-          window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
-            <span style="color:#a6e22e">event</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;recaptcha&#39;</span>, 
-            <span style="color:#a6e22e">recaptchaAnswer</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">greResult</span>.<span style="color:#a6e22e">success</span>,
-            <span style="color:#a6e22e">recaptchaScore</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">greResult</span>.<span style="color:#a6e22e">score</span>
+&lt;/<span style="color:#1e90ff;font-weight:bold">style</span>&gt;
+&lt;<span style="color:#1e90ff;font-weight:bold">script</span> <span style="color:#1e90ff">src</span>=<span style="color:#a50">&#34;https://www.google.com/recaptcha/api.js?render=_reCAPTCHA_site_key_&#34;</span>&gt;&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+  grecaptcha.ready(<span style="color:#00a">function</span>() {
+    grecaptcha.execute(<span style="color:#a50">&#39;_reCAPTCHA_site_key_&#39;</span>, {
+      action: <span style="color:#a50">&#39;homepage&#39;</span>
+    }).then(<span style="color:#00a">function</span>(token) {
+      <span style="color:#00a">var</span> xhr = <span style="color:#00a">new</span> XMLHttpRequest();
+      xhr.onload = <span style="color:#00a">function</span>() {
+        <span style="color:#00a">if</span> (xhr.response !== <span style="color:#a50">&#39;noChange&#39;</span>) {
+          <span style="color:#00a">var</span> greResult = JSON.parse(xhr.response);
+          <span style="color:#0aa">window</span>.dataLayer.push({
+            event: <span style="color:#a50">&#39;recaptcha&#39;</span>, 
+            recaptchaAnswer: greResult.success,
+            recaptchaScore: greResult.score
           });
         }
       };
-      <span style="color:#a6e22e">xhr</span>.<span style="color:#a6e22e">open</span>(<span style="color:#e6db74">&#39;POST&#39;</span>, <span style="color:#e6db74">&#39;/gtm/recaptcha.php&#39;</span>, <span style="color:#66d9ef">true</span>); <span style="color:#75715e">//replace this with URL to your PHP fil
-</span><span style="color:#75715e"></span>      <span style="color:#a6e22e">xhr</span>.<span style="color:#a6e22e">setRequestHeader</span>(<span style="color:#e6db74">&#39;Content-type&#39;</span>, <span style="color:#e6db74">&#39;application/x-www-form-urlencoded&#39;</span>);
-      <span style="color:#a6e22e">xhr</span>.<span style="color:#a6e22e">send</span>(<span style="color:#e6db74">&#39;token=&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">token</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;&amp;action=homepage&#39;</span>);
+      xhr.open(<span style="color:#a50">&#39;POST&#39;</span>, <span style="color:#a50">&#39;/gtm/recaptcha.php&#39;</span>, <span style="color:#00a">true</span>); <span style="color:#aaa;font-style:italic">//replace this with URL to your PHP fil
+</span><span style="color:#aaa;font-style:italic"></span>      xhr.setRequestHeader(<span style="color:#a50">&#39;Content-type&#39;</span>, <span style="color:#a50">&#39;application/x-www-form-urlencoded&#39;</span>);
+      xhr.send(<span style="color:#a50">&#39;token=&#39;</span> + token + <span style="color:#a50">&#39;&amp;action=homepage&#39;</span>);
     });
   });
-&lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
+&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
 <p>You can set this tag to fire on whatever trigger you wish, though a trigger that fires when the page loads (e.g. All Pages, DOM Ready, or Window Loaded) is recommended.</p>
 <p>Make sure you edit the following:</p>
 <ul>
@@ -472,45 +472,45 @@
 <blockquote>
 <p><strong>NOTE!</strong> You can use whatever path and filename you want for the PHP file - just remember to update the Custom HTML tag's HTTP request endpoint URL accordingly.</p>
 </blockquote>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-php" data-lang="php"><span style="color:#75715e">&lt;?php</span>
-	<span style="color:#75715e">// reCaptcha info
-</span><span style="color:#75715e"></span>    $url <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;https://www.google.com/recaptcha/api/siteverify&#39;</span>;        
-    $secret <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;_reCAPTCHA_secret_key_&#34;</span>;
-	$remoteip <span style="color:#f92672">=</span> $_SERVER[<span style="color:#e6db74">&#39;REMOTE_ADDR&#39;</span>];
-	<span style="color:#75715e">// Form info
-</span><span style="color:#75715e"></span>	$action <span style="color:#f92672">=</span> $_POST[<span style="color:#e6db74">&#39;action&#39;</span>];
-	$response <span style="color:#f92672">=</span> $_POST[<span style="color:#e6db74">&#39;token&#39;</span>];
-	<span style="color:#75715e">// Botscore
-</span><span style="color:#75715e"></span>	$botscore <span style="color:#f92672">=</span> $_COOKIE[<span style="color:#e6db74">&#39;_rbs&#39;</span>];
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-php" data-lang="php"><span style="color:#4c8317">&lt;?php</span>
+	<span style="color:#aaa;font-style:italic">// reCaptcha info
+</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#a00">$url</span> = <span style="color:#a50">&#39;https://www.google.com/recaptcha/api/siteverify&#39;</span>;        
+    <span style="color:#a00">$secret</span> = <span style="color:#a50">&#34;_reCAPTCHA_secret_key_&#34;</span>;
+	<span style="color:#a00">$remoteip</span> = <span style="color:#a00">$_SERVER</span>[<span style="color:#a50">&#39;REMOTE_ADDR&#39;</span>];
+	<span style="color:#aaa;font-style:italic">// Form info
+</span><span style="color:#aaa;font-style:italic"></span>	<span style="color:#a00">$action</span> = <span style="color:#a00">$_POST</span>[<span style="color:#a50">&#39;action&#39;</span>];
+	<span style="color:#a00">$response</span> = <span style="color:#a00">$_POST</span>[<span style="color:#a50">&#39;token&#39;</span>];
+	<span style="color:#aaa;font-style:italic">// Botscore
+</span><span style="color:#aaa;font-style:italic"></span>	<span style="color:#a00">$botscore</span> = <span style="color:#a00">$_COOKIE</span>[<span style="color:#a50">&#39;_rbs&#39;</span>];
 
-	<span style="color:#75715e">// Curl Request
-</span><span style="color:#75715e"></span>	$curl <span style="color:#f92672">=</span> <span style="color:#a6e22e">curl_init</span>();
-	<span style="color:#a6e22e">curl_setopt</span>($curl, <span style="color:#a6e22e">CURLOPT_URL</span>, $url);
-	<span style="color:#a6e22e">curl_setopt</span>($curl, <span style="color:#a6e22e">CURLOPT_POST</span>, <span style="color:#66d9ef">true</span>);
-	<span style="color:#a6e22e">curl_setopt</span>($curl, <span style="color:#a6e22e">CURLOPT_RETURNTRANSFER</span>, <span style="color:#ae81ff">1</span>);
-	<span style="color:#a6e22e">curl_setopt</span>($curl, <span style="color:#a6e22e">CURLOPT_POSTFIELDS</span>, <span style="color:#66d9ef">array</span>(
-		<span style="color:#e6db74">&#39;secret&#39;</span> <span style="color:#f92672">=&gt;</span> $secret,
-		<span style="color:#e6db74">&#39;remoteip&#39;</span> <span style="color:#f92672">=&gt;</span> $remoteip,
-		<span style="color:#e6db74">&#39;action&#39;</span> <span style="color:#f92672">=&gt;</span> $action,		
-		<span style="color:#e6db74">&#39;response&#39;</span> <span style="color:#f92672">=&gt;</span> $response
+	<span style="color:#aaa;font-style:italic">// Curl Request
+</span><span style="color:#aaa;font-style:italic"></span>	<span style="color:#a00">$curl</span> = curl_init();
+	curl_setopt(<span style="color:#a00">$curl</span>, CURLOPT_URL, <span style="color:#a00">$url</span>);
+	curl_setopt(<span style="color:#a00">$curl</span>, CURLOPT_POST, <span style="color:#00a">true</span>);
+	curl_setopt(<span style="color:#a00">$curl</span>, CURLOPT_RETURNTRANSFER, <span style="color:#099">1</span>);
+	curl_setopt(<span style="color:#a00">$curl</span>, CURLOPT_POSTFIELDS, <span style="color:#00a">array</span>(
+		<span style="color:#a50">&#39;secret&#39;</span> =&gt; <span style="color:#a00">$secret</span>,
+		<span style="color:#a50">&#39;remoteip&#39;</span> =&gt; <span style="color:#a00">$remoteip</span>,
+		<span style="color:#a50">&#39;action&#39;</span> =&gt; <span style="color:#a00">$action</span>,		
+		<span style="color:#a50">&#39;response&#39;</span> =&gt; <span style="color:#a00">$response</span>
 	));
-	$curlData <span style="color:#f92672">=</span> <span style="color:#a6e22e">curl_exec</span>($curl);
-	<span style="color:#a6e22e">curl_close</span>($curl);
-	$curlJson <span style="color:#f92672">=</span> <span style="color:#a6e22e">json_decode</span>($curlData, <span style="color:#66d9ef">true</span>);
+	<span style="color:#a00">$curlData</span> = curl_exec(<span style="color:#a00">$curl</span>);
+	curl_close(<span style="color:#a00">$curl</span>);
+	<span style="color:#a00">$curlJson</span> = json_decode(<span style="color:#a00">$curlData</span>, <span style="color:#00a">true</span>);
 	
-	<span style="color:#75715e">//defining the answer
-</span><span style="color:#75715e"></span>	$answer <span style="color:#f92672">=</span> $curlData;
+	<span style="color:#aaa;font-style:italic">//defining the answer
+</span><span style="color:#aaa;font-style:italic"></span>	<span style="color:#a00">$answer</span> = <span style="color:#a00">$curlData</span>;
 	
-	<span style="color:#75715e">//refresh the cookie
-</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">setcookie</span>(<span style="color:#e6db74">&#39;_rbs&#39;</span>, $curlJson[<span style="color:#e6db74">&#39;score&#39;</span>], <span style="color:#a6e22e">time</span>()<span style="color:#f92672">+</span><span style="color:#ae81ff">1800</span>, <span style="color:#e6db74">&#39;/&#39;</span>,<span style="color:#e6db74">&#39;&#39;</span>, <span style="color:#ae81ff">0</span>); 
+	<span style="color:#aaa;font-style:italic">//refresh the cookie
+</span><span style="color:#aaa;font-style:italic"></span>	setcookie(<span style="color:#a50">&#39;_rbs&#39;</span>, <span style="color:#a00">$curlJson</span>[<span style="color:#a50">&#39;score&#39;</span>], time()+<span style="color:#099">1800</span>, <span style="color:#a50">&#39;/&#39;</span>,<span style="color:#a50">&#39;&#39;</span>, <span style="color:#099">0</span>); 
 	
-	<span style="color:#75715e">// only fire $answer if botscore cookie is not set or different from acutal score
-</span><span style="color:#75715e"></span>	<span style="color:#66d9ef">if</span> ($botscore <span style="color:#f92672">!=</span> $curlJson[<span style="color:#e6db74">&#39;score&#39;</span>]) {
-		<span style="color:#66d9ef">echo</span> $answer;
-	} <span style="color:#66d9ef">else</span> {
-		<span style="color:#66d9ef">echo</span> <span style="color:#e6db74">&#34;noChange&#34;</span>;
+	<span style="color:#aaa;font-style:italic">// only fire $answer if botscore cookie is not set or different from acutal score
+</span><span style="color:#aaa;font-style:italic"></span>	<span style="color:#00a">if</span> (<span style="color:#a00">$botscore</span> != <span style="color:#a00">$curlJson</span>[<span style="color:#a50">&#39;score&#39;</span>]) {
+		<span style="color:#00a">echo</span> <span style="color:#a00">$answer</span>;
+	} <span style="color:#00a">else</span> {
+		<span style="color:#00a">echo</span> <span style="color:#a50">&#34;noChange&#34;</span>;
 	}
-<span style="color:#75715e">?&gt;</span>
+<span style="color:#4c8317">?&gt;</span>
 </code></pre></div>
 <p>Again, make sure you replace the <code>_reCAPTCHA_secret_key</code> on line 4 with the <strong>secret key</strong> you got from the admin console.</p>
 <p>This PHP code takes the response sent by Google Tag Manager, validates it against the reCAPTCHA verification API, and then sends the result object in the response, which will, in turn, be pushed into <code>dataLayer</code> for your tags to use.</p>
@@ -520,35 +520,35 @@
 <h3 id="custom-html-tag-1">Custom HTML tag</h3>
 <p>The main difference (apart from the tech stack) to the PHP solution is that we'll log errors as well. They are sent as the value of the <code>recaptchaScore</code> key in <code>dataLayer</code>, so in your report you'll end up with a mix of valid scores and error texts, but this should be easy to filter in your tables.</p>
 <p>This is what the Custom HTML tag looks like:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">style</span>&gt;
-  <span style="color:#75715e">/* hides the recaptcha badge */</span>
-  .<span style="color:#a6e22e">grecaptcha-badge</span> {
-    <span style="color:#66d9ef">display</span>: <span style="color:#66d9ef">none</span> <span style="color:#75715e">!important</span>;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">style</span>&gt;
+  <span style="color:#aaa;font-style:italic">/* hides the recaptcha badge */</span>
+  .<span style="color:#0a0;text-decoration:underline">grecaptcha-badge</span> {
+    <span style="color:#00a">display</span>: <span style="color:#00a">none</span> <span style="color:#4c8317">!important</span>;
   }
-&lt;/<span style="color:#f92672">style</span>&gt;
-&lt;<span style="color:#f92672">script</span> <span style="color:#a6e22e">src</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;https://www.google.com/recaptcha/api.js?render=_reCAPTCHA_site_key&amp;onload=__recaptchaCallback&#34;</span> <span style="color:#a6e22e">async</span> <span style="color:#a6e22e">defer</span>&gt;&lt;/<span style="color:#f92672">script</span>&gt;
-&lt;<span style="color:#f92672">script</span>&gt;
-  window.<span style="color:#a6e22e">__recaptchaCallback</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>() {
-    <span style="color:#66d9ef">if</span> (window.<span style="color:#a6e22e">grecaptcha</span>) {
-      window.<span style="color:#a6e22e">grecaptcha</span>.<span style="color:#a6e22e">execute</span>(<span style="color:#e6db74">&#39;_reCAPTCHA_site_key&#39;</span>, {<span style="color:#a6e22e">action</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;homepage&#39;</span>}).<span style="color:#a6e22e">then</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">token</span>) {
-        <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;https://mydomain.com:3000/recaptcha/&#39;</span>;
-        <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">xhr</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">XMLHttpRequest</span>();
-        <span style="color:#a6e22e">xhr</span>.<span style="color:#a6e22e">open</span>(<span style="color:#e6db74">&#39;GET&#39;</span>, <span style="color:#a6e22e">url</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;?g-recaptcha-response=&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">token</span>, <span style="color:#66d9ef">true</span>);
-        <span style="color:#a6e22e">xhr</span>.<span style="color:#a6e22e">onreadystatechange</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">data</span>) {
-          <span style="color:#66d9ef">if</span> (<span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">readyState</span> <span style="color:#f92672">===</span> <span style="color:#a6e22e">XMLHttpRequest</span>.<span style="color:#a6e22e">DONE</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">status</span> <span style="color:#f92672">===</span> <span style="color:#ae81ff">200</span>) {
-            <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">responseJson</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(<span style="color:#a6e22e">xhr</span>.<span style="color:#a6e22e">response</span>);
-            window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
-              <span style="color:#a6e22e">event</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;recaptcha&#39;</span>,
-              <span style="color:#a6e22e">recaptchaAnswer</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">responseJson</span>.<span style="color:#a6e22e">status</span>,
-              <span style="color:#a6e22e">recaptchaScore</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">responseJson</span>.<span style="color:#a6e22e">recaptcha</span>.<span style="color:#a6e22e">score</span>
+&lt;/<span style="color:#1e90ff;font-weight:bold">style</span>&gt;
+&lt;<span style="color:#1e90ff;font-weight:bold">script</span> <span style="color:#1e90ff">src</span>=<span style="color:#a50">&#34;https://www.google.com/recaptcha/api.js?render=_reCAPTCHA_site_key&amp;onload=__recaptchaCallback&#34;</span> <span style="color:#1e90ff">async</span> <span style="color:#1e90ff">defer</span>&gt;&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+  <span style="color:#0aa">window</span>.__recaptchaCallback = <span style="color:#00a">function</span>() {
+    <span style="color:#00a">if</span> (<span style="color:#0aa">window</span>.grecaptcha) {
+      <span style="color:#0aa">window</span>.grecaptcha.execute(<span style="color:#a50">&#39;_reCAPTCHA_site_key&#39;</span>, {action: <span style="color:#a50">&#39;homepage&#39;</span>}).then(<span style="color:#00a">function</span>(token) {
+        <span style="color:#00a">var</span> url = <span style="color:#a50">&#39;https://mydomain.com:3000/recaptcha/&#39;</span>;
+        <span style="color:#00a">var</span> xhr = <span style="color:#00a">new</span> XMLHttpRequest();
+        xhr.open(<span style="color:#a50">&#39;GET&#39;</span>, url + <span style="color:#a50">&#39;?g-recaptcha-response=&#39;</span> + token, <span style="color:#00a">true</span>);
+        xhr.onreadystatechange = <span style="color:#00a">function</span>(data) {
+          <span style="color:#00a">if</span> (<span style="color:#00a">this</span>.readyState === XMLHttpRequest.DONE &amp;&amp; <span style="color:#00a">this</span>.status === <span style="color:#099">200</span>) {
+            <span style="color:#00a">var</span> responseJson = JSON.parse(xhr.response);
+            <span style="color:#0aa">window</span>.dataLayer.push({
+              event: <span style="color:#a50">&#39;recaptcha&#39;</span>,
+              recaptchaAnswer: responseJson.status,
+              recaptchaScore: responseJson.recaptcha.score
             });
           }
         }
-        <span style="color:#a6e22e">xhr</span>.<span style="color:#a6e22e">send</span>();
+        xhr.send();
       });
     }
   };
-&lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
+&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
 <p>Remember to change the <code>_reCAPTCHA_site_key</code> on lines 7 and 11.</p>
 <p>The <code>url</code> variable on line 12 needs to point to your Node.js application.</p>
 <p>This setup is different from the PHP request. Here, we use a GET request, and we parse the response, pushing both the success and error into <code>dataLayer</code> using a success callback for the HTTP request.</p>
@@ -557,40 +557,40 @@
 <h3 id="nodejs-application">Node.js application</h3>
 <p>The <strong>Node.js</strong> application example here is the simplest possible thing you can build. For it to work, you need to have <a href="https://nodejs.org/en/download/">Node.js installed</a> on in the environment where you want to run the endpoint (for example, a web server running on your site or in the cloud).</p>
 <p>Create an empty directory, and initialize a new <code>npm</code> project with <code>npm init</code>. After following through the setup steps, run:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">$ npm install express express-recaptcha cookie-parser --save</code></pre></div>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">$ npm install express express-recaptcha cookie-parser --save</code></pre></div>
 <p>This installs the required dependencies to run a simple <strong>express.js</strong> web server as well as the files required to run the reCAPTCHA middleware and some cookie parsing logic.</p>
 <p>Then, create a file named <strong>server.js</strong>, open it for editing, and add the following code within:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">express</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;express&#39;</span>);
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">cookieParser</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;cookie-parser&#39;</span>);
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">Recaptcha</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;express-recaptcha&#39;</span>).<span style="color:#a6e22e">RecaptchaV3</span>;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">const</span> express = require(<span style="color:#a50">&#39;express&#39;</span>);
+<span style="color:#00a">const</span> cookieParser = require(<span style="color:#a50">&#39;cookie-parser&#39;</span>);
+<span style="color:#00a">const</span> Recaptcha = require(<span style="color:#a50">&#39;express-recaptcha&#39;</span>).RecaptchaV3;
 
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">app</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">express</span>();
-<span style="color:#a6e22e">app</span>.<span style="color:#a6e22e">use</span>(<span style="color:#a6e22e">cookieParser</span>());
+<span style="color:#00a">const</span> app = express();
+app.use(cookieParser());
 
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">siteKey</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;_reCAPTCHA_site_key&#39;</span>;
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">secretKey</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;_reCAPTCHA_secret_key&#39;</span>;
+<span style="color:#00a">const</span> siteKey = <span style="color:#a50">&#39;_reCAPTCHA_site_key&#39;</span>;
+<span style="color:#00a">const</span> secretKey = <span style="color:#a50">&#39;_reCAPTCHA_secret_key&#39;</span>;
 
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">recaptcha</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Recaptcha</span>(<span style="color:#a6e22e">siteKey</span>, <span style="color:#a6e22e">secretKey</span>, {<span style="color:#a6e22e">action</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;homepage&#39;</span>});
+<span style="color:#00a">const</span> recaptcha = <span style="color:#00a">new</span> Recaptcha(siteKey, secretKey, {action: <span style="color:#a50">&#39;homepage&#39;</span>});
 
-<span style="color:#a6e22e">app</span>.<span style="color:#a6e22e">get</span>(<span style="color:#e6db74">&#39;/recaptcha/&#39;</span>, <span style="color:#a6e22e">recaptcha</span>.<span style="color:#a6e22e">middleware</span>.<span style="color:#a6e22e">verify</span>, (<span style="color:#a6e22e">req</span>, <span style="color:#a6e22e">res</span>) =&gt; {
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">botCookie</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">req</span>.<span style="color:#a6e22e">cookies</span>.<span style="color:#a6e22e">_rbs</span>;
-  <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">header</span>(<span style="color:#e6db74">&#39;Access-Control-Allow-Origin&#39;</span>, <span style="color:#e6db74">&#39;*&#39;</span>); <span style="color:#75715e">// Set this to the actual domain that will be sending the requests
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">req</span>.<span style="color:#a6e22e">recaptcha</span>.<span style="color:#a6e22e">error</span>) {
-    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">recaptcha</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">req</span>.<span style="color:#a6e22e">recaptcha</span>.<span style="color:#a6e22e">data</span>;
-    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">score</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">recaptcha</span>.<span style="color:#a6e22e">score</span>;
-    <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">cookie</span>(<span style="color:#e6db74">&#39;_rbs&#39;</span>, <span style="color:#a6e22e">score</span>, {<span style="color:#a6e22e">path</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;/&#39;</span>, <span style="color:#a6e22e">maxAge</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">30</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">60</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">1000</span>});
-    <span style="color:#75715e">// Only send response if cookie does not exist or does not match the latest score
-</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">botCookie</span> <span style="color:#f92672">!==</span> <span style="color:#a6e22e">score</span>) {
-      <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">send</span>({<span style="color:#a6e22e">status</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;1&#39;</span>, <span style="color:#a6e22e">recaptcha</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">req</span>.<span style="color:#a6e22e">recaptcha</span>.<span style="color:#a6e22e">data</span>});
+app.get(<span style="color:#a50">&#39;/recaptcha/&#39;</span>, recaptcha.middleware.verify, (req, res) =&gt; {
+  <span style="color:#00a">const</span> botCookie = req.cookies._rbs;
+  res.header(<span style="color:#a50">&#39;Access-Control-Allow-Origin&#39;</span>, <span style="color:#a50">&#39;*&#39;</span>); <span style="color:#aaa;font-style:italic">// Set this to the actual domain that will be sending the requests
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#00a">if</span> (!req.recaptcha.error) {
+    <span style="color:#00a">const</span> recaptcha = req.recaptcha.data;
+    <span style="color:#00a">const</span> score = recaptcha.score;
+    res.cookie(<span style="color:#a50">&#39;_rbs&#39;</span>, score, {path: <span style="color:#a50">&#39;/&#39;</span>, maxAge: <span style="color:#099">30</span> * <span style="color:#099">60</span> * <span style="color:#099">1000</span>});
+    <span style="color:#aaa;font-style:italic">// Only send response if cookie does not exist or does not match the latest score
+</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">if</span> (botCookie !== score) {
+      res.send({status: <span style="color:#a50">&#39;1&#39;</span>, recaptcha: req.recaptcha.data});
     }
-  } <span style="color:#66d9ef">else</span> {
-    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">score</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">req</span>.<span style="color:#a6e22e">recaptcha</span>.<span style="color:#a6e22e">error</span>;
-    <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">cookie</span>(<span style="color:#e6db74">&#39;_rbs&#39;</span>, <span style="color:#a6e22e">score</span>, {<span style="color:#a6e22e">path</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;/&#39;</span>, <span style="color:#a6e22e">maxAge</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">30</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">60</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">1000</span>});
-    <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">send</span>({<span style="color:#a6e22e">status</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;0&#39;</span>, <span style="color:#a6e22e">recaptcha</span><span style="color:#f92672">:</span> {<span style="color:#a6e22e">score</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">score</span>}});
+  } <span style="color:#00a">else</span> {
+    <span style="color:#00a">const</span> score = req.recaptcha.error;
+    res.cookie(<span style="color:#a50">&#39;_rbs&#39;</span>, score, {path: <span style="color:#a50">&#39;/&#39;</span>, maxAge: <span style="color:#099">30</span> * <span style="color:#099">60</span> * <span style="color:#099">1000</span>});
+    res.send({status: <span style="color:#a50">&#39;0&#39;</span>, recaptcha: {score: score}});
   }
 });
 
-<span style="color:#a6e22e">app</span>.<span style="color:#a6e22e">listen</span>(<span style="color:#ae81ff">3000</span>, () =&gt; <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#39;App listening on port 3000!&#39;</span>));
+app.listen(<span style="color:#099">3000</span>, () =&gt; console.log(<span style="color:#a50">&#39;App listening on port 3000!&#39;</span>));
 </code></pre></div>
 <p>Edit lines 8 and 9 with the actual <strong>site key</strong> and <strong>secret key</strong>, respectively.</p>
 <p>Edit line 15 to allow requests only from your site (so if your site is running on <code>https://mydomain.com</code>, that's what you would add as a valid origin instead of <code>*</code>).</p>

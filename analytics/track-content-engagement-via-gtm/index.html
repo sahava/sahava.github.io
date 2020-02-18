@@ -386,90 +386,90 @@ I've had to rewrite parts of this article due to a severe limitation in utilizin
 <p>Note that there are some caveats to what you can do in Google Analytics, which depend on whether you're already using User Timings in your data collection. I'll get back to those when discussing the calculated metric you need to create.</p>
 <h2 id="1-custom-html-tag">1. Custom HTML Tag</h2>
 <p>Create a new <strong>Custom HTML Tag</strong>, give it some fancy name, and copy-paste the following code within:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
-  (<span style="color:#66d9ef">function</span>() {
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">startEngage</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Date().<span style="color:#a6e22e">getTime</span>();
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">timeEngaged</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">idleTime</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">idle</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>;
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">idleReport</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>;
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">idleTimer</span>, <span style="color:#a6e22e">reportTimer</span>;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+  (<span style="color:#00a">function</span>() {
+    <span style="color:#00a">var</span> startEngage = <span style="color:#00a">new</span> <span style="color:#0aa">Date</span>().getTime();
+    <span style="color:#00a">var</span> timeEngaged = <span style="color:#099">0</span>;
+    <span style="color:#00a">var</span> idleTime = <span style="color:#099">0</span>;
+    <span style="color:#00a">var</span> idle = <span style="color:#00a">true</span>;
+    <span style="color:#00a">var</span> idleReport = <span style="color:#00a">false</span>;
+    <span style="color:#00a">var</span> idleTimer, reportTimer;
     
-    <span style="color:#75715e">/*  Set the user as idle, and calculate the time
-</span><span style="color:#75715e">        they were non-idle */</span>
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">setIdle</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>() {
-      <span style="color:#a6e22e">idleTime</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Date().<span style="color:#a6e22e">getTime</span>();
-      <span style="color:#a6e22e">timeEngaged</span> <span style="color:#f92672">+=</span> <span style="color:#a6e22e">idleTime</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">startEngage</span>;
-      <span style="color:#a6e22e">idle</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>;
+    <span style="color:#aaa;font-style:italic">/*  Set the user as idle, and calculate the time
+</span><span style="color:#aaa;font-style:italic">        they were non-idle */</span>
+    <span style="color:#00a">var</span> setIdle = <span style="color:#00a">function</span>() {
+      idleTime = <span style="color:#00a">new</span> <span style="color:#0aa">Date</span>().getTime();
+      timeEngaged += idleTime - startEngage;
+      idle = <span style="color:#00a">true</span>;
     };
     
-    <span style="color:#75715e">/*  Reset the 5 second idle timer.
-</span><span style="color:#75715e">        If the user was idle, start the non-idle timer */</span>
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">pulse</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">evt</span>) {
-      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">idle</span>) {
-        <span style="color:#a6e22e">idle</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>;
-        <span style="color:#a6e22e">startEngage</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Date().<span style="color:#a6e22e">getTime</span>();
-        <span style="color:#a6e22e">idleReport</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>;
+    <span style="color:#aaa;font-style:italic">/*  Reset the 5 second idle timer.
+</span><span style="color:#aaa;font-style:italic">        If the user was idle, start the non-idle timer */</span>
+    <span style="color:#00a">var</span> pulse = <span style="color:#00a">function</span>(evt) {
+      <span style="color:#00a">if</span> (idle) {
+        idle = <span style="color:#00a">false</span>;
+        startEngage = <span style="color:#00a">new</span> <span style="color:#0aa">Date</span>().getTime();
+        idleReport = <span style="color:#00a">false</span>;
       }
-      window.<span style="color:#a6e22e">clearTimeout</span>(<span style="color:#a6e22e">idleTimer</span>);
-      <span style="color:#a6e22e">idleTimer</span> <span style="color:#f92672">=</span> window.<span style="color:#a6e22e">setTimeout</span>(<span style="color:#a6e22e">setIdle</span>, <span style="color:#ae81ff">5000</span>); 
+      <span style="color:#0aa">window</span>.clearTimeout(idleTimer);
+      idleTimer = <span style="color:#0aa">window</span>.setTimeout(setIdle, <span style="color:#099">5000</span>); 
     };    
     
-    <span style="color:#75715e">//  Utility function for attaching listeners to the window
-</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">addListener</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">evt</span>, <span style="color:#a6e22e">cb</span>) {
-      <span style="color:#66d9ef">if</span> (window.<span style="color:#a6e22e">addEventListener</span>) {
-        window.<span style="color:#a6e22e">addEventListener</span>(<span style="color:#a6e22e">evt</span>, <span style="color:#a6e22e">cb</span>);
-      } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (window.<span style="color:#a6e22e">attachEvent</span>) {
-        window.<span style="color:#a6e22e">attachEvent</span>(<span style="color:#e6db74">&#39;on&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">evt</span>, <span style="color:#a6e22e">cb</span>);
+    <span style="color:#aaa;font-style:italic">//  Utility function for attaching listeners to the window
+</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">var</span> addListener = <span style="color:#00a">function</span>(evt, cb) {
+      <span style="color:#00a">if</span> (<span style="color:#0aa">window</span>.addEventListener) {
+        <span style="color:#0aa">window</span>.addEventListener(evt, cb);
+      } <span style="color:#00a">else</span> <span style="color:#00a">if</span> (<span style="color:#0aa">window</span>.attachEvent) {
+        <span style="color:#0aa">window</span>.attachEvent(<span style="color:#a50">&#39;on&#39;</span> + evt, cb);
       }
     };
     
-    <span style="color:#75715e">/* Push an event to dataLayer every 15 seconds
-</span><span style="color:#75715e">       unless the user is idle.
-</span><span style="color:#75715e">       Also, push an event when the user leaves the page */</span>
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">report</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">evt</span>) {
-      <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">idle</span>) {
-        <span style="color:#a6e22e">timeEngaged</span> <span style="color:#f92672">+=</span> <span style="color:#66d9ef">new</span> Date().<span style="color:#a6e22e">getTime</span>() <span style="color:#f92672">-</span> <span style="color:#a6e22e">startEngage</span>;
+    <span style="color:#aaa;font-style:italic">/* Push an event to dataLayer every 15 seconds
+</span><span style="color:#aaa;font-style:italic">       unless the user is idle.
+</span><span style="color:#aaa;font-style:italic">       Also, push an event when the user leaves the page */</span>
+    <span style="color:#00a">var</span> report = <span style="color:#00a">function</span>(evt) {
+      <span style="color:#00a">if</span> (!idle) {
+        timeEngaged += <span style="color:#00a">new</span> <span style="color:#0aa">Date</span>().getTime() - startEngage;
       }
 
-      <span style="color:#75715e">// Push the payload to dataLayer, and only push valid time values
-</span><span style="color:#75715e"></span>      <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">idleReport</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">timeEngaged</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">timeEngaged</span> <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">3600000</span>) { 
-	    window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
-    	  <span style="color:#e6db74">&#39;event&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;nonIdle&#39;</span>,
-          <span style="color:#e6db74">&#39;nonIdleTimeElapsed&#39;</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">timeEngaged</span>
+      <span style="color:#aaa;font-style:italic">// Push the payload to dataLayer, and only push valid time values
+</span><span style="color:#aaa;font-style:italic"></span>      <span style="color:#00a">if</span> (!idleReport &amp;&amp; timeEngaged &gt; <span style="color:#099">0</span> &amp;&amp; timeEngaged &lt; <span style="color:#099">3600000</span>) { 
+	    <span style="color:#0aa">window</span>.dataLayer.push({
+    	  <span style="color:#a50">&#39;event&#39;</span> : <span style="color:#a50">&#39;nonIdle&#39;</span>,
+          <span style="color:#a50">&#39;nonIdleTimeElapsed&#39;</span> : timeEngaged
         });
       }
-      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">idle</span>) {
-        <span style="color:#a6e22e">idleReport</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>;
+      <span style="color:#00a">if</span> (idle) {
+        idleReport = <span style="color:#00a">true</span>;
       }
       
-      <span style="color:#75715e">// Fix possible beforeunload duplication problem
-</span><span style="color:#75715e"></span>      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">evt</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">evt</span>.<span style="color:#a6e22e">type</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#39;beforeunload&#39;</span>) {
-	    window.<span style="color:#a6e22e">removeEventListener</span>(<span style="color:#e6db74">&#39;beforeunload&#39;</span>, <span style="color:#a6e22e">report</span>);
+      <span style="color:#aaa;font-style:italic">// Fix possible beforeunload duplication problem
+</span><span style="color:#aaa;font-style:italic"></span>      <span style="color:#00a">if</span> (evt &amp;&amp; evt.type === <span style="color:#a50">&#39;beforeunload&#39;</span>) {
+	    <span style="color:#0aa">window</span>.removeEventListener(<span style="color:#a50">&#39;beforeunload&#39;</span>, report);
       }
-      <span style="color:#a6e22e">timeEngaged</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
-      <span style="color:#a6e22e">startEngage</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Date().<span style="color:#a6e22e">getTime</span>();
-      <span style="color:#a6e22e">reportTimer</span> <span style="color:#f92672">=</span> window.<span style="color:#a6e22e">setTimeout</span>(<span style="color:#a6e22e">report</span>, <span style="color:#ae81ff">15000</span>);
+      timeEngaged = <span style="color:#099">0</span>;
+      startEngage = <span style="color:#00a">new</span> <span style="color:#0aa">Date</span>().getTime();
+      reportTimer = <span style="color:#0aa">window</span>.setTimeout(report, <span style="color:#099">15000</span>);
     };
     
-    <span style="color:#a6e22e">addListener</span>(<span style="color:#e6db74">&#39;mousedown&#39;</span>, <span style="color:#a6e22e">pulse</span>);
-    <span style="color:#a6e22e">addListener</span>(<span style="color:#e6db74">&#39;keydown&#39;</span>, <span style="color:#a6e22e">pulse</span>);
-    <span style="color:#a6e22e">addListener</span>(<span style="color:#e6db74">&#39;scroll&#39;</span>, <span style="color:#a6e22e">pulse</span>);
-    <span style="color:#a6e22e">addListener</span>(<span style="color:#e6db74">&#39;mousemove&#39;</span>, <span style="color:#a6e22e">pulse</span>);
-    <span style="color:#a6e22e">addListener</span>(<span style="color:#e6db74">&#39;beforeunload&#39;</span>, <span style="color:#a6e22e">report</span>);
-    <span style="color:#a6e22e">idleTimer</span> <span style="color:#f92672">=</span> window.<span style="color:#a6e22e">setTimeout</span>(<span style="color:#a6e22e">setIdle</span>, <span style="color:#ae81ff">5000</span>);
-    <span style="color:#a6e22e">reportTimer</span> <span style="color:#f92672">=</span> window.<span style="color:#a6e22e">setTimeout</span>(<span style="color:#a6e22e">report</span>, <span style="color:#ae81ff">15000</span>);
+    addListener(<span style="color:#a50">&#39;mousedown&#39;</span>, pulse);
+    addListener(<span style="color:#a50">&#39;keydown&#39;</span>, pulse);
+    addListener(<span style="color:#a50">&#39;scroll&#39;</span>, pulse);
+    addListener(<span style="color:#a50">&#39;mousemove&#39;</span>, pulse);
+    addListener(<span style="color:#a50">&#39;beforeunload&#39;</span>, report);
+    idleTimer = <span style="color:#0aa">window</span>.setTimeout(setIdle, <span style="color:#099">5000</span>);
+    reportTimer = <span style="color:#0aa">window</span>.setTimeout(report, <span style="color:#099">15000</span>);
   })();
-&lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
+&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
 <p>Let's take a look at the script, just briefly and superficially, so that you have an idea of what you're doing.</p>
 <p>At the very end, you have the following lines:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">addListener</span>(<span style="color:#e6db74">&#39;mousedown&#39;</span>, <span style="color:#a6e22e">pulse</span>);
-<span style="color:#a6e22e">addListener</span>(<span style="color:#e6db74">&#39;keydown&#39;</span>, <span style="color:#a6e22e">pulse</span>);
-<span style="color:#a6e22e">addListener</span>(<span style="color:#e6db74">&#39;scroll&#39;</span>, <span style="color:#a6e22e">pulse</span>);
-<span style="color:#a6e22e">addListener</span>(<span style="color:#e6db74">&#39;mousemove&#39;</span>, <span style="color:#a6e22e">pulse</span>);
-<span style="color:#a6e22e">addListener</span>(<span style="color:#e6db74">&#39;beforeunload&#39;</span>, <span style="color:#a6e22e">report</span>);
-<span style="color:#a6e22e">idleTimer</span> <span style="color:#f92672">=</span> window.<span style="color:#a6e22e">setTimeout</span>(<span style="color:#a6e22e">setIdle</span>, <span style="color:#ae81ff">5000</span>);
-<span style="color:#a6e22e">reportTimer</span> <span style="color:#f92672">=</span> window.<span style="color:#a6e22e">setTimeout</span>(<span style="color:#a6e22e">report</span>, <span style="color:#ae81ff">15000</span>);
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">addListener(<span style="color:#a50">&#39;mousedown&#39;</span>, pulse);
+addListener(<span style="color:#a50">&#39;keydown&#39;</span>, pulse);
+addListener(<span style="color:#a50">&#39;scroll&#39;</span>, pulse);
+addListener(<span style="color:#a50">&#39;mousemove&#39;</span>, pulse);
+addListener(<span style="color:#a50">&#39;beforeunload&#39;</span>, report);
+idleTimer = <span style="color:#0aa">window</span>.setTimeout(setIdle, <span style="color:#099">5000</span>);
+reportTimer = <span style="color:#0aa">window</span>.setTimeout(report, <span style="color:#099">15000</span>);
 </code></pre></div>
 <p>Here, you're binding the events <strong>mousedown</strong> (when a mouse button is depressed), <strong>keydown</strong> (when a key is depressed), <strong>scroll</strong> (when the page is scrolled), and <strong>mousemove</strong> (when the mouse is moved) to send a <em>pulse</em> that the user is engaged. If there's a <strong>5000 millisecond</strong> (5 second) delay between pulses, the user is set as idle.</p>
 <p>Finally, every 15 seconds the cumulative engaged time is sent to Google Analytics, resetting the time engaged for the next 15 second stretch.</p>

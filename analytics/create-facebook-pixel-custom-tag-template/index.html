@@ -358,8 +358,24 @@
       <ul>
         <li><a href="#what-youll-end-up-with">What you'll end up with</a></li>
         <li><a href="#step-1-add-template-information">Step 1: Add template information</a></li>
-        <li><a href="#step-2-add-fields">Step 2: Add fields</a></li>
-        <li><a href="#step-3-edit-code">Step 3: Edit code</a></li>
+        <li><a href="#step-2-add-fields">Step 2: Add fields</a>
+          <ul>
+            <li><a href="#field-1-text-input-named-pixelid">Field 1: Text Input named pixelId</a></li>
+            <li><a href="#field-2-drop-down-menu-named-eventname">Field 2: Drop-down Menu named eventName</a></li>
+            <li><a href="#field-3-group-named-objectproperties">Field 3: Group named objectProperties</a></li>
+            <li><a href="#field-4-group-named-moresettings">Field 4: Group named moreSettings</a></li>
+          </ul>
+        </li>
+        <li><a href="#step-3-edit-code">Step 3: Edit code</a>
+          <ul>
+            <li><a href="#initialize-the-necessary-apis">Initialize the necessary APIs</a></li>
+            <li><a href="#fetch-list-of-initialized-ids">Fetch list of initialized IDs</a></li>
+            <li><a href="#utility-to-fetch-the-proper-global-fbq-method">Utility to fetch the proper global fbq method</a></li>
+            <li><a href="#prepare-the-fbq-command">Prepare the fbq command</a></li>
+            <li><a href="#cycle-through-all-pixel-ids-defined-in-tag-and-dispatch-the-commands">Cycle through all Pixel IDs defined in tag, and dispatch the commands</a></li>
+            <li><a href="#load-the-facebook-sdk">Load the Facebook SDK</a></li>
+          </ul>
+        </li>
         <li><a href="#step-4-permissions">Step 4: Permissions</a></li>
         <li><a href="#test-it">Test it!</a></li>
       </ul>
@@ -632,83 +648,83 @@
 </ol>
 <h3 id="step-3-edit-code">Step 3: Edit code</h3>
 <p>Step on over to the <strong>Code editor</strong> tab, and replace the contents with the following JavaScript:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">createQueue</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;createQueue&#39;</span>);
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">callInWindow</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;callInWindow&#39;</span>);
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">aliasInWindow</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;aliasInWindow&#39;</span>);
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">copyFromWindow</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;copyFromWindow&#39;</span>);
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">setInWindow</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;setInWindow&#39;</span>);
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">injectScript</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;injectScript&#39;</span>);
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">makeTableMap</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;makeTableMap&#39;</span>);
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">const</span> createQueue = require(<span style="color:#a50">&#39;createQueue&#39;</span>);
+<span style="color:#00a">const</span> callInWindow = require(<span style="color:#a50">&#39;callInWindow&#39;</span>);
+<span style="color:#00a">const</span> aliasInWindow = require(<span style="color:#a50">&#39;aliasInWindow&#39;</span>);
+<span style="color:#00a">const</span> copyFromWindow = require(<span style="color:#a50">&#39;copyFromWindow&#39;</span>);
+<span style="color:#00a">const</span> setInWindow = require(<span style="color:#a50">&#39;setInWindow&#39;</span>);
+<span style="color:#00a">const</span> injectScript = require(<span style="color:#a50">&#39;injectScript&#39;</span>);
+<span style="color:#00a">const</span> makeTableMap = require(<span style="color:#a50">&#39;makeTableMap&#39;</span>);
 
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">initIds</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">copyFromWindow</span>(<span style="color:#e6db74">&#39;_fbq_gtm_ids&#39;</span>) <span style="color:#f92672">||</span> [];
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">pixelIds</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">pixelId</span>;
+<span style="color:#00a">const</span> initIds = copyFromWindow(<span style="color:#a50">&#39;_fbq_gtm_ids&#39;</span>) || [];
+<span style="color:#00a">const</span> pixelIds = data.pixelId;
 
-<span style="color:#75715e">// Utility function to use either fbq.queue[]
-</span><span style="color:#75715e"></span><span style="color:#75715e">// (if the FB SDK hasn&#39;t loaded yet), or fbq.callMethod()
-</span><span style="color:#75715e"></span><span style="color:#75715e">// if the SDK has loaded.
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">getFbq</span> <span style="color:#f92672">=</span> () =&gt; {
-  <span style="color:#75715e">// Return the existing &#39;fbq&#39; global method if available
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">fbq</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">copyFromWindow</span>(<span style="color:#e6db74">&#39;fbq&#39;</span>);
-  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">fbq</span>) {
-    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">fbq</span>;
+<span style="color:#aaa;font-style:italic">// Utility function to use either fbq.queue[]
+</span><span style="color:#aaa;font-style:italic"></span><span style="color:#aaa;font-style:italic">// (if the FB SDK hasn&#39;t loaded yet), or fbq.callMethod()
+</span><span style="color:#aaa;font-style:italic"></span><span style="color:#aaa;font-style:italic">// if the SDK has loaded.
+</span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">const</span> getFbq = () =&gt; {
+  <span style="color:#aaa;font-style:italic">// Return the existing &#39;fbq&#39; global method if available
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#00a">const</span> fbq = copyFromWindow(<span style="color:#a50">&#39;fbq&#39;</span>);
+  <span style="color:#00a">if</span> (fbq) {
+    <span style="color:#00a">return</span> fbq;
   }
   
-  <span style="color:#75715e">// Initialize the &#39;fbq&#39; global method to either use
-</span><span style="color:#75715e"></span>  <span style="color:#75715e">// fbq.callMethod or fbq.queue)
-</span><span style="color:#75715e"></span>  <span style="color:#a6e22e">setInWindow</span>(<span style="color:#e6db74">&#39;fbq&#39;</span>, <span style="color:#66d9ef">function</span>() {    
-    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">callMethod</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">copyFromWindow</span>(<span style="color:#e6db74">&#39;fbq.callMethod.apply&#39;</span>);
-    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">callMethod</span>) {           
-      <span style="color:#a6e22e">callInWindow</span>(<span style="color:#e6db74">&#39;fbq.callMethod.apply&#39;</span>, <span style="color:#66d9ef">null</span>, <span style="color:#a6e22e">arguments</span>); 
-    } <span style="color:#66d9ef">else</span> {       
-      <span style="color:#a6e22e">callInWindow</span>(<span style="color:#e6db74">&#39;fbq.queue.push&#39;</span>, <span style="color:#a6e22e">arguments</span>);
+  <span style="color:#aaa;font-style:italic">// Initialize the &#39;fbq&#39; global method to either use
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#aaa;font-style:italic">// fbq.callMethod or fbq.queue)
+</span><span style="color:#aaa;font-style:italic"></span>  setInWindow(<span style="color:#a50">&#39;fbq&#39;</span>, <span style="color:#00a">function</span>() {    
+    <span style="color:#00a">const</span> callMethod = copyFromWindow(<span style="color:#a50">&#39;fbq.callMethod.apply&#39;</span>);
+    <span style="color:#00a">if</span> (callMethod) {           
+      callInWindow(<span style="color:#a50">&#39;fbq.callMethod.apply&#39;</span>, <span style="color:#00a">null</span>, arguments); 
+    } <span style="color:#00a">else</span> {       
+      callInWindow(<span style="color:#a50">&#39;fbq.queue.push&#39;</span>, arguments);
     }
   });
-  <span style="color:#a6e22e">aliasInWindow</span>(<span style="color:#e6db74">&#39;_fbq&#39;</span>, <span style="color:#e6db74">&#39;fbq&#39;</span>);
+  aliasInWindow(<span style="color:#a50">&#39;_fbq&#39;</span>, <span style="color:#a50">&#39;fbq&#39;</span>);
   
-  <span style="color:#75715e">// Create the fbq.queue
-</span><span style="color:#75715e"></span>  <span style="color:#a6e22e">createQueue</span>(<span style="color:#e6db74">&#39;fbq.queue&#39;</span>);
+  <span style="color:#aaa;font-style:italic">// Create the fbq.queue
+</span><span style="color:#aaa;font-style:italic"></span>  createQueue(<span style="color:#a50">&#39;fbq.queue&#39;</span>);
     
-  <span style="color:#75715e">// Return the global &#39;fbq&#39; method, created above
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">copyFromWindow</span>(<span style="color:#e6db74">&#39;fbq&#39;</span>);
+  <span style="color:#aaa;font-style:italic">// Return the global &#39;fbq&#39; method, created above
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#00a">return</span> copyFromWindow(<span style="color:#a50">&#39;fbq&#39;</span>);
 };
 
-<span style="color:#75715e">// Get reference to the global method
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">fbq</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">getFbq</span>();
+<span style="color:#aaa;font-style:italic">// Get reference to the global method
+</span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">const</span> fbq = getFbq();
 
-<span style="color:#75715e">// Build the fbq() command arguments
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">props</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">propertyList</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">makeTableMap</span>(<span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">propertyList</span>, <span style="color:#e6db74">&#39;name&#39;</span>, <span style="color:#e6db74">&#39;value&#39;</span>) <span style="color:#f92672">:</span> {};
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">command</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">eventName</span> <span style="color:#f92672">!==</span> <span style="color:#e6db74">&#39;Custom&#39;</span> <span style="color:#f92672">?</span> <span style="color:#e6db74">&#39;trackSingle&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;trackSingleCustom&#39;</span>;
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">eventName</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">eventName</span> <span style="color:#f92672">!==</span> <span style="color:#e6db74">&#39;Custom&#39;</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">eventName</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">customEventName</span>;
+<span style="color:#aaa;font-style:italic">// Build the fbq() command arguments
+</span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">const</span> props = data.propertyList ? makeTableMap(data.propertyList, <span style="color:#a50">&#39;name&#39;</span>, <span style="color:#a50">&#39;value&#39;</span>) : {};
+<span style="color:#00a">const</span> command = data.eventName !== <span style="color:#a50">&#39;Custom&#39;</span> ? <span style="color:#a50">&#39;trackSingle&#39;</span> : <span style="color:#a50">&#39;trackSingleCustom&#39;</span>;
+<span style="color:#00a">const</span> eventName = data.eventName !== <span style="color:#a50">&#39;Custom&#39;</span> ? data.eventName : data.customEventName;
 
-<span style="color:#75715e">// Handle multiple, comma-separated pixel IDs,
-</span><span style="color:#75715e"></span><span style="color:#75715e">// and initialize each ID if not done already.
-</span><span style="color:#75715e"></span><span style="color:#a6e22e">pixelIds</span>.<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#39;,&#39;</span>).<span style="color:#a6e22e">forEach</span>(<span style="color:#a6e22e">pixelId</span> =&gt; {
-  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">initIds</span>.<span style="color:#a6e22e">indexOf</span>(<span style="color:#a6e22e">pixelId</span>) <span style="color:#f92672">===</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>) {
+<span style="color:#aaa;font-style:italic">// Handle multiple, comma-separated pixel IDs,
+</span><span style="color:#aaa;font-style:italic"></span><span style="color:#aaa;font-style:italic">// and initialize each ID if not done already.
+</span><span style="color:#aaa;font-style:italic"></span>pixelIds.split(<span style="color:#a50">&#39;,&#39;</span>).forEach(pixelId =&gt; {
+  <span style="color:#00a">if</span> (initIds.indexOf(pixelId) === -<span style="color:#099">1</span>) {
     
-    <span style="color:#75715e">// If the user has chosen to disable automatic configuration
-</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">disableAutoConfig</span>) {
-      <span style="color:#a6e22e">fbq</span>(<span style="color:#e6db74">&#39;set&#39;</span>, <span style="color:#e6db74">&#39;autoConfig&#39;</span>, <span style="color:#66d9ef">false</span>, <span style="color:#a6e22e">pixelId</span>);
+    <span style="color:#aaa;font-style:italic">// If the user has chosen to disable automatic configuration
+</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">if</span> (data.disableAutoConfig) {
+      fbq(<span style="color:#a50">&#39;set&#39;</span>, <span style="color:#a50">&#39;autoConfig&#39;</span>, <span style="color:#00a">false</span>, pixelId);
     }
 
-    <span style="color:#75715e">// Initialize pixel and store in global array
-</span><span style="color:#75715e"></span>    <span style="color:#a6e22e">fbq</span>(<span style="color:#e6db74">&#39;init&#39;</span>, <span style="color:#a6e22e">pixelId</span>);
-    <span style="color:#a6e22e">initIds</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">pixelId</span>);
-    <span style="color:#a6e22e">setInWindow</span>(<span style="color:#e6db74">&#39;_fbq_gtm_ids&#39;</span>, <span style="color:#a6e22e">initIds</span>, <span style="color:#66d9ef">true</span>);
+    <span style="color:#aaa;font-style:italic">// Initialize pixel and store in global array
+</span><span style="color:#aaa;font-style:italic"></span>    fbq(<span style="color:#a50">&#39;init&#39;</span>, pixelId);
+    initIds.push(pixelId);
+    setInWindow(<span style="color:#a50">&#39;_fbq_gtm_ids&#39;</span>, initIds, <span style="color:#00a">true</span>);
     
   }
   
-  <span style="color:#75715e">// Call the fbq() method with the parameters defined earlier
-</span><span style="color:#75715e"></span>  <span style="color:#a6e22e">fbq</span>(<span style="color:#a6e22e">command</span>, <span style="color:#a6e22e">pixelId</span>, <span style="color:#a6e22e">eventName</span>, <span style="color:#a6e22e">props</span>);
+  <span style="color:#aaa;font-style:italic">// Call the fbq() method with the parameters defined earlier
+</span><span style="color:#aaa;font-style:italic"></span>  fbq(command, pixelId, eventName, props);
 });
 
-<span style="color:#a6e22e">injectScript</span>(<span style="color:#e6db74">&#39;https://connect.facebook.net/en_US/fbevents.js&#39;</span>, <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">gtmOnSuccess</span>, <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">gtmOnFailure</span>, <span style="color:#e6db74">&#39;fbPixel&#39;</span>);
+injectScript(<span style="color:#a50">&#39;https://connect.facebook.net/en_US/fbevents.js&#39;</span>, data.gtmOnSuccess, data.gtmOnFailure, <span style="color:#a50">&#39;fbPixel&#39;</span>);
 </code></pre></div>
 <p>At this point, it's a good idea to take a short breather.</p>
 <p>If you take a close look at the code, you'll see that it's far more complex than what the Facebook pixel snippet is. The reason for this is the <a href="https://www.simoahava.com/analytics/custom-templates-guide-for-google-tag-manager/#sandboxed-javascript">sandboxed JavaScript</a> that custom templates use. For example, the Facebook snippet creates the global <code>fbq()</code> method with something like:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">window.<span style="color:#a6e22e">fbq</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>() {
-  window.<span style="color:#a6e22e">fbq</span>.<span style="color:#a6e22e">callMethod</span> <span style="color:#f92672">?</span> 
-    window.<span style="color:#a6e22e">fbq</span>.<span style="color:#a6e22e">callMethod</span>.<span style="color:#a6e22e">apply</span>(window.<span style="color:#a6e22e">fbq</span>, <span style="color:#a6e22e">arguments</span>) <span style="color:#f92672">:</span>
-    window.<span style="color:#a6e22e">fbq</span>.<span style="color:#a6e22e">queue</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">arguments</span>);
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#0aa">window</span>.fbq = <span style="color:#00a">function</span>() {
+  <span style="color:#0aa">window</span>.fbq.callMethod ? 
+    <span style="color:#0aa">window</span>.fbq.callMethod.apply(<span style="color:#0aa">window</span>.fbq, arguments) :
+    <span style="color:#0aa">window</span>.fbq.queue.push(arguments);
 }
 </code></pre></div>
 <p>It's a very simple piece of code, which simply passes the arguments you provide to <code>fbq()</code> (e.g. <code>'track', 'PageView'</code>) to one of two places, depending on whether the SDK has loaded yet or not.</p>
@@ -716,26 +732,26 @@
 <p>So, let's go over block by block to understand what the code does.</p>
 <h4 id="initialize-the-necessary-apis">Initialize the necessary APIs</h4>
 <p>This script needs a handful of APIs, which are initialized with the <code>require()</code> API:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">createQueue</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;createQueue&#39;</span>);
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">callInWindow</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;callInWindow&#39;</span>);
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">aliasInWindow</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;aliasInWindow&#39;</span>);
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">copyFromWindow</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;copyFromWindow&#39;</span>);
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">setInWindow</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;setInWindow&#39;</span>);
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">injectScript</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;injectScript&#39;</span>);
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">makeTableMap</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;makeTableMap&#39;</span>);
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">const</span> createQueue = require(<span style="color:#a50">&#39;createQueue&#39;</span>);
+<span style="color:#00a">const</span> callInWindow = require(<span style="color:#a50">&#39;callInWindow&#39;</span>);
+<span style="color:#00a">const</span> aliasInWindow = require(<span style="color:#a50">&#39;aliasInWindow&#39;</span>);
+<span style="color:#00a">const</span> copyFromWindow = require(<span style="color:#a50">&#39;copyFromWindow&#39;</span>);
+<span style="color:#00a">const</span> setInWindow = require(<span style="color:#a50">&#39;setInWindow&#39;</span>);
+<span style="color:#00a">const</span> injectScript = require(<span style="color:#a50">&#39;injectScript&#39;</span>);
+<span style="color:#00a">const</span> makeTableMap = require(<span style="color:#a50">&#39;makeTableMap&#39;</span>);
 </code></pre></div>
 <p>I'll explain how they function when we encounter them in the code.</p>
 <h4 id="fetch-list-of-initialized-ids">Fetch list of initialized IDs</h4>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">initIds</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">copyFromWindow</span>(<span style="color:#e6db74">&#39;_fbq_gtm_ids&#39;</span>) <span style="color:#f92672">||</span> [];
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">pixelIds</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">pixelId</span>;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">const</span> initIds = copyFromWindow(<span style="color:#a50">&#39;_fbq_gtm_ids&#39;</span>) || [];
+<span style="color:#00a">const</span> pixelIds = data.pixelId;
 </code></pre></div>
 <p>Here we fetch the list of initialized IDs (stored in a custom <code>_fbq_gtm_ids</code> global array), and we also pull in the value, input by the user, of the <code>pixelId</code> field from the template itself.</p>
 <h4 id="utility-to-fetch-the-proper-global-fbq-method">Utility to fetch the proper global <code>fbq</code> method</h4>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">getFbq</span> <span style="color:#f92672">=</span> () =&gt; {
-  <span style="color:#75715e">// Return the existing &#39;fbq&#39; global method if available
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">fbq</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">copyFromWindow</span>(<span style="color:#e6db74">&#39;fbq&#39;</span>);
-  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">fbq</span>) {
-    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">fbq</span>;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">const</span> getFbq = () =&gt; {
+  <span style="color:#aaa;font-style:italic">// Return the existing &#39;fbq&#39; global method if available
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#00a">const</span> fbq = copyFromWindow(<span style="color:#a50">&#39;fbq&#39;</span>);
+  <span style="color:#00a">if</span> (fbq) {
+    <span style="color:#00a">return</span> fbq;
   }
   ...
 </code></pre></div>
@@ -745,51 +761,51 @@
 <p>The purpose of <code>getFbq</code> is to return a representation of the global <code>fbq</code> method, which passes the arguments to the correct place, similar to how the regular Facebook snippet works.</p>
 <p>The first lines check if <code>fbq</code> has already been created globally, and returns the global method in that case.</p>
 <p>In case the global method does <strong>not</strong> exist, it needs to be created.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">  ...
-  <span style="color:#a6e22e">setInWindow</span>(<span style="color:#e6db74">&#39;fbq&#39;</span>, <span style="color:#66d9ef">function</span>() {    
-    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">callMethod</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">copyFromWindow</span>(<span style="color:#e6db74">&#39;fbq.callMethod.apply&#39;</span>);
-    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">callMethod</span>) {           
-      <span style="color:#a6e22e">callInWindow</span>(<span style="color:#e6db74">&#39;fbq.callMethod.apply&#39;</span>, <span style="color:#66d9ef">null</span>, <span style="color:#a6e22e">arguments</span>); 
-    } <span style="color:#66d9ef">else</span> {       
-      <span style="color:#a6e22e">callInWindow</span>(<span style="color:#e6db74">&#39;fbq.queue.push&#39;</span>, <span style="color:#a6e22e">arguments</span>);
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">  ...
+  setInWindow(<span style="color:#a50">&#39;fbq&#39;</span>, <span style="color:#00a">function</span>() {    
+    <span style="color:#00a">const</span> callMethod = copyFromWindow(<span style="color:#a50">&#39;fbq.callMethod.apply&#39;</span>);
+    <span style="color:#00a">if</span> (callMethod) {           
+      callInWindow(<span style="color:#a50">&#39;fbq.callMethod.apply&#39;</span>, <span style="color:#00a">null</span>, arguments); 
+    } <span style="color:#00a">else</span> {       
+      callInWindow(<span style="color:#a50">&#39;fbq.queue.push&#39;</span>, arguments);
     }
   });
-  <span style="color:#a6e22e">aliasInWindow</span>(<span style="color:#e6db74">&#39;_fbq&#39;</span>, <span style="color:#e6db74">&#39;fbq&#39;</span>);
+  aliasInWindow(<span style="color:#a50">&#39;_fbq&#39;</span>, <span style="color:#a50">&#39;fbq&#39;</span>);
   ...
 </code></pre></div>
 <p>Here, the global <code>fbq</code> method is initialized as a new function. This function first checks if the <code>fbq.callMethod</code> method already exists (which means the FB SDK has loaded), and if it does, it passes the arguments sent to the <code>fbq</code> method (e.g. <code>'track', 'PageView'</code>) to this built-in method.</p>
 <p>If the <code>callMethod</code> method has <strong>not</strong> been created yet, then the method passes its arguments to <code>fbq.queue</code> as an array push. The queue is basically a waiting list for pixel request, queued up for the Facebook SDK as it loads over the network. Once the SDK has loaded, it processes the messages in this queue and dispatches them to Facebook.</p>
 <p>The last line makes an alias of the <code>fbq</code> method in another global variable, <code>_fbq</code>. I'm not certain why this is necessary, but it is what the Facebook snippet does as well.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">  ...
-  <span style="color:#a6e22e">createQueue</span>(<span style="color:#e6db74">&#39;fbq.queue&#39;</span>);
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">  ...
+  createQueue(<span style="color:#a50">&#39;fbq.queue&#39;</span>);
   
-  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">copyFromWindow</span>(<span style="color:#e6db74">&#39;fbq&#39;</span>);
+  <span style="color:#00a">return</span> copyFromWindow(<span style="color:#a50">&#39;fbq&#39;</span>);
 };
 </code></pre></div>
 <p>The last lines of the <code>setInWindow</code> API call create the <code>fbq.queue</code> global array, before finally returning the current content of the global <code>fbq</code> variable, which is the function you created above.</p>
 <h4 id="prepare-the-fbq-command">Prepare the <code>fbq</code> command</h4>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">fbq</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">getFbq</span>();
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">const</span> fbq = getFbq();
 
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">props</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">propertyList</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">makeTableMap</span>(<span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">propertyList</span>, <span style="color:#e6db74">&#39;name&#39;</span>, <span style="color:#e6db74">&#39;value&#39;</span>) <span style="color:#f92672">:</span> {};
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">command</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">eventName</span> <span style="color:#f92672">!==</span> <span style="color:#e6db74">&#39;Custom&#39;</span> <span style="color:#f92672">?</span> <span style="color:#e6db74">&#39;trackSingle&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;trackSingleCustom&#39;</span>;
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">eventName</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">eventName</span> <span style="color:#f92672">!==</span> <span style="color:#e6db74">&#39;Custom&#39;</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">eventName</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">customEventName</span>;
+<span style="color:#00a">const</span> props = data.propertyList ? makeTableMap(data.propertyList, <span style="color:#a50">&#39;name&#39;</span>, <span style="color:#a50">&#39;value&#39;</span>) : {};
+<span style="color:#00a">const</span> command = data.eventName !== <span style="color:#a50">&#39;Custom&#39;</span> ? <span style="color:#a50">&#39;trackSingle&#39;</span> : <span style="color:#a50">&#39;trackSingleCustom&#39;</span>;
+<span style="color:#00a">const</span> eventName = data.eventName !== <span style="color:#a50">&#39;Custom&#39;</span> ? data.eventName : data.customEventName;
 </code></pre></div>
 <p>These lines first fetch the latest representation of the <code>fbq</code> global method by invoking the <code>getFbq</code> function you <em>just</em> created.</p>
 <p>Next, the contents of the <code>fbq</code> command are built. The <code>makeTableMap</code> API takes your <code>propertyList</code> Simple Table field, and converts each row to a key-value pair, where the key is the first column value (e.g. <code>content_ids</code>), and the value is the second column value (e.g. <code>123456</code>). It's a really handy API for converting the template table format into what many JavaScript libraries expect.</p>
 <p>The <code>command</code> variable depends on whether you're using a standard event (e.g. PageView or Lead), in which case it is set to <code>trackSingle</code>, or whether you're using the Custom event, in which case it's set to <code>trackSingleCustom</code>.</p>
 <p>The <code>eventName</code> takes either the value of the drop-down menu selection if a standard event is selected, or the value of the <code>customEventName</code> text input field if a Custom event is selected.</p>
 <h4 id="cycle-through-all-pixel-ids-defined-in-tag-and-dispatch-the-commands">Cycle through all Pixel IDs defined in tag, and dispatch the commands</h4>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">pixelIds</span>.<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#39;,&#39;</span>).<span style="color:#a6e22e">forEach</span>(<span style="color:#a6e22e">pixelId</span> =&gt; {
-  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">initIds</span>.<span style="color:#a6e22e">indexOf</span>(<span style="color:#a6e22e">pixelId</span>) <span style="color:#f92672">===</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>) {
-    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">disableAutoConfig</span>) {
-      <span style="color:#a6e22e">fbq</span>(<span style="color:#e6db74">&#39;set&#39;</span>, <span style="color:#e6db74">&#39;autoConfig&#39;</span>, <span style="color:#66d9ef">false</span>, <span style="color:#a6e22e">pixelId</span>);
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">pixelIds.split(<span style="color:#a50">&#39;,&#39;</span>).forEach(pixelId =&gt; {
+  <span style="color:#00a">if</span> (initIds.indexOf(pixelId) === -<span style="color:#099">1</span>) {
+    <span style="color:#00a">if</span> (data.disableAutoConfig) {
+      fbq(<span style="color:#a50">&#39;set&#39;</span>, <span style="color:#a50">&#39;autoConfig&#39;</span>, <span style="color:#00a">false</span>, pixelId);
     }
-    <span style="color:#a6e22e">fbq</span>(<span style="color:#e6db74">&#39;init&#39;</span>, <span style="color:#a6e22e">pixelId</span>);
-    <span style="color:#a6e22e">initIds</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">pixelId</span>);
-    <span style="color:#a6e22e">setInWindow</span>(<span style="color:#e6db74">&#39;_fbq_gtm_ids&#39;</span>, <span style="color:#a6e22e">initIds</span>, <span style="color:#66d9ef">true</span>);
+    fbq(<span style="color:#a50">&#39;init&#39;</span>, pixelId);
+    initIds.push(pixelId);
+    setInWindow(<span style="color:#a50">&#39;_fbq_gtm_ids&#39;</span>, initIds, <span style="color:#00a">true</span>);
   }
   
-  <span style="color:#a6e22e">fbq</span>(<span style="color:#a6e22e">command</span>, <span style="color:#a6e22e">pixelId</span>, <span style="color:#a6e22e">eventName</span>, <span style="color:#a6e22e">props</span>);
+  fbq(command, pixelId, eventName, props);
 });
 </code></pre></div>
 <p>The whole command process is wrapped in an iterator, which loops through all the Pixel IDs the user has added to the tag. The commands are run identically for every single Pixel ID in the tag.</p>
@@ -799,7 +815,7 @@
 <p>Finally, the <code>fbq()</code> command is run with the parameters you created previously.</p>
 <h4 id="load-the-facebook-sdk">Load the Facebook SDK</h4>
 <p>The very last line in the code editor loads the Facebook SDK, and signals either <code>data.gtmOnSuccess()</code> or <code>data.gtmOnFailure</code>, depending on whether the SDK load was successful or not.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">injectScript</span>(<span style="color:#e6db74">&#39;https://connect.facebook.net/en_US/fbevents.js&#39;</span>, <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">gtmOnSuccess</span>, <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">gtmOnFailure</span>, <span style="color:#e6db74">&#39;fbPixel&#39;</span>);
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">injectScript(<span style="color:#a50">&#39;https://connect.facebook.net/en_US/fbevents.js&#39;</span>, data.gtmOnSuccess, data.gtmOnFailure, <span style="color:#a50">&#39;fbPixel&#39;</span>);
 </code></pre></div>
 <h3 id="step-4-permissions">Step 4: Permissions</h3>
 <p>Because you use all these APIs and mess so much with the global namespace, you'll need to add some permissions if you want the template code to run.</p>

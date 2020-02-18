@@ -340,23 +340,23 @@
 
 <p>With JavaScript's Array methods, this is easy to do. Here's a walkthrough using an actual example.</p>
 <p>Let's say you have an order receipt page on your ecommerce store, where you have implemented the following <a href="https://developers.google.com/tag-manager/enhanced-ecommerce#purchases">Enhanced Ecommerce</a> <code>purchase</code> setup:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">window.<span style="color:#a6e22e">dataLayer</span> <span style="color:#f92672">=</span> window.<span style="color:#a6e22e">dataLayer</span> <span style="color:#f92672">||</span> [];
-window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
-  <span style="color:#a6e22e">event</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;ecommerce&#39;</span>,
-  <span style="color:#a6e22e">ecommerce</span><span style="color:#f92672">:</span> {
-    <span style="color:#a6e22e">purchase</span><span style="color:#f92672">:</span> {
-      <span style="color:#a6e22e">actionField</span><span style="color:#f92672">:</span> {
-        <span style="color:#a6e22e">id</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;order1&#39;</span>,
-        <span style="color:#a6e22e">revenue</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;10.00&#39;</span>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#0aa">window</span>.dataLayer = <span style="color:#0aa">window</span>.dataLayer || [];
+<span style="color:#0aa">window</span>.dataLayer.push({
+  event: <span style="color:#a50">&#39;ecommerce&#39;</span>,
+  ecommerce: {
+    purchase: {
+      actionField: {
+        id: <span style="color:#a50">&#39;order1&#39;</span>,
+        revenue: <span style="color:#a50">&#39;10.00&#39;</span>
       },
-      <span style="color:#a6e22e">products</span><span style="color:#f92672">:</span> [{
-        <span style="color:#a6e22e">id</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;product1&#39;</span>,
-        <span style="color:#a6e22e">price</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;6.00&#39;</span>,
-        <span style="color:#a6e22e">quantity</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">1</span>
+      products: [{
+        id: <span style="color:#a50">&#39;product1&#39;</span>,
+        price: <span style="color:#a50">&#39;6.00&#39;</span>,
+        quantity: <span style="color:#099">1</span>
       },{
-        <span style="color:#a6e22e">id</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;product2&#39;</span>,
-        <span style="color:#a6e22e">price</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;4.00&#39;</span>,
-        <span style="color:#a6e22e">quantity</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">1</span>
+        id: <span style="color:#a50">&#39;product2&#39;</span>,
+        price: <span style="color:#a50">&#39;4.00&#39;</span>,
+        quantity: <span style="color:#099">1</span>
       }]
     }
   }
@@ -382,27 +382,27 @@ window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">
 
 <p>I've chosen to name this <strong>{{DLV - ecommerce.purchase.products}}</strong>.</p>
 <p>Next, you'll need a Custom JavaScript Variable where the magic happens. This variable returns an <strong>Array</strong> of all the product IDs (i.e. <code>['product1', 'product2']</code>).</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">products</span> <span style="color:#f92672">=</span> {{<span style="color:#a6e22e">DLV</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">ecommerce</span>.<span style="color:#a6e22e">purchase</span>.<span style="color:#a6e22e">products</span>}};
-  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">products</span>.<span style="color:#a6e22e">reduce</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">arr</span>, <span style="color:#a6e22e">prod</span>) { <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">arr</span>.<span style="color:#a6e22e">concat</span>(<span style="color:#a6e22e">prod</span>.<span style="color:#a6e22e">id</span>); }, []);
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() {
+  <span style="color:#00a">var</span> products = {{DLV - ecommerce.purchase.products}};
+  <span style="color:#00a">return</span> products.reduce(<span style="color:#00a">function</span>(arr, prod) { <span style="color:#00a">return</span> arr.concat(prod.id); }, []);
 }
 </code></pre></div>
 <p>The <code>reduce()</code> method basically takes an Array (the <code>products</code> Array), and for every member in the Array you can choose to increment an accumulator (an empty Array in this case) with the data of your choice. In this case, we're taking the <code>id</code> value from every item in the Array, and building a new Array with this information.</p>
 <p>If you want to turn this into a <strong>comma-separated string</strong> (i.e. <code>'product1,product2'</code>), you only need to chain another Array method to the <code>return</code> statement:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">products</span> <span style="color:#f92672">=</span> {{<span style="color:#a6e22e">DLV</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">ecommerce</span>.<span style="color:#a6e22e">purchase</span>.<span style="color:#a6e22e">products</span>}};
-  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">products</span>.<span style="color:#a6e22e">reduce</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">arr</span>, <span style="color:#a6e22e">prod</span>) { <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">arr</span>.<span style="color:#a6e22e">concat</span>(<span style="color:#a6e22e">prod</span>.<span style="color:#a6e22e">id</span>); }, []).<span style="color:#a6e22e">join</span>();
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() {
+  <span style="color:#00a">var</span> products = {{DLV - ecommerce.purchase.products}};
+  <span style="color:#00a">return</span> products.reduce(<span style="color:#00a">function</span>(arr, prod) { <span style="color:#00a">return</span> arr.concat(prod.id); }, []).join();
 }
 </code></pre></div>
 <p>The <code>join()</code> method flattens any Array into a string, using whatever you pass into the parentheses as the separator. If you don't explicitly define a delimiter, a comma is automatically used.</p>
 <p>These two functions should let you easily turn any complex Array of objects into a single, straightforward data structure - whatever you need in any given situation.</p>
 <p><strong>UPDATE</strong>: Thanks to postman31's comment below, you can also use the <code>Array.prototype.map()</code> method to perform these tasks even more elegantly.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">products</span> <span style="color:#f92672">=</span> {{<span style="color:#a6e22e">DLV</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">ecommerce</span>.<span style="color:#a6e22e">purchase</span>.<span style="color:#a6e22e">products</span>}};
-  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">products</span>.<span style="color:#a6e22e">map</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">prod</span>) { <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">prod</span>.<span style="color:#a6e22e">id</span>; });
-  <span style="color:#75715e">// OR:
-</span><span style="color:#75715e"></span>  <span style="color:#75715e">// return products.map(function(prod) { return prod.id; }).join();
-</span><span style="color:#75715e"></span>}
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() {
+  <span style="color:#00a">var</span> products = {{DLV - ecommerce.purchase.products}};
+  <span style="color:#00a">return</span> products.map(<span style="color:#00a">function</span>(prod) { <span style="color:#00a">return</span> prod.id; });
+  <span style="color:#aaa;font-style:italic">// OR:
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#aaa;font-style:italic">// return products.map(function(prod) { return prod.id; }).join();
+</span><span style="color:#aaa;font-style:italic"></span>}
 </code></pre></div>
 
               

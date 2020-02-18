@@ -364,7 +364,7 @@
 <h4 id="custom-amp-configuration">Custom AMP configuration</h4>
 <p><code>amp-analytics</code> is the component that AMP uses for tracking user interactions. If you'd like to learn more about all the features it supports, check out <a href="https://www.simoahava.com/analytics/accelerated-mobile-pages-via-google-tag-manager/">the AMP for GTM guide in this blog</a>; it should have all the information you need.</p>
 <p>For our purposes, let's focus on the <code>config</code> attribute. It's an optional attribute that we can use to tell AMP: <em>&ldquo;Hey, we've got some additional configurations that we need to you fetch from this location&rdquo;</em>. This attribute should be set to a URL where additional analytics configurations should be retrieved from. In other words, you need to specify an HTTP request endpoint which returns a valid, <a href="https://www.ampproject.org/docs/reference/components/amp-analytics">AMP-compliant JSON</a> configuration file.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">amp-analytics</span> <span style="color:#a6e22e">config</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;//example.com/analytics.config.json&#34;</span>&gt;&lt;/<span style="color:#f92672">amp-analytics</span>&gt;</code></pre></div>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">amp-analytics</span> <span style="color:#1e90ff">config</span>=<span style="color:#a50">&#34;//example.com/analytics.config.json&#34;</span>&gt;&lt;/<span style="color:#1e90ff;font-weight:bold">amp-analytics</span>&gt;</code></pre></div>
 <p>Once the browser has loaded the AMP page, and the page is visible in the browser window, AMP will fetch this external configuration file and use it to supplement any configurations that might already be established on the page. Unlike other resources in your content, your <code>amp-analytics</code> config will always point to your server and the result isn't automatically cached. When the request to your server comes in, it will include all of the cookies set on the user's browser on your domain.</p>
 <p><strong>NOTE!</strong> If, and when, your content is served through the Google AMP Cache, any external configuration <strong>must be downloaded from an HTTPS source</strong>. Thus if your web server is behind HTTP, you'll need to either only serve your custom configuration when visitors are on your domain OR use just the default configuration template instead. Or, you know, switch to HTTPS as soon as possible.</p>
 <h4 id="grabbing-the--ga-cookie">Grabbing the <code>_ga</code> cookie</h4>
@@ -374,9 +374,9 @@
 <p>You can then leverage the <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie"><code>Set-Cookie</code></a> header in the HTTP Response, and instruct the browser to store the new Client ID in a <code>_ga</code> cookie, making sure to set the domain, path, and expiration date to match the domain the request originated from (e.g. <code>cdn.ampproject.org</code>), just like analytics.js does. You'll need to add the same <strong>GA1.X.</strong> prefix that GA uses, too. Furthermore, you'll need to do this on <em>every single</em> request, so that the lifetime of the <code>_ga</code> cookie continues to be extended on each page load. The <code>Set-Cookie</code> should end up looking something like this:</p>
 <p><code>Set-Cookie:</code> _ga=GA1.1.18347199128.1478727498; Domain=example.com; Path=/; Expires=Sat, 10 Nov 2018 21:06:48 GMT;</p>
 <p>Finally, you can return the Client ID in the JSON response as a custom AMP variable for use with our AMP requests:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">{
-  <span style="color:#f92672">&#34;vars&#34;</span>: {
-    <span style="color:#f92672">&#34;clientId&#34;</span>: <span style="color:#e6db74">&#34;18347199128.1478727498&#34;</span>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">{
+  <span style="color:#1e90ff;font-weight:bold">&#34;vars&#34;</span>: {
+    <span style="color:#1e90ff;font-weight:bold">&#34;clientId&#34;</span>: <span style="color:#a50">&#34;18347199128.1478727498&#34;</span>
   }
 }</code></pre></div>
 <h4 id="checklist-for-setting-up-the-request-handler">Checklist for setting up the request handler</h4>
@@ -433,45 +433,45 @@
 <h2 id="google-tag-manager-proxy-using-nodejs">Google Tag Manager proxy using NodeJS</h2>
 <p>As Simo covered in his <a href="https://www.simoahava.com/analytics/accelerated-mobile-pages-via-google-tag-manager/">GTM/AMP guide</a>, Google Tag Manager allows us to build Tags and Triggers in a web UI, then compile those down into a JSON configuration in the format AMP expects. If we used the standard GTM implementation, however, the container request is done directly to GTM's server, which means our custom API wouldn't be able to serve the proper Client ID. That said, you can still combine both techniques. You've just got to roll up your sleeves a little.</p>
 <p>Here's a truncated example, using <a href="https://nodejs.org/en/">Node</a> and <a href="http://expressjs.com/">Express</a>. For the complete code, <a href="https://github.com/DanWilkerson/amp-config-example">visit this GitHub repository</a>.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">app</span>.<span style="color:#a6e22e">get</span>(<span style="color:#e6db74">&#39;/gtm-analytics.config.json&#39;</span>, (<span style="color:#a6e22e">req</span>, <span style="color:#a6e22e">res</span>) =&gt; {
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">app.get(<span style="color:#a50">&#39;/gtm-analytics.config.json&#39;</span>, (req, res) =&gt; {
 
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">domain</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">req</span>.<span style="color:#a6e22e">headers</span>.<span style="color:#a6e22e">host</span>.<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#39;:&#39;</span>)[<span style="color:#ae81ff">0</span>]
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">gaCookie</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">req</span>.<span style="color:#a6e22e">cookies</span>.<span style="color:#a6e22e">_ga</span> <span style="color:#f92672">||</span> <span style="color:#a6e22e">generateGaCookie</span>(<span style="color:#a6e22e">domain</span>)
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">clientId</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">parseClientIdFromGaCookie</span>(<span style="color:#a6e22e">gaCookie</span>)
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">cookieString</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">generateCookieString</span>({
-    <span style="color:#a6e22e">name</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;_ga&#39;</span>,
-    <span style="color:#a6e22e">value</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">gaCookie</span>,
-    <span style="color:#a6e22e">domain</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">domain</span>.<span style="color:#a6e22e">replace</span>(<span style="color:#e6db74">&#39;www.&#39;</span>, <span style="color:#e6db74">&#39;&#39;</span>),
-    <span style="color:#a6e22e">path</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;/&#39;</span>,
-    <span style="color:#a6e22e">expires</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">new</span> Date(<span style="color:#ae81ff">1000</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">60</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">60</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">24</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">365</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">2</span> <span style="color:#f92672">+</span> (<span style="color:#f92672">+</span><span style="color:#66d9ef">new</span> Date)).<span style="color:#a6e22e">toGMTString</span>()
+  <span style="color:#00a">const</span> domain = req.headers.host.split(<span style="color:#a50">&#39;:&#39;</span>)[<span style="color:#099">0</span>]
+  <span style="color:#00a">const</span> gaCookie = req.cookies._ga || generateGaCookie(domain)
+  <span style="color:#00a">const</span> clientId = parseClientIdFromGaCookie(gaCookie)
+  <span style="color:#00a">const</span> cookieString = generateCookieString({
+    name: <span style="color:#a50">&#39;_ga&#39;</span>,
+    value: gaCookie,
+    domain: domain.replace(<span style="color:#a50">&#39;www.&#39;</span>, <span style="color:#a50">&#39;&#39;</span>),
+    path: <span style="color:#a50">&#39;/&#39;</span>,
+    expires: <span style="color:#00a">new</span> <span style="color:#0aa">Date</span>(<span style="color:#099">1000</span> * <span style="color:#099">60</span> * <span style="color:#099">60</span> * <span style="color:#099">24</span> * <span style="color:#099">365</span> * <span style="color:#099">2</span> + (+<span style="color:#00a">new</span> <span style="color:#0aa">Date</span>)).toGMTString()
   })
 
-  <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">setHeader</span>(<span style="color:#e6db74">&#39;Set-Cookie&#39;</span>, <span style="color:#a6e22e">cookieString</span>)
-  <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">setHeader</span>(<span style="color:#e6db74">&#39;Access-Control-Allow-Origin&#39;</span>, <span style="color:#e6db74">&#39;https://cdn.ampproject.org&#39;</span>)
-  <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">setHeader</span>(<span style="color:#e6db74">&#39;Access-Control-Expose-Headers&#39;</span>, <span style="color:#e6db74">&#39;AMP-Access-Control-Allow-Source-Origin&#39;</span>)
-  <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">setHeader</span>(<span style="color:#e6db74">&#39;Access-Control-Allow-Credentials&#39;</span>, <span style="color:#e6db74">&#39;true&#39;</span>)
-  <span style="color:#75715e">// AMP-specific header, check your protocol
-</span><span style="color:#75715e"></span>  <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">setHeader</span>(<span style="color:#e6db74">&#39;AMP-Access-Control-Allow-Source-Origin&#39;</span>, <span style="color:#e6db74">&#39;https://&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">domain</span>)
+  res.setHeader(<span style="color:#a50">&#39;Set-Cookie&#39;</span>, cookieString)
+  res.setHeader(<span style="color:#a50">&#39;Access-Control-Allow-Origin&#39;</span>, <span style="color:#a50">&#39;https://cdn.ampproject.org&#39;</span>)
+  res.setHeader(<span style="color:#a50">&#39;Access-Control-Expose-Headers&#39;</span>, <span style="color:#a50">&#39;AMP-Access-Control-Allow-Source-Origin&#39;</span>)
+  res.setHeader(<span style="color:#a50">&#39;Access-Control-Allow-Credentials&#39;</span>, <span style="color:#a50">&#39;true&#39;</span>)
+  <span style="color:#aaa;font-style:italic">// AMP-specific header, check your protocol
+</span><span style="color:#aaa;font-style:italic"></span>  res.setHeader(<span style="color:#a50">&#39;AMP-Access-Control-Allow-Source-Origin&#39;</span>, <span style="color:#a50">&#39;https://&#39;</span> + domain)
 
-  <span style="color:#a6e22e">request</span>.<span style="color:#a6e22e">get</span>({
-    <span style="color:#a6e22e">url</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;https://www.googletagmanager.com/amp.json&#39;</span>,
-    <span style="color:#a6e22e">qs</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">req</span>.<span style="color:#a6e22e">query</span>,
-    <span style="color:#a6e22e">json</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span>
-  }, (<span style="color:#a6e22e">err</span>, <span style="color:#a6e22e">response</span>, <span style="color:#a6e22e">data</span>) =&gt; {
+  request.get({
+    url: <span style="color:#a50">&#39;https://www.googletagmanager.com/amp.json&#39;</span>,
+    qs: req.query,
+    json: <span style="color:#00a">true</span>
+  }, (err, response, data) =&gt; {
 
-    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">err</span>) <span style="color:#a6e22e">data</span> <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#34;vars&#34;</span><span style="color:#f92672">:</span> {}}  <span style="color:#75715e">// Add additional error handling here
-</span><span style="color:#75715e"></span>
-    <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">vars</span>.<span style="color:#a6e22e">clientId</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">clientId</span>
+    <span style="color:#00a">if</span> (err) data = {<span style="color:#a50">&#34;vars&#34;</span>: {}}  <span style="color:#aaa;font-style:italic">// Add additional error handling here
+</span><span style="color:#aaa;font-style:italic"></span>
+    data.vars.clientId = clientId
 
-    <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">requests</span> <span style="color:#f92672">=</span> Object.<span style="color:#a6e22e">keys</span>(<span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">requests</span>)
-      .<span style="color:#a6e22e">reduce</span>((<span style="color:#a6e22e">map</span>, <span style="color:#a6e22e">key</span>) =&gt; {
+    data.requests = <span style="color:#0aa">Object</span>.keys(data.requests)
+      .reduce((map, key) =&gt; {
   
-        <span style="color:#a6e22e">map</span>[<span style="color:#a6e22e">key</span>] <span style="color:#f92672">=</span> <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">requests</span>[<span style="color:#a6e22e">key</span>].<span style="color:#a6e22e">replace</span>(<span style="color:#e6db74">/(&amp;cid=)[^&amp;]+/</span>, <span style="color:#e6db74">&#39;$1${clientId}&#39;</span>)
-        <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">map</span>
+        map[key] = data.requests[key].replace(<span style="color:#099">/(&amp;cid=)[^&amp;]+/</span>, <span style="color:#a50">&#39;$1${clientId}&#39;</span>)
+        <span style="color:#00a">return</span> map
 
       }, {})
 
-    <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">json</span>(<span style="color:#a6e22e">data</span>)
+    res.json(data)
 
   })
 
@@ -530,13 +530,13 @@
 </li>
 </ul>
 <p>In your site code you'll need:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html"><span style="color:#75715e">&lt;!--</span><span style="color:#75715e"> Google Tag Manager </span><span style="color:#75715e">--&gt;</span>
-&lt;<span style="color:#f92672">amp-analytics</span> <span style="color:#a6e22e">config</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;//www.yourdomain.com/gtm-analytics.config.json?id=GTM-XXXXX&amp;gtm.url=SOURCE_URL&#34;</span> <span style="color:#a6e22e">data-credentials</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;include&#34;</span>&gt;&lt;/<span style="color:#f92672">amp-analytics</span>&gt;</code></pre></div>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html"><span style="color:#aaa;font-style:italic">&lt;!--</span><span style="color:#aaa;font-style:italic"> Google Tag Manager </span><span style="color:#aaa;font-style:italic">--&gt;</span>
+&lt;<span style="color:#1e90ff;font-weight:bold">amp-analytics</span> <span style="color:#1e90ff">config</span>=<span style="color:#a50">&#34;//www.yourdomain.com/gtm-analytics.config.json?id=GTM-XXXXX&amp;gtm.url=SOURCE_URL&#34;</span> <span style="color:#1e90ff">data-credentials</span>=<span style="color:#a50">&#34;include&#34;</span>&gt;&lt;/<span style="color:#1e90ff;font-weight:bold">amp-analytics</span>&gt;</code></pre></div>
 <p>Congratulations, you have created a web proxy that fetches the Google Tag Manager container from Google's servers and modifies the JSON to leverage the value stored in the <code>_ga</code> cookie.</p>
 <h2 id="google-tag-manager-proxy-with-wordpress">Google Tag Manager proxy with WordPress</h2>
 <p>This blog is running on WordPress, so Simo wanted to see how trivial it would be to create the endpoint. As it turns out, it's very simple indeed.</p>
 <p>WordPress provides the <a href="https://developer.wordpress.org/reference/hooks/rest_api_init/"><code>rest_api_init</code></a> hook, which lets you create an HTTP request endpoint on your web server:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-php" data-lang="php">// REST API for GTM container
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-php" data-lang="php">// REST API for GTM container
 add_action( &#39;rest_api_init&#39;, function() {
     register_rest_route( 
         &#39;amp-gtm&#39;,
@@ -548,7 +548,7 @@ add_action( &#39;rest_api_init&#39;, function() {
     );
 });</code></pre></div>
 <p>That piece of code in your <strong>functions.php</strong> would create a GET request endpoint in your web domain path <code>/wp-json/amp-gtm/amp.json</code>. If a GET request to this endpoint is recorded, the callback function named <code>retrieve_gtm_json</code> is then invoked:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-php" data-lang="php">// Generate random Client ID
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-php" data-lang="php">// Generate random Client ID
 function generate_ga_client_id() {
     return rand(100000000,999999999) . &#39;.&#39; . time();
 }
@@ -586,8 +586,8 @@ function retrieve_gtm_json( $data ) {
      * the original request. */
     $container = file_get_contents(&#34;https://www.googletagmanager.com/amp.json?{$query}&#34;);
     
-    // Replace the &amp;cid; parameter value with ${clientId}
-    $container = preg_replace(&#39;/(<span style="color:#960050;background-color:#1e0010">&amp;</span>cid=)[^<span style="color:#960050;background-color:#1e0010">&amp;</span>]+/&#39;,&#39;${1}${clientId}&#39;, $container);
+    // Replace the <span style="color:#800;font-weight:bold">&amp;cid;</span> parameter value with ${clientId}
+    $container = preg_replace(&#39;/(<span style="color:#f00;background-color:#faa">&amp;</span>cid=)[^<span style="color:#f00;background-color:#faa">&amp;</span>]+/&#39;,&#39;${1}${clientId}&#39;, $container);
   
     // Add the clientId to the &#34;vars&#34; object in the container JSON.
     $container = json_decode($container);
@@ -609,8 +609,8 @@ function retrieve_gtm_json( $data ) {
 }</code></pre></div>
 <p>This is the API script that handles requests for the Google Tag Manager container. The proxy fetches the GTM container, and replaces the default Client ID with the AMP variable <code>${clientId}</code>. This, in turn, is added to the configuration JSON with the value retrieved from the <code>_ga</code> cookie. If the <code>_ga</code> cookie doesn't exist, a new one is generated.</p>
 <p>In your site code, you'll need:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html"><span style="color:#75715e">&lt;!--</span><span style="color:#75715e"> Google Tag Manager </span><span style="color:#75715e">--&gt;</span>
-&lt;<span style="color:#f92672">amp-analytics</span> <span style="color:#a6e22e">config</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;//www.yourdomain.com/wp-json/amp-gtm/amp.json?id=GTM-XXXXX&amp;gtm.url=SOURCE_URL&#34;</span> <span style="color:#a6e22e">data-credentials</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;include&#34;</span>&gt;&lt;/<span style="color:#f92672">amp-analytics</span>&gt;</code></pre></div>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html"><span style="color:#aaa;font-style:italic">&lt;!--</span><span style="color:#aaa;font-style:italic"> Google Tag Manager </span><span style="color:#aaa;font-style:italic">--&gt;</span>
+&lt;<span style="color:#1e90ff;font-weight:bold">amp-analytics</span> <span style="color:#1e90ff">config</span>=<span style="color:#a50">&#34;//www.yourdomain.com/wp-json/amp-gtm/amp.json?id=GTM-XXXXX&amp;gtm.url=SOURCE_URL&#34;</span> <span style="color:#1e90ff">data-credentials</span>=<span style="color:#a50">&#34;include&#34;</span>&gt;&lt;/<span style="color:#1e90ff;font-weight:bold">amp-analytics</span>&gt;</code></pre></div>
 <p>This request is then passed to your endpoint, and the process described above will take place.</p>
 <h2 id="google-analytics-setup">Google Analytics setup</h2>
 <p>Not much has to be done in Google Analytics, but you will want to add <strong>ampproject.org</strong> into the <strong>Referral Exclusion List</strong> of your Google Analytics property settings. Otherwise, if the user follows any link from the cached AMP page to the rest of your site, the click will start a new session with a referral from ampproject.org.</p>

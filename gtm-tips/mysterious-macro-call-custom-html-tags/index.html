@@ -388,12 +388,12 @@ What&#39;s up with that? Well, there&#39;s a fairly logical explanation to this.
 <h3 id="but-why-do-some-variables-resolve-in-preview-mode">But why do SOME variables resolve in Preview mode?</h3>
 <p>Hahaa! You found the exception.</p>
 <p>Take a look at this Custom HTML tag:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
-  (<span style="color:#66d9ef">function</span>() {
-    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>({{<span style="color:#a6e22e">Container</span> <span style="color:#a6e22e">ID</span>}});
-    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#34;{{Container ID}}&#34;</span>);
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+  (<span style="color:#00a">function</span>() {
+    console.log({{Container ID}});
+    console.log(<span style="color:#a50">&#34;{{Container ID}}&#34;</span>);
   })();
-&lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
+&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
 <p>See the difference? The first logs the variable plainly, without regard to what its return type is. The second <strong>casts the variable as a string</strong> before logging it.</p>
 <p>Let's take a look at what Preview mode shows.</p>
 
@@ -438,18 +438,18 @@ What&#39;s up with that? Well, there&#39;s a fairly logical explanation to this.
 <p>The variable value <strong>should</strong> match the one in the injected Custom HTML tag.</p>
 <h4 id="2-add-some-consolelog-calls">2. Add some <code>console.log()</code> calls</h4>
 <p>Another slightly awkward way to debug is to add <code>console.log()</code> calls to the Custom HTML tag. Have the variable value log into console just before you use it to verify it actually has the right value.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#f92672">&lt;</span><span style="color:#a6e22e">script</span><span style="color:#f92672">&gt;</span>
-  (<span style="color:#66d9ef">function</span>() {
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">log</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">msg</span>) {
-      <span style="color:#66d9ef">if</span> ({{<span style="color:#a6e22e">Debug</span> <span style="color:#a6e22e">Mode</span>}}) {
-        <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">msg</span>);
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">&lt;script&gt;
+  (<span style="color:#00a">function</span>() {
+    <span style="color:#00a">var</span> log = <span style="color:#00a">function</span>(msg) {
+      <span style="color:#00a">if</span> ({{Debug Mode}}) {
+        console.log(msg);
       }
     };
 
-    <span style="color:#a6e22e">log</span>({{<span style="color:#a6e22e">Some</span> <span style="color:#a6e22e">Variable</span>}});
-    window.<span style="color:#a6e22e">someFunction</span>({{<span style="color:#a6e22e">Some</span> <span style="color:#a6e22e">Variable</span>}});
+    log({{Some Variable}});
+    <span style="color:#0aa">window</span>.someFunction({{Some Variable}});
   })();
-<span style="color:#f92672">&lt;</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#960050;background-color:#1e0010">s</span><span style="color:#960050;background-color:#1e0010">c</span><span style="color:#960050;background-color:#1e0010">r</span><span style="color:#960050;background-color:#1e0010">i</span><span style="color:#960050;background-color:#1e0010">p</span><span style="color:#960050;background-color:#1e0010">t</span><span style="color:#960050;background-color:#1e0010">&gt;</span>
+&lt;<span style="color:#f00;background-color:#faa">/</span><span style="color:#f00;background-color:#faa">s</span><span style="color:#f00;background-color:#faa">c</span><span style="color:#f00;background-color:#faa">r</span><span style="color:#f00;background-color:#faa">i</span><span style="color:#f00;background-color:#faa">p</span><span style="color:#f00;background-color:#faa">t</span><span style="color:#f00;background-color:#faa">&gt;</span>
 </code></pre></div>
 <p>In the code sample above, there is a global method <code>window.someFunction</code> to which we want to pass the variable <code>{{Some Variable}}</code>. However, we are uncertain what its actual value is since Preview mode isn't very helpful.</p>
 <p>Because of this, we log the value of <code>{{Some Variable}}</code> into the <a href="https://support.airtable.com/hc/en-us/articles/232313848-How-to-open-the-developer-console">browser JavaScript console</a>.</p>
@@ -459,15 +459,15 @@ What&#39;s up with that? Well, there&#39;s a fairly logical explanation to this.
 <p>When you add JavaScript to a Custom HTML tag, it should <strong>do something</strong>. Maybe it adds some text to an HTML element, maybe it creates a new pixel or Ajax call, or perhaps it pushes something to <code>dataLayer</code>.</p>
 <p>In any case, the best way to ensure whether or not the <code>.macro()</code> call resolved to its correct value is to check the <strong>output</strong> or <strong>result</strong> of the tag itself to see if whatever value the variable was supposed to pass was done correctly.</p>
 <p>For example, let's say your tag creates a pixel request like this:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
-  (<span style="color:#66d9ef">function</span>() {
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">imgId</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;?id=&#39;</span> <span style="color:#f92672">+</span> {{<span style="color:#a6e22e">Container</span> <span style="color:#a6e22e">ID</span>}};
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">imgUrl</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;https://www.somedomain.com/img&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">imgId</span>;
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">el</span> <span style="color:#f92672">=</span> document.<span style="color:#a6e22e">createElement</span>(<span style="color:#e6db74">&#39;img&#39;</span>);
-    <span style="color:#a6e22e">el</span>.<span style="color:#a6e22e">src</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">imgUrl</span>;
-    document.<span style="color:#a6e22e">body</span>.<span style="color:#a6e22e">appendChild</span>(<span style="color:#a6e22e">el</span>);
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+  (<span style="color:#00a">function</span>() {
+    <span style="color:#00a">var</span> imgId = <span style="color:#a50">&#39;?id=&#39;</span> + {{Container ID}};
+    <span style="color:#00a">var</span> imgUrl = <span style="color:#a50">&#39;https://www.somedomain.com/img&#39;</span> + imgId;
+    <span style="color:#00a">var</span> el = <span style="color:#0aa">document</span>.createElement(<span style="color:#a50">&#39;img&#39;</span>);
+    el.src = imgUrl;
+    <span style="color:#0aa">document</span>.body.appendChild(el);
   })();
-&lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
+&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
 <p>It's a simple, almost nonsensical example, but it should serve to highlight the debug process nicely.</p>
 <p>The tag creates a new image element whose URL is <code>https://www.somedomain.com/img</code> plus the string <code>?id=</code> concatenated with whatever is returned by the <code>{{Container ID}}</code> variable.</p>
 <p>This is what it looks like in Preview mode:</p>

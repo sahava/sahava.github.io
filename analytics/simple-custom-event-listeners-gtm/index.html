@@ -341,20 +341,20 @@
 <p>The idea is that when the page loads, you attach your custom listener to whatever element you want to track for the given event. Then, when this interaction is recorded by the browser, the code pushes an object into <code>dataLayer</code> which you can then use to populate your tags.</p>
 <h3 id="the-custom-html-tag">The Custom HTML tag</h3>
 <p>This is what the Custom HTML tag would look like.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
-  (<span style="color:#66d9ef">function</span>() {
-    <span style="color:#75715e">// Use events from https://developer.mozilla.org/en-US/docs/Web/Events
-</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">eventName</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;dragstart&#39;</span>;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+  (<span style="color:#00a">function</span>() {
+    <span style="color:#aaa;font-style:italic">// Use events from https://developer.mozilla.org/en-US/docs/Web/Events
+</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">var</span> eventName = <span style="color:#a50">&#39;dragstart&#39;</span>;
     
-    <span style="color:#75715e">// Attach listener directly to element or document if element not found
-</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">el</span> <span style="color:#f92672">=</span> document.<span style="color:#a6e22e">querySelector</span>(<span style="color:#e6db74">&#39;img#download&#39;</span>) <span style="color:#f92672">||</span> document;
+    <span style="color:#aaa;font-style:italic">// Attach listener directly to element or document if element not found
+</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">var</span> el = <span style="color:#0aa">document</span>.querySelector(<span style="color:#a50">&#39;img#download&#39;</span>) || <span style="color:#0aa">document</span>;
     
-    <span style="color:#75715e">// Leave useCapture to true if you want to avoid propagation issues.
-</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">useCapture</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>;
+    <span style="color:#aaa;font-style:italic">// Leave useCapture to true if you want to avoid propagation issues.
+</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">var</span> useCapture = <span style="color:#00a">true</span>;
     
-    <span style="color:#a6e22e">el</span>.<span style="color:#a6e22e">addEventListener</span>(<span style="color:#a6e22e">eventName</span>, {{<span style="color:#a6e22e">JS</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">Generic</span> <span style="color:#a6e22e">Event</span> <span style="color:#a6e22e">callback</span>}}, <span style="color:#a6e22e">useCapture</span>);
+    el.addEventListener(eventName, {{JS - Generic Event callback}}, useCapture);
   })();
-&lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
+&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
 <p>Fire this on a <strong>Page View</strong> trigger if attaching directly to the <code>document</code> node, or a <strong>DOM Ready</strong> trigger if attaching directly to an element and the element is in the <em>HTML source</em>, or a <strong>Window Loaded</strong> trigger if attaching directly to an element that is added dynamically to the page during the page load.</p>
 <p>Make sure you change the <code>eventName</code> value to reflect which event you want to track. If you want to track clicks, change it to <code>click</code>. If you want to track users hovering over the element, change it to <code>mouseover</code>, and so on.</p>
 <p>You can choose to add the listener directly to an element by using the appropriate <a href="https://www.simoahava.com/gtm-tips/10-useful-css-selectors/">CSS selector</a> as the parameter of <code>document.querySelector()</code>. Alternatively, you can add the listener directly on the <code>document</code> node.</p>
@@ -363,16 +363,16 @@
 <p>The last line actually adds the listener, providing a Custom JavaScript variable as the callback.</p>
 <h3 id="the-custom-javascript-variable">The Custom JavaScript variable</h3>
 <p>Here's what <strong>{{JS - Generic Event callback}}</strong> should look like:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
-  <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">event</span>) {
-    window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
-      <span style="color:#a6e22e">event</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;custom.event.&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">event</span>.<span style="color:#a6e22e">type</span>,
-      <span style="color:#e6db74">&#39;custom.gtm.element&#39;</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">event</span>.<span style="color:#a6e22e">target</span>,
-      <span style="color:#e6db74">&#39;custom.gtm.elementClasses&#39;</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">event</span>.<span style="color:#a6e22e">target</span>.<span style="color:#a6e22e">className</span> <span style="color:#f92672">||</span> <span style="color:#e6db74">&#39;&#39;</span>,
-      <span style="color:#e6db74">&#39;custom.gtm.elementId&#39;</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">event</span>.<span style="color:#a6e22e">target</span>.<span style="color:#a6e22e">id</span> <span style="color:#f92672">||</span> <span style="color:#e6db74">&#39;&#39;</span>,
-      <span style="color:#e6db74">&#39;custom.gtm.elementTarget&#39;</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">event</span>.<span style="color:#a6e22e">target</span>.<span style="color:#a6e22e">target</span> <span style="color:#f92672">||</span> <span style="color:#e6db74">&#39;&#39;</span>,
-      <span style="color:#e6db74">&#39;custom.gtm.elementUrl&#39;</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">event</span>.<span style="color:#a6e22e">target</span>.<span style="color:#a6e22e">href</span> <span style="color:#f92672">||</span> <span style="color:#a6e22e">event</span>.<span style="color:#a6e22e">target</span>.<span style="color:#a6e22e">action</span> <span style="color:#f92672">||</span> <span style="color:#e6db74">&#39;&#39;</span>,
-      <span style="color:#e6db74">&#39;custom.gtm.originalEvent&#39;</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">event</span>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() {
+  <span style="color:#00a">return</span> <span style="color:#00a">function</span>(event) {
+    <span style="color:#0aa">window</span>.dataLayer.push({
+      event: <span style="color:#a50">&#39;custom.event.&#39;</span> + event.type,
+      <span style="color:#a50">&#39;custom.gtm.element&#39;</span>: event.target,
+      <span style="color:#a50">&#39;custom.gtm.elementClasses&#39;</span>: event.target.className || <span style="color:#a50">&#39;&#39;</span>,
+      <span style="color:#a50">&#39;custom.gtm.elementId&#39;</span>: event.target.id || <span style="color:#a50">&#39;&#39;</span>,
+      <span style="color:#a50">&#39;custom.gtm.elementTarget&#39;</span>: event.target.target || <span style="color:#a50">&#39;&#39;</span>,
+      <span style="color:#a50">&#39;custom.gtm.elementUrl&#39;</span>: event.target.href || event.target.action || <span style="color:#a50">&#39;&#39;</span>,
+      <span style="color:#a50">&#39;custom.gtm.originalEvent&#39;</span>: event
     });
   };
 }
@@ -435,30 +435,30 @@
 <h3 id="working-example">Working example</h3>
 <p>Let's tackle a problem that you might well have on your site. You want to track a form element with id <code>contactUs</code>, but no matter what you do, GTM's own Form trigger refuses to fire. You've looked around, read <a href="https://www.simoahava.com/gtm-tips/fix-problems-with-gtm-listeners/">my articles</a>, and come to the conclusion that the problem is other JavaScript on the site stopping the propagation of the form submit event. Your friendly local developer tells you that due to the nature of the plugin you use, it's impossible to change this behavior.</p>
 <p>Custom event listeners to the rescue! You can trust the <code>useCapture</code> flag to track the form submission even though propagation has been stopped. Here's what the <strong>Custom HTML tag</strong> would look like:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
-  (<span style="color:#66d9ef">function</span>() {
-    <span style="color:#75715e">// Use events from https://developer.mozilla.org/en-US/docs/Web/Events
-</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">eventName</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;submit&#39;</span>;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+  (<span style="color:#00a">function</span>() {
+    <span style="color:#aaa;font-style:italic">// Use events from https://developer.mozilla.org/en-US/docs/Web/Events
+</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">var</span> eventName = <span style="color:#a50">&#39;submit&#39;</span>;
 	
-    <span style="color:#75715e">// Attach listener directly to element or document if element not found
-</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">el</span> <span style="color:#f92672">=</span> document.<span style="color:#a6e22e">querySelector</span>(<span style="color:#e6db74">&#39;form#contactUs&#39;</span>) <span style="color:#f92672">||</span> document;
+    <span style="color:#aaa;font-style:italic">// Attach listener directly to element or document if element not found
+</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">var</span> el = <span style="color:#0aa">document</span>.querySelector(<span style="color:#a50">&#39;form#contactUs&#39;</span>) || <span style="color:#0aa">document</span>;
 	
-    <span style="color:#75715e">// Leave useCapture to true if you want to avoid propagation issues.
-</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">useCapture</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>;
+    <span style="color:#aaa;font-style:italic">// Leave useCapture to true if you want to avoid propagation issues.
+</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">var</span> useCapture = <span style="color:#00a">true</span>;
 	
-    <span style="color:#a6e22e">el</span>.<span style="color:#a6e22e">addEventListener</span>(<span style="color:#a6e22e">eventName</span>, {{<span style="color:#a6e22e">JS</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">Generic</span> <span style="color:#a6e22e">Event</span> <span style="color:#a6e22e">callback</span>}}, <span style="color:#a6e22e">useCapture</span>);
+    el.addEventListener(eventName, {{JS - Generic Event callback}}, useCapture);
   })();
-&lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
+&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
 <p>Add a <strong>DOM Ready</strong> trigger to this tag, set to fire on pages which have this particular form in the HTML source.</p>
 <p>Now, whenever a form submission is detected, your Custom HTML tag will go off, pushing the following object into <code>dataLayer</code>:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">{
-    <span style="color:#e6db74">&#39;event&#39;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;custom.event.submit&#39;</span>,
-    <span style="color:#e6db74">&#39;custom.gtm.element&#39;</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">form</span><span style="color:#960050;background-color:#1e0010">#</span><span style="color:#a6e22e">contactUs</span>,
-    <span style="color:#e6db74">&#39;custom.gtm.elementClasses&#39;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;&#39;</span>,
-    <span style="color:#e6db74">&#39;custom.gtm.elementId&#39;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;contactUs&#39;</span>,
-    <span style="color:#e6db74">&#39;custom.gtm.elementTarget&#39;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;&#39;</span>,
-    <span style="color:#e6db74">&#39;custom.gtm.elementUrl&#39;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;https://www.domain.com/my-form-handler/&#39;</span>,
-    <span style="color:#e6db74">&#39;custom.gtm.originalEvent&#39;</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">submitEvent</span>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">{
+    <span style="color:#a50">&#39;event&#39;</span>: <span style="color:#a50">&#39;custom.event.submit&#39;</span>,
+    <span style="color:#a50">&#39;custom.gtm.element&#39;</span>: form<span style="color:#f00;background-color:#faa">#</span>contactUs,
+    <span style="color:#a50">&#39;custom.gtm.elementClasses&#39;</span>: <span style="color:#a50">&#39;&#39;</span>,
+    <span style="color:#a50">&#39;custom.gtm.elementId&#39;</span>: <span style="color:#a50">&#39;contactUs&#39;</span>,
+    <span style="color:#a50">&#39;custom.gtm.elementTarget&#39;</span>: <span style="color:#a50">&#39;&#39;</span>,
+    <span style="color:#a50">&#39;custom.gtm.elementUrl&#39;</span>: <span style="color:#a50">&#39;https://www.domain.com/my-form-handler/&#39;</span>,
+    <span style="color:#a50">&#39;custom.gtm.originalEvent&#39;</span>: submitEvent
 }
 </code></pre></div>
 <p>And you can pick these up with the Data Layer variables you created earlier.</p>

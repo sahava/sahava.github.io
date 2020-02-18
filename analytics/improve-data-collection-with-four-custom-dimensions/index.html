@@ -466,17 +466,17 @@
 <p>Note that if you wish, you could just as well scope this to <strong>User</strong> instead. The Client ID, by definition, is the same for the user throughout, so it might make sense to scope it accordingly. User-scoped dimensions are a bit questionable in terms of privacy, but in this case I don't see any issue, as you're just exposing a dimension that exists anyway. Thanks to Michael Hayes for pointing this out in the comments!</p>
 <h3 id="22-custom-javascript-variable">2.2. Custom JavaScript Variable</h3>
 <p>The Custom JavaScript Variable is named <strong>{{Get Client ID for current Tracker}}</strong>, and it needs the following code:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
-  <span style="color:#66d9ef">try</span> {
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">trackers</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ga</span>.<span style="color:#a6e22e">getAll</span>();
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">len</span>;
-    <span style="color:#66d9ef">for</span> (<span style="color:#a6e22e">i</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>, <span style="color:#a6e22e">len</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">trackers</span>.<span style="color:#a6e22e">length</span>; <span style="color:#a6e22e">i</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">len</span>; <span style="color:#a6e22e">i</span> <span style="color:#f92672">+=</span> <span style="color:#ae81ff">1</span>) {
-      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">trackers</span>[<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">get</span>(<span style="color:#e6db74">&#39;trackingId&#39;</span>) <span style="color:#f92672">===</span> {{<span style="color:#a6e22e">GA</span> <span style="color:#a6e22e">Tracking</span> <span style="color:#a6e22e">Code</span>}}) {
-        <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">trackers</span>[<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">get</span>(<span style="color:#e6db74">&#39;clientId&#39;</span>);
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() {
+  <span style="color:#00a">try</span> {
+    <span style="color:#00a">var</span> trackers = ga.getAll();
+    <span style="color:#00a">var</span> i, len;
+    <span style="color:#00a">for</span> (i = <span style="color:#099">0</span>, len = trackers.length; i &lt; len; i += <span style="color:#099">1</span>) {
+      <span style="color:#00a">if</span> (trackers[i].get(<span style="color:#a50">&#39;trackingId&#39;</span>) === {{GA Tracking Code}}) {
+        <span style="color:#00a">return</span> trackers[i].get(<span style="color:#a50">&#39;clientId&#39;</span>);
       }
     }
-  } <span style="color:#66d9ef">catch</span>(<span style="color:#a6e22e">e</span>) {}  
-  <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#39;false&#39;</span>;
+  } <span style="color:#00a">catch</span>(e) {}  
+  <span style="color:#00a">return</span> <span style="color:#a50">&#39;false&#39;</span>;
 }
 </code></pre></div>
 <p>The function contents are wrapped in a <code>try...catch</code> block, so any errors and problems with loading the <code>ga</code> interface are gobbled up. If you want, you can add your own error debugging code into the <code>catch</code> block. The key thing is to make sure the Event Tag doesn't fire if there's a problem with retrieving the Client ID. This means that you might miss some hits, but since we're sending the information to a <em>session-scoped</em> Custom Dimension, you only need one successful hit sent during the session.</p>
@@ -571,8 +571,8 @@
 <p>Just remember to make note of the index number, again.</p>
 <h3 id="32-custom-javascript-variable">3.2. Custom JavaScript Variable</h3>
 <p>The Custom JavaScript Variable is aptly named <strong>{{Random Session ID}}</strong>, and it has the following code:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
-    <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">new</span> Date().<span style="color:#a6e22e">getTime</span>() <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;.&#39;</span> <span style="color:#f92672">+</span> Math.<span style="color:#a6e22e">random</span>().<span style="color:#a6e22e">toString</span>(<span style="color:#ae81ff">36</span>).<span style="color:#a6e22e">substring</span>(<span style="color:#ae81ff">5</span>);
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() {
+    <span style="color:#00a">return</span> <span style="color:#00a">new</span> <span style="color:#0aa">Date</span>().getTime() + <span style="color:#a50">&#39;.&#39;</span> + <span style="color:#0aa">Math</span>.random().toString(<span style="color:#099">36</span>).substring(<span style="color:#099">5</span>);
 }
 </code></pre></div>
 <p>This script creates a pretty unique, randomized session ID. It does it by taking the hit timestamp in Unix time, adding a period, and following with a random string of alphanumeric characters. Because of the timestamp (accurate up to milliseconds), it's very improbable that two similar session IDs are ever created.</p>
@@ -657,24 +657,24 @@
 <p><strong>2015-04-03T18:55:27.466+03:00</strong></p>
 <p>This translates to April 3rd, 2015, at 6:55PM Helsinki time.</p>
 <p>So, to get something like this, some JavaScript is required. Create a new Custom JavaScript Variable, and name it <strong>{{Hit Timestamp Local Time With Offset}}</strong>. Add the following code within:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
-    <span style="color:#75715e">// Get local time as ISO string with offset at the end
-</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">now</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Date();
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">tzo</span> <span style="color:#f92672">=</span> <span style="color:#f92672">-</span><span style="color:#a6e22e">now</span>.<span style="color:#a6e22e">getTimezoneOffset</span>();
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">dif</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">tzo</span> <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">?</span> <span style="color:#e6db74">&#39;+&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;-&#39;</span>;
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">pad</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">num</span>) {
-        <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">norm</span> <span style="color:#f92672">=</span> Math.<span style="color:#a6e22e">abs</span>(Math.<span style="color:#a6e22e">floor</span>(<span style="color:#a6e22e">num</span>));
-        <span style="color:#66d9ef">return</span> (<span style="color:#a6e22e">norm</span> <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">10</span> <span style="color:#f92672">?</span> <span style="color:#e6db74">&#39;0&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;&#39;</span>) <span style="color:#f92672">+</span> <span style="color:#a6e22e">norm</span>;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() {
+    <span style="color:#aaa;font-style:italic">// Get local time as ISO string with offset at the end
+</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">var</span> now = <span style="color:#00a">new</span> <span style="color:#0aa">Date</span>();
+    <span style="color:#00a">var</span> tzo = -now.getTimezoneOffset();
+    <span style="color:#00a">var</span> dif = tzo &gt;= <span style="color:#099">0</span> ? <span style="color:#a50">&#39;+&#39;</span> : <span style="color:#a50">&#39;-&#39;</span>;
+    <span style="color:#00a">var</span> pad = <span style="color:#00a">function</span>(num) {
+        <span style="color:#00a">var</span> norm = <span style="color:#0aa">Math</span>.abs(<span style="color:#0aa">Math</span>.floor(num));
+        <span style="color:#00a">return</span> (norm &lt; <span style="color:#099">10</span> ? <span style="color:#a50">&#39;0&#39;</span> : <span style="color:#a50">&#39;&#39;</span>) + norm;
     };
-    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">now</span>.<span style="color:#a6e22e">getFullYear</span>() 
-        <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;-&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">pad</span>(<span style="color:#a6e22e">now</span>.<span style="color:#a6e22e">getMonth</span>()<span style="color:#f92672">+</span><span style="color:#ae81ff">1</span>)
-        <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;-&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">pad</span>(<span style="color:#a6e22e">now</span>.<span style="color:#a6e22e">getDate</span>())
-        <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;T&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">pad</span>(<span style="color:#a6e22e">now</span>.<span style="color:#a6e22e">getHours</span>())
-        <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;:&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">pad</span>(<span style="color:#a6e22e">now</span>.<span style="color:#a6e22e">getMinutes</span>()) 
-        <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;:&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">pad</span>(<span style="color:#a6e22e">now</span>.<span style="color:#a6e22e">getSeconds</span>())
-        <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;.&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">pad</span>(<span style="color:#a6e22e">now</span>.<span style="color:#a6e22e">getMilliseconds</span>())
-        <span style="color:#f92672">+</span> <span style="color:#a6e22e">dif</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">pad</span>(<span style="color:#a6e22e">tzo</span> <span style="color:#f92672">/</span> <span style="color:#ae81ff">60</span>) 
-        <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;:&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">pad</span>(<span style="color:#a6e22e">tzo</span> <span style="color:#f92672">%</span> <span style="color:#ae81ff">60</span>);
+    <span style="color:#00a">return</span> now.getFullYear() 
+        + <span style="color:#a50">&#39;-&#39;</span> + pad(now.getMonth()+<span style="color:#099">1</span>)
+        + <span style="color:#a50">&#39;-&#39;</span> + pad(now.getDate())
+        + <span style="color:#a50">&#39;T&#39;</span> + pad(now.getHours())
+        + <span style="color:#a50">&#39;:&#39;</span> + pad(now.getMinutes()) 
+        + <span style="color:#a50">&#39;:&#39;</span> + pad(now.getSeconds())
+        + <span style="color:#a50">&#39;.&#39;</span> + pad(now.getMilliseconds())
+        + dif + pad(tzo / <span style="color:#099">60</span>) 
+        + <span style="color:#a50">&#39;:&#39;</span> + pad(tzo % <span style="color:#099">60</span>);
 }
 </code></pre></div>
 <p>This code has been gratefully copy-pasted form <a href="http://stackoverflow.com/a/17415677">this StackOverflow discussion</a>.</p>

@@ -358,7 +358,7 @@
 <p>In my experience, and this is definitely a <strong>very</strong> marginal view, jQuery introduces a certain degree of, erm, <em>sloppiness</em>. I know the &ldquo;it's too easy&rdquo; argument is infantile, but in some cases the lack of transparency to what's actually happening in the code can invite some pretty poor development work. In a way, jQuery is more about <a href="http://api.jquery.com/">reading a manual</a> than about actually creating code, and that sucks. Especially with event handlers, some development decisions are clearly influenced by how easy it is to bind the handlers to elements.</p>
 <p>For Google Tag Manager, this is <a href="https://www.simoahava.com/analytics/dont-gtm-listeners-work/">all too familiar</a>. An innocuous <code>return false;</code> or <code>e.stopPropagation()</code> will prevent your GTM listeners from ever retrieving the DOM event. Often the only reason propagation is cancelled like this is the fact that the code was copy-pasted from some Stack Overflow discussion completely unrelated to your website's markup.</p>
 <p>OK, sorry for the rant. Here's what I suggest. Whenever your GTM listener doesn't fire when it should, open the JavaScript console and type the following line of code there&hellip;</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">if</span>(<span style="color:#66d9ef">typeof</span>(<span style="color:#a6e22e">jQuery</span>)<span style="color:#f92672">!==</span><span style="color:#e6db74">&#39;undefined&#39;</span>){<span style="color:#a6e22e">jQuery</span>(<span style="color:#e6db74">&#39;body&#39;</span>).<span style="color:#a6e22e">find</span>(<span style="color:#e6db74">&#39;*&#39;</span>).<span style="color:#a6e22e">off</span>();}
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">if</span>(<span style="color:#00a">typeof</span>(jQuery)!==<span style="color:#a50">&#39;undefined&#39;</span>){jQuery(<span style="color:#a50">&#39;body&#39;</span>).find(<span style="color:#a50">&#39;*&#39;</span>).off();}
 </code></pre></div>
 <p>&hellip;and press enter. Then try clicking or form submitting again.</p>
 <p>What this simple line does is it unbinds <strong>all</strong> jQuery event handlers from all HTML elements in the document body. If your GTM listener works after this, it means that there's some interfering jQuery script. The next step is to find the problematic script, and ask your developer to fix it so that propagation isn't prevented.</p>
@@ -366,24 +366,24 @@
 <p>Or you can choose the hacker route. If you find the interfering script, and if you find the function that's grabbing your clicks or submits and preventing propagation, you can use a Custom HTML tag to fix it.</p>
 <p><strong>NOTE!</strong> This is a <em>hack</em>. Be sure to test, test and TEST before publishing a container where you unbind jQuery. Also, it wouldn't hurt to consult with someone who has an understanding of just what event handlers are used on the site.</p>
 <p>Let's say you have a Back To Top button which is not sending clicks to GTM's listeners. You find the code in one of the page assets, and it looks something like this:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">jQuery</span>(<span style="color:#e6db74">&#39;.top-of-page, a[href=&#34;#top&#34;]&#39;</span>).<span style="color:#a6e22e">click</span>(<span style="color:#66d9ef">function</span> () {
-  <span style="color:#a6e22e">jQuery</span>(<span style="color:#e6db74">&#39;html, body&#39;</span>).<span style="color:#a6e22e">animate</span>({
-    <span style="color:#a6e22e">scrollTop</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">0</span>
-  }, <span style="color:#ae81ff">400</span>);
-  <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span>;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">jQuery(<span style="color:#a50">&#39;.top-of-page, a[href=&#34;#top&#34;]&#39;</span>).click(<span style="color:#00a">function</span> () {
+  jQuery(<span style="color:#a50">&#39;html, body&#39;</span>).animate({
+    scrollTop: <span style="color:#099">0</span>
+  }, <span style="color:#099">400</span>);
+  <span style="color:#00a">return</span> <span style="color:#00a">false</span>;
 });
 </code></pre></div>
 <p>As you can see, the dreaded <code>return false;</code> is there. That's what's stopping the events from climbing up the DOM tree.</p>
 <p>To fix this, create a new Custom HTML tag with the following code within:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
-  <span style="color:#a6e22e">jQuery</span>(<span style="color:#e6db74">&#39;.top-of-page, a[href=&#34;#top&#34;]&#39;</span>).<span style="color:#a6e22e">off</span>(<span style="color:#e6db74">&#39;click&#39;</span>);
-  <span style="color:#a6e22e">jQuery</span>(<span style="color:#e6db74">&#39;.top-of-page, a[href=&#34;#top&#34;]&#39;</span>).<span style="color:#a6e22e">click</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e</span>) {
-    <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">preventDefault</span>();
-    <span style="color:#a6e22e">jQuery</span>(<span style="color:#e6db74">&#39;html, body&#39;</span>).<span style="color:#a6e22e">animate</span>({
-      <span style="color:#a6e22e">scrollTop</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">0</span>
-    }, <span style="color:#ae81ff">400</span>);
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+  jQuery(<span style="color:#a50">&#39;.top-of-page, a[href=&#34;#top&#34;]&#39;</span>).off(<span style="color:#a50">&#39;click&#39;</span>);
+  jQuery(<span style="color:#a50">&#39;.top-of-page, a[href=&#34;#top&#34;]&#39;</span>).click(<span style="color:#00a">function</span>(e) {
+    e.preventDefault();
+    jQuery(<span style="color:#a50">&#39;html, body&#39;</span>).animate({
+      scrollTop: <span style="color:#099">0</span>
+    }, <span style="color:#099">400</span>);
   });
-&lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
+&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
 <p>If jQuery and the problematic script are loaded in the <code>&lt;head&gt;</code> of your template, you can have this tag fire on <strong>{{url}} matches RegEx .</strong>*. If they're loaded elsewhere (like in the footer of your page), you might need some other event rule such as <strong>{{event}} equals gtm.load</strong>.</p>
 <p>On the first line, I unbind the original click handler. Then, I add <code>e</code> as an argument of the new click function. This <code>e</code> contains the event object, and I can then use its <code>preventDefault()</code> method to stop the original action of the click <em>without</em> stopping its propagation. Finally, I remove the <code>return false;</code> from the end of the function.</p>
 <p>Naturally, you'll need to test, test, test and then test some more whether this hack breaks down your entire site or not.</p>
@@ -408,57 +408,57 @@
 
 
 <p>However, thanks to how the GA API works, you only need one tag. Just make sure that the macro which returns the Custom Dimension value resolves to <em>undefined type</em> when the dimension doesn't have a value. There are a bunch of ways you can do this:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">t</span>;
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">y</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>;
-  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">t</span>; <span style="color:#75715e">// returns undefined type
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">return</span>; <span style="color:#75715e">// returns undefined type
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">undefined</span>; <span style="color:#75715e">// returns undefined type
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span>; <span style="color:#75715e">// returns boolean type
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">y</span>; <span style="color:#75715e">// returns string type
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">x</span>; <span style="color:#75715e">// throws ReferenceError
-</span><span style="color:#75715e"></span>}
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() {
+  <span style="color:#00a">var</span> t;
+  <span style="color:#00a">var</span> y = <span style="color:#a50">&#34;&#34;</span>;
+  <span style="color:#00a">return</span> t; <span style="color:#aaa;font-style:italic">// returns undefined type
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#00a">return</span>; <span style="color:#aaa;font-style:italic">// returns undefined type
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#00a">return</span> <span style="color:#00a">undefined</span>; <span style="color:#aaa;font-style:italic">// returns undefined type
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#00a">return</span> <span style="color:#00a">false</span>; <span style="color:#aaa;font-style:italic">// returns boolean type
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#00a">return</span> y; <span style="color:#aaa;font-style:italic">// returns string type
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#00a">return</span> x; <span style="color:#aaa;font-style:italic">// throws ReferenceError
+</span><span style="color:#aaa;font-style:italic"></span>}
 </code></pre></div>
 <p>As you can see, returning <strong>false</strong>, an empty string, or a variable which hasn't been declared will not do.</p>
 <p>The cool thing about GTM is that if you have a Data Layer Variable Macro which doesn't resolve, it will be automatically set to <em>undefined type</em>, meaning a Custom Dimension which refers to this macro will not get sent. So the best way to navigate through this particular scenario is to have <strong>blog-author</strong> declared in the dataLayer declaration before the container snippet on the page template. If the page isn't a blog page, then this declaration can just be left out.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">dataLayer</span> <span style="color:#f92672">=</span> [{<span style="color:#e6db74">&#39;blog-author&#39;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;Simo Ahava&#39;</span>}]; <span style="color:#75715e">// Blog author declared, dimension will get sent
-</span><span style="color:#75715e"></span>&lt;/<span style="color:#f92672">script</span>&gt;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+  <span style="color:#00a">var</span> dataLayer = [{<span style="color:#a50">&#39;blog-author&#39;</span>: <span style="color:#a50">&#39;Simo Ahava&#39;</span>}]; <span style="color:#aaa;font-style:italic">// Blog author declared, dimension will get sent
+</span><span style="color:#aaa;font-style:italic"></span>&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
 ...
-&lt;<span style="color:#f92672">script</span>&gt;
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">dataLayer</span> <span style="color:#f92672">=</span> []; <span style="color:#75715e">// Blog author not declared, dimension will not get sent
-</span><span style="color:#75715e"></span>&lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
+&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+  <span style="color:#00a">var</span> dataLayer = []; <span style="color:#aaa;font-style:italic">// Blog author not declared, dimension will not get sent
+</span><span style="color:#aaa;font-style:italic"></span>&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
 <p>Then, when you create a Data Layer Variable Macro, on pages with <strong>blog-author</strong> in the array, it will fire the Custom Dimension with the blog author's name as the value. On all other pages the dimension will not get sent.</p>
 <p>Once you familiarize yourself with JavaScript and understand all the different ways how GTM and JavaScript resolve variables to <em>undefined</em> type, you can get really creative with this feature, making your tags even more leaner.</p>
 <h2 id="3-track-copy-event">3. Track copy event</h2>
 <p>Ever wondered how often people copy text using CTRL+C or some other means? Well, wonder no more, because now you can track it as an event!</p>
 <p>Create this simple Custom HTML tag:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">c</span> <span style="color:#f92672">=</span> document.<span style="color:#a6e22e">getElementById</span>(<span style="color:#e6db74">&#34;entry-content&#34;</span>);
-  <span style="color:#66d9ef">if</span>(<span style="color:#66d9ef">typeof</span>(<span style="color:#a6e22e">c</span>)<span style="color:#f92672">!==</span><span style="color:#e6db74">&#39;undefined&#39;</span>) {
-    <span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">addEventListener</span>(<span style="color:#e6db74">&#39;copy&#39;</span>, <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">evt</span>) {
-      <span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({<span style="color:#e6db74">&#39;event&#39;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;copy&#39;</span>});
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+  <span style="color:#00a">var</span> c = <span style="color:#0aa">document</span>.getElementById(<span style="color:#a50">&#34;entry-content&#34;</span>);
+  <span style="color:#00a">if</span>(<span style="color:#00a">typeof</span>(c)!==<span style="color:#a50">&#39;undefined&#39;</span>) {
+    c.addEventListener(<span style="color:#a50">&#39;copy&#39;</span>, <span style="color:#00a">function</span>(evt) {
+      dataLayer.push({<span style="color:#a50">&#39;event&#39;</span>: <span style="color:#a50">&#39;copy&#39;</span>});
     });
   }
-&lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
+&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
 <p>This is a very simple script that pushes the dataLayer event &lsquo;copy&rsquo; whenever someone copies something on your page within the HTML element with ID <em>entry-content</em> (e.g. <code>&lt;div id=&quot;entry-content&quot;&gt;&lt;/div&gt;</code>).</p>
 <p>Be sure to change the element whose content you want to track with the event listener to match the markup on your website.</p>
 <p>You can make it more versatile by exploring the contents of the <code>evt</code> argument, which is the event object. Its <code>target</code> property contains the HTML element which was the target of the event. Here are some ideas:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">...
-<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({<span style="color:#e6db74">&#39;event&#39;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;copy&#39;</span>, <span style="color:#e6db74">&#39;copy-id&#39;</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">evt</span>.<span style="color:#a6e22e">target</span>.<span style="color:#a6e22e">id</span>, <span style="color:#e6db74">&#39;copy-content&#39;</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">evt</span>.<span style="color:#a6e22e">target</span>.<span style="color:#a6e22e">innerHTML</span>});
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">...
+dataLayer.push({<span style="color:#a50">&#39;event&#39;</span>: <span style="color:#a50">&#39;copy&#39;</span>, <span style="color:#a50">&#39;copy-id&#39;</span>: evt.target.id, <span style="color:#a50">&#39;copy-content&#39;</span>: evt.target.innerHTML});
 ...
 </code></pre></div>
 <p>And so on. Note that <code>evt.target</code> stores the element where the copy event started. So if the copy action takes place over multiple paragraphs, headers, or spans, for example, you'll only be able to observe the properties of the first element targeted by the action.</p>
 <h2 id="4-errors-as-events">4. Errors as events</h2>
 <p>Google Tag Manager has this cool thing called the <a href="https://support.google.com/tagmanager/answer/3415369?hl=en#JSErrorListener">JavaScript Error Listener</a>. This fires whenever an <em>unchecked</em> exception occurs on the site. For example, consider the following:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">myText</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Hello!&#34;</span>;
-<span style="color:#a6e22e">alert</span>(<span style="color:#a6e22e">myTxt</span>); <span style="color:#75715e">// Unchecked ReferenceError, will fire GTM&#39;s error listener
-</span><span style="color:#75715e"></span>
-<span style="color:#75715e">// Exception caught, will not fire GTM&#39;s error listener
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">try</span> {
-  <span style="color:#a6e22e">alert</span>(<span style="color:#a6e22e">myTxt</span>);
-} <span style="color:#66d9ef">catch</span>(<span style="color:#a6e22e">e</span>) {
-  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">message</span>);
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">var</span> myText = <span style="color:#a50">&#34;Hello!&#34;</span>;
+alert(myTxt); <span style="color:#aaa;font-style:italic">// Unchecked ReferenceError, will fire GTM&#39;s error listener
+</span><span style="color:#aaa;font-style:italic"></span>
+<span style="color:#aaa;font-style:italic">// Exception caught, will not fire GTM&#39;s error listener
+</span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">try</span> {
+  alert(myTxt);
+} <span style="color:#00a">catch</span>(e) {
+  console.log(e.message);
 }
 </code></pre></div>
 <p>With GTM's error listener, you can send each uncaught error as an event to Google Analytics. You can then analyze these events to find problems with your scripts. If you have a huge site, you might get hundreds of these errors, so you'll need to adjust the code to perhaps only listen for certain pages or errors.</p>

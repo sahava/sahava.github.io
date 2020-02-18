@@ -360,52 +360,52 @@
 <p>The code is all contained in a single <strong>Custom HTML tag</strong> which fires on the <strong>DOM Ready</strong> trigger. You'll then need a <strong>Custom Event trigger</strong> to fire when a valid search is recorded, as well as a <strong>Data Layer Variable</strong> to grab that search term.</p>
 <h2 id="1-the-custom-html-tag">1. The Custom HTML tag</h2>
 <p>Here's the code that runs the whole thing:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
-  (<span style="color:#66d9ef">function</span>() {
-    <span style="color:#75715e">// Set searchField to the search input field.
-</span><span style="color:#75715e"></span>    <span style="color:#75715e">// Set timeout to the time you want to wait after the last character in milliseconds.
-</span><span style="color:#75715e"></span>    <span style="color:#75715e">// Set minLength to the minimum number of characters that constitutes a valid search.
-</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">searchField</span> <span style="color:#f92672">=</span> document.<span style="color:#a6e22e">querySelector</span>(<span style="color:#e6db74">&#39;input#search-field&#39;</span>),
-        <span style="color:#a6e22e">timeout</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">2000</span>,
-        <span style="color:#a6e22e">minLength</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">3</span>;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+  (<span style="color:#00a">function</span>() {
+    <span style="color:#aaa;font-style:italic">// Set searchField to the search input field.
+</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#aaa;font-style:italic">// Set timeout to the time you want to wait after the last character in milliseconds.
+</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#aaa;font-style:italic">// Set minLength to the minimum number of characters that constitutes a valid search.
+</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">var</span> searchField = <span style="color:#0aa">document</span>.querySelector(<span style="color:#a50">&#39;input#search-field&#39;</span>),
+        timeout = <span style="color:#099">2000</span>,
+        minLength = <span style="color:#099">3</span>;
 
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">textEntered</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>;
+    <span style="color:#00a">var</span> textEntered = <span style="color:#00a">false</span>;
 
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">timer</span>, <span style="color:#a6e22e">searchText</span>;
+    <span style="color:#00a">var</span> timer, searchText;
     
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">handleInput</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>() {
-      <span style="color:#a6e22e">searchText</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">searchField</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">searchField</span>.<span style="color:#a6e22e">value</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;&#39;</span>;
-      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">searchText</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">minLength</span>) {
-        <span style="color:#66d9ef">return</span>;
+    <span style="color:#00a">var</span> handleInput = <span style="color:#00a">function</span>() {
+      searchText = searchField ? searchField.value : <span style="color:#a50">&#39;&#39;</span>;
+      <span style="color:#00a">if</span> (searchText.length &lt; minLength) {
+        <span style="color:#00a">return</span>;
       }
-      window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
-        <span style="color:#a6e22e">event</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;customSearch&#39;</span>,
-        <span style="color:#a6e22e">customSearchInput</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">searchText</span>
+      <span style="color:#0aa">window</span>.dataLayer.push({
+        event: <span style="color:#a50">&#39;customSearch&#39;</span>,
+        customSearchInput: searchText
       });
-      <span style="color:#a6e22e">textEntered</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>;
+      textEntered = <span style="color:#00a">false</span>;
     };
     
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">startTimer</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e</span>) {
-      <span style="color:#a6e22e">textEntered</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>;
-      window.<span style="color:#a6e22e">clearTimeout</span>(<span style="color:#a6e22e">timer</span>);
-      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">keyCode</span> <span style="color:#f92672">===</span> <span style="color:#ae81ff">13</span>) {
-        <span style="color:#a6e22e">handleInput</span>();
-        <span style="color:#66d9ef">return</span>;
+    <span style="color:#00a">var</span> startTimer = <span style="color:#00a">function</span>(e) {
+      textEntered = <span style="color:#00a">true</span>;
+      <span style="color:#0aa">window</span>.clearTimeout(timer);
+      <span style="color:#00a">if</span> (e.keyCode === <span style="color:#099">13</span>) {
+        handleInput();
+        <span style="color:#00a">return</span>;
       }
-      <span style="color:#a6e22e">timer</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">setTimeout</span>(<span style="color:#a6e22e">handleInput</span>, <span style="color:#a6e22e">timeout</span>);
+      timer = setTimeout(handleInput, timeout);
     };
     
-    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">searchField</span> <span style="color:#f92672">!==</span> <span style="color:#66d9ef">null</span>) {
-      <span style="color:#a6e22e">searchField</span>.<span style="color:#a6e22e">addEventListener</span>(<span style="color:#e6db74">&#39;keydown&#39;</span>, <span style="color:#a6e22e">startTimer</span>, <span style="color:#66d9ef">true</span>);
-      <span style="color:#a6e22e">searchField</span>.<span style="color:#a6e22e">addEventListener</span>(<span style="color:#e6db74">&#39;blur&#39;</span>, <span style="color:#66d9ef">function</span>() {
-        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">textEntered</span>) {
-          window.<span style="color:#a6e22e">clearTimeout</span>(<span style="color:#a6e22e">timer</span>);
-          <span style="color:#a6e22e">handleInput</span>();
+    <span style="color:#00a">if</span> (searchField !== <span style="color:#00a">null</span>) {
+      searchField.addEventListener(<span style="color:#a50">&#39;keydown&#39;</span>, startTimer, <span style="color:#00a">true</span>);
+      searchField.addEventListener(<span style="color:#a50">&#39;blur&#39;</span>, <span style="color:#00a">function</span>() {
+        <span style="color:#00a">if</span> (textEntered) {
+          <span style="color:#0aa">window</span>.clearTimeout(timer);
+          handleInput();
         }
-      }, <span style="color:#66d9ef">true</span>);
+      }, <span style="color:#00a">true</span>);
     }
   })();
-&lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
+&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
 <p>First, you need to define some utility variables.</p>
 <ul>
 <li>

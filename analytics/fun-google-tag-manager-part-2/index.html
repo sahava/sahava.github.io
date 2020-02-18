@@ -364,18 +364,18 @@
 <p>So here's the first tip:</p>
 <p><strong>You need to declare <code>dataLayer</code> as an Array before you can use its push() method.</strong></p>
 <p>To turn <code>dataLayer</code> into an array, you need the following code <em>before the container snippet</em>:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">dataLayer</span> <span style="color:#f92672">=</span> [];
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">var</span> dataLayer = [];
 </code></pre></div>
 <p>If you don't declare it with this explicit statement, then <strong><a href="https://www.simoahava.com/analytics/container-snippet-gtm-secrets-revealed/">GTM will declare dataLayer</a> for you</strong>. This is very important, since it ensures that you will always have <code>dataLayer</code> available for your tags.</p>
 <p>The thing with JavaScript objects and primitives (numbers, strings, etc.) is that if you <strong>redefine</strong> a JavaScript entity, its previous state will be overwritten! JavaScript entities are dynamic, so you can redefine a string as an object, an Array as a number, and so forth without any difficulty. There's also no way of protecting a global variable such as <code>dataLayer</code> from being redefined as a different type, so precautions must be taken so that you don't mess things up.</p>
 <p>Why is this important? Well, if you have more than one <code>dataLayer</code> declaration on your page template OR in your GTM tags, you will <strong>erase all previous information in the structure</strong>! Oops. Here's an example:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">dataLayer</span> <span style="color:#f92672">=</span> [{<span style="color:#e6db74">&#39;pageCategory&#39;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;home&#39;</span>, <span style="color:#e6db74">&#39;logged-in&#39;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;true&#39;</span>}];
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">var</span> dataLayer = [{<span style="color:#a50">&#39;pageCategory&#39;</span>: <span style="color:#a50">&#39;home&#39;</span>, <span style="color:#a50">&#39;logged-in&#39;</span>: <span style="color:#a50">&#39;true&#39;</span>}];
 ...
-<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">dataLayer</span> <span style="color:#f92672">=</span> [{<span style="color:#e6db74">&#39;event&#39;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;allDone&#39;</span>}];
+<span style="color:#00a">var</span> dataLayer = [{<span style="color:#a50">&#39;event&#39;</span>: <span style="color:#a50">&#39;allDone&#39;</span>}];
 </code></pre></div>
 <p>After the first line of code, <code>dataLayer</code> has a single object with two properties: <code>pageCategory</code> and <code>logged-in</code>. A little on further down the code is the second declaration. Now, after this code is run, <code>dataLayer</code> will still only have one object, but with just the <code>event</code> property! Can you see how harmful this is? None of the previous information is recoverable after this.</p>
 <p>The safest way to prevent this is to preface the ONLY <code>dataLayer</code> declaration on the page with the following line:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">window.<span style="color:#a6e22e">dataLayer</span> <span style="color:#f92672">=</span> window.<span style="color:#a6e22e">dataLayer</span> <span style="color:#f92672">||</span> [];
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#0aa">window</span>.dataLayer = <span style="color:#0aa">window</span>.dataLayer || [];
 </code></pre></div>
 <p>And then only use <strong>dataLayer.push()</strong> to add objects to the Array. This line ensures that if <code>dataLayer</code> has already been declared, it won't be overwritten. It's not foolproof, since it doesn't test whether the global variable <code>dataLayer</code> is of type Array or not, but I think it's good enough. If you have another JavaScript library which HAPPENS to use a variable called <code>dataLayer</code> as well, you might be in trouble. But this is what testing and debugging is for.</p>
 <p>So here's my final tip for this section:</p>
@@ -383,10 +383,10 @@
 <p>In your GTM tags you can just use <code>dataLayer.push()</code>, and you don't need to check whether <code>dataLayer</code> exists or not, since GTM declares it for you in the container snippet. But when working on the page template, you need to be extra careful not to overwrite the Array.</p>
 <h2 id="using-eventcallback-in-datalayerpush">Using eventCallback in dataLayer.push()</h2>
 <p>You can use the <code>eventCallback</code> dataLayer variable in the <code>push()</code> method to execute code after all dependent tags have fired. I know, that was a mouthful but it's really simple. Take this example:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
-  <span style="color:#e6db74">&#39;event&#39;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;fireEvent&#39;</span>,
-  <span style="color:#e6db74">&#39;eventCallback&#39;</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">function</span>() {
-    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#34;Event has fired&#34;</span>);
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">dataLayer.push({
+  <span style="color:#a50">&#39;event&#39;</span>: <span style="color:#a50">&#39;fireEvent&#39;</span>,
+  <span style="color:#a50">&#39;eventCallback&#39;</span>: <span style="color:#00a">function</span>() {
+    console.log(<span style="color:#a50">&#34;Event has fired&#34;</span>);
   }
 });
 </code></pre></div>
@@ -429,7 +429,7 @@
 
 
 <p>After this, whenever you want to halt a timer, all you have to do is have the following line of JavaScript in your Custom HTML tag or your Custom JavaScript macro:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">window.<span style="color:#a6e22e">clearInterval</span>({{<span style="color:#a6e22e">timer</span> <span style="color:#a6e22e">id</span>}});
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#0aa">window</span>.clearInterval({{timer id}});
 </code></pre></div>
 <p>This will halt the most recently fired timer. So if you have multiple timers, you might have to edit the code somewhat to find the proper timer (easiest way to do this is to use <strong>{{event}} equals your_timer_event</strong> as one of the rule conditions of the tag that stops the timer).</p>
 <h2 id="naming-and-version-control-conventions">Naming and version control conventions</h2>
@@ -627,10 +627,10 @@ URL Hostname</p>
 <h2 id="true-and-false">{{true}} and {{false}}</h2>
 <p>This one's a quicky but pretty important. Create two Custom JavaScript macros:</p>
 <p><strong>{{true}}</strong></p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() { <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">true</span>; }
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() { <span style="color:#00a">return</span> <span style="color:#00a">true</span>; }
 </code></pre></div>
 <p><strong>{{false}}</strong></p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() { <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span>; }
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() { <span style="color:#00a">return</span> <span style="color:#00a">false</span>; }
 </code></pre></div>
 <p>Why, you ask? Well, let's say you want to set the Anonymize IP setting to <em>true</em> for one domain and <em>false</em> for two other domains (this idea came from Carmen Mardiros, by the way!). You want to use a Lookup Table Macro to achieve this, but when your Lookup Table aligns domains with the return value of &ldquo;true&rdquo; and &ldquo;false&rdquo;, you notice that things don't work as you'd like them to. The problem is that if you add text to a field in GTM, it is always cast to string type. Anonymize IP requires <em>Boolean</em> type, otherwise it fails.</p>
 <p>To circumvent this problem, instead of typing &ldquo;true&rdquo; and &ldquo;false&rdquo; into GTM's fields, use the macros you just created. They return <em>true</em> and <em>false</em> in proper Boolean type! This way you will be able to pass the correct value types to the settings which require Boolean values.</p>

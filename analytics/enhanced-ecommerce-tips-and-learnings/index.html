@@ -377,15 +377,15 @@
 <p>If you <strong>do</strong> want to recursively merge &lsquo;ecommerce&rsquo; objects, you will need to use the &ldquo;Read data from variable&rdquo; option which becomes available when you uncheck the &ldquo;Use Data Layer&rdquo; option. Read on&hellip;</p>
 <h3 id="custom-javascript-variable-to-the-rescue">Custom JavaScript Variable to the rescue</h3>
 <p>I've <a href="https://www.simoahava.com/analytics/enhanced-ecommerce-with-a-custom-javascript-variable/">written about this before</a>, and these days I actually only use this option to send the payloads. When you use the Custom JavaScript option (see the <a href="https://developers.google.com/tag-manager/enhanced-ecommerce#macro">developer guide</a> for further information), you can create, parse, and delete parts of the &lsquo;ecommerce&rsquo; object until it's to your liking. This is an incredibly powerful tool, letting you pull in data from multiple sources to compile the object, or allowing you to access the <em>full</em> &lsquo;ecommerce&rsquo; object stored in <a href="https://www.simoahava.com/analytics/google-tag-manager-data-model/">the data model</a>, and not just the stunted <em>version 1</em> object available if you use the &ldquo;Use Data Layer&rdquo; option in your Tags.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">ecom</span> <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#39;ecommerce&#39;</span> <span style="color:#f92672">:</span> {
-    <span style="color:#e6db74">&#39;impressions&#39;</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">pageData</span>.<span style="color:#a6e22e">productImpressions</span>,
-    <span style="color:#e6db74">&#39;detail&#39;</span> <span style="color:#f92672">:</span> {
-      <span style="color:#e6db74">&#39;actionField&#39;</span> <span style="color:#f92672">:</span> {<span style="color:#e6db74">&#39;list&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;Related Products&#39;</span>},
-      <span style="color:#e6db74">&#39;products&#39;</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">pageData</span>.<span style="color:#a6e22e">productDetailView</span>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() {
+  <span style="color:#00a">var</span> ecom = {<span style="color:#a50">&#39;ecommerce&#39;</span> : {
+    <span style="color:#a50">&#39;impressions&#39;</span> : pageData.productImpressions,
+    <span style="color:#a50">&#39;detail&#39;</span> : {
+      <span style="color:#a50">&#39;actionField&#39;</span> : {<span style="color:#a50">&#39;list&#39;</span> : <span style="color:#a50">&#39;Related Products&#39;</span>},
+      <span style="color:#a50">&#39;products&#39;</span> : pageData.productDetailView
     }
   };
-  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ecom</span>;
+  <span style="color:#00a">return</span> ecom;
 }
 </code></pre></div>
 <p>The example above pulls together both <em>product impressions</em> and <em>product detail view</em> in a single object, sending the complete payload to Google Analytics with the Tag.</p>
@@ -426,26 +426,26 @@
 <p>This, in turn, basically means that the <code>products</code> Array needs to be consistent throughout the funnel. For example, if you have a product which has the category &lsquo;T-Shirts&rsquo;, you will need to have this information in all the payloads the product is sent in if you want to query for it across the entire funnel. GTM or GA will not persist this information.</p>
 <p>You'll want to be very careful when designing and developing the Data Layer for your Enhanced Ecommerce payloads. The developers need to understand how important it is to have the product details be identical throughout the funnel process.</p>
 <p>This has implications for queries as well. For example, let's say you send the following two payloads to Google Analytics:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
-  <span style="color:#e6db74">&#39;ecommerce&#39;</span> <span style="color:#f92672">:</span> {
-    <span style="color:#e6db74">&#39;detail&#39;</span> <span style="color:#f92672">:</span> {
-      <span style="color:#e6db74">&#39;products&#39;</span> <span style="color:#f92672">:</span> [{
-        <span style="color:#e6db74">&#39;id&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;A12345&#39;</span>,
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">dataLayer.push({
+  <span style="color:#a50">&#39;ecommerce&#39;</span> : {
+    <span style="color:#a50">&#39;detail&#39;</span> : {
+      <span style="color:#a50">&#39;products&#39;</span> : [{
+        <span style="color:#a50">&#39;id&#39;</span> : <span style="color:#a50">&#39;A12345&#39;</span>,
       }]
     }
   },
-  <span style="color:#e6db74">&#39;event&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;ecommerce&#39;</span>
+  <span style="color:#a50">&#39;event&#39;</span> : <span style="color:#a50">&#39;ecommerce&#39;</span>
 });
-<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
-  <span style="color:#e6db74">&#39;ecommerce&#39;</span> <span style="color:#f92672">:</span> {
-    <span style="color:#e6db74">&#39;add&#39;</span> <span style="color:#f92672">:</span> {
-      <span style="color:#e6db74">&#39;products&#39;</span> <span style="color:#f92672">:</span> [{
-        <span style="color:#e6db74">&#39;id&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;A12345&#39;</span>,
-        <span style="color:#e6db74">&#39;name&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;My T-Shirt&#39;</span>
+dataLayer.push({
+  <span style="color:#a50">&#39;ecommerce&#39;</span> : {
+    <span style="color:#a50">&#39;add&#39;</span> : {
+      <span style="color:#a50">&#39;products&#39;</span> : [{
+        <span style="color:#a50">&#39;id&#39;</span> : <span style="color:#a50">&#39;A12345&#39;</span>,
+        <span style="color:#a50">&#39;name&#39;</span> : <span style="color:#a50">&#39;My T-Shirt&#39;</span>
       }]
     }
   },
-  <span style="color:#e6db74">&#39;event&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;ecommerce&#39;</span>
+  <span style="color:#a50">&#39;event&#39;</span> : <span style="color:#a50">&#39;ecommerce&#39;</span>
 });
 </code></pre></div>
 <p>In this case, querying for product <strong>SKU</strong> &lsquo;A12345&rsquo; will return a result when queried against <em>product detail views</em> and <em>product adds to cart</em>. However, product <strong>name</strong> &lsquo;My T-Shirt&rsquo; will only return a result when queried against <em>product adds to cart</em>. Since this product name was missing from the &lsquo;detail&rsquo; payload, you won't be able to query for this information.</p>
@@ -457,18 +457,18 @@
 <p>Product-scoped custom dimensions and metrics are a wonderful way to extend the rather limited set of information you can send with each product.</p>
 <p>To send a product-scoped dimension or metric in Google Tag Manager, you need to include the <code>dimensionX</code> and/or <code>metricX</code> key in the respective product in the payload you want to send the dimension/metric in. Again, as in the previous chapter, product-scoped dimensions and metrics do not persist, so you will need to include them consistently in the payloads.</p>
 <p>For example, to send a dimension with details about the T-shirt size, and a metric with the tax-free value of the shirt, the <code>dataLayer.push()</code> would look like this:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
-  <span style="color:#e6db74">&#39;ecommerce&#39;</span> <span style="color:#f92672">:</span> {
-    <span style="color:#e6db74">&#39;detail&#39;</span> <span style="color:#f92672">:</span> {
-      <span style="color:#e6db74">&#39;products&#39;</span> <span style="color:#f92672">:</span> [{
-        <span style="color:#e6db74">&#39;id&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;A12345&#39;</span>,
-        <span style="color:#e6db74">&#39;name&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;My T-Shirt&#39;</span>,
-        <span style="color:#e6db74">&#39;dimension3&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;Large&#39;</span>,
-        <span style="color:#e6db74">&#39;metric2&#39;</span> <span style="color:#f92672">:</span> <span style="color:#ae81ff">11.99</span>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">dataLayer.push({
+  <span style="color:#a50">&#39;ecommerce&#39;</span> : {
+    <span style="color:#a50">&#39;detail&#39;</span> : {
+      <span style="color:#a50">&#39;products&#39;</span> : [{
+        <span style="color:#a50">&#39;id&#39;</span> : <span style="color:#a50">&#39;A12345&#39;</span>,
+        <span style="color:#a50">&#39;name&#39;</span> : <span style="color:#a50">&#39;My T-Shirt&#39;</span>,
+        <span style="color:#a50">&#39;dimension3&#39;</span> : <span style="color:#a50">&#39;Large&#39;</span>,
+        <span style="color:#a50">&#39;metric2&#39;</span> : <span style="color:#099">11.99</span>
       }]
     }
   },
-  <span style="color:#e6db74">&#39;event&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;ecommerce&#39;</span>
+  <span style="color:#a50">&#39;event&#39;</span> : <span style="color:#a50">&#39;ecommerce&#39;</span>
 });
 </code></pre></div>
 <p>Naturally, a payload like this will only let you query for this information with <em>product detail view</em> queries, and for this particular product only. These dimensions do not persist across funnel payloads, nor do they cover multiple products. They're <strong>per product, per hit</strong>.</p>
@@ -477,12 +477,12 @@
 <p>The &lsquo;category&rsquo; field has been available in &ldquo;traditional&rdquo; Ecommerce as well, but it's been slightly revamped in Enhanced Ecommerce.</p>
 <p>First of all, the consistency requirement applies here as well. If you want to make full-funnel queries against a product category, you will need to send the category with every single product in all steps of the funnel you want to query against. The field does not persist.</p>
 <p>The other thing about categories is that you can send <strong>five levels</strong> of categories, resulting in some sweet segmentation in your reports. These levels are sent by using the slash (<strong>/</strong>) between levels, where level 1 is the first item in the string, level 2 the second, etc. So, a full five-level product category string would look like this in a payload:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
-  <span style="color:#e6db74">&#39;ecommerce&#39;</span> <span style="color:#f92672">:</span> {
-    <span style="color:#e6db74">&#39;detail&#39;</span> <span style="color:#f92672">:</span> {
-      <span style="color:#e6db74">&#39;products&#39;</span> <span style="color:#f92672">:</span> [{
-        <span style="color:#e6db74">&#39;id&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;A12345&#39;</span>,
-        <span style="color:#e6db74">&#39;category&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;Clothes/T-Shirts/Men/Sleeveless/Used&#39;</span>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">dataLayer.push({
+  <span style="color:#a50">&#39;ecommerce&#39;</span> : {
+    <span style="color:#a50">&#39;detail&#39;</span> : {
+      <span style="color:#a50">&#39;products&#39;</span> : [{
+        <span style="color:#a50">&#39;id&#39;</span> : <span style="color:#a50">&#39;A12345&#39;</span>,
+        <span style="color:#a50">&#39;category&#39;</span> : <span style="color:#a50">&#39;Clothes/T-Shirts/Men/Sleeveless/Used&#39;</span>
       }]
     }
   }

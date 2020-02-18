@@ -374,9 +374,9 @@
 
 
 <p>So when a user logs in, the website should push their User ID into <code>dataLayer</code> like so:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
-  <span style="color:#e6db74">&#39;userId&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;AAA-123&#39;</span>,
-  <span style="color:#e6db74">&#39;event&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;authentication&#39;</span>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">dataLayer.push({
+  <span style="color:#a50">&#39;userId&#39;</span> : <span style="color:#a50">&#39;AAA-123&#39;</span>,
+  <span style="color:#a50">&#39;event&#39;</span> : <span style="color:#a50">&#39;authentication&#39;</span>
 });
 </code></pre></div>
 <p>This shouldn't come as a surprise, right? That's how you should do it in any case. The &lsquo;event&rsquo; push fires the Event Tag which sends the user ID to Google Analytics. Nothing ground-breaking here, yet.</p>
@@ -397,17 +397,17 @@
 
 
 <p>Finally, you'll need a <strong>Custom JavaScript Variable</strong>, which we'll call <strong>{{user id}}</strong>. Its task is to perform the algorithm described in the beginning of this chapter.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
-    <span style="color:#66d9ef">if</span> ({{<span style="color:#a6e22e">uid</span> <span style="color:#66d9ef">in</span> <span style="color:#a6e22e">datalayer</span>}}) {
-        <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">d</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Date();
-        <span style="color:#a6e22e">d</span>.<span style="color:#a6e22e">setTime</span>(<span style="color:#a6e22e">d</span>.<span style="color:#a6e22e">getTime</span>()<span style="color:#f92672">+</span><span style="color:#ae81ff">1000</span><span style="color:#f92672">*</span><span style="color:#ae81ff">60</span><span style="color:#f92672">*</span><span style="color:#ae81ff">60</span><span style="color:#f92672">*</span><span style="color:#ae81ff">24</span><span style="color:#f92672">*</span><span style="color:#ae81ff">365</span><span style="color:#f92672">*</span><span style="color:#ae81ff">2</span>);
-        <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">expires</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;expires=&#39;</span><span style="color:#f92672">+</span><span style="color:#a6e22e">d</span>.<span style="color:#a6e22e">toGMTString</span>();
-        document.<span style="color:#a6e22e">cookie</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;userId=&#39;</span> <span style="color:#f92672">+</span> {{<span style="color:#a6e22e">uid</span> <span style="color:#66d9ef">in</span> <span style="color:#a6e22e">datalayer</span>}} <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;; &#39;</span><span style="color:#f92672">+</span><span style="color:#a6e22e">expires</span><span style="color:#f92672">+</span><span style="color:#e6db74">&#39;; path=/&#39;</span>;
-        <span style="color:#66d9ef">return</span> {{<span style="color:#a6e22e">uid</span> <span style="color:#66d9ef">in</span> <span style="color:#a6e22e">datalayer</span>}};
-    } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> ({{<span style="color:#a6e22e">uid</span> <span style="color:#66d9ef">in</span> <span style="color:#a6e22e">cookie</span>}}) {
-        <span style="color:#66d9ef">return</span> {{<span style="color:#a6e22e">uid</span> <span style="color:#66d9ef">in</span> <span style="color:#a6e22e">cookie</span>}};
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() {
+    <span style="color:#00a">if</span> ({{uid <span style="color:#00a">in</span> datalayer}}) {
+        <span style="color:#00a">var</span> d = <span style="color:#00a">new</span> <span style="color:#0aa">Date</span>();
+        d.setTime(d.getTime()+<span style="color:#099">1000</span>*<span style="color:#099">60</span>*<span style="color:#099">60</span>*<span style="color:#099">24</span>*<span style="color:#099">365</span>*<span style="color:#099">2</span>);
+        <span style="color:#00a">var</span> expires = <span style="color:#a50">&#39;expires=&#39;</span>+d.toGMTString();
+        <span style="color:#0aa">document</span>.cookie = <span style="color:#a50">&#39;userId=&#39;</span> + {{uid <span style="color:#00a">in</span> datalayer}} + <span style="color:#a50">&#39;; &#39;</span>+expires+<span style="color:#a50">&#39;; path=/&#39;</span>;
+        <span style="color:#00a">return</span> {{uid <span style="color:#00a">in</span> datalayer}};
+    } <span style="color:#00a">else</span> <span style="color:#00a">if</span> ({{uid <span style="color:#00a">in</span> cookie}}) {
+        <span style="color:#00a">return</span> {{uid <span style="color:#00a">in</span> cookie}};
     }
-    <span style="color:#66d9ef">return</span>;
+    <span style="color:#00a">return</span>;
 }
 </code></pre></div>
 <p>And, finally (phew! this was supposed to be a simple tip), you need to edit your Universal Analytics tags to fetch the <strong>{{user id}}</strong> for the <code>&amp;uid;</code>:</p>

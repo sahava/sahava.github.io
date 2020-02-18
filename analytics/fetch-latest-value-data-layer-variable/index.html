@@ -339,17 +339,17 @@
 
 <p>For example, let's say your site has a <a href="https://www.simoahava.com/analytics/simple-custom-event-listeners-gtm/">custom event listener</a> built to detect when the user is about to leave a page (using the <a href="https://www.simoahava.com/analytics/fire-trigger-when-user-about-to-leave-page/"><code>beforeunload</code></a> custom event). However, you only want to send that event if the user is logged out, for some obscure reason.</p>
 <p>This is what your first attempt might look like. It's a Custom HTML tag set to fire when the page is first loaded with the <strong>All Pages</strong> trigger.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
-  (<span style="color:#66d9ef">function</span>() {
-    window.<span style="color:#a6e22e">addEventListener</span>(<span style="color:#e6db74">&#39;beforeunload&#39;</span>, <span style="color:#66d9ef">function</span>() {
-	  <span style="color:#66d9ef">if</span> ({{<span style="color:#a6e22e">DLV</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">loginStatus</span>}} <span style="color:#f92672">===</span> <span style="color:#e6db74">&#39;logged-out&#39;</span>) {
-  	    window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
-	      <span style="color:#a6e22e">event</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;userLeavesPages&#39;</span>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+  (<span style="color:#00a">function</span>() {
+    <span style="color:#0aa">window</span>.addEventListener(<span style="color:#a50">&#39;beforeunload&#39;</span>, <span style="color:#00a">function</span>() {
+	  <span style="color:#00a">if</span> ({{DLV - loginStatus}} === <span style="color:#a50">&#39;logged-out&#39;</span>) {
+  	    <span style="color:#0aa">window</span>.dataLayer.push({
+	      event: <span style="color:#a50">&#39;userLeavesPages&#39;</span>
 	    });
 	  }
 	});
   })();
-&lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
+&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
 <p>Now, when the Custom HTML tag fires, the <code>beforeunload</code> listener is created, and the <strong>{{DLV - loginStatus}}</strong> variable is resolved to whatever value it had when the tag fired.</p>
 <p>Then, when the user is about to leave the page by closing the browser or clicking a link, the <code>beforeunload</code> callback is executed, and it checks if this original state of <code>loginStatus</code> is &ldquo;logged-out&rdquo;, in which case it runs the <code>dataLayer.push()</code>.</p>
 <p>Do you see the problem here? The <code>beforeunload</code> event is not fired until the user tries to leave the page, but the <strong>{{DLV - loginStatus}}</strong> is resolved to whatever value it had when the tag itself was initially run. If the <code>loginStatus</code> <strong>changes</strong> while the user is on the page, it wouldn't make a difference. The initial value is what's used in the <code>if...</code> condition, meaning you'll risk losing valid hits because of that.</p>
@@ -358,17 +358,17 @@
 <p><code>window.google_tag_manager[{{Container ID}}].dataLayer.get('variableNameHere');</code></p>
 <p>Remember to enable the Container ID <a href="https://www.simoahava.com/analytics/variable-guide-google-tag-manager/#built-in-variables">built-in variable</a> for this.</p>
 <p>This method polls GTM's internal <a href="https://www.simoahava.com/analytics/google-tag-manager-data-model/">data model</a> and fetches the latest value of the <code>variableNameHere</code> Data Layer variable. So, to modify the original example, here's what you end up with:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
-  (<span style="color:#66d9ef">function</span>() {
-    window.<span style="color:#a6e22e">addEventListener</span>(<span style="color:#e6db74">&#39;beforeunload&#39;</span>, <span style="color:#66d9ef">function</span>() {
-	  <span style="color:#66d9ef">if</span> (window.<span style="color:#a6e22e">google_tag_manager</span>[{{<span style="color:#a6e22e">Container</span> <span style="color:#a6e22e">ID</span>}}].<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">get</span>(<span style="color:#e6db74">&#39;loginStatus&#39;</span>) <span style="color:#f92672">===</span> <span style="color:#e6db74">&#39;logged-out&#39;</span>) {
-	    window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
-		  <span style="color:#a6e22e">event</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;userLeavesPage&#39;</span>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+  (<span style="color:#00a">function</span>() {
+    <span style="color:#0aa">window</span>.addEventListener(<span style="color:#a50">&#39;beforeunload&#39;</span>, <span style="color:#00a">function</span>() {
+	  <span style="color:#00a">if</span> (<span style="color:#0aa">window</span>.google_tag_manager[{{Container ID}}].dataLayer.get(<span style="color:#a50">&#39;loginStatus&#39;</span>) === <span style="color:#a50">&#39;logged-out&#39;</span>) {
+	    <span style="color:#0aa">window</span>.dataLayer.push({
+		  event: <span style="color:#a50">&#39;userLeavesPage&#39;</span>
 	    });
 	  }
     });
   })();
-&lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
+&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
 <p>Now the <code>if...</code> condition checks what the <strong>latest</strong> value of <code>loginStatus</code> is, and it will work nicely if the status has changed while the user is on the current page.</p>
 <p>It's a simple trick, but can come in handy when working with GTM's idiosyncractic way of freezing the variable state for the duration of each trigger event.</p>
 

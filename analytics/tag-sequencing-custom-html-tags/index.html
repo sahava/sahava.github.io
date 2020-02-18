@@ -359,30 +359,30 @@
 <blockquote>
 <p><strong>NOTE!</strong> Remember to enable the <strong>Container ID</strong> and <strong>HTML ID</strong> <a href="https://www.simoahava.com/analytics/variable-guide-google-tag-manager/#utilities">built-in variables</a> for this.</p>
 </blockquote>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">(<span style="color:#66d9ef">function</span>() {
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">gtm</span> <span style="color:#f92672">=</span> window.<span style="color:#a6e22e">google_tag_manager</span>[{{<span style="color:#a6e22e">Container</span> <span style="color:#a6e22e">ID</span>}}]; <span style="color:#75715e">// Required
-</span><span style="color:#75715e"></span>	  
-  window[<span style="color:#e6db74">&#39;something&#39;</span>] <span style="color:#f92672">=</span> <span style="color:#a6e22e">getSomethingElse</span>();
-  <span style="color:#66d9ef">if</span> (<span style="color:#66d9ef">typeof</span> window[<span style="color:#e6db74">&#39;something&#39;</span>] <span style="color:#f92672">!==</span> <span style="color:#e6db74">&#39;undefined&#39;</span>) {
-    <span style="color:#a6e22e">gtm</span>.<span style="color:#a6e22e">onHtmlSuccess</span>({{<span style="color:#a6e22e">HTML</span> <span style="color:#a6e22e">ID</span>}}); <span style="color:#75715e">// Success, move to next tag
-</span><span style="color:#75715e"></span>  } <span style="color:#66d9ef">else</span> {
-    <span style="color:#a6e22e">gtm</span>.<span style="color:#a6e22e">onHtmlFailure</span>({{<span style="color:#a6e22e">HTML</span> <span style="color:#a6e22e">ID</span>}}); <span style="color:#75715e">// Failure, move to next tag unless it has failure toggle on
-</span><span style="color:#75715e"></span>  }
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">(<span style="color:#00a">function</span>() {
+  <span style="color:#00a">var</span> gtm = <span style="color:#0aa">window</span>.google_tag_manager[{{Container ID}}]; <span style="color:#aaa;font-style:italic">// Required
+</span><span style="color:#aaa;font-style:italic"></span>	  
+  <span style="color:#0aa">window</span>[<span style="color:#a50">&#39;something&#39;</span>] = getSomethingElse();
+  <span style="color:#00a">if</span> (<span style="color:#00a">typeof</span> <span style="color:#0aa">window</span>[<span style="color:#a50">&#39;something&#39;</span>] !== <span style="color:#a50">&#39;undefined&#39;</span>) {
+    gtm.onHtmlSuccess({{HTML ID}}); <span style="color:#aaa;font-style:italic">// Success, move to next tag
+</span><span style="color:#aaa;font-style:italic"></span>  } <span style="color:#00a">else</span> {
+    gtm.onHtmlFailure({{HTML ID}}); <span style="color:#aaa;font-style:italic">// Failure, move to next tag unless it has failure toggle on
+</span><span style="color:#aaa;font-style:italic"></span>  }
 })();
 </code></pre></div>
 <h3 id="lesson-2-the-success-and-failure-callbacks-arent-always-necessary">Lesson 2: The success and failure callbacks aren't always necessary</h3>
 <p>Here's something I think most guides have missed: you don't <em>need</em> <code>onHtmlSuccess()</code> and <code>onHtmlFailure()</code> in your Custom HTML tag! The web browser executes all the code it finds in a Custom HTML tag from top-to-bottom before moving to the next item in the sequence.</p>
 <p>For example, if you've setup the <a href="http://www.analytics-ninja.com/blog/2017/05/guide-facebook-pixel-google-tag-manager.html">Facebook pixel</a> with Custom HTML tags, you don't need <code>onHtmlSuccess()</code> in the base pixel tag.</p>
-<p><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#f92672">!</span><span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">f</span>,<span style="color:#a6e22e">b</span>,<span style="color:#a6e22e">e</span>,<span style="color:#a6e22e">v</span>,<span style="color:#a6e22e">n</span>,<span style="color:#a6e22e">t</span>,<span style="color:#a6e22e">s</span>){<span style="color:#66d9ef">if</span>(<span style="color:#a6e22e">f</span>.<span style="color:#a6e22e">fbq</span>)<span style="color:#66d9ef">return</span>;<span style="color:#a6e22e">n</span><span style="color:#f92672">=</span><span style="color:#a6e22e">f</span>.<span style="color:#a6e22e">fbq</span><span style="color:#f92672">=</span><span style="color:#66d9ef">function</span>(){<span style="color:#a6e22e">n</span>.<span style="color:#a6e22e">callMethod</span><span style="color:#f92672">?</span>
-<span style="color:#a6e22e">n</span>.<span style="color:#a6e22e">callMethod</span>.<span style="color:#a6e22e">apply</span>(<span style="color:#a6e22e">n</span>,<span style="color:#a6e22e">arguments</span>)<span style="color:#f92672">:</span><span style="color:#a6e22e">n</span>.<span style="color:#a6e22e">queue</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">arguments</span>)};<span style="color:#66d9ef">if</span>(<span style="color:#f92672">!</span><span style="color:#a6e22e">f</span>.<span style="color:#a6e22e">_fbq</span>)<span style="color:#a6e22e">f</span>.<span style="color:#a6e22e">_fbq</span><span style="color:#f92672">=</span><span style="color:#a6e22e">n</span>;
-<span style="color:#a6e22e">n</span>.<span style="color:#a6e22e">push</span><span style="color:#f92672">=</span><span style="color:#a6e22e">n</span>;<span style="color:#a6e22e">n</span>.<span style="color:#a6e22e">loaded</span><span style="color:#f92672">=</span><span style="color:#f92672">!</span><span style="color:#ae81ff">0</span>;<span style="color:#a6e22e">n</span>.<span style="color:#a6e22e">version</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#39;2.0&#39;</span>;<span style="color:#a6e22e">n</span>.<span style="color:#a6e22e">queue</span><span style="color:#f92672">=</span>[];<span style="color:#a6e22e">t</span><span style="color:#f92672">=</span><span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">createElement</span>(<span style="color:#a6e22e">e</span>);<span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">async</span><span style="color:#f92672">=</span><span style="color:#f92672">!</span><span style="color:#ae81ff">0</span>;
-<span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">src</span><span style="color:#f92672">=</span><span style="color:#a6e22e">v</span>;<span style="color:#a6e22e">s</span><span style="color:#f92672">=</span><span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">getElementsByTagName</span>(<span style="color:#a6e22e">e</span>)[<span style="color:#ae81ff">0</span>];<span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">parentNode</span>.<span style="color:#a6e22e">insertBefore</span>(<span style="color:#a6e22e">t</span>,<span style="color:#a6e22e">s</span>)}(window,
-document,<span style="color:#e6db74">&#39;script&#39;</span>,<span style="color:#e6db74">&#39;https://connect.facebook.net/en_US/fbevents.js&#39;</span>);
+<p><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">!<span style="color:#00a">function</span>(f,b,e,v,n,t,s){<span style="color:#00a">if</span>(f.fbq)<span style="color:#00a">return</span>;n=f.fbq=<span style="color:#00a">function</span>(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};<span style="color:#00a">if</span>(!f._fbq)f._fbq=n;
+n.push=n;n.loaded=!<span style="color:#099">0</span>;n.version=<span style="color:#a50">&#39;2.0&#39;</span>;n.queue=[];t=b.createElement(e);t.async=!<span style="color:#099">0</span>;
+t.src=v;s=b.getElementsByTagName(e)[<span style="color:#099">0</span>];s.parentNode.insertBefore(t,s)}(<span style="color:#0aa">window</span>,
+<span style="color:#0aa">document</span>,<span style="color:#a50">&#39;script&#39;</span>,<span style="color:#a50">&#39;https://connect.facebook.net/en_US/fbevents.js&#39;</span>);
  
-<span style="color:#a6e22e">fbq</span>(<span style="color:#e6db74">&#39;init&#39;</span>, {{<span style="color:#a6e22e">Facebook</span> <span style="color:#a6e22e">Pixel</span> <span style="color:#a6e22e">ID</span>}});
+fbq(<span style="color:#a50">&#39;init&#39;</span>, {{Facebook Pixel ID}});
 
-<span style="color:#75715e">// The following line is NOT necessary:
-</span><span style="color:#75715e"></span><span style="color:#75715e">// window.google_tag_manager[{{Container ID}}].onHtmlSuccess({{HTML ID}}); 
+<span style="color:#aaa;font-style:italic">// The following line is NOT necessary:
+</span><span style="color:#aaa;font-style:italic"></span><span style="color:#aaa;font-style:italic">// window.google_tag_manager[{{Container ID}}].onHtmlSuccess({{HTML ID}}); 
 </span></code></pre></div>
 Why is the last line not necessary? Because GTM would pass execution to the next tag <em>in any case</em> when it reaches the last line of this tag. The web browser runs code synchronously - there's no way it will stop in the middle of this tag and start working on the next tag.</p>
 <p>So the lesson is:</p>
@@ -391,53 +391,53 @@ Why is the last line not necessary? Because GTM would pass execution to the next
 <h3 id="lesson-3-if-you-have-onhtmlfailure-youll-always-want-to-have-onhtmlsuccess-too">Lesson 3: If you have <code>onHtmlFailure()</code>, you'll always want to have <code>onHtmlSuccess()</code>, too</h3>
 <p>If you use <code>onHtmlFailure()</code> to signal that at some point in the code an error is met and sequence should <em>not</em> proceed with the next tag (since you have the failure toggle on), you should also add <code>onHtmlSuccess()</code> somewhere in the code.</p>
 <p>This is because when you use the failure callback, GTM will not automatically proceed to the next tag anymore when it reaches the last line of the Custom HTML tag, even if you have the failure toggle turned off. By using <code>onHtmlFailure()</code>, you are telling Google Tag Manager to wait for either the <code>onHtmlFailure()</code> or <code>onHtmlSuccess()</code> before deciding whether to move to the next tag.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">(<span style="color:#66d9ef">function</span>() {
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">gtm</span> <span style="color:#f92672">=</span> window.<span style="color:#a6e22e">google_tag_manager</span>[{{<span style="color:#a6e22e">Container</span> <span style="color:#a6e22e">ID</span>}}];
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">(<span style="color:#00a">function</span>() {
+  <span style="color:#00a">var</span> gtm = <span style="color:#0aa">window</span>.google_tag_manager[{{Container ID}}];
   
-  <span style="color:#66d9ef">if</span> (<span style="color:#66d9ef">true</span>) {
-    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#39;Worked!&#39;</span>);
-  } <span style="color:#66d9ef">else</span> {
-    <span style="color:#a6e22e">gtm</span>.<span style="color:#a6e22e">onHtmlFailure</span>({{<span style="color:#a6e22e">HTML</span> <span style="color:#a6e22e">ID</span>}});
+  <span style="color:#00a">if</span> (<span style="color:#00a">true</span>) {
+    console.log(<span style="color:#a50">&#39;Worked!&#39;</span>);
+  } <span style="color:#00a">else</span> {
+    gtm.onHtmlFailure({{HTML ID}});
   }
 })();
 </code></pre></div>
 <p>In the above example, sequence will <strong>never</strong> proceed to the next tag. You have <code>onHtmlFailure()</code> which is <em>never</em> met (because <code>true</code> is always <code>true</code>), but you don't have <code>onHtmlSuccess()</code> anywhere. So only this first tag is run, and the sequence is never continued.</p>
 <p>This is one way it <strong>would</strong> work:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">if</span> (<span style="color:#66d9ef">true</span>) {
-  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#39;Worked&#39;</span>);
-  <span style="color:#a6e22e">gtm</span>.<span style="color:#a6e22e">onHtmlSuccess</span>({{<span style="color:#a6e22e">HTML</span> <span style="color:#a6e22e">ID</span>}});
-} <span style="color:#66d9ef">else</span> {
-  <span style="color:#a6e22e">gtm</span>.<span style="color:#a6e22e">onHtmlFailure</span>({{<span style="color:#a6e22e">HTML</span> <span style="color:#a6e22e">ID</span>}});
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">if</span> (<span style="color:#00a">true</span>) {
+  console.log(<span style="color:#a50">&#39;Worked&#39;</span>);
+  gtm.onHtmlSuccess({{HTML ID}});
+} <span style="color:#00a">else</span> {
+  gtm.onHtmlFailure({{HTML ID}});
 }
 </code></pre></div>
 <p>This would also work (though it's not a good pattern), if the next tag in the sequence had the failure toggle off:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">if</span> (<span style="color:#66d9ef">true</span>) {
-  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#39;Worked&#39;</span>);
-  <span style="color:#a6e22e">gtm</span>.<span style="color:#a6e22e">onHtmlFailure</span>({{<span style="color:#a6e22e">HTML</span> <span style="color:#a6e22e">ID</span>}});
-} <span style="color:#66d9ef">else</span> {
-  <span style="color:#a6e22e">gtm</span>.<span style="color:#a6e22e">onHtmlFailure</span>({{<span style="color:#a6e22e">HTML</span> <span style="color:#a6e22e">ID</span>}});
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">if</span> (<span style="color:#00a">true</span>) {
+  console.log(<span style="color:#a50">&#39;Worked&#39;</span>);
+  gtm.onHtmlFailure({{HTML ID}});
+} <span style="color:#00a">else</span> {
+  gtm.onHtmlFailure({{HTML ID}});
 }
 </code></pre></div>
 <p>And since it's synchronous code, you can leave both callbacks out, and the sequence will proceed normally after logging <code>Worked</code> to the console in this case, too:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">(<span style="color:#66d9ef">function</span>() {
-  <span style="color:#66d9ef">if</span> (<span style="color:#66d9ef">true</span>) {
-    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#39;Worked&#39;</span>);
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">(<span style="color:#00a">function</span>() {
+  <span style="color:#00a">if</span> (<span style="color:#00a">true</span>) {
+    console.log(<span style="color:#a50">&#39;Worked&#39;</span>);
   }
 })();
 </code></pre></div>
 <h3 id="lesson-4-the-callbacks-are-at-their-best-in-asynchronous-operations">Lesson 4: The callbacks are at their best in asynchronous operations</h3>
 <p>In my view, the <em>purpose</em> of tag sequencing is to establish order when the previous tag has an asynchronous operation. In other words, you want the browser to wait for the operation to complete before telling the next tag to start firing.</p>
 <p>For example, here we load the <a href="https://jquery.com">jQuery</a> library asynchronously, waiting for it to have completely loaded before moving to the next tag:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">(<span style="color:#66d9ef">function</span>() {
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">gtm</span> <span style="color:#f92672">=</span> window.<span style="color:#a6e22e">google_tag_manager</span>[{{<span style="color:#a6e22e">Container</span> <span style="color:#a6e22e">ID</span>}}];
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">(<span style="color:#00a">function</span>() {
+  <span style="color:#00a">var</span> gtm = <span style="color:#0aa">window</span>.google_tag_manager[{{Container ID}}];
   
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">el</span> <span style="color:#f92672">=</span> document.<span style="color:#a6e22e">createElement</span>(<span style="color:#e6db74">&#39;script&#39;</span>);
-  <span style="color:#a6e22e">el</span>.<span style="color:#a6e22e">async</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>;
-  <span style="color:#a6e22e">el</span>.<span style="color:#a6e22e">src</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js&#39;</span>;
-  <span style="color:#a6e22e">el</span>.<span style="color:#a6e22e">addEventListener</span>(<span style="color:#e6db74">&#39;load&#39;</span>, <span style="color:#66d9ef">function</span>() {
-    <span style="color:#a6e22e">gtm</span>.<span style="color:#a6e22e">onHtmlSuccess</span>({{<span style="color:#a6e22e">HTML</span> <span style="color:#a6e22e">ID</span>}});
+  <span style="color:#00a">var</span> el = <span style="color:#0aa">document</span>.createElement(<span style="color:#a50">&#39;script&#39;</span>);
+  el.async = <span style="color:#00a">true</span>;
+  el.src = <span style="color:#a50">&#39;https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js&#39;</span>;
+  el.addEventListener(<span style="color:#a50">&#39;load&#39;</span>, <span style="color:#00a">function</span>() {
+    gtm.onHtmlSuccess({{HTML ID}});
   });
-  document.<span style="color:#a6e22e">head</span>.<span style="color:#a6e22e">appendChild</span>(<span style="color:#a6e22e">el</span>);
+  <span style="color:#0aa">document</span>.head.appendChild(el);
 })();
 </code></pre></div>
 <p>As you can see, <code>onHtmlSuccess()</code> is embedded in the callback of the <a href="https://www.simoahava.com/gtm-tips/add-load-listener-script-elements/"><code>load</code> listener</a>, which is invoked only after the library has downloaded and the browser has executed the code within.</p>

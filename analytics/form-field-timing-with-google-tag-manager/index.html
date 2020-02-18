@@ -344,41 +344,41 @@
 <p>Note! Timings are counted against the <strong>500 hits / session</strong> limit in Google Analytics. That's why you have to be careful when implementing this. I suggest you only implement it on one form and for a short time, and then see if users&rsquo; sessions are getting miscalculated thanks to them surpassing the 500 hit limit. There are some <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/user-timings#sampling">additional limitations</a> per property as well, but they only count towards the timing hits and not all hits in the session.</p>
 <h2 id="the-custom-html-tag">The Custom HTML Tag</h2>
 <p>The Custom HTML Tag looks like this:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
-(<span style="color:#66d9ef">function</span>() {
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">form</span> <span style="color:#f92672">=</span> document.<span style="color:#a6e22e">querySelector</span>(<span style="color:#e6db74">&#39;#commentform&#39;</span>);
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">fields</span> <span style="color:#f92672">=</span> {};
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+(<span style="color:#00a">function</span>() {
+  <span style="color:#00a">var</span> form = <span style="color:#0aa">document</span>.querySelector(<span style="color:#a50">&#39;#commentform&#39;</span>);
+  <span style="color:#00a">var</span> fields = {};
   
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">enterField</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">name</span>) {
-    <span style="color:#a6e22e">fields</span>[<span style="color:#a6e22e">name</span>] <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Date().<span style="color:#a6e22e">getTime</span>();
+  <span style="color:#00a">var</span> enterField = <span style="color:#00a">function</span>(name) {
+    fields[name] = <span style="color:#00a">new</span> <span style="color:#0aa">Date</span>().getTime();
   }
   
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">leaveField</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e</span>) {
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">timeSpent</span>;
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">fieldName</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">target</span>.<span style="color:#a6e22e">name</span>;
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">leaveType</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">type</span>;
-    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">fields</span>.<span style="color:#a6e22e">hasOwnProperty</span>(<span style="color:#a6e22e">fieldName</span>)) {
-      <span style="color:#a6e22e">timeSpent</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Date().<span style="color:#a6e22e">getTime</span>() <span style="color:#f92672">-</span> <span style="color:#a6e22e">fields</span>[<span style="color:#a6e22e">fieldName</span>];
-      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">timeSpent</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">timeSpent</span> <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">1800000</span>) {
-        window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
-          <span style="color:#e6db74">&#39;event&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;fieldTiming&#39;</span>,
-          <span style="color:#e6db74">&#39;timingCategory&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;Comment Form Field Timing&#39;</span>,
-          <span style="color:#e6db74">&#39;timingVariable&#39;</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">fieldName</span>,
-          <span style="color:#e6db74">&#39;timingLabel&#39;</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">leaveType</span>,
-          <span style="color:#e6db74">&#39;timingValue&#39;</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">timeSpent</span>
+  <span style="color:#00a">var</span> leaveField = <span style="color:#00a">function</span>(e) {
+    <span style="color:#00a">var</span> timeSpent;
+    <span style="color:#00a">var</span> fieldName = e.target.name;
+    <span style="color:#00a">var</span> leaveType = e.type;
+    <span style="color:#00a">if</span> (fields.hasOwnProperty(fieldName)) {
+      timeSpent = <span style="color:#00a">new</span> <span style="color:#0aa">Date</span>().getTime() - fields[fieldName];
+      <span style="color:#00a">if</span> (timeSpent &gt; <span style="color:#099">0</span> &amp;&amp; timeSpent &lt; <span style="color:#099">1800000</span>) {
+        <span style="color:#0aa">window</span>.dataLayer.push({
+          <span style="color:#a50">&#39;event&#39;</span> : <span style="color:#a50">&#39;fieldTiming&#39;</span>,
+          <span style="color:#a50">&#39;timingCategory&#39;</span> : <span style="color:#a50">&#39;Comment Form Field Timing&#39;</span>,
+          <span style="color:#a50">&#39;timingVariable&#39;</span> : fieldName,
+          <span style="color:#a50">&#39;timingLabel&#39;</span> : leaveType,
+          <span style="color:#a50">&#39;timingValue&#39;</span> : timeSpent
         });
       }
-      <span style="color:#66d9ef">delete</span> <span style="color:#a6e22e">fields</span>[<span style="color:#a6e22e">fieldName</span>];
+      <span style="color:#00a">delete</span> fields[fieldName];
     }
   }
   
-  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">form</span>) {
-    <span style="color:#a6e22e">form</span>.<span style="color:#a6e22e">addEventListener</span>(<span style="color:#e6db74">&#39;focus&#39;</span>, <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e</span>) { <span style="color:#a6e22e">enterField</span>(<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">target</span>.<span style="color:#a6e22e">name</span>); }, <span style="color:#66d9ef">true</span>);
-    <span style="color:#a6e22e">form</span>.<span style="color:#a6e22e">addEventListener</span>(<span style="color:#e6db74">&#39;blur&#39;</span>, <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e</span>) { <span style="color:#a6e22e">leaveField</span>(<span style="color:#a6e22e">e</span>); }, <span style="color:#66d9ef">true</span>);
-    <span style="color:#a6e22e">form</span>.<span style="color:#a6e22e">addEventListener</span>(<span style="color:#e6db74">&#39;change&#39;</span>, <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e</span>) { <span style="color:#a6e22e">leaveField</span>(<span style="color:#a6e22e">e</span>); }, <span style="color:#66d9ef">true</span>);
+  <span style="color:#00a">if</span> (form) {
+    form.addEventListener(<span style="color:#a50">&#39;focus&#39;</span>, <span style="color:#00a">function</span>(e) { enterField(e.target.name); }, <span style="color:#00a">true</span>);
+    form.addEventListener(<span style="color:#a50">&#39;blur&#39;</span>, <span style="color:#00a">function</span>(e) { leaveField(e); }, <span style="color:#00a">true</span>);
+    form.addEventListener(<span style="color:#a50">&#39;change&#39;</span>, <span style="color:#00a">function</span>(e) { leaveField(e); }, <span style="color:#00a">true</span>);
   }
 })();
-&lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
+&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
 <p>To fire this Tag, I suggest you create a <strong>Page View Trigger</strong> which only fires this Tag on pages where your form exists.</p>
 <p>Next, change the very first variable <code>var form = document.querySelector('#commentform');</code> to select the form you want to track. On my site this happens to be a form with ID #commentform.</p>
 <p>Whenever a <code>focus</code> event is detected, a hash table is updated with the form field name and the time when the field was entered.</p>

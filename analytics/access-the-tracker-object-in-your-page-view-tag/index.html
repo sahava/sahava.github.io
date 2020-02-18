@@ -379,35 +379,35 @@
 <p><strong>NOTE!</strong> Any modifications to the tracker, such as <code>allowLinker : true</code>, custom cookie settings, and so forth need to be setup on this Custom HTML tracker, so that the Client ID you will be fetching from this custom tracker matches the one used by your main Page View Tag.</p>
 <p>The next part is important. The <strong>analytics.js</strong> library is loaded <em>asynchronously</em>, which means that you don't actually know when the tracker object has been created and its <code>get</code> method can be invoked. So, the library lets you pass a callback function to the <code>ga</code> object, which will be executed once the library has loaded and the tracker has been created. As I mention in the beginning: <strong>this feature is not available in the default tag template</strong>, which is why we need this workaround.</p>
 <p>To add the callback, you add the following rows of code after the <code>ga('create', ...);</code> expression:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">ga</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">tracker</span>) {
-  ...<span style="color:#a6e22e">any</span> <span style="color:#a6e22e">methods</span> <span style="color:#a6e22e">which</span> <span style="color:#a6e22e">need</span> <span style="color:#a6e22e">the</span> <span style="color:#a6e22e">tracker</span> <span style="color:#a6e22e">object</span>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">ga(<span style="color:#00a">function</span>(tracker) {
+  ...any methods which need the tracker object
 });
 </code></pre></div>
 <p>Any code within the callback function will be executed only once the library has been loaded, the tracker has been created, and the tracker object responds to interface methods. In this callback function, we'll first fetch the Client ID, and then push it into <code>dataLayer</code> together with an initialization event:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">ga</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">tracker</span>) {
-  window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
-    <span style="color:#e6db74">&#39;event&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;trackerReady&#39;</span>,
-    <span style="color:#e6db74">&#39;cid&#39;</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">tracker</span>.<span style="color:#a6e22e">get</span>(<span style="color:#e6db74">&#39;clientId&#39;</span>)
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">ga(<span style="color:#00a">function</span>(tracker) {
+  <span style="color:#0aa">window</span>.dataLayer.push({
+    <span style="color:#a50">&#39;event&#39;</span> : <span style="color:#a50">&#39;trackerReady&#39;</span>,
+    <span style="color:#a50">&#39;cid&#39;</span> : tracker.get(<span style="color:#a50">&#39;clientId&#39;</span>)
   });
 });
 </code></pre></div>
 <p>As you can see, I'm invoking the <code>get</code> command of the tracker object, and asking to retrieve the Client ID from the tracker. This wouldn't be possible without the <code>ga(function(tracker) {})</code> call.</p>
 <p>My personal, finished example for the Custom HTML Tag looks like this. Remember, any customizations you need for the tracker object need to go here as well, so be sure to read up on how to set up <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/advanced">advanced configurations</a> for your Universal Analytics tracking code.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
-  (<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">i</span>,<span style="color:#a6e22e">s</span>,<span style="color:#a6e22e">o</span>,<span style="color:#a6e22e">g</span>,<span style="color:#a6e22e">r</span>,<span style="color:#a6e22e">a</span>,<span style="color:#a6e22e">m</span>){<span style="color:#a6e22e">i</span>[<span style="color:#e6db74">&#39;GoogleAnalyticsObject&#39;</span>]<span style="color:#f92672">=</span><span style="color:#a6e22e">r</span>;<span style="color:#a6e22e">i</span>[<span style="color:#a6e22e">r</span>]<span style="color:#f92672">=</span><span style="color:#a6e22e">i</span>[<span style="color:#a6e22e">r</span>]<span style="color:#f92672">||</span><span style="color:#66d9ef">function</span>(){
-  (<span style="color:#a6e22e">i</span>[<span style="color:#a6e22e">r</span>].<span style="color:#a6e22e">q</span><span style="color:#f92672">=</span><span style="color:#a6e22e">i</span>[<span style="color:#a6e22e">r</span>].<span style="color:#a6e22e">q</span><span style="color:#f92672">||</span>[]).<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">arguments</span>)},<span style="color:#a6e22e">i</span>[<span style="color:#a6e22e">r</span>].<span style="color:#a6e22e">l</span><span style="color:#f92672">=</span><span style="color:#ae81ff">1</span><span style="color:#f92672">*</span><span style="color:#66d9ef">new</span> Date();<span style="color:#a6e22e">a</span><span style="color:#f92672">=</span><span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">createElement</span>(<span style="color:#a6e22e">o</span>),
-  <span style="color:#a6e22e">m</span><span style="color:#f92672">=</span><span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">getElementsByTagName</span>(<span style="color:#a6e22e">o</span>)[<span style="color:#ae81ff">0</span>];<span style="color:#a6e22e">a</span>.<span style="color:#a6e22e">async</span><span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>;<span style="color:#a6e22e">a</span>.<span style="color:#a6e22e">src</span><span style="color:#f92672">=</span><span style="color:#a6e22e">g</span>;<span style="color:#a6e22e">m</span>.<span style="color:#a6e22e">parentNode</span>.<span style="color:#a6e22e">insertBefore</span>(<span style="color:#a6e22e">a</span>,<span style="color:#a6e22e">m</span>)
-  })(window,document,<span style="color:#e6db74">&#39;script&#39;</span>,<span style="color:#e6db74">&#39;//www.google-analytics.com/analytics.js&#39;</span>,<span style="color:#e6db74">&#39;ga&#39;</span>);
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+  (<span style="color:#00a">function</span>(i,s,o,g,r,a,m){i[<span style="color:#a50">&#39;GoogleAnalyticsObject&#39;</span>]=r;i[r]=i[r]||<span style="color:#00a">function</span>(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=<span style="color:#099">1</span>*<span style="color:#00a">new</span> <span style="color:#0aa">Date</span>();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[<span style="color:#099">0</span>];a.async=<span style="color:#099">1</span>;a.src=g;m.parentNode.insertBefore(a,m)
+  })(<span style="color:#0aa">window</span>,<span style="color:#0aa">document</span>,<span style="color:#a50">&#39;script&#39;</span>,<span style="color:#a50">&#39;//www.google-analytics.com/analytics.js&#39;</span>,<span style="color:#a50">&#39;ga&#39;</span>);
 
-  <span style="color:#a6e22e">ga</span>(<span style="color:#e6db74">&#39;create&#39;</span>, <span style="color:#e6db74">&#39;{{GA Tracking Code}}&#39;</span>, <span style="color:#e6db74">&#39;auto&#39;</span>, {<span style="color:#e6db74">&#39;allowLinker&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;true&#39;</span>});  
-  <span style="color:#a6e22e">ga</span>(<span style="color:#e6db74">&#39;require&#39;</span>, <span style="color:#e6db74">&#39;simoPlugin&#39;</span>); <span style="color:#75715e">// Any plugins you want to load would go here  
-</span><span style="color:#75715e"></span>  <span style="color:#a6e22e">ga</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">tracker</span>) {
-      window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
-          <span style="color:#e6db74">&#39;event&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;trackerReady&#39;</span>,
-          <span style="color:#e6db74">&#39;cid&#39;</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">tracker</span>.<span style="color:#a6e22e">get</span>(<span style="color:#e6db74">&#39;clientId&#39;</span>)
+  ga(<span style="color:#a50">&#39;create&#39;</span>, <span style="color:#a50">&#39;{{GA Tracking Code}}&#39;</span>, <span style="color:#a50">&#39;auto&#39;</span>, {<span style="color:#a50">&#39;allowLinker&#39;</span> : <span style="color:#a50">&#39;true&#39;</span>});  
+  ga(<span style="color:#a50">&#39;require&#39;</span>, <span style="color:#a50">&#39;simoPlugin&#39;</span>); <span style="color:#aaa;font-style:italic">// Any plugins you want to load would go here  
+</span><span style="color:#aaa;font-style:italic"></span>  ga(<span style="color:#00a">function</span>(tracker) {
+      <span style="color:#0aa">window</span>.dataLayer.push({
+          <span style="color:#a50">&#39;event&#39;</span> : <span style="color:#a50">&#39;trackerReady&#39;</span>,
+          <span style="color:#a50">&#39;cid&#39;</span> : tracker.get(<span style="color:#a50">&#39;clientId&#39;</span>)
       });
   });
-&lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
+&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
 <p>Just a few comments on the customizations:</p>
 <ul>
 <li>

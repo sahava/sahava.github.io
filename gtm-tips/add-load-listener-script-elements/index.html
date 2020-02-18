@@ -342,34 +342,34 @@
 <h3 id="datalayerpush-in-the-load-listener-callback"><code>dataLayer.push()</code> in the load listener callback</h3>
 <p>The first method is to create a <strong>Custom HTML tag</strong> that fires as early as possible. So you'd want to add the <strong>All Pages</strong> trigger to it, so that it fires as soon as the GTM container has loaded.</p>
 <p>At this point it's important that you <strong>do not</strong> load the script by simply adding the <code>&lt;script src=&quot;url_to_jquery&quot; async=&quot;true&quot;&gt;</code> into the Custom HTML tag. Instead, we'll introduce some extra control by using JavaScript to create the element, add the listener to it, and inject it manually to the page. You could use the <code>onload</code> attribute directly in the element, but the risk here is that you overwrite any existing <code>onload</code> attribute. By using JavaScript DOM manipulation methods, you won't mess with any pre-existing listeners.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
-  (<span style="color:#66d9ef">function</span>() {
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">el</span> <span style="color:#f92672">=</span> document.<span style="color:#a6e22e">createElement</span>(<span style="color:#e6db74">&#39;script&#39;</span>);
-	<span style="color:#a6e22e">el</span>.<span style="color:#a6e22e">src</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;https://code.jquery.com/jquery-3.2.1.js&#39;</span>;
-	<span style="color:#a6e22e">el</span>.<span style="color:#a6e22e">async</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;true&#39;</span>;
-	<span style="color:#a6e22e">el</span>.<span style="color:#a6e22e">addEventListener</span>(<span style="color:#e6db74">&#39;load&#39;</span>, <span style="color:#66d9ef">function</span>() {
-	  window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
-	    <span style="color:#a6e22e">event</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;jQueryLoaded&#39;</span>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+  (<span style="color:#00a">function</span>() {
+    <span style="color:#00a">var</span> el = <span style="color:#0aa">document</span>.createElement(<span style="color:#a50">&#39;script&#39;</span>);
+	el.src = <span style="color:#a50">&#39;https://code.jquery.com/jquery-3.2.1.js&#39;</span>;
+	el.async = <span style="color:#a50">&#39;true&#39;</span>;
+	el.addEventListener(<span style="color:#a50">&#39;load&#39;</span>, <span style="color:#00a">function</span>() {
+	  <span style="color:#0aa">window</span>.dataLayer.push({
+	    event: <span style="color:#a50">&#39;jQueryLoaded&#39;</span>
 	  });
     });
-    document.<span style="color:#a6e22e">head</span>.<span style="color:#a6e22e">appendChild</span>(<span style="color:#a6e22e">el</span>);
+    <span style="color:#0aa">document</span>.head.appendChild(el);
   })();
-&lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
+&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
 <p>When this Custom HTML tag is run by GTM, the browser creates an asynchronous request to download the <code>jquery-3.2.1.js</code> from the CDN (Content Distribution Network). Once this asynchronous process is over, a <code>dataLayer.push({event: 'jQueryLoaded'})</code> fires, and you can then build a <strong>Custom Event trigger</strong> for this event name to fire any tags that are dependent on jQuery having loaded.</p>
 <h3 id="using-tag-sequencing">Using Tag Sequencing</h3>
 <p>If you only have a single tag that needs the asynchronously downloaded resource, a fairly elegant way to do this would be with <a href="https://www.simoahava.com/analytics/understanding-tag-sequencing-in-google-tag-manager/">tag sequencing</a>. With tag sequencing, you would create a <strong>Custom HTML tag</strong> for this code, and add it as the <strong>Setup tag</strong> in the sequence. The logic is that the asynchronous request is executed in the Setup tag, and once it's complete, the main tag can fire with confidence that the resource it is dependent on has completely loaded.</p>
 <p>This is what the Custom HTML tag for the Setup tag would look like:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
-  (<span style="color:#66d9ef">function</span>() {
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">el</span> <span style="color:#f92672">=</span> document.<span style="color:#a6e22e">createElement</span>(<span style="color:#e6db74">&#39;script&#39;</span>);
-	<span style="color:#a6e22e">el</span>.<span style="color:#a6e22e">src</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;https://code.jquery.com/jquery-3.2.1.js&#39;</span>;
-	<span style="color:#a6e22e">el</span>.<span style="color:#a6e22e">async</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;true&#39;</span>;
-	<span style="color:#a6e22e">el</span>.<span style="color:#a6e22e">addEventListener</span>(<span style="color:#e6db74">&#39;load&#39;</span>, <span style="color:#66d9ef">function</span>() {
-	  window.<span style="color:#a6e22e">google_tag_manager</span>[{{<span style="color:#a6e22e">Container</span> <span style="color:#a6e22e">ID</span>}}].<span style="color:#a6e22e">onHtmlSuccess</span>({{<span style="color:#a6e22e">HTML</span> <span style="color:#a6e22e">ID</span>}});
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+  (<span style="color:#00a">function</span>() {
+    <span style="color:#00a">var</span> el = <span style="color:#0aa">document</span>.createElement(<span style="color:#a50">&#39;script&#39;</span>);
+	el.src = <span style="color:#a50">&#39;https://code.jquery.com/jquery-3.2.1.js&#39;</span>;
+	el.async = <span style="color:#a50">&#39;true&#39;</span>;
+	el.addEventListener(<span style="color:#a50">&#39;load&#39;</span>, <span style="color:#00a">function</span>() {
+	  <span style="color:#0aa">window</span>.google_tag_manager[{{Container ID}}].onHtmlSuccess({{HTML ID}});
     });
-    document.<span style="color:#a6e22e">head</span>.<span style="color:#a6e22e">appendChild</span>(<span style="color:#a6e22e">el</span>);
+    <span style="color:#0aa">document</span>.head.appendChild(el);
   })();
-&lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
+&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
 <p>Note that for this to work, you must enable the <a href="https://www.simoahava.com/analytics/variable-guide-google-tag-manager/#built-in-variables">Built-in variables</a> <strong>Container ID</strong> and <strong>HTML ID</strong>.</p>
 <p>The mysterious <code>window.google_tag_manager[].onHtmlSuccess()</code> method is an internal function you need to use in tag sequencing if you want GTM to wait for some code (e.g. asynchronous callbacks) to execute before moving from the setup tag to the main tag. If you didn't have this piece of code here, GTM would simply jump straight to the main tag after executing the last line of the setup tag, and in that case it's very possible that jQuery hasn't completely downloaded yet.</p>
 <h2 id="summary">Summary</h2>

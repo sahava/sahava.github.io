@@ -381,20 +381,20 @@
 <p>So, <code>beforeUnload</code> is a browser event that is dispatched when the page is unloaded from the browser. Most typical ways for a page to unload is if the user is redirected to some other page (via a link or form submission, for example), or if the user decides to close the browser. Naturally, if the user's computer crashes, no controlled <code>beforeUnload</code> event is dispatched.</p>
 <p>We want to use this browser event to invoke a <code>dataLayer.push()</code> when the user leaves the page. This <code>push()</code> will include a custom <code>event</code> key as well as values for the fields in the Event Tag we'll create in the next chapter.</p>
 <p>Create a Custom HTML Tag, give it some illustrious name, and set it to fire only on pages with forms. Here's the code we'll work on. Just copy-paste it into the Tag.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
-  (<span style="color:#66d9ef">function</span>() {
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">eventAction</span>;
-    window.<span style="color:#a6e22e">addEventListener</span>(<span style="color:#e6db74">&#39;beforeunload&#39;</span>, <span style="color:#66d9ef">function</span>() {
-      window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
-        <span style="color:#e6db74">&#39;event&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;formAbandonment&#39;</span>,
-        <span style="color:#e6db74">&#39;eventCategory&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;Form Abandonment&#39;</span>,
-        <span style="color:#e6db74">&#39;eventAction&#39;</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">eventAction</span>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+  (<span style="color:#00a">function</span>() {
+    <span style="color:#00a">var</span> eventAction;
+    <span style="color:#0aa">window</span>.addEventListener(<span style="color:#a50">&#39;beforeunload&#39;</span>, <span style="color:#00a">function</span>() {
+      <span style="color:#0aa">window</span>.dataLayer.push({
+        <span style="color:#a50">&#39;event&#39;</span> : <span style="color:#a50">&#39;formAbandonment&#39;</span>,
+        <span style="color:#a50">&#39;eventCategory&#39;</span> : <span style="color:#a50">&#39;Form Abandonment&#39;</span>,
+        <span style="color:#a50">&#39;eventAction&#39;</span> : eventAction
       });
     });
   
-    <span style="color:#75715e">// Add actual logic here...
-</span><span style="color:#75715e"></span>  })();
-&lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
+    <span style="color:#aaa;font-style:italic">// Add actual logic here...
+</span><span style="color:#aaa;font-style:italic"></span>  })();
+&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
 <p>That's pretty simple, right? All you do is attach a listener to the page, which waits for the <code>beforeunload</code> event. When that takes place, a <code>dataLayer.push()</code> is invoked, which is then used to fire a Google Analytics Event Tag with all your abandonment issues within. The whole thing is wrapped in an immediately-invoked function expression to protect the global namespace from being polluted with your variables.</p>
 <h2 id="the-event-tag">The Event Tag</h2>
 <p>Before we go on, let's create the Event Tag itself. And before we do that, you'll need to create a Custom Event Trigger and two Data Layer Variables.</p>
@@ -472,25 +472,25 @@ Value: <strong>beacon</strong></p>
 <h2 id="track-simple-interaction">Track simple interaction</h2>
 <p>&ldquo;Simple interaction&rdquo; here translates to: <strong>the user changed the value of any form field</strong>. That's all we care about. It doesn't matter which field, and it doesn't matter how many form fields. We want to draw a line between two types of people: those who didn't interact with the form at all, and those who did.</p>
 <p>To make this work, you'll need to add <strong>another</strong> custom listener into the Custom HTML Tag. Here's what we'll go with in the Custom HTML Tag you've already created:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
-  (<span style="color:#66d9ef">function</span>() {
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">eventAction</span>;
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">formSelector</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;form&#39;</span>; <span style="color:#75715e">// Modify this CSS selector to match your form. Default is first form on the page.
-</span><span style="color:#75715e"></span>    window.<span style="color:#a6e22e">addEventListener</span>(<span style="color:#e6db74">&#39;beforeunload&#39;</span>, <span style="color:#66d9ef">function</span>() {
-      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">eventAction</span>) {
-        window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
-          <span style="color:#e6db74">&#39;event&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;formAbandonment&#39;</span>,
-          <span style="color:#e6db74">&#39;eventCategory&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;Form Abandonment&#39;</span>,
-          <span style="color:#e6db74">&#39;eventAction&#39;</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">eventAction</span>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+  (<span style="color:#00a">function</span>() {
+    <span style="color:#00a">var</span> eventAction;
+    <span style="color:#00a">var</span> formSelector = <span style="color:#a50">&#39;form&#39;</span>; <span style="color:#aaa;font-style:italic">// Modify this CSS selector to match your form. Default is first form on the page.
+</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#0aa">window</span>.addEventListener(<span style="color:#a50">&#39;beforeunload&#39;</span>, <span style="color:#00a">function</span>() {
+      <span style="color:#00a">if</span> (eventAction) {
+        <span style="color:#0aa">window</span>.dataLayer.push({
+          <span style="color:#a50">&#39;event&#39;</span> : <span style="color:#a50">&#39;formAbandonment&#39;</span>,
+          <span style="color:#a50">&#39;eventCategory&#39;</span> : <span style="color:#a50">&#39;Form Abandonment&#39;</span>,
+          <span style="color:#a50">&#39;eventAction&#39;</span> : eventAction
         });
       }
     });
   
-    document.<span style="color:#a6e22e">querySelector</span>(<span style="color:#a6e22e">formSelector</span>).<span style="color:#a6e22e">addEventListener</span>(<span style="color:#e6db74">&#39;change&#39;</span>, <span style="color:#66d9ef">function</span>() {
-      <span style="color:#a6e22e">eventAction</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;True&#39;</span>;
+    <span style="color:#0aa">document</span>.querySelector(formSelector).addEventListener(<span style="color:#a50">&#39;change&#39;</span>, <span style="color:#00a">function</span>() {
+      eventAction = <span style="color:#a50">&#39;True&#39;</span>;
     });
   })();
-&lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
+&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
 <p>In the beginning, you define a <code>formSelector</code>. This is a basic CSS selector that you use to target a single form, e.g. &lsquo;<strong>#formId</strong>&rsquo; or &lsquo;<strong>.formClass</strong>'. If you choose a selector that can have potentially multiple hits on the page, this script will only listen to the <strong>first</strong> instance.</p>
 <p>In the end, we add a <code>change</code> listener to this particular form. If a <code>change</code> event is registered in any of the form fields, i.e. the form field value changes, then the <code>eventAction</code> variable is given a value &lsquo;true&rsquo;.</p>
 <p>Finally, the <code>dataLayer.push()</code> that sends the payload to <code>dataLayer</code> which triggers the Event Tag is set to execute only if the <code>eventAction</code> variable is set. Thus, you'll only report on potential form abandonments if the user has interacted with the form.</p>
@@ -509,26 +509,26 @@ Value: <strong>beacon</strong></p>
 <h2 id="track-last-field-interacted-with">Track last field interacted with</h2>
 <p>Let's improve the previous solution a little. Instead of just blindly looking at who interacted and who didn't, let's send the <strong>last field</strong> the user interacted with to GA. Maybe this will give us some clue about what made the user abandon the form.</p>
 <p>So, modify the Custom HTML Tag to look like this:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
-  (<span style="color:#66d9ef">function</span>() {
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">eventAction</span>;
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">formSelector</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;form&#39;</span>; <span style="color:#75715e">// Modify this CSS selector to match your form. Default is first form on the page.
-</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">attribute</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;name&#39;</span>;
-    window.<span style="color:#a6e22e">addEventListener</span>(<span style="color:#e6db74">&#39;beforeunload&#39;</span>, <span style="color:#66d9ef">function</span>() {
-      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">eventAction</span>) {
-        window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
-          <span style="color:#e6db74">&#39;event&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;formAbandonment&#39;</span>,
-          <span style="color:#e6db74">&#39;eventCategory&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;Form Abandonment&#39;</span>,
-          <span style="color:#e6db74">&#39;eventAction&#39;</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">eventAction</span>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+  (<span style="color:#00a">function</span>() {
+    <span style="color:#00a">var</span> eventAction;
+    <span style="color:#00a">var</span> formSelector = <span style="color:#a50">&#39;form&#39;</span>; <span style="color:#aaa;font-style:italic">// Modify this CSS selector to match your form. Default is first form on the page.
+</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">var</span> attribute = <span style="color:#a50">&#39;name&#39;</span>;
+    <span style="color:#0aa">window</span>.addEventListener(<span style="color:#a50">&#39;beforeunload&#39;</span>, <span style="color:#00a">function</span>() {
+      <span style="color:#00a">if</span> (eventAction) {
+        <span style="color:#0aa">window</span>.dataLayer.push({
+          <span style="color:#a50">&#39;event&#39;</span> : <span style="color:#a50">&#39;formAbandonment&#39;</span>,
+          <span style="color:#a50">&#39;eventCategory&#39;</span> : <span style="color:#a50">&#39;Form Abandonment&#39;</span>,
+          <span style="color:#a50">&#39;eventAction&#39;</span> : eventAction
         });
       }
     });
   
-    document.<span style="color:#a6e22e">querySelector</span>(<span style="color:#a6e22e">formSelector</span>).<span style="color:#a6e22e">addEventListener</span>(<span style="color:#e6db74">&#39;change&#39;</span>, <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e</span>) {
-      <span style="color:#a6e22e">eventAction</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">e</span>[<span style="color:#e6db74">&#39;target&#39;</span>].<span style="color:#a6e22e">getAttribute</span>(<span style="color:#a6e22e">attribute</span>);
+    <span style="color:#0aa">document</span>.querySelector(formSelector).addEventListener(<span style="color:#a50">&#39;change&#39;</span>, <span style="color:#00a">function</span>(e) {
+      eventAction = e[<span style="color:#a50">&#39;target&#39;</span>].getAttribute(attribute);
     });
   })();
-&lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
+&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
 <p>We've added a new variable, <code>attribute</code>. In this, you specify the attribute name that you want to collect to describe which form field was the last one that was interacted with. I would recommend against choosing <strong>value</strong> or anything that the user can add content to. This is to protect your GA account from inadvertently collecting personally identifiable information such as e-mail addresses and such.</p>
 <p>The other additions are the <code>e</code> parameter in the callback function of the &lsquo;change&rsquo; listener, and the attribute value of the <code>e['target']</code> object as the value that <code>eventAction</code> retrieves. The <code>target</code> parameter of the event object contains the HTML element that was the target of the event action, which in this case would be the form field whose value changed.</p>
 <p>I would recommend you use the <code>name</code> attribute, since it's usually the most descriptive one (especially with well-formed forms).</p>
@@ -539,26 +539,26 @@ Value: <strong>beacon</strong></p>
 <p><strong>firstName &gt; lastName &gt; address &gt; creditCardNumber &gt; expirationDate &gt; creditCardNumber</strong></p>
 <p>As you can see, it will record multiple interactions as well. The history example above would indicate that the Credit Card Number field was the one that caused the user to disdainfully abandon your form.</p>
 <p>To make this work, here's the revamped version of the Custom HTML Tag:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
-  (<span style="color:#66d9ef">function</span>() {
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">formSelector</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;form&#39;</span>; <span style="color:#75715e">// Modify this CSS selector to match your form. Default is first form on the page.
-</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">attribute</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;name&#39;</span>;
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">history</span> <span style="color:#f92672">=</span> [];
-    window.<span style="color:#a6e22e">addEventListener</span>(<span style="color:#e6db74">&#39;beforeunload&#39;</span>, <span style="color:#66d9ef">function</span>() {
-      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">history</span>.<span style="color:#a6e22e">length</span>) {
-        window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
-          <span style="color:#e6db74">&#39;event&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;formAbandonment&#39;</span>,
-          <span style="color:#e6db74">&#39;eventCategory&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;Form Abandonment&#39;</span>,
-          <span style="color:#e6db74">&#39;eventAction&#39;</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">history</span>.<span style="color:#a6e22e">join</span>(<span style="color:#e6db74">&#39; &gt; &#39;</span>)
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+  (<span style="color:#00a">function</span>() {
+    <span style="color:#00a">var</span> formSelector = <span style="color:#a50">&#39;form&#39;</span>; <span style="color:#aaa;font-style:italic">// Modify this CSS selector to match your form. Default is first form on the page.
+</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">var</span> attribute = <span style="color:#a50">&#39;name&#39;</span>;
+    <span style="color:#00a">var</span> history = [];
+    <span style="color:#0aa">window</span>.addEventListener(<span style="color:#a50">&#39;beforeunload&#39;</span>, <span style="color:#00a">function</span>() {
+      <span style="color:#00a">if</span> (history.length) {
+        <span style="color:#0aa">window</span>.dataLayer.push({
+          <span style="color:#a50">&#39;event&#39;</span> : <span style="color:#a50">&#39;formAbandonment&#39;</span>,
+          <span style="color:#a50">&#39;eventCategory&#39;</span> : <span style="color:#a50">&#39;Form Abandonment&#39;</span>,
+          <span style="color:#a50">&#39;eventAction&#39;</span> : history.join(<span style="color:#a50">&#39; &gt; &#39;</span>)
         });
       }
     });
   
-    document.<span style="color:#a6e22e">querySelector</span>(<span style="color:#a6e22e">formSelector</span>).<span style="color:#a6e22e">addEventListener</span>(<span style="color:#e6db74">&#39;change&#39;</span>, <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e</span>) {
-      <span style="color:#a6e22e">history</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">e</span>[<span style="color:#e6db74">&#39;target&#39;</span>].<span style="color:#a6e22e">getAttribute</span>(<span style="color:#a6e22e">attribute</span>));
+    <span style="color:#0aa">document</span>.querySelector(formSelector).addEventListener(<span style="color:#a50">&#39;change&#39;</span>, <span style="color:#00a">function</span>(e) {
+      history.push(e[<span style="color:#a50">&#39;target&#39;</span>].getAttribute(attribute));
     });
   })();
-&lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
+&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
 <p>Let's see. We've removed the variable <code>eventAction</code>, and opted for a new Array named <code>history</code>. Instead of checking for whether the <code>eventAction</code> variable has a value, we now check if the <code>history</code> Array has any contents. If it does, we <code>join()</code> the <code>history</code> Array as a string delimited with whitespace-&gt;-whitespace. So, an Array that looks like <code>['firstName', 'lastName', 'phone']</code> becomes <code>'firstName &gt; lastName &gt; phone'</code>.</p>
 <p>Finally, in the <code>change</code> listener we use the <code>history.push()</code> method to insert the specified attribute value of the changed form field into the <code>history</code> Array.</p>
 <p>Thus, each time the user changes a value of a form field, the specified attribute (&lsquo;name&rsquo; is again recommended) value will be pushed into the <code>history</code> Array, and this is how we get our neatly formatted interaction history to GA as the Event Action value of the hit.</p>
@@ -566,42 +566,42 @@ Value: <strong>beacon</strong></p>
 <h2 id="only-send-event-when-a-form-isnt-submitted">Only send event when a form isn't submitted</h2>
 <p>The major caveat with all the previous examples, apart from the browser support, is that the event is sent every time the page is unloaded and a field has changed, so for <strong>successful</strong> form submissions as well. This means you'll need to create an Advanced Segment in GA to make the most of your form abandonment analysis.</p>
 <p>However, you can tweak the Custom HTML Tag slightly to only send the form abandonment event when the page unloads for some other reason than a form submission. To do this, the revised Custom HTML Tag should look like this:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
-  (<span style="color:#66d9ef">function</span>() {
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">eventAction</span>, <span style="color:#a6e22e">i</span>;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+  (<span style="color:#00a">function</span>() {
+    <span style="color:#00a">var</span> eventAction, i;
 
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">checkSubmit</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>() {
-      <span style="color:#a6e22e">i</span> <span style="color:#f92672">=</span> window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>;
-      <span style="color:#66d9ef">while</span> (<span style="color:#a6e22e">i</span> <span style="color:#f92672">&gt;</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>) {
-        <span style="color:#66d9ef">if</span> (window.<span style="color:#a6e22e">dataLayer</span>[<span style="color:#a6e22e">i</span>][<span style="color:#e6db74">&#39;event&#39;</span>] <span style="color:#f92672">===</span> <span style="color:#e6db74">&#39;gtm.formSubmit&#39;</span>) {
-          <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">true</span>;
+    <span style="color:#00a">var</span> checkSubmit = <span style="color:#00a">function</span>() {
+      i = <span style="color:#0aa">window</span>.dataLayer.length - <span style="color:#099">1</span>;
+      <span style="color:#00a">while</span> (i &gt; -<span style="color:#099">1</span>) {
+        <span style="color:#00a">if</span> (<span style="color:#0aa">window</span>.dataLayer[i][<span style="color:#a50">&#39;event&#39;</span>] === <span style="color:#a50">&#39;gtm.formSubmit&#39;</span>) {
+          <span style="color:#00a">return</span> <span style="color:#00a">true</span>;
         }
-        <span style="color:#a6e22e">i</span><span style="color:#f92672">--</span>;
+        i--;
       }
     };
 
-    window.<span style="color:#a6e22e">addEventListener</span>(<span style="color:#e6db74">&#39;beforeunload&#39;</span>, <span style="color:#66d9ef">function</span>() {
-      <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">checkSubmit</span>()) {
-        window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
-          <span style="color:#e6db74">&#39;event&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;formAbandonment&#39;</span>,
-          <span style="color:#e6db74">&#39;eventCategory&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;Form Abandonment&#39;</span>,
-          <span style="color:#e6db74">&#39;eventAction&#39;</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">eventAction</span>
+    <span style="color:#0aa">window</span>.addEventListener(<span style="color:#a50">&#39;beforeunload&#39;</span>, <span style="color:#00a">function</span>() {
+      <span style="color:#00a">if</span> (!checkSubmit()) {
+        <span style="color:#0aa">window</span>.dataLayer.push({
+          <span style="color:#a50">&#39;event&#39;</span> : <span style="color:#a50">&#39;formAbandonment&#39;</span>,
+          <span style="color:#a50">&#39;eventCategory&#39;</span> : <span style="color:#a50">&#39;Form Abandonment&#39;</span>,
+          <span style="color:#a50">&#39;eventAction&#39;</span> : eventAction
         });
       }
     });
   
-    <span style="color:#75715e">// Add actual logic here...
-</span><span style="color:#75715e"></span>  })();
-&lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
+    <span style="color:#aaa;font-style:italic">// Add actual logic here...
+</span><span style="color:#aaa;font-style:italic"></span>  })();
+&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
 <p>The first change is that you define a new counter variable <code>i</code>. Next, there's a new mini-function in town called <code>checkSubmit()</code>. This loops through <code>dataLayer</code>, starting from the end, and returns the Boolean value <code>true</code> if an &lsquo;event&rsquo; key with the value &lsquo;gtm.formSubmit&rsquo; is found. This would indicate that the unload was due to a form submission.</p>
 <p>Finally, the <code>window.dataLayer.push()</code> is wrapped in an <code>if</code> block, which is executed only if the <code>checkSubmit()</code> function does <strong>not</strong> return a truthy value. This is because we want to send the Event only if a form submission <em>didn't</em> cause the page unload.</p>
 <p>You might be wondering why not just check against the value of the <strong>{{Event}}</strong> key. Well, GTM has some internal logic running which prevents the value of a Data Layer Variable from being modified during the lifetime of a Tag. Thus, <strong>{{Event}}</strong> will always return <strong>gtm.js</strong> or whatever event name you're using to fire the Custom HTML Tag in the first place.</p>
 <p>If you already have the <code>if</code> block there to check for either <code>eventAction</code> or <code>history.length</code>, you can simply add the <strong>checkSubmit()</strong> check with Boolean logic:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">eventAction</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#f92672">!</span><span style="color:#a6e22e">checkSubmit</span>()) {
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">if</span> (eventAction &amp;&amp; !checkSubmit()) {
   ...
 }
 
-<span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">history</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#f92672">!</span><span style="color:#a6e22e">checkSubmit</span>()) {
+<span style="color:#00a">if</span> (history.length &amp;&amp; !checkSubmit()) {
   ...
 }
 </code></pre></div>

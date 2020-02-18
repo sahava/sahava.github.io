@@ -563,62 +563,62 @@
 </li>
 </ol>
 <p>Here's what the parent page script would look like:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#75715e">// Create iframe
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">el</span> <span style="color:#f92672">=</span> document.<span style="color:#a6e22e">createElement</span>(<span style="color:#e6db74">&#39;iframe&#39;</span>);
-<span style="color:#a6e22e">el</span>.<span style="color:#a6e22e">src</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;https://www.maindomain.com/tracker.html&#39;</span>;
-<span style="color:#a6e22e">el</span>.<span style="color:#a6e22e">setAttribute</span>(<span style="color:#e6db74">&#39;style&#39;</span>, <span style="color:#e6db74">&#39;width:0;height:0;border:0;border:none&#39;</span>);
-document.<span style="color:#a6e22e">body</span>.<span style="color:#a6e22e">appendChild</span>(<span style="color:#a6e22e">el</span>);
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#aaa;font-style:italic">// Create iframe
+</span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">var</span> el = <span style="color:#0aa">document</span>.createElement(<span style="color:#a50">&#39;iframe&#39;</span>);
+el.src = <span style="color:#a50">&#39;https://www.maindomain.com/tracker.html&#39;</span>;
+el.setAttribute(<span style="color:#a50">&#39;style&#39;</span>, <span style="color:#a50">&#39;width:0;height:0;border:0;border:none&#39;</span>);
+<span style="color:#0aa">document</span>.body.appendChild(el);
 
-<span style="color:#75715e">// Add listener to get the stored Client ID
-</span><span style="color:#75715e"></span>window.<span style="color:#a6e22e">addEventListener</span>(<span style="color:#e6db74">&#39;message&#39;</span>, <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e</span>) {
-  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">origin</span> <span style="color:#f92672">!==</span> <span style="color:#e6db74">&#39;https://www.maindomain.com&#39;</span>) { <span style="color:#66d9ef">return</span>; }
-  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">data</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#39;null&#39;</span>) { <span style="color:#a6e22e">generateTracker</span>(<span style="color:#66d9ef">null</span>); }
-  <span style="color:#66d9ef">else</span> { <span style="color:#a6e22e">generateTracker</span>(<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">data</span>); }
+<span style="color:#aaa;font-style:italic">// Add listener to get the stored Client ID
+</span><span style="color:#aaa;font-style:italic"></span><span style="color:#0aa">window</span>.addEventListener(<span style="color:#a50">&#39;message&#39;</span>, <span style="color:#00a">function</span>(e) {
+  <span style="color:#00a">if</span> (e.origin !== <span style="color:#a50">&#39;https://www.maindomain.com&#39;</span>) { <span style="color:#00a">return</span>; }
+  <span style="color:#00a">if</span> (e.data === <span style="color:#a50">&#39;null&#39;</span>) { generateTracker(<span style="color:#00a">null</span>); }
+  <span style="color:#00a">else</span> { generateTracker(e.data); }
 });
 
-<span style="color:#75715e">// Send request to get the Client ID
-</span><span style="color:#75715e"></span><span style="color:#a6e22e">el</span>.<span style="color:#a6e22e">contentWindow</span>.<span style="color:#a6e22e">postMessage</span>(<span style="color:#e6db74">&#39;get&#39;</span>, <span style="color:#e6db74">&#39;https://www.maindomain.com&#39;</span>);
+<span style="color:#aaa;font-style:italic">// Send request to get the Client ID
+</span><span style="color:#aaa;font-style:italic"></span>el.contentWindow.postMessage(<span style="color:#a50">&#39;get&#39;</span>, <span style="color:#a50">&#39;https://www.maindomain.com&#39;</span>);
 
-<span style="color:#75715e">// Send message to set the Client ID after the tracker has generated one
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">trackerGeneratedCallback</span>(<span style="color:#a6e22e">clientId</span>) {
-  <span style="color:#a6e22e">el</span>.<span style="color:#a6e22e">contentWindow</span>.<span style="color:#a6e22e">postMessage</span>(<span style="color:#a6e22e">clientId</span>, <span style="color:#e6db74">&#39;https://www.maindomain.com&#39;</span>);
+<span style="color:#aaa;font-style:italic">// Send message to set the Client ID after the tracker has generated one
+</span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">function</span> trackerGeneratedCallback(clientId) {
+  el.contentWindow.postMessage(clientId, <span style="color:#a50">&#39;https://www.maindomain.com&#39;</span>);
 }
 </code></pre></div>
 <p>Here, the iframe is generated, after which a message is sent to the iframe to get the Client ID. A listener on the page then waits for the iframe to respond. If the iframe responds with a <code>'null'</code> message, a new tracker is generated (<code>generateTracker</code>) with its default Client ID generation mechanism.</p>
 <p>If the iframe responds with the stored Client ID, then a new tracker is generated with this stored Client ID instead.</p>
 <p>If the tracker <strong>did</strong> generate a new Client ID, then the <code>trackerGeneratedCallback</code> is called afterwards, and this sends the Client ID to the tracker page for storage.</p>
 <p>And this is what the iframe page would look like:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">html</span>&gt;
-&lt;<span style="color:#f92672">head</span>&gt;
-&lt;<span style="color:#f92672">meta</span> <span style="color:#a6e22e">name</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;robots&#34;</span> <span style="color:#a6e22e">content</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;noindex,nofollow&#34;</span>&gt;
-&lt;<span style="color:#f92672">script</span>&gt;
-  <span style="color:#75715e">// Check the request comes from *.maindomain.com
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">hostNameRegex</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">/^https:\/\/([^.]+\.)maindomain\.com/</span>;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">html</span>&gt;
+&lt;<span style="color:#1e90ff;font-weight:bold">head</span>&gt;
+&lt;<span style="color:#1e90ff;font-weight:bold">meta</span> <span style="color:#1e90ff">name</span>=<span style="color:#a50">&#34;robots&#34;</span> <span style="color:#1e90ff">content</span>=<span style="color:#a50">&#34;noindex,nofollow&#34;</span>&gt;
+&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+  <span style="color:#aaa;font-style:italic">// Check the request comes from *.maindomain.com
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#00a">var</span> hostNameRegex = <span style="color:#099">/^https:\/\/([^.]+\.)maindomain\.com/</span>;
   
-  <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">processMessage</span>(<span style="color:#a6e22e">event</span>) {
-    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">hostnameRegex</span>.<span style="color:#a6e22e">test</span>(<span style="color:#a6e22e">event</span>.<span style="color:#a6e22e">origin</span>)) {
-      <span style="color:#66d9ef">return</span>;
+  <span style="color:#00a">function</span> processMessage(event) {
+    <span style="color:#00a">if</span> (!hostnameRegex.test(event.origin)) {
+      <span style="color:#00a">return</span>;
     }
     
-    <span style="color:#75715e">// If request is to get the clientId, send it as a message back to the source page
-</span><span style="color:#75715e"></span>    <span style="color:#75715e">// or send &#39;null&#39; if no Client ID is found.
-</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">event</span>.<span style="color:#a6e22e">data</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#39;get&#39;</span>) {
-      <span style="color:#a6e22e">event</span>.<span style="color:#a6e22e">source</span>.<span style="color:#a6e22e">postMessage</span>(window.<span style="color:#a6e22e">localStorage</span>.<span style="color:#a6e22e">getItem</span>(<span style="color:#e6db74">&#39;ga_client_id&#39;</span>) <span style="color:#f92672">||</span> <span style="color:#e6db74">&#39;null&#39;</span>, <span style="color:#a6e22e">event</span>.<span style="color:#a6e22e">origin</span>);
-      <span style="color:#66d9ef">return</span>;
+    <span style="color:#aaa;font-style:italic">// If request is to get the clientId, send it as a message back to the source page
+</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#aaa;font-style:italic">// or send &#39;null&#39; if no Client ID is found.
+</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">if</span> (event.data === <span style="color:#a50">&#39;get&#39;</span>) {
+      event.source.postMessage(<span style="color:#0aa">window</span>.localStorage.getItem(<span style="color:#a50">&#39;ga_client_id&#39;</span>) || <span style="color:#a50">&#39;null&#39;</span>, event.origin);
+      <span style="color:#00a">return</span>;
     }
     
-    <span style="color:#75715e">// Otherwise, set the Client ID in localStorage using the message content
-</span><span style="color:#75715e"></span>    window.<span style="color:#a6e22e">localStorage</span>.<span style="color:#a6e22e">setItem</span>(<span style="color:#e6db74">&#39;ga_client_id&#39;</span>, <span style="color:#a6e22e">event</span>.<span style="color:#a6e22e">data</span>);
-    <span style="color:#66d9ef">return</span>,
+    <span style="color:#aaa;font-style:italic">// Otherwise, set the Client ID in localStorage using the message content
+</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#0aa">window</span>.localStorage.setItem(<span style="color:#a50">&#39;ga_client_id&#39;</span>, event.data);
+    <span style="color:#00a">return</span>,
   }
   
-  <span style="color:#75715e">// Add a listener to listen for postMessage messages
-</span><span style="color:#75715e"></span>  window.<span style="color:#a6e22e">addEventListener</span>(<span style="color:#e6db74">&#39;message&#39;</span>, <span style="color:#a6e22e">processMessage</span>);
-&lt;/<span style="color:#f92672">script</span>&gt;
-&lt;/<span style="color:#f92672">head</span>&gt;
-&lt;<span style="color:#f92672">body</span>&gt;
-&lt;/<span style="color:#f92672">body</span>&gt;
-&lt;/<span style="color:#f92672">html</span>&gt;</code></pre></div>
+  <span style="color:#aaa;font-style:italic">// Add a listener to listen for postMessage messages
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#0aa">window</span>.addEventListener(<span style="color:#a50">&#39;message&#39;</span>, processMessage);
+&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+&lt;/<span style="color:#1e90ff;font-weight:bold">head</span>&gt;
+&lt;<span style="color:#1e90ff;font-weight:bold">body</span>&gt;
+&lt;/<span style="color:#1e90ff;font-weight:bold">body</span>&gt;
+&lt;/<span style="color:#1e90ff;font-weight:bold">html</span>&gt;</code></pre></div>
 <p>This way you could persist any client-side cookie values in the <code>localStorage</code> store of the domain where the iframe rests. This example is just for an arbitrary Client ID, but you could extend it for any value passed in the message.</p>
 <p>Just remember the idiosyncracies of each platform. With Google Analytics, for example, additional measures need to be taken to handle cross-domain tracking, cookie expiration, etc.</p>
 <h3 id="set-cookie-headers-in-a-server-side-script">Set-Cookie headers in a server-side script</h3>
@@ -626,23 +626,23 @@ document.<span style="color:#a6e22e">body</span>.<span style="color:#a6e22e">app
 <p><strong>Update 1 October 2019</strong>: This is definitely the most effective way to persist client-side state. See <a href="https://www.simoahava.com/google-cloud/create-cookie-rewrite-web-service-google-cloud/">this article</a> for inspiration.</p>
 </blockquote>
 <p>Instead of setting the <code>_ga</code> cookie with <code>document.cookie</code>, you could instead set it with the HTTP response. For example, if running a <strong>node.js</strong> Express server, you could have the following lines in your code:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">app</span>.<span style="color:#a6e22e">get</span>(<span style="color:#e6db74">&#39;/&#39;</span>, (<span style="color:#a6e22e">req</span>, <span style="color:#a6e22e">res</span>) =&gt; {
-  <span style="color:#75715e">// Check for existing cookie and use that if found
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">ga</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">req</span>.<span style="color:#a6e22e">cookies</span>[<span style="color:#e6db74">&#39;_ga&#39;</span>];
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">app.get(<span style="color:#a50">&#39;/&#39;</span>, (req, res) =&gt; {
+  <span style="color:#aaa;font-style:italic">// Check for existing cookie and use that if found
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#00a">let</span> ga = req.cookies[<span style="color:#a50">&#39;_ga&#39;</span>];
   
-  <span style="color:#75715e">// Check for linker and use that if valid
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">req</span>.<span style="color:#a6e22e">query</span>[<span style="color:#e6db74">&#39;_ga&#39;</span>]) {
-    <span style="color:#a6e22e">ga</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">getClientIdFromLinker</span>(<span style="color:#a6e22e">req</span>.<span style="color:#a6e22e">query</span>[<span style="color:#e6db74">&#39;_ga&#39;</span>]) <span style="color:#f92672">||</span> <span style="color:#a6e22e">ga</span>;
+  <span style="color:#aaa;font-style:italic">// Check for linker and use that if valid
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#00a">if</span> (req.query[<span style="color:#a50">&#39;_ga&#39;</span>]) {
+    ga = getClientIdFromLinker(req.query[<span style="color:#a50">&#39;_ga&#39;</span>]) || ga;
   }
   
-  <span style="color:#75715e">// Otherwise generate a new Client ID
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">ga</span>) {
-    <span style="color:#a6e22e">ga</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">generateGAClientId</span>();
+  <span style="color:#aaa;font-style:italic">// Otherwise generate a new Client ID
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#00a">if</span> (!ga) {
+    ga = generateGAClientId();
   }
   
-  <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">cookie</span>(<span style="color:#e6db74">&#39;_ga&#39;</span>, <span style="color:#a6e22e">ga</span>, {<span style="color:#a6e22e">domain</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;simoahava.com&#39;</span>, <span style="color:#a6e22e">path</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;/&#39;</span>, <span style="color:#a6e22e">secure</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span>, <span style="color:#a6e22e">expires</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">new</span> Date(Date.<span style="color:#a6e22e">now</span>() <span style="color:#f92672">+</span> <span style="color:#ae81ff">1000</span><span style="color:#f92672">*</span><span style="color:#ae81ff">60</span><span style="color:#f92672">*</span><span style="color:#ae81ff">60</span><span style="color:#f92672">*</span><span style="color:#ae81ff">24</span><span style="color:#f92672">*</span><span style="color:#ae81ff">365</span><span style="color:#f92672">*</span><span style="color:#ae81ff">2</span>), });
+  res.cookie(<span style="color:#a50">&#39;_ga&#39;</span>, ga, {domain: <span style="color:#a50">&#39;simoahava.com&#39;</span>, path: <span style="color:#a50">&#39;/&#39;</span>, secure: <span style="color:#00a">true</span>, expires: <span style="color:#00a">new</span> <span style="color:#0aa">Date</span>(<span style="color:#0aa">Date</span>.now() + <span style="color:#099">1000</span>*<span style="color:#099">60</span>*<span style="color:#099">60</span>*<span style="color:#099">24</span>*<span style="color:#099">365</span>*<span style="color:#099">2</span>), });
   
-  <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">render</span>(<span style="color:#e6db74">&#39;index&#39;</span>);
+  res.render(<span style="color:#a50">&#39;index&#39;</span>);
 });
 </code></pre></div>
 <p>In this example, when the home page is requested from the server, its cookies are parsed. If the <code>_ga</code> cookie is found, its value is stored as a local variable. Then, if the request also has the cross-domain linker parameter, the parameter validity is verified (using e.g. my <a href="https://gist.github.com/sahava/f3718f981bb01768c0eba714ee94e2d2">Gist</a>) and if it's a valid parameter, the local variable is overwritten with the Client ID from the linker.</p>
@@ -699,13 +699,13 @@ document.<span style="color:#a6e22e">body</span>.<span style="color:#a6e22e">app
 <p>We have the same limitations here as with the CNAME option above. Google would need to process the request before returning the header. Considering how many millions of requests to their services are made daily, any type of extra processing they'd need to do would reflect in costs.</p>
 <p>The main difference between this and the CNAME option is that a reverse proxy requires the site owners and developers to add the server-side logic for the proxy, whereas CNAME requires just a DNS record change.</p>
 <p>Setting up a reverse proxy isn't complicated at all - with a Node.js server, you could do it with <code>http-proxy-middleware</code> in just a couple of lines:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">proxy</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;http-proxy-middleware&#39;</span>);
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">const</span> proxy = require(<span style="color:#a50">&#39;http-proxy-middleware&#39;</span>);
 
 ...
 
-<span style="color:#a6e22e">app</span>.<span style="color:#a6e22e">get</span>(<span style="color:#e6db74">&#39;/analytics.js&#39;</span>, <span style="color:#a6e22e">proxy</span>({
-  <span style="color:#a6e22e">target</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;https://www.google-analytics.com/&#39;</span>,
-  <span style="color:#a6e22e">changeOrigin</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span>
+app.get(<span style="color:#a50">&#39;/analytics.js&#39;</span>, proxy({
+  target: <span style="color:#a50">&#39;https://www.google-analytics.com/&#39;</span>,
+  changeOrigin: <span style="color:#00a">true</span>
 });
 </code></pre></div>
 <p>This would essentially perform the GET request for the <strong>analytics.js</strong> library on Google's domain, but serve its content under your domain's <code>/analytics.js</code> URL. If Google plays along, it could serve as a valid solution especially in cases where you can't add any more CNAME records to your DNS.</p>

@@ -391,29 +391,29 @@
 
 <h3 id="custom-javascript-js-is-transaction-id-in-cookie">Custom JavaScript: {{js is transaction id in cookie}}</h3>
 <p>The purpose of this variable is to return <em>true</em> if the transaction ID on the thank you page is found in the cookie. This means that one of the conditions of the Transaction Tag firing trigger is a check for if the cookie value <em>is not</em> true. This would mean that the transaction ID has not been fired yet by this user. The code looks like this:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
-  <span style="color:#66d9ef">return</span> <span style="color:#e6db74">/(,|^){{dlv transaction id}}/</span>.<span style="color:#a6e22e">test</span>({{<span style="color:#a6e22e">cookie</span> <span style="color:#a6e22e">user</span> <span style="color:#a6e22e">transactions</span>}});
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() {
+  <span style="color:#00a">return</span> <span style="color:#099">/(,|^){{dlv transaction id}}/</span>.test({{cookie user transactions}});
 }
 </code></pre></div>
 <h3 id="custom-javascript-js-hitcallback-set-transaction-cookie">Custom JavaScript: {{js hitcallback set transaction cookie}}</h3>
 <p>In this Custom JavaScript variable, we'll add the value returned by <strong>{{transactionId}}</strong> to the cookie that's referenced in the variable we just created above. Since I'm assuming the visitor can have multiple transactions, the cookie will be appended with the value, not overwritten. The expiration date depends on the lifetime of a single transaction ID. In my case, I'm assuming that they're always unique, so I have an expiration time of two years (completely arbitrary figure). If you know that transaction IDs are not unique, you should make the expiration shorter to reflect this.</p>
 <p>Here's what the <strong>{{js hitcallback set transaction cookie}}</strong> should have within:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
-  <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">function</span>() {
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">d</span>, <span style="color:#a6e22e">expires</span>;
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">cvalue</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;&#39;</span>;
-    <span style="color:#75715e">// Run the code only if a transaction is found in the data layer
-</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">if</span> ({{<span style="color:#a6e22e">dlv</span> <span style="color:#a6e22e">transaction</span> <span style="color:#a6e22e">id</span>}}) {
-      <span style="color:#a6e22e">d</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Date();
-      <span style="color:#a6e22e">d</span>.<span style="color:#a6e22e">setTime</span>(<span style="color:#a6e22e">d</span>.<span style="color:#a6e22e">getTime</span>() <span style="color:#f92672">+</span> (<span style="color:#ae81ff">2</span><span style="color:#f92672">*</span><span style="color:#ae81ff">365</span><span style="color:#f92672">*</span><span style="color:#ae81ff">24</span><span style="color:#f92672">*</span><span style="color:#ae81ff">60</span><span style="color:#f92672">*</span><span style="color:#ae81ff">60</span><span style="color:#f92672">*</span><span style="color:#ae81ff">1000</span>));
-      <span style="color:#a6e22e">expires</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;expires=&#39;</span><span style="color:#f92672">+</span><span style="color:#a6e22e">d</span>.<span style="color:#a6e22e">toUTCString</span>();
-      <span style="color:#75715e">// If the cookie already exists, append not overwrite
-</span><span style="color:#75715e"></span>      <span style="color:#66d9ef">if</span> ({{<span style="color:#a6e22e">cookie</span> <span style="color:#a6e22e">user</span> <span style="color:#a6e22e">transactions</span>}}) {
-        <span style="color:#a6e22e">cvalue</span> <span style="color:#f92672">=</span> {{<span style="color:#a6e22e">cookie</span> <span style="color:#a6e22e">user</span> <span style="color:#a6e22e">transactions</span>}} <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;,&#39;</span>;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() {
+  <span style="color:#00a">return</span> <span style="color:#00a">function</span>() {
+    <span style="color:#00a">var</span> d, expires;
+    <span style="color:#00a">var</span> cvalue = <span style="color:#a50">&#39;&#39;</span>;
+    <span style="color:#aaa;font-style:italic">// Run the code only if a transaction is found in the data layer
+</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">if</span> ({{dlv transaction id}}) {
+      d = <span style="color:#00a">new</span> <span style="color:#0aa">Date</span>();
+      d.setTime(d.getTime() + (<span style="color:#099">2</span>*<span style="color:#099">365</span>*<span style="color:#099">24</span>*<span style="color:#099">60</span>*<span style="color:#099">60</span>*<span style="color:#099">1000</span>));
+      expires = <span style="color:#a50">&#39;expires=&#39;</span>+d.toUTCString();
+      <span style="color:#aaa;font-style:italic">// If the cookie already exists, append not overwrite
+</span><span style="color:#aaa;font-style:italic"></span>      <span style="color:#00a">if</span> ({{cookie user transactions}}) {
+        cvalue = {{cookie user transactions}} + <span style="color:#a50">&#39;,&#39;</span>;
       }    
-      document.<span style="color:#a6e22e">cookie</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;user_transaction_ids=&#39;</span> <span style="color:#f92672">+</span> 
-            <span style="color:#a6e22e">cvalue</span> <span style="color:#f92672">+</span> {{<span style="color:#a6e22e">dlv</span> <span style="color:#a6e22e">transaction</span> <span style="color:#a6e22e">id</span>}} <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;; &#39;</span> <span style="color:#f92672">+</span> 
-            <span style="color:#a6e22e">expires</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;; path=/&#39;</span>;
+      <span style="color:#0aa">document</span>.cookie = <span style="color:#a50">&#39;user_transaction_ids=&#39;</span> + 
+            cvalue + {{dlv transaction id}} + <span style="color:#a50">&#39;; &#39;</span> + 
+            expires + <span style="color:#a50">&#39;; path=/&#39;</span>;
     }
   };
 }

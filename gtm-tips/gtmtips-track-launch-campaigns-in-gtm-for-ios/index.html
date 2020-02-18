@@ -349,22 +349,22 @@
 </ol>
 <h3 id="1-modifying-the-app-code">1. Modifying the app code</h3>
 <p>To parse the URL, we'll leverage the <code>setCampaignParametersFromUrl</code> method in the <code>GAIDictionaryBuilder</code> class of the Google Analytics SDK. We won't use it for anything else except for parsing the URL. So, in your <strong>AppDelegate.swift</strong> file, locate the overloaded constructor with the <code>handleOpenURL</code> method, or create it yourself:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">application</span>(application: UIApplication, handleOpenURL url: NSURL) -&gt; Bool {
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="color:#00a">func</span> <span style="color:#0a0">application</span>(application: UIApplication, handleOpenURL url: NSURL) -&gt; <span style="color:#0aa">Bool</span> {
   ...
 }</code></pre></div>
 <p>This is where the app parses any URL parameters used in the launch.</p>
 <p>So, now we need to leverage the GA SDK's built-in methods, and we need to push the parameters to <code>dataLayer</code>. The setup might look something like this:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">application</span>(application: UIApplication, handleOpenURL url: NSURL) -&gt; Bool {
-  <span style="color:#66d9ef">let</span> urlString = url.absoluteString
-  <span style="color:#66d9ef">let</span> hitParams = GAIDictionaryBuilder.<span style="color:#66d9ef">init</span>()
-  <span style="color:#66d9ef">let</span> dataLayer = TAGManager.instance().dataLayer
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="color:#00a">func</span> <span style="color:#0a0">application</span>(application: UIApplication, handleOpenURL url: NSURL) -&gt; <span style="color:#0aa">Bool</span> {
+  <span style="color:#00a">let</span> <span style="color:#a00">urlString</span> = url.absoluteString
+  <span style="color:#00a">let</span> <span style="color:#a00">hitParams</span> = GAIDictionaryBuilder.<span style="color:#00a">init</span>()
+  <span style="color:#00a">let</span> <span style="color:#a00">dataLayer</span> = TAGManager.instance().dataLayer
   hitParams.setCampaignParametersFromUrl(urlString)
   dataLayer.push([
-    <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">campaignMedium</span><span style="color:#e6db74">&#34;</span> : hitParams.<span style="color:#66d9ef">get</span>(kGAICampaignMedium) ?? <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">&#34;</span>,
-    <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">campaignName</span><span style="color:#e6db74">&#34;</span> : hitParams.<span style="color:#66d9ef">get</span>(kGAICampaignName) ?? <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">&#34;</span>,
-    <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">campaignSource</span><span style="color:#e6db74">&#34;</span> : hitParams.<span style="color:#66d9ef">get</span>(kGAICampaignSource) ?? <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">&#34;</span>
+    <span style="color:#a50">&#34;</span><span style="color:#a50">campaignMedium</span><span style="color:#a50">&#34;</span> : hitParams.<span style="color:#00a">get</span>(kGAICampaignMedium) ?? <span style="color:#a50">&#34;</span><span style="color:#a50">&#34;</span>,
+    <span style="color:#a50">&#34;</span><span style="color:#a50">campaignName</span><span style="color:#a50">&#34;</span> : hitParams.<span style="color:#00a">get</span>(kGAICampaignName) ?? <span style="color:#a50">&#34;</span><span style="color:#a50">&#34;</span>,
+    <span style="color:#a50">&#34;</span><span style="color:#a50">campaignSource</span><span style="color:#a50">&#34;</span> : hitParams.<span style="color:#00a">get</span>(kGAICampaignSource) ?? <span style="color:#a50">&#34;</span><span style="color:#a50">&#34;</span>
   ])
-  <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">true</span>
+  <span style="color:#00a">return</span> <span style="color:#00a">true</span>
 }</code></pre></div>
 <p>Let's just quickly walk through this. <code>urlString</code> is the variable where we'll store the URL string itself (d'oh). <code>hitParams</code> is what we'll use to parse the URL, and <code>dataLayer</code> is where we'll push the information.</p>
 <p>The <code>setCampaignParametersFromUrl()</code> method takes a URL string, and parses it for the <a href="https://support.google.com/analytics/answer/1033867?hl=en">regular UTM campaign parameters</a>. It stores them in a bunch of constants the GA SDK leverages to pass information between the app and Google Analytics.</p>

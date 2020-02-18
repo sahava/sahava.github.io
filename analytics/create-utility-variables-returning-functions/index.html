@@ -342,57 +342,57 @@
 <p>In Google Tag Manager, using the function as a closure isn't necessarily the biggest perk, because Custom JavaScript variables are designed to be ephemeral - simply processing things in scope (e.g. other variables), and then returning the result of this processing.</p>
 <p>However, when you <strong>return a function</strong> which accepts parameters in a Custom JavaScript variable, you can create a utility that can be invoked from Custom HTML tags and other Custom JavaScript variables without having to always rewrite the same code in all the places you need to the utility.</p>
 <p>For example, let's say you want to create a <strong>browser cookie</strong> in a Custom HTML tag. You have some options:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
-  <span style="color:#75715e">// Option 1: Create a global method
-</span><span style="color:#75715e"></span>  window.<span style="color:#a6e22e">_setCookie</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">name</span>, <span style="color:#a6e22e">value</span>, <span style="color:#a6e22e">ms</span>, <span style="color:#a6e22e">path</span>, <span style="color:#a6e22e">domain</span>) {
-    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">name</span> <span style="color:#f92672">||</span> <span style="color:#f92672">!</span><span style="color:#a6e22e">value</span>) {
-      <span style="color:#66d9ef">return</span>;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+  <span style="color:#aaa;font-style:italic">// Option 1: Create a global method
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#0aa">window</span>._setCookie = <span style="color:#00a">function</span>(name, value, ms, path, domain) {
+    <span style="color:#00a">if</span> (!name || !value) {
+      <span style="color:#00a">return</span>;
     }
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">d</span>;
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">cpath</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">path</span> <span style="color:#f92672">?</span> <span style="color:#e6db74">&#39;; path=&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">path</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;&#39;</span>;
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">cdomain</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">domain</span> <span style="color:#f92672">?</span> <span style="color:#e6db74">&#39;; domain=&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">domain</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;&#39;</span>;
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">expires</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;&#39;</span>;
-    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">ms</span>) {
-      <span style="color:#a6e22e">d</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Date();
-      <span style="color:#a6e22e">d</span>.<span style="color:#a6e22e">setTime</span>(<span style="color:#a6e22e">d</span>.<span style="color:#a6e22e">getTime</span>() <span style="color:#f92672">+</span> <span style="color:#a6e22e">ms</span>);
-      <span style="color:#a6e22e">expires</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;; expires=&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">d</span>.<span style="color:#a6e22e">toUTCString</span>();
+    <span style="color:#00a">var</span> d;
+    <span style="color:#00a">var</span> cpath = path ? <span style="color:#a50">&#39;; path=&#39;</span> + path : <span style="color:#a50">&#39;&#39;</span>;
+    <span style="color:#00a">var</span> cdomain = domain ? <span style="color:#a50">&#39;; domain=&#39;</span> + domain : <span style="color:#a50">&#39;&#39;</span>;
+    <span style="color:#00a">var</span> expires = <span style="color:#a50">&#39;&#39;</span>;
+    <span style="color:#00a">if</span> (ms) {
+      d = <span style="color:#00a">new</span> <span style="color:#0aa">Date</span>();
+      d.setTime(d.getTime() + ms);
+      expires = <span style="color:#a50">&#39;; expires=&#39;</span> + d.toUTCString();
     }
-    document.<span style="color:#a6e22e">cookie</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">name</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;=&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">value</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">expires</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">cpath</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">cdomain</span>;
+    <span style="color:#0aa">document</span>.cookie = name + <span style="color:#a50">&#34;=&#34;</span> + value + expires + cpath + cdomain;
   };
   
-  window.<span style="color:#a6e22e">_setCookie</span>(<span style="color:#e6db74">&#39;someCookieName&#39;</span>, <span style="color:#e6db74">&#39;someCookieValue&#39;</span>);
+  <span style="color:#0aa">window</span>._setCookie(<span style="color:#a50">&#39;someCookieName&#39;</span>, <span style="color:#a50">&#39;someCookieValue&#39;</span>);
   
-  <span style="color:#75715e">// Option 2: Directly call the document.cookie API
-</span><span style="color:#75715e"></span>  document.<span style="color:#a6e22e">cookie</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;someCookieName=someCookieValue&#39;</span>;
+  <span style="color:#aaa;font-style:italic">// Option 2: Directly call the document.cookie API
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#0aa">document</span>.cookie = <span style="color:#a50">&#39;someCookieName=someCookieValue&#39;</span>;
   
-  <span style="color:#75715e">// Option 3: Use a Custom JavaScript variable
-</span><span style="color:#75715e"></span>  {{<span style="color:#a6e22e">Set</span> <span style="color:#a6e22e">Cookie</span>}}(<span style="color:#e6db74">&#39;someCookieName=someCookieValue&#39;</span>);
-&lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
+  <span style="color:#aaa;font-style:italic">// Option 3: Use a Custom JavaScript variable
+</span><span style="color:#aaa;font-style:italic"></span>  {{Set Cookie}}(<span style="color:#a50">&#39;someCookieName=someCookieValue&#39;</span>);
+&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
 <p><strong>Option 1</strong> creates a utility method, too, but it adds it to the global namespace. Yes, this has the added benefit of being available to all your Custom HTML tags and Custom JavaScript variables, and actually <strong>any other script</strong> running on your site, even outside GTM. Assuming these other tags and scripts run <strong>after</strong> the <code>_setCookie</code> global method has been created with this tag, that is.</p>
 <p>The downside is that you're <strong>polluting the global namespace</strong>. You're reserving a key that might be overwritten or accessed by any other JavaScript running on the site. If only scripts within GTM need this method, you'd be better off with some other solution.</p>
 <p><strong>Option 2</strong> is simple in that you don't need a function at all, you're directly writing the cookie. With the example above it's really the simplest way to go about it. However, as soon as you need to do some extra processing, such as determining on which domain or path to write the cookie or what its expiration should be, you'll add lines and lines of code, and all of these lines need to be rewritten in any other tag where you also want to write a cookie.</p>
 <p><strong>Option 3</strong> is what this article is about. Instead of adding the <code>_setCookie</code> method into the global scope of the page, you can use Google Tag Manager's Custom JavaScript variables to handle the logic for you. The variable would look like this:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
-  <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">name</span>, <span style="color:#a6e22e">value</span>, <span style="color:#a6e22e">ms</span>, <span style="color:#a6e22e">path</span>, <span style="color:#a6e22e">domain</span>) {
-    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">name</span> <span style="color:#f92672">||</span> <span style="color:#f92672">!</span><span style="color:#a6e22e">value</span>) {
-      <span style="color:#66d9ef">return</span>;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() {
+  <span style="color:#00a">return</span> <span style="color:#00a">function</span>(name, value, ms, path, domain) {
+    <span style="color:#00a">if</span> (!name || !value) {
+      <span style="color:#00a">return</span>;
     }
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">d</span>;
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">cpath</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">path</span> <span style="color:#f92672">?</span> <span style="color:#e6db74">&#39;; path=&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">path</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;&#39;</span>;
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">cdomain</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">domain</span> <span style="color:#f92672">?</span> <span style="color:#e6db74">&#39;; domain=&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">domain</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;&#39;</span>;
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">expires</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;&#39;</span>;
-    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">ms</span>) {
-      <span style="color:#a6e22e">d</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Date();
-      <span style="color:#a6e22e">d</span>.<span style="color:#a6e22e">setTime</span>(<span style="color:#a6e22e">d</span>.<span style="color:#a6e22e">getTime</span>() <span style="color:#f92672">+</span> <span style="color:#a6e22e">ms</span>);
-      <span style="color:#a6e22e">expires</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;; expires=&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">d</span>.<span style="color:#a6e22e">toUTCString</span>();
+    <span style="color:#00a">var</span> d;
+    <span style="color:#00a">var</span> cpath = path ? <span style="color:#a50">&#39;; path=&#39;</span> + path : <span style="color:#a50">&#39;&#39;</span>;
+    <span style="color:#00a">var</span> cdomain = domain ? <span style="color:#a50">&#39;; domain=&#39;</span> + domain : <span style="color:#a50">&#39;&#39;</span>;
+    <span style="color:#00a">var</span> expires = <span style="color:#a50">&#39;&#39;</span>;
+    <span style="color:#00a">if</span> (ms) {
+      d = <span style="color:#00a">new</span> <span style="color:#0aa">Date</span>();
+      d.setTime(d.getTime() + ms);
+      expires = <span style="color:#a50">&#39;; expires=&#39;</span> + d.toUTCString();
     }
-    document.<span style="color:#a6e22e">cookie</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">name</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;=&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">value</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">expires</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">cpath</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">cdomain</span>;
+    <span style="color:#0aa">document</span>.cookie = name + <span style="color:#a50">&#34;=&#34;</span> + value + expires + cpath + cdomain;
   }
 }
 </code></pre></div>
 <p>As you can see, it's almost the same as <strong>Option 1</strong>, except instead of assigning the function to a global variable, you're <strong>returning</strong> it in the Custom JavaScript variable. And because you return the function, you can then invoke it with the parameters <code>name, value, ms, path, domain</code>, and have the function handle writing the cookie for you.</p>
 <p>Assuming you'll name that Custom JavaScript variable as <strong>Set cookie variable</strong>, this is how you would invoke it from a Custom HTML tag or a Custom JavaScript variable:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">{{<span style="color:#a6e22e">Set</span> <span style="color:#a6e22e">cookie</span> <span style="color:#a6e22e">variable</span>}}(<span style="color:#e6db74">&#39;cookieName&#39;</span>, <span style="color:#e6db74">&#39;cookieValue&#39;</span>, <span style="color:#ae81ff">100000</span>, <span style="color:#e6db74">&#39;/&#39;</span>, <span style="color:#e6db74">&#39;simoahava.com&#39;</span>);
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">{{Set cookie variable}}(<span style="color:#a50">&#39;cookieName&#39;</span>, <span style="color:#a50">&#39;cookieValue&#39;</span>, <span style="color:#099">100000</span>, <span style="color:#a50">&#39;/&#39;</span>, <span style="color:#a50">&#39;simoahava.com&#39;</span>);
 </code></pre></div>
 <p>This is just one example. You could also&hellip;</p>
 <ul>

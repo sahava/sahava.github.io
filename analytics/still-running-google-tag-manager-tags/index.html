@@ -342,18 +342,18 @@
 <h2 id="when-is-a-tag-done">When is a tag &ldquo;done&rdquo;?</h2>
 <p>By default, a tag is done when its code is executed, and the browser is ready to move on to the next script block in queue. This can happen if the browser reaches the end of the script in turn to be executed, <strong>or if the script throws an error that is not caught</strong>.</p>
 <p>For example, take a <strong>Custom HTML Tag</strong> that looks like this:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
-  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#39;Hello!&#39;</span>);
-&lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+  console.log(<span style="color:#a50">&#39;Hello!&#39;</span>);
+&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
 <p>When it's time to fire this tag, Google Tag Manager injects this tag to the end of <code>&lt;body&gt;</code> in the document object model, and then the browser proceeds to execute the code within the <code>&lt;script&gt;</code> block.</p>
 <p>As this is all run synchronously, by the time the browser has written <code>Hello!</code> to the console, it's ready to move to the next script waiting to be executed, and GTM will thus know that this tag is now &ldquo;done&rdquo;. Preview mode will show that the tag has <strong>Succeeded</strong>.</p>
 <p>What about if we have an asynchronous operation in the middle of the tag?</p>
 <p>Let's simulate async with a simple timeout.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
-  window.<span style="color:#a6e22e">setTimeout</span>(<span style="color:#66d9ef">function</span>() {
-    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#39;Hello!&#39;</span>);
-  }, <span style="color:#ae81ff">5000</span>);
-&lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+  <span style="color:#0aa">window</span>.setTimeout(<span style="color:#00a">function</span>() {
+    console.log(<span style="color:#a50">&#39;Hello!&#39;</span>);
+  }, <span style="color:#099">5000</span>);
+&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
 <p>This time, when the tag's JavaScript is executed, the browser waits five seconds before writing to the console. So when does GTM signal tag completion? No, not after 5 seconds, but rather after the browser reaches the end of the <code>setTimeout</code> expression.</p>
 <p>With asynchronous operations, Google Tag Manager doesn't <em>wait</em>. As with synchronous scripting, as soon as the browser reaches the end of the code block, the tag has <strong>Succeeded</strong>, regardless of how many asynchronous operations are still waiting for completion.</p>
 <p>You can instruct Google Tag Manager to <strong>wait</strong> for an asynchronous operation to complete by utilizing <strong>callbacks</strong>. There are four different callbacks you'd use, depending on use case, to signal Google Tag Manager that a tag has run its course:</p>
@@ -372,28 +372,28 @@
 </li>
 </ol>
 <p>So, if we wanted the browser to wait for the <code>setTimeout</code> call to complete, we'd use it like this:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
-  window.<span style="color:#a6e22e">setTimeout</span>(<span style="color:#66d9ef">function</span>() {
-    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#39;Hello!&#39;</span>);
-    window.<span style="color:#a6e22e">google_tag_manager</span>[{{<span style="color:#a6e22e">Container</span> <span style="color:#a6e22e">ID</span>}}].<span style="color:#a6e22e">onHtmlSuccess</span>({{<span style="color:#a6e22e">HTML</span> <span style="color:#a6e22e">ID</span>}});
-  }, <span style="color:#ae81ff">5000</span>);
-&lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+  <span style="color:#0aa">window</span>.setTimeout(<span style="color:#00a">function</span>() {
+    console.log(<span style="color:#a50">&#39;Hello!&#39;</span>);
+    <span style="color:#0aa">window</span>.google_tag_manager[{{Container ID}}].onHtmlSuccess({{HTML ID}});
+  }, <span style="color:#099">5000</span>);
+&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
 <p>If invoking the callback with a significant delay (e.g. 5 seconds), you might see the tag as <strong>Still Running</strong> in Preview mode only for as long as the timeout lasts. As soon as the success callback is invoked, the status will change from <strong>Still Running</strong> to <strong>Succeeded</strong> (or <strong>Failure</strong> if that's the callback you ran with).</p>
 <h2 id="so-why-do-tags-stay-in-still-running-state">So why do tags stay in &ldquo;Still running&rdquo; state?</h2>
 <p>If you recall from the previous chapter, if the tag has no callbacks, GTM will signal completion once it reaches the end of the code block or if the code block throws a syntax error. Thus there's no actual way for a tag like this to signal it is &ldquo;Still running&rdquo;, as if the browser never reaches the end of the code block and the code never throws an error, it means the code is stuck in an infinite loop or memory leak, and the whole browser would freeze as a result.</p>
 <p><strong>However</strong>, as soon as you add either the <code>google_tag_manager[...]</code> callbacks in a Custom HTML tag or <code>data</code> callbacks in a custom tag template, GTM will actively wait for these callbacks to execute before signalling the tag is done.</p>
 <p>Ergo, if the browser never <strong>reaches</strong> these callbacks when they are nevertheless present in the code, GTM will never receive the completion signal and will remain in &ldquo;Still running&rdquo; state.</p>
 <p>Here's an example that will result in the tag being stuck in &ldquo;Still running&rdquo; limbo.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
-  <span style="color:#66d9ef">if</span> (<span style="color:#66d9ef">false</span>) {
-    window.<span style="color:#a6e22e">google_tag_manager</span>[{{<span style="color:#a6e22e">Container</span> <span style="color:#a6e22e">ID</span>}}].<span style="color:#a6e22e">onHtmlSuccess</span>({{<span style="color:#a6e22e">HTML</span> <span style="color:#a6e22e">ID</span>}});
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+  <span style="color:#00a">if</span> (<span style="color:#00a">false</span>) {
+    <span style="color:#0aa">window</span>.google_tag_manager[{{Container ID}}].onHtmlSuccess({{HTML ID}});
   }
-&lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
+&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
 <p>The browser will never reach the expression within the <code>if {...}</code> block because <code>false</code> will never evaluate to <code>true</code>. Thus, GTM has detected a success callback written in the code block, and it anxiously waits for it to be executed, but it never will. Thus in GTM's view, the tag is perpetually running.</p>
 <p>You can replace the callback with <code>onHtmlFailure()</code> to achieve the same result. It's enough for either callback to be present for Google Tag Manager to actively wait for resolution.</p>
 <p>With <strong>tag templates</strong>, it's the same thing. If you run this:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">if</span> (<span style="color:#66d9ef">false</span>) {
-  <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">gtmOnSuccess</span>();
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">if</span> (<span style="color:#00a">false</span>) {
+  data.gtmOnSuccess();
 }
 </code></pre></div>
 <p>This template would always have its tags be stuck in &ldquo;Still running&rdquo; state, since there's no way to reach that callback.</p>
@@ -476,7 +476,7 @@
 
 
 <p>Easiest way to verify this is to open the <strong>JavaScript console</strong> of your page, and running the following command:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(window[window[<span style="color:#e6db74">&#39;GoogleAnalyticsObject&#39;</span>]].<span style="color:#a6e22e">answer</span>);
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">console.log(<span style="color:#0aa">window</span>[<span style="color:#0aa">window</span>[<span style="color:#a50">&#39;GoogleAnalyticsObject&#39;</span>]].answer);
 </code></pre></div>
 <p>If the method has <strong>not</strong> been overwritten, you should see the number <code>42</code> written into the console. This is a sign that the analytics.js library still works with the global method.</p>
 <p>If you see anything else, most likely either <code>undefined</code> or an error, it would mean that there's something wrong with the global method.</p>

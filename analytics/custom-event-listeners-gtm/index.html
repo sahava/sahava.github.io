@@ -361,16 +361,16 @@
 <p>Showing is easier than telling, so here's the code for you to copy-paste:</p>
 <p><strong>Macro Name</strong>: {{generic event handler}}<br>
 <strong>Macro Type</strong>: Custom JavaScript</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
-  <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e</span>) {
-    <span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
-      <span style="color:#e6db74">&#39;event&#39;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;event.&#39;</span><span style="color:#f92672">+</span><span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">type</span>,
-      <span style="color:#e6db74">&#39;gtm.element&#39;</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">target</span>,
-      <span style="color:#e6db74">&#39;gtm.elementClasses&#39;</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">target</span>.<span style="color:#a6e22e">className</span> <span style="color:#f92672">||</span> <span style="color:#e6db74">&#39;&#39;</span>,
-      <span style="color:#e6db74">&#39;gtm.elementId&#39;</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">target</span>.<span style="color:#a6e22e">id</span> <span style="color:#f92672">||</span> <span style="color:#e6db74">&#39;&#39;</span>,
-      <span style="color:#e6db74">&#39;gtm.elementTarget&#39;</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">target</span>.<span style="color:#a6e22e">target</span> <span style="color:#f92672">||</span> <span style="color:#e6db74">&#39;&#39;</span>,
-      <span style="color:#e6db74">&#39;gtm.elementUrl&#39;</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">target</span>.<span style="color:#a6e22e">href</span> <span style="color:#f92672">||</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">target</span>.<span style="color:#a6e22e">action</span> <span style="color:#f92672">||</span> <span style="color:#e6db74">&#39;&#39;</span>,
-      <span style="color:#e6db74">&#39;gtm.originalEvent&#39;</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">e</span>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() {
+  <span style="color:#00a">return</span> <span style="color:#00a">function</span>(e) {
+    dataLayer.push({
+      <span style="color:#a50">&#39;event&#39;</span>: <span style="color:#a50">&#39;event.&#39;</span>+e.type,
+      <span style="color:#a50">&#39;gtm.element&#39;</span>: e.target,
+      <span style="color:#a50">&#39;gtm.elementClasses&#39;</span>: e.target.className || <span style="color:#a50">&#39;&#39;</span>,
+      <span style="color:#a50">&#39;gtm.elementId&#39;</span>: e.target.id || <span style="color:#a50">&#39;&#39;</span>,
+      <span style="color:#a50">&#39;gtm.elementTarget&#39;</span>: e.target.target || <span style="color:#a50">&#39;&#39;</span>,
+      <span style="color:#a50">&#39;gtm.elementUrl&#39;</span>: e.target.href || e.target.action || <span style="color:#a50">&#39;&#39;</span>,
+      <span style="color:#a50">&#39;gtm.originalEvent&#39;</span>: e
     });
   }
 }
@@ -390,16 +390,16 @@
 <h2 id="the-listener-tag">The listener tag</h2>
 <p>Now that we have our generic event handler, the next step is to create a tag which sets up the listener. The key here is recognizing just which listener you want to set up. Also, for symmetry's sake I will only show how to prime the event listener on the <code>document</code> node, because that's the generic way AND the way GTM's own proprietary listeners work. If you want, you can attach the listeners to specific DOM nodes, which reduces the risk of <a href="https://www.simoahava.com/analytics/dont-gtm-listeners-work/">propagation problems</a>, but as a solution it won't be as generic any more.</p>
 <p>First, here's the listener code itself. Put this in a Custom HTML Tag, and add a firing rule which uses either <strong>{{event}} equals gtm.js</strong> if you're attaching the listener on the <code>document</code> node, or <strong>{{event}} equals gtm.dom</strong> if you're listening on specific HTML elements.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
-  (<span style="color:#66d9ef">function</span>() {
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">eventType</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;change&#34;</span>; <span style="color:#75715e">// Modify this to reflect the event type you want to listen for
-</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">if</span> (document.<span style="color:#a6e22e">addEventListener</span>) { 
-      document.<span style="color:#a6e22e">addEventListener</span>(<span style="color:#a6e22e">eventType</span>, {{<span style="color:#a6e22e">generic</span> <span style="color:#a6e22e">event</span> <span style="color:#a6e22e">handler</span>}}, <span style="color:#66d9ef">false</span>); 
-    } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (document.<span style="color:#a6e22e">attachEvent</span>) { 
-      document.<span style="color:#a6e22e">attachEvent</span>(<span style="color:#e6db74">&#39;on&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">eventType</span>, {{<span style="color:#a6e22e">generic</span> <span style="color:#a6e22e">event</span> <span style="color:#a6e22e">handler</span>}}); 
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+  (<span style="color:#00a">function</span>() {
+    <span style="color:#00a">var</span> eventType = <span style="color:#a50">&#34;change&#34;</span>; <span style="color:#aaa;font-style:italic">// Modify this to reflect the event type you want to listen for
+</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">if</span> (<span style="color:#0aa">document</span>.addEventListener) { 
+      <span style="color:#0aa">document</span>.addEventListener(eventType, {{generic event handler}}, <span style="color:#00a">false</span>); 
+    } <span style="color:#00a">else</span> <span style="color:#00a">if</span> (<span style="color:#0aa">document</span>.attachEvent) { 
+      <span style="color:#0aa">document</span>.attachEvent(<span style="color:#a50">&#39;on&#39;</span> + eventType, {{generic event handler}}); 
     }
   })();
-&lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
+&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
 <p>On the first line, you specify just what type of event you want to listen for. For the full list of supported types, <a href="https://developer.mozilla.org/en-US/docs/Web/Events">follow this link</a>. Remember, you can also dispatch and listen to your own custom events, which makes this solution even more flexible. Here's MDN's excellent guide on <a href="https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Creating_and_triggering_events">creating and triggering events</a>.</p>
 <p>Anyway, here's a list of some of the most popular event types:</p>
 <ul>

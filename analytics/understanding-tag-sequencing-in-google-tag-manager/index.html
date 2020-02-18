@@ -425,18 +425,18 @@
 </li>
 </ol>
 <p>In the following code example, I'm running some custom JavaScript, and once it's done, I'm letting the sequence know that <code>onSuccess</code> has been called.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
-  (<span style="color:#66d9ef">function</span>() {
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">gtm</span> <span style="color:#f92672">=</span> window.<span style="color:#a6e22e">google_tag_manager</span>[{{<span style="color:#a6e22e">Container</span> <span style="color:#a6e22e">ID</span>}}];
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">el</span> <span style="color:#f92672">=</span> document.<span style="color:#a6e22e">getElementById</span>(<span style="color:#e6db74">&#39;content-head&#39;</span>);
-    <span style="color:#66d9ef">try</span> {
-      <span style="color:#a6e22e">el</span>.<span style="color:#a6e22e">innerHTML</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;We have taken over your website!&#39;</span>;
-      <span style="color:#a6e22e">gtm</span>.<span style="color:#a6e22e">onHtmlSuccess</span>({{<span style="color:#a6e22e">HTML</span> <span style="color:#a6e22e">ID</span>}});
-    } <span style="color:#66d9ef">catch</span>(<span style="color:#a6e22e">e</span>) {
-      <span style="color:#a6e22e">gtm</span>.<span style="color:#a6e22e">onHtmlFailure</span>({{<span style="color:#a6e22e">HTML</span> <span style="color:#a6e22e">ID</span>}});
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+  (<span style="color:#00a">function</span>() {
+    <span style="color:#00a">var</span> gtm = <span style="color:#0aa">window</span>.google_tag_manager[{{Container ID}}];
+    <span style="color:#00a">var</span> el = <span style="color:#0aa">document</span>.getElementById(<span style="color:#a50">&#39;content-head&#39;</span>);
+    <span style="color:#00a">try</span> {
+      el.innerHTML = <span style="color:#a50">&#39;We have taken over your website!&#39;</span>;
+      gtm.onHtmlSuccess({{HTML ID}});
+    } <span style="color:#00a">catch</span>(e) {
+      gtm.onHtmlFailure({{HTML ID}});
     }
   })();
-&lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
+&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
 <p>In the first line of the script, you copy a reference to the GTM container interface into the <code>gtm</code> variable. This is a very specific interface into GTM's mechanisms, so don't worry about it too much. Suffice to say that this reference allows you to pass the <code>onSuccess</code> and <code>onFailure</code> callbacks, which is why it's important here.</p>
 <p>Next, there's a <code>try...catch</code> block, where a DOM method is executed. Once it's completed, the <code>onHtmlSuccess()</code> method of the interface is invoked. The parameter to this method is the new <strong>HTML ID</strong> Built-In Variable. This way GTM will be able to communicate to the next member of the sequence that it was precisely <em>this</em> particular Custom HTML Tag that just completed.</p>
 <p>If there's an error, then the <code>onHtmlFailure()</code> method is invoked, and information is passed to the sequence that this Tag did not complete successfully.</p>
@@ -500,13 +500,13 @@
 
 
 <p>However, at the time of writing this, <code>dataLayer.set()</code> does not exist. I asked the developers, and this seems to be a mistake in the guide. Instead, you need to use the following command to <em>set</em> values in the Data Layer even during the tag sequence:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#75715e">// To set a value, use set() with the key as the first parameter, and value as the second
-</span><span style="color:#75715e"></span><span style="color:#a6e22e">google_tag_manager</span>[{{<span style="color:#a6e22e">Container</span> <span style="color:#a6e22e">ID</span>}}].<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">set</span>(<span style="color:#e6db74">&#39;someKey&#39;</span>, <span style="color:#e6db74">&#39;someValue&#39;</span>);
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#aaa;font-style:italic">// To set a value, use set() with the key as the first parameter, and value as the second
+</span><span style="color:#aaa;font-style:italic"></span>google_tag_manager[{{Container ID}}].dataLayer.set(<span style="color:#a50">&#39;someKey&#39;</span>, <span style="color:#a50">&#39;someValue&#39;</span>);
 </code></pre></div>
 <p>Once you use this, any Tag that fires after this one (in the same sequence), will have its Data Layer Variable reference to <strong>someKey</strong> updated to return <em>someValue</em>.</p>
 <p>If you want to retrieve this changed value in the <em>same</em> Tag it was changed in, you can't use a Data Layer Variable, since it's resolved before the Tag is executed (and the <code>set()</code> command is run). You'll need to use this syntax instead:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#75715e">// To get a value, use get() with the key as the parameter
-</span><span style="color:#75715e"></span><span style="color:#a6e22e">google_tag_manager</span>[{{<span style="color:#a6e22e">Container</span> <span style="color:#a6e22e">ID</span>}}].<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">get</span>(<span style="color:#e6db74">&#39;someKey&#39;</span>);
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#aaa;font-style:italic">// To get a value, use get() with the key as the parameter
+</span><span style="color:#aaa;font-style:italic"></span>google_tag_manager[{{Container ID}}].dataLayer.get(<span style="color:#a50">&#39;someKey&#39;</span>);
 </code></pre></div>
 <p>Remember to enable the <strong>Container ID</strong> Built-in Variable!</p>
 <p>These are fairly advanced use cases, but it's very good to keep this in mind when working with Tag sequences that are scoped to a single Data Layer event.</p>

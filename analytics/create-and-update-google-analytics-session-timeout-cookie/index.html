@@ -339,45 +339,45 @@
 <p>Naturally, I have also updated my <a href="https://www.simoahava.com/analytics/customtask-the-guide/">guide to <code>customTask</code></a> as well as my <a href="https://www.simoahava.com/tools/customtask-builder/">customTask Builder tool</a> with this trick, so you can start using it with all the other cool <code>customTask</code> tricks out there!</p>
 <h2 id="the-customtask-code">The <code>customTask</code> code</h2>
 <p>Here's what the <code>customTask</code> method looks like:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">_customTask</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>() {
-  <span style="color:#75715e">// Update expiresMs to be the number of milliseconds when the cookie should expire.
-</span><span style="color:#75715e"></span>  <span style="color:#75715e">// Update domain to match the parent domain of your website.
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">updateSessionCookie</span> <span style="color:#f92672">=</span> {
-    <span style="color:#a6e22e">expiresMs</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">1000</span><span style="color:#f92672">*</span><span style="color:#ae81ff">60</span><span style="color:#f92672">*</span><span style="color:#ae81ff">30</span>,
-    <span style="color:#a6e22e">domain</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;mydomain.com&#39;</span>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">var</span> _customTask = <span style="color:#00a">function</span>() {
+  <span style="color:#aaa;font-style:italic">// Update expiresMs to be the number of milliseconds when the cookie should expire.
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#aaa;font-style:italic">// Update domain to match the parent domain of your website.
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#00a">var</span> updateSessionCookie = {
+    expiresMs: <span style="color:#099">1000</span>*<span style="color:#099">60</span>*<span style="color:#099">30</span>,
+    domain: <span style="color:#a50">&#39;mydomain.com&#39;</span>
   };
 
-  <span style="color:#75715e">// DO NOT EDIT ANYTHING BELOW THIS LINE
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">globalSendHitTaskName</span>   <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;_ga_originalSendHitTask&#39;</span>;
+  <span style="color:#aaa;font-style:italic">// DO NOT EDIT ANYTHING BELOW THIS LINE
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#00a">var</span> globalSendHitTaskName   = <span style="color:#a50">&#39;_ga_originalSendHitTask&#39;</span>;
 
-  <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">customTaskModel</span>) {
+  <span style="color:#00a">return</span> <span style="color:#00a">function</span>(customTaskModel) {
 
-    window[<span style="color:#a6e22e">globalSendHitTaskName</span>] <span style="color:#f92672">=</span> window[<span style="color:#a6e22e">globalSendHitTaskName</span>] <span style="color:#f92672">||</span> <span style="color:#a6e22e">customTaskModel</span>.<span style="color:#a6e22e">get</span>(<span style="color:#e6db74">&#39;sendHitTask&#39;</span>);
+    <span style="color:#0aa">window</span>[globalSendHitTaskName] = <span style="color:#0aa">window</span>[globalSendHitTaskName] || customTaskModel.get(<span style="color:#a50">&#39;sendHitTask&#39;</span>);
 
-    <span style="color:#a6e22e">customTaskModel</span>.<span style="color:#a6e22e">set</span>(<span style="color:#e6db74">&#39;sendHitTask&#39;</span>, <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">sendHitTaskModel</span>) {
+    customTaskModel.set(<span style="color:#a50">&#39;sendHitTask&#39;</span>, <span style="color:#00a">function</span>(sendHitTaskModel) {
 
-      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">originalSendHitTaskModel</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sendHitTaskModel</span>,
-          <span style="color:#a6e22e">originalSendHitTask</span>      <span style="color:#f92672">=</span> window[<span style="color:#a6e22e">globalSendHitTaskName</span>];
+      <span style="color:#00a">var</span> originalSendHitTaskModel = sendHitTaskModel,
+          originalSendHitTask      = <span style="color:#0aa">window</span>[globalSendHitTaskName];
 
-      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">hitType</span>, <span style="color:#a6e22e">nonInteraction</span>, <span style="color:#a6e22e">d</span>;
+      <span style="color:#00a">var</span> hitType, nonInteraction, d;
 
-      <span style="color:#66d9ef">try</span> {
-        <span style="color:#a6e22e">originalSendHitTask</span>(<span style="color:#a6e22e">sendHitTaskModel</span>);
+      <span style="color:#00a">try</span> {
+        originalSendHitTask(sendHitTaskModel);
 
-        <span style="color:#75715e">// updateSessionCookie
-</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">if</span> (<span style="color:#66d9ef">typeof</span> <span style="color:#a6e22e">updateSessionCookie</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#39;object&#39;</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">updateSessionCookie</span>.<span style="color:#a6e22e">hasOwnProperty</span>(<span style="color:#e6db74">&#39;expiresMs&#39;</span>) <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">updateSessionCookie</span>.<span style="color:#a6e22e">hasOwnProperty</span>(<span style="color:#e6db74">&#39;domain&#39;</span>)) {
-          <span style="color:#a6e22e">hitType</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sendHitTaskModel</span>.<span style="color:#a6e22e">get</span>(<span style="color:#e6db74">&#39;hitType&#39;</span>);
-          <span style="color:#a6e22e">nonInteraction</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sendHitTaskModel</span>.<span style="color:#a6e22e">get</span>(<span style="color:#e6db74">&#39;nonInteraction&#39;</span>);
-          <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">nonInteraction</span> <span style="color:#f92672">!==</span> <span style="color:#66d9ef">true</span> <span style="color:#f92672">&amp;&amp;</span> (<span style="color:#a6e22e">hitType</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#39;pageview&#39;</span> <span style="color:#f92672">||</span> <span style="color:#a6e22e">hitType</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#39;event&#39;</span>)) {
-            <span style="color:#a6e22e">d</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Date();
-            <span style="color:#a6e22e">d</span>.<span style="color:#a6e22e">setTime</span>(<span style="color:#a6e22e">d</span>.<span style="color:#a6e22e">getTime</span>() <span style="color:#f92672">+</span> <span style="color:#a6e22e">updateSessionCookie</span>.<span style="color:#a6e22e">expiresMs</span>);
-            document.<span style="color:#a6e22e">cookie</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;_session_&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">sendHitTaskModel</span>.<span style="color:#a6e22e">get</span>(<span style="color:#e6db74">&#39;trackingId&#39;</span>) <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;=true; expires=&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">d</span>.<span style="color:#a6e22e">toUTCString</span>() <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;; path=/; domain=&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">updateSessionCookie</span>.<span style="color:#a6e22e">domain</span>;
+        <span style="color:#aaa;font-style:italic">// updateSessionCookie
+</span><span style="color:#aaa;font-style:italic"></span>        <span style="color:#00a">if</span> (<span style="color:#00a">typeof</span> updateSessionCookie === <span style="color:#a50">&#39;object&#39;</span> &amp;&amp; updateSessionCookie.hasOwnProperty(<span style="color:#a50">&#39;expiresMs&#39;</span>) &amp;&amp; updateSessionCookie.hasOwnProperty(<span style="color:#a50">&#39;domain&#39;</span>)) {
+          hitType = sendHitTaskModel.get(<span style="color:#a50">&#39;hitType&#39;</span>);
+          nonInteraction = sendHitTaskModel.get(<span style="color:#a50">&#39;nonInteraction&#39;</span>);
+          <span style="color:#00a">if</span> (nonInteraction !== <span style="color:#00a">true</span> &amp;&amp; (hitType === <span style="color:#a50">&#39;pageview&#39;</span> || hitType === <span style="color:#a50">&#39;event&#39;</span>)) {
+            d = <span style="color:#00a">new</span> <span style="color:#0aa">Date</span>();
+            d.setTime(d.getTime() + updateSessionCookie.expiresMs);
+            <span style="color:#0aa">document</span>.cookie = <span style="color:#a50">&#39;_session_&#39;</span> + sendHitTaskModel.get(<span style="color:#a50">&#39;trackingId&#39;</span>) + <span style="color:#a50">&#39;=true; expires=&#39;</span> + d.toUTCString() + <span style="color:#a50">&#39;; path=/; domain=&#39;</span> + updateSessionCookie.domain;
           }
         }
-        <span style="color:#75715e">// /updateSessionCookie
-</span><span style="color:#75715e"></span>
-      } <span style="color:#66d9ef">catch</span>(<span style="color:#a6e22e">e</span>) {
-        <span style="color:#a6e22e">originalSendHitTask</span>(<span style="color:#a6e22e">originalSendHitTaskModel</span>);
+        <span style="color:#aaa;font-style:italic">// /updateSessionCookie
+</span><span style="color:#aaa;font-style:italic"></span>
+      } <span style="color:#00a">catch</span>(e) {
+        originalSendHitTask(originalSendHitTaskModel);
       }
       
     });
@@ -386,9 +386,9 @@
 </code></pre></div>
 <p>If you're using <a href="https://tagmanager.google.com">Google Tag Manager</a>, copy-paste that into a Custom JavaScript variable, and then change the first line to <code>function() {</code> and remove the very last character of the code block (the final semicolon). Then, add it as a new <strong>Field to Set</strong> in your <a href="https://www.simoahava.com/analytics/edit-google-analytics-tag-settings/">Google Analytics tag settings</a>.</p>
 <p>if you're using Google Analytics, you need to run this JavaScript before the Google Analytics snippet, and then when creating the tracker modify it to:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">ga</span>(<span style="color:#e6db74">&#39;create&#39;</span>, <span style="color:#e6db74">&#39;UA-XXXXX-Y&#39;</span>);
-<span style="color:#a6e22e">ga</span>(<span style="color:#e6db74">&#39;set&#39;</span>, <span style="color:#e6db74">&#39;customTask&#39;</span>, <span style="color:#a6e22e">_customTask</span>); <span style="color:#75715e">// &lt;-- Add this
-</span><span style="color:#75715e"></span><span style="color:#a6e22e">ga</span>(<span style="color:#e6db74">&#39;send&#39;</span>, <span style="color:#e6db74">&#39;pageview&#39;</span>);
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">ga(<span style="color:#a50">&#39;create&#39;</span>, <span style="color:#a50">&#39;UA-XXXXX-Y&#39;</span>);
+ga(<span style="color:#a50">&#39;set&#39;</span>, <span style="color:#a50">&#39;customTask&#39;</span>, _customTask); <span style="color:#aaa;font-style:italic">// &lt;-- Add this
+</span><span style="color:#aaa;font-style:italic"></span>ga(<span style="color:#a50">&#39;send&#39;</span>, <span style="color:#a50">&#39;pageview&#39;</span>);
 </code></pre></div>
 <p>This <code>customTask</code> should be added to all the tags and hits that you want to have an impact on the session refresh. Basically, it should fire with all your pageviews and events, since those are the two that keep the session alive.</p>
 <h2 id="how-it-works">How it works</h2>
@@ -435,21 +435,21 @@
 <p>This is pretty brutal - you're not sending event hits to GA because you're afraid they'll create orphaned sessions. It's a valid fear to have with GA's sessionization schema, but it might be overkill.</p>
 <p>So another option is to turn all event hits into <strong>non-interactive</strong> hits, because these don't increment the session counts or dimensions in your data set, but the data is still collected.</p>
 <p>To do this, you need a <strong>Custom JavaScript variable</strong> that looks like this:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
-  <span style="color:#66d9ef">return</span> {{<span style="color:#a6e22e">UA</span><span style="color:#f92672">-</span><span style="color:#a6e22e">XXXXX</span><span style="color:#f92672">-</span><span style="color:#a6e22e">Y</span> <span style="color:#a6e22e">session</span>}} <span style="color:#f92672">!==</span> <span style="color:#e6db74">&#39;true&#39;</span>;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() {
+  <span style="color:#00a">return</span> {{UA-XXXXX-Y session}} !== <span style="color:#a50">&#39;true&#39;</span>;
 }
 </code></pre></div>
 <p>This JavaScript returns <code>false</code> if the session is active, and <code>true</code> if there is no active session. By adding this to the <strong>Non-Interaction</strong> field in your Event tags, the hit will be non-interactive if there is no active session.</p>
 <p>You could even modify the <code>customTask</code> to do this logic for you. Within the <code>customTask</code> method, just after <code>try {</code>, you could do something like this (you'll need the <strong>1st Party Cookie</strong> for this):</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">try</span> {
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">try</span> {
   
-  <span style="color:#75715e">// ADD THIS
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">if</span> ({{<span style="color:#a6e22e">UA</span><span style="color:#f92672">-</span><span style="color:#a6e22e">XXXXX</span><span style="color:#f92672">-</span><span style="color:#a6e22e">Y</span> <span style="color:#a6e22e">session</span>}} <span style="color:#f92672">!==</span> <span style="color:#e6db74">&#39;true&#39;</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">sendHitTaskModel</span>.<span style="color:#a6e22e">get</span>(<span style="color:#e6db74">&#39;hitType&#39;</span>) <span style="color:#f92672">===</span> <span style="color:#e6db74">&#39;event&#39;</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">sendHitTaskModel</span>.<span style="color:#a6e22e">get</span>(<span style="color:#e6db74">&#39;nonInteraction&#39;</span>) <span style="color:#f92672">!==</span> <span style="color:#66d9ef">true</span>) {
-    <span style="color:#66d9ef">return</span>;
+  <span style="color:#aaa;font-style:italic">// ADD THIS
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#00a">if</span> ({{UA-XXXXX-Y session}} !== <span style="color:#a50">&#39;true&#39;</span> &amp;&amp; sendHitTaskModel.get(<span style="color:#a50">&#39;hitType&#39;</span>) === <span style="color:#a50">&#39;event&#39;</span> &amp;&amp; sendHitTaskModel.get(<span style="color:#a50">&#39;nonInteraction&#39;</span>) !== <span style="color:#00a">true</span>) {
+    <span style="color:#00a">return</span>;
   }
-  <span style="color:#75715e">// UP TO HERE
-</span><span style="color:#75715e"></span>  
-  <span style="color:#a6e22e">originalSendHitTask</span>(<span style="color:#a6e22e">sendHitTaskModel</span>);
+  <span style="color:#aaa;font-style:italic">// UP TO HERE
+</span><span style="color:#aaa;font-style:italic"></span>  
+  originalSendHitTask(sendHitTaskModel);
   ...
 }
 </code></pre></div>

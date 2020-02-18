@@ -340,15 +340,31 @@
   <ul>
     <li><a href="#unit-tests-in-custom-templates">Unit tests in Custom Templates</a>
       <ul>
-        <li><a href="#simple-example-of-coverage">Simple example of coverage</a></li>
+        <li><a href="#simple-example-of-coverage">Simple example of coverage</a>
+          <ul>
+            <li><a href="#1-does-the-variable-return-undefined-for-array-input">1. Does the variable return undefined for array input</a></li>
+            <li><a href="#2-does-the-variable-return-the-input">2. Does the variable return the input</a></li>
+            <li><a href="#what-about-missing-input">What about missing input?</a></li>
+          </ul>
+        </li>
       </ul>
     </li>
     <li><a href="#the-anatomy-of-a-test">The anatomy of a test</a>
       <ul>
-        <li><a href="#1-mocking">1. Mocking</a></li>
+        <li><a href="#1-mocking">1. Mocking</a>
+          <ul>
+            <li><a href="#mocking-the-data-object">Mocking the data object</a></li>
+            <li><a href="#mocking-template-apis">Mocking template APIs</a></li>
+          </ul>
+        </li>
         <li><a href="#2-running-the-code">2. Running the code</a></li>
         <li><a href="#3-failing-the-test">3. Failing the test</a></li>
-        <li><a href="#4-assertions">4. Assertions</a></li>
+        <li><a href="#4-assertions">4. Assertions</a>
+          <ul>
+            <li><a href="#using-assertthat">Using assertThat</a></li>
+            <li><a href="#using-assertapi">Using assertApi</a></li>
+          </ul>
+        </li>
         <li><a href="#the-test-setup">The test Setup</a></li>
       </ul>
     </li>
@@ -362,41 +378,41 @@
 <p>With unit tests, you are testing the most atomic components of your code: the functions and variables. When you write tests, you aim for high <strong>code coverage</strong>. Coverage means the number of <strong>lines</strong> of code that are evaluated in some test.</p>
 <h3 id="simple-example-of-coverage">Simple example of coverage</h3>
 <p>For example, say that you have a simple variable template like this:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">getType</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;getType&#39;</span>);
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">input</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">input</span>;
-<span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">getType</span>(<span style="color:#a6e22e">input</span>) <span style="color:#f92672">===</span> <span style="color:#e6db74">&#39;array&#39;</span>) {
-  <span style="color:#66d9ef">return</span>;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">const</span> getType = require(<span style="color:#a50">&#39;getType&#39;</span>);
+<span style="color:#00a">const</span> input = data.input;
+<span style="color:#00a">if</span> (getType(input) === <span style="color:#a50">&#39;array&#39;</span>) {
+  <span style="color:#00a">return</span>;
 }
-<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">input</span>;
+<span style="color:#00a">return</span> input;
 </code></pre></div>
 <p>This template takes the user input and returns it. If the input is of type <strong>array</strong>, then <code>undefined</code> is returned instead.</p>
 <p>When writing tests for this variable, there are basically <strong>two</strong> scenarios you would need to test.</p>
 <h4 id="1-does-the-variable-return-undefined-for-array-input">1. Does the variable return <code>undefined</code> for array input</h4>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#75715e">// Call runCode to run the template&#39;s code.
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">mockData</span> <span style="color:#f92672">=</span> {
-  <span style="color:#a6e22e">input</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;notAnArray&#39;</span>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#aaa;font-style:italic">// Call runCode to run the template&#39;s code.
+</span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">const</span> mockData = {
+  input: <span style="color:#a50">&#39;notAnArray&#39;</span>
 };
 
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">variableResult</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">runCode</span>(<span style="color:#a6e22e">mockData</span>);
+<span style="color:#00a">const</span> variableResult = runCode(mockData);
 
-<span style="color:#75715e">// Verify that the variable returns a result.
-</span><span style="color:#75715e"></span><span style="color:#a6e22e">assertThat</span>(<span style="color:#a6e22e">variableResult</span>).<span style="color:#a6e22e">isUndefined</span>();
+<span style="color:#aaa;font-style:italic">// Verify that the variable returns a result.
+</span><span style="color:#aaa;font-style:italic"></span>assertThat(variableResult).isUndefined();
 </code></pre></div>
 <p>Here you create a <strong>mock</strong> object that provides the input. This object has key-value pairs where each key corresponds to a property in the <code>data</code> object, reflecting the input the user would have added to the template fields.</p>
 <p>This object is passed to the <code>runCode</code> function, which is a template API that runs the template code against the data object.</p>
 <p>Finally, the result of <code>runCode</code> is passed to <code>assertThat</code>, which is an <strong>assertion</strong> method where you check whether the result of the code resolves to an expected value.</p>
 <h4 id="2-does-the-variable-return-the-input">2. Does the variable return the input</h4>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">mockInput</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;something&#39;</span>;
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">mockData</span> <span style="color:#f92672">=</span> {
-  <span style="color:#a6e22e">input</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">mockInput</span>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">const</span> mockInput = <span style="color:#a50">&#39;something&#39;</span>;
+<span style="color:#00a">const</span> mockData = {
+  input: mockInput
 };
 
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">expected</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">mockInput</span>;
+<span style="color:#00a">const</span> expected = mockInput;
 
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">variableResult</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">runCode</span>(<span style="color:#a6e22e">mockData</span>);
+<span style="color:#00a">const</span> variableResult = runCode(mockData);
 
-<span style="color:#75715e">// Verify that the variable returns a result.
-</span><span style="color:#75715e"></span><span style="color:#a6e22e">assertThat</span>(<span style="color:#a6e22e">variableResult</span>).<span style="color:#a6e22e">isEqualTo</span>(<span style="color:#a6e22e">expected</span>);
+<span style="color:#aaa;font-style:italic">// Verify that the variable returns a result.
+</span><span style="color:#aaa;font-style:italic"></span>assertThat(variableResult).isEqualTo(expected);
 </code></pre></div>
 <p>As you can see, I'm using constants and variables where possible to avoid hard-coding any values. This prevents simple typos from creating false positives or negatives in your tests.</p>
 <p>With these two tests, you actually achieve <strong>100% test coverage</strong> for the variable template, because the code tests all the possible variations of the variable.</p>
@@ -417,14 +433,14 @@
 <h4 id="mocking-the-data-object">Mocking the <code>data</code> object</h4>
 <p>The first is simple to do. You build an object, where each key corresponds to a property of the <code>data</code> object that your code processes.</p>
 <p>For example, if your template has a <a href="https://www.simoahava.com/analytics/custom-templates-guide-for-google-tag-manager/#text-input">text input</a> field named <code>name</code> and then a <a href="https://www.simoahava.com/analytics/custom-templates-guide-for-google-tag-manager/#simple-table">simple table</a> field named <code>optionalParameters</code>, you could build a mock object like this:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">mockData</span> <span style="color:#f92672">=</span> {
-  <span style="color:#a6e22e">name</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;Simo Ahava&#39;</span>,
-  <span style="color:#a6e22e">optionalParameters</span><span style="color:#f92672">:</span> [{
-    <span style="color:#a6e22e">parameterName</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;country&#39;</span>,
-    <span style="color:#a6e22e">parameterValue</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;Finland&#39;</span>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">const</span> mockData = {
+  name: <span style="color:#a50">&#39;Simo Ahava&#39;</span>,
+  optionalParameters: [{
+    parameterName: <span style="color:#a50">&#39;country&#39;</span>,
+    parameterValue: <span style="color:#a50">&#39;Finland&#39;</span>
   },{
-    <span style="color:#a6e22e">parameterName</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;hair_color&#39;</span>,
-    <span style="color:#a6e22e">parameterValue</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;n/a&#39;</span>
+    parameterName: <span style="color:#a50">&#39;hair_color&#39;</span>,
+    parameterValue: <span style="color:#a50">&#39;n/a&#39;</span>
   }]
 };
 </code></pre></div>
@@ -450,32 +466,32 @@
 <p>Calling <a href="https://developers.google.com/tag-manager/templates/api#sendpixel"><code>sendPixel</code></a> over and over again with different inputs might <em>not</em> make a lot of sense.</p>
 <p>This is where API mocking plays a vital row. In the Tests interface, you can <strong>replace</strong> API functionality with a mock function. This way you can run the test <em>as if</em> the template had called the API, and process the returned value <em>as if</em> the API had returned it.</p>
 <p>For example, let's say we have a tag template that injects a script onto the page, where the domain name is input by the user into a template field. This is what the template code would look like:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sendPixel</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;sendPixel&#39;</span>);
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">const</span> sendPixel = require(<span style="color:#a50">&#39;sendPixel&#39;</span>);
 
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">domainName</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">domainName</span>;
+<span style="color:#00a">const</span> domainName = data.domainName;
 
-<span style="color:#a6e22e">sendPixel</span>(<span style="color:#a6e22e">domainName</span>, <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">gtmOnSuccess</span>, <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">gtmOnFailure</span>);
+sendPixel(domainName, data.gtmOnSuccess, data.gtmOnFailure);
 </code></pre></div>
 <p>To test this, you could write a test that simply checks if <code>gtmOnSuccess</code> was called for a valid hostname and <code>gtmOnFailure</code> for an invalid one:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">mockData</span> <span style="color:#f92672">=</span> {
-  <span style="color:#a6e22e">domainName</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;https://invalid.com&#39;</span>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">const</span> mockData = {
+  domainName: <span style="color:#a50">&#39;https://invalid.com&#39;</span>
 };
-<span style="color:#a6e22e">runCode</span>(<span style="color:#a6e22e">mockData</span>);
-<span style="color:#a6e22e">assertApi</span>(<span style="color:#e6db74">&#39;gtmOnFailure&#39;</span>).<span style="color:#a6e22e">wasCalled</span>();
+runCode(mockData);
+assertApi(<span style="color:#a50">&#39;gtmOnFailure&#39;</span>).wasCalled();
 </code></pre></div>
 <p>However, this test actually tries to send the pixel request to the domain name, meaning it's difficult to test positive and negative results without polluting the endpoint.</p>
 <p>Instead, you can <strong>mock</strong> the API like this:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">mockData</span> <span style="color:#f92672">=</span> {
-  <span style="color:#a6e22e">domainName</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;https://invalid.com&#39;</span>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">const</span> mockData = {
+  domainName: <span style="color:#a50">&#39;https://invalid.com&#39;</span>
 };
 
-<span style="color:#a6e22e">mock</span>(<span style="color:#e6db74">&#39;sendPixel&#39;</span>, (<span style="color:#a6e22e">url</span>, <span style="color:#a6e22e">onSuccess</span>, <span style="color:#a6e22e">onFailure</span>) =&gt; {
-  <span style="color:#a6e22e">onFailure</span>();
+mock(<span style="color:#a50">&#39;sendPixel&#39;</span>, (url, onSuccess, onFailure) =&gt; {
+  onFailure();
 });
 
-<span style="color:#a6e22e">runCode</span>(<span style="color:#a6e22e">mockData</span>);
+runCode(mockData);
 
-<span style="color:#a6e22e">assertApi</span>(<span style="color:#e6db74">&#39;gtmOnFailure&#39;</span>).<span style="color:#a6e22e">wasCalled</span>();
+assertApi(<span style="color:#a50">&#39;gtmOnFailure&#39;</span>).wasCalled();
 </code></pre></div>
 <p>With <code>mock</code>, you instruct the test to use the function stub you provide, meaning whenever the <code>sendPixel</code> API is invoked, it always runs the <code>onFailure()</code> method regardless of input (at least, in this current test).</p>
 <p>So when using APIs that invoke external endpoints, it might be a good idea to mock them.</p>
@@ -486,15 +502,15 @@
 <p>If you do not pass any object to it as an argument, or if you pass an empty object, the template will be run as if the user had not added any input to any field.</p>
 <p>With <strong>tag templates</strong>, you just need to execute <code>runCode()</code>, because your assertions will be made against the APIs that have been called. Tag templates do not return anything, so there's nothing to assess from the result of <code>runCode()</code>.</p>
 <p>With <strong>variable templates</strong>, the template should actually <strong>return</strong> something, and thus your assertions should also be done against the <em>result</em> of <code>runCode()</code>.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">mockData</span> <span style="color:#f92672">=</span> {<span style="color:#a6e22e">input</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;test&#39;</span>};
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">const</span> mockData = {input: <span style="color:#a50">&#39;test&#39;</span>};
 
-<span style="color:#75715e">// With tag templates
-</span><span style="color:#75715e"></span><span style="color:#a6e22e">runCode</span>(<span style="color:#a6e22e">mockData</span>);
-<span style="color:#a6e22e">assertApi</span>(<span style="color:#e6db74">&#39;someApi&#39;</span>).<span style="color:#a6e22e">wasCalled</span>();
+<span style="color:#aaa;font-style:italic">// With tag templates
+</span><span style="color:#aaa;font-style:italic"></span>runCode(mockData);
+assertApi(<span style="color:#a50">&#39;someApi&#39;</span>).wasCalled();
 
-<span style="color:#75715e">// With variable templates
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">result</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">runCode</span>(<span style="color:#a6e22e">mockData</span>);
-<span style="color:#a6e22e">assertThat</span>(<span style="color:#a6e22e">result</span>).<span style="color:#a6e22e">isEqualTo</span>(<span style="color:#e6db74">&#39;test&#39;</span>);
+<span style="color:#aaa;font-style:italic">// With variable templates
+</span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">const</span> result = runCode(mockData);
+assertThat(result).isEqualTo(<span style="color:#a50">&#39;test&#39;</span>);
 </code></pre></div>
 <p>Once the test has run, you are ready to <strong>assert</strong> the results.</p>
 <h3 id="3-failing-the-test">3. Failing the test</h3>
@@ -503,35 +519,35 @@
 <p>Some like to use a fail mechanism to indicate tests that have not yet been written, others like to use it to expose paths that should never be encountered by tests.</p>
 <p>Typically, you wouldn't use <code>fail()</code> in production-ready code, because there would not be incomplete tests and assertion logic would handle all possible permutations of the template code.</p>
 <p>To use <code>fail()</code> is dead simple - just add the command to a branch of the code, and set the failure message as the argument.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">mockData</span> <span style="color:#f92672">=</span> {<span style="color:#a6e22e">input</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;test&#39;</span>};
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">const</span> mockData = {input: <span style="color:#a50">&#39;test&#39;</span>};
 
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">result</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">runCode</span>(<span style="color:#a6e22e">mockData</span>);
+<span style="color:#00a">const</span> result = runCode(mockData);
 
-<span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">result</span> <span style="color:#f92672">===</span> <span style="color:#66d9ef">undefined</span>) {
-  <span style="color:#a6e22e">fail</span>(<span style="color:#e6db74">&#39;Result should never be undefined.&#39;</span>);
+<span style="color:#00a">if</span> (result === <span style="color:#00a">undefined</span>) {
+  fail(<span style="color:#a50">&#39;Result should never be undefined.&#39;</span>);
 }
-<span style="color:#a6e22e">assertThat</span>(<span style="color:#a6e22e">result</span>).<span style="color:#a6e22e">isEqualTo</span>(<span style="color:#e6db74">&#39;test&#39;</span>);
+assertThat(result).isEqualTo(<span style="color:#a50">&#39;test&#39;</span>);
 </code></pre></div>
 <p>You can use <code>fail()</code> to create custom assertions. For example, to check if the object returned by the code contains some property, you could do this:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">mockData</span> <span style="color:#f92672">=</span> {<span style="color:#a6e22e">input</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;test&#39;</span>};
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">const</span> mockData = {input: <span style="color:#a50">&#39;test&#39;</span>};
 
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">result</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">runCode</span>(<span style="color:#a6e22e">mockData</span>);
+<span style="color:#00a">const</span> result = runCode(mockData);
 
-<span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">result</span>.<span style="color:#a6e22e">hasOwnProperty</span>(<span style="color:#e6db74">&#39;someProperty&#39;</span>)) {
-  <span style="color:#a6e22e">assertThat</span>(<span style="color:#66d9ef">true</span>);
-} <span style="color:#66d9ef">else</span> {
-  <span style="color:#a6e22e">fail</span>(<span style="color:#e6db74">&#39;Variable did not have &#34;someProperty&#34;.&#39;</span>);
+<span style="color:#00a">if</span> (result.hasOwnProperty(<span style="color:#a50">&#39;someProperty&#39;</span>)) {
+  assertThat(<span style="color:#00a">true</span>);
+} <span style="color:#00a">else</span> {
+  fail(<span style="color:#a50">&#39;Variable did not have &#34;someProperty&#34;.&#39;</span>);
 }
 </code></pre></div>
 <p>It's not pretty, but it does its job while we wait for new assertion APIs to be added.</p>
 <h3 id="4-assertions">4. Assertions</h3>
 <p>With <strong>assertions</strong>, you are making statements about the results of the test. The best assertion libraries are a pleasure to use, because assertions are written with a grammar and syntax reminiscent of actual language.</p>
 <p>For example, to assert that the variable template code returns a specific value, you add something like:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">assertThat</span>(<span style="color:#a6e22e">runCodeResult</span>).<span style="color:#a6e22e">isEqualTo</span>(<span style="color:#e6db74">&#39;some value&#39;</span>);
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">assertThat(runCodeResult).isEqualTo(<span style="color:#a50">&#39;some value&#39;</span>);
 </code></pre></div>
 <p>The test is a <strong>success</strong> if the assertion resolves to <code>true</code>. In other words, if the <code>runCodeResult</code> had exactly the value <code>'some value'</code>, the test would pass.</p>
 <p>With APIs, you are asserting whether the API was called or not.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">assertApi</span>(<span style="color:#e6db74">&#39;sendPixel&#39;</span>).<span style="color:#a6e22e">wasCalled</span>();
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">assertApi(<span style="color:#a50">&#39;sendPixel&#39;</span>).wasCalled();
 </code></pre></div>
 <p>This test would be a success if the <code>sendPIxel</code> API was invoked during the execution of the test code.</p>
 <blockquote>
@@ -610,34 +626,34 @@
 <p>The <code>assertApi()</code> function can be used to check if the template code has made calls to specific template APIs.</p>
 <p>This is a typical <em>flow test</em> - you are checking that certain things happen in order.</p>
 <p>For example, take the following template code:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">log</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;logToConsole&#39;</span>);
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">makeTableMap</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;makeTableMap&#39;</span>);
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sendPixel</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;sendPixel&#39;</span>);
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">injectScript</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;injectScript&#39;</span>);
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">const</span> log = require(<span style="color:#a50">&#39;logToConsole&#39;</span>);
+<span style="color:#00a">const</span> makeTableMap = require(<span style="color:#a50">&#39;makeTableMap&#39;</span>);
+<span style="color:#00a">const</span> sendPixel = require(<span style="color:#a50">&#39;sendPixel&#39;</span>);
+<span style="color:#00a">const</span> injectScript = require(<span style="color:#a50">&#39;injectScript&#39;</span>);
 
-<span style="color:#75715e">// Log input to console
-</span><span style="color:#75715e"></span><span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">input</span>);
+<span style="color:#aaa;font-style:italic">// Log input to console
+</span><span style="color:#aaa;font-style:italic"></span>log(data.input);
 
-<span style="color:#75715e">// Shape into object
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">makeTableMap</span>(<span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">input</span>, <span style="color:#e6db74">&#39;propertyName&#39;</span>, <span style="color:#e6db74">&#39;propertyValue&#39;</span>);
+<span style="color:#aaa;font-style:italic">// Shape into object
+</span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">const</span> obj = makeTableMap(data.input, <span style="color:#a50">&#39;propertyName&#39;</span>, <span style="color:#a50">&#39;propertyValue&#39;</span>);
 
-<span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">someValue</span>) {
-  <span style="color:#a6e22e">sendPixel</span>(<span style="color:#e6db74">&#39;https://endPoint.com/?value=&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">someValue</span>, <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">gtmOnSuccess</span>, <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">gtmOnFailure</span>);
-} <span style="color:#66d9ef">else</span> {
-  <span style="color:#a6e22e">injectScript</span>(<span style="color:#e6db74">&#39;https://endPoint.com/script.js&#39;</span>, <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">gtmOnSuccess</span>, <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">gtmOnFailure</span>);
+<span style="color:#00a">if</span> (obj.someValue) {
+  sendPixel(<span style="color:#a50">&#39;https://endPoint.com/?value=&#39;</span> + obj.someValue, data.gtmOnSuccess, data.gtmOnFailure);
+} <span style="color:#00a">else</span> {
+  injectScript(<span style="color:#a50">&#39;https://endPoint.com/script.js&#39;</span>, data.gtmOnSuccess, data.gtmOnFailure);
 }
 </code></pre></div>
 <p>To test the flow of this template, you could use a test like this:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">mockData</span> <span style="color:#f92672">=</span> {<span style="color:#a6e22e">someValue</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span>};
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">const</span> mockData = {someValue: <span style="color:#00a">true</span>};
 
-<span style="color:#a6e22e">runCode</span>(<span style="color:#a6e22e">mockData</span>);
+runCode(mockData);
 
-<span style="color:#a6e22e">assertApi</span>(<span style="color:#e6db74">&#39;logToConsole&#39;</span>).<span style="color:#a6e22e">wasCalled</span>();
-<span style="color:#a6e22e">assertApi</span>(<span style="color:#e6db74">&#39;makeTableMap&#39;</span>).<span style="color:#a6e22e">wasCalled</span>();
-<span style="color:#a6e22e">assertApi</span>(<span style="color:#e6db74">&#39;sendPixel&#39;</span>).<span style="color:#a6e22e">wasCalled</span>();
-<span style="color:#a6e22e">assertApi</span>(<span style="color:#e6db74">&#39;injectScript&#39;</span>).<span style="color:#a6e22e">wasNotCalled</span>();
+assertApi(<span style="color:#a50">&#39;logToConsole&#39;</span>).wasCalled();
+assertApi(<span style="color:#a50">&#39;makeTableMap&#39;</span>).wasCalled();
+assertApi(<span style="color:#a50">&#39;sendPixel&#39;</span>).wasCalled();
+assertApi(<span style="color:#a50">&#39;injectScript&#39;</span>).wasNotCalled();
 
-<span style="color:#a6e22e">assertApi</span>(<span style="color:#e6db74">&#39;gtmOnSuccess&#39;</span>).<span style="color:#a6e22e">wasCalled</span>();
+assertApi(<span style="color:#a50">&#39;gtmOnSuccess&#39;</span>).wasCalled();
 </code></pre></div>
 <p>Pay attention to the last line - with tag templates you should always have a test that checks whether the <code>gtmOnSuccess</code> API was called. You can also test for <code>gtmOnFailure</code> in some circumstances (specifically, when the template executes <code>data.gtmOnFailure()</code>).</p>
 <p><code>assertApi(apiName)</code> returns an object that has two assertions:</p>

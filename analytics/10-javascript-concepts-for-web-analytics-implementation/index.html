@@ -438,8 +438,8 @@
 <p>The Custom JavaScript Variable doesn't take any parameters, either. All values you want to process through it need to come from the internal data model of Google Tag Manager (GTM's &ldquo;Variables&rdquo;), need to be created on the spot (local scope), or need to be available in the global namespace (global scope).</p>
 <p>Finally, all Custom JavaScript Variables need a <code>return</code> statement. They must always return some value, as they are invoked in situations where a value is required.</p>
 <p>So this is the minimum viable Custom JavaScript Variable you could create.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
-  <span style="color:#66d9ef">return</span>;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() {
+  <span style="color:#00a">return</span>;
 }
 </code></pre></div>
 <p>When invoked with the {{Variable}} syntax, this function would return <code>undefined</code>.</p>
@@ -447,48 +447,48 @@
 <p>Since the Custom JavaScript Variable is a value-returning function which does not accept parameters, it should only be used for input/output operations. Thus, the purpose of the Custom JavaScript Variable is to take some value, modify it, and then return the modified value.</p>
 <p>A function has side effects if it does something else except the input/output operation described in the previous paragraph. Typical side effects occur when a function is used to modify something in the global scope, or it's used to set some value elsewhere, or, in the context of Google Tag Manager, it's used to manipulate the Data Layer.</p>
 <p>You should avoid side effects because Google Tag Manager can't guarantee that the Custom JavaScript Variable is only resolved once per activation. In fact, in Preview mode, Custom JavaScript Variables can be resolved dozens of times per <code>dataLayer.push()</code>, which can lead to a confusing experience.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
-  <span style="color:#75715e">// AVOID THIS:
-</span><span style="color:#75715e"></span>  window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({<span style="color:#e6db74">&#39;event&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;JavaScript executed&#39;</span>});
-  <span style="color:#66d9ef">return</span>;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() {
+  <span style="color:#aaa;font-style:italic">// AVOID THIS:
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#0aa">window</span>.dataLayer.push({<span style="color:#a50">&#39;event&#39;</span> : <span style="color:#a50">&#39;JavaScript executed&#39;</span>});
+  <span style="color:#00a">return</span>;
 }
 </code></pre></div>
 <p>The main problem with side effects is that they're hard to trace if problems arise. Since the Custom JavaScript Variables are resolved at arbitrary times, having them modify the global scope can be hazardous and can easily lead to unwanted race conditions.</p>
 <h3 id="understand-scope-utilize-closures">Understand scope, utilize closures</h3>
 <p>JavaScript in the web has two types of scope: local and global.</p>
 <p><strong>Local scope</strong>, also known as function scope, is what variables are restricted to when declared within a function. When you declare a variable in a function, it will only exist for the duration of the function call (though see the part about closures below), after which the garbage collector comes and whisks it away. Locally scoped variables cannot be referred to or invoked from outside the current function context.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
-  <span style="color:#75715e">// These variables all have local scope
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">hello</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Hi, &#34;</span>;
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">myname</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Simo!&#34;</span>;
-  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">hello</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">myname</span>;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() {
+  <span style="color:#aaa;font-style:italic">// These variables all have local scope
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#00a">var</span> hello = <span style="color:#a50">&#34;Hi, &#34;</span>;
+  <span style="color:#00a">var</span> myname = <span style="color:#a50">&#34;Simo!&#34;</span>;
+  <span style="color:#00a">return</span> hello + myname;
 }
 </code></pre></div>
 <p><strong>Global scope</strong>, on the other hand, comprises variables that are declared as properties of the <code>window</code> object. If you don't use the <code>var</code> keyword when declaring a variable in a function, it is automatically elevated into global scope.</p>
 <p>When a variable is in global scope, you can refer to it anywhere. For example, the ubiquitous <code>document</code> property of the browser's Document Object Model can be used anywhere since it's actually a global property of the <code>window</code> object:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">window.document <span style="color:#f92672">===</span> document; <span style="color:#75715e">// true
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#0aa">window</span>.<span style="color:#0aa">document</span> === <span style="color:#0aa">document</span>; <span style="color:#aaa;font-style:italic">// true
 </span></code></pre></div>
 <p><strong>Closures</strong> are an exception to how locally scoped variables are ephemeral and inaccessible from the outside. When you create a closure, you are actually creating a simple <em>interface</em> that lets you access the locally scoped variable from outside the function!</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">timeNow</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Date(); <span style="color:#75715e">// Locally scoped
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">function</span>() {
-    <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;Time then was: &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">timeNow</span>;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() {
+  <span style="color:#00a">var</span> timeNow = <span style="color:#00a">new</span> <span style="color:#0aa">Date</span>(); <span style="color:#aaa;font-style:italic">// Locally scoped
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#00a">return</span> <span style="color:#00a">function</span>() {
+    <span style="color:#00a">return</span> <span style="color:#a50">&#34;Time then was: &#34;</span> + timeNow;
   };
 }
 </code></pre></div>
 <p>The closure is the <code>return function() {...}</code> statement. Because the function is declared within same context, it has access to the locally scoped <code>timeNow</code> variable. And because the function is the target of the <code>return</code> statement, you can actually call this returned function in code! In the example below, the Custom JavaScript Variable we just created above is named <strong>Time Then</strong>.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">timeThen</span> <span style="color:#f92672">=</span> {{<span style="color:#a6e22e">Time</span> <span style="color:#a6e22e">Then</span>}}();
-<span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">timeThen</span>);
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">var</span> timeThen = {{Time Then}}();
+console.log(timeThen);
 </code></pre></div>
 <p>The parentheses at the end of the Custom JavaScript Variable are significant. If you simply had <code>{{Time Then}}</code>, the variable assignment would store the return value of the Custom JavaScript Variable (the closure) into the <code>timeThen</code> variable. The <code>console.log()</code> command would simply output the function description itself, and not the result. By adding the parentheses, you're telling the browser to actually <strong>invoke</strong> the function returned by the Custom JavaScript Variable. Since the <code>timeNow</code> is only created once (when the Custom JavaScript Variable is first resolved), the closure will always return the same date-time string.</p>
 <h3 id="modify-state-when-you-are-in-control-of-resolution">Modify state when you are in control of resolution</h3>
 <p>There is one exception to Custom JavaScript Variables having side effects. When you are in full control of when the function is resolved, it's fine to cause side effects, since you don't have to worry about the function resolving an unknown number of times or in unknown contexts.</p>
 <p>One such example is when using a closure in a <em>callback</em>. Callbacks (more on these later) are execution milestones which take place after some other process has completed. So if you indicate the closure of a Custom JavaScript Variable as the value of a callback, you can rest assured that the function is only called once - when the main process has completed.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
-  <span style="color:#75715e">// Return a function to be used by hitCallback
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">function</span>() {
-    <span style="color:#75715e">// It&#39;s OK to modify state here!
-</span><span style="color:#75715e"></span>    window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({<span style="color:#e6db74">&#39;event&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;tagHasFired&#39;</span>});
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() {
+  <span style="color:#aaa;font-style:italic">// Return a function to be used by hitCallback
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#00a">return</span> <span style="color:#00a">function</span>() {
+    <span style="color:#aaa;font-style:italic">// It&#39;s OK to modify state here!
+</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#0aa">window</span>.dataLayer.push({<span style="color:#a50">&#39;event&#39;</span> : <span style="color:#a50">&#39;tagHasFired&#39;</span>});
   };
 }
 </code></pre></div>
@@ -525,79 +525,79 @@
 
 
 <p>In JavaScript, you have five value-carrying data types:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">something</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">5</span>; <span style="color:#75715e">// number
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">something</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;five&#34;</span>; <span style="color:#75715e">// string
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">something</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>; <span style="color:#75715e">// boolean
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">something</span> <span style="color:#f92672">=</span> {<span style="color:#a6e22e">five</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">5</span>}; <span style="color:#75715e">// object
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">something</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>() { <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">5</span>; }; <span style="color:#75715e">// function
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">var</span> something = <span style="color:#099">5</span>; <span style="color:#aaa;font-style:italic">// number
+</span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">var</span> something = <span style="color:#a50">&#34;five&#34;</span>; <span style="color:#aaa;font-style:italic">// string
+</span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">var</span> something = <span style="color:#00a">true</span>; <span style="color:#aaa;font-style:italic">// boolean
+</span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">var</span> something = {five: <span style="color:#099">5</span>}; <span style="color:#aaa;font-style:italic">// object
+</span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">var</span> something = <span style="color:#00a">function</span>() { <span style="color:#00a">return</span> <span style="color:#099">5</span>; }; <span style="color:#aaa;font-style:italic">// function
 </span></code></pre></div>
 <p>It gets slightly messier than this, since there are actually lots of different types of objects (all JavaScript data types are actually an extension of &ldquo;object&rdquo; in its fundamental sense):</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">something</span> <span style="color:#f92672">=</span> {<span style="color:#a6e22e">five</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">5</span>}; <span style="color:#75715e">// Object
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">something</span> <span style="color:#f92672">=</span> [<span style="color:#ae81ff">5</span>,<span style="color:#ae81ff">5</span>,<span style="color:#ae81ff">5</span>]; <span style="color:#75715e">// Array
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">something</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Date(); <span style="color:#75715e">// Date
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">var</span> something = {five: <span style="color:#099">5</span>}; <span style="color:#aaa;font-style:italic">// Object
+</span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">var</span> something = [<span style="color:#099">5</span>,<span style="color:#099">5</span>,<span style="color:#099">5</span>]; <span style="color:#aaa;font-style:italic">// Array
+</span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">var</span> something = <span style="color:#00a">new</span> <span style="color:#0aa">Date</span>(); <span style="color:#aaa;font-style:italic">// Date
 </span></code></pre></div>
 <p>And finally we have some mystic pseudo-types which don't carry any value:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">something</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">undefined</span>; <span style="color:#75715e">// undefined
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">something</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">null</span>; <span style="color:#75715e">// null
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">var</span> something = <span style="color:#00a">undefined</span>; <span style="color:#aaa;font-style:italic">// undefined
+</span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">var</span> something = <span style="color:#00a">null</span>; <span style="color:#aaa;font-style:italic">// null
 </span></code></pre></div>
 <h3 id="dynamic-type">Dynamic type</h3>
 <p>Unlike some other programming languages (e.g. Java), type is <em>dynamic</em> in JavaScript. That means that you can reassign a variable with a completely different type without having to worry about type conversion.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">something</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">5</span>;
-<span style="color:#a6e22e">something</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;five&#34;</span>;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">var</span> something = <span style="color:#099">5</span>;
+something = <span style="color:#a50">&#34;five&#34;</span>;
 </code></pre></div>
 <p>The above is possible in JavaScript, because the variable assignment itself doesn't coerce the assigned value to any specific type. This can be a weakness in the code, because it requires you to test for type to avoid errors.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#75715e">// Works because something is a number
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">something</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">5</span>;
-<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">somethingMultiplied</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">something</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">2</span>;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#aaa;font-style:italic">// Works because something is a number
+</span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">var</span> something = <span style="color:#099">5</span>;
+<span style="color:#00a">var</span> somethingMultiplied = something * <span style="color:#099">2</span>;
 
-<span style="color:#75715e">// Won&#39;t work because something is suddenly a string
-</span><span style="color:#75715e"></span><span style="color:#a6e22e">something</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;five&#34;</span>;
-<span style="color:#a6e22e">somethingMultiplied</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">something</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">2</span>; <span style="color:#75715e">// NaN: Not a Number
-</span><span style="color:#75715e"></span>
-<span style="color:#75715e">// So you need to test
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">if</span> (<span style="color:#66d9ef">typeof</span> <span style="color:#a6e22e">something</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#39;number&#39;</span>) {
-  <span style="color:#a6e22e">somethingMultiplied</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">something</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">2</span>;
+<span style="color:#aaa;font-style:italic">// Won&#39;t work because something is suddenly a string
+</span><span style="color:#aaa;font-style:italic"></span>something = <span style="color:#a50">&#34;five&#34;</span>;
+somethingMultiplied = something * <span style="color:#099">2</span>; <span style="color:#aaa;font-style:italic">// NaN: Not a Number
+</span><span style="color:#aaa;font-style:italic"></span>
+<span style="color:#aaa;font-style:italic">// So you need to test
+</span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">if</span> (<span style="color:#00a">typeof</span> something === <span style="color:#a50">&#39;number&#39;</span>) {
+  somethingMultiplied = something * <span style="color:#099">2</span>;
 }
 </code></pre></div>
 <p>The further apart your variables are from their execution context, the messier it can get with all the type checks. So try to avoid exploiting dynamic type, and do your best to maintain type when creating and reassigning variables.</p>
 <h3 id="loose-type">Loose type</h3>
 <p>JavaScript also does type conversion for you when needed. This means that the following is possible:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">something</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;5&#34;</span>;
-<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">somethingMultiplied</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">something</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">2</span>; <span style="color:#75715e">// 10
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">var</span> something = <span style="color:#a50">&#34;5&#34;</span>;
+<span style="color:#00a">var</span> somethingMultiplied = something * <span style="color:#099">2</span>; <span style="color:#aaa;font-style:italic">// 10
 </span></code></pre></div>
 <p>In the multiplication, JavaScript expects <code>something</code> to resolve to the number type. Even though <code>something</code> is a string, JavaScript detects the number within and automatically converts the variable to a number for the multiplication statement. The variable <code>something</code> itself is not modified, but the value held by it is converted automatically to make resolving <code>somethingMultiplied</code> possible.</p>
 <p>Note that there are some embarrassing exceptions. The plus operator (+) is not only used for mathematical statements but also for concatenating strings. So if you try to add a number to a string, you'll end up with a concatenated string rather than a number!</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">a</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;5&#34;</span>;
-<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">b</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">6</span>;
-<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">c</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">a</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">b</span>; <span style="color:#75715e">// &#34;56&#34;!
-</span><span style="color:#75715e"></span>
-<span style="color:#75715e">// You need to use parseInt() to manually convert to number:
-</span><span style="color:#75715e"></span><span style="color:#a6e22e">c</span> <span style="color:#f92672">=</span> parseInt(<span style="color:#a6e22e">a</span>) <span style="color:#f92672">+</span> <span style="color:#a6e22e">b</span>; <span style="color:#75715e">// 11
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">var</span> a = <span style="color:#a50">&#34;5&#34;</span>;
+<span style="color:#00a">var</span> b = <span style="color:#099">6</span>;
+<span style="color:#00a">var</span> c = a + b; <span style="color:#aaa;font-style:italic">// &#34;56&#34;!
+</span><span style="color:#aaa;font-style:italic"></span>
+<span style="color:#aaa;font-style:italic">// You need to use parseInt() to manually convert to number:
+</span><span style="color:#aaa;font-style:italic"></span>c = <span style="color:#0aa">parseInt</span>(a) + b; <span style="color:#aaa;font-style:italic">// 11
 </span></code></pre></div>
 <h3 id="weird-stuff">Weird stuff</h3>
 <p>I'll just leave this list here. It's just a handful off the odd behavior you get when working with loose and dynamic type.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">typeof</span> <span style="color:#66d9ef">NaN</span>; <span style="color:#75715e">// number
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">NaN</span> <span style="color:#f92672">===</span> <span style="color:#66d9ef">NaN</span>; <span style="color:#75715e">// false
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">typeof</span> <span style="color:#66d9ef">NaN</span>; <span style="color:#75715e">// number
-</span><span style="color:#75715e"></span>isNaN(<span style="color:#66d9ef">NaN</span>); <span style="color:#75715e">// true
-</span><span style="color:#75715e"></span>isNaN(<span style="color:#66d9ef">null</span>); <span style="color:#75715e">// false
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">typeof</span> <span style="color:#66d9ef">null</span>; <span style="color:#75715e">// object
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">null</span> <span style="color:#66d9ef">instanceof</span> Object; <span style="color:#75715e">// false
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">typeof</span> <span style="color:#66d9ef">undefined</span>; <span style="color:#75715e">// undefined
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">undefined</span> <span style="color:#f92672">===</span> <span style="color:#66d9ef">null</span>; <span style="color:#75715e">// false
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">undefined</span> <span style="color:#f92672">==</span> <span style="color:#66d9ef">null</span>; <span style="color:#75715e">// true
-</span><span style="color:#75715e"></span>{<span style="color:#a6e22e">simo</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span>} <span style="color:#f92672">===</span> {<span style="color:#a6e22e">simo</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span>}; <span style="color:#75715e">// false
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">typeof</span> <span style="color:#00a">NaN</span>; <span style="color:#aaa;font-style:italic">// number
+</span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">NaN</span> === <span style="color:#00a">NaN</span>; <span style="color:#aaa;font-style:italic">// false
+</span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">typeof</span> <span style="color:#00a">NaN</span>; <span style="color:#aaa;font-style:italic">// number
+</span><span style="color:#aaa;font-style:italic"></span><span style="color:#0aa">isNaN</span>(<span style="color:#00a">NaN</span>); <span style="color:#aaa;font-style:italic">// true
+</span><span style="color:#aaa;font-style:italic"></span><span style="color:#0aa">isNaN</span>(<span style="color:#00a">null</span>); <span style="color:#aaa;font-style:italic">// false
+</span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">typeof</span> <span style="color:#00a">null</span>; <span style="color:#aaa;font-style:italic">// object
+</span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">null</span> <span style="color:#00a">instanceof</span> <span style="color:#0aa">Object</span>; <span style="color:#aaa;font-style:italic">// false
+</span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">typeof</span> <span style="color:#00a">undefined</span>; <span style="color:#aaa;font-style:italic">// undefined
+</span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">undefined</span> === <span style="color:#00a">null</span>; <span style="color:#aaa;font-style:italic">// false
+</span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">undefined</span> == <span style="color:#00a">null</span>; <span style="color:#aaa;font-style:italic">// true
+</span><span style="color:#aaa;font-style:italic"></span>{simo: <span style="color:#00a">true</span>} === {simo: <span style="color:#00a">true</span>}; <span style="color:#aaa;font-style:italic">// false
 </span></code></pre></div>
 <h3 id="undefined-and-google-analytics">Undefined and Google Analytics</h3>
 <p>Remember that the <code>undefined</code> type has a <a href="https://www.simoahava.com/gtm-tips/undefined-dimensions-wont-get-sent/">special function</a> in Google Analytics (and Google Tag Manager). If you refer to a variable which returns <code>undefined</code>, that particular setting, field, or parameter is automatically dropped from the request to Google Analytics.</p>
 <p>In Google Tag Manager, <code>undefined</code> can also be used to <a href="https://www.simoahava.com/gtm-tips/remember-to-flush-unused-data-layer-variables/">purge values from the Data Layer</a>. This is extremely useful on single-page apps, where variables persist their values throughout the visit.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
-  <span style="color:#a6e22e">event</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;GAEvent&#39;</span>,
-  <span style="color:#a6e22e">eventData</span> <span style="color:#f92672">:</span> {
-    <span style="color:#a6e22e">cat</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;Category value&#39;</span>,
-    <span style="color:#a6e22e">act</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;Action value&#39;</span>,
-    <span style="color:#a6e22e">lab</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">undefined</span>,
-    <span style="color:#a6e22e">val</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">undefined</span>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#0aa">window</span>.dataLayer.push({
+  event: <span style="color:#a50">&#39;GAEvent&#39;</span>,
+  eventData : {
+    cat: <span style="color:#a50">&#39;Category value&#39;</span>,
+    act: <span style="color:#a50">&#39;Action value&#39;</span>,
+    lab: <span style="color:#00a">undefined</span>,
+    val: <span style="color:#00a">undefined</span>
   }
 });
 </code></pre></div>
@@ -632,7 +632,7 @@
 <p>When looking for things that can slow down the site, slow or poorly performing HTTP requests are usually the easy culprit to blame.</p>
 <p>Thanks to asynchronous loading, most HTTP requests are done in such a way that they don't block the page from rendering, but async itself doesn't guarantee a smooth ride.</p>
 <p>Let's take Google Tag Manager as an example. This is a typical container snippet:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">w</span>,<span style="color:#a6e22e">d</span>,<span style="color:#a6e22e">s</span>,<span style="color:#a6e22e">l</span>,<span style="color:#a6e22e">i</span>){<span style="color:#a6e22e">w</span>[<span style="color:#a6e22e">l</span>]<span style="color:#f92672">=</span><span style="color:#a6e22e">w</span>[<span style="color:#a6e22e">l</span>]<span style="color:#f92672">||</span>[];<span style="color:#a6e22e">w</span>[<span style="color:#a6e22e">l</span>].<span style="color:#a6e22e">push</span>({<span style="color:#e6db74">&#39;gtm.start&#39;</span><span style="color:#f92672">:</span><span style="color:#66d9ef">new</span> Date().<span style="color:#a6e22e">getTime</span>(),<span style="color:#a6e22e">event</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#39;gtm.js&#39;</span>});<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">f</span><span style="color:#f92672">=</span><span style="color:#a6e22e">d</span>.<span style="color:#a6e22e">getElementsByTagName</span>(<span style="color:#a6e22e">s</span>)[<span style="color:#ae81ff">0</span>],<span style="color:#a6e22e">j</span><span style="color:#f92672">=</span><span style="color:#a6e22e">d</span>.<span style="color:#a6e22e">createElement</span>(<span style="color:#a6e22e">s</span>),<span style="color:#a6e22e">dl</span><span style="color:#f92672">=</span><span style="color:#a6e22e">l</span><span style="color:#f92672">!=</span><span style="color:#e6db74">&#39;dataLayer&#39;</span><span style="color:#f92672">?</span><span style="color:#e6db74">&#39;&amp;l=&#39;</span><span style="color:#f92672">+</span><span style="color:#a6e22e">l</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#39;&#39;</span>;<span style="color:#a6e22e">j</span>.<span style="color:#a6e22e">async</span><span style="color:#f92672">=</span><span style="color:#66d9ef">true</span>;<span style="color:#a6e22e">j</span>.<span style="color:#a6e22e">src</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#39;//www.googletagmanager.com/gtm.js?id=&#39;</span><span style="color:#f92672">+</span><span style="color:#a6e22e">i</span><span style="color:#f92672">+</span><span style="color:#a6e22e">dl</span>;<span style="color:#a6e22e">f</span>.<span style="color:#a6e22e">parentNode</span>.<span style="color:#a6e22e">insertBefore</span>(<span style="color:#a6e22e">j</span>,<span style="color:#a6e22e">f</span>);})(window,document,<span style="color:#e6db74">&#39;script&#39;</span>,<span style="color:#e6db74">&#39;dataLayer&#39;</span>,<span style="color:#e6db74">&#39;GTM-W92WQQ&#39;</span>);
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">(<span style="color:#00a">function</span>(w,d,s,l,i){w[l]=w[l]||[];w[l].push({<span style="color:#a50">&#39;gtm.start&#39;</span>:<span style="color:#00a">new</span> <span style="color:#0aa">Date</span>().getTime(),event:<span style="color:#a50">&#39;gtm.js&#39;</span>});<span style="color:#00a">var</span> f=d.getElementsByTagName(s)[<span style="color:#099">0</span>],j=d.createElement(s),dl=l!=<span style="color:#a50">&#39;dataLayer&#39;</span>?<span style="color:#a50">&#39;&amp;l=&#39;</span>+l:<span style="color:#a50">&#39;&#39;</span>;j.async=<span style="color:#00a">true</span>;j.src=<span style="color:#a50">&#39;//www.googletagmanager.com/gtm.js?id=&#39;</span>+i+dl;f.parentNode.insertBefore(j,f);})(<span style="color:#0aa">window</span>,<span style="color:#0aa">document</span>,<span style="color:#a50">&#39;script&#39;</span>,<span style="color:#a50">&#39;dataLayer&#39;</span>,<span style="color:#a50">&#39;GTM-W92WQQ&#39;</span>);
 </code></pre></div>
 <p>I've gone over this code in an <a href="https://www.simoahava.com/analytics/container-snippet-gtm-secrets-revealed/">earlier article</a>, but suffice to say that the end result of all this code is this:</p>
 
@@ -669,41 +669,41 @@
 
 <p>So just by creating the <code>script</code> tag, the browser automatically executed an HTTP request to the given endpoint, and the result of this request is the <strong>gtm.js</strong> retrieved in the browser for immediate execution.</p>
 <p>There are lots of elements that can produce an HTTP request. All scripts, images, and HTML files need to be retrieved from the web server, and the main channel of data transfer is the HTTP request. The following HTML tags (with the given attributes) also invoke HTTP requests:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">input</span> <span style="color:#a6e22e">src</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;url&#34;</span>&gt;
-&lt;<span style="color:#f92672">input</span> <span style="color:#a6e22e">usemap</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;url&#34;</span>&gt;
-&lt;<span style="color:#f92672">ins</span> <span style="color:#a6e22e">cite</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;url&#34;</span>&gt;
-&lt;<span style="color:#f92672">link</span> <span style="color:#a6e22e">href</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;url&#34;</span>&gt;
-&lt;<span style="color:#f92672">object</span> <span style="color:#a6e22e">classid</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;url&#34;</span>&gt;
-&lt;<span style="color:#f92672">object</span> <span style="color:#a6e22e">codebase</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;url&#34;</span>&gt;
-&lt;<span style="color:#f92672">object</span> <span style="color:#a6e22e">data</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;url&#34;</span>&gt;
-&lt;<span style="color:#f92672">object</span> <span style="color:#a6e22e">usemap</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;url&#34;</span>&gt;
-&lt;<span style="color:#f92672">q</span> <span style="color:#a6e22e">cite</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;url&#34;</span>&gt;
-&lt;<span style="color:#f92672">script</span> <span style="color:#a6e22e">src</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;url&#34;</span>&gt;&lt;/<span style="color:#f92672">script</span>&gt;
-&lt;<span style="color:#f92672">audio</span> <span style="color:#a6e22e">src</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;url&#34;</span>&gt;
-&lt;<span style="color:#f92672">button</span> <span style="color:#a6e22e">formaction</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;url&#34;</span>&gt;
-&lt;<span style="color:#f92672">command</span> <span style="color:#a6e22e">icon</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;url&#34;</span>&gt;
-&lt;<span style="color:#f92672">embed</span> <span style="color:#a6e22e">src</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;url&#34;</span>&gt;
-&lt;<span style="color:#f92672">html</span> <span style="color:#a6e22e">manifest</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;url&#34;</span>&gt;
-&lt;<span style="color:#f92672">input</span> <span style="color:#a6e22e">formaction</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;url&#34;</span>&gt;
-&lt;<span style="color:#f92672">source</span> <span style="color:#a6e22e">src</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;url&#34;</span>&gt;
-&lt;<span style="color:#f92672">video</span> <span style="color:#a6e22e">poster</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;url&#34;</span>&gt;
-&lt;<span style="color:#f92672">video</span> <span style="color:#a6e22e">src</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;url&#34;</span>&gt;
-&lt;<span style="color:#f92672">a</span> <span style="color:#a6e22e">href</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;url&#34;</span>&gt;
-&lt;<span style="color:#f92672">applet</span> <span style="color:#a6e22e">codebase</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;url&#34;</span>&gt;
-&lt;<span style="color:#f92672">area</span> <span style="color:#a6e22e">href</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;url&#34;</span>&gt;
-&lt;<span style="color:#f92672">base</span> <span style="color:#a6e22e">href</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;url&#34;</span>&gt;
-&lt;<span style="color:#f92672">blockquote</span> <span style="color:#a6e22e">cite</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;url&#34;</span>&gt;
-&lt;<span style="color:#f92672">body</span> <span style="color:#a6e22e">background</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;url&#34;</span>&gt;
-&lt;<span style="color:#f92672">del</span> <span style="color:#a6e22e">cite</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;url&#34;</span>&gt;
-&lt;<span style="color:#f92672">form</span> <span style="color:#a6e22e">action</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;url&#34;</span>&gt;
-&lt;<span style="color:#f92672">frame</span> <span style="color:#a6e22e">longdesc</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;url&#34;</span>&gt;
-&lt;<span style="color:#f92672">frame</span> <span style="color:#a6e22e">src</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;url&#34;</span>&gt;
-&lt;<span style="color:#f92672">head</span> <span style="color:#a6e22e">profile</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;url&#34;</span>&gt;
-&lt;<span style="color:#f92672">iframe</span> <span style="color:#a6e22e">longdesc</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;url&#34;</span>&gt;
-&lt;<span style="color:#f92672">iframe</span> <span style="color:#a6e22e">src</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;url&#34;</span>&gt;
-&lt;<span style="color:#f92672">img</span> <span style="color:#a6e22e">longdesc</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;url&#34;</span>&gt;
-&lt;<span style="color:#f92672">img</span> <span style="color:#a6e22e">src</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;url&#34;</span>&gt;
-&lt;<span style="color:#f92672">img</span> <span style="color:#a6e22e">usemap</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;url&#34;</span>&gt;</code></pre></div>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">input</span> <span style="color:#1e90ff">src</span>=<span style="color:#a50">&#34;url&#34;</span>&gt;
+&lt;<span style="color:#1e90ff;font-weight:bold">input</span> <span style="color:#1e90ff">usemap</span>=<span style="color:#a50">&#34;url&#34;</span>&gt;
+&lt;<span style="color:#1e90ff;font-weight:bold">ins</span> <span style="color:#1e90ff">cite</span>=<span style="color:#a50">&#34;url&#34;</span>&gt;
+&lt;<span style="color:#1e90ff;font-weight:bold">link</span> <span style="color:#1e90ff">href</span>=<span style="color:#a50">&#34;url&#34;</span>&gt;
+&lt;<span style="color:#1e90ff;font-weight:bold">object</span> <span style="color:#1e90ff">classid</span>=<span style="color:#a50">&#34;url&#34;</span>&gt;
+&lt;<span style="color:#1e90ff;font-weight:bold">object</span> <span style="color:#1e90ff">codebase</span>=<span style="color:#a50">&#34;url&#34;</span>&gt;
+&lt;<span style="color:#1e90ff;font-weight:bold">object</span> <span style="color:#1e90ff">data</span>=<span style="color:#a50">&#34;url&#34;</span>&gt;
+&lt;<span style="color:#1e90ff;font-weight:bold">object</span> <span style="color:#1e90ff">usemap</span>=<span style="color:#a50">&#34;url&#34;</span>&gt;
+&lt;<span style="color:#1e90ff;font-weight:bold">q</span> <span style="color:#1e90ff">cite</span>=<span style="color:#a50">&#34;url&#34;</span>&gt;
+&lt;<span style="color:#1e90ff;font-weight:bold">script</span> <span style="color:#1e90ff">src</span>=<span style="color:#a50">&#34;url&#34;</span>&gt;&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+&lt;<span style="color:#1e90ff;font-weight:bold">audio</span> <span style="color:#1e90ff">src</span>=<span style="color:#a50">&#34;url&#34;</span>&gt;
+&lt;<span style="color:#1e90ff;font-weight:bold">button</span> <span style="color:#1e90ff">formaction</span>=<span style="color:#a50">&#34;url&#34;</span>&gt;
+&lt;<span style="color:#1e90ff;font-weight:bold">command</span> <span style="color:#1e90ff">icon</span>=<span style="color:#a50">&#34;url&#34;</span>&gt;
+&lt;<span style="color:#1e90ff;font-weight:bold">embed</span> <span style="color:#1e90ff">src</span>=<span style="color:#a50">&#34;url&#34;</span>&gt;
+&lt;<span style="color:#1e90ff;font-weight:bold">html</span> <span style="color:#1e90ff">manifest</span>=<span style="color:#a50">&#34;url&#34;</span>&gt;
+&lt;<span style="color:#1e90ff;font-weight:bold">input</span> <span style="color:#1e90ff">formaction</span>=<span style="color:#a50">&#34;url&#34;</span>&gt;
+&lt;<span style="color:#1e90ff;font-weight:bold">source</span> <span style="color:#1e90ff">src</span>=<span style="color:#a50">&#34;url&#34;</span>&gt;
+&lt;<span style="color:#1e90ff;font-weight:bold">video</span> <span style="color:#1e90ff">poster</span>=<span style="color:#a50">&#34;url&#34;</span>&gt;
+&lt;<span style="color:#1e90ff;font-weight:bold">video</span> <span style="color:#1e90ff">src</span>=<span style="color:#a50">&#34;url&#34;</span>&gt;
+&lt;<span style="color:#1e90ff;font-weight:bold">a</span> <span style="color:#1e90ff">href</span>=<span style="color:#a50">&#34;url&#34;</span>&gt;
+&lt;<span style="color:#1e90ff;font-weight:bold">applet</span> <span style="color:#1e90ff">codebase</span>=<span style="color:#a50">&#34;url&#34;</span>&gt;
+&lt;<span style="color:#1e90ff;font-weight:bold">area</span> <span style="color:#1e90ff">href</span>=<span style="color:#a50">&#34;url&#34;</span>&gt;
+&lt;<span style="color:#1e90ff;font-weight:bold">base</span> <span style="color:#1e90ff">href</span>=<span style="color:#a50">&#34;url&#34;</span>&gt;
+&lt;<span style="color:#1e90ff;font-weight:bold">blockquote</span> <span style="color:#1e90ff">cite</span>=<span style="color:#a50">&#34;url&#34;</span>&gt;
+&lt;<span style="color:#1e90ff;font-weight:bold">body</span> <span style="color:#1e90ff">background</span>=<span style="color:#a50">&#34;url&#34;</span>&gt;
+&lt;<span style="color:#1e90ff;font-weight:bold">del</span> <span style="color:#1e90ff">cite</span>=<span style="color:#a50">&#34;url&#34;</span>&gt;
+&lt;<span style="color:#1e90ff;font-weight:bold">form</span> <span style="color:#1e90ff">action</span>=<span style="color:#a50">&#34;url&#34;</span>&gt;
+&lt;<span style="color:#1e90ff;font-weight:bold">frame</span> <span style="color:#1e90ff">longdesc</span>=<span style="color:#a50">&#34;url&#34;</span>&gt;
+&lt;<span style="color:#1e90ff;font-weight:bold">frame</span> <span style="color:#1e90ff">src</span>=<span style="color:#a50">&#34;url&#34;</span>&gt;
+&lt;<span style="color:#1e90ff;font-weight:bold">head</span> <span style="color:#1e90ff">profile</span>=<span style="color:#a50">&#34;url&#34;</span>&gt;
+&lt;<span style="color:#1e90ff;font-weight:bold">iframe</span> <span style="color:#1e90ff">longdesc</span>=<span style="color:#a50">&#34;url&#34;</span>&gt;
+&lt;<span style="color:#1e90ff;font-weight:bold">iframe</span> <span style="color:#1e90ff">src</span>=<span style="color:#a50">&#34;url&#34;</span>&gt;
+&lt;<span style="color:#1e90ff;font-weight:bold">img</span> <span style="color:#1e90ff">longdesc</span>=<span style="color:#a50">&#34;url&#34;</span>&gt;
+&lt;<span style="color:#1e90ff;font-weight:bold">img</span> <span style="color:#1e90ff">src</span>=<span style="color:#a50">&#34;url&#34;</span>&gt;
+&lt;<span style="color:#1e90ff;font-weight:bold">img</span> <span style="color:#1e90ff">usemap</span>=<span style="color:#a50">&#34;url&#34;</span>&gt;</code></pre></div>
 <p>Yeah. That's quite a bunch.</p>
 <p>Note that HTTP requests can be created manually using e.g. <code>XMLHttpRequest</code> or <code>jQuery.ajax()</code>. In fact, when you send hits to Google Analytics, you're actually using HTTP requests created by the <strong>analytics.js</strong> library.</p>
 
@@ -755,46 +755,46 @@
 <p>So, when a request is made asynchronously, the browser initiates the download but then proceeds to the next line of code <em>while the download goes on in the background</em>. Only after the file is completely downloaded, does the browser return execution to this initial process, rendering the downloaded asset in the browser.</p>
 <p>The problem with asynchronous execution is that even though you can pinpoint the exact moment when the request is initiated, as it's governed by the order of the lines of code in the page template, you'll never know the exact moment when it completes. And this can lead to something called a <strong>race condition</strong>.</p>
 <p>So let's say I have the following two lines of code in the page template:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span> <span style="color:#a6e22e">async</span> <span style="color:#a6e22e">src</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js&#34;</span>&gt;&lt;/<span style="color:#f92672">script</span>&gt;
-&lt;<span style="color:#f92672">script</span> <span style="color:#a6e22e">async</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;&#34;</span> <span style="color:#a6e22e">src</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;https//www.googletagmanager.com/gtm.js?id=GTM-XXXXX&#34;</span>&gt;&lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">script</span> <span style="color:#1e90ff">async</span> <span style="color:#1e90ff">src</span>=<span style="color:#a50">&#34;https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js&#34;</span>&gt;&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+&lt;<span style="color:#1e90ff;font-weight:bold">script</span> <span style="color:#1e90ff">async</span>=<span style="color:#a50">&#34;&#34;</span> <span style="color:#1e90ff">src</span>=<span style="color:#a50">&#34;https//www.googletagmanager.com/gtm.js?id=GTM-XXXXX&#34;</span>&gt;&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
 <p>The browser starts loading the jQuery library before GTM, so I might expect jQuery to available to GTM as soon as the latter has finished downloading. But that's not necessarily the case! The actual download of jQuery can end long <em>after</em> GTM has completed, because the jQuery library is more often than not quite a bulky thing. Also, if the CDN providing the jQuery library has latency, it might affect when jQuery becomes available.</p>
 <p>So, if in Google Tag Manager I try to use jQuery, there can be a <strong>race condition</strong> where GTM expects jQuery to be available but it isn't.</p>
 <p>To combat the race condition, we can use tools like <strong>callbacks</strong>, <strong>promises</strong> or, in GTM, <a href="https://www.simoahava.com/analytics/understanding-tag-sequencing-in-google-tag-manager/">Tag Sequencing</a>. You can always resort to synchronous downloading if you're really concerned about race conditions, but remember that this can have a detrimental impact on user experience.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html"><span style="color:#75715e">&lt;!--</span><span style="color:#75715e"> Synchronous request </span><span style="color:#75715e">--&gt;</span>
-&lt;<span style="color:#f92672">script</span> <span style="color:#a6e22e">src</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js&#34;</span>&gt;&lt;/<span style="color:#f92672">script</span>&gt;
-&lt;<span style="color:#f92672">script</span> <span style="color:#a6e22e">async</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;&#34;</span> <span style="color:#a6e22e">src</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;https//www.googletagmanager.com/gtm.js?id=GTM-XXXXX&#34;</span>&gt;&lt;/<span style="color:#f92672">script</span>&gt;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html"><span style="color:#aaa;font-style:italic">&lt;!--</span><span style="color:#aaa;font-style:italic"> Synchronous request </span><span style="color:#aaa;font-style:italic">--&gt;</span>
+&lt;<span style="color:#1e90ff;font-weight:bold">script</span> <span style="color:#1e90ff">src</span>=<span style="color:#a50">&#34;https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js&#34;</span>&gt;&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+&lt;<span style="color:#1e90ff;font-weight:bold">script</span> <span style="color:#1e90ff">async</span>=<span style="color:#a50">&#34;&#34;</span> <span style="color:#1e90ff">src</span>=<span style="color:#a50">&#34;https//www.googletagmanager.com/gtm.js?id=GTM-XXXXX&#34;</span>&gt;&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
 
-<span style="color:#75715e">&lt;!--</span><span style="color:#75715e"> Callback </span><span style="color:#75715e">--&gt;</span>
-&lt;<span style="color:#f92672">script</span>&gt;
-  (<span style="color:#66d9ef">function</span>() {
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">el</span> <span style="color:#f92672">=</span> document.<span style="color:#a6e22e">createElement</span>(<span style="color:#e6db74">&#39;script&#39;</span>);
-    <span style="color:#a6e22e">el</span>.<span style="color:#a6e22e">src</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js&#39;</span>;
-    <span style="color:#a6e22e">el</span>.<span style="color:#a6e22e">async</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>;
-    <span style="color:#a6e22e">el</span>.<span style="color:#a6e22e">addEventListener</span>(<span style="color:#e6db74">&#39;load&#39;</span>, <span style="color:#66d9ef">function</span>() {
-      window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({<span style="color:#a6e22e">event</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;jQueryLoaded&#39;</span>});
+<span style="color:#aaa;font-style:italic">&lt;!--</span><span style="color:#aaa;font-style:italic"> Callback </span><span style="color:#aaa;font-style:italic">--&gt;</span>
+&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+  (<span style="color:#00a">function</span>() {
+    <span style="color:#00a">var</span> el = <span style="color:#0aa">document</span>.createElement(<span style="color:#a50">&#39;script&#39;</span>);
+    el.src = <span style="color:#a50">&#39;https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js&#39;</span>;
+    el.async = <span style="color:#00a">true</span>;
+    el.addEventListener(<span style="color:#a50">&#39;load&#39;</span>, <span style="color:#00a">function</span>() {
+      <span style="color:#0aa">window</span>.dataLayer.push({event: <span style="color:#a50">&#39;jQueryLoaded&#39;</span>});
     });
-    document.<span style="color:#a6e22e">head</span>.<span style="color:#a6e22e">appendChild</span>(<span style="color:#a6e22e">el</span>);
+    <span style="color:#0aa">document</span>.head.appendChild(el);
   })();
-&lt;/<span style="color:#f92672">script</span>&gt;
+&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
 
-<span style="color:#75715e">&lt;!--</span><span style="color:#75715e"> Tag Sequencing </span><span style="color:#75715e">--&gt;</span>
-&lt;<span style="color:#f92672">script</span>&gt;
-  (<span style="color:#66d9ef">function</span>() {
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">el</span> <span style="color:#f92672">=</span> document.<span style="color:#a6e22e">createElement</span>(<span style="color:#e6db74">&#39;script&#39;</span>);
-    <span style="color:#a6e22e">el</span>.<span style="color:#a6e22e">src</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js&#39;</span>;
-    <span style="color:#a6e22e">el</span>.<span style="color:#a6e22e">async</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>;
-    <span style="color:#a6e22e">el</span>.<span style="color:#a6e22e">addEventListener</span>(<span style="color:#e6db74">&#39;load&#39;</span>, <span style="color:#66d9ef">function</span>() {
-      window[<span style="color:#e6db74">&#39;google_tag_maanger&#39;</span>][{{<span style="color:#a6e22e">Container</span> <span style="color:#a6e22e">ID</span>}}].<span style="color:#a6e22e">onHtmlSuccess</span>({{<span style="color:#a6e22e">HTML</span> <span style="color:#a6e22e">ID</span>}});
+<span style="color:#aaa;font-style:italic">&lt;!--</span><span style="color:#aaa;font-style:italic"> Tag Sequencing </span><span style="color:#aaa;font-style:italic">--&gt;</span>
+&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+  (<span style="color:#00a">function</span>() {
+    <span style="color:#00a">var</span> el = <span style="color:#0aa">document</span>.createElement(<span style="color:#a50">&#39;script&#39;</span>);
+    el.src = <span style="color:#a50">&#39;https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js&#39;</span>;
+    el.async = <span style="color:#00a">true</span>;
+    el.addEventListener(<span style="color:#a50">&#39;load&#39;</span>, <span style="color:#00a">function</span>() {
+      <span style="color:#0aa">window</span>[<span style="color:#a50">&#39;google_tag_maanger&#39;</span>][{{Container ID}}].onHtmlSuccess({{HTML ID}});
     });
-    document.<span style="color:#a6e22e">head</span>.<span style="color:#a6e22e">appendChild</span>(<span style="color:#a6e22e">el</span>);
+    <span style="color:#0aa">document</span>.head.appendChild(el);
   })();
-&lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
+&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
 <p>It's better to be safe than sorry, so when working with potential race conditions, make sure to always check if the resources you are trying to use actually exist.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">if</span> (<span style="color:#66d9ef">typeof</span> <span style="color:#a6e22e">jQuery</span> <span style="color:#f92672">!==</span> <span style="color:#e6db74">&#39;undefined&#39;</span>) {
-  <span style="color:#75715e">// Use jQuery
-</span><span style="color:#75715e"></span>} <span style="color:#66d9ef">else</span> {
-  <span style="color:#75715e">// Use something else
-</span><span style="color:#75715e"></span>}
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">if</span> (<span style="color:#00a">typeof</span> jQuery !== <span style="color:#a50">&#39;undefined&#39;</span>) {
+  <span style="color:#aaa;font-style:italic">// Use jQuery
+</span><span style="color:#aaa;font-style:italic"></span>} <span style="color:#00a">else</span> {
+  <span style="color:#aaa;font-style:italic">// Use something else
+</span><span style="color:#aaa;font-style:italic"></span>}
 </code></pre></div>
 <h3 id="further-reading-3">FURTHER READING</h3>
 <p>Here are some useful links on race conditions, callbacks, and such.</p>
@@ -828,17 +828,17 @@
 <p>SPAs have significant implications for web analytics. For example, an SPA can suffer from the <a href="https://www.simoahava.com/gtm-tips/be-careful-with-the-tracker-name-setting/">rogue referrer</a> problem, where URL query parameters that are used for campaign settings are overwritten by a subsequent page view hit. For Google Tag Manager, the problem of persistence rears its ugly head, where variables maintain the values you set earlier, leading to these values bleeding into subsequent tags.</p>
 <p>Browser history is manipulated because when content is dynamically loaded, the site needs to tell the web browser that the user has entered a new page without the benefit of the page reload doing this automatically. Otherwise you wouldn't be able to link to dynamic content, nor would the Back and Forward buttons of the browser find your dynamic content.</p>
 <p>The two interfaces you'll run into most often are <code>pushState</code> and <code>replaceState</code>. The former creates a new history entry in the web browser, and the latter replaces the current entry entirely. Here are examples of how to use them:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">window.<span style="color:#a6e22e">history</span>.<span style="color:#a6e22e">pushState</span>(
-  {<span style="color:#a6e22e">pageType</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;formThankYou&#39;</span>},
-  <span style="color:#e6db74">&#39;Form Success&#39;</span>,
-  <span style="color:#e6db74">&#39;/thank-you/&#39;</span>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#0aa">window</span>.history.pushState(
+  {pageType: <span style="color:#a50">&#39;formThankYou&#39;</span>},
+  <span style="color:#a50">&#39;Form Success&#39;</span>,
+  <span style="color:#a50">&#39;/thank-you/&#39;</span>
 );
 </code></pre></div>
 <p>When you run this command, the URL changes to /thank-you/ without a page reload. The first two parameters add additional information about the state. If you now click the Back button of the browser, you are taken to the URL where you called <code>pushState</code>.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">window.<span style="color:#a6e22e">history</span>.<span style="color:#a6e22e">replaceState</span>(
-  {<span style="color:#a6e22e">pageType</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;formThankyou&#39;</span>},
-  <span style="color:#e6db74">&#39;Form Success&#39;</span>,
-  <span style="color:#e6db74">&#39;/thank-you/&#39;</span>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#0aa">window</span>.history.replaceState(
+  {pageType: <span style="color:#a50">&#39;formThankyou&#39;</span>},
+  <span style="color:#a50">&#39;Form Success&#39;</span>,
+  <span style="color:#a50">&#39;/thank-you/&#39;</span>
 );
 </code></pre></div>
 <p>When you execute this command, it actually <em>replaces</em> the current page in the browser history. In other words, when you click the browser's Back button, you are taken to the page you were on <em>before</em> you entered the page from where you called <code>replaceState</code>.</p>
@@ -904,17 +904,17 @@
 <p>Cookies also survive transitions from the http:// protocol to https://.</p>
 <h3 id="web-storage">Web Storage</h3>
 <p>Web Storage (or DOM Storage) encompasses both <code>localStorage</code> (no expiration) and <code>sessionStorage</code> (expires when the web browser is closed). Web Storage is much more flexible than using cookies, because the entries are stored as a hash table, and lookups can be done on a key-by-key basis. With cookies, you need to unravel the entire cookie string just to find the value want.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#75715e">// TO SET
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">if</span> (window[<span style="color:#e6db74">&#39;Storage&#39;</span>]) {
-  <span style="color:#a6e22e">localStorage</span>.<span style="color:#a6e22e">setItem</span>(<span style="color:#e6db74">&#39;subscribe&#39;</span>, <span style="color:#e6db74">&#39;true&#39;</span>); 
-  <span style="color:#a6e22e">sessionStorage</span>.<span style="color:#a6e22e">setItem</span>(<span style="color:#e6db74">&#39;subscribe&#39;</span>, <span style="color:#e6db74">&#39;true&#39;</span>);
-} <span style="color:#66d9ef">else</span> {
-  <span style="color:#a6e22e">setCookie</span>(<span style="color:#e6db74">&#39;subscribe&#39;</span>, <span style="color:#e6db74">&#39;true&#39;</span>);
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#aaa;font-style:italic">// TO SET
+</span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">if</span> (<span style="color:#0aa">window</span>[<span style="color:#a50">&#39;Storage&#39;</span>]) {
+  localStorage.setItem(<span style="color:#a50">&#39;subscribe&#39;</span>, <span style="color:#a50">&#39;true&#39;</span>); 
+  sessionStorage.setItem(<span style="color:#a50">&#39;subscribe&#39;</span>, <span style="color:#a50">&#39;true&#39;</span>);
+} <span style="color:#00a">else</span> {
+  setCookie(<span style="color:#a50">&#39;subscribe&#39;</span>, <span style="color:#a50">&#39;true&#39;</span>);
 }
 
-<span style="color:#75715e">// TO FETCH
-</span><span style="color:#75715e"></span><span style="color:#a6e22e">localStorage</span>.<span style="color:#a6e22e">getItem</span>(<span style="color:#e6db74">&#39;subscribe&#39;</span>);
-<span style="color:#a6e22e">sessionStorage</span>.<span style="color:#a6e22e">getItem</span>(<span style="color:#e6db74">&#39;subscribe&#39;</span>);
+<span style="color:#aaa;font-style:italic">// TO FETCH
+</span><span style="color:#aaa;font-style:italic"></span>localStorage.getItem(<span style="color:#a50">&#39;subscribe&#39;</span>);
+sessionStorage.getItem(<span style="color:#a50">&#39;subscribe&#39;</span>);
 </code></pre></div>
 <p>Note that Web Storage does <em>not</em> survive the transition from http:// to https://. Both protocols have their own storage.</p>
 <h3 id="indexeddb">IndexedDB</h3>
@@ -966,26 +966,26 @@
 
 
 <p>There are many ways to retrieve an element relative to some other with JavaScript. A very clumsy way to do it would be to build a complete element chain all between the two elements. So if you wanted to retrieve the element at the top of the DOM in the image above, you could do something like this in a Custom JavaScript Variable:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
-  <span style="color:#75715e">// Please don&#39;t do this:
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">return</span> {{<span style="color:#a6e22e">Click</span> <span style="color:#a6e22e">Element</span>}}
-    .<span style="color:#a6e22e">parentElement</span>
-    .<span style="color:#a6e22e">parentElement</span>
-    .<span style="color:#a6e22e">parentElement</span>
-    .<span style="color:#a6e22e">parentElement</span>
-    .<span style="color:#a6e22e">parentElement</span>;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() {
+  <span style="color:#aaa;font-style:italic">// Please don&#39;t do this:
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#00a">return</span> {{Click Element}}
+    .parentElement
+    .parentElement
+    .parentElement
+    .parentElement
+    .parentElement;
 }
 </code></pre></div>
 <p>But please don't do this. It's clumsy and it has multiple points of failure. You're basically expecting the DOM to have a certain structure without providing any redundancies or fallbacks. The longer the chain, the more sensitive it is to even minor changes to the page markup.A better way is to disregard the actual number of elements, and just climb up the DOM until you reach the very top.</p>
 <p>So a more robust way of retrieving the element would be something like this:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">el</span> <span style="color:#f92672">=</span> {{<span style="color:#a6e22e">Click</span> <span style="color:#a6e22e">Element</span>}};
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() {
+  <span style="color:#00a">var</span> el = {{Click Element}};
   
-  <span style="color:#66d9ef">while</span> (<span style="color:#a6e22e">el</span>.<span style="color:#a6e22e">className</span> <span style="color:#f92672">!==</span> <span style="color:#e6db74">&#39;content-sidebar-wrap&#39;</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">el</span>.<span style="color:#a6e22e">tagName</span> <span style="color:#f92672">!==</span> <span style="color:#e6db74">&#39;BODY&#39;</span>) {
-    <span style="color:#a6e22e">el</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">el</span>.<span style="color:#a6e22e">parentElement</span>;
+  <span style="color:#00a">while</span> (el.className !== <span style="color:#a50">&#39;content-sidebar-wrap&#39;</span> &amp;&amp; el.tagName !== <span style="color:#a50">&#39;BODY&#39;</span>) {
+    el = el.parentElement;
   }
 
-  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">el</span>.<span style="color:#a6e22e">tagName</span> <span style="color:#f92672">!==</span> <span style="color:#e6db74">&#39;BODY&#39;</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">el</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">undefined</span>;
+  <span style="color:#00a">return</span> el.tagName !== <span style="color:#a50">&#39;BODY&#39;</span> ? el : <span style="color:#00a">undefined</span>;
 }
 </code></pre></div>
 <p>This little script simply climbs up the DOM until it either reaches the element you wanted (<code>.content-sidebar-wrap</code>) or the <code>&lt;body&gt;</code> tag. If it reaches <code>&lt;body&gt;</code>, the assumption is that the element you were looking for was not found, and <code>undefined</code> is returned instead.</p>
@@ -1020,22 +1020,22 @@
 
 <p>When Google Tag Manager introduced the <a href="https://www.simoahava.com/analytics/matches-css-selector-operator-in-gtm-triggers/">matches CSS selector</a> Trigger operator a while ago, it eliminated a lot of complexity from validating Triggers to only fire for certain HTML element interactions. In a similar manner, the <code>querySelector</code> and <code>querySelectorAll</code> JavaScript DOM methods were just as impactful when they were introduced some years ago into the web browser API.</p>
 <p>If you've built websites or worked with CSS (Cascading Style Sheets) styles before, you'll know what selectors do. They let you select any element or group of elements on the page, and then apply a style to them. For example, the following style declaration would remove the default <em>underline</em> from all links (<code>&lt;a&gt;</code>) with class <code>internal</code>:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-css" data-lang="css"><span style="color:#f92672">a</span>.<span style="color:#a6e22e">internal</span> {
-    <span style="color:#66d9ef">text-decoration</span>: <span style="color:#66d9ef">none</span>;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-css" data-lang="css"><span style="color:#1e90ff;font-weight:bold">a</span>.<span style="color:#0a0;text-decoration:underline">internal</span> {
+    <span style="color:#00a">text-decoration</span>: <span style="color:#00a">none</span>;
 }</code></pre></div>
 <p>Because it's such an effective way of selecting HTML elements, it's not a big surprise that JavaScript introduced methods for using CSS selectors to find and retrieve HTML elements on the page:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#75715e">// Select every link with attribute data-gtm on the page:
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">gtmLinks</span> <span style="color:#f92672">=</span> document.<span style="color:#a6e22e">querySelectorAll</span>(<span style="color:#e6db74">&#39;a[data-gtm]&#39;</span>);
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#aaa;font-style:italic">// Select every link with attribute data-gtm on the page:
+</span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">var</span> gtmLinks = <span style="color:#0aa">document</span>.querySelectorAll(<span style="color:#a50">&#39;a[data-gtm]&#39;</span>);
 
-<span style="color:#75715e">// Select the first &#39;h2&#39; element on the page, which is the direct child of &#39;section&#39;
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">firstH2</span> <span style="color:#f92672">=</span> document.<span style="color:#a6e22e">querySelector</span>(<span style="color:#e6db74">&#39;section &gt; h2&#39;</span>);
+<span style="color:#aaa;font-style:italic">// Select the first &#39;h2&#39; element on the page, which is the direct child of &#39;section&#39;
+</span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">var</span> firstH2 = <span style="color:#0aa">document</span>.querySelector(<span style="color:#a50">&#39;section &gt; h2&#39;</span>);
 
-<span style="color:#75715e">// Select the &#39;span&#39; with class &#39;title&#39; that is a descendant of the aforementioned &#39;h2&#39;
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">spanTitle</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">firstH2</span>.<span style="color:#a6e22e">querySelector</span>(<span style="color:#e6db74">&#39;span.title&#39;</span>);
+<span style="color:#aaa;font-style:italic">// Select the &#39;span&#39; with class &#39;title&#39; that is a descendant of the aforementioned &#39;h2&#39;
+</span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">var</span> spanTitle = firstH2.querySelector(<span style="color:#a50">&#39;span.title&#39;</span>);
 </code></pre></div>
 <p>Similarly, if you already <em>have</em> an HTML element, you can use the <code>matches</code> API to check if it matches a specific CSS selector:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">isElementLink</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">el</span>) {
-  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">el</span>.<span style="color:#a6e22e">matches</span>(<span style="color:#e6db74">&#39;a&#39;</span>);
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">var</span> isElementLink = <span style="color:#00a">function</span>(el) {
+  <span style="color:#00a">return</span> el.matches(<span style="color:#a50">&#39;a&#39;</span>);
 }
 </code></pre></div>
 <p>The function above would return <code>true</code> or <code>false</code>, depending on whether the element passed as a parameter is a link or not. Note that <code>matches</code> isn't widely supported yet, but there's a <a href="https://developer.mozilla.org/en-US/docs/Web/API/Element/matches#Polyfill">polyfill you can use</a> to make it work across all browsers.</p>
@@ -1083,50 +1083,50 @@
 
 <p><a href="http://jquery.com/">jQuery</a> is undoubtedly the most used JavaScript library in the world, and its contributions to standardizing the web experience across browsers and devices should not and do not go unnoticed. The framework provides such a wealth of utilities that trivialize and abstract many of the woes a web developer might have when developing their site to be as accessible across the splintered browser landscape as possible.</p>
 <p>In short, jQuery is a library which provides a bunch of simple APIs to perform otherwise complex tasks. For example, let's take the DOM traversal example from chapter 7 and rewrite it with jQuery:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#75715e">// Vanilla JS
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span>() {
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">el</span> <span style="color:#f92672">=</span> {{<span style="color:#a6e22e">Click</span> <span style="color:#a6e22e">Element</span>}};
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#aaa;font-style:italic">// Vanilla JS
+</span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">function</span>() {
+  <span style="color:#00a">var</span> el = {{Click Element}};
   
-  <span style="color:#66d9ef">while</span> (<span style="color:#a6e22e">el</span>.<span style="color:#a6e22e">className</span> <span style="color:#f92672">!==</span> <span style="color:#e6db74">&#39;content-sidebar-wrap&#39;</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">el</span>.<span style="color:#a6e22e">tagName</span> <span style="color:#f92672">!==</span> <span style="color:#e6db74">&#39;BODY&#39;</span>) {
-    <span style="color:#a6e22e">el</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">el</span>.<span style="color:#a6e22e">parentElement</span>;
+  <span style="color:#00a">while</span> (el.className !== <span style="color:#a50">&#39;content-sidebar-wrap&#39;</span> &amp;&amp; el.tagName !== <span style="color:#a50">&#39;BODY&#39;</span>) {
+    el = el.parentElement;
   }
 
-  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">el</span>.<span style="color:#a6e22e">tagName</span> <span style="color:#f92672">!==</span> <span style="color:#e6db74">&#39;BODY&#39;</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">el</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">undefined</span>;
+  <span style="color:#00a">return</span> el.tagName !== <span style="color:#a50">&#39;BODY&#39;</span> ? el : <span style="color:#00a">undefined</span>;
 }
 
-<span style="color:#75715e">// jQuery
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span>() {
-  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">jQuery</span>({{<span style="color:#a6e22e">Click</span> <span style="color:#a6e22e">Element</span>}}).<span style="color:#a6e22e">closest</span>(<span style="color:#e6db74">&#39;.content-sidebar-wrap&#39;</span>)[<span style="color:#ae81ff">0</span>];
+<span style="color:#aaa;font-style:italic">// jQuery
+</span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">function</span>() {
+  <span style="color:#00a">return</span> jQuery({{Click Element}}).closest(<span style="color:#a50">&#39;.content-sidebar-wrap&#39;</span>)[<span style="color:#099">0</span>];
 }
 </code></pre></div>
 <p>So a single line of jQuery abstracted the previous implementation.</p>
 <p>Similarly, here's the difference between building a custom HTTP POST request using regular JavaScript versus using jQuery:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#75715e">// Vanilla JS
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">xhr</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">XMLHttpRequest</span>();
-<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">payload</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;v=1&amp;tid=UA-12345-1&amp;t=pageview&amp;dl=https://www.simoahava.com/&amp;cid=12345.12345&#39;</span>;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#aaa;font-style:italic">// Vanilla JS
+</span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">var</span> xhr = <span style="color:#00a">new</span> XMLHttpRequest();
+<span style="color:#00a">var</span> payload = <span style="color:#a50">&#39;v=1&amp;tid=UA-12345-1&amp;t=pageview&amp;dl=https://www.simoahava.com/&amp;cid=12345.12345&#39;</span>;
 
-<span style="color:#a6e22e">xhr</span>.<span style="color:#a6e22e">open</span>(<span style="color:#e6db74">&#39;POST&#39;</span>, <span style="color:#e6db74">&#39;https://www.google-analytics.com/collect&#39;</span>);
-<span style="color:#a6e22e">xhr</span>.<span style="color:#a6e22e">setRequestHeader</span>(<span style="color:#e6db74">&#39;Content-Type&#39;</span>, <span style="color:#e6db74">&#39;application/x-www-form-urlencoded&#39;</span>);
-<span style="color:#a6e22e">xhr</span>.<span style="color:#a6e22e">onload</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>() {
-  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">xhr</span>.<span style="color:#a6e22e">status</span> <span style="color:#f92672">===</span> <span style="color:#ae81ff">200</span>) {
-    <span style="color:#a6e22e">alert</span>(<span style="color:#e6db74">&#39;Yay!&#39;</span>);
+xhr.open(<span style="color:#a50">&#39;POST&#39;</span>, <span style="color:#a50">&#39;https://www.google-analytics.com/collect&#39;</span>);
+xhr.setRequestHeader(<span style="color:#a50">&#39;Content-Type&#39;</span>, <span style="color:#a50">&#39;application/x-www-form-urlencoded&#39;</span>);
+xhr.onload = <span style="color:#00a">function</span>() {
+  <span style="color:#00a">if</span> (xhr.status === <span style="color:#099">200</span>) {
+    alert(<span style="color:#a50">&#39;Yay!&#39;</span>);
   }
-  <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">xhr</span>.<span style="color:#a6e22e">status</span> <span style="color:#f92672">!==</span> <span style="color:#ae81ff">200</span>) {
-    <span style="color:#a6e22e">alert</span>(<span style="color:#e6db74">&#39;Aww :(&#39;</span>);
+  <span style="color:#00a">else</span> <span style="color:#00a">if</span> (xhr.status !== <span style="color:#099">200</span>) {
+    alert(<span style="color:#a50">&#39;Aww :(&#39;</span>);
   }
 };
-<span style="color:#a6e22e">xhr</span>.<span style="color:#a6e22e">send</span>(encodeURI(<span style="color:#a6e22e">payload</span>));
+xhr.send(<span style="color:#0aa">encodeURI</span>(payload));
 
-<span style="color:#75715e">// jQuery
-</span><span style="color:#75715e"></span><span style="color:#a6e22e">jQuery</span>.<span style="color:#a6e22e">post</span>(
-  <span style="color:#e6db74">&#39;https://www.google-analytics.com/collect&#39;</span>,
-  <span style="color:#e6db74">&#39;v=1&amp;tid=UA-12345-1&amp;t=pageview&amp;dl=https://www.simoahava.com/&amp;cid=12345.12345&#39;</span>
+<span style="color:#aaa;font-style:italic">// jQuery
+</span><span style="color:#aaa;font-style:italic"></span>jQuery.post(
+  <span style="color:#a50">&#39;https://www.google-analytics.com/collect&#39;</span>,
+  <span style="color:#a50">&#39;v=1&amp;tid=UA-12345-1&amp;t=pageview&amp;dl=https://www.simoahava.com/&amp;cid=12345.12345&#39;</span>
 )
-  .<span style="color:#a6e22e">done</span>(<span style="color:#66d9ef">function</span>() {
-    <span style="color:#a6e22e">alert</span>(<span style="color:#e6db74">&#39;Yay!&#39;</span>);
+  .done(<span style="color:#00a">function</span>() {
+    alert(<span style="color:#a50">&#39;Yay!&#39;</span>);
   })
-  .<span style="color:#a6e22e">fail</span>(<span style="color:#66d9ef">function</span>() {
-    <span style="color:#a6e22e">alert</span>(<span style="color:#e6db74">&#39;Aww :(&#39;</span>);
+  .fail(<span style="color:#00a">function</span>() {
+    alert(<span style="color:#a50">&#39;Aww :(&#39;</span>);
   });
 </code></pre></div>
 <p>I hope you see the trend here. jQuery really makes things more elegant for both the developer as well as for anyone who wants to look at the code and quickly understand what it tries to do.</p>

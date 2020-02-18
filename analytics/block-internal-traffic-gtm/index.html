@@ -420,9 +420,9 @@
 <p>Finally, check with a debugger like <a href="http://webanalyticssolutionprofiler.com/">WASP</a> that your custom dimension is actually being sent over.</p>
 <h3 id="pro-tip-use-a-url-rewrite">Pro tip, use a URL rewrite</h3>
 <p>If you or your internal traffic users find that using a URL query parameter is tedious, you should set up a 301 server-side redirection, and use either a vanity URL or a subdomain to handle the redirection. So if <code>http://www.mydomain.com/?internal=true</code> is just too difficult to manage, make it so that <code>http://www.mydomain.com/office</code> or <code>office.mydomain.com</code> redirect the user to the home page with the query parameter in place (or both!). If you have an Apache server, you could try something like this for the subdomain redirect (check with IT first!):</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ApacheConf" data-lang="ApacheConf">RewriteEngine <span style="color:#66d9ef">on</span>
-RewriteCond %{HTTP_HOST} ^office\.mydomain\.com$
-RewriteRule ^$ http://www.mydomain.com/?internal=true [R=301,L]</code></pre></div>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ApacheConf" data-lang="ApacheConf"><span style="color:#0aa">RewriteEngine</span> <span style="color:#00a">on</span>
+<span style="color:#0aa">RewriteCond</span> %{HTTP_HOST} ^office\.mydomain\.com$
+<span style="color:#0aa">RewriteRule</span> ^$ http://www.mydomain.com/?internal=true [R=301,L]</code></pre></div>
 <h2 id="method-2-ip-extraction">Method 2: IP extraction</h2>
 <p>A popular way to separate internal traffic from external traffic is to use the client's IP address. The most common method is to use Google Analytics&rsquo; standard features to filter out any IP addresses that are within a specified range. Because this is so &ldquo;standard&rdquo;, I won't go into it (you can read the <a href="https://support.google.com/analytics/answer/1034840?hl=en">official words here</a>).</p>
 <p>This guide is for <em>annotating</em> internal traffic, not for filtering it, so you'll be checking the client's IP address against a specified range, and if there's a match, you'll send this information via custom dimension.</p>
@@ -430,9 +430,9 @@ RewriteRule ^$ http://www.mydomain.com/?internal=true [R=301,L]</code></pre></di
 <p>To extract the client IP, you have a number of choices. The accuracy will vary greatly, since if the visitor is using a proxy, for example, it's not really their IP that's retrieved but the proxy's. In this guide, I'll introduce you to a simple PHP value retrieval, and also how to retrieve the IP with JavaScript using an external API call.</p>
 <h3 id="retrieve-and-process-the-ip-with-php">Retrieve and process the IP with PHP</h3>
 <p>This is one way to do it, and it should work if you have a site which is parsed with PHP (WordPress, Drupal, etc.). In your page template, before your container snippet, you create the dataLayer object with <strong>window.dataLayer = window.dataLayer || [];</strong>. Use this to enter the client IP into the dataLayer object as it is created. This way it will be ready when the container is set up and your page views are sent:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">  window.<span style="color:#a6e22e">dataLayer</span> <span style="color:#f92672">=</span> window.<span style="color:#a6e22e">dataLayer</span> <span style="color:#f92672">||</span> [];
-  window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
-    <span style="color:#e6db74">&#34;ipaddress&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;&lt;?php echo $IPADDRESS ?&gt;&#34;</span>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">  <span style="color:#0aa">window</span>.dataLayer = <span style="color:#0aa">window</span>.dataLayer || [];
+  <span style="color:#0aa">window</span>.dataLayer.push({
+    <span style="color:#a50">&#34;ipaddress&#34;</span>: <span style="color:#a50">&#34;&lt;?php echo $IPADDRESS ?&gt;&#34;</span>
   });
 </code></pre></div>
 <p>This will retrieve the IP address using the designated PHP variable, and it will store it in the data layer variable <strong>ipaddress</strong>.</p>
@@ -474,25 +474,25 @@ RewriteRule ^$ http://www.mydomain.com/?internal=true [R=301,L]</code></pre></di
 <p>Add the following code within:</p>
 </li>
 </ul>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">ipaddress</span> <span style="color:#f92672">=</span> {{<span style="color:#a6e22e">Retrieve</span> <span style="color:#a6e22e">IP</span>}}; <span style="color:#75715e">// Retrieves the IP from the data layer
-</span><span style="color:#75715e"></span>
-  <span style="color:#75715e">// Comment following three lines if you want to use the IP range method
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">ipaddress</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;111.222.333.444&#34;</span>) {
-    <span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({<span style="color:#e6db74">&#34;internal&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;true&#34;</span>});
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+  <span style="color:#00a">var</span> ipaddress = {{Retrieve IP}}; <span style="color:#aaa;font-style:italic">// Retrieves the IP from the data layer
+</span><span style="color:#aaa;font-style:italic"></span>
+  <span style="color:#aaa;font-style:italic">// Comment following three lines if you want to use the IP range method
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#00a">if</span> (ipaddress == <span style="color:#a50">&#34;111.222.333.444&#34;</span>) {
+    dataLayer.push({<span style="color:#a50">&#34;internal&#34;</span>: <span style="color:#a50">&#34;true&#34;</span>});
   }
 
-  <span style="color:#75715e">// To use the following IP range check, comment the previous three lines
-</span><span style="color:#75715e"></span>  <span style="color:#75715e">// of code and uncomment the following lines
-</span><span style="color:#75715e"></span>  <span style="color:#75715e">//
-</span><span style="color:#75715e"></span>  <span style="color:#75715e">//  var ipRange = ipaddress.split(&#34;.&#34;);
-</span><span style="color:#75715e"></span>  <span style="color:#75715e">//  var lastOctet = parseInt(ipRange.pop());
-</span><span style="color:#75715e"></span>  <span style="color:#75715e">//  if(lastOctet &gt;= 1 &amp;&amp; lastOctet &lt;= 100) {
-</span><span style="color:#75715e"></span>  <span style="color:#75715e">//    dataLayer.push({&#34;internal&#34;: &#34;true&#34;});
-</span><span style="color:#75715e"></span>  <span style="color:#75715e">//  }
-</span><span style="color:#75715e"></span>  
-  <span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({<span style="color:#e6db74">&#34;event&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;ipComplete&#34;</span>});
-&lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
+  <span style="color:#aaa;font-style:italic">// To use the following IP range check, comment the previous three lines
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#aaa;font-style:italic">// of code and uncomment the following lines
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#aaa;font-style:italic">//
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#aaa;font-style:italic">//  var ipRange = ipaddress.split(&#34;.&#34;);
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#aaa;font-style:italic">//  var lastOctet = parseInt(ipRange.pop());
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#aaa;font-style:italic">//  if(lastOctet &gt;= 1 &amp;&amp; lastOctet &lt;= 100) {
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#aaa;font-style:italic">//    dataLayer.push({&#34;internal&#34;: &#34;true&#34;});
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#aaa;font-style:italic">//  }
+</span><span style="color:#aaa;font-style:italic"></span>  
+  dataLayer.push({<span style="color:#a50">&#34;event&#34;</span>: <span style="color:#a50">&#34;ipComplete&#34;</span>});
+&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
 <ul>
 <li>Add Firing Rule to tag: <strong>{{event}} equals gtm.js</strong></li>
 </ul>
@@ -512,43 +512,43 @@ RewriteRule ^$ http://www.mydomain.com/?internal=true [R=301,L]</code></pre></di
 <p>Add the following code in the tag:</p>
 </li>
 </ul>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
-  <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">matchIP</span>(<span style="color:#a6e22e">ipaddress</span>) {
-    <span style="color:#75715e">// Comment following three lines if you want to use the IP range method
-</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">ipaddress</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;111.222.333.444&#34;</span>) {
-      <span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({<span style="color:#e6db74">&#34;internal&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;true&#34;</span>});
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+  <span style="color:#00a">function</span> matchIP(ipaddress) {
+    <span style="color:#aaa;font-style:italic">// Comment following three lines if you want to use the IP range method
+</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">if</span> (ipaddress == <span style="color:#a50">&#34;111.222.333.444&#34;</span>) {
+      dataLayer.push({<span style="color:#a50">&#34;internal&#34;</span>: <span style="color:#a50">&#34;true&#34;</span>});
     }
 
-    <span style="color:#75715e">// To use the following IP range check, comment the previous three lines
-</span><span style="color:#75715e"></span>    <span style="color:#75715e">// of code and uncomment the following lines
-</span><span style="color:#75715e"></span>    <span style="color:#75715e">//
-</span><span style="color:#75715e"></span>    <span style="color:#75715e">//  var ipRange = ipaddress.split(&#34;.&#34;);
-</span><span style="color:#75715e"></span>    <span style="color:#75715e">//  var lastOctet = parseInt(ipRange.pop());
-</span><span style="color:#75715e"></span>    <span style="color:#75715e">//  if(lastOctet &gt;= 1 &amp;&amp; lastOctet &lt;= 100) {
-</span><span style="color:#75715e"></span>    <span style="color:#75715e">//    dataLayer.push({&#34;internal&#34;: &#34;true&#34;});
-</span><span style="color:#75715e"></span>    <span style="color:#75715e">//  }
-</span><span style="color:#75715e"></span>  }
+    <span style="color:#aaa;font-style:italic">// To use the following IP range check, comment the previous three lines
+</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#aaa;font-style:italic">// of code and uncomment the following lines
+</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#aaa;font-style:italic">//
+</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#aaa;font-style:italic">//  var ipRange = ipaddress.split(&#34;.&#34;);
+</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#aaa;font-style:italic">//  var lastOctet = parseInt(ipRange.pop());
+</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#aaa;font-style:italic">//  if(lastOctet &gt;= 1 &amp;&amp; lastOctet &lt;= 100) {
+</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#aaa;font-style:italic">//    dataLayer.push({&#34;internal&#34;: &#34;true&#34;});
+</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#aaa;font-style:italic">//  }
+</span><span style="color:#aaa;font-style:italic"></span>  }
   
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">ipaddress</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>;
-  <span style="color:#66d9ef">try</span> {
-    <span style="color:#a6e22e">jQuery</span>.<span style="color:#a6e22e">ajax</span>({
-      <span style="color:#a6e22e">type</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;GET&#34;</span>,
-      <span style="color:#a6e22e">dataType</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;json&#34;</span>,
-      <span style="color:#a6e22e">url</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;http://api.hostip.info/get_json.php&#34;</span>,
-      <span style="color:#a6e22e">async</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span>,
-      <span style="color:#a6e22e">success</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">data</span>) {
-        <span style="color:#a6e22e">ipaddress</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">ip</span>;      
-      },<span style="color:#a6e22e">error</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">errorData</span>) {
-        <span style="color:#a6e22e">ipaddress</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;none&#34;</span>;
-      },<span style="color:#a6e22e">complete</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">function</span>() {
-        <span style="color:#a6e22e">matchIP</span>(<span style="color:#a6e22e">ipaddress</span>);
+  <span style="color:#00a">var</span> ipaddress = <span style="color:#a50">&#34;&#34;</span>;
+  <span style="color:#00a">try</span> {
+    jQuery.ajax({
+      type : <span style="color:#a50">&#34;GET&#34;</span>,
+      dataType : <span style="color:#a50">&#34;json&#34;</span>,
+      url : <span style="color:#a50">&#34;http://api.hostip.info/get_json.php&#34;</span>,
+      async : <span style="color:#00a">true</span>,
+      success : <span style="color:#00a">function</span>(data) {
+        ipaddress = data.ip;      
+      },error : <span style="color:#00a">function</span>(errorData) {
+        ipaddress = <span style="color:#a50">&#34;none&#34;</span>;
+      },complete : <span style="color:#00a">function</span>() {
+        matchIP(ipaddress);
       }
     });
-  } <span style="color:#66d9ef">catch</span>(<span style="color:#a6e22e">e</span>) {
-    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#34;Oops, something went wrong: &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">message</span>);
+  } <span style="color:#00a">catch</span>(e) {
+    console.log(<span style="color:#a50">&#34;Oops, something went wrong: &#34;</span> + e.message);
   }
-  <span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({<span style="color:#e6db74">&#34;event&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;ipComplete&#34;</span>});
-&lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
+  dataLayer.push({<span style="color:#a50">&#34;event&#34;</span>: <span style="color:#a50">&#34;ipComplete&#34;</span>});
+&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
 <ul>
 <li>Set Firing Rule for tag <strong>{{event}} equals gtm.js</strong></li>
 </ul>

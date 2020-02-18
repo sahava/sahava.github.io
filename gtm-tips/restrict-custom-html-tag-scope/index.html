@@ -337,36 +337,36 @@
 
 
 <p>The tip is very simple. Whenever adding JavaScript code in a Custom HTML Tag between <code>&lt;script&gt;</code> and <code>&lt;/script&gt;</code> tags, add the following code around whatever you've written:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">(<span style="color:#66d9ef">function</span>() {
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">(<span style="color:#00a">function</span>() {
   
-  <span style="color:#75715e">// Your JavaScript here
-</span><span style="color:#75715e"></span>
+  <span style="color:#aaa;font-style:italic">// Your JavaScript here
+</span><span style="color:#aaa;font-style:italic"></span>
 })();
 </code></pre></div>
 <p>What you're doing is creating an <strong>immediately invoked function expression</strong>, or IIFE for short. By wrapping the <code>function() {...}</code> in parentheses, you're instructing the browser to treat the code within as an <em>expression</em> rather than a <em>declaration</em>. In other words, you're instructing the browser to invoke the function, making it syntactically valid by adding the empty parentheses at the end (so that the browser knows it'a a function expression). This executes whatever code is within the <code>&lt;script/&gt;</code> block.</p>
 <p>So if it does exactly what it would do even without the IIFE, why do it?</p>
 <p>Well, JavaScript scopes variables to their execution context. This means that if variables are declared within a function, they are <strong>only</strong> accessible inside that function. Furthermore, JavaScript has a global namespace which in the web browser is defined by the <code>window</code> object. If you <em>didn't</em> have the IIFE around your code, then any variables you declared would be hoisted to the global <code>window</code> namespace, thus creating potential for conflict.</p>
 <p>Take a look at this example:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
-  <span style="color:#75715e">// No IIFE
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">ga</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;My secret &#39;ga&#39; code&#34;</span>;
-  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">ga</span>);
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+  <span style="color:#aaa;font-style:italic">// No IIFE
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#00a">var</span> ga = <span style="color:#a50">&#34;My secret &#39;ga&#39; code&#34;</span>;
+  console.log(ga);
 
-  <span style="color:#75715e">// Results in an error
-</span><span style="color:#75715e"></span>  window.<span style="color:#a6e22e">ga</span>(<span style="color:#e6db74">&#39;send&#39;</span>, <span style="color:#e6db74">&#39;pageview&#39;</span>);
-&lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
+  <span style="color:#aaa;font-style:italic">// Results in an error
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#0aa">window</span>.ga(<span style="color:#a50">&#39;send&#39;</span>, <span style="color:#a50">&#39;pageview&#39;</span>);
+&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
 <p>By overwriting <code>ga</code> with your own nifty little string, you just broke Universal Analytics. Congratulations.</p>
 <p>Whereas if you did this:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
-  (<span style="color:#66d9ef">function</span>() {
-    <span style="color:#75715e">// IIFE
-</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">ga</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;My secret &#39;ga&#39; code&#34;</span>;
-    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">ga</span>);
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+  (<span style="color:#00a">function</span>() {
+    <span style="color:#aaa;font-style:italic">// IIFE
+</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">var</span> ga = <span style="color:#a50">&#34;My secret &#39;ga&#39; code&#34;</span>;
+    console.log(ga);
   })();
 
-  <span style="color:#75715e">// Works
-</span><span style="color:#75715e"></span>  window.<span style="color:#a6e22e">ga</span>(<span style="color:#e6db74">&#39;send&#39;</span>, <span style="color:#e6db74">&#39;pageview&#39;</span>);
-&lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
+  <span style="color:#aaa;font-style:italic">// Works
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#0aa">window</span>.ga(<span style="color:#a50">&#39;send&#39;</span>, <span style="color:#a50">&#39;pageview&#39;</span>);
+&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
 <p>This time you're protecting your own little <code>ga</code> variable and, more importantly, you're protecting the <strong>global</strong> <code>ga</code> function by declaring your variable in an IIFE.</p>
 <p>Just remember the following additional tips:</p>
 <ul>

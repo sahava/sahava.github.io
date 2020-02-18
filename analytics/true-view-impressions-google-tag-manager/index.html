@@ -503,57 +503,57 @@
 <h3 id="js---function---true-view-impression-handler">{{JS - Function - True view impression handler}}</h3>
 <p>This is the main driving force of the solution. It's a <a href="https://www.simoahava.com/analytics/customtask-the-guide/"><code>customTask</code></a> variable, designed to build the batch queue, to create the <code>beforeunload</code> handler, to allow hits to fire (when the batch queue is full or a product is clicked), and to block GA hits from being dispatched (if the impression was simply added to the queue).</p>
 <p>Here's what the code in the <strong>Custom JavaScript</strong> variable should look like:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
-  <span style="color:#75715e">// Configure the following
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">maxBatch</span>           <span style="color:#f92672">=</span> <span style="color:#ae81ff">10</span>,
-      <span style="color:#a6e22e">batchVariableName</span>  <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;_impressions_batch&#39;</span>,
-      <span style="color:#a6e22e">productIdAttribute</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;data-productid&#39;</span>;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() {
+  <span style="color:#aaa;font-style:italic">// Configure the following
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#00a">var</span> maxBatch           = <span style="color:#099">10</span>,
+      batchVariableName  = <span style="color:#a50">&#39;_impressions_batch&#39;</span>,
+      productIdAttribute = <span style="color:#a50">&#39;data-productid&#39;</span>;
   
-  <span style="color:#75715e">// Do not touch anything below this
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">targetElement</span> <span style="color:#f92672">=</span> {{<span style="color:#a6e22e">Click</span> <span style="color:#a6e22e">Element</span>}},
-      <span style="color:#a6e22e">event</span>         <span style="color:#f92672">=</span> {{<span style="color:#a6e22e">Event</span>}};
+  <span style="color:#aaa;font-style:italic">// Do not touch anything below this
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#00a">var</span> targetElement = {{Click Element}},
+      event         = {{Event}};
 
-  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">event</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#39;gtm.click&#39;</span>) {
-    <span style="color:#66d9ef">while</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">targetElement</span>.<span style="color:#a6e22e">getAttribute</span>(<span style="color:#a6e22e">productIdAttribute</span>) <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">targetElement</span>.<span style="color:#a6e22e">tagName</span> <span style="color:#f92672">!==</span> <span style="color:#e6db74">&#39;BODY&#39;</span>) {
-      <span style="color:#a6e22e">targetElement</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">targetElement</span>.<span style="color:#a6e22e">parentElement</span>;
+  <span style="color:#00a">if</span> (event === <span style="color:#a50">&#39;gtm.click&#39;</span>) {
+    <span style="color:#00a">while</span> (!targetElement.getAttribute(productIdAttribute) &amp;&amp; targetElement.tagName !== <span style="color:#a50">&#39;BODY&#39;</span>) {
+      targetElement = targetElement.parentElement;
     }
   }
 
-  <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">customModel</span>) {
+  <span style="color:#00a">return</span> <span style="color:#00a">function</span>(customModel) {
 
-    <span style="color:#75715e">// Set up the beforeunload listener only when the tag is first run.
-</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">if</span> (<span style="color:#66d9ef">typeof</span> window[<span style="color:#a6e22e">batchVariableName</span>] <span style="color:#f92672">===</span> <span style="color:#e6db74">&#39;undefined&#39;</span>) {
-      window.<span style="color:#a6e22e">addEventListener</span>(<span style="color:#e6db74">&#39;beforeunload&#39;</span>, <span style="color:#66d9ef">function</span>() {
-		window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
-          <span style="color:#a6e22e">event</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;sendFinalBatch&#39;</span>
+    <span style="color:#aaa;font-style:italic">// Set up the beforeunload listener only when the tag is first run.
+</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">if</span> (<span style="color:#00a">typeof</span> <span style="color:#0aa">window</span>[batchVariableName] === <span style="color:#a50">&#39;undefined&#39;</span>) {
+      <span style="color:#0aa">window</span>.addEventListener(<span style="color:#a50">&#39;beforeunload&#39;</span>, <span style="color:#00a">function</span>() {
+		<span style="color:#0aa">window</span>.dataLayer.push({
+          event: <span style="color:#a50">&#39;sendFinalBatch&#39;</span>
         });
       });
     }
     
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">shouldFire</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>,
-        <span style="color:#a6e22e">batch</span>      <span style="color:#f92672">=</span> window[<span style="color:#a6e22e">batchVariableName</span>] <span style="color:#f92672">=</span> window[<span style="color:#a6e22e">batchVariableName</span>] <span style="color:#f92672">||</span> [],
-        <span style="color:#a6e22e">impressionId</span>, 
-        <span style="color:#a6e22e">ost</span>;
+    <span style="color:#00a">var</span> shouldFire = <span style="color:#00a">false</span>,
+        batch      = <span style="color:#0aa">window</span>[batchVariableName] = <span style="color:#0aa">window</span>[batchVariableName] || [],
+        impressionId, 
+        ost;
         
-    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">event</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#39;gtm.elementVisibility&#39;</span>) {
-      <span style="color:#a6e22e">impressionId</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">targetElement</span>.<span style="color:#a6e22e">getAttribute</span>(<span style="color:#a6e22e">productIdAttribute</span>);
-      <span style="color:#a6e22e">batch</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">impressionId</span>);
-      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">batch</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">===</span> <span style="color:#a6e22e">maxBatch</span>) { <span style="color:#a6e22e">shouldFire</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>; }
+    <span style="color:#00a">if</span> (event === <span style="color:#a50">&#39;gtm.elementVisibility&#39;</span>) {
+      impressionId = targetElement.getAttribute(productIdAttribute);
+      batch.push(impressionId);
+      <span style="color:#00a">if</span> (batch.length === maxBatch) { shouldFire = <span style="color:#00a">true</span>; }
     }
     
-    <span style="color:#66d9ef">if</span> ([<span style="color:#e6db74">&#39;sendFinalBatch&#39;</span>, <span style="color:#e6db74">&#39;gtm.timer&#39;</span>].<span style="color:#a6e22e">indexOf</span>(<span style="color:#a6e22e">event</span>) <span style="color:#f92672">&gt;</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">batch</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) { <span style="color:#a6e22e">shouldFire</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>; }
+    <span style="color:#00a">if</span> ([<span style="color:#a50">&#39;sendFinalBatch&#39;</span>, <span style="color:#a50">&#39;gtm.timer&#39;</span>].indexOf(event) &gt; -<span style="color:#099">1</span> &amp;&amp; batch.length &gt; <span style="color:#099">0</span>) { shouldFire = <span style="color:#00a">true</span>; }
     
-    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">event</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#39;gtm.click&#39;</span>) { <span style="color:#a6e22e">shouldFire</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>; }
+    <span style="color:#00a">if</span> (event === <span style="color:#a50">&#39;gtm.click&#39;</span>) { shouldFire = <span style="color:#00a">true</span>; }
     
-    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">shouldFire</span>) {
-      <span style="color:#a6e22e">ost</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">customModel</span>.<span style="color:#a6e22e">get</span>(<span style="color:#e6db74">&#39;sendHitTask&#39;</span>);
-      <span style="color:#a6e22e">customModel</span>.<span style="color:#a6e22e">set</span>(<span style="color:#e6db74">&#39;sendHitTask&#39;</span>, <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">sendModel</span>) {
-        <span style="color:#a6e22e">ost</span>(<span style="color:#a6e22e">sendModel</span>);
-        window[<span style="color:#a6e22e">batchVariableName</span>] <span style="color:#f92672">=</span> [];
+    <span style="color:#00a">if</span> (shouldFire) {
+      ost = customModel.get(<span style="color:#a50">&#39;sendHitTask&#39;</span>);
+      customModel.set(<span style="color:#a50">&#39;sendHitTask&#39;</span>, <span style="color:#00a">function</span>(sendModel) {
+        ost(sendModel);
+        <span style="color:#0aa">window</span>[batchVariableName] = [];
       });
-    } <span style="color:#66d9ef">else</span> {
-      <span style="color:#a6e22e">customModel</span>.<span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">keys</span>.<span style="color:#a6e22e">forEach</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">key</span>) {
-        <span style="color:#a6e22e">customModel</span>.<span style="color:#a6e22e">set</span>(<span style="color:#a6e22e">key</span>, <span style="color:#66d9ef">null</span>);
+    } <span style="color:#00a">else</span> {
+      customModel.data.keys.forEach(<span style="color:#00a">function</span>(key) {
+        customModel.set(key, <span style="color:#00a">null</span>);
       });
     }
   };
@@ -572,50 +572,50 @@
 </li>
 </ul>
 <p>Let me tear this code apart and show you what each individual part does.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">event</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#39;gtm.click&#39;</span>) {
-  <span style="color:#66d9ef">while</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">targetElement</span>.<span style="color:#a6e22e">getAttribute</span>(<span style="color:#a6e22e">productIdAttribute</span>) <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">targetElement</span>.<span style="color:#a6e22e">tagName</span> <span style="color:#f92672">!==</span> <span style="color:#e6db74">&#39;BODY&#39;</span>) {
-    <span style="color:#a6e22e">targetElement</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">targetElement</span>.<span style="color:#a6e22e">parentElement</span>;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">if</span> (event === <span style="color:#a50">&#39;gtm.click&#39;</span>) {
+  <span style="color:#00a">while</span> (!targetElement.getAttribute(productIdAttribute) &amp;&amp; targetElement.tagName !== <span style="color:#a50">&#39;BODY&#39;</span>) {
+    targetElement = targetElement.parentElement;
   }
 }
 </code></pre></div>
 <p>This is a simple iterator which climbs up the element tree from the clicked element until it finds the element with the aforementioned product ID attribute.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">if</span> (<span style="color:#66d9ef">typeof</span> window[<span style="color:#a6e22e">batchVariableName</span>] <span style="color:#f92672">===</span> <span style="color:#e6db74">&#39;undefined&#39;</span>) {
-  window.<span style="color:#a6e22e">addEventListener</span>(<span style="color:#e6db74">&#39;beforeunload&#39;</span>, <span style="color:#66d9ef">function</span>() {
-    window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
-      <span style="color:#a6e22e">event</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;sendFinalBatch&#39;</span>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">if</span> (<span style="color:#00a">typeof</span> <span style="color:#0aa">window</span>[batchVariableName] === <span style="color:#a50">&#39;undefined&#39;</span>) {
+  <span style="color:#0aa">window</span>.addEventListener(<span style="color:#a50">&#39;beforeunload&#39;</span>, <span style="color:#00a">function</span>() {
+    <span style="color:#0aa">window</span>.dataLayer.push({
+      event: <span style="color:#a50">&#39;sendFinalBatch&#39;</span>
     });
   });
 }
 </code></pre></div>
 <p>When the <code>customTask</code> is fired for the first time on the page, a <code>beforeunload</code> listener is created. The idea is that when the user leaves the current page, the <code>beforeunload</code> event that is automatically dispatched triggers a <code>window.dataLayer.push()</code> call that we can then use to send the remaining items in the batch queue.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">shouldFire</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>,
-    <span style="color:#a6e22e">batch</span>      <span style="color:#f92672">=</span> window[<span style="color:#a6e22e">batchVariableName</span>] <span style="color:#f92672">=</span> window[<span style="color:#a6e22e">batchVariableName</span>] <span style="color:#f92672">||</span> [],
-    <span style="color:#a6e22e">impressionId</span>, 
-    <span style="color:#a6e22e">ost</span>;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">var</span> shouldFire = <span style="color:#00a">false</span>,
+    batch      = <span style="color:#0aa">window</span>[batchVariableName] = <span style="color:#0aa">window</span>[batchVariableName] || [],
+    impressionId, 
+    ost;
 </code></pre></div>
 <p>By default, the <code>customTask</code> blocks the Google Analytics request from firing (<code>shouldFire = false</code>). Also, here we create the batch queue if one doesn't already exist.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">event</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#39;gtm.elementVisibility&#39;</span>) {
-  <span style="color:#a6e22e">impressionId</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">targetElement</span>.<span style="color:#a6e22e">getAttribute</span>(<span style="color:#a6e22e">productIdAttribute</span>);
-  <span style="color:#a6e22e">batch</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">impressionId</span>);
-  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">batch</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">===</span> <span style="color:#a6e22e">maxBatch</span>) { <span style="color:#a6e22e">shouldFire</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>; }
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">if</span> (event === <span style="color:#a50">&#39;gtm.elementVisibility&#39;</span>) {
+  impressionId = targetElement.getAttribute(productIdAttribute);
+  batch.push(impressionId);
+  <span style="color:#00a">if</span> (batch.length === maxBatch) { shouldFire = <span style="color:#00a">true</span>; }
 }
 </code></pre></div>
 <p>If the tag was fired due to a visibility event, the product ID that triggered the event will be pushed into the batch queue. If the batch queue thus reaches its maximum length, <code>customTask</code> will allow the hit to fire.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">if</span> ([<span style="color:#e6db74">&#39;sendFinalBatch&#39;</span>, <span style="color:#e6db74">&#39;gtm.timer&#39;</span>].<span style="color:#a6e22e">indexOf</span>(<span style="color:#a6e22e">event</span>) <span style="color:#f92672">&gt;</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">batch</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) { <span style="color:#a6e22e">shouldFire</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>; }
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">if</span> ([<span style="color:#a50">&#39;sendFinalBatch&#39;</span>, <span style="color:#a50">&#39;gtm.timer&#39;</span>].indexOf(event) &gt; -<span style="color:#099">1</span> &amp;&amp; batch.length &gt; <span style="color:#099">0</span>) { shouldFire = <span style="color:#00a">true</span>; }
     
-<span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">event</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#39;gtm.click&#39;</span>) { <span style="color:#a6e22e">shouldFire</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>; }
+<span style="color:#00a">if</span> (event === <span style="color:#a50">&#39;gtm.click&#39;</span>) { shouldFire = <span style="color:#00a">true</span>; }
 </code></pre></div>
 <p>If the trigger event was <code>sendFinalBatch</code> (i.e. the user is trying to leave the page) or <code>gtm.timer</code> (i.e. 60 seconds have passed since the previous timer event or page load) AND if the batch queue has items in it, the hit will be allowed to fire, thus clearing the batch queue and sending all the items within to GA.</p>
 <p>If the trigger event was a click, meaning the user clicked a product impression, the GA request will be allowed to complete as well.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">shouldFire</span>) {
-  <span style="color:#a6e22e">ost</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">customModel</span>.<span style="color:#a6e22e">get</span>(<span style="color:#e6db74">&#39;sendHitTask&#39;</span>);
-  <span style="color:#a6e22e">customModel</span>.<span style="color:#a6e22e">set</span>(<span style="color:#e6db74">&#39;sendHitTask&#39;</span>, <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">sendModel</span>) {
-    <span style="color:#a6e22e">ost</span>(<span style="color:#a6e22e">sendModel</span>);
-    window[<span style="color:#a6e22e">batchVariableName</span>] <span style="color:#f92672">=</span> [];
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">if</span> (shouldFire) {
+  ost = customModel.get(<span style="color:#a50">&#39;sendHitTask&#39;</span>);
+  customModel.set(<span style="color:#a50">&#39;sendHitTask&#39;</span>, <span style="color:#00a">function</span>(sendModel) {
+    ost(sendModel);
+    <span style="color:#0aa">window</span>[batchVariableName] = [];
   });
-} <span style="color:#66d9ef">else</span> {
-  <span style="color:#a6e22e">customModel</span>.<span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">keys</span>.<span style="color:#a6e22e">forEach</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">key</span>) {
-    <span style="color:#a6e22e">customModel</span>.<span style="color:#a6e22e">set</span>(<span style="color:#a6e22e">key</span>, <span style="color:#66d9ef">null</span>);
+} <span style="color:#00a">else</span> {
+  customModel.data.keys.forEach(<span style="color:#00a">function</span>(key) {
+    customModel.set(key, <span style="color:#00a">null</span>);
   });
 }
 </code></pre></div>
@@ -624,51 +624,51 @@
 <h3 id="js---get-true-view-object">{{JS - Get True View object}}</h3>
 <p>This variable builds the Enhanced Ecommerce object when the tag fires. It's used to build both the impression <strong>view</strong> object and the impression <strong>click</strong> object.</p>
 <p>So, create a <strong>Custom JavaScript</strong> variable, and put the following code within:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
-  <span style="color:#75715e">// Configure the following:
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">maxBatch</span>           <span style="color:#f92672">=</span> <span style="color:#ae81ff">10</span>,
-      <span style="color:#a6e22e">batchVariableName</span>  <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;_impressions_batch&#39;</span>,
-      <span style="color:#a6e22e">productIdAttribute</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;data-productid&#39;</span>; 
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() {
+  <span style="color:#aaa;font-style:italic">// Configure the following:
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#00a">var</span> maxBatch           = <span style="color:#099">10</span>,
+      batchVariableName  = <span style="color:#a50">&#39;_impressions_batch&#39;</span>,
+      productIdAttribute = <span style="color:#a50">&#39;data-productid&#39;</span>; 
   
-  <span style="color:#75715e">// Do not touch anything below this
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">targetElement</span> <span style="color:#f92672">=</span> {{<span style="color:#a6e22e">Click</span> <span style="color:#a6e22e">Element</span>}},
-      <span style="color:#a6e22e">event</span>         <span style="color:#f92672">=</span> {{<span style="color:#a6e22e">Event</span>}},
-      <span style="color:#a6e22e">batch</span>         <span style="color:#f92672">=</span> window[<span style="color:#a6e22e">batchVariableName</span>],
-      <span style="color:#a6e22e">impressions</span>   <span style="color:#f92672">=</span> <span style="color:#a6e22e">google_tag_manager</span>[{{<span style="color:#a6e22e">Container</span> <span style="color:#a6e22e">ID</span>}}].<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">get</span>(<span style="color:#e6db74">&#39;ecommerce.impressions&#39;</span>),
-      <span style="color:#a6e22e">ecomObj</span>       <span style="color:#f92672">=</span> {<span style="color:#a6e22e">ecommerce</span><span style="color:#f92672">:</span> {}};
+  <span style="color:#aaa;font-style:italic">// Do not touch anything below this
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#00a">var</span> targetElement = {{Click Element}},
+      event         = {{Event}},
+      batch         = <span style="color:#0aa">window</span>[batchVariableName],
+      impressions   = google_tag_manager[{{Container ID}}].dataLayer.get(<span style="color:#a50">&#39;ecommerce.impressions&#39;</span>),
+      ecomObj       = {ecommerce: {}};
 
-  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">event</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#39;gtm.click&#39;</span>) {
-    <span style="color:#66d9ef">while</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">targetElement</span>.<span style="color:#a6e22e">getAttribute</span>(<span style="color:#a6e22e">productIdAttribute</span>) <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">targetElement</span>.<span style="color:#a6e22e">tagName</span> <span style="color:#f92672">!==</span> <span style="color:#e6db74">&#39;BODY&#39;</span>) {
-      <span style="color:#a6e22e">targetElement</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">targetElement</span>.<span style="color:#a6e22e">parentElement</span>;
+  <span style="color:#00a">if</span> (event === <span style="color:#a50">&#39;gtm.click&#39;</span>) {
+    <span style="color:#00a">while</span> (!targetElement.getAttribute(productIdAttribute) &amp;&amp; targetElement.tagName !== <span style="color:#a50">&#39;BODY&#39;</span>) {
+      targetElement = targetElement.parentElement;
     }
   }
 
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">latestImpression</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">impressions</span>.<span style="color:#a6e22e">filter</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">impression</span>) {
-    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">impression</span>.<span style="color:#a6e22e">id</span> <span style="color:#f92672">===</span> <span style="color:#a6e22e">targetElement</span>.<span style="color:#a6e22e">getAttribute</span>(<span style="color:#a6e22e">productIdAttribute</span>);
-  }).<span style="color:#a6e22e">shift</span>();
+  <span style="color:#00a">var</span> latestImpression = impressions.filter(<span style="color:#00a">function</span>(impression) {
+    <span style="color:#00a">return</span> impression.id === targetElement.getAttribute(productIdAttribute);
+  }).shift();
 
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">impressionsArr</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">batch</span>.<span style="color:#a6e22e">map</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">id</span>) {
-    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">impressions</span>.<span style="color:#a6e22e">filter</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">impression</span>) {
-      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">impression</span>.<span style="color:#a6e22e">id</span> <span style="color:#f92672">===</span> <span style="color:#a6e22e">id</span>;
-    }).<span style="color:#a6e22e">shift</span>();
+  <span style="color:#00a">var</span> impressionsArr = batch.map(<span style="color:#00a">function</span>(id) {
+    <span style="color:#00a">return</span> impressions.filter(<span style="color:#00a">function</span>(impression) {
+      <span style="color:#00a">return</span> impression.id === id;
+    }).shift();
   });
   
-  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">event</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#39;gtm.elementVisibility&#39;</span>){
-    <span style="color:#a6e22e">impressionsArr</span>[<span style="color:#a6e22e">maxBatch</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>] <span style="color:#f92672">=</span> <span style="color:#a6e22e">latestImpression</span>;
+  <span style="color:#00a">if</span> (event === <span style="color:#a50">&#39;gtm.elementVisibility&#39;</span>){
+    impressionsArr[maxBatch - <span style="color:#099">1</span>] = latestImpression;
   }
 
-  <span style="color:#a6e22e">ecomObj</span>.<span style="color:#a6e22e">impressions</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">impressionsArr</span>; 
+  ecomObj.impressions = impressionsArr; 
 
-  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">event</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#39;gtm.click&#39;</span>) {
-    <span style="color:#a6e22e">ecomObj</span>.<span style="color:#a6e22e">click</span> <span style="color:#f92672">=</span> {
-      <span style="color:#a6e22e">actionField</span><span style="color:#f92672">:</span> {
-        <span style="color:#a6e22e">list</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">latestImpression</span>.<span style="color:#a6e22e">list</span>
+  <span style="color:#00a">if</span> (event === <span style="color:#a50">&#39;gtm.click&#39;</span>) {
+    ecomObj.click = {
+      actionField: {
+        list: latestImpression.list
       },
-      <span style="color:#a6e22e">products</span><span style="color:#f92672">:</span> [<span style="color:#a6e22e">latestImpression</span>]
+      products: [latestImpression]
     };
   }
-  <span style="color:#66d9ef">return</span> {
-    <span style="color:#a6e22e">ecommerce</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">ecomObj</span>
+  <span style="color:#00a">return</span> {
+    ecommerce: ecomObj
   };
 }
 </code></pre></div>

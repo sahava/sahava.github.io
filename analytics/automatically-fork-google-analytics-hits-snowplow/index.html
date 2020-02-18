@@ -369,26 +369,26 @@
 <p>The second simply doesn't work. Even if you do manage to load the plugin in the tracker, Google Analytics would not stop to wait for the plugin to be registered, but would simply send the hit before the plugin has had time to attach and modify the tracker object itself.</p>
 <p>So in this tip, we're just going to skip the plugin altogether, and replicate its functionality using <code>customTask</code>.</p>
 <p>To make it all work, create a new <strong>Custom JavaScript variable</strong>, name it something like <strong>{{customTask - Snowplow duplicator}}</strong>, and add the following code within:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
-  <span style="color:#75715e">// Add your snowplow collector endpoint here
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">endpoint</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;https://collector.simoahava.com/&#39;</span>;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() {
+  <span style="color:#aaa;font-style:italic">// Add your snowplow collector endpoint here
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#00a">var</span> endpoint = <span style="color:#a50">&#39;https://collector.simoahava.com/&#39;</span>;
   
-  <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">model</span>) {
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">vendor</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;com.google.analytics&#39;</span>;
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">version</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;v1&#39;</span>;
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">path</span> <span style="color:#f92672">=</span> ((<span style="color:#a6e22e">endpoint</span>.<span style="color:#a6e22e">substr</span>(<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>) <span style="color:#f92672">!==</span> <span style="color:#e6db74">&#39;/&#39;</span>) <span style="color:#f92672">?</span> <span style="color:#a6e22e">endpoint</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;/&#39;</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">endpoint</span>) <span style="color:#f92672">+</span> <span style="color:#a6e22e">vendor</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;/&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">version</span>;
+  <span style="color:#00a">return</span> <span style="color:#00a">function</span>(model) {
+    <span style="color:#00a">var</span> vendor = <span style="color:#a50">&#39;com.google.analytics&#39;</span>;
+    <span style="color:#00a">var</span> version = <span style="color:#a50">&#39;v1&#39;</span>;
+    <span style="color:#00a">var</span> path = ((endpoint.substr(-<span style="color:#099">1</span>) !== <span style="color:#a50">&#39;/&#39;</span>) ? endpoint + <span style="color:#a50">&#39;/&#39;</span> : endpoint) + vendor + <span style="color:#a50">&#39;/&#39;</span> + version;
     
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">globalSendTaskName</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;_&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">model</span>.<span style="color:#a6e22e">get</span>(<span style="color:#e6db74">&#39;trackingId&#39;</span>) <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;_sendHitTask&#39;</span>;
+    <span style="color:#00a">var</span> globalSendTaskName = <span style="color:#a50">&#39;_&#39;</span> + model.get(<span style="color:#a50">&#39;trackingId&#39;</span>) + <span style="color:#a50">&#39;_sendHitTask&#39;</span>;
     
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">originalSendHitTask</span> <span style="color:#f92672">=</span> window[<span style="color:#a6e22e">globalSendTaskName</span>] <span style="color:#f92672">=</span> window[<span style="color:#a6e22e">globalSendTaskName</span>] <span style="color:#f92672">||</span> <span style="color:#a6e22e">model</span>.<span style="color:#a6e22e">get</span>(<span style="color:#e6db74">&#39;sendHitTask&#39;</span>);
+    <span style="color:#00a">var</span> originalSendHitTask = <span style="color:#0aa">window</span>[globalSendTaskName] = <span style="color:#0aa">window</span>[globalSendTaskName] || model.get(<span style="color:#a50">&#39;sendHitTask&#39;</span>);
     
-    <span style="color:#a6e22e">model</span>.<span style="color:#a6e22e">set</span>(<span style="color:#e6db74">&#39;sendHitTask&#39;</span>, <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">sendModel</span>) {
-      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">payload</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sendModel</span>.<span style="color:#a6e22e">get</span>(<span style="color:#e6db74">&#39;hitPayload&#39;</span>);
-      <span style="color:#a6e22e">originalSendHitTask</span>(<span style="color:#a6e22e">sendModel</span>);
-      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">request</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">XMLHttpRequest</span>();
-      <span style="color:#a6e22e">request</span>.<span style="color:#a6e22e">open</span>(<span style="color:#e6db74">&#39;POST&#39;</span>, <span style="color:#a6e22e">path</span>, <span style="color:#66d9ef">true</span>);
-      <span style="color:#a6e22e">request</span>.<span style="color:#a6e22e">setRequestHeader</span>(<span style="color:#e6db74">&#39;Content-type&#39;</span>, <span style="color:#e6db74">&#39;text/plain; charset=UTF-8&#39;</span>);
-      <span style="color:#a6e22e">request</span>.<span style="color:#a6e22e">send</span>(<span style="color:#a6e22e">payload</span>);
+    model.set(<span style="color:#a50">&#39;sendHitTask&#39;</span>, <span style="color:#00a">function</span>(sendModel) {
+      <span style="color:#00a">var</span> payload = sendModel.get(<span style="color:#a50">&#39;hitPayload&#39;</span>);
+      originalSendHitTask(sendModel);
+      <span style="color:#00a">var</span> request = <span style="color:#00a">new</span> XMLHttpRequest();
+      request.open(<span style="color:#a50">&#39;POST&#39;</span>, path, <span style="color:#00a">true</span>);
+      request.setRequestHeader(<span style="color:#a50">&#39;Content-type&#39;</span>, <span style="color:#a50">&#39;text/plain; charset=UTF-8&#39;</span>);
+      request.send(payload);
     });
   };
 }

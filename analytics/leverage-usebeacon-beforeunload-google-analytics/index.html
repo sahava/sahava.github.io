@@ -458,14 +458,14 @@ The Data Layer Variable would look like this:</p>
 
 <h3 id="4-custom-html-tag">4. Custom HTML Tag</h3>
 <p>The next step is our custom <em>beforeunload</em> listener. Create a new Custom HTML Tag, and set it to fire with the <strong>All Pages</strong> Trigger. Add the following code within:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
-  window.<span style="color:#a6e22e">addEventListener</span>(<span style="color:#e6db74">&#39;beforeunload&#39;</span>, <span style="color:#66d9ef">function</span>() {
-    window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
-      <span style="color:#e6db74">&#39;event&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;unloadEvent&#39;</span>,
-      <span style="color:#e6db74">&#39;timeonpage&#39;</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">new</span> Date().<span style="color:#a6e22e">getTime</span>() <span style="color:#f92672">-</span> {{<span style="color:#a6e22e">DLV</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">gtm</span>.<span style="color:#a6e22e">start</span>}}
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+  <span style="color:#0aa">window</span>.addEventListener(<span style="color:#a50">&#39;beforeunload&#39;</span>, <span style="color:#00a">function</span>() {
+    <span style="color:#0aa">window</span>.dataLayer.push({
+      <span style="color:#a50">&#39;event&#39;</span> : <span style="color:#a50">&#39;unloadEvent&#39;</span>,
+      <span style="color:#a50">&#39;timeonpage&#39;</span> : <span style="color:#00a">new</span> <span style="color:#0aa">Date</span>().getTime() - {{DLV - gtm.start}}
     });
   });
-&lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
+&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
 <p>This attaches the <em>beforeunload</em> listener to the global <code>window</code> object. When the unload process begins, i.e. when the user chooses to leave the page, the callback is invoked, and a <code>dataLayer.push()</code> is executed, with a custom &lsquo;event&rsquo; value and also a value for the &lsquo;timeonpage&rsquo; Variable we just created.</p>
 <p>The time on page is calculated by getting the timestamp for the <em>beforeunload</em> event, and subtracting the <strong>gtm.start</strong> timestamp from it. The result is the time in milliseconds between these two events. If you want to have a safeguard for session expiration, cap this time at 1800000 milliseconds, which is 30 minutes.</p>
 <p>Now all we need is the Timing Tag, which sends the <strong>timeonpage</strong> value both as a Timing value and as a Custom Dimension value.</p>

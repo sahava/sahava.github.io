@@ -347,32 +347,32 @@
 
 <p>Always add the <code>eventTimeout</code> when using <code>eventCallback</code>. The former takes a numerical value as its parameter, representing the number of <strong>milliseconds</strong> to wait before calling <code>eventCallback</code> anyway. In other words, even if your Tags stall and never signal completion, after two seconds <code>eventCallback</code> is invoked.</p>
 <p>So, let's imagine you have this, problematic code:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">processLinkClick</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e</span>) {
-  <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">preventDefault</span>();
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">targetUrl</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">target</span>.<span style="color:#a6e22e">href</span>;
-  window.<span style="color:#a6e22e">dataLayer</span> <span style="color:#f92672">=</span> window.<span style="color:#a6e22e">dataLayer</span> <span style="color:#f92672">||</span> [];
-  window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
-    <span style="color:#e6db74">&#39;event&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;processLink&#39;</span>,
-    <span style="color:#e6db74">&#39;eventCallback&#39;</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">function</span>() {
-      window.<span style="color:#a6e22e">location</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">targetUrl</span>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">var</span> processLinkClick = <span style="color:#00a">function</span>(e) {
+  e.preventDefault();
+  <span style="color:#00a">var</span> targetUrl = e.target.href;
+  <span style="color:#0aa">window</span>.dataLayer = <span style="color:#0aa">window</span>.dataLayer || [];
+  <span style="color:#0aa">window</span>.dataLayer.push({
+    <span style="color:#a50">&#39;event&#39;</span> : <span style="color:#a50">&#39;processLink&#39;</span>,
+    <span style="color:#a50">&#39;eventCallback&#39;</span> : <span style="color:#00a">function</span>() {
+      <span style="color:#0aa">window</span>.location = targetUrl
     }
   });
 };
 </code></pre></div>
 <p>It's a function which grabs the event object, prevents its default action (redirect), does the <code>dataLayer.push()</code>, and finally in the <code>eventCallback</code> finalizes the redirect. But there's no safeguard a) for when Google Tag Manager isn't loaded, and b) if the Tags stall.</p>
 <p>So here's the fixed code:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">processLinkClick</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e</span>) {
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">targetUrl</span>;
-  <span style="color:#66d9ef">if</span> (window[<span style="color:#e6db74">&#39;google_tag_manager&#39;</span>]) {
-    <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">preventDefault</span>();
-    <span style="color:#a6e22e">targetUrl</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">target</span>.<span style="color:#a6e22e">href</span>;
-    window.<span style="color:#a6e22e">dataLayer</span> <span style="color:#f92672">=</span> window.<span style="color:#a6e22e">dataLayer</span> <span style="color:#f92672">||</span> [];
-    window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
-      <span style="color:#e6db74">&#39;event&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;processLink&#39;</span>,
-      <span style="color:#e6db74">&#39;eventCallback&#39;</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">function</span>() {
-        window.<span style="color:#a6e22e">location</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">targetUrl</span>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">var</span> processLinkClick = <span style="color:#00a">function</span>(e) {
+  <span style="color:#00a">var</span> targetUrl;
+  <span style="color:#00a">if</span> (<span style="color:#0aa">window</span>[<span style="color:#a50">&#39;google_tag_manager&#39;</span>]) {
+    e.preventDefault();
+    targetUrl = e.target.href;
+    <span style="color:#0aa">window</span>.dataLayer = <span style="color:#0aa">window</span>.dataLayer || [];
+    <span style="color:#0aa">window</span>.dataLayer.push({
+      <span style="color:#a50">&#39;event&#39;</span> : <span style="color:#a50">&#39;processLink&#39;</span>,
+      <span style="color:#a50">&#39;eventCallback&#39;</span> : <span style="color:#00a">function</span>() {
+        <span style="color:#0aa">window</span>.location = targetUrl
       },
-      <span style="color:#e6db74">&#39;eventTimeout&#39;</span> <span style="color:#f92672">:</span> <span style="color:#ae81ff">2000</span>
+      <span style="color:#a50">&#39;eventTimeout&#39;</span> : <span style="color:#099">2000</span>
     });
   }
 };

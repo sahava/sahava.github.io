@@ -387,25 +387,25 @@
 <h2 id="cookies-and-gtm">Cookies and GTM</h2>
 <p>Google Tag Manager, thankfully, already provides us an interface to query for cookie values: the <a href="https://www.simoahava.com/analytics/variable-guide-google-tag-manager/">1st Party Cookie Variable</a>. When you set the Variable to a cookie name, it will always return whatever value is stored in that particular cookie. This is a huge help, since you don't need to go through the rather tedious process of parsing the entire cookie string for the name-value pair you're looking for.</p>
 <p>Setting a cookie, however, still needs to be done manually. The easiest way to set a cookie is to add the following code in a Custom HTML Tag:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">document.<span style="color:#a6e22e">cookie</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;cookieName=cookieValue&#39;</span>;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#0aa">document</span>.cookie = <span style="color:#a50">&#39;cookieName=cookieValue&#39;</span>;
 </code></pre></div>
 <p>This would set a cookie with the name <strong>cookieName</strong> and the value <strong>cookieValue</strong>. However, using this code alone would set the cookie to expire at the end of the <strong>browser session</strong> (i.e. when the browser is shut down), and the cookie would be set on the current <strong>path</strong> and the current <strong>domain</strong> only. The path and domain combination is especially important, as the cookie would only be accessible via the page it was set on.</p>
 <p>This is why it's customary to create a helper function, with which you can provide some important parameters. To create this type of helper in GTM's context, I suggest using a <strong>Custom JavaScript Variable</strong> named <strong>{{JS - setCookie}}</strong>:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
-  <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">name</span>, <span style="color:#a6e22e">value</span>, <span style="color:#a6e22e">ms</span>, <span style="color:#a6e22e">path</span>, <span style="color:#a6e22e">domain</span>) {
-    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">name</span> <span style="color:#f92672">||</span> <span style="color:#f92672">!</span><span style="color:#a6e22e">value</span>) {
-      <span style="color:#66d9ef">return</span>;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() {
+  <span style="color:#00a">return</span> <span style="color:#00a">function</span>(name, value, ms, path, domain) {
+    <span style="color:#00a">if</span> (!name || !value) {
+      <span style="color:#00a">return</span>;
     }
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">d</span>;
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">cpath</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">path</span> <span style="color:#f92672">?</span> <span style="color:#e6db74">&#39;; path=&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">path</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;&#39;</span>;
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">cdomain</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">domain</span> <span style="color:#f92672">?</span> <span style="color:#e6db74">&#39;; domain=&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">domain</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;&#39;</span>;
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">expires</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;&#39;</span>;
-    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">ms</span>) {
-      <span style="color:#a6e22e">d</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Date();
-      <span style="color:#a6e22e">d</span>.<span style="color:#a6e22e">setTime</span>(<span style="color:#a6e22e">d</span>.<span style="color:#a6e22e">getTime</span>() <span style="color:#f92672">+</span> <span style="color:#a6e22e">ms</span>);
-      <span style="color:#a6e22e">expires</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;; expires=&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">d</span>.<span style="color:#a6e22e">toUTCString</span>();
+    <span style="color:#00a">var</span> d;
+    <span style="color:#00a">var</span> cpath = path ? <span style="color:#a50">&#39;; path=&#39;</span> + path : <span style="color:#a50">&#39;&#39;</span>;
+    <span style="color:#00a">var</span> cdomain = domain ? <span style="color:#a50">&#39;; domain=&#39;</span> + domain : <span style="color:#a50">&#39;&#39;</span>;
+    <span style="color:#00a">var</span> expires = <span style="color:#a50">&#39;&#39;</span>;
+    <span style="color:#00a">if</span> (ms) {
+      d = <span style="color:#00a">new</span> <span style="color:#0aa">Date</span>();
+      d.setTime(d.getTime() + ms);
+      expires = <span style="color:#a50">&#39;; expires=&#39;</span> + d.toUTCString();
     }
-    document.<span style="color:#a6e22e">cookie</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">name</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;=&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">value</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">expires</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">cpath</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">cdomain</span>;
+    <span style="color:#0aa">document</span>.cookie = name + <span style="color:#a50">&#34;=&#34;</span> + value + expires + cpath + cdomain;
   }
 }
 </code></pre></div>
@@ -428,33 +428,33 @@
 </li>
 </ul>
 <p>To use this Variable in a script, you need to use the following syntax:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">{{<span style="color:#a6e22e">JS</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">setCookie</span>}}(<span style="color:#e6db74">&#39;session&#39;</span>, <span style="color:#e6db74">&#39;true&#39;</span>, <span style="color:#ae81ff">1800000</span>, <span style="color:#e6db74">&#39;/&#39;</span>, <span style="color:#e6db74">&#39;simoahava.com&#39;</span>);
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">{{JS - setCookie}}(<span style="color:#a50">&#39;session&#39;</span>, <span style="color:#a50">&#39;true&#39;</span>, <span style="color:#099">1800000</span>, <span style="color:#a50">&#39;/&#39;</span>, <span style="color:#a50">&#39;simoahava.com&#39;</span>);
 </code></pre></div>
 <p>This would set a cookie with the name <strong>session</strong> and value <strong>true</strong>, which persists for <strong>30 minutes</strong>, and is written on the root page of the root domain.</p>
 <p>If you want to leave a parameter out, you'll need to replace it with <code>undefined</code>, if you still want to send one of the latter parameters. For example:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">{{<span style="color:#a6e22e">JS</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">setCookie</span>}}(<span style="color:#e6db74">&#39;session&#39;</span>, <span style="color:#e6db74">&#39;true&#39;</span>, <span style="color:#66d9ef">undefined</span>, <span style="color:#66d9ef">undefined</span>, <span style="color:#e6db74">&#39;simoahava.com&#39;</span>);
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">{{JS - setCookie}}(<span style="color:#a50">&#39;session&#39;</span>, <span style="color:#a50">&#39;true&#39;</span>, <span style="color:#00a">undefined</span>, <span style="color:#00a">undefined</span>, <span style="color:#a50">&#39;simoahava.com&#39;</span>);
 </code></pre></div>
 <p>Would set a cookie with name <strong>session</strong>, value <strong>true</strong>, which would be a Session cookie, written on the current page of the root domain.</p>
 <p>Phew! That's a mouthful of code. But it does its job nicely. Combine this with the excellent 1st Party Cookie Variable, and you've managed to create a nice and handy cookie setter/getter.</p>
 <h2 id="web-storage-api-and-gtm">Web Storage API and GTM</h2>
 <p>You could create a fancy set of Custom JavaScript Variables for <code>localStorage</code> and <code>sessionStorage</code> as well, but why bother? They're dead simple to interact with.</p>
 <p>To set a key-value pair in storage, you can use the following syntax:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">if</span> (window[<span style="color:#e6db74">&#39;Storage&#39;</span>]) {
-  <span style="color:#75715e">// localStorage persists indefinitely
-</span><span style="color:#75715e"></span>  <span style="color:#a6e22e">localStorage</span>.<span style="color:#a6e22e">setItem</span>(<span style="color:#e6db74">&#39;session&#39;</span>, <span style="color:#e6db74">&#39;true&#39;</span>); 
-  <span style="color:#75715e">// sessionStorage persists until the browser is closed
-</span><span style="color:#75715e"></span>  <span style="color:#a6e22e">sessionStorage</span>.<span style="color:#a6e22e">setItem</span>(<span style="color:#e6db74">&#39;session&#39;</span>, <span style="color:#e6db74">&#39;true&#39;</span>);
-} <span style="color:#66d9ef">else</span> {
-  <span style="color:#75715e">// Fallback for when the browser doesn&#39;t support Web Storage API
-</span><span style="color:#75715e"></span>  {{<span style="color:#a6e22e">JS</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">setCookie</span>}}(<span style="color:#e6db74">&#39;session&#39;</span>, <span style="color:#e6db74">&#39;true&#39;</span>);
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">if</span> (<span style="color:#0aa">window</span>[<span style="color:#a50">&#39;Storage&#39;</span>]) {
+  <span style="color:#aaa;font-style:italic">// localStorage persists indefinitely
+</span><span style="color:#aaa;font-style:italic"></span>  localStorage.setItem(<span style="color:#a50">&#39;session&#39;</span>, <span style="color:#a50">&#39;true&#39;</span>); 
+  <span style="color:#aaa;font-style:italic">// sessionStorage persists until the browser is closed
+</span><span style="color:#aaa;font-style:italic"></span>  sessionStorage.setItem(<span style="color:#a50">&#39;session&#39;</span>, <span style="color:#a50">&#39;true&#39;</span>);
+} <span style="color:#00a">else</span> {
+  <span style="color:#aaa;font-style:italic">// Fallback for when the browser doesn&#39;t support Web Storage API
+</span><span style="color:#aaa;font-style:italic"></span>  {{JS - setCookie}}(<span style="color:#a50">&#39;session&#39;</span>, <span style="color:#a50">&#39;true&#39;</span>);
 }
 </code></pre></div>
 <p>First of all, you need to check if the browser supports the Web Storage API. That's just a simple <code>if...else</code> block. See what I did with the fallback? That's right! I used the <strong>{{JS - setCookie}}</strong> method we just created! What a beautiful segue.</p>
 <p>Web Storage only accepts strings as values, so you need to make sure whatever you're storing can be safely converted into a String. Don't worry, the Storage API does the casting for you, if you fail to explicitly save a String type.</p>
 <p>Unfortunately, as of yet GTM does not have a handy Variable you can use to fetch items from storage (I hope this changes soon!). But to retrieve a value is just as simple as setting one:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">if</span> (window[<span style="color:#e6db74">&#39;Storage&#39;</span>]) {
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">localSession</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">localStorage</span>.<span style="color:#a6e22e">getItem</span>(<span style="color:#e6db74">&#39;session&#39;</span>);
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">sessionSession</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sessionStorage</span>.<span style="color:#a6e22e">getItem</span>(<span style="color:#e6db74">&#39;session&#39;</span>);
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">if</span> (<span style="color:#0aa">window</span>[<span style="color:#a50">&#39;Storage&#39;</span>]) {
+  <span style="color:#00a">var</span> localSession = localStorage.getItem(<span style="color:#a50">&#39;session&#39;</span>);
+  <span style="color:#00a">var</span> sessionSession = sessionStorage.getItem(<span style="color:#a50">&#39;session&#39;</span>);
 }
 </code></pre></div>
 <p>That's right, it's the <code>getItem()</code> method of the API that lets you access stored keys. It returns <code>null</code> if the item isn't found.</p>

@@ -338,42 +338,42 @@
 
 
 <p>The API request itself is run in a <strong>Custom HTML tag</strong> (as custom templates do not support arbitrary HTTP requests yet), so go ahead and create one. In the tag, add the following code:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
-  (<span style="color:#66d9ef">function</span>() {
-    <span style="color:#75715e">// Set expiration to stored cache. Default 24 hours.
-</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">cacheExpiresHours</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">24</span>;
-    <span style="color:#75715e">// Set currency to get rates against
-</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">base</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;EUR&#39;</span>;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+  (<span style="color:#00a">function</span>() {
+    <span style="color:#aaa;font-style:italic">// Set expiration to stored cache. Default 24 hours.
+</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">var</span> cacheExpiresHours = <span style="color:#099">24</span>;
+    <span style="color:#aaa;font-style:italic">// Set currency to get rates against
+</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">var</span> base = <span style="color:#a50">&#39;EUR&#39;</span>;
     
-    <span style="color:#75715e">// Do not edit below
-</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">rates</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(window.<span style="color:#a6e22e">sessionStorage</span>.<span style="color:#a6e22e">getItem</span>(<span style="color:#e6db74">&#39;currencyRates&#39;</span>) <span style="color:#f92672">||</span> <span style="color:#e6db74">&#39;{}&#39;</span>);
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">now</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Date().<span style="color:#a6e22e">getTime</span>();
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">xhr</span>;
-    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">rates</span>.<span style="color:#a6e22e">timestamp</span> <span style="color:#f92672">||</span> <span style="color:#a6e22e">rates</span>.<span style="color:#a6e22e">timestamp</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">cacheExpiresHours</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">60</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">60</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">1000</span> <span style="color:#f92672">&lt;=</span> <span style="color:#a6e22e">now</span>) {
-      <span style="color:#a6e22e">xhr</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">XMLHttpRequest</span>();
-      <span style="color:#a6e22e">xhr</span>.<span style="color:#a6e22e">open</span>(<span style="color:#e6db74">&#39;GET&#39;</span>, <span style="color:#e6db74">&#39;https://api.exchangeratesapi.io/latest?base=&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">base</span>);
-      <span style="color:#a6e22e">xhr</span>.<span style="color:#a6e22e">onreadystatechange</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>() {
-        <span style="color:#66d9ef">if</span>(<span style="color:#a6e22e">xhr</span>.<span style="color:#a6e22e">readyState</span> <span style="color:#f92672">===</span> <span style="color:#a6e22e">XMLHttpRequest</span>.<span style="color:#a6e22e">DONE</span>) {
-          <span style="color:#a6e22e">rates</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(<span style="color:#a6e22e">xhr</span>.<span style="color:#a6e22e">responseText</span>).<span style="color:#a6e22e">rates</span>;
-          <span style="color:#a6e22e">rates</span>.<span style="color:#a6e22e">timestamp</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">now</span>;
-          <span style="color:#a6e22e">sessionStorage</span>.<span style="color:#a6e22e">setItem</span>(<span style="color:#e6db74">&#39;currencyRates&#39;</span>, <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">rates</span>));
-          window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
-		    <span style="color:#a6e22e">event</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;exchangeRates&#39;</span>,
-		    <span style="color:#a6e22e">rates</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">rates</span>,
-            <span style="color:#a6e22e">ratesType</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;fresh&#39;</span>
+    <span style="color:#aaa;font-style:italic">// Do not edit below
+</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">var</span> rates = JSON.parse(<span style="color:#0aa">window</span>.sessionStorage.getItem(<span style="color:#a50">&#39;currencyRates&#39;</span>) || <span style="color:#a50">&#39;{}&#39;</span>);
+    <span style="color:#00a">var</span> now = <span style="color:#00a">new</span> <span style="color:#0aa">Date</span>().getTime();
+    <span style="color:#00a">var</span> xhr;
+    <span style="color:#00a">if</span> (!rates.timestamp || rates.timestamp + cacheExpiresHours * <span style="color:#099">60</span> * <span style="color:#099">60</span> * <span style="color:#099">1000</span> &lt;= now) {
+      xhr = <span style="color:#00a">new</span> XMLHttpRequest();
+      xhr.open(<span style="color:#a50">&#39;GET&#39;</span>, <span style="color:#a50">&#39;https://api.exchangeratesapi.io/latest?base=&#39;</span> + base);
+      xhr.onreadystatechange = <span style="color:#00a">function</span>() {
+        <span style="color:#00a">if</span>(xhr.readyState === XMLHttpRequest.DONE) {
+          rates = JSON.parse(xhr.responseText).rates;
+          rates.timestamp = now;
+          sessionStorage.setItem(<span style="color:#a50">&#39;currencyRates&#39;</span>, JSON.stringify(rates));
+          <span style="color:#0aa">window</span>.dataLayer.push({
+		    event: <span style="color:#a50">&#39;exchangeRates&#39;</span>,
+		    rates: rates,
+            ratesType: <span style="color:#a50">&#39;fresh&#39;</span>
           });
         }
       };
-      <span style="color:#a6e22e">xhr</span>.<span style="color:#a6e22e">send</span>();
-    } <span style="color:#66d9ef">else</span> {
-      window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
-      	<span style="color:#a6e22e">event</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;exchangeRates&#39;</span>,
-        <span style="color:#a6e22e">rates</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">rates</span>,
-        <span style="color:#a6e22e">ratesType</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;cached&#39;</span>
+      xhr.send();
+    } <span style="color:#00a">else</span> {
+      <span style="color:#0aa">window</span>.dataLayer.push({
+      	event: <span style="color:#a50">&#39;exchangeRates&#39;</span>,
+        rates: rates,
+        ratesType: <span style="color:#a50">&#39;cached&#39;</span>
       });
     }
   })();
-&lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
+&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
 <p>Modify the <code>cacheExpiresHours</code> to determine how long the currency rates should be cached in the browser for. If you don't want to cache them, set it to <code>0</code>. This would fetch the latest rates with every page load.</p>
 <p>I would recommend using a cache. The API is a free service, and it's free for as long as it's not abused. It makes no sense to continually fetch the latest rates, so set the cache to something you can live with.</p>
 <p>You'll also need to set a base currency against which the rates are calculated. In the example, I'm using <code>'EUR'</code> as I want the rates to be calculated against euros.</p>
@@ -387,22 +387,22 @@
 </li>
 </ol>
 <p>I also included a key to reflect whether or not the results were cached (<code>ratesType: 'fresh/cached'</code>), which you can use to determine the reliability of the results. This is what the <code>dataLayer</code> would look like:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">{
-  <span style="color:#a6e22e">event</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;exchangeRates&#34;</span>,
-  <span style="color:#a6e22e">rates</span><span style="color:#f92672">:</span> {
-    <span style="color:#a6e22e">AUD</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">1.6467</span>,
-    <span style="color:#a6e22e">BGN</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">1.9558</span>,
-    <span style="color:#a6e22e">BRL</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">4.4099</span>,
-    <span style="color:#a6e22e">CAD</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">1.4785</span>
-    <span style="color:#a6e22e">CHF</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">1.0919</span>
-    <span style="color:#a6e22e">CNY</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">7.8521</span>
-    <span style="color:#a6e22e">CZK</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">25.727</span>
-    <span style="color:#a6e22e">DKK</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">7.4644</span>
-    <span style="color:#a6e22e">GBP</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">0.9183</span>,
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">{
+  event: <span style="color:#a50">&#34;exchangeRates&#34;</span>,
+  rates: {
+    AUD: <span style="color:#099">1.6467</span>,
+    BGN: <span style="color:#099">1.9558</span>,
+    BRL: <span style="color:#099">4.4099</span>,
+    CAD: <span style="color:#099">1.4785</span>
+    CHF: <span style="color:#099">1.0919</span>
+    CNY: <span style="color:#099">7.8521</span>
+    CZK: <span style="color:#099">25.727</span>
+    DKK: <span style="color:#099">7.4644</span>
+    GBP: <span style="color:#099">0.9183</span>,
     ...
-    <span style="color:#a6e22e">timestamp</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">1565172369394</span>
+    timestamp: <span style="color:#099">1565172369394</span>
   },
-  <span style="color:#a6e22e">ratesType</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;fresh&#39;</span>
+  ratesType: <span style="color:#a50">&#39;fresh&#39;</span>
 }
 </code></pre></div>
 <p><strong>Set this tag to fire on the All Pages trigger</strong>. That way it will fire as soon as the GTM container has loaded.</p>
@@ -424,17 +424,17 @@
 
 
 <p>Now, to perform a conversion, you need the source variable (the value you want to convert) and this Data Layer variable. For example, if your source value is in Australian dollars, you can convert that to euros with a Custom JavaScript variable that has the following code:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
-  <span style="color:#75715e">// Update these if necessary
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">convertFrom</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;AUD&#39;</span>;
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">sourceVariable</span> <span style="color:#f92672">=</span> {{<span style="color:#a6e22e">Source</span> <span style="color:#a6e22e">value</span> <span style="color:#66d9ef">in</span> <span style="color:#a6e22e">AUD</span>}};
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">rates</span> <span style="color:#f92672">=</span> {{<span style="color:#a6e22e">DLV</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">rates</span>}};
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() {
+  <span style="color:#aaa;font-style:italic">// Update these if necessary
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#00a">var</span> convertFrom = <span style="color:#a50">&#39;AUD&#39;</span>;
+  <span style="color:#00a">var</span> sourceVariable = {{Source value <span style="color:#00a">in</span> AUD}};
+  <span style="color:#00a">var</span> rates = {{DLV - rates}};
   
-  <span style="color:#75715e">// Don&#39;t change anything below
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">rates</span> <span style="color:#f92672">||</span> <span style="color:#f92672">!</span><span style="color:#a6e22e">rates</span>[<span style="color:#a6e22e">convertFrom</span>] <span style="color:#f92672">||</span> isNaN(<span style="color:#a6e22e">sourceVariable</span>)) {
-    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">sourceVariable</span>;
+  <span style="color:#aaa;font-style:italic">// Don&#39;t change anything below
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#00a">if</span> (!rates || !rates[convertFrom] || <span style="color:#0aa">isNaN</span>(sourceVariable)) {
+    <span style="color:#00a">return</span> sourceVariable;
   }
-  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">sourceVariable</span> <span style="color:#f92672">/</span> <span style="color:#a6e22e">rates</span>[<span style="color:#a6e22e">convertFrom</span>];
+  <span style="color:#00a">return</span> sourceVariable / rates[convertFrom];
 }
 </code></pre></div>
 <p>This variable pulls in the source value and the <code>rates</code> object. In case the <code>rates</code> object doesn't exist, OR it doesn't contain the currency symbol you want to convert from, OR the source variable does not return a number, the source variable is returned untouched.</p>

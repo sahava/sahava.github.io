@@ -424,8 +424,8 @@
 <p>You can no longer trust the reset that occurs with every page load, since there are actually no page loads after the first one. Instead, you're going to have to come up with a new terminology for tracking your visitors. For some it's <a href="http://cutroni.com/blog/2014/02/12/advanced-content-tracking-with-universal-analytics/">scroll tracking</a>, via events or virtual pageviews, and for some it's tracking user interactions with the page, such as clicking on tabs or call-to-action buttons, and for some it's invoking GTM's <a href="https://www.simoahava.com/analytics/google-tag-manager-history-listener/">history listener</a>, which reacts to changes in browser state.</p>
 <p>If you're using Google Tag Manager, an important aspect of these single-page apps is that the <a href="https://www.simoahava.com/analytics/data-layer/"><code>dataLayer</code> object</a> is not reset as it is with page refreshes. That's because in a web context, the painstakingly rendered web page with all its variables, objects, elements, texts, links, images, and other clutter is recreated with every page refresh. In other words, objects on a given page do not persist to other pages. With a single-page app, there is no page refresh, so there's no purge. The data layer is alive for the entire time the user stays on the page, meaning it's more than possible that anything you store into <code>dataLayer</code> and send to GA might be sent with subsequent hits as well.</p>
 <p>With single-page apps, then, you need to be aware of the state of <code>dataLayer</code> at all times, and if necessary you need to emulate a page refresh by deleting keys that you don't want to persist:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
-  <span style="color:#e6db74">&#39;key_to_be_deleted&#39;</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">undefined</span>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">dataLayer.push({
+  <span style="color:#a50">&#39;key_to_be_deleted&#39;</span> : <span style="color:#00a">undefined</span>
 });
 </code></pre></div>
 <h3 id="4-dont-be-idiotidiosyncratic">4) Don't be idiot&hellip;idiosyncratic</h3>
@@ -452,13 +452,13 @@
 <p>Now, we can argue that Auto-Tune is a good thing, and we can argue that it's great that the browser helps you like this. But having a machine correct your singing is no excuse to stop trying to reach the correct pitch naturally, and having a browser fix your source code problems is no reason not to aim for good markup.</p>
 <p>For analytics, this browser behavior has some implications.</p>
 <p>Because every browser wants to be a bit better than the next, they have their own ways of parsing source code. Sometimes these idiosyncrasies are subtle enough to not make a dent, but sometimes they erupt into full-blown compatibility issues, polyfills, and disgruntled developers. At the heart of this tragedy is the analyst, who only wanted to know how many people leave a specific form field empty when submitting the contact form.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#75715e">// Classic example of browser compatibility checking
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">if</span> (document.<span style="color:#a6e22e">addEventListener</span>) {
-  <span style="color:#75715e">// For real browsers
-</span><span style="color:#75715e"></span>  document.<span style="color:#a6e22e">addEventListener</span>(<span style="color:#e6db74">&#39;click&#39;</span>, <span style="color:#a6e22e">handleClick</span>);
-} <span style="color:#66d9ef">else</span> {
-  <span style="color:#75715e">// For IE8 and earlier
-</span><span style="color:#75715e"></span>  document.<span style="color:#a6e22e">attachEvent</span>(<span style="color:#e6db74">&#39;onclick&#39;</span>, <span style="color:#a6e22e">handleClick</span>);
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#aaa;font-style:italic">// Classic example of browser compatibility checking
+</span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">if</span> (<span style="color:#0aa">document</span>.addEventListener) {
+  <span style="color:#aaa;font-style:italic">// For real browsers
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#0aa">document</span>.addEventListener(<span style="color:#a50">&#39;click&#39;</span>, handleClick);
+} <span style="color:#00a">else</span> {
+  <span style="color:#aaa;font-style:italic">// For IE8 and earlier
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#0aa">document</span>.attachEvent(<span style="color:#a50">&#39;onclick&#39;</span>, handleClick);
 }
 </code></pre></div>
 <p>To combat these problems in the render process, it's often wise to adopt a framework. If you're tracking the &ldquo;traditional way&rdquo;, <a href="http://jquery.com">jQuery</a> is something you might want to take a look at. If you're using Google Tag Manager, well, you're already using a JavaScript framework. By leveraging the built-in features of GTM, such as <a href="https://www.simoahava.com/analytics/auto-event-tracking-gtm-2-0/">auto-event tracking</a> and <a href="https://support.google.com/tagmanager/answer/2574372">tag templates</a>, you're externalizing cross-browser woes to Google Tag Manager. It's the framework's job to take care that any features you want to use work across the wide variety of browsers and devices.</p>

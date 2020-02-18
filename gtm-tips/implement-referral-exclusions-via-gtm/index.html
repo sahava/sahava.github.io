@@ -340,22 +340,22 @@
 <p>First, let's get one thing straight. The referral exclude list <strong>excludes</strong> referral traffic, it doesn't <strong>block</strong> it. &lsquo;Exclude&rsquo; here means that traffic that comes in from a referral you've excluded gets converted into the <strong>Direct / (none)</strong> source/medium bucket. If you know your Google Analytics, you know that GA attributes all hits to the <em>last non-direct acquisition source</em>. In plain English this means that all hits that have no referral information get attributed to whatever non-direct source you previously had active. If you don't have a previous campaign, or if the <a href="https://support.google.com/analytics/answer/2795871?hl=en">Campaign Timeout</a> setting has expired, then it gets attributed to <strong>Direct / (none)</strong>.</p>
 <p>That means also that <strong>Referral Exclusion Lists should not be used to fight <a href="https://www.simoahava.com/analytics/spam-filter-insertion-tool/">referral spam</a></strong>. So many people have recommended this method, and all these people are thus guilty of giving horrible, horrible advice.</p>
 <p>Now that we've got that cleared, let's get on with the solution. For this to work, you need to create a new <strong>Custom JavaScript Variable</strong>. Give it a descriptive name such as <strong>{{JS - Exclude Referrals}}</strong>. Copy-paste the following code within:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">referrals</span> <span style="color:#f92672">=</span> [
-    <span style="color:#e6db74">&#39;referrer1.com&#39;</span>,
-    <span style="color:#e6db74">&#39;referrer2.com&#39;</span>,
-    <span style="color:#e6db74">&#39;referrer3.com&#39;</span>,
-    <span style="color:#e6db74">&#39;referrer4.com&#39;</span>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() {
+  <span style="color:#00a">var</span> referrals = [
+    <span style="color:#a50">&#39;referrer1.com&#39;</span>,
+    <span style="color:#a50">&#39;referrer2.com&#39;</span>,
+    <span style="color:#a50">&#39;referrer3.com&#39;</span>,
+    <span style="color:#a50">&#39;referrer4.com&#39;</span>
   ];
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">hname</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> RegExp(<span style="color:#e6db74">&#39;https?://([^/:]+)&#39;</span>).<span style="color:#a6e22e">exec</span>({{<span style="color:#a6e22e">Referrer</span>}});
-  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">hname</span>) { 
-    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">referrals</span>.<span style="color:#a6e22e">length</span>; <span style="color:#a6e22e">i</span><span style="color:#f92672">--</span>;) {
-      <span style="color:#66d9ef">if</span> (<span style="color:#66d9ef">new</span> RegExp(<span style="color:#a6e22e">referrals</span>[<span style="color:#a6e22e">i</span>] <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;$&#39;</span>).<span style="color:#a6e22e">test</span>(<span style="color:#a6e22e">hname</span>[<span style="color:#ae81ff">1</span>])) {
-        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">null</span>;
+  <span style="color:#00a">var</span> hname = <span style="color:#00a">new</span> <span style="color:#0aa">RegExp</span>(<span style="color:#a50">&#39;https?://([^/:]+)&#39;</span>).exec({{Referrer}});
+  <span style="color:#00a">if</span> (hname) { 
+    <span style="color:#00a">for</span> (<span style="color:#00a">var</span> i = referrals.length; i--;) {
+      <span style="color:#00a">if</span> (<span style="color:#00a">new</span> <span style="color:#0aa">RegExp</span>(referrals[i] + <span style="color:#a50">&#39;$&#39;</span>).test(hname[<span style="color:#099">1</span>])) {
+        <span style="color:#00a">return</span> <span style="color:#00a">null</span>;
       }
     }
   }
-  <span style="color:#66d9ef">return</span> {{<span style="color:#a6e22e">Referrer</span>}};
+  <span style="color:#00a">return</span> {{Referrer}};
 }
 </code></pre></div>
 <p>The only thing you need to edit is the <code>referrals</code> Array. Each referral source you want to exclude is on its own row, enclosed in single quotes, and all lines end with a comma except the last one. That's the syntax.</p>
@@ -384,8 +384,8 @@
 </li>
 </ul>
 <p>I hope you get the drift. If you're handy with regular expressions, feel free to modify the strings in the <code>referrals</code> Array. For example, to <em>only</em> exclude <strong>simoahava.com</strong> but not, for example <strong>store.simoahava.com</strong>, you'd create the entry like:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">referrals</span> <span style="color:#f92672">=</span> [
-  <span style="color:#e6db74">&#39;^simoahava.com&#39;</span>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">var</span> referrals = [
+  <span style="color:#a50">&#39;^simoahava.com&#39;</span>
 ];
 </code></pre></div>
 <p>The <code>$</code> which closes the expression at the end is added automatically to each line later in the script.</p>

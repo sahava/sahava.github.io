@@ -378,12 +378,12 @@
 <p>That's the beauty of GTM, again. Since the macro returns false for non-search pageviews, you'll just need the one, single, normal, ordinary pageview tag to cover all the searches as well. No need for extra tags, woohoo!</p>
 <p>So, let's say that the site search term is displayed like it's displayed on <a href="http://www.drupal.org">www.drupal.org</a>: /search/site/<strong>keyword</strong>. The <code>{{search path}}</code> macro should first check if the URI starts with /search/site/, and if it does, it should return whatever comes after, properly modified into a proper path.</p>
 <p>Here's the code for the <code>{{search path}}</code> macro:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">regex</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">/^\/search\/site\/(.*)/</span>;
-  <span style="color:#66d9ef">if</span>(<span style="color:#a6e22e">regex</span>.<span style="color:#a6e22e">test</span>({{<span style="color:#a6e22e">url</span> <span style="color:#a6e22e">path</span>}})) {
-    <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;/search/site?q=&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">regex</span>.<span style="color:#a6e22e">exec</span>({{<span style="color:#a6e22e">url</span> <span style="color:#a6e22e">path</span>}})[<span style="color:#ae81ff">1</span>];
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() {
+  <span style="color:#00a">var</span> regex = <span style="color:#099">/^\/search\/site\/(.*)/</span>;
+  <span style="color:#00a">if</span>(regex.test({{url path}})) {
+    <span style="color:#00a">return</span> <span style="color:#a50">&#34;/search/site?q=&#34;</span> + regex.exec({{url path}})[<span style="color:#099">1</span>];
   }
-  <span style="color:#66d9ef">return</span>;
+  <span style="color:#00a">return</span>;
 }
 </code></pre></div>
 <p>The regular expression looks at the <code>{{url path}}</code> macro (which stores the current URI of the page), and if the path starts with /search/site/, it returns a modified version of the URI with the search term appended as the value of the query parameter <strong>q</strong>. Change this parameter to reflect whatever you want to have in your Google Analytics view's site search settings.</p>
@@ -469,11 +469,11 @@
 
 <p>Replace the <strong>Element ID</strong> field with whatever your page is using.</p>
 <p>Next, we'll need to edit the Custom JavaScript Macro <code>{{search path}}</code>:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
-  <span style="color:#66d9ef">if</span>({{<span style="color:#a6e22e">search</span> <span style="color:#a6e22e">term</span>}} <span style="color:#f92672">&amp;&amp;</span> {{<span style="color:#a6e22e">search</span> <span style="color:#a6e22e">term</span>}} <span style="color:#f92672">!==</span> <span style="color:#e6db74">&#39;null&#39;</span>) {
-    <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;/search/site?q=&#34;</span> <span style="color:#f92672">+</span> {{<span style="color:#a6e22e">search</span> <span style="color:#a6e22e">term</span>}};
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() {
+  <span style="color:#00a">if</span>({{search term}} &amp;&amp; {{search term}} !== <span style="color:#a50">&#39;null&#39;</span>) {
+    <span style="color:#00a">return</span> <span style="color:#a50">&#34;/search/site?q=&#34;</span> + {{search term}};
   }
-  <span style="color:#66d9ef">return</span>;
+  <span style="color:#00a">return</span>;
 }
 </code></pre></div>
 <p>So first we check if an element with the ID you specify exists. If it does, the macro returns <code>&quot;/search/site?q=&lt;keyword&gt;&quot;</code> as the document path, same as in the previous example. If no such element is found, the macro returns false, and the original document path (i.e. the URI of the page the visitor is on) is sent.</p>
@@ -544,11 +544,11 @@
 
 
 <p>Next, create a new Custom HTML Tag which fires upon <strong><code>{{event}}</code> equals gtm.formSubmit</strong>. Have the following code within:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
-  <span style="color:#66d9ef">if</span>({{<span style="color:#a6e22e">search</span> <span style="color:#a6e22e">field</span> <span style="color:#a6e22e">value</span>}} <span style="color:#f92672">&amp;&amp;</span> {{<span style="color:#a6e22e">search</span> <span style="color:#a6e22e">field</span> <span style="color:#a6e22e">value</span>}} <span style="color:#f92672">!==</span> <span style="color:#e6db74">&#39;null&#39;</span>) {
-    document.<span style="color:#a6e22e">cookie</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;keyword=&#34;</span><span style="color:#f92672">+</span>{{<span style="color:#a6e22e">search</span> <span style="color:#a6e22e">field</span> <span style="color:#a6e22e">value</span>}}<span style="color:#f92672">+</span><span style="color:#e6db74">&#34;;path=/&#34;</span>;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+  <span style="color:#00a">if</span>({{search field value}} &amp;&amp; {{search field value}} !== <span style="color:#a50">&#39;null&#39;</span>) {
+    <span style="color:#0aa">document</span>.cookie = <span style="color:#a50">&#34;keyword=&#34;</span>+{{search field value}}+<span style="color:#a50">&#34;;path=/&#34;</span>;
   }
-&lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
+&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
 <p>Here we look for an HTML element with the ID &ldquo;search-field&rdquo;, and with a VALUE attribute. If this is found, then the content of this attribute is set into a new cookie named &ldquo;keyword&rdquo;. This is, in fact, whatever was typed into the search field at the time of form submission.</p>
 <p>(<strong>NOTE!</strong> If there are multiple forms on a page, you might want to enhance this tag with a check that it was actually the search form that was submitted. It's possible that another form is submitted with text in the search field, and this script would then falsely interpret this event as a submission of the site search form.)</p>
 <p>Next, create a new 1st Party Cookie Macro, which retrieves the value from the &ldquo;keyword&rdquo; cookie. Call this <code>{{cookie search term}}</code>.</p>
@@ -568,22 +568,22 @@
 
 
 <p>Next, modify the Custom JavaScript Macro <code>{{search path}}</code> to look like this:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
-  <span style="color:#66d9ef">if</span>({{<span style="color:#a6e22e">cookie</span> <span style="color:#a6e22e">search</span> <span style="color:#a6e22e">term</span>}}) {
-    <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;/search/site?q=&#34;</span> <span style="color:#f92672">+</span> {{<span style="color:#a6e22e">cookie</span> <span style="color:#a6e22e">search</span> <span style="color:#a6e22e">term</span>}};
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() {
+  <span style="color:#00a">if</span>({{cookie search term}}) {
+    <span style="color:#00a">return</span> <span style="color:#a50">&#34;/search/site?q=&#34;</span> + {{cookie search term}};
   }
-  <span style="color:#66d9ef">return</span>;
+  <span style="color:#00a">return</span>;
 }
 </code></pre></div>
 <p>So, first we check if the cookie exists. If it does, then its value is returned as a properly formatted Document Path for the pageview tag.</p>
 <p>Finally, create a new Custom JavaScript Macro <code>{{searchCallback}}</code>, which looks like this:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
-  <span style="color:#66d9ef">if</span>({{<span style="color:#a6e22e">cookie</span> <span style="color:#a6e22e">search</span> <span style="color:#a6e22e">term</span>}}) {
-    <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">function</span>() {
-      document.<span style="color:#a6e22e">cookie</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;keyword=;path=/;expires=Thu, 01-Jan-70 00:00:01 GMT&#34;</span>;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() {
+  <span style="color:#00a">if</span>({{cookie search term}}) {
+    <span style="color:#00a">return</span> <span style="color:#00a">function</span>() {
+      <span style="color:#0aa">document</span>.cookie = <span style="color:#a50">&#34;keyword=;path=/;expires=Thu, 01-Jan-70 00:00:01 GMT&#34;</span>;
     }
   }
-  <span style="color:#66d9ef">return</span>;
+  <span style="color:#00a">return</span>;
 }
 </code></pre></div>
 <p>This looks for the &ldquo;keyword&rdquo; cookie, and if one is found, then the cookie is deleted. This is extremely important, since you don't want to keep on sending the virtual pageview with every single page load! Cookies are deleted by setting their expiration date to the past.</p>

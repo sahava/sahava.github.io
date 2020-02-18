@@ -376,11 +376,11 @@
 <p>But when you use the All Elements trigger, you are using the <em>capture</em> phase, which is cancelled far less often.</p>
 <p>In other words, you can actually use the All Elements trigger to apply link tracking for links that do not create a GTM event when using the Just Links trigger!</p>
 <p>The only problem with this approach is that the All Elements trigger returns the actual element that was clicked. For example, let's say you have HTML like this on the site:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">div</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;contact-us&#34;</span>&gt;
-  &lt;<span style="color:#f92672">a</span> <span style="color:#a6e22e">href</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;mailto:simo@example.com&#34;</span>&gt;
-    &lt;<span style="color:#f92672">span</span>&gt;Send me mail&lt;/<span style="color:#f92672">span</span>&gt;
-  &lt;/<span style="color:#f92672">a</span>&gt;
-&lt;/<span style="color:#f92672">div</span>&gt;</code></pre></div>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">div</span> <span style="color:#1e90ff">id</span>=<span style="color:#a50">&#34;contact-us&#34;</span>&gt;
+  &lt;<span style="color:#1e90ff;font-weight:bold">a</span> <span style="color:#1e90ff">href</span>=<span style="color:#a50">&#34;mailto:simo@example.com&#34;</span>&gt;
+    &lt;<span style="color:#1e90ff;font-weight:bold">span</span>&gt;Send me mail&lt;/<span style="color:#1e90ff;font-weight:bold">span</span>&gt;
+  &lt;/<span style="color:#1e90ff;font-weight:bold">a</span>&gt;
+&lt;/<span style="color:#1e90ff;font-weight:bold">div</span>&gt;</code></pre></div>
 <p>If you used a <strong>Just Links</strong> trigger, and event propagation wasn't stopped, clicking the link will pass the <code>&lt;a href=&quot;mailto:simo@example.com&quot;/&gt;</code> to Google Tag Manager as the target element of the event. But if you're using the <strong>All Elements</strong> trigger, GTM captures the <code>&lt;span/&gt;</code>, because it's what the click actually landed on!</p>
 <p>So how do we get the benefit of All Elements with its <em>capture</em> phase handler, but still be able to capture any element up the DOM tree?</p>
 <p>With some Custom HTML Tag and Custom JavaScript variable magic, of course!</p>
@@ -390,22 +390,22 @@
 <p>Note that you can achieve most of this easily with <a href="https://jquery.com">jQuery</a> or something similar. However, I want to show the native JavaScript way of doing it, since it's not actually that complex.</p>
 <h3 id="the-custom-html-tag">The Custom HTML Tag</h3>
 <p>The Custom HTML Tag should fire as early as possible on the page, so you can use the All Pages trigger, if you wish. This is what it holds:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#f92672">&lt;</span><span style="color:#a6e22e">script</span><span style="color:#f92672">&gt;</span>
-  <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">Element</span>.<span style="color:#a6e22e">prototype</span>.<span style="color:#a6e22e">matches</span>) {
-    <span style="color:#a6e22e">Element</span>.<span style="color:#a6e22e">prototype</span>.<span style="color:#a6e22e">matches</span> <span style="color:#f92672">=</span> 
-        <span style="color:#a6e22e">Element</span>.<span style="color:#a6e22e">prototype</span>.<span style="color:#a6e22e">matchesSelector</span> <span style="color:#f92672">||</span> 
-        <span style="color:#a6e22e">Element</span>.<span style="color:#a6e22e">prototype</span>.<span style="color:#a6e22e">mozMatchesSelector</span> <span style="color:#f92672">||</span>
-        <span style="color:#a6e22e">Element</span>.<span style="color:#a6e22e">prototype</span>.<span style="color:#a6e22e">msMatchesSelector</span> <span style="color:#f92672">||</span> 
-        <span style="color:#a6e22e">Element</span>.<span style="color:#a6e22e">prototype</span>.<span style="color:#a6e22e">oMatchesSelector</span> <span style="color:#f92672">||</span> 
-        <span style="color:#a6e22e">Element</span>.<span style="color:#a6e22e">prototype</span>.<span style="color:#a6e22e">webkitMatchesSelector</span> <span style="color:#f92672">||</span>
-        <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">s</span>) {
-            <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">matches</span> <span style="color:#f92672">=</span> (<span style="color:#66d9ef">this</span>.document <span style="color:#f92672">||</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">ownerDocument</span>).<span style="color:#a6e22e">querySelectorAll</span>(<span style="color:#a6e22e">s</span>),
-                <span style="color:#a6e22e">i</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">matches</span>.<span style="color:#a6e22e">length</span>;
-            <span style="color:#66d9ef">while</span> (<span style="color:#f92672">--</span><span style="color:#a6e22e">i</span> <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">matches</span>.<span style="color:#a6e22e">item</span>(<span style="color:#a6e22e">i</span>) <span style="color:#f92672">!==</span> <span style="color:#66d9ef">this</span>) {}
-            <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">&gt;</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>;            
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">&lt;script&gt;
+  <span style="color:#00a">if</span> (!Element.prototype.matches) {
+    Element.prototype.matches = 
+        Element.prototype.matchesSelector || 
+        Element.prototype.mozMatchesSelector ||
+        Element.prototype.msMatchesSelector || 
+        Element.prototype.oMatchesSelector || 
+        Element.prototype.webkitMatchesSelector ||
+        <span style="color:#00a">function</span>(s) {
+            <span style="color:#00a">var</span> matches = (<span style="color:#00a">this</span>.<span style="color:#0aa">document</span> || <span style="color:#00a">this</span>.ownerDocument).querySelectorAll(s),
+                i = matches.length;
+            <span style="color:#00a">while</span> (--i &gt;= <span style="color:#099">0</span> &amp;&amp; matches.item(i) !== <span style="color:#00a">this</span>) {}
+            <span style="color:#00a">return</span> i &gt; -<span style="color:#099">1</span>;            
         };
   }
-<span style="color:#f92672">&lt;</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#960050;background-color:#1e0010">s</span><span style="color:#960050;background-color:#1e0010">c</span><span style="color:#960050;background-color:#1e0010">r</span><span style="color:#960050;background-color:#1e0010">i</span><span style="color:#960050;background-color:#1e0010">p</span><span style="color:#960050;background-color:#1e0010">t</span><span style="color:#960050;background-color:#1e0010">&gt;</span>
+&lt;<span style="color:#f00;background-color:#faa">/</span><span style="color:#f00;background-color:#faa">s</span><span style="color:#f00;background-color:#faa">c</span><span style="color:#f00;background-color:#faa">r</span><span style="color:#f00;background-color:#faa">i</span><span style="color:#f00;background-color:#faa">p</span><span style="color:#f00;background-color:#faa">t</span><span style="color:#f00;background-color:#faa">&gt;</span>
 </code></pre></div>
 <p>This is a good addition to the site code in general, so if possible to add it to the regular JavaScript of the site, I recommend you do!</p>
 <p>The polyfill is gratefully copied from the <a href="https://developer.mozilla.org/en/docs/Web/API/Element/matches">Mozilla Developer Network pages</a>.</p>
@@ -413,12 +413,12 @@
 <p>Once this is running, you can start using it!</p>
 <h3 id="the-custom-javascript-variable">The Custom JavaScript variable</h3>
 <p>To make things work, we need a little utility Custom JavaScript variable. So create a new Custom JavaScript Variable, and name it <strong>{{Find closest}}</strong>. This is the code you need to put within:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
-  <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">target</span>, <span style="color:#a6e22e">selector</span>) {
-    <span style="color:#66d9ef">while</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">target</span>.<span style="color:#a6e22e">matches</span>(<span style="color:#a6e22e">selector</span>) <span style="color:#f92672">&amp;&amp;</span> <span style="color:#f92672">!</span><span style="color:#a6e22e">target</span>.<span style="color:#a6e22e">matches</span>(<span style="color:#e6db74">&#39;body&#39;</span>)) {
-      <span style="color:#a6e22e">target</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">target</span>.<span style="color:#a6e22e">parentElement</span>;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() {
+  <span style="color:#00a">return</span> <span style="color:#00a">function</span>(target, selector) {
+    <span style="color:#00a">while</span> (!target.matches(selector) &amp;&amp; !target.matches(<span style="color:#a50">&#39;body&#39;</span>)) {
+      target = target.parentElement;
     }
-    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">target</span>.<span style="color:#a6e22e">matches</span>(<span style="color:#a6e22e">selector</span>) <span style="color:#f92672">?</span> <span style="color:#a6e22e">target</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">undefined</span>;
+    <span style="color:#00a">return</span> target.matches(selector) ? target : <span style="color:#00a">undefined</span>;
   }
 }
 </code></pre></div>
@@ -431,20 +431,20 @@
 <p>Once you've set up the polyfill and the Custom JavaScript Variable, you can leverage the variable in all your Google Tag Manager JavaScript with the following syntax:</p>
 <p><code>var elementFound = {{Find closest}}(someHTMLElement, 'someCSSselector');</code></p>
 <p>For example, let's say you have an HTML structure that looks like this:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">div</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;product_12345&#34;</span>&gt;
-  &lt;<span style="color:#f92672">div</span> <span style="color:#a6e22e">class</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;details&#34;</span>&gt;
-    &lt;<span style="color:#f92672">h2</span>&gt;Product 1&lt;/<span style="color:#f92672">h2</span>&gt;
-  &lt;/<span style="color:#f92672">div</span>&gt;
-  &lt;<span style="color:#f92672">div</span> <span style="color:#a6e22e">class</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;link&#34;</span>&gt;
-    &lt;<span style="color:#f92672">a</span> <span style="color:#a6e22e">href</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;product1.html&#34;</span>&gt;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">div</span> <span style="color:#1e90ff">id</span>=<span style="color:#a50">&#34;product_12345&#34;</span>&gt;
+  &lt;<span style="color:#1e90ff;font-weight:bold">div</span> <span style="color:#1e90ff">class</span>=<span style="color:#a50">&#34;details&#34;</span>&gt;
+    &lt;<span style="color:#1e90ff;font-weight:bold">h2</span>&gt;Product 1&lt;/<span style="color:#1e90ff;font-weight:bold">h2</span>&gt;
+  &lt;/<span style="color:#1e90ff;font-weight:bold">div</span>&gt;
+  &lt;<span style="color:#1e90ff;font-weight:bold">div</span> <span style="color:#1e90ff">class</span>=<span style="color:#a50">&#34;link&#34;</span>&gt;
+    &lt;<span style="color:#1e90ff;font-weight:bold">a</span> <span style="color:#1e90ff">href</span>=<span style="color:#a50">&#34;product1.html&#34;</span>&gt;
       Product 1
-    &lt;/<span style="color:#f92672">a</span>&gt;
-  &lt;/<span style="color:#f92672">div</span>&gt;
-&lt;/<span style="color:#f92672">div</span>&gt;</code></pre></div>
+    &lt;/<span style="color:#1e90ff;font-weight:bold">a</span>&gt;
+  &lt;/<span style="color:#1e90ff;font-weight:bold">div</span>&gt;
+&lt;/<span style="color:#1e90ff;font-weight:bold">div</span>&gt;</code></pre></div>
 <p>Now, you've set up a <strong>Click - Just Links</strong> or <strong>Click - All Elements</strong> trigger to capture clicks on the <code>&lt;a/&gt;</code> element. Now, however, you also want to grab the value of the <code>id</code> attribute from the very top-most <code>div</code> (&ldquo;product_12345&rdquo;). To get that, you could use a Custom JavaScript Variable like this:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">el</span> <span style="color:#f92672">=</span> {{<span style="color:#a6e22e">Find</span> <span style="color:#a6e22e">closest</span>}}({{<span style="color:#a6e22e">Click</span> <span style="color:#a6e22e">Element</span>}}, <span style="color:#e6db74">&#39;div[id^=&#34;product&#34;]&#39;</span>);
-  <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">typeof</span> <span style="color:#a6e22e">el</span> <span style="color:#f92672">!==</span> <span style="color:#e6db74">&#39;undefined&#39;</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">el</span>.<span style="color:#a6e22e">id</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">undefined</span>;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() {
+  <span style="color:#00a">var</span> el = {{Find closest}}({{Click Element}}, <span style="color:#a50">&#39;div[id^=&#34;product&#34;]&#39;</span>);
+  <span style="color:#00a">return</span> <span style="color:#00a">typeof</span> el !== <span style="color:#a50">&#39;undefined&#39;</span> ? el.id : <span style="color:#00a">undefined</span>;
 }
 </code></pre></div>
 <p>This Custom JavaScript Variable takes {{Click Element}} (the element that was originally clicked), and then starts walking up the DOM until it finds a <code>div</code> whose <code>id</code> attribute begins with the string &ldquo;product&rdquo;. If such an element is found, it returns the value of the <code>id</code> attribute in question. If the element isn't found, it simply returns <code>undefined</code>.</p>

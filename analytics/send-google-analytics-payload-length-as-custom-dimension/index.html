@@ -366,48 +366,48 @@
 
 
 <p>Then, in Google Tag Manager, create a new <strong>Custom JavaScript variable</strong>. Name it something descriptive, e.g. <strong>customTask - hit payload length</strong>. This is what you should add within:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
-  <span style="color:#75715e">// Change this index to match that of the Custom Dimension you created in GA
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">customDimensionIndex</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">10</span>;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() {
+  <span style="color:#aaa;font-style:italic">// Change this index to match that of the Custom Dimension you created in GA
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#00a">var</span> customDimensionIndex = <span style="color:#099">10</span>;
   
-  <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">model</span>) {
+  <span style="color:#00a">return</span> <span style="color:#00a">function</span>(model) {
     
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">globalSendTaskName</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;_&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">model</span>.<span style="color:#a6e22e">get</span>(<span style="color:#e6db74">&#39;trackingId&#39;</span>) <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;_sendHitTask&#39;</span>;
+    <span style="color:#00a">var</span> globalSendTaskName = <span style="color:#a50">&#39;_&#39;</span> + model.get(<span style="color:#a50">&#39;trackingId&#39;</span>) + <span style="color:#a50">&#39;_sendHitTask&#39;</span>;
     
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">originalSendHitTask</span> <span style="color:#f92672">=</span> window[<span style="color:#a6e22e">globalSendTaskName</span>] <span style="color:#f92672">=</span> window[<span style="color:#a6e22e">globalSendTaskName</span>] <span style="color:#f92672">||</span> <span style="color:#a6e22e">model</span>.<span style="color:#a6e22e">get</span>(<span style="color:#e6db74">&#39;sendHitTask&#39;</span>);
+    <span style="color:#00a">var</span> originalSendHitTask = <span style="color:#0aa">window</span>[globalSendTaskName] = <span style="color:#0aa">window</span>[globalSendTaskName] || model.get(<span style="color:#a50">&#39;sendHitTask&#39;</span>);
     
-    <span style="color:#a6e22e">model</span>.<span style="color:#a6e22e">set</span>(<span style="color:#e6db74">&#39;sendHitTask&#39;</span>, <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">sendModel</span>) {
+    model.set(<span style="color:#a50">&#39;sendHitTask&#39;</span>, <span style="color:#00a">function</span>(sendModel) {
       
-      <span style="color:#66d9ef">try</span> {
+      <span style="color:#00a">try</span> {
         
-        <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">originalHitPayload</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sendModel</span>.<span style="color:#a6e22e">get</span>(<span style="color:#e6db74">&#39;hitPayload&#39;</span>);
+        <span style="color:#00a">var</span> originalHitPayload = sendModel.get(<span style="color:#a50">&#39;hitPayload&#39;</span>);
         
-        <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">hitPayload</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sendModel</span>.<span style="color:#a6e22e">get</span>(<span style="color:#e6db74">&#39;hitPayload&#39;</span>);
-        <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">customDimensionParameter</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;&amp;cd&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">customDimensionIndex</span>;
+        <span style="color:#00a">var</span> hitPayload = sendModel.get(<span style="color:#a50">&#39;hitPayload&#39;</span>);
+        <span style="color:#00a">var</span> customDimensionParameter = <span style="color:#a50">&#39;&amp;cd&#39;</span> + customDimensionIndex;
       
-        <span style="color:#75715e">// If hitPayload already has that Custom Dimension, note this in the console and do not overwrite the existing dimension
-</span><span style="color:#75715e"></span>      
-        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">hitPayload</span>.<span style="color:#a6e22e">indexOf</span>(<span style="color:#a6e22e">customDimensionParameter</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;=&#39;</span>) <span style="color:#f92672">&gt;</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>) {
+        <span style="color:#aaa;font-style:italic">// If hitPayload already has that Custom Dimension, note this in the console and do not overwrite the existing dimension
+</span><span style="color:#aaa;font-style:italic"></span>      
+        <span style="color:#00a">if</span> (hitPayload.indexOf(customDimensionParameter + <span style="color:#a50">&#39;=&#39;</span>) &gt; -<span style="color:#099">1</span>) {
           
-          <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#39;Google Analytics error: tried to send hit payload length in an already assigned Custom Dimension&#39;</span>);
-          <span style="color:#a6e22e">originalSendHitTask</span>(<span style="color:#a6e22e">sendModel</span>);
+          console.log(<span style="color:#a50">&#39;Google Analytics error: tried to send hit payload length in an already assigned Custom Dimension&#39;</span>);
+          originalSendHitTask(sendModel);
         
-        } <span style="color:#66d9ef">else</span> {
+        } <span style="color:#00a">else</span> {
       
-        <span style="color:#75715e">// Otherwise add the Custom Dimension to the string
-</span><span style="color:#75715e"></span>        <span style="color:#75715e">// together with the complete length of the payload
-</span><span style="color:#75715e"></span>          <span style="color:#a6e22e">hitPayload</span> <span style="color:#f92672">+=</span> <span style="color:#a6e22e">customDimensionParameter</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;=&#39;</span>;
-          <span style="color:#a6e22e">hitPayload</span> <span style="color:#f92672">+=</span> (<span style="color:#a6e22e">hitPayload</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">hitPayload</span>.<span style="color:#a6e22e">length</span>.<span style="color:#a6e22e">toString</span>().<span style="color:#a6e22e">length</span>);
+        <span style="color:#aaa;font-style:italic">// Otherwise add the Custom Dimension to the string
+</span><span style="color:#aaa;font-style:italic"></span>        <span style="color:#aaa;font-style:italic">// together with the complete length of the payload
+</span><span style="color:#aaa;font-style:italic"></span>          hitPayload += customDimensionParameter + <span style="color:#a50">&#39;=&#39;</span>;
+          hitPayload += (hitPayload.length + hitPayload.length.toString().length);
         
-          <span style="color:#a6e22e">sendModel</span>.<span style="color:#a6e22e">set</span>(<span style="color:#e6db74">&#39;hitPayload&#39;</span>, <span style="color:#a6e22e">hitPayload</span>, <span style="color:#66d9ef">true</span>);
-          <span style="color:#a6e22e">originalSendHitTask</span>(<span style="color:#a6e22e">sendModel</span>);
+          sendModel.set(<span style="color:#a50">&#39;hitPayload&#39;</span>, hitPayload, <span style="color:#00a">true</span>);
+          originalSendHitTask(sendModel);
         
         }
-      } <span style="color:#66d9ef">catch</span>(<span style="color:#a6e22e">e</span>) {
+      } <span style="color:#00a">catch</span>(e) {
        
-        <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">error</span>(<span style="color:#e6db74">&#39;Error sending hit payload length to Google Analytics&#39;</span>);
-        <span style="color:#a6e22e">sendModel</span>.<span style="color:#a6e22e">set</span>(<span style="color:#e6db74">&#39;hitPayload&#39;</span>, <span style="color:#a6e22e">originalHitPayload</span>, <span style="color:#66d9ef">true</span>);
-        <span style="color:#a6e22e">originalSendHitTask</span>(<span style="color:#a6e22e">sendModel</span>);
+        console.error(<span style="color:#a50">&#39;Error sending hit payload length to Google Analytics&#39;</span>);
+        sendModel.set(<span style="color:#a50">&#39;hitPayload&#39;</span>, originalHitPayload, <span style="color:#00a">true</span>);
+        originalSendHitTask(sendModel);
         
       }
     });

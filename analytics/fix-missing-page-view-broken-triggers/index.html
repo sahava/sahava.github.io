@@ -352,27 +352,27 @@
 <p>You should always see (2) and (3) - there's very little you can do to mess these up. But it's possible you won't see the <strong>Page View</strong> event. If you don't it means you've <strong>messed up the <code>dataLayer</code> implementation</strong>.</p>
 <p>Google Tag Manager establishes the <code>dataLayer</code> construct with its own <code>.push()</code> method in the JavaScript library that represents your container. The <code>gtm.js</code> event is pushed into <code>dataLayer</code> in the container snippet, and it is used to trigger any tags that use the Page View or All Pages triggers.</p>
 <p>The main reason for not seeing the <strong>Page View</strong> events is simple. You have <strong>overwritten the <code>dataLayer</code> modified in the container snippet with a brand new array</strong>. You do it like this:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">  <span style="color:#75715e">&lt;!--</span><span style="color:#75715e"> Google Tag Manager container snippet here </span><span style="color:#75715e">--&gt;</span>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">  <span style="color:#aaa;font-style:italic">&lt;!--</span><span style="color:#aaa;font-style:italic"> Google Tag Manager container snippet here </span><span style="color:#aaa;font-style:italic">--&gt;</span>
   (function...)
-  <span style="color:#75715e">&lt;!--</span><span style="color:#75715e"> Google Tag Manager container snippet ends </span><span style="color:#75715e">--&gt;</span>
-&lt;/<span style="color:#f92672">head</span>&gt;
-&lt;<span style="color:#f92672">body</span>&gt;
-  &lt;<span style="color:#f92672">script</span>&gt;
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">dataLayer</span> <span style="color:#f92672">=</span> [{
-      <span style="color:#a6e22e">someVariable</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;someValue&#39;</span>
+  <span style="color:#aaa;font-style:italic">&lt;!--</span><span style="color:#aaa;font-style:italic"> Google Tag Manager container snippet ends </span><span style="color:#aaa;font-style:italic">--&gt;</span>
+&lt;/<span style="color:#1e90ff;font-weight:bold">head</span>&gt;
+&lt;<span style="color:#1e90ff;font-weight:bold">body</span>&gt;
+  &lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+    <span style="color:#00a">var</span> dataLayer = [{
+      someVariable: <span style="color:#a50">&#39;someValue&#39;</span>
     }];
-  &lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
+  &lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
 <p>See the problem? By using the syntax <code>var dataLayer = ...</code>, you are resetting the <code>dataLayer</code> variable to a new Array, thus overwriting anything that was in it before (such as Google Tag Manager's own listener). Since you overwrite <code>dataLayer</code>, it no longer works properly with GTM, and a typical symptom is that <strong>GTM's triggers don't work anymore</strong>, either. So if you have a Click / All Elements trigger on the site and nothing is pushed to <code>dataLayer</code> when you click around, chances are you've overwritten GTM's <code>dataLayer</code> with your reinitialization.</p>
 <p>How to fix it? Simple. Always check for the existence of <code>dataLayer</code> before adding items to it, and always add items to <code>dataLayer</code> only with the <code>push()</code> command.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#75715e">// WRONG! NEVER USE THIS:
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">dataLayer</span> <span style="color:#f92672">=</span> [{
-  <span style="color:#a6e22e">pageType</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;home&#39;</span>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#aaa;font-style:italic">// WRONG! NEVER USE THIS:
+</span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">var</span> dataLayer = [{
+  pageType: <span style="color:#a50">&#39;home&#39;</span>
 }];
 
-<span style="color:#75715e">// CORRECT! ALWAYS USE THIS:
-</span><span style="color:#75715e"></span>window.<span style="color:#a6e22e">dataLayer</span> <span style="color:#f92672">=</span> window.<span style="color:#a6e22e">dataLayer</span> <span style="color:#f92672">||</span> [];
-window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
-  <span style="color:#a6e22e">pageType</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;home&#39;</span>
+<span style="color:#aaa;font-style:italic">// CORRECT! ALWAYS USE THIS:
+</span><span style="color:#aaa;font-style:italic"></span><span style="color:#0aa">window</span>.dataLayer = <span style="color:#0aa">window</span>.dataLayer || [];
+<span style="color:#0aa">window</span>.dataLayer.push({
+  pageType: <span style="color:#a50">&#39;home&#39;</span>
 });
 </code></pre></div>
 <p>This is a popular topic on this blog and many others simply because it's so easy to screw it up. It doesn't help that somewhere in GTM's documentation there are still instructions to use the <em>declarative</em> method for setting up <code>dataLayer</code>.</p>

@@ -431,55 +431,55 @@
 
 
 <p>So the standard Universal Analytics snippet instantiates <code>ga</code> as a tiny function that saves all the arguments you pass to it as an Array in <code>ga.q</code>. This is called the <em>command queue</em>. It's created by the second line of the GA install snippet function, shown here (beautified with more readable variable names):</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">window[<span style="color:#a6e22e">gaObjName</span>] <span style="color:#f92672">=</span> window[<span style="color:#a6e22e">gaObjName</span>] <span style="color:#f92672">||</span> <span style="color:#66d9ef">function</span>() {
-  ( window[<span style="color:#a6e22e">gaObjName</span>].<span style="color:#a6e22e">q</span> <span style="color:#f92672">=</span> window[<span style="color:#a6e22e">gaObjName</span>].<span style="color:#a6e22e">q</span> <span style="color:#f92672">||</span> [] ).<span style="color:#a6e22e">push</span>( <span style="color:#a6e22e">arguments</span> )
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#0aa">window</span>[gaObjName] = <span style="color:#0aa">window</span>[gaObjName] || <span style="color:#00a">function</span>() {
+  ( <span style="color:#0aa">window</span>[gaObjName].q = <span style="color:#0aa">window</span>[gaObjName].q || [] ).push( arguments )
 },
-<span style="color:#a6e22e">ga</span>.<span style="color:#a6e22e">l</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">new</span> Date();
+ga.l = <span style="color:#099">1</span> * <span style="color:#00a">new</span> <span style="color:#0aa">Date</span>();
 </code></pre></div>
 <p>Aside: Notice any similarities to the <a href="https://www.simoahava.com/gtm-tips/datalayer-declaration-vs-push/">recommended format</a> for data layer pushes?</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">( window.<span style="color:#a6e22e">dataLayer</span> <span style="color:#f92672">=</span> window.<span style="color:#a6e22e">dataLayer</span> <span style="color:#f92672">||</span> [] ).<span style="color:#a6e22e">push</span>( { } )
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">( <span style="color:#0aa">window</span>.dataLayer = <span style="color:#0aa">window</span>.dataLayer || [] ).push( { } )
 </code></pre></div>
 <p>Once this queue is established, the snippet creates a <em>script loader</em>, which starts an asynchronous request to download the <strong>analytics.js</strong> library from Google's servers.</p>
 <p>Once analytics.js loads, it will run the commands in the command queue and replace the queue function <code>ga</code> with much more robust object, which we call the <code>ga</code> object or function. Once this happens, <code>ga</code> stops keeping track of previously called commands, and will run commands as soon as they are called.</p>
 <h3 id="13-spy-moves">1.3. Spy Moves</h3>
 <p>The core of this script is the <code>hijack</code> function. What it does is simple: it saves a private reference to the global <code>ga</code> object, then updates the global reference (<code>window.ga</code> or simply <code>ga</code>) to point to a custom function, which we'll call our &ldquo;proxy&rdquo; function. Note that if you've chosen to rename the global function as something other than <code>ga</code>, it will still work nicely with <strong>GA Spy</strong>.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">hijack</span>(){
-  <span style="color:#75715e">// The current global GA object (could be GA command queue or loaded GA object).
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">gaOrig</span> <span style="color:#f92672">=</span> window.<span style="color:#a6e22e">ga</span>;
-  <span style="color:#75715e">// Replace global GA object with a proxy.
-</span><span style="color:#75715e"></span>  window.<span style="color:#a6e22e">ga</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">proxy</span>;
-  <span style="color:#75715e">// Maintain references to GA&#39;s public interface.
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">for</span>( <span style="color:#a6e22e">k</span> <span style="color:#66d9ef">in</span> <span style="color:#a6e22e">gaOrig</span> )
-     <span style="color:#66d9ef">if</span>( <span style="color:#a6e22e">gaOrig</span>.<span style="color:#a6e22e">hasOwnProperty</span>( <span style="color:#a6e22e">k</span> ) )
-        <span style="color:#a6e22e">proxy</span>[<span style="color:#a6e22e">k</span>] <span style="color:#f92672">=</span> <span style="color:#a6e22e">gaOrig</span>[<span style="color:#a6e22e">k</span>];
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span> hijack(){
+  <span style="color:#aaa;font-style:italic">// The current global GA object (could be GA command queue or loaded GA object).
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#00a">var</span> gaOrig = <span style="color:#0aa">window</span>.ga;
+  <span style="color:#aaa;font-style:italic">// Replace global GA object with a proxy.
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#0aa">window</span>.ga = proxy;
+  <span style="color:#aaa;font-style:italic">// Maintain references to GA&#39;s public interface.
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#00a">for</span>( k <span style="color:#00a">in</span> gaOrig )
+     <span style="color:#00a">if</span>( gaOrig.hasOwnProperty( k ) )
+        proxy[k] = gaOrig[k];
 }
 </code></pre></div>
 <p>The <code>proxy</code> function mimics the data members and methods of the original <code>ga</code> function. Thus it behaves like the original, which we accomplish by passing its arguments back to the <code>ga</code> function (and returning the result). But, only if we so choose. We can reject the message, simply by not sending the message to the original <code>ga</code> function, and thus intercept and block the hardcoded GA from running its requests altogether.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">proxy</span>(){
-  <span style="color:#75715e">// Grab all arguments as an array.
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">args</span> <span style="color:#f92672">=</span> [].<span style="color:#a6e22e">slice</span>.<span style="color:#a6e22e">call</span>( <span style="color:#a6e22e">arguments</span> );
-  <span style="color:#75715e">// Unless processArgs() returns false ...
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">if</span>( <span style="color:#a6e22e">processArgs</span>( <span style="color:#a6e22e">args</span> ) )
-     <span style="color:#75715e">// ... pass through to original GA object.
-</span><span style="color:#75715e"></span>     <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">gaOrig</span>.<span style="color:#a6e22e">apply</span>( <span style="color:#a6e22e">gaOrig</span>, <span style="color:#a6e22e">args</span> );
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span> proxy(){
+  <span style="color:#aaa;font-style:italic">// Grab all arguments as an array.
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#00a">var</span> args = [].slice.call( arguments );
+  <span style="color:#aaa;font-style:italic">// Unless processArgs() returns false ...
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#00a">if</span>( processArgs( args ) )
+     <span style="color:#aaa;font-style:italic">// ... pass through to original GA object.
+</span><span style="color:#aaa;font-style:italic"></span>     <span style="color:#00a">return</span> gaOrig.apply( gaOrig, args );
 };
 </code></pre></div>
 <p>The <code>processArgs</code> function simply delegates the processing and filtering of all commands to you (via the custom listener function).</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">processArgs</span>( <span style="color:#a6e22e">a</span> ){
-  <span style="color:#75715e">// Call listener, return false only if listener returns false.
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">listener</span>( <span style="color:#a6e22e">a</span> ) <span style="color:#f92672">!==</span> <span style="color:#66d9ef">false</span>;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span> processArgs( a ){
+  <span style="color:#aaa;font-style:italic">// Call listener, return false only if listener returns false.
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#00a">return</span> listener( a ) !== <span style="color:#00a">false</span>;
 }
 </code></pre></div>
 <h3 id="14-time-to-spy">1.4. Time To Spy</h3>
 <p>As soon as <strong>GA Spy</strong> is run, it will instantiate the command queue if it doesn't already exist, just as the Universal Analytics snippet would. Both in this script and in the Universal Analytics snippet, we're careful not to blindly set a new variable and lose any previous data.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">if</span>( <span style="color:#f92672">!</span> window[<span style="color:#a6e22e">gaObjName</span>] ){ <span style="color:#75715e">// If global object doesn&#39;t exist ...
-</span><span style="color:#75715e"></span>  <span style="color:#a6e22e">ga</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(){
-    <span style="color:#66d9ef">if</span>( <span style="color:#f92672">!</span> window[<span style="color:#a6e22e">gaObjName</span>].<span style="color:#a6e22e">q</span> )
-      window[<span style="color:#a6e22e">gaObjName</span>].<span style="color:#a6e22e">q</span> <span style="color:#f92672">=</span> [];
-      window[<span style="color:#a6e22e">gaObjName</span>].<span style="color:#a6e22e">q</span>.<span style="color:#a6e22e">push</span>( <span style="color:#a6e22e">arguments</span> );
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">if</span>( ! <span style="color:#0aa">window</span>[gaObjName] ){ <span style="color:#aaa;font-style:italic">// If global object doesn&#39;t exist ...
+</span><span style="color:#aaa;font-style:italic"></span>  ga = <span style="color:#00a">function</span>(){
+    <span style="color:#00a">if</span>( ! <span style="color:#0aa">window</span>[gaObjName].q )
+      <span style="color:#0aa">window</span>[gaObjName].q = [];
+      <span style="color:#0aa">window</span>[gaObjName].q.push( arguments );
   };
-  <span style="color:#a6e22e">ga</span>.<span style="color:#a6e22e">l</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">new</span> Date();
-  window[<span style="color:#a6e22e">gaObjName</span>] <span style="color:#f92672">=</span> <span style="color:#a6e22e">ga</span>;
+  ga.l = <span style="color:#099">1</span> * <span style="color:#00a">new</span> <span style="color:#0aa">Date</span>();
+  <span style="color:#0aa">window</span>[gaObjName] = ga;
 }
 </code></pre></div>
 <p>Note: the above code does the exact same thing as the second line of the GA install snippet function, shown beautified under A Good Spy Starts With Research above.</p>
@@ -509,20 +509,20 @@
 <h2 id="3-usage">3. Usage</h2>
 <h3 id="31-placement">3.1. Placement</h3>
 <p>If you need to intercept GA commands that run upon page load or shortly thereafter (such as the tracker creation or <code>'pageview'</code> in the base GA install snippet), then you'll need deploy <strong>GA Spy</strong> in an inline script tag or external script (with no <code>async</code> or <code>defer</code> attributes) above the first GA command (usually in the base GA snippet).</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">html</span>&gt;
-  &lt;<span style="color:#f92672">head</span>&gt;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">html</span>&gt;
+  &lt;<span style="color:#1e90ff;font-weight:bold">head</span>&gt;
   ...
     // GA Spy:
-    &lt;<span style="color:#f92672">script</span>&gt;
-      ;window.<span style="color:#a6e22e">gaSpy</span> <span style="color:#f92672">=</span> window.<span style="color:#a6e22e">gaSpy</span>...
-    &lt;/<span style="color:#f92672">script</span>&gt;
+    &lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+      ;<span style="color:#0aa">window</span>.gaSpy = <span style="color:#0aa">window</span>.gaSpy...
+    &lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
 
     // Universal Analytics snippet:
-    &lt;<span style="color:#f92672">script</span>&gt;
-      (<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">i</span>,<span style="color:#a6e22e">s</span>,<span style="color:#a6e22e">o</span>,<span style="color:#a6e22e">g</span>,<span style="color:#a6e22e">r</span>,<span style="color:#a6e22e">a</span>,<span style="color:#a6e22e">m</span>)...
-    &lt;/<span style="color:#f92672">script</span>&gt;
+    &lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+      (<span style="color:#00a">function</span>(i,s,o,g,r,a,m)...
+    &lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
   ...
-  &lt;/<span style="color:#f92672">head</span>&gt;</code></pre></div>
+  &lt;/<span style="color:#1e90ff;font-weight:bold">head</span>&gt;</code></pre></div>
 <p>If the commands you need to intercept are triggered by user action, then this is not an issue and you can deploy <strong>GA Spy</strong> using GTM.</p>
 
 
@@ -556,38 +556,38 @@
 </li>
 </ol>
 <p>In many cases, we'll want to push the hit values onto the <code>dataLayer</code> so they can be accessed in GTM.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
-  <span style="color:#a6e22e">gaSpy</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">obj</span>) {
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+  gaSpy(<span style="color:#00a">function</span>(obj) {
     
-    <span style="color:#75715e">// Do something with the arguments to ga():
-</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">args</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">args</span>;
+    <span style="color:#aaa;font-style:italic">// Do something with the arguments to ga():
+</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">var</span> args = obj.args;
 
-    <span style="color:#75715e">// Do something with details about the tracker itself:
-</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">details</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">the</span>;
+    <span style="color:#aaa;font-style:italic">// Do something with details about the tracker itself:
+</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">var</span> details = obj.the;
 
   });
-&lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
+&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
 <p>Naturally, any calls to <code>gaSpy()</code> need to be timed so that they take place <em>after</em> you've loaded the <strong>GA Spy</strong> code itself.</p>
 <p>See the <a href="https://github.com/smhmic/ga-spy/blob/master/README.md#configuration">README file</a> for more details on what data is passed to the callback function, as well as additional <strong>GA Spy</strong> configuration options.</p>
 <h3 id="33-listening-from-gtm">3.3. Listening From GTM</h3>
 <p>If using <strong>GA Spy</strong> in GTM, the listener should typically ignore all commands from GTM. Failure to do this could result in blocking GTM hits or in an infinite loop. We can do this by checking the tracker name. GTM uses tracker names starting with &ldquo;gtm&rdquo; followed by the timestamp of when the tracker was created.</p>
 <p>However, this method will not work when callbacks are passed in place of a GA command. GTM does not appear to use these currently, but we cannot do much with a them anyway, so as a precaution any listener should ignore callbacks too.</p>
 <p>Use the this code at the top of your callback function to avoid issues:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">gaSpy</span>( <span style="color:#66d9ef">function</span>( <span style="color:#a6e22e">ev</span> ){
-  <span style="color:#66d9ef">if</span>( <span style="color:#a6e22e">ev</span>.<span style="color:#a6e22e">the</span>.<span style="color:#a6e22e">callback</span> )
-    <span style="color:#66d9ef">return</span>;
-  <span style="color:#66d9ef">if</span>( <span style="color:#a6e22e">ev</span>.<span style="color:#a6e22e">the</span>.<span style="color:#a6e22e">trackerName</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">ev</span>.<span style="color:#a6e22e">the</span>.<span style="color:#a6e22e">trackerName</span>.<span style="color:#a6e22e">substr</span>( <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">3</span> ) <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;gtm&#39;</span> ) 
-    <span style="color:#66d9ef">return</span>;
-  <span style="color:#75715e">// Your code here
-</span><span style="color:#75715e"></span>});
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">gaSpy( <span style="color:#00a">function</span>( ev ){
+  <span style="color:#00a">if</span>( ev.the.callback )
+    <span style="color:#00a">return</span>;
+  <span style="color:#00a">if</span>( ev.the.trackerName &amp;&amp; ev.the.trackerName.substr( <span style="color:#099">0</span>, <span style="color:#099">3</span> ) == <span style="color:#a50">&#39;gtm&#39;</span> ) 
+    <span style="color:#00a">return</span>;
+  <span style="color:#aaa;font-style:italic">// Your code here
+</span><span style="color:#aaa;font-style:italic"></span>});
 </code></pre></div>
 <p>This is not foolproof, but it'll work unless hardcoded tracking is using a tracker name starting with &ldquo;gtm&rdquo; (or if the tracker names in GTM are customized, which is probably done as an alternative to this solution). For example, this method will not work for Wistia's built-in tracking, because Wistia's code (erroneously) sends hits through every named tracker on the page.</p>
 <h2 id="4-examples">4. Examples</h2>
 <h3 id="41-log-ga-commands">4.1. Log GA Commands</h3>
 <p>Logging GA commands is a useful way to easily see what commands are being picked up by <strong>GA Spy</strong>, letting you see which things <strong>GA Spy</strong> can block and/or latch on to in order to execute custom behavior. Compared with browser extensions and the verbose analytics_debug.js, <strong>GA Spy</strong> logging can be very minimalistic. You could even log using only emojis if you wanted! And it has the advantage of working even when the hit does not fire (such as when using GA opt-out or tracking blockers).</p>
 <p>This listener callback will print <code>ga()</code> arguments exactly as they are given:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">gaSpy</span>( <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">gaSpy_cb_</span>( <span style="color:#a6e22e">ev</span> ){
-    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">debug</span>.<span style="color:#a6e22e">apply</span>( <span style="color:#a6e22e">console</span>, <span style="color:#a6e22e">ev</span>.<span style="color:#a6e22e">args</span> )
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">gaSpy( <span style="color:#00a">function</span> gaSpy_cb_( ev ){
+    console.debug.apply( console, ev.args )
 });
 </code></pre></div>
 <p>Or check out <a href="https://github.com/smhmic/ga-spy/blob/master/examples/ga-spy-log.js">one of the examples on GitHub</a> for something a bit more robust:</p>
@@ -609,20 +609,20 @@
 <p>Since this is all one script, you could turn this into a bookmarklet. This could also block all hits, so it serves as a &lsquo;test mode&rsquo; bookmarklet, which both logs and prevents any hits from being fired.</p>
 <h3 id="42-access-hardcoded-ga-command-data-via-gtm">4.2. Access Hardcoded GA Command Data Via GTM</h3>
 <p>If you know exactly what you're looking for, you can simply look for that format and send it to <code>dataLayer</code>. Remember to define an <a href="https://www.simoahava.com/gtm-tips/add-the-event-key-to-datalayer-pushes/">event name</a> in the <code>dataLayer.push()</code>, so you can create a GTM trigger based on the event. Here's an example that clocks hardcoded events from the social sharing plugin ShareThis and forwards them to GTM:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">gaSpy</span>( <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">gaSpy_cb_</span>( <span style="color:#a6e22e">ev</span> ){
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">a</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ev</span>.<span style="color:#a6e22e">args</span>;
-  <span style="color:#66d9ef">if</span>( <span style="color:#a6e22e">a</span>[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;send&#34;</span> 
-   <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">a</span>[<span style="color:#ae81ff">1</span>] <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;event&#34;</span> 
-   <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">a</span>[<span style="color:#ae81ff">2</span>] <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;ShareThis&#34;</span> ){
-    <span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
-      <span style="color:#e6db74">&#39;event&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;spy.ga.socialPlugin&#39;</span>,
-      <span style="color:#e6db74">&#39;spy.ga.socialPlugin&#39;</span> <span style="color:#f92672">:</span> {
-        <span style="color:#e6db74">&#39;network&#39;</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">a</span>[<span style="color:#ae81ff">3</span>],
-        <span style="color:#e6db74">&#39;url&#39;</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">a</span>[<span style="color:#ae81ff">4</span>]
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">gaSpy( <span style="color:#00a">function</span> gaSpy_cb_( ev ){
+  <span style="color:#00a">var</span> a = ev.args;
+  <span style="color:#00a">if</span>( a[<span style="color:#099">0</span>] == <span style="color:#a50">&#34;send&#34;</span> 
+   &amp;&amp; a[<span style="color:#099">1</span>] == <span style="color:#a50">&#34;event&#34;</span> 
+   &amp;&amp; a[<span style="color:#099">2</span>] == <span style="color:#a50">&#34;ShareThis&#34;</span> ){
+    dataLayer.push({
+      <span style="color:#a50">&#39;event&#39;</span> : <span style="color:#a50">&#39;spy.ga.socialPlugin&#39;</span>,
+      <span style="color:#a50">&#39;spy.ga.socialPlugin&#39;</span> : {
+        <span style="color:#a50">&#39;network&#39;</span> : a[<span style="color:#099">3</span>],
+        <span style="color:#a50">&#39;url&#39;</span> : a[<span style="color:#099">4</span>]
       }
     });
   }
-  <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span>;
+  <span style="color:#00a">return</span> <span style="color:#00a">false</span>;
 });
 </code></pre></div>
 <p><a href="https://github.com/smhmic/ga-spy/blob/master/examples/ga-spy-datalayer.gtm.tag.html">Here's a more robust example</a> that sends all non-GTM commands to <code>dataLayer</code>.</p>

@@ -432,14 +432,14 @@
 </ul>
 <p>The best way to fix the issue, however, is to open a line of communication with your developers, and tell them that GTM requires a standard <code>submit</code> browser event to propagate all the way to the <code>document</code> node to work.</p>
 <p>If this can't be done, the next best thing is to ask the developer to implement a custom <code>dataLayer.push()</code> into the callback function which is invoked upon a successful submission. The piece of code could be something like:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">onFormSuccess</span>(<span style="color:#a6e22e">event</span>) {
-  window.<span style="color:#a6e22e">dataLayer</span> <span style="color:#f92672">=</span> window.<span style="color:#a6e22e">dataLayer</span> <span style="color:#f92672">||</span> [];
-  window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
-    <span style="color:#a6e22e">event</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;formSubmissionSuccess&#39;</span>,
-    <span style="color:#a6e22e">formId</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;contactForm&#39;</span>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span> onFormSuccess(event) {
+  <span style="color:#0aa">window</span>.dataLayer = <span style="color:#0aa">window</span>.dataLayer || [];
+  <span style="color:#0aa">window</span>.dataLayer.push({
+    event: <span style="color:#a50">&#39;formSubmissionSuccess&#39;</span>,
+    formId: <span style="color:#a50">&#39;contactForm&#39;</span>
   });
-  <span style="color:#75715e">// Rest of the success callback code
-</span><span style="color:#75715e"></span>}
+  <span style="color:#aaa;font-style:italic">// Rest of the success callback code
+</span><span style="color:#aaa;font-style:italic"></span>}
 </code></pre></div>
 <p>This would push <code>formSubmissionSuccess</code> into the <code>dataLayer</code> as the value of the <code>event</code> key. Then, you can create a Custom Event Trigger, which waits for an event named <code>formSubmissionSuccess</code>. Using this Trigger would then fire a Tag when the form is successfully submitted.</p>
 <p>There are other workarounds which involve e.g. polling the page until a thank you message is identified, or perhaps using a custom-built <a href="https://www.simoahava.com/analytics/google-tag-manager-dom-listener/">DOM Listener</a>. Unfortunately, all workarounds are far less robust than either fixing the form to respect GTM's Form Trigger requirements or the custom <code>dataLayer.push()</code> method described above.</p>
@@ -483,26 +483,26 @@
 <p>Many of the following solutions rely on these Built-In Variables.</p>
 <h2 id="4-note-about-scope">4. Note about scope</h2>
 <p>All the Variables described below are <strong>Custom JavaScript Variables</strong>. They are all scoped, by default, to the form that was submitted with <code>{{Form Element}}.querySelector...</code>. If you want to access <em>any</em> form on the page, submitted or not, you need to use the following syntax:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">form</span> <span style="color:#f92672">=</span> document.<span style="color:#a6e22e">querySelector</span>(<span style="color:#e6db74">&#39;#someform&#39;</span>);
-<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">field</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">form</span>.<span style="color:#a6e22e">querySelector</span>...
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">var</span> form = <span style="color:#0aa">document</span>.querySelector(<span style="color:#a50">&#39;#someform&#39;</span>);
+<span style="color:#00a">var</span> field = form.querySelector...
 </code></pre></div>
 <p>Keep this in mind when applying the following solutions to your own measurement plan.</p>
 <h2 id="5-capture-field-value">5. Capture field value</h2>
 <p>This is a simple Custom JavaScript Variable which captures the value user has input into a form field. Do note that items like checkboxes, radio buttons, and drop-down lists work a little differently, which is why they are covered in their own chapters.</p>
 <p><strong>Name</strong>: {{Field value}}</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">field</span> <span style="color:#f92672">=</span> {{<span style="color:#a6e22e">Form</span> <span style="color:#a6e22e">Element</span>}}.<span style="color:#a6e22e">querySelector</span>(<span style="color:#e6db74">&#39;#inputFieldId&#39;</span>);
-  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">field</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">field</span>.<span style="color:#a6e22e">value</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">undefined</span>;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() {
+  <span style="color:#00a">var</span> field = {{Form Element}}.querySelector(<span style="color:#a50">&#39;#inputFieldId&#39;</span>);
+  <span style="color:#00a">return</span> field ? field.value : <span style="color:#00a">undefined</span>;
 }
 </code></pre></div>
 <p><strong>Description</strong>: This solution accesses the <code>value</code> attribute of the form field with ID <em>inputFieldId</em>, as long as its found within the form that was submitted. If no such field is found, then <em>undefined</em> is returned instead. Remember, do <strong>not</strong> collect personally identifiable information!</p>
 <h2 id="6-capture-selected-radio-button-value">6. Capture selected radio button value</h2>
 <p>This solution is for capturing the value of the checked radio button. The default solution is for capturing just one radio button value, i.e. accessing just one group. See chapter 9 for an example of how to access multiple values from similar elements.</p>
 <p><strong>Name</strong>: {{Checked radio button}}</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">radioName</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;radioName&#34;</span>;
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">checked</span> <span style="color:#f92672">=</span> {{<span style="color:#a6e22e">Form</span> <span style="color:#a6e22e">Element</span>}}.<span style="color:#a6e22e">querySelector</span>(<span style="color:#e6db74">&#39;[name=&#34;&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">radioName</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;&#34;]:checked&#39;</span>);
-  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">checked</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">checked</span>.<span style="color:#a6e22e">value</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">undefined</span>;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() {
+  <span style="color:#00a">var</span> radioName = <span style="color:#a50">&#34;radioName&#34;</span>;
+  <span style="color:#00a">var</span> checked = {{Form Element}}.querySelector(<span style="color:#a50">&#39;[name=&#34;&#39;</span> + radioName + <span style="color:#a50">&#39;&#34;]:checked&#39;</span>);
+  <span style="color:#00a">return</span> checked ? checked.value : <span style="color:#00a">undefined</span>;
 }
 </code></pre></div>
 <p><strong>Description</strong>: Returns the value of the checked radio button in the group with the name <em>radioName</em>. This group must exist within the form that was submitted. If no checked button is found, <em>undefined</em> is returned.</p>
@@ -512,43 +512,43 @@
 <h2 id="8-capture-selected-drop-down-list-item-value">8. Capture selected drop-down list item value</h2>
 <p>To capture the selected item value in a drop-down list, checking for the <code>value</code> of the list itself will not work, as you'd intuitively expect. Instead, you need to access the option in the list that was selected, and then capture its value.</p>
 <p><strong>Name</strong>: {{Selected list item}}</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">selectList</span> <span style="color:#f92672">=</span> {{<span style="color:#a6e22e">Form</span> <span style="color:#a6e22e">Element</span>}}.<span style="color:#a6e22e">querySelector</span>(<span style="color:#e6db74">&#39;#selectListId&#39;</span>);
-  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">selectList</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">selectList</span>.<span style="color:#a6e22e">options</span>[<span style="color:#a6e22e">selectList</span>.<span style="color:#a6e22e">selectedIndex</span>].<span style="color:#a6e22e">value</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">undefined</span>;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() {
+  <span style="color:#00a">var</span> selectList = {{Form Element}}.querySelector(<span style="color:#a50">&#39;#selectListId&#39;</span>);
+  <span style="color:#00a">return</span> selectList ? selectList.options[selectList.selectedIndex].value : <span style="color:#00a">undefined</span>;
 }
 </code></pre></div>
 <p><strong>Description</strong>: First, the script retrieves the drop-down list with ID <em>selectListId</em>. Next, it returns the value of the selected option in the list. If the list does not exist, the script returns <em>undefined</em>.</p>
 <h2 id="9-capture-multiple-values">9. Capture multiple values</h2>
 <p>Sometimes you'll want to capture multiple values of some specified group. A prime example is the checkbox, where you can have multiple checked boxes in a single group. Here are some ideas for how to capture these values.</p>
 <p><strong>Return concatenated string of checked item values</strong></p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">groupName</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;groupName&#34;</span>;
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">elems</span> <span style="color:#f92672">=</span> {{<span style="color:#a6e22e">Form</span> <span style="color:#a6e22e">Element</span>}}.<span style="color:#a6e22e">querySelectorAll</span>(<span style="color:#e6db74">&#39;[name=&#34;&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">groupName</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;&#34;]:checked&#39;</span>);
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">vals</span> <span style="color:#f92672">=</span> [];
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">len</span>;
-  <span style="color:#66d9ef">for</span> (<span style="color:#a6e22e">i</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>, <span style="color:#a6e22e">len</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">elems</span>.<span style="color:#a6e22e">length</span>; <span style="color:#a6e22e">i</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">len</span>; <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span>) {
-    <span style="color:#a6e22e">vals</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">elems</span>[<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">value</span>);
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() {
+  <span style="color:#00a">var</span> groupName = <span style="color:#a50">&#34;groupName&#34;</span>;
+  <span style="color:#00a">var</span> elems = {{Form Element}}.querySelectorAll(<span style="color:#a50">&#39;[name=&#34;&#39;</span> + groupName + <span style="color:#a50">&#39;&#34;]:checked&#39;</span>);
+  <span style="color:#00a">var</span> vals = [];
+  <span style="color:#00a">var</span> i, len;
+  <span style="color:#00a">for</span> (i = <span style="color:#099">0</span>, len = elems.length; i &lt; len; i++) {
+    vals.push(elems[i].value);
   }
-  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">vals</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">vals</span>.<span style="color:#a6e22e">join</span>(<span style="color:#e6db74">&#39; &#39;</span>) <span style="color:#f92672">:</span> <span style="color:#66d9ef">undefined</span>;
+  <span style="color:#00a">return</span> vals.length ? vals.join(<span style="color:#a50">&#39; &#39;</span>) : <span style="color:#00a">undefined</span>;
 } 
 </code></pre></div>
 <p><strong>Description</strong>: This returns a concatenated string of all the checked item values within the group with name <em>groupName</em>. An example would be e.g. &ldquo;breakfast lunch&rdquo;, where the user chooses which meals they always eat out of &ldquo;breakfast&rdquo;, &ldquo;lunch&rdquo;, and &ldquo;dinner&rdquo;.</p>
 <p>To return just the plain Array, so that you can process it further in the Tag which calls this Variable, change the <code>return</code> statement to:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">return</span> <span style="color:#a6e22e">vals</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">vals</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">undefined</span>;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">return</span> vals.length ? vals : <span style="color:#00a">undefined</span>;
 </code></pre></div>
 <p>If you want to get the values in a multiple selection list, use the following script. It returns the results in a concatenated string again, but by following the tip in the previous paragraph you can return an Array instead.</p>
 <p><strong>Return selected values in a multiple selection list</strong></p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">selectList</span> <span style="color:#f92672">=</span> {{<span style="color:#a6e22e">Form</span> <span style="color:#a6e22e">Element</span>}}.<span style="color:#a6e22e">querySelector</span>(<span style="color:#e6db74">&#39;#selectListId&#39;</span>);
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">options</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">selectList</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">selectList</span>.<span style="color:#a6e22e">options</span> <span style="color:#f92672">:</span> [];
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">vals</span> <span style="color:#f92672">=</span> [];
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">len</span>;
-  <span style="color:#66d9ef">for</span> (<span style="color:#a6e22e">i</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>, <span style="color:#a6e22e">len</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">options</span>.<span style="color:#a6e22e">length</span>; <span style="color:#a6e22e">i</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">len</span>; <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span>) {
-    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">options</span>[<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">selected</span>) {
-      <span style="color:#a6e22e">vals</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">options</span>[<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">value</span>);
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() {
+  <span style="color:#00a">var</span> selectList = {{Form Element}}.querySelector(<span style="color:#a50">&#39;#selectListId&#39;</span>);
+  <span style="color:#00a">var</span> options = selectList ? selectList.options : [];
+  <span style="color:#00a">var</span> vals = [];
+  <span style="color:#00a">var</span> i, len;
+  <span style="color:#00a">for</span> (i = <span style="color:#099">0</span>, len = options.length; i &lt; len; i++) {
+    <span style="color:#00a">if</span> (options[i].selected) {
+      vals.push(options[i].value);
     }
   }
-  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">vals</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">vals</span>.<span style="color:#a6e22e">join</span>(<span style="color:#e6db74">&#39; &#39;</span>) <span style="color:#f92672">:</span> <span style="color:#66d9ef">undefined</span>;
+  <span style="color:#00a">return</span> vals.length ? vals.join(<span style="color:#a50">&#39; &#39;</span>) : <span style="color:#00a">undefined</span>;
 }
 </code></pre></div>
 <p><strong>Description</strong>: This returns a concatenated string of all the selected options in a multiple selection drop-down list, which has the ID <em>selectListId</em> and which is within the submitted form.</p>

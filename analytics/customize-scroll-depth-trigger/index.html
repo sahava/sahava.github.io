@@ -359,8 +359,8 @@
 <p>The easiest customization you can make is to track different percentages depending on the page in question. For example, on article pages in my blog I might be interested in tracking in increments of 25% of vertical depth scrolled. But on list pages and summary pages I might only be interested in knowing who scrolls down to the bottom.</p>
 <p>The <strong>Vertical Scroll Depths</strong> and <strong>Horizontal Scroll Depths</strong> fields require a number or a list of numbers (comma-separated) to work. Thus you can easily use a <strong>Custom JavaScript variable</strong> to return one list of numbers for a certain condition, and a different list of numbers for some other condition.</p>
 <p>For example, here's a Custom JavaScript variable that does what I described in the first paragraph of this chapter.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
-  <span style="color:#66d9ef">return</span> {{<span style="color:#a6e22e">Page</span> <span style="color:#a6e22e">Path</span>}}.<span style="color:#a6e22e">indexOf</span>(<span style="color:#e6db74">&#39;/analytics/&#39;</span>) <span style="color:#f92672">&gt;</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span> <span style="color:#f92672">?</span> <span style="color:#e6db74">&#39;25,50,75,100&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;75,100&#39;</span>;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() {
+  <span style="color:#00a">return</span> {{Page Path}}.indexOf(<span style="color:#a50">&#39;/analytics/&#39;</span>) &gt; -<span style="color:#099">1</span> ? <span style="color:#a50">&#39;25,50,75,100&#39;</span> : <span style="color:#a50">&#39;75,100&#39;</span>;
 }
 </code></pre></div>
 <p>This variable returns the string <code>25,50,75,100</code> if the page URL contains <code>/analytics/</code>, and <code>75,100</code> otherwise. Thus, on blog pages, it will measure scroll depth in increments of 25 percent, but on other pages only scrolling up to 75% and 100% in depth.</p>
@@ -419,8 +419,8 @@
 <p>As you can see, there's no <a href="https://www.simoahava.com/gtm-tips/enable-fire-triggers-google-tag-manager/">&ldquo;Enable when&hellip;&quot;</a> option on the Scroll Depth trigger, similar to what you might see with a Just Links trigger, for example. Thus you might be tempted to think that there's no way to prevent those pesky <code>gtm.scrollDepth</code> events from populating the <code>dataLayer</code> on pages where you are not interested in tracking scroll depths.</p>
 <p>However, there's a very easy hack to make sure the trigger doesn't push anything to <code>dataLayer</code>. Just set the percentage threshold to <code>101</code>. It's impossible to scroll to 101% length of the page, so by setting the threshold to this you'll deactivate the trigger, effectively.</p>
 <p>Thus you could modify #2 above by putting the following Custom JavaScript variable into the <strong>Percentages</strong> field of the trigger:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
-  <span style="color:#66d9ef">return</span> {{<span style="color:#a6e22e">Page</span> <span style="color:#a6e22e">Path</span>}}.<span style="color:#a6e22e">indexOf</span>(<span style="color:#e6db74">&#39;/analytics/&#39;</span>) <span style="color:#f92672">&gt;</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span> <span style="color:#f92672">?</span> <span style="color:#e6db74">&#39;25,50,75,100&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;101&#39;</span>;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() {
+  <span style="color:#00a">return</span> {{Page Path}}.indexOf(<span style="color:#a50">&#39;/analytics/&#39;</span>) &gt; -<span style="color:#099">1</span> ? <span style="color:#a50">&#39;25,50,75,100&#39;</span> : <span style="color:#a50">&#39;101&#39;</span>;
 }
 </code></pre></div>
 <p>This sets the thresholds to &lsquo;25,50,75,100&rsquo; on pages where the URL contains <strong>/analytics/</strong>, and &lsquo;101&rsquo; elsewhere.</p>
@@ -445,24 +445,24 @@
 <p>The higher the ratio between the height of the visible viewport and the height of the page, the less there is to scroll. For example, if the visible viewport is 400 pixels in height, and the page height is also 400 pixels, there is nothing to scroll. The entire page will be visible in the viewport, and any vertical thresholds you have defined in the Scroll Depth trigger will auto-fire.</p>
 <p>So, if you want to only fire the trigger when the user actually scrolls to 25%, 50%, 75%, and 100%, you need to make sure the ratio between the visible viewport height and the page height is <em>less than 0.25</em>. This means that less than 25% of the page is visible in the browser viewport.</p>
 <p>To do this, you need to create a <strong>Custom JavaScript variable</strong> that looks like this:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
-  <span style="color:#75715e">// Change this to reflect the percentages or pixels you want to fire the trigger for
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">verticalScrollDepths</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;25,50,75,100&#39;</span>;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() {
+  <span style="color:#aaa;font-style:italic">// Change this to reflect the percentages or pixels you want to fire the trigger for
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#00a">var</span> verticalScrollDepths = <span style="color:#a50">&#39;25,50,75,100&#39;</span>;
   
-  <span style="color:#75715e">// Change this to the MAXIMUM ratio of viewport height / page height you want the trigger to activate for
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">maximumRatio</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.25</span>;
+  <span style="color:#aaa;font-style:italic">// Change this to the MAXIMUM ratio of viewport height / page height you want the trigger to activate for
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#00a">var</span> maximumRatio = <span style="color:#099">0.25</span>;
   
-  <span style="color:#75715e">// Change this to what thresholds should be tracked if the ratio is more than the maximum
-</span><span style="color:#75715e"></span>  <span style="color:#75715e">// Leave it at &#39;101&#39; if you want to prevent the trigger from functioning in this case
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">fallbackDepths</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;101&#39;</span>;
+  <span style="color:#aaa;font-style:italic">// Change this to what thresholds should be tracked if the ratio is more than the maximum
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#aaa;font-style:italic">// Leave it at &#39;101&#39; if you want to prevent the trigger from functioning in this case
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#00a">var</span> fallbackDepths = <span style="color:#a50">&#39;101&#39;</span>;
   
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">heightOfPage</span> <span style="color:#f92672">=</span> Math.<span style="color:#a6e22e">max</span>(document.<span style="color:#a6e22e">body</span>.<span style="color:#a6e22e">scrollHeight</span>, document.<span style="color:#a6e22e">body</span>.<span style="color:#a6e22e">offsetHeight</span>, document.<span style="color:#a6e22e">documentElement</span>.<span style="color:#a6e22e">clientHeight</span>, document.<span style="color:#a6e22e">documentElement</span>.<span style="color:#a6e22e">scrollHeight</span>, document.<span style="color:#a6e22e">documentElement</span>.<span style="color:#a6e22e">offsetHeight</span>);
+  <span style="color:#00a">var</span> heightOfPage = <span style="color:#0aa">Math</span>.max(<span style="color:#0aa">document</span>.body.scrollHeight, <span style="color:#0aa">document</span>.body.offsetHeight, <span style="color:#0aa">document</span>.documentElement.clientHeight, <span style="color:#0aa">document</span>.documentElement.scrollHeight, <span style="color:#0aa">document</span>.documentElement.offsetHeight);
   
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">heightOfViewport</span> <span style="color:#f92672">=</span> Math.<span style="color:#a6e22e">max</span>(document.<span style="color:#a6e22e">documentElement</span>.<span style="color:#a6e22e">clientHeight</span>, window.<span style="color:#a6e22e">innerHeight</span>);
+  <span style="color:#00a">var</span> heightOfViewport = <span style="color:#0aa">Math</span>.max(<span style="color:#0aa">document</span>.documentElement.clientHeight, <span style="color:#0aa">window</span>.innerHeight);
   
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">ratio</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">heightOfViewport</span> <span style="color:#f92672">/</span> <span style="color:#a6e22e">heightOfPage</span>;
+  <span style="color:#00a">var</span> ratio = heightOfViewport / heightOfPage;
   
-  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ratio</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">maximumRatio</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">verticalScrollDepths</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">fallbackDepths</span>;
+  <span style="color:#00a">return</span> ratio &lt; maximumRatio ? verticalScrollDepths : fallbackDepths;
 }
 </code></pre></div>
 <p>First thing you'll need to do is edit the <code>verticalScrollDepths</code> variable to reflect the list of thresholds you want to track if the page passes the ratio check.</p>
@@ -492,25 +492,25 @@
 
 <p>As you can see, the total height of the element is <strong>1200 pixels</strong>. If I want to track scroll depth increments of 33%, it means that the respective marks are at 400, 800, and 1200 pixels. Since the top of the content element is exactly <strong>250 pixels</strong> from the top of the page, I need to add this number to the thresholds before I feed it into the Scroll Depth trigger, because it measures everything counting from the top of the page. Thus the final pixel depths would be <strong>650</strong>, <strong>1050</strong>, and <strong>1450</strong> pixels.</p>
 <p>Now, since we don't want to hard-code these into the trigger, as that would lead to a horrible mess to manage (every single page would need its own trigger), we can use a <strong>Custom JavaScript variable</strong> to dynamically calculate the pixel depths.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
-  <span style="color:#75715e">// Change the contents of this array to reflect the percentages of scroll depth you want to track
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">verticalPercentages</span> <span style="color:#f92672">=</span> [<span style="color:#ae81ff">25</span>,<span style="color:#ae81ff">50</span>,<span style="color:#ae81ff">75</span>,<span style="color:#ae81ff">100</span>];
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() {
+  <span style="color:#aaa;font-style:italic">// Change the contents of this array to reflect the percentages of scroll depth you want to track
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#00a">var</span> verticalPercentages = [<span style="color:#099">25</span>,<span style="color:#099">50</span>,<span style="color:#099">75</span>,<span style="color:#099">100</span>];
   
-  <span style="color:#75715e">// Change this to fetch the element you want to track scrolling in
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">targetElement</span> <span style="color:#f92672">=</span> document.<span style="color:#a6e22e">querySelector</span>(<span style="color:#e6db74">&#39;div.post-content .main-content-wrap&#39;</span>);
+  <span style="color:#aaa;font-style:italic">// Change this to fetch the element you want to track scrolling in
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#00a">var</span> targetElement = <span style="color:#0aa">document</span>.querySelector(<span style="color:#a50">&#39;div.post-content .main-content-wrap&#39;</span>);
   
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">elementHeight</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">targetElement</span>.<span style="color:#a6e22e">offsetHeight</span>;
+  <span style="color:#00a">var</span> elementHeight = targetElement.offsetHeight;
   
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">totalOffsetTop</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+  <span style="color:#00a">var</span> totalOffsetTop = <span style="color:#099">0</span>;
   
-  <span style="color:#66d9ef">while</span> (<span style="color:#a6e22e">targetElement</span>) {
-    <span style="color:#a6e22e">totalOffsetTop</span> <span style="color:#f92672">+=</span> (<span style="color:#a6e22e">targetElement</span>.<span style="color:#a6e22e">offsetTop</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">targetElement</span>.<span style="color:#a6e22e">scrollTop</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">targetElement</span>.<span style="color:#a6e22e">clientTop</span>);
-    <span style="color:#a6e22e">targetElement</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">targetElement</span>.<span style="color:#a6e22e">offsetParent</span>;
+  <span style="color:#00a">while</span> (targetElement) {
+    totalOffsetTop += (targetElement.offsetTop - targetElement.scrollTop + targetElement.clientTop);
+    targetElement = targetElement.offsetParent;
   }
   
-  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">verticalPercentages</span>.<span style="color:#a6e22e">map</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">percentage</span>) {
-    <span style="color:#66d9ef">return</span> parseInt(<span style="color:#a6e22e">elementHeight</span> <span style="color:#f92672">*</span> (<span style="color:#a6e22e">percentage</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">0.01</span>) <span style="color:#f92672">+</span> <span style="color:#a6e22e">totalOffsetTop</span>);
-  }).<span style="color:#a6e22e">join</span>();
+  <span style="color:#00a">return</span> verticalPercentages.map(<span style="color:#00a">function</span>(percentage) {
+    <span style="color:#00a">return</span> <span style="color:#0aa">parseInt</span>(elementHeight * (percentage * <span style="color:#099">0.01</span>) + totalOffsetTop);
+  }).join();
 }
 </code></pre></div>
 <p>You'd then need to add this variable reference to the <strong>Pixel</strong> field in the Vertical Scroll Depths selection of the trigger:</p>
@@ -538,35 +538,35 @@
 <p>What this also means is that any variables you use to determine the height of the content and, subsequently, what the respective percentages actually reflect, can change from one trigger event to the next. Thus, in order to get the <em>actual</em> percentages used by the Scroll Depth trigger, we'll need to do something that I've <a href="https://www.simoahava.com/analytics/100-google-tag-manager-learnings/#76-should-avoid-side-effects">repeatedly</a> instructed to avoid at all costs: implement a side effect in the Custom JavaScript variable.</p>
 <p>Basically, we'll need to store the scroll thresholds in a <strong>global</strong> variable when the Custom JavaScript variable is first run. After the initial run, we'll always pull whatever was stored in the global variable instead of generating a new set each time the variable is invoked. This way, any triggers and tags that use the thresholds will always access the same values, even if they might be off a bit from what the content thresholds <em>actually</em> are.</p>
 <p>The modification looks like this:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() {
   
-  <span style="color:#66d9ef">if</span> (<span style="color:#66d9ef">typeof</span> window.<span style="color:#a6e22e">_gtm_scroll_set</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#39;undefined&#39;</span>) {
+  <span style="color:#00a">if</span> (<span style="color:#00a">typeof</span> <span style="color:#0aa">window</span>._gtm_scroll_set === <span style="color:#a50">&#39;undefined&#39;</span>) {
     
-    <span style="color:#75715e">// Change the contents of this array to reflect the percentages of scroll depth you want to track
-</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">verticalPercentages</span> <span style="color:#f92672">=</span> [<span style="color:#ae81ff">25</span>,<span style="color:#ae81ff">50</span>,<span style="color:#ae81ff">75</span>,<span style="color:#ae81ff">100</span>];
+    <span style="color:#aaa;font-style:italic">// Change the contents of this array to reflect the percentages of scroll depth you want to track
+</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">var</span> verticalPercentages = [<span style="color:#099">25</span>,<span style="color:#099">50</span>,<span style="color:#099">75</span>,<span style="color:#099">100</span>];
   
-    <span style="color:#75715e">// Change this to fetch the element you want to track scrolling in
-</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">targetElement</span> <span style="color:#f92672">=</span> document.<span style="color:#a6e22e">querySelector</span>(<span style="color:#e6db74">&#39;div.post-content .main-content-wrap&#39;</span>);
+    <span style="color:#aaa;font-style:italic">// Change this to fetch the element you want to track scrolling in
+</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">var</span> targetElement = <span style="color:#0aa">document</span>.querySelector(<span style="color:#a50">&#39;div.post-content .main-content-wrap&#39;</span>);
   
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">elementHeight</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">targetElement</span>.<span style="color:#a6e22e">offsetHeight</span>;
+    <span style="color:#00a">var</span> elementHeight = targetElement.offsetHeight;
   
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">totalOffsetTop</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+    <span style="color:#00a">var</span> totalOffsetTop = <span style="color:#099">0</span>;
   
-    <span style="color:#66d9ef">while</span> (<span style="color:#a6e22e">targetElement</span>) {
-      <span style="color:#a6e22e">totalOffsetTop</span> <span style="color:#f92672">+=</span> (<span style="color:#a6e22e">targetElement</span>.<span style="color:#a6e22e">offsetTop</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">targetElement</span>.<span style="color:#a6e22e">scrollTop</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">targetElement</span>.<span style="color:#a6e22e">clientTop</span>);
-      <span style="color:#a6e22e">targetElement</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">targetElement</span>.<span style="color:#a6e22e">offsetParent</span>;
+    <span style="color:#00a">while</span> (targetElement) {
+      totalOffsetTop += (targetElement.offsetTop - targetElement.scrollTop + targetElement.clientTop);
+      targetElement = targetElement.offsetParent;
     }
     
-    window.<span style="color:#a6e22e">_gtm_scroll_set</span> <span style="color:#f92672">=</span> {
-      <span style="color:#a6e22e">thresholds</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">verticalPercentages</span>.<span style="color:#a6e22e">map</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">percentage</span>) {
-          <span style="color:#66d9ef">return</span> parseInt(<span style="color:#a6e22e">elementHeight</span> <span style="color:#f92672">*</span> (<span style="color:#a6e22e">percentage</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">0.01</span>) <span style="color:#f92672">+</span> <span style="color:#a6e22e">totalOffsetTop</span>);
-        }).<span style="color:#a6e22e">join</span>(),
-      <span style="color:#a6e22e">percentages</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">verticalPercentages</span>
+    <span style="color:#0aa">window</span>._gtm_scroll_set = {
+      thresholds: verticalPercentages.map(<span style="color:#00a">function</span>(percentage) {
+          <span style="color:#00a">return</span> <span style="color:#0aa">parseInt</span>(elementHeight * (percentage * <span style="color:#099">0.01</span>) + totalOffsetTop);
+        }).join(),
+      percentages: verticalPercentages
     };
     
   }
   
-  <span style="color:#66d9ef">return</span> window.<span style="color:#a6e22e">_gtm_scroll_set</span>.<span style="color:#a6e22e">thresholds</span>;
+  <span style="color:#00a">return</span> <span style="color:#0aa">window</span>._gtm_scroll_set.thresholds;
 }
 </code></pre></div>
 <p>As you can see, we populate a global variable <code>window._gtm_scroll_set</code> with an object that contains two properties:</p>
@@ -579,21 +579,21 @@
 </li>
 </ul>
 <p>Now that we know what the thresholds are, what the percentages are, and we can trust that the same thresholds are returned whenever this Custom JavaScript variable is invoked, we can create <strong>another</strong> Custom JavaScript variable whose only job is to return which percentage the user scrolled past when the trigger fired. This is what that variable looks like:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
-  <span style="color:#66d9ef">if</span> (<span style="color:#66d9ef">typeof</span> window.<span style="color:#a6e22e">_gtm_scroll_set</span> <span style="color:#f92672">!==</span> <span style="color:#e6db74">&#39;undefined&#39;</span>) {
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() {
+  <span style="color:#00a">if</span> (<span style="color:#00a">typeof</span> <span style="color:#0aa">window</span>._gtm_scroll_set !== <span style="color:#a50">&#39;undefined&#39;</span>) {
     
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">percentages</span> <span style="color:#f92672">=</span> window.<span style="color:#a6e22e">_gtm_scroll_set</span>.<span style="color:#a6e22e">percentages</span>;
+    <span style="color:#00a">var</span> percentages = <span style="color:#0aa">window</span>._gtm_scroll_set.percentages;
   
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">thresholds</span> <span style="color:#f92672">=</span> window.<span style="color:#a6e22e">_gtm_scroll_set</span>.<span style="color:#a6e22e">thresholds</span>.<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#39;,&#39;</span>).<span style="color:#a6e22e">map</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">t</span>) {
-      <span style="color:#66d9ef">return</span> parseInt(<span style="color:#a6e22e">t</span>);
+    <span style="color:#00a">var</span> thresholds = <span style="color:#0aa">window</span>._gtm_scroll_set.thresholds.split(<span style="color:#a50">&#39;,&#39;</span>).map(<span style="color:#00a">function</span>(t) {
+      <span style="color:#00a">return</span> <span style="color:#0aa">parseInt</span>(t);
     });
     
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">crossedIndex</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">thresholds</span>.<span style="color:#a6e22e">indexOf</span>({{<span style="color:#a6e22e">Scroll</span> <span style="color:#a6e22e">Depth</span> <span style="color:#a6e22e">Threshold</span>}});
+    <span style="color:#00a">var</span> crossedIndex = thresholds.indexOf({{Scroll Depth Threshold}});
 
-    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">percentages</span>[<span style="color:#a6e22e">crossedIndex</span>];
+    <span style="color:#00a">return</span> percentages[crossedIndex];
   
   }
-  <span style="color:#66d9ef">return</span> {{<span style="color:#a6e22e">Scroll</span> <span style="color:#a6e22e">Depth</span> <span style="color:#a6e22e">Threshold</span>}};
+  <span style="color:#00a">return</span> {{Scroll Depth Threshold}};
 }
 </code></pre></div>
 <p>This Custom JavaScript variable checks which threshold was returned by {{Scroll Depth Threshold}}, and returns the respective percentage value.</p>

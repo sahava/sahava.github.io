@@ -348,42 +348,42 @@
 <p>We'll use the Variable in the <code>hitCallback</code> field of the very first Tag that fires on your site (should be the Page View Tag). This callback function will reload any iframe of your choice with linker parameters, meaning the Tags in the iframe will run nicely as part of the ongoing session.</p>
 <p><strong>Linker parameter</strong> is basically your browser's unique client ID (with some other stuff), attached as a query parameter to the iframe <code>src</code> value. This is then picked up by the tracker in the iframe and used to recreate the <strong>_ga</strong> cookie in the iframe. That's how Google Analytics&rsquo; cross-domain hack works!</p>
 <p>So, to get started, create a new Custom JavaScript Variable, and name it intelligently. I've used <strong>{{JS - hitCallback for X-Dom iframe}}</strong>, but you can use something less poetic if you wish. Here's what it looks like:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
-  <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">function</span>() {
-    <span style="color:#66d9ef">try</span> { 
-      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">gobj</span> <span style="color:#f92672">=</span> window[window.<span style="color:#a6e22e">GoogleAnalyticsObject</span>];
-      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">iframe</span> <span style="color:#f92672">=</span> document.<span style="color:#a6e22e">querySelector</span>(<span style="color:#e6db74">&#39;#myIframe&#39;</span>);
-      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">tracker</span>, <span style="color:#a6e22e">linker</span>;
-      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">gobj</span>) {
-        <span style="color:#a6e22e">tracker</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">gobj</span>.<span style="color:#a6e22e">getAll</span>()[<span style="color:#ae81ff">0</span>];
-        <span style="color:#a6e22e">linker</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> window.<span style="color:#a6e22e">gaplugins</span>.<span style="color:#a6e22e">Linker</span>(<span style="color:#a6e22e">tracker</span>);
-        <span style="color:#a6e22e">iframe</span>.<span style="color:#a6e22e">src</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">linker</span>.<span style="color:#a6e22e">decorate</span>(<span style="color:#a6e22e">iframe</span>.<span style="color:#a6e22e">src</span>);
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() {
+  <span style="color:#00a">return</span> <span style="color:#00a">function</span>() {
+    <span style="color:#00a">try</span> { 
+      <span style="color:#00a">var</span> gobj = <span style="color:#0aa">window</span>[<span style="color:#0aa">window</span>.GoogleAnalyticsObject];
+      <span style="color:#00a">var</span> iframe = <span style="color:#0aa">document</span>.querySelector(<span style="color:#a50">&#39;#myIframe&#39;</span>);
+      <span style="color:#00a">var</span> tracker, linker;
+      <span style="color:#00a">if</span> (gobj) {
+        tracker = gobj.getAll()[<span style="color:#099">0</span>];
+        linker = <span style="color:#00a">new</span> <span style="color:#0aa">window</span>.gaplugins.Linker(tracker);
+        iframe.src = linker.decorate(iframe.src);
       }
-    } <span style="color:#66d9ef">catch</span>(<span style="color:#a6e22e">e</span>) {}
+    } <span style="color:#00a">catch</span>(e) {}
   }
 }
 </code></pre></div>
 <p>So, time for a line-by-line walkthrough.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() { ... }
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() { ... }
 </code></pre></div>
 <p>On the first line, you're declaring a basic GTM JavaScript function, which needs to be an anonymous function. Nothing special here, moving on.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">return</span> <span style="color:#66d9ef">function</span>() { ... }
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">return</span> <span style="color:#00a">function</span>() { ... }
 </code></pre></div>
 <p>Next, you're <em>returning</em> another function, as <code>hitCallback</code> requires a function as a parameter for it to work correctly. Also, by returning a function, we're avoiding unsolicited side effects which would result if you just executed global DOM methods in the outer function. Since we're operating in a closure, we're restricting the execution of this function to only the single time it's called, which is when the <code>hitCallback</code> is executed at the end of the Google Analytics payload dispatch process.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">try</span> { ... } <span style="color:#66d9ef">catch</span>(<span style="color:#a6e22e">e</span>) {}
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">try</span> { ... } <span style="color:#00a">catch</span>(e) {}
 </code></pre></div>
 <p>We're wrapping the code with a <code>try...catch</code> because that's simply a good practice. You can add some debugging code into the <code>catch(e) {}</code> block if you wish, but I usually just let it sizzle down silently.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">gobj</span> <span style="color:#f92672">=</span> window[window.<span style="color:#a6e22e">GoogleAnalyticsObject</span>];
-<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">iframe</span> <span style="color:#f92672">=</span> document.<span style="color:#a6e22e">querySelector</span>(<span style="color:#e6db74">&#39;#myIframe&#39;</span>);
-<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">tracker</span>, <span style="color:#a6e22e">linker</span>;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">var</span> gobj = <span style="color:#0aa">window</span>[<span style="color:#0aa">window</span>.GoogleAnalyticsObject];
+<span style="color:#00a">var</span> iframe = <span style="color:#0aa">document</span>.querySelector(<span style="color:#a50">&#39;#myIframe&#39;</span>);
+<span style="color:#00a">var</span> tracker, linker;
 </code></pre></div>
 <p>The following three lines setup some variables. First, we're setting <code>gobj</code> to the global Google Analytics function name. This is again just a good practice, since there are cases where you want to change the function name from <code>ga</code> to something else. With this one-liner, we're making sure we're always referring to the correct object.</p>
 <p>The next line is important. This is where you'll <strong>retrieve the iframe element you want to modify</strong>. I'm using a simple CSS selector to find my iframe (an element with the ID <code>myIframe</code>), so remember to change it to reflect whatever you want to target. You can run this code on multiple iframes if you wish. You just need to loop through each iframe, and run the <code>linker.decorate()</code> method on each.</p>
 <p>We're also declaring <code>tracker</code> and <code>linker</code> as utility variables, which we'll use in a bit.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">gobj</span>) {
-  <span style="color:#a6e22e">tracker</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">gobj</span>.<span style="color:#a6e22e">getAll</span>()[<span style="color:#ae81ff">0</span>];
-  <span style="color:#a6e22e">linker</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> window.<span style="color:#a6e22e">gaplugins</span>.<span style="color:#a6e22e">Linker</span>(<span style="color:#a6e22e">tracker</span>);
-  <span style="color:#a6e22e">iframe</span>.<span style="color:#a6e22e">src</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">linker</span>.<span style="color:#a6e22e">decorate</span>(<span style="color:#a6e22e">iframe</span>.<span style="color:#a6e22e">src</span>);
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">if</span> (gobj) {
+  tracker = gobj.getAll()[<span style="color:#099">0</span>];
+  linker = <span style="color:#00a">new</span> <span style="color:#0aa">window</span>.gaplugins.Linker(tracker);
+  iframe.src = linker.decorate(iframe.src);
 }
 </code></pre></div>
 <p>The final part of the code is where the magic happens. Checking for the existence of the global Google Analytics object is just another good practice you might want to employ.</p>

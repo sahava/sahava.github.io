@@ -381,12 +381,12 @@
 <h2 id="5-snippet-based-vs-tag-based-tracking">5. Snippet-based vs. Tag-based tracking</h2>
 <p>When you create your Google Analytics tracker using the given <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/?hl=en">snippet</a>, you have the option of providing a <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/creating-trackers#naming_trackers">tracker name</a> vs. using the default name.</p>
 <p>For example, if you want to name the tracker <strong>SuperTracker</strong>, you'd use the following syntax in the tracker creation command:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">ga</span>(<span style="color:#e6db74">&#39;create&#39;</span>, <span style="color:#e6db74">&#39;UA-12345-1&#39;</span>, {<span style="color:#e6db74">&#39;name&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;SuperTracker&#39;</span>});
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">ga(<span style="color:#a50">&#39;create&#39;</span>, <span style="color:#a50">&#39;UA-12345-1&#39;</span>, {<span style="color:#a50">&#39;name&#39;</span> : <span style="color:#a50">&#39;SuperTracker&#39;</span>});
 </code></pre></div>
 <p>This would give the tracker a name, after which you interact with it by prefixing all commands sent to the <code>ga()</code> queue with the tracker name: <code>ga('SuperTracker.send', 'pageview);</code>.</p>
 <p>If you <strong>don't</strong> provide a tracker name, you can use the naked <code>ga('send',...)</code> syntax, where you don't use a tracker name prefix. However, the tracker <strong>does</strong> have a name: <strong>t0</strong> (t-zero). So the following two commands do the same thing:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">ga</span>(<span style="color:#e6db74">&#39;send&#39;</span>, <span style="color:#e6db74">&#39;pageview&#39;</span>);
-<span style="color:#a6e22e">ga</span>(<span style="color:#e6db74">&#39;t0.send&#39;</span>, <span style="color:#e6db74">&#39;pageview&#39;</span>);
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">ga(<span style="color:#a50">&#39;send&#39;</span>, <span style="color:#a50">&#39;pageview&#39;</span>);
+ga(<span style="color:#a50">&#39;t0.send&#39;</span>, <span style="color:#a50">&#39;pageview&#39;</span>);
 </code></pre></div>
 <p>This is clear, yes? The reason you'd want to rename the tracker is if you're running multiple trackers on the page, or due to some very special edge cases I might or might not touch upon later in the article (I'm just making this stuff up as I go along).</p>
 <p>Now, with <strong>Google Tag Manager</strong> it's a bit different. In GTM, <em>whenever a Tag is injected</em>, i.e. whenever a Tag &ldquo;fires&rdquo; (hate that terminology as well) due to some Trigger &ldquo;firing&rdquo; as well, a <strong>new</strong> tracker is created with a random, unique name:</p>
@@ -439,7 +439,7 @@
 <p>I've covered many of these cases in my <a href="https://www.simoahava.com/gtm-tips/be-careful-with-the-tracker-name-setting/">tracker name rant</a>.</p>
 <p>The most important thing to note is that if the tracker name is shared between the snippet-based tracker and GTM's Tag, each time a new tracker is created on the page (usually via GTM) with that name, any settings it has will overwrite all the previous settings on any of the trackers.</p>
 <p>So, for example, let's say you've created the snippet-based tracker with:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">ga</span>(<span style="color:#e6db74">&#39;create&#39;</span>, <span style="color:#e6db74">&#39;UA-12345-1&#39;</span>);
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">ga(<span style="color:#a50">&#39;create&#39;</span>, <span style="color:#a50">&#39;UA-12345-1&#39;</span>);
 </code></pre></div>
 <p>And then you set the Tracker name in GTM to <em>blank</em>:</p>
 
@@ -489,12 +489,12 @@
 </li>
 </ol>
 <p>The first one is very difficult to respect, since the Google Tag Manager is downloaded asynchronously. To mitigate this, you can add this line to the <code>&lt;head&gt;</code> of each page, before any <code>ga()</code> functions are called:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
-  window[<span style="color:#e6db74">&#39;GoogleAnalyticsObject&#39;</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;ga&#39;</span>;
-  window[<span style="color:#e6db74">&#39;ga&#39;</span>] <span style="color:#f92672">=</span> window[<span style="color:#e6db74">&#39;ga&#39;</span>] <span style="color:#f92672">||</span> <span style="color:#66d9ef">function</span>() {
-    (window[<span style="color:#e6db74">&#39;ga&#39;</span>].<span style="color:#a6e22e">q</span> <span style="color:#f92672">=</span> window[<span style="color:#e6db74">&#39;ga&#39;</span>].<span style="color:#a6e22e">q</span> <span style="color:#f92672">||</span> []).<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">arguments</span>)
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+  <span style="color:#0aa">window</span>[<span style="color:#a50">&#39;GoogleAnalyticsObject&#39;</span>] = <span style="color:#a50">&#39;ga&#39;</span>;
+  <span style="color:#0aa">window</span>[<span style="color:#a50">&#39;ga&#39;</span>] = <span style="color:#0aa">window</span>[<span style="color:#a50">&#39;ga&#39;</span>] || <span style="color:#00a">function</span>() {
+    (<span style="color:#0aa">window</span>[<span style="color:#a50">&#39;ga&#39;</span>].q = <span style="color:#0aa">window</span>[<span style="color:#a50">&#39;ga&#39;</span>].q || []).push(arguments)
   };
-&lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
+&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
 <p>This is taken from the <a href="https://www.thyngster.com/how-does-the-universal-analytics-snippet-work/">Universal Analytics snippet</a>, and it basically creates a temporary data store for all <code>ga()</code> commands that exist before the <strong>analytics.js</strong> library has been created.</p>
 <p>If you take all the previous tips into account, then there should be minimal problems with combining tracking methods like this. However, it's still suboptimal, and can lead to unexpected problems due to the complexity of the code you need to manage and maintain.</p>
 <h2 id="summary">Summary</h2>

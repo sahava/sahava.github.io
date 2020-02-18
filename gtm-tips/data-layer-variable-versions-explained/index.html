@@ -359,27 +359,27 @@
 <h3 id="version-1">Version 1</h3>
 <p>Version 1 of the Data Layer Variable has a very limited reach. Basically, the key-value pair that is pushed into <code>dataLayer</code> needs to be in the root of the object, as Version 1 doesn't let you access nested keys.</p>
 <p>Here's an example of what would happen with a Version 1 Data Layer Variable that points to key name <code>'product.price'</code>:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#75715e">// Works because the dots are in the key name, and the key is in the root:
-</span><span style="color:#75715e"></span>window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
-  <span style="color:#e6db74">&#39;product.price&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;11.99&#39;</span>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#aaa;font-style:italic">// Works because the dots are in the key name, and the key is in the root:
+</span><span style="color:#aaa;font-style:italic"></span><span style="color:#0aa">window</span>.dataLayer.push({
+  <span style="color:#a50">&#39;product.price&#39;</span> : <span style="color:#a50">&#39;11.99&#39;</span>
 });
-<span style="color:#75715e">// Won&#39;t work because &#39;price&#39; is nested in the &#39;product&#39; object:
-</span><span style="color:#75715e"></span>window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
-  <span style="color:#e6db74">&#39;product&#39;</span> <span style="color:#f92672">:</span> {
-    <span style="color:#e6db74">&#39;price&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;11.99&#39;</span>
+<span style="color:#aaa;font-style:italic">// Won&#39;t work because &#39;price&#39; is nested in the &#39;product&#39; object:
+</span><span style="color:#aaa;font-style:italic"></span><span style="color:#0aa">window</span>.dataLayer.push({
+  <span style="color:#a50">&#39;product&#39;</span> : {
+    <span style="color:#a50">&#39;price&#39;</span> : <span style="color:#a50">&#39;11.99&#39;</span>
   }
 });
 </code></pre></div>
 <p>You could, though, access the nested object indirectly with a Version 1 Data Layer Variable by creating the variable for the key <code>'product'</code>, and then manipulating the returned object in a Custom HTML Tag or a Custom JavaScript Variable.</p>
 <p>And&hellip;yeah. That's all that Version 1 does. There's no merging, no special data model functions, no nothing that you can use to further manipulate the retrieved object. So let's take a look at what happens when I push two different values for the same key (<code>'product'</code>):</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
-  <span style="color:#e6db74">&#39;product&#39;</span> <span style="color:#f92672">:</span> {
-    <span style="color:#e6db74">&#39;price&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;11.99&#39;</span>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#0aa">window</span>.dataLayer.push({
+  <span style="color:#a50">&#39;product&#39;</span> : {
+    <span style="color:#a50">&#39;price&#39;</span> : <span style="color:#a50">&#39;11.99&#39;</span>
   }
 });
-window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
-  <span style="color:#e6db74">&#39;product&#39;</span> <span style="color:#f92672">:</span> {
-    <span style="color:#e6db74">&#39;name&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;Tim Duncan Fan Club Membership&#39;</span>
+<span style="color:#0aa">window</span>.dataLayer.push({
+  <span style="color:#a50">&#39;product&#39;</span> : {
+    <span style="color:#a50">&#39;name&#39;</span> : <span style="color:#a50">&#39;Tim Duncan Fan Club Membership&#39;</span>
   }
 });
 </code></pre></div>
@@ -389,31 +389,31 @@ window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">
 <p>If you want more flexibility, use Version 2 of the Data Layer Variable. This treats objects more like you'd expect if you're familiar with how JavaScript works.</p>
 <p>Instead of bulldozing over existing keys, Version 2 first checks whether a key with that name already exists in the data model. If it does, it <strong>recursively merges</strong> information in the new push with information in the existing object.</p>
 <p>Let's see an example:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
-  <span style="color:#e6db74">&#39;product&#39;</span> <span style="color:#f92672">:</span> {
-    <span style="color:#e6db74">&#39;price&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;119.99&#39;</span>,
-    <span style="color:#e6db74">&#39;category&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;Membership&#39;</span>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#0aa">window</span>.dataLayer.push({
+  <span style="color:#a50">&#39;product&#39;</span> : {
+    <span style="color:#a50">&#39;price&#39;</span> : <span style="color:#a50">&#39;119.99&#39;</span>,
+    <span style="color:#a50">&#39;category&#39;</span> : <span style="color:#a50">&#39;Membership&#39;</span>
   }
 });
-window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
-  <span style="color:#e6db74">&#39;product&#39;</span> <span style="color:#f92672">:</span> {
-    <span style="color:#e6db74">&#39;price&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;1199.99&#39;</span>,
-    <span style="color:#e6db74">&#39;name&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;Tim Duncan Fan Club Membership&#39;</span>
+<span style="color:#0aa">window</span>.dataLayer.push({
+  <span style="color:#a50">&#39;product&#39;</span> : {
+    <span style="color:#a50">&#39;price&#39;</span> : <span style="color:#a50">&#39;1199.99&#39;</span>,
+    <span style="color:#a50">&#39;name&#39;</span> : <span style="color:#a50">&#39;Tim Duncan Fan Club Membership&#39;</span>
   }
 });
 </code></pre></div>
 <p>So, let's say you're using Version 2 of the Data Layer Variable, and you're yet again pointing to the key with name <code>'product'</code>.</p>
 <p>After the first <code>dataLayer.push()</code>, the variable would return a plain object with:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">{ 
-  <span style="color:#e6db74">&#39;price&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;119.99&#39;</span>, 
-  <span style="color:#e6db74">&#39;category&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;Membership&#39;</span>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">{ 
+  <span style="color:#a50">&#39;price&#39;</span> : <span style="color:#a50">&#39;119.99&#39;</span>, 
+  <span style="color:#a50">&#39;category&#39;</span> : <span style="color:#a50">&#39;Membership&#39;</span>
 }
 </code></pre></div>
 <p>After the second push, the contents would be:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">{
-  <span style="color:#e6db74">&#39;price&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;1199.99&#39;</span>, 
-  <span style="color:#e6db74">&#39;category&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;Membership&#39;</span>, 
-  <span style="color:#e6db74">&#39;name&#39;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;Tim Duncan Fan Club Membership&#39;</span>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">{
+  <span style="color:#a50">&#39;price&#39;</span> : <span style="color:#a50">&#39;1199.99&#39;</span>, 
+  <span style="color:#a50">&#39;category&#39;</span> : <span style="color:#a50">&#39;Membership&#39;</span>, 
+  <span style="color:#a50">&#39;name&#39;</span> : <span style="color:#a50">&#39;Tim Duncan Fan Club Membership&#39;</span>
 }
 </code></pre></div>
 <p>Can you see what happened here? Another object with the same key name (<code>'product'</code>) is pushed. Version 2 of the Data Layer Variable finds an instance of this key within the data model. Then, it recursively checks each key within this object to see if there are conflicts.</p>
@@ -431,21 +431,21 @@ window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">
 </li>
 </ol>
 <p>One of the best use cases for Version 1 is with <a href="https://www.simoahava.com/analytics/enhanced-ecommerce-with-a-custom-javascript-variable/">Enhanced Ecommerce</a>. If you're using the <strong>Custom JavaScript Variable</strong> method, which I seem to use almost exclusively, you probably want to use Version 1 of the Data Layer when interacting with the <code>'ecommerce'</code> key. This way, GTM will only access the <em>most recent push</em> into <code>dataLayer</code>. And why is this significant? Take a look at the example below:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
-  <span style="color:#e6db74">&#39;ecommerce&#39;</span> <span style="color:#f92672">:</span> {
-    <span style="color:#e6db74">&#39;impressions&#39;</span> <span style="color:#f92672">:</span> [{ ... <span style="color:#a6e22e">impressions</span> ... }]
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#0aa">window</span>.dataLayer.push({
+  <span style="color:#a50">&#39;ecommerce&#39;</span> : {
+    <span style="color:#a50">&#39;impressions&#39;</span> : [{ ... impressions ... }]
   }
 });
-<span style="color:#75715e">// Later on the same page
-</span><span style="color:#75715e"></span>window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
-  <span style="color:#e6db74">&#39;ecommerce&#39;</span> <span style="color:#f92672">:</span> {
-    <span style="color:#e6db74">&#39;detail&#39;</span> <span style="color:#f92672">:</span> { ... <span style="color:#a6e22e">product</span> <span style="color:#a6e22e">detail</span> <span style="color:#a6e22e">view</span> ... }
+<span style="color:#aaa;font-style:italic">// Later on the same page
+</span><span style="color:#aaa;font-style:italic"></span><span style="color:#0aa">window</span>.dataLayer.push({
+  <span style="color:#a50">&#39;ecommerce&#39;</span> : {
+    <span style="color:#a50">&#39;detail&#39;</span> : { ... product detail view ... }
   }
 });
-<span style="color:#75715e">// And yet later on the same page
-</span><span style="color:#75715e"></span>window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
-  <span style="color:#e6db74">&#39;ecommerce&#39;</span> <span style="color:#f92672">:</span> {
-    <span style="color:#e6db74">&#39;add&#39;</span> <span style="color:#f92672">:</span> { ... <span style="color:#a6e22e">add</span> <span style="color:#a6e22e">to</span> <span style="color:#a6e22e">cart</span> <span style="color:#a6e22e">action</span> ... }
+<span style="color:#aaa;font-style:italic">// And yet later on the same page
+</span><span style="color:#aaa;font-style:italic"></span><span style="color:#0aa">window</span>.dataLayer.push({
+  <span style="color:#a50">&#39;ecommerce&#39;</span> : {
+    <span style="color:#a50">&#39;add&#39;</span> : { ... add to cart action ... }
   }
 });
 </code></pre></div>

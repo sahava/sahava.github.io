@@ -342,12 +342,12 @@
 
 <p>The way this works is that you store the initial page URL in a global variable such as <code>dataLayer</code>, and then manually set the Document Location field in all your Universal Analytics tags to use this variable.</p>
 <p>The most robust way to do this would be to have the following in the page HTML before the GTM container snippet:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">window.<span style="color:#a6e22e">dataLayer</span> <span style="color:#f92672">=</span> window.<span style="color:#a6e22e">dataLayer</span> <span style="color:#f92672">||</span> [];
-window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">push</span>({
-  <span style="color:#a6e22e">originalLocation</span><span style="color:#f92672">:</span> document.<span style="color:#a6e22e">location</span>.<span style="color:#a6e22e">protocol</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;//&#39;</span> <span style="color:#f92672">+</span>
-                    document.<span style="color:#a6e22e">location</span>.<span style="color:#a6e22e">hostname</span> <span style="color:#f92672">+</span>
-                    document.<span style="color:#a6e22e">location</span>.<span style="color:#a6e22e">pathname</span> <span style="color:#f92672">+</span>
-                    document.<span style="color:#a6e22e">location</span>.<span style="color:#a6e22e">search</span>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#0aa">window</span>.dataLayer = <span style="color:#0aa">window</span>.dataLayer || [];
+<span style="color:#0aa">window</span>.dataLayer.push({
+  originalLocation: <span style="color:#0aa">document</span>.location.protocol + <span style="color:#a50">&#39;//&#39;</span> +
+                    <span style="color:#0aa">document</span>.location.hostname +
+                    <span style="color:#0aa">document</span>.location.pathname +
+                    <span style="color:#0aa">document</span>.location.search
 });
 </code></pre></div>
 <p>This would store the original URL of the page (without #hash) into a dataLayer variable named <code>originalLocation</code>. Then, you'd add this to all your Universal Analytics tags by browsing to <strong>Fields to Set</strong> and adding a new field:</p>
@@ -358,8 +358,8 @@ window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">
 <p><strong>Field name</strong>: page<br>
 <strong>Value</strong>: {{JS - Get Page URL}}</p>
 <p>Where the variable {{JS - Get Page URL}} is a <strong>Custom JavaScript variable</strong> with:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
-  <span style="color:#66d9ef">return</span> document.<span style="color:#a6e22e">location</span>.<span style="color:#a6e22e">pathname</span> <span style="color:#f92672">+</span> document.<span style="color:#a6e22e">location</span>.<span style="color:#a6e22e">search</span>;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() {
+  <span style="color:#00a">return</span> <span style="color:#0aa">document</span>.location.pathname + <span style="color:#0aa">document</span>.location.search;
 }
 </code></pre></div>
 <p>This would send the current page pathname with any query parameters as the virtual page path dispatched with your GA Tags. Thank you <strong>Brian Clifton</strong> for pointing out that query parameters should be sent, too.)</p>
@@ -383,8 +383,8 @@ window.<span style="color:#a6e22e">dataLayer</span>.<span style="color:#a6e22e">
 <p>That way the original URL is stored into <code>dataLayer</code> before the Page View Tag fires, and is thus available for all the Universal Analytics tags that fire on the page.</p>
 <h2 id="caveat">Caveat</h2>
 <p>If you're pushing the <code>originalLocation</code> via GTM and not the page template, there might be a race condition between when the <code>originalLocation</code> variable is pushed into <code>dataLayer</code>, and when Tags try to access it. In these cases, analytics.js does <em>not</em> default to the current URL, resulting in a <strong>missing Document Location field</strong>! To fix this, instead of adding <code>{{Data Layer Variable - originalLocation}}</code> directly to the <strong>location</strong> field in your GA Tags, you might want to add a Custom JavaScript Variable instead:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span>() {
-  <span style="color:#66d9ef">return</span> {{<span style="color:#a6e22e">Data</span> <span style="color:#a6e22e">Layer</span> <span style="color:#a6e22e">Variable</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">originalLocation</span>}} <span style="color:#f92672">||</span> window.<span style="color:#a6e22e">location</span>.<span style="color:#a6e22e">protocol</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;//&#39;</span> <span style="color:#f92672">+</span> window.<span style="color:#a6e22e">location</span>.<span style="color:#a6e22e">hostname</span> <span style="color:#f92672">+</span> window.<span style="color:#a6e22e">location</span>.<span style="color:#a6e22e">pathname</span> <span style="color:#f92672">+</span> window.<span style="color:#a6e22e">location</span>.<span style="color:#a6e22e">search</span>;
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() {
+  <span style="color:#00a">return</span> {{Data Layer Variable - originalLocation}} || <span style="color:#0aa">window</span>.location.protocol + <span style="color:#a50">&#39;//&#39;</span> + <span style="color:#0aa">window</span>.location.hostname + <span style="color:#0aa">window</span>.location.pathname + <span style="color:#0aa">window</span>.location.search;
 }
 </code></pre></div>
 <p>This returns either <code>{{Data Layer Variable - originalLocation}}</code> or, if that hasn't been set yet, the current URL without hash.</p>

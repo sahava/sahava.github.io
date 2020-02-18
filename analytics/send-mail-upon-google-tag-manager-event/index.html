@@ -381,18 +381,18 @@ Data Layer Variable Name: gtm.errorLineNumber</p>
 </ol>
 <p>The Custom HTML Tag below uses <a href="http://www.jquery.com">jQuery</a> to send the POST request, so you'll need to make sure that jQuery is loaded <strong>before</strong> the Custom HTML is run. I'm not a huge fan of jQuery or really any JS framework stacked on top of GTM, but for making POST requests using AJAX, it's a huge help.</p>
 <p>So anyway, here's what the Custom HTML Tag looks like:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">data</span> <span style="color:#f92672">=</span> {
-    <span style="color:#a6e22e">errorUrl</span><span style="color:#f92672">:</span> {{Error <span style="color:#f92672">-</span> <span style="color:#a6e22e">URL</span>}},
-    <span style="color:#a6e22e">errorLine</span><span style="color:#f92672">:</span> {{Error <span style="color:#f92672">-</span> <span style="color:#a6e22e">LINE</span>}},
-    <span style="color:#a6e22e">errorMsg</span><span style="color:#f92672">:</span> {{Error <span style="color:#f92672">-</span> <span style="color:#a6e22e">MSG</span>}}
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+  <span style="color:#00a">var</span> data = {
+    errorUrl: {{<span style="color:#0aa">Error</span> - URL}},
+    errorLine: {{<span style="color:#0aa">Error</span> - LINE}},
+    errorMsg: {{<span style="color:#0aa">Error</span> - MSG}}
   };
-  <span style="color:#a6e22e">jQuery</span>.<span style="color:#a6e22e">ajax</span>({
-    <span style="color:#a6e22e">type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;POST&#34;</span>,
-    <span style="color:#a6e22e">url</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;/wp-content/uploads/email.php&#34;</span>,
-    <span style="color:#a6e22e">data</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">data</span>
+  jQuery.ajax({
+    type: <span style="color:#a50">&#34;POST&#34;</span>,
+    url: <span style="color:#a50">&#34;/wp-content/uploads/email.php&#34;</span>,
+    data: data
   });
-&lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
+&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
 <p>Like I said, it's really bare-bones. You should add some validation code, maybe utilize the <em>success</em>, <em>error</em> and <em>complete</em> callbacks and so forth.</p>
 <p>The first bit is about building the payload. I'm doing that by creating an object literal, which is populated by the values retrieved by the error macros created earlier. So when an error occurs, the object <strong>data</strong> might have the following key-value pairs:</p>
 <p>errorUrl: <code>https://www.simoahava.com/</code><br>
@@ -400,14 +400,14 @@ errorLine: &ldquo;3&rdquo;<br>
 errorMsg: &ldquo;Uncaught ReferenceError: myFunction is not defined&rdquo;</p>
 <p>The next bit is about using jQuery's ajax() function to send the data with a POST request to the custom PHP script. You'll need to specify the location of the script for this to work.</p>
 <p>I wrote a <em>very</em> simple mail script, which you can find below. Save this as <strong>email.php</strong> and store it in a location you can refer to in the POST request.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-php" data-lang="php"><span style="color:#75715e">&lt;?php</span>
-<span style="color:#66d9ef">if</span>($_POST){
-  $message <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Uncaught exception on page &#39;</span> <span style="color:#f92672">.</span> $_POST[<span style="color:#e6db74">&#39;errorUrl&#39;</span>] <span style="color:#f92672">.</span> 
-             <span style="color:#e6db74">&#39;, line &#39;</span> <span style="color:#f92672">.</span> $_POST[<span style="color:#e6db74">&#39;errorLine&#39;</span>] <span style="color:#f92672">.</span> 
-             <span style="color:#e6db74">&#39;: &#39;</span> <span style="color:#f92672">.</span> $_POST[<span style="color:#e6db74">&#39;errorMsg&#39;</span>];
-  <span style="color:#a6e22e">mail</span>(<span style="color:#e6db74">&#34;XYZ@XYZ.com&#34;</span>, <span style="color:#e6db74">&#34;[GTM simoahava.com] Uncaught error&#34;</span>, $message);
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-php" data-lang="php"><span style="color:#4c8317">&lt;?php</span>
+<span style="color:#00a">if</span>(<span style="color:#a00">$_POST</span>){
+  <span style="color:#a00">$message</span> = <span style="color:#a50">&#39;Uncaught exception on page &#39;</span> . <span style="color:#a00">$_POST</span>[<span style="color:#a50">&#39;errorUrl&#39;</span>] . 
+             <span style="color:#a50">&#39;, line &#39;</span> . <span style="color:#a00">$_POST</span>[<span style="color:#a50">&#39;errorLine&#39;</span>] . 
+             <span style="color:#a50">&#39;: &#39;</span> . <span style="color:#a00">$_POST</span>[<span style="color:#a50">&#39;errorMsg&#39;</span>];
+  mail(<span style="color:#a50">&#34;XYZ@XYZ.com&#34;</span>, <span style="color:#a50">&#34;[GTM simoahava.com] Uncaught error&#34;</span>, <span style="color:#a00">$message</span>);
 }
-<span style="color:#75715e">?&gt;</span>
+<span style="color:#4c8317">?&gt;</span>
 </code></pre></div>
 <p>Again, very simple. The PHP basically waits for a POST request, after which it populates a variable $message with the payload data. Next, it utilizes the mail() function to send mail to my email with the subject <code>[GTM simoahava.com] Uncaught error</code>, and the error data in the message body.</p>
 <p>Ta-da! You've just created your email alert system using some simple jQuery and PHP. Here's what a sample email looks like:</p>
@@ -470,33 +470,33 @@ errorMsg: &ldquo;Uncaught ReferenceError: myFunction is not defined&rdquo;</p>
 
 
 <p>And that's it for setting up your Mandrill account. What you need to do next is create the Custom HTML Tag which negotiates with the Mandrill API to send your mail. Here's what this tag should look like:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">script</span>&gt;
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">data</span> <span style="color:#f92672">=</span> {
-    <span style="color:#e6db74">&#34;key&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;IVrVuUMfhLFbY97Rjjp1ug&#34;</span>,
-    <span style="color:#e6db74">&#34;message&#34;</span><span style="color:#f92672">:</span> {
-      <span style="color:#e6db74">&#34;text&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Uncaught exception on page &#34;</span> <span style="color:#f92672">+</span> {{Error <span style="color:#f92672">-</span> <span style="color:#a6e22e">URL</span>}} <span style="color:#f92672">+</span>
-            <span style="color:#e6db74">&#34;, line &#34;</span> <span style="color:#f92672">+</span> {{Error <span style="color:#f92672">-</span> <span style="color:#a6e22e">LINE</span>}} <span style="color:#f92672">+</span>
-            <span style="color:#e6db74">&#34;: &#34;</span> <span style="color:#f92672">+</span> {{Error <span style="color:#f92672">-</span> <span style="color:#a6e22e">MSG</span>}},
-      <span style="color:#e6db74">&#34;subject&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;[GTM simoahava.com] Uncaught error&#34;</span>,
-      <span style="color:#e6db74">&#34;from_email&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;simo@simoahava.com&#34;</span><span style="color:#a6e22e">OB</span>,
-      <span style="color:#e6db74">&#34;from_name&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;GTM Simo&#34;</span>,
-      <span style="color:#e6db74">&#34;to&#34;</span><span style="color:#f92672">:</span> [
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+    <span style="color:#00a">var</span> data = {
+    <span style="color:#a50">&#34;key&#34;</span>: <span style="color:#a50">&#34;IVrVuUMfhLFbY97Rjjp1ug&#34;</span>,
+    <span style="color:#a50">&#34;message&#34;</span>: {
+      <span style="color:#a50">&#34;text&#34;</span>: <span style="color:#a50">&#34;Uncaught exception on page &#34;</span> + {{<span style="color:#0aa">Error</span> - URL}} +
+            <span style="color:#a50">&#34;, line &#34;</span> + {{<span style="color:#0aa">Error</span> - LINE}} +
+            <span style="color:#a50">&#34;: &#34;</span> + {{<span style="color:#0aa">Error</span> - MSG}},
+      <span style="color:#a50">&#34;subject&#34;</span>: <span style="color:#a50">&#34;[GTM simoahava.com] Uncaught error&#34;</span>,
+      <span style="color:#a50">&#34;from_email&#34;</span>: <span style="color:#a50">&#34;simo@simoahava.com&#34;</span>OB,
+      <span style="color:#a50">&#34;from_name&#34;</span>: <span style="color:#a50">&#34;GTM Simo&#34;</span>,
+      <span style="color:#a50">&#34;to&#34;</span>: [
         {
-          <span style="color:#e6db74">&#34;email&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;simo@simoahava.com&#34;</span>,
-          <span style="color:#e6db74">&#34;name&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Simo Ahava&#34;</span>,
-          <span style="color:#e6db74">&#34;type&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;to&#34;</span>
+          <span style="color:#a50">&#34;email&#34;</span>: <span style="color:#a50">&#34;simo@simoahava.com&#34;</span>,
+          <span style="color:#a50">&#34;name&#34;</span>: <span style="color:#a50">&#34;Simo Ahava&#34;</span>,
+          <span style="color:#a50">&#34;type&#34;</span>: <span style="color:#a50">&#34;to&#34;</span>
         }
       ]
     },
-    <span style="color:#e6db74">&#34;async&#34;</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span>
+    <span style="color:#a50">&#34;async&#34;</span>: <span style="color:#00a">true</span>
   };
-  <span style="color:#a6e22e">jQuery</span>.<span style="color:#a6e22e">ajax</span>({
-    <span style="color:#a6e22e">type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;POST&#34;</span>,
-    <span style="color:#a6e22e">url</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;https://mandrillapp.com/api/1.0/messages/send.json&#34;</span>,
-    <span style="color:#a6e22e">dataType</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;json&#34;</span>,
-    <span style="color:#a6e22e">data</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">data</span>
+  jQuery.ajax({
+    type: <span style="color:#a50">&#34;POST&#34;</span>,
+    url: <span style="color:#a50">&#34;https://mandrillapp.com/api/1.0/messages/send.json&#34;</span>,
+    dataType: <span style="color:#a50">&#34;json&#34;</span>,
+    data: data
   });
-&lt;/<span style="color:#f92672">script</span>&gt;</code></pre></div>
+&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
 <p>As you can see, you need to add a bit more information into the payload object to satisfy the <a href="https://mandrillapp.com/api/docs/messages.JSON.html#method=send">requirements of the Mandrill API</a>.</p>
 <p>The code itself is pretty similar to when we sent the POST request to the PHP script, with the notable exception of having to declare the dataType parameter explicitly as &ldquo;json&rdquo;.</p>
 <p>When the mail is sent successfully, you should again see a pretty hideous email in your inbox. By the way, take a look at Mandrill's reports. You'll see some pretty interesting data on your API use, so if you want to build this into a whole email-system-thing, you can use Mandrill's powerful features to diagnose your mail traffic.</p>
