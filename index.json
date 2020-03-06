@@ -7,15 +7,64 @@
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/tags/api/",
-	"title": "api",
+	"uri": "https://www.simoahava.com/categories/",
+	"title": "Categories",
 	"tags": [],
 	"description": "",
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/categories/",
-	"title": "Categories",
+	"uri": "https://www.simoahava.com/tags/google-analytics/",
+	"title": "google analytics",
+	"tags": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "https://www.simoahava.com/tags/google-tag-manager/",
+	"title": "Google Tag Manager",
+	"tags": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "https://www.simoahava.com/tags/measurement-protocol/",
+	"title": "measurement protocol",
+	"tags": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "https://www.simoahava.com/post/",
+	"title": "Posts",
+	"tags": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "https://www.simoahava.com/tags/queue-time/",
+	"title": "queue time",
+	"tags": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "https://www.simoahava.com/analytics/send-hits-past-google-analytics/",
+	"title": "Send Hits To The Past With Google Analytics",
+	"tags": ["google tag manager", "google analytics", "measurement protocol", "queue time"],
+	"description": "Google Analytics has the Queue Time parameter that lets you send hits to the past. However, there are limitations to how this parameter can be used, and these will be explored in the article.",
+	"content": "   "
+},
+{
+	"uri": "https://www.simoahava.com/tags/",
+	"title": "Tags",
+	"tags": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "https://www.simoahava.com/tags/api/",
+	"title": "api",
 	"tags": [],
 	"description": "",
 	"content": ""
@@ -42,29 +91,8 @@
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/tags/google-tag-manager/",
-	"title": "Google Tag Manager",
-	"tags": [],
-	"description": "",
-	"content": ""
-},
-{
-	"uri": "https://www.simoahava.com/post/",
-	"title": "Posts",
-	"tags": [],
-	"description": "",
-	"content": ""
-},
-{
 	"uri": "https://www.simoahava.com/tags/slack/",
 	"title": "slack",
-	"tags": [],
-	"description": "",
-	"content": ""
-},
-{
-	"uri": "https://www.simoahava.com/tags/",
-	"title": "Tags",
 	"tags": [],
 	"description": "",
 	"content": ""
@@ -257,13 +285,6 @@
 	"tags": ["app+web", "google analytics", "parameter reporting"],
 	"description": "How custom parameter reporting works in Google Analytics: App + Web, and how to enable it event by event, parameter by parameter.",
 	"content": "In Google Analytics: App + Web, you collect events. One event differs from another event by the name it uses. An event with the name page_view is different from, say, an event with the name file_download.\nThis is all run-of-the-mill stuff. You know this.\nHowever, the fundamental change that App + Web introduces, when compared to Universal Analytics, is how event parameters are collected and processed.\n  This gets more complicated than it should be. The complication arises from the fact that there are several components to how App + Web handles event parameters, including:\n Data collection time - limitations on the number of parameters that can be collected with the hit. Data processing time - events are processed, and the parameters and their values are shown in the real-time stream views. A maximum of 25 custom parameters included in the hit are made available to reports and the BigQuery Export (assuming you've enabled it for your App + Web property). Data reporting time - to be able to actually segment and report on these parameters, you need to enable them as custom parameters in your reports. This is the main focus of the article you are reading.  Data collection - parameter limit Google Analytics: App + Web has the same limitation as Google Analytics for Firebase (makes sense, since they share the same technical infrastructure) - you can only send up to 25 custom event parameters per hit. This is in addition to the automatically collected parameters (such as page_location for the page_view event).\nFor example, here I have a custom event with 26 custom parameters:\n  When that tag is fired on the web page, all 26 custom parameters are sent with the hit.\nIn the App + Web reporting interface, only 25 custom parameters are made available. What makes it even more unfortunate is that there doesn't seem to be a discernible pattern for which parameter is dropped. In the example below, parameter param21 is the one that was dropped.\n  The next time I dispatched the event, it was param04 that was dropped. It seems to me that the dropping of events is completely random, which is unfortunate. I would have expected an alphabetic sort and truncation from either head or tail of the list.\nIn any case, you need to be mindful of this. If you want to process the event parameters in the App + Web reporting user interface, you need to make sure to send a maximum of 25 custom event parameters per hit.\nData processing - real time When you send hits with custom parameters, you'll be able to see the parameters in real time reports.\nThe DebugView is a great place to debug the custom parameters. If you're using Google Tag Manager, entering GTM's Preview mode will automatically flag App + Web hits as originating from a debug device.\n  Find your user agent in the Debug Devices list, and then click the event you want to analyze. The parameters will be displayed in one of the DebugView widgets.\nYou can also see the parameters in the Realtime report (StreamView in Firebase lingo).\n  Choose Events as the filter, then click the Top Events widget, find your custom event, and expand its parameters.\nYou can also find the parameters in the All Events report, assuming the events have been collected long enough ago to actually appear in the report. After clicking the event name to enter its dashboard, you can see a Realtime widget where you can choose to filter by parameter name.\n  As noted before, these are all subject to the 25 parameter limit in data collection. All of the reports in the Google Analytics: App + Web reporting user interface will show you the truncated list.\nData processing - BigQuery export Once again, I profess my love for Google BigQuery. Enabling the BigQuery export for your Google Analytics: App + Web data is the smartest thing you can do today, so don't dally!\nThe BigQuery export gives you the raw data from your App + Web data collection.\nIt is subject to the same 25 custom parameter limitation per hit as the reporting interface, but you do not have to worry about enabling custom parameters for reporting in BigQuery - all the parameters and their values per hit are collected to BQ.\n  Data reporting - enabling custom parameters And now we get to the meat of this article.\nGoogle Analytics: App + Web gives you 50 text parameters and 50 number parameters that you can enable as custom parameters in your reports. That's per event and per project.\nThis means that if you want to include your custom parameters in your reports as their own widgets, and if you want to utilize them in the Analysis reports (such as Exploration), you need to first enable these parameters for reporting.\nEach time you enable a parameter for an event, you exhaust the quota available for your project. So if you want to use page_location in your custom reports, you need to enable it for the page_view event as a text parameter, and now you have 49 text parameters remaining to enable in your project.\n  The kicker is that if you enable custom_parameter_01 for an event named my_custom_event, it will exhaust the quota by 1. Then, if you want to use custom_parameter_01 with some other event, e.g. my_other_event, you need to enable it for THAT, too, and it will again exhaust the quota by 1.\nThese quotas are pretty strict, and I hope they are lifted. If they aren't, at least you'll have the BigQuery export to fall back on.\nAnyway, to enable custom parameters, you need to go to Events -\u0026gt; All events, and then click the little action menu at the end of the row with the event name.\nNote! This means that you need to first collect the event before you can enable parameters for it. Hopefully it will be possible at some point to enable parameters for events that are yet to be collected.\n  From that menu, choose Edit parameter reporting.\n You can always click the Parameter reporting tab on top of the All events report to see a list of the events that have custom parameters enabled, and you can click the event name to edit the parameters.\n     Once you see the parameter selector, you can search for the parameters name in the list. The list will show all parameters that have been collected with the given event in the date range selected.\nIf you find the parameter, select it and click ADD.\n  You can also add a parameter that does not appear in the list. Just type its name in the search field and click Add.\n  Once you've added the parameter, you can set its type, which impacts what you can actually do with the parameter in the reports.\n  Once you're happy, click Save to save the changes.\nRemember, there is a quota - make your decisions carefully!\nArchiving a parameter When you edit parameters, you can also choose to archive a parameter to free up quota.\n Note! If you DO archive a parameter, it is no longer available in the reports. So the change is retroactive - the data will not be recoverable.\n   The BigQuery export is, again, your best friend, because archiving a parameter will not delete it from the BigQuery tables you have already collected.\nSummary I hope this guide has managed to shed light on how event parameters work in App + Web. The focus was specifically on custom parameters, as they seem to be the biggest source of confusion.\nIt's important to rid yourself of the analogy with Custom Dimensions and Custom Metrics in Universal Analytics. Custom reporting in App + Web has fundamental differences to ye olde Google Analytics, particularly in how the same parameter name across different events is treated as a different entity each time, and how archiving a parameter removes it from your collected data, too.\nSimilarly to Universal Analytics, custom parameters are not retroactive, so they will start collecting data in reports only after being enabled per event.\nI'm not sure what to think of custom parameters yet. In the reporting interface they are oddly handicapped with the quotas and the hard-and-fast removal process, but in the BigQuery export they are really valuable.\nWe'll see how custom parameters evolve as the beta matures; I think they will play an important part in deciding whether to migrate from Universal Analytics to App + Web.\n"
-},
-{
-	"uri": "https://www.simoahava.com/tags/google-analytics/",
-	"title": "google analytics",
-	"tags": [],
-	"description": "",
-	"content": ""
 },
 {
 	"uri": "https://www.simoahava.com/tags/parameter-reporting/",
@@ -1600,7 +1621,7 @@
 	"title": "Upcoming Talks",
 	"tags": [],
 	"description": "Simo Ahava&#39;s upcoming conference schedule and event participation.",
-	"content": "  5-7 April 2020: CXL Live, Austin 17 April 2020: eCOM360, Riga 25-26 May 2020: GPeC Immersion, Bucharest 17 September 2020: Ecommerce Power Day, Aarhus    I enjoy presenting at conferences and meetups, and I have a track record of hundreds of talks since 2013, comprising keynotes, conference presentations, workshops, seminars, and public trainings. Audience sizes have varied between 3 and 2,000.\nMy favorite topics revolve around web analytics development and analytics customization, but I'm more than happy to talk about integrating analytics into organizations, knowledge transfer, improving technical skills, digital marketing, and content creation.\nSome of my conference slides can be found at SlideShare.\nFor a sample, here's a talk I gave at Reaktor Breakpoint in 2015.\n  You can contact me at simo (at) simoahava.com for enquiring about my availability for your event.\n"
+	"content": "  5-7 April 2020: CXL Live, Austin 17 April 2020: eCOM360, Riga 25-26 May 2020: GPeC Immersion, Bucharest 17 September 2020: Ecommerce Power Day, Aarhus 5-6 October 2020: SMX Advanced, Berlin    I enjoy presenting at conferences and meetups, and I have a track record of hundreds of talks since 2013, comprising keynotes, conference presentations, workshops, seminars, and public trainings. Audience sizes have varied between 3 and 2,000.\nMy favorite topics revolve around web analytics development and analytics customization, but I'm more than happy to talk about integrating analytics into organizations, knowledge transfer, improving technical skills, digital marketing, and content creation.\nSome of my conference slides can be found at SlideShare.\nFor a sample, here's a talk I gave at Reaktor Breakpoint in 2015.\n  You can contact me at simo (at) simoahava.com for enquiring about my availability for your event.\n"
 },
 {
 	"uri": "https://www.simoahava.com/tools/gtm-tools-by-simo-ahava/",
@@ -2560,13 +2581,6 @@
 	"tags": ["debug", "google analytics", "measurement protocol"],
 	"description": "Guide to using the Google Analytics collection endpoint debugger.",
 	"content": "This is a really cool feature for Google Analytics data collection, of which I've heard very, very little buzz. It's a way to debug any and all hits sent to the Google Analytics endpoint at https://www.google-analytics.com/collect.\n  In all simplicity, you just need to copy the entire URL of the HTTP request to your clipboard, paste it into a web browser, and add /debug between the hostname and /collect.\nA few words on the Measurement Protocol Let's take a quick step back and remind ourselves of one important thing. Every single time you're sending a hit to Google Analytics, whether it be via mobile app SDKs, analytics.js on your website, or by using arbitrary HTTP requests, you're using the \u0026ldquo;Measurement Protocol\u0026quot;. In other words, MP is not a discrete, isolated method of data transfer, but rather the underlying protocol that all the SDKs and libraries use as the method of dispatching payload data to GA.\nSo, when you hear a discussion along the lines of:\nJANE: Let's just configure the ga('send'...) commands on the page to incorporate that feature. JACK: Nah, let's use Measurement Protocol instead.\nThey're actually talking about the same thing. However, what Jack is probably referring to is a manually built HTTP request to the /collect endpoint, using any of the zillions of different ways to do so. When you use the ga('send'...) syntax, you're communicating with the analytics.js library, and abstracting the HTTP request build process with a simplified shorthand syntax.\nYou can verify this by browsing to a Universal-Analytics-enabled website, opening the browser's debugging tools, and looking at the network requests the site is sending:\n  Why is this significant? Why am I quibbling on semantics? Well, for one, I love to nitpick. But also, especially with the whole phenomenon of referral spam, people have been condemning Measurement Protocol as it introduces an open, unauthenticated venue for spamming a Google Analytics reporting profile.\nWell, the reason it's open and unauthenticated is because your website relies on the same protocol. If you were to add a layer of authentication there, it would need to happen server-side, as a spammer would be able to just visit your site, copy the payload request, and spam it until the authentication expires. Also, authentication would add latency, and that would affect Real Time reporting as well as the time for data to enter your reports.\nBut I'm sidetracking. Let's get back on topic.\nUsing the debugger As I mentioned, this hasn't really been advertised, for some odd reason, but it is there. In fact, there's even a support page for this feature.\nSo let's go back to the example of the browser's developer tool, and inspecting the network request to /collect. Copy the entire request URL (in Chrome it's right-click =\u0026gt; Copy Link Address on the request), and paste it into a new browser window.\nIf you now press Enter, your browser will simply send the request to GA. However, before you press Enter, add /debug into the URL, between the hostname and /collect, so it looks like this:\n  And now press Enter. You should see the response in your web browser:\n  Since you're copying a request sent by your website, you should hope it's valid. If it isn't, start working on a fix!\nWhy it's useful Well, for one, you can debug your hits and see if there's something wrong with them. Common mistakes include when you've got a field value wrong in your code, or when you've forgotten to add a field which is required. For example, setting Event Value to a blank string or a decimal number would return an error, as if the field is in the request, it always needs to be an integer.\nAnother good use case is for when you're actually using the Measurement Protocol in your custom setups. The debugger returns a response object, meaning you can debug your setup without actually sending data to Google Analytics! By parsing the response, you can easily identify if your custom payload is working or not.\nI know I'm in the geek camp with this, but this feature is definitely packing a kiloton worth of awesome in a small space. This is a perfect way to test your setups without sending actual data to Google Analytics, and the response object has lots of information, all missing from the actual request to /collect.\n"
-},
-{
-	"uri": "https://www.simoahava.com/tags/measurement-protocol/",
-	"title": "measurement protocol",
-	"tags": [],
-	"description": "",
-	"content": ""
 },
 {
 	"uri": "https://www.simoahava.com/gtm-tips/check-if-dom-ready-or-window-loaded-have-fired/",
