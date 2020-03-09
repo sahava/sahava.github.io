@@ -7,15 +7,64 @@
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/tags/api/",
-	"title": "api",
+	"uri": "https://www.simoahava.com/categories/",
+	"title": "Categories",
 	"tags": [],
 	"description": "",
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/categories/",
-	"title": "Categories",
+	"uri": "https://www.simoahava.com/tags/google-analytics/",
+	"title": "google analytics",
+	"tags": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "https://www.simoahava.com/tags/google-tag-manager/",
+	"title": "Google Tag Manager",
+	"tags": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "https://www.simoahava.com/tags/measurement-protocol/",
+	"title": "measurement protocol",
+	"tags": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "https://www.simoahava.com/post/",
+	"title": "Posts",
+	"tags": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "https://www.simoahava.com/tags/queue-time/",
+	"title": "queue time",
+	"tags": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "https://www.simoahava.com/analytics/send-hits-past-google-analytics/",
+	"title": "Send Hits To The Past With Google Analytics",
+	"tags": ["google tag manager", "google analytics", "measurement protocol", "queue time"],
+	"description": "Google Analytics has the Queue Time parameter that lets you send hits to the past. However, there are limitations to how this parameter can be used, and these will be explored in the article.",
+	"content": "One of the hard-and-fast rules in Google Analytics is that once hits have been collected and processed into your data properties, those hits are untouchable. This means that if you mistakenly collect duplicate or incorrect transactions, PII traffic, or referral spam, for example, it's extremely difficult, if not downright impossible, to purge or change this data in Google Analytics.\nAnother staple of Google Analytics\u0026rsquo; strict schema is that displacing hits in time is also very difficult. Hits are digested as they come in, and they are placed in time in the order of processing. If Google Analytics collects hit B after hit A, then it will be reported as having occurred in that order, too.\nHowever, there is a feature in the Google Analytics collection protocol that does allow you to realign a hit in the past timeline. So even if hit B is sent after hit A, you can still have it enter data tables with a timestamp that precedes hit A.\nThis feature is called Queue Time, and because of some fairly confusing documentation, it has been either easily ignored or misunderstood.\n  In this article, I'll explain how Queue Time works, and how you can use it to realign hits.\nWhat is Queue Time Queue Time is a parameter in the Measurement Protocol (qt). It takes a zero or a positive integer number as its value.\nWith the Queue Time parameter, you can instruct Google Analytics to process the hit so that it would appear as having occurred as many milliseconds ago from the collection moment as specified by the parameter.\nFor example, if you send a hit to Google Analytics at precisely 12:35:05 with the following qt value:\n\u0026amp;qt=5000\nThe hit will have a timestamp of 12:35:00, as you instructed Google Analytics to assign the hit with a timestamp 5 seconds (5000 milliseconds) earlier than it was actually collected.\nThis is a very useful parameter, and is actively used in things like service workers to correctly place hits collected when the network was down, and with mobile app analytics to make sure that batched and deferred hits are collected correctly.\nYou could also use it with other offline data collection systems like point-of-sales machines, in order to place a transaction in Google Analytics at the actual time of the transaction, even if you send the data in batches every evening after business hours.\nLimitation: only same-day hits And now we get to the biggest source of confusion.\n  The documentation states that Values greater than four hours may lead to hits not being processed, but it doesn't really say what this means.\nTo clarify this, here's the main limitation of Queue Time:\nQueue Time only lets you send hits to the current day (with one major caveat, coming right up).\nThus, for any day that starts at 00:00:00 (midnight) and ends at 23:59:59, the hit that uses Queue Time must also occur within that time window.\nHowever. There are two catches.\nCatch 1: You can send hits until 4 a.m. of the following day The time window is artifically extended to 03:59:59 of the following morning.\nThus, if you want to send a hit so that it happened on Friday, March 6th 2020, the hit must be sent either during March 6th, or no later than 03:59:59 in the morning of March 7th.\nThis means that the maximum value for Queue Time is 100799000 milliseconds. That's 27 hours, 59 minutes, and 59 seconds. That hit must be sent at 03:59:59, and it will be processed by Google Analytics as having occurred at 00:00:00 the previous day.\nCatch 2: The concept of \u0026ldquo;time\u0026rdquo; is bound to the timezone settings of the Google Analytics view And here's where it gets tricky.\n  The only way for your 100799000 millisecond Queue Time will work is if you send it at 03:59:59 of the following day in the timezone of the Google Analytics view that will report the hit.\nAs you can probably understand, this will lead to issues if you have a property with multiple views in different timezones.\nFour hours is the maximum length of time that is guaranteed to work Perhaps now the weird four-hour processing limitation from the Measurement Protocol documentation is a bit clearer.\nIf you use Queue Time, then a maximum value of 14400000, that's 4 hours, is guaranteed to work. This is because regardless of timezone in the Google Analytics property, a hit with a Queue Time of 14400000 is always guaranteed to either fall within the previous day (if sent no later than 03:59:59 the following morning), or the current day (if sent at 04:00:00 in the morning or later).\nLet's imagine you send a hit with a Queue Time of 14400000, and the timezone you send it in is in UTC. The date is March 7th, and the local time is 03:59:59 in the morning.\nHere's how the hit is processed from the point-of-view of a Google Analytics view that receives the hit.\n   Google Analytics timezone Date and time of hit sent Date and time of hit processed Valid     UTC March 7, 03:59:59 March 6, 23:59:59 Yes   UTC-06:00 March 6, 21:59:59 March 6, 17:59:59 Yes   UTC+01:00 March 7, 04:59:59 March 7, 00:59:59 Yes   UTC+10:00 March 7, 13:59:59 March 7, 09:59:59 Yes    See how regardless of timezone, the hit is valid. That's because the hit is sent and processed either during the same day, or the hit is sent before 4 a.m. the following day, per the Google Analytics timezone.\nLet's try a value larger than that. We'll attempt to send the hit 7 hours into the past - that's 25200000 milliseconds. We're still in UTC, the date is still March 7th, and it's still 03:59:59 in the morning.\n   Google Analytics timezone Date and time of hit sent Date and time of hit processed Valid     UTC March 7, 03:59:59 March 6, 20:59:59 Yes   UTC-06:00 March 6, 21:59:59 March 6, 17:59:59 Yes   UTC+01:00 March 7, 04:59:59 March 6, 21:59:59 NO   UTC+10:00 March 7, 13:59:59 March 7, 06:59:59 Yes    All other hits are valid except the one collected in the Google Analytics view in the UTC+01:00 timezone. This is because the hit is queued to have happened during March 6, but it's sent after 4 a.m. on March 7th.\nHow to implement To add the Queue Time parameter to a hit, you simply need to set it in the hit itself. If you're using Google Tag Manager, it's as simple as adding a new Fields to set that looks something like this:\n  The field name is \u0026amp;qt, and the value is the delta in milliseconds of when the hit should be processed vs. when it is sent.\nWith analytics.js, you'd set it like this:\nga(\u0026#39;send\u0026#39;, \u0026#39;event\u0026#39;, \u0026#39;Some Category\u0026#39;, \u0026#39;Some Action\u0026#39;, {\u0026#39;\u0026amp;qt\u0026#39;: 5000});  As far as I know, there is no way to set arbitrary Measurement Protocol parameters in a gtag.js call.\nSummary The Queue Time parameter lets you send hits to the past with Google Analytics. As such, it's a fairly powerful utility. There are many reasons why you'd want to delay hits from being sent at time of collection, only to still be processed in the correct time within the Google Analytics timeline.\nThe catch is that you can only append hits to the current day. There's no way to send hits more than a day into the past, unfortunately.\nGoogle Analytics extends the time window to stretch until 4 a.m. of the following day, but the problem is that the concepts of \u0026ldquo;current day\u0026rdquo; and \u0026ldquo;following day\u0026rdquo; are established by the timezone of the settings of each individual Google Analytics view.\nThus when you use the Queue Time parameter in Measurement Protocol hits, you need to either correlate the client time (time of the browser or machine sending the hits) with the time of the Google Analytics view to which you send the hits. If you can't do this correlation, then you should make sure to only send hits a maximum of four hours into the past, because those are the only types of queued hits that are guaranteed to work.\n"
+},
+{
+	"uri": "https://www.simoahava.com/tags/",
+	"title": "Tags",
+	"tags": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "https://www.simoahava.com/tags/api/",
+	"title": "api",
 	"tags": [],
 	"description": "",
 	"content": ""
@@ -42,29 +91,8 @@
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/tags/google-tag-manager/",
-	"title": "Google Tag Manager",
-	"tags": [],
-	"description": "",
-	"content": ""
-},
-{
-	"uri": "https://www.simoahava.com/post/",
-	"title": "Posts",
-	"tags": [],
-	"description": "",
-	"content": ""
-},
-{
 	"uri": "https://www.simoahava.com/tags/slack/",
 	"title": "slack",
-	"tags": [],
-	"description": "",
-	"content": ""
-},
-{
-	"uri": "https://www.simoahava.com/tags/",
-	"title": "Tags",
 	"tags": [],
 	"description": "",
 	"content": ""
@@ -257,13 +285,6 @@
 	"tags": ["app+web", "google analytics", "parameter reporting"],
 	"description": "How custom parameter reporting works in Google Analytics: App + Web, and how to enable it event by event, parameter by parameter.",
 	"content": "In Google Analytics: App + Web, you collect events. One event differs from another event by the name it uses. An event with the name page_view is different from, say, an event with the name file_download.\nThis is all run-of-the-mill stuff. You know this.\nHowever, the fundamental change that App + Web introduces, when compared to Universal Analytics, is how event parameters are collected and processed.\n  This gets more complicated than it should be. The complication arises from the fact that there are several components to how App + Web handles event parameters, including:\n Data collection time - limitations on the number of parameters that can be collected with the hit. Data processing time - events are processed, and the parameters and their values are shown in the real-time stream views. A maximum of 25 custom parameters included in the hit are made available to reports and the BigQuery Export (assuming you've enabled it for your App + Web property). Data reporting time - to be able to actually segment and report on these parameters, you need to enable them as custom parameters in your reports. This is the main focus of the article you are reading.  Data collection - parameter limit Google Analytics: App + Web has the same limitation as Google Analytics for Firebase (makes sense, since they share the same technical infrastructure) - you can only send up to 25 custom event parameters per hit. This is in addition to the automatically collected parameters (such as page_location for the page_view event).\nFor example, here I have a custom event with 26 custom parameters:\n  When that tag is fired on the web page, all 26 custom parameters are sent with the hit.\nIn the App + Web reporting interface, only 25 custom parameters are made available. What makes it even more unfortunate is that there doesn't seem to be a discernible pattern for which parameter is dropped. In the example below, parameter param21 is the one that was dropped.\n  The next time I dispatched the event, it was param04 that was dropped. It seems to me that the dropping of events is completely random, which is unfortunate. I would have expected an alphabetic sort and truncation from either head or tail of the list.\nIn any case, you need to be mindful of this. If you want to process the event parameters in the App + Web reporting user interface, you need to make sure to send a maximum of 25 custom event parameters per hit.\nData processing - real time When you send hits with custom parameters, you'll be able to see the parameters in real time reports.\nThe DebugView is a great place to debug the custom parameters. If you're using Google Tag Manager, entering GTM's Preview mode will automatically flag App + Web hits as originating from a debug device.\n  Find your user agent in the Debug Devices list, and then click the event you want to analyze. The parameters will be displayed in one of the DebugView widgets.\nYou can also see the parameters in the Realtime report (StreamView in Firebase lingo).\n  Choose Events as the filter, then click the Top Events widget, find your custom event, and expand its parameters.\nYou can also find the parameters in the All Events report, assuming the events have been collected long enough ago to actually appear in the report. After clicking the event name to enter its dashboard, you can see a Realtime widget where you can choose to filter by parameter name.\n  As noted before, these are all subject to the 25 parameter limit in data collection. All of the reports in the Google Analytics: App + Web reporting user interface will show you the truncated list.\nData processing - BigQuery export Once again, I profess my love for Google BigQuery. Enabling the BigQuery export for your Google Analytics: App + Web data is the smartest thing you can do today, so don't dally!\nThe BigQuery export gives you the raw data from your App + Web data collection.\nIt is subject to the same 25 custom parameter limitation per hit as the reporting interface, but you do not have to worry about enabling custom parameters for reporting in BigQuery - all the parameters and their values per hit are collected to BQ.\n  Data reporting - enabling custom parameters And now we get to the meat of this article.\nGoogle Analytics: App + Web gives you 50 text parameters and 50 number parameters that you can enable as custom parameters in your reports. That's per event and per project.\nThis means that if you want to include your custom parameters in your reports as their own widgets, and if you want to utilize them in the Analysis reports (such as Exploration), you need to first enable these parameters for reporting.\nEach time you enable a parameter for an event, you exhaust the quota available for your project. So if you want to use page_location in your custom reports, you need to enable it for the page_view event as a text parameter, and now you have 49 text parameters remaining to enable in your project.\n  The kicker is that if you enable custom_parameter_01 for an event named my_custom_event, it will exhaust the quota by 1. Then, if you want to use custom_parameter_01 with some other event, e.g. my_other_event, you need to enable it for THAT, too, and it will again exhaust the quota by 1.\nThese quotas are pretty strict, and I hope they are lifted. If they aren't, at least you'll have the BigQuery export to fall back on.\nAnyway, to enable custom parameters, you need to go to Events -\u0026gt; All events, and then click the little action menu at the end of the row with the event name.\nNote! This means that you need to first collect the event before you can enable parameters for it. Hopefully it will be possible at some point to enable parameters for events that are yet to be collected.\n  From that menu, choose Edit parameter reporting.\n You can always click the Parameter reporting tab on top of the All events report to see a list of the events that have custom parameters enabled, and you can click the event name to edit the parameters.\n     Once you see the parameter selector, you can search for the parameters name in the list. The list will show all parameters that have been collected with the given event in the date range selected.\nIf you find the parameter, select it and click ADD.\n  You can also add a parameter that does not appear in the list. Just type its name in the search field and click Add.\n  Once you've added the parameter, you can set its type, which impacts what you can actually do with the parameter in the reports.\n  Once you're happy, click Save to save the changes.\nRemember, there is a quota - make your decisions carefully!\nArchiving a parameter When you edit parameters, you can also choose to archive a parameter to free up quota.\n Note! If you DO archive a parameter, it is no longer available in the reports. So the change is retroactive - the data will not be recoverable.\n   The BigQuery export is, again, your best friend, because archiving a parameter will not delete it from the BigQuery tables you have already collected.\nSummary I hope this guide has managed to shed light on how event parameters work in App + Web. The focus was specifically on custom parameters, as they seem to be the biggest source of confusion.\nIt's important to rid yourself of the analogy with Custom Dimensions and Custom Metrics in Universal Analytics. Custom reporting in App + Web has fundamental differences to ye olde Google Analytics, particularly in how the same parameter name across different events is treated as a different entity each time, and how archiving a parameter removes it from your collected data, too.\nSimilarly to Universal Analytics, custom parameters are not retroactive, so they will start collecting data in reports only after being enabled per event.\nI'm not sure what to think of custom parameters yet. In the reporting interface they are oddly handicapped with the quotas and the hard-and-fast removal process, but in the BigQuery export they are really valuable.\nWe'll see how custom parameters evolve as the beta matures; I think they will play an important part in deciding whether to migrate from Universal Analytics to App + Web.\n"
-},
-{
-	"uri": "https://www.simoahava.com/tags/google-analytics/",
-	"title": "google analytics",
-	"tags": [],
-	"description": "",
-	"content": ""
 },
 {
 	"uri": "https://www.simoahava.com/tags/parameter-reporting/",
@@ -2560,13 +2581,6 @@
 	"tags": ["debug", "google analytics", "measurement protocol"],
 	"description": "Guide to using the Google Analytics collection endpoint debugger.",
 	"content": "This is a really cool feature for Google Analytics data collection, of which I've heard very, very little buzz. It's a way to debug any and all hits sent to the Google Analytics endpoint at https://www.google-analytics.com/collect.\n  In all simplicity, you just need to copy the entire URL of the HTTP request to your clipboard, paste it into a web browser, and add /debug between the hostname and /collect.\nA few words on the Measurement Protocol Let's take a quick step back and remind ourselves of one important thing. Every single time you're sending a hit to Google Analytics, whether it be via mobile app SDKs, analytics.js on your website, or by using arbitrary HTTP requests, you're using the \u0026ldquo;Measurement Protocol\u0026quot;. In other words, MP is not a discrete, isolated method of data transfer, but rather the underlying protocol that all the SDKs and libraries use as the method of dispatching payload data to GA.\nSo, when you hear a discussion along the lines of:\nJANE: Let's just configure the ga('send'...) commands on the page to incorporate that feature. JACK: Nah, let's use Measurement Protocol instead.\nThey're actually talking about the same thing. However, what Jack is probably referring to is a manually built HTTP request to the /collect endpoint, using any of the zillions of different ways to do so. When you use the ga('send'...) syntax, you're communicating with the analytics.js library, and abstracting the HTTP request build process with a simplified shorthand syntax.\nYou can verify this by browsing to a Universal-Analytics-enabled website, opening the browser's debugging tools, and looking at the network requests the site is sending:\n  Why is this significant? Why am I quibbling on semantics? Well, for one, I love to nitpick. But also, especially with the whole phenomenon of referral spam, people have been condemning Measurement Protocol as it introduces an open, unauthenticated venue for spamming a Google Analytics reporting profile.\nWell, the reason it's open and unauthenticated is because your website relies on the same protocol. If you were to add a layer of authentication there, it would need to happen server-side, as a spammer would be able to just visit your site, copy the payload request, and spam it until the authentication expires. Also, authentication would add latency, and that would affect Real Time reporting as well as the time for data to enter your reports.\nBut I'm sidetracking. Let's get back on topic.\nUsing the debugger As I mentioned, this hasn't really been advertised, for some odd reason, but it is there. In fact, there's even a support page for this feature.\nSo let's go back to the example of the browser's developer tool, and inspecting the network request to /collect. Copy the entire request URL (in Chrome it's right-click =\u0026gt; Copy Link Address on the request), and paste it into a new browser window.\nIf you now press Enter, your browser will simply send the request to GA. However, before you press Enter, add /debug into the URL, between the hostname and /collect, so it looks like this:\n  And now press Enter. You should see the response in your web browser:\n  Since you're copying a request sent by your website, you should hope it's valid. If it isn't, start working on a fix!\nWhy it's useful Well, for one, you can debug your hits and see if there's something wrong with them. Common mistakes include when you've got a field value wrong in your code, or when you've forgotten to add a field which is required. For example, setting Event Value to a blank string or a decimal number would return an error, as if the field is in the request, it always needs to be an integer.\nAnother good use case is for when you're actually using the Measurement Protocol in your custom setups. The debugger returns a response object, meaning you can debug your setup without actually sending data to Google Analytics! By parsing the response, you can easily identify if your custom payload is working or not.\nI know I'm in the geek camp with this, but this feature is definitely packing a kiloton worth of awesome in a small space. This is a perfect way to test your setups without sending actual data to Google Analytics, and the response object has lots of information, all missing from the actual request to /collect.\n"
-},
-{
-	"uri": "https://www.simoahava.com/tags/measurement-protocol/",
-	"title": "measurement protocol",
-	"tags": [],
-	"description": "",
-	"content": ""
 },
 {
 	"uri": "https://www.simoahava.com/gtm-tips/check-if-dom-ready-or-window-loaded-have-fired/",

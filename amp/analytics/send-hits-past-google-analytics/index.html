@@ -52,10 +52,10 @@
 
 
     
-        <meta property="article:published_time" content="2020-03-05T12:50:40Z"/>
+        <meta property="article:published_time" content="2020-03-09T07:00:40Z"/>
     
     
-        <meta property="article:modified_time" content="2020-03-05T12:50:40Z"/>
+        <meta property="article:modified_time" content="2020-03-09T07:00:40Z"/>
     
 
 
@@ -123,9 +123,9 @@
 
 <meta itemprop="name" content="Send Hits To The Past With Google Analytics">
 <meta itemprop="description" content="Google Analytics has the Queue Time parameter that lets you send hits to the past. However, there are limitations to how this parameter can be used, and these will be explored in the article.">
-<meta itemprop="datePublished" content="2020-03-05T14:50:40&#43;02:00" />
-<meta itemprop="dateModified" content="2020-03-05T14:50:40&#43;02:00" />
-<meta itemprop="wordCount" content="0">
+<meta itemprop="datePublished" content="2020-03-09T09:00:40&#43;02:00" />
+<meta itemprop="dateModified" content="2020-03-09T09:00:40&#43;02:00" />
+<meta itemprop="wordCount" content="1346">
 
 
 
@@ -158,8 +158,8 @@
     }
   },
   "url": "https:\/\/www.simoahava.com\/amp\/analytics\/send-hits-past-google-analytics\/",
-  "datePublished": "2020-03-05T14:50:40\x2b02:00",
-  "dateModified": "2020-03-05T14:50:40\x2b02:00",
+  "datePublished": "2020-03-09T09:00:40\x2b02:00",
+  "dateModified": "2020-03-09T09:00:40\x2b02:00",
   "description": "Google Analytics has the Queue Time parameter that lets you send hits to the past. However, there are limitations to how this parameter can be used, and these will be explored in the article.",
   "author": {
     "@type": "Person",
@@ -905,8 +905,8 @@ on
         , <a href="https://www.simoahava.com/amp/tags/queue-time">#queue time</a>
     
 
-<time class="post-date" datetime="2020-03-05T14:50:40&#43;02:00">
-    5 March 2020
+<time class="post-date" datetime="2020-03-09T09:00:40&#43;02:00">
+    9 March 2020
 </time>
 
 
@@ -914,7 +914,11 @@ on
     </header>
 
     <section class="post-content">
-      
+      <p>One of the hard-and-fast rules in <a href="https://analytics.google.com/">Google Analytics</a> is that once hits have been collected and processed into your data properties, those hits are <em>untouchable</em>. This means that if you mistakenly collect <a href="https://www.simoahava.com/analytics/prevent-google-analytics-duplicate-transactions-with-customtask/">duplicate or incorrect transactions</a>, <a href="https://www.simoahava.com/gtm-tips/remove-pii-google-analytics-hits/">PII traffic</a>, or <a href="https://help.analyticsedge.com/article/definitive-guide-to-removing-google-analytics-spam/">referral spam</a>, for example, it's extremely difficult, if not downright impossible, to purge or change this data in Google Analytics.</p>
+<p>Another staple of Google Analytics&rsquo; strict schema is that <strong>displacing hits in time</strong> is also very difficult. Hits are digested as they come in, and they are placed in time in the order of processing. If Google Analytics collects hit B after hit A, then it will be reported as having occurred in that order, too.</p>
+<p>However, there is a feature in the Google Analytics collection protocol that <em>does</em> allow you to realign a hit in the past timeline. So even if hit B is <em>sent</em> after hit A, you can still have it enter data tables with a timestamp that <em>precedes</em> hit A.</p>
+<p>This feature is called <strong>Queue Time</strong>, and because of some fairly confusing <a href="https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters#qt">documentation</a>, it has been either easily ignored or misunderstood.</p>
+
 
     <a href="https://www.simoahava.com/amp/images/2020/03/queue-time-google-analytics.jpg" title="Queue time parameter in Google Analytics">
   
@@ -923,6 +927,149 @@ on
     </a>
   
 
+<p>In this article, I'll explain how <strong>Queue Time</strong> works, and how you can use it to realign hits.</p>
+<h2 id="what-is-queue-time">What is Queue Time</h2>
+<p>Queue Time is a parameter in the <a href="https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters#qt">Measurement Protocol</a> (<code>qt</code>). It takes a zero or a positive integer number as its value.</p>
+<p>With the Queue Time parameter, you can instruct Google Analytics to <em>process</em> the hit so that it would appear as having occurred as many milliseconds ago from the collection moment as specified by the parameter.</p>
+<p>For example, if you send a hit to Google Analytics at precisely 12:35:05 with the following <code>qt</code> value:</p>
+<p><code>&amp;qt=5000</code></p>
+<p>The hit will have a timestamp of 12:35:00, as you instructed Google Analytics to assign the hit with a timestamp 5 seconds (5000 milliseconds) earlier than it was actually collected.</p>
+<p>This is a very useful parameter, and is actively used in things like <a href="https://developers.google.com/web/tools/workbox/modules/workbox-google-analytics">service workers</a> to correctly place hits collected when the network was down, and with <a href="https://developers.google.com/analytics/devguides/collection/ios/v3/sdk-download">mobile app analytics</a> to make sure that batched and deferred hits are collected correctly.</p>
+<p>You could also use it with other offline data collection systems like point-of-sales machines, in order to place a transaction in Google Analytics at the actual time of the transaction, even if you send the data in batches every evening after business hours.</p>
+<h2 id="limitation-only-same-day-hits">Limitation: only same-day hits</h2>
+<p>And now we get to the biggest source of confusion.</p>
+
+
+    <a href="https://www.simoahava.com/amp/images/2020/03/queue-time-clarification.jpg" title="Queue Time Clarification">
+  
+    <amp-img src="https://www.simoahava.com/amp/images/2020/03/queue-time-clarification.jpg" layout="responsive" alt="Queue Time Clarification" height="704" width="1784"></amp-img>
+  
+    </a>
+  
+
+<p>The documentation states that <strong>Values greater than four hours may lead to hits not being processed</strong>, but it doesn't really say what this means.</p>
+<p>To clarify this, here's the main limitation of Queue Time:</p>
+<p><strong>Queue Time only lets you send hits to the current day</strong> (with one <em>major</em> caveat, coming right up).</p>
+<p>Thus, for any day that starts at 00:00:00 (midnight) and ends at 23:59:59, the hit that uses Queue Time must also occur within that time window.</p>
+<p>However. <strong>There are two catches</strong>.</p>
+<h3 id="catch-1-you-can-send-hits-until-4-am-of-the-following-day">Catch 1: You can send hits until 4 a.m. of the following day</h3>
+<p>The time window is artifically extended to 03:59:59 of the following morning.</p>
+<p>Thus, if you want to send a hit so that it happened on Friday, March 6th 2020, the hit must be sent either during March 6th, or no later than 03:59:59 in the morning of March 7th.</p>
+<p>This means that the <strong>maximum</strong> value for Queue Time is <strong>100799000</strong> milliseconds. That's 27 hours, 59 minutes, and 59 seconds. That hit <em>must</em> be sent at 03:59:59, and it will be processed by Google Analytics as having occurred at 00:00:00 the previous day.</p>
+<h3 id="catch-2-the-concept-of-time-is-bound-to-the-timezone-settings-of-the-google-analytics-view">Catch 2: The concept of &ldquo;time&rdquo; is bound to the timezone settings of the Google Analytics view</h3>
+<p>And here's where it gets tricky.</p>
+
+
+    <a href="https://www.simoahava.com/amp/images/2020/03/ga-timezone.jpg" title="Google Analytics timezone">
+  
+    <amp-img src="https://www.simoahava.com/amp/images/2020/03/ga-timezone.jpg" layout="responsive" alt="Google Analytics timezone" height="414" width="1124"></amp-img>
+  
+    </a>
+  
+
+<p>The only way for your <strong>100799000</strong> millisecond Queue Time will work is if you send it at 03:59:59 of the following day <strong>in the timezone of the Google Analytics view that will report the hit</strong>.</p>
+<p>As you can probably understand, this will lead to issues if you have a property with multiple views in different timezones.</p>
+<h2 id="four-hours-is-the-maximum-length-of-time-that-is-guaranteed-to-work">Four hours is the maximum length of time that is guaranteed to work</h2>
+<p>Perhaps now the weird four-hour processing limitation from the Measurement Protocol documentation is a bit clearer.</p>
+<p>If you use Queue Time, then a maximum value of <strong>14400000</strong>, that's 4 hours, is guaranteed to work. This is because <strong>regardless</strong> of timezone in the Google Analytics property, a hit with a Queue Time of <strong>14400000</strong> is always guaranteed to either fall within the previous day (if sent no later than 03:59:59 the following morning), or the current day (if sent at 04:00:00 in the morning or later).</p>
+<p>Let's imagine you send a hit with a Queue Time of <strong>14400000</strong>, and the timezone you send it in is in UTC. The date is March 7th, and the local time is 03:59:59 in the morning.</p>
+<p>Here's how the hit is processed from the point-of-view of a Google Analytics view that receives the hit.</p>
+<table>
+<thead>
+<tr>
+<th>Google Analytics timezone</th>
+<th>Date and time of hit sent</th>
+<th>Date and time of hit processed</th>
+<th>Valid</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>UTC</td>
+<td>March 7, 03:59:59</td>
+<td>March 6, 23:59:59</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>UTC-06:00</td>
+<td>March 6, 21:59:59</td>
+<td>March 6, 17:59:59</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>UTC+01:00</td>
+<td>March 7, 04:59:59</td>
+<td>March 7, 00:59:59</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>UTC+10:00</td>
+<td>March 7, 13:59:59</td>
+<td>March 7, 09:59:59</td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<p>See how regardless of timezone, the hit is valid. That's because the hit is <strong>sent</strong> and <strong>processed</strong> either during the same day, or the hit is sent before 4 a.m. the following day, per the Google Analytics timezone.</p>
+<p>Let's try a value larger than that. We'll attempt to send the hit <strong>7 hours</strong> into the past - that's <strong>25200000</strong> milliseconds. We're still in UTC, the date is still March 7th, and it's still 03:59:59 in the morning.</p>
+<table>
+<thead>
+<tr>
+<th>Google Analytics timezone</th>
+<th>Date and time of hit sent</th>
+<th>Date and time of hit processed</th>
+<th>Valid</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>UTC</td>
+<td>March 7, 03:59:59</td>
+<td>March 6, 20:59:59</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>UTC-06:00</td>
+<td>March 6, 21:59:59</td>
+<td>March 6, 17:59:59</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>UTC+01:00</td>
+<td>March 7, 04:59:59</td>
+<td>March 6, 21:59:59</td>
+<td><strong>NO</strong></td>
+</tr>
+<tr>
+<td>UTC+10:00</td>
+<td>March 7, 13:59:59</td>
+<td>March 7, 06:59:59</td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<p>All other hits are valid except the one collected in the Google Analytics view in the UTC+01:00 timezone. This is because the hit is queued to have happened during March 6, but it's sent <em>after 4 a.m.</em> on March 7th.</p>
+<h2 id="how-to-implement">How to implement</h2>
+<p>To add the Queue Time parameter to a hit, you simply need to <code>set</code> it in the hit itself. If you're using Google Tag Manager, it's as simple as adding a new <strong>Fields to set</strong> that looks something like this:</p>
+
+
+    <a href="https://www.simoahava.com/amp/images/2020/03/gtm-tag.jpg" title="GTM tag">
+  
+    <amp-img src="https://www.simoahava.com/amp/images/2020/03/gtm-tag.jpg" layout="responsive" alt="GTM tag" height="726" width="1776"></amp-img>
+  
+    </a>
+  
+
+<p>The field name is <code>&amp;qt</code>, and the value is the delta in milliseconds of when the hit should be processed vs. when it is sent.</p>
+<p>With <strong>analytics.js</strong>, you'd set it like this:</p>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">ga</span><span class="p">(</span><span class="s1">&#39;send&#39;</span><span class="p">,</span> <span class="s1">&#39;event&#39;</span><span class="p">,</span> <span class="s1">&#39;Some Category&#39;</span><span class="p">,</span> <span class="s1">&#39;Some Action&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;&amp;qt&#39;</span><span class="o">:</span> <span class="mi">5000</span><span class="p">}</span><span class="p">)</span><span class="p">;</span>
+</code></pre></div>
+<p>As far as I know, there is no way to set arbitrary Measurement Protocol parameters in a <strong>gtag.js</strong> call.</p>
+<h2 id="summary">Summary</h2>
+<p>The Queue Time parameter lets you send hits to the past with Google Analytics. As such, it's a fairly powerful utility. There are  many reasons why you'd want to delay hits from being sent at time of collection, only to still be processed in the correct time within the Google Analytics timeline.</p>
+<p>The catch is that you can only append hits to the current day. There's no way to send hits more than a day into the past, unfortunately.</p>
+<p>Google Analytics extends the time window to stretch until 4 a.m. of the following day, but the problem is that the concepts of &ldquo;current day&rdquo; and &ldquo;following day&rdquo; are established by the <strong>timezone of the settings of each individual Google Analytics view</strong>.</p>
+<p>Thus when you use the Queue Time parameter in Measurement Protocol hits, you need to either correlate the client time (time of the browser or machine sending the hits) with the time of the Google Analytics view to which you send the hits. If you can't do this correlation, then you should make sure to only send hits a maximum of four hours into the past, because those are the only types of queued hits that are guaranteed to work.</p>
 
     </section>
 
