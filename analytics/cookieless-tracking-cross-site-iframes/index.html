@@ -318,7 +318,10 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              <p>Here I am, back with <code>&lt;iframe&gt;</code> and <strong>cross-domain tracking</strong>. I've published a couple of articles before on the topic, with <a href="https://www.simoahava.com/analytics/tracking-cross-domain-iframes-upgraded-solution/">my upgraded solution</a> being the most recent one. These articles tackle the general problem of <strong>passing the Client ID from the parent to the <code>&lt;iframe&gt;</code></strong>.</p>
+              <blockquote>
+<p><strong>Updated 15 April 2020</strong>: Fix the message forwarder to properly clone objects before they are passed to <code>postMessage</code></p>
+</blockquote>
+<p>Here I am, back with <code>&lt;iframe&gt;</code> and <strong>cross-domain tracking</strong>. I've published a couple of articles before on the topic, with <a href="https://www.simoahava.com/analytics/tracking-cross-domain-iframes-upgraded-solution/">my upgraded solution</a> being the most recent one. These articles tackle the general problem of <strong>passing the Client ID from the parent to the <code>&lt;iframe&gt;</code></strong>.</p>
 <p>By doing so, the <code>&lt;iframe&gt;</code> can take the Client ID from the frame URL and create the <code>_ga</code> cookie in the <code>&lt;iframe&gt;</code>, allowing hits from the parent <em>and</em> the <code>&lt;iframe&gt;</code> to use the same Client ID. Great.</p>
 <p>However, there's a catch that's become more and more troubling with the increase of <a href="https://www.cookiestatus.com">browsers&rsquo; tracking protection mechanisms</a>: if the <code>&lt;iframe&gt;</code> loads content <strong>cross-site</strong>, the browser must <strong>allow cookie access in third-party context</strong>. In other words, if the browser blocks <em>third-party cookies</em>, the <code>&lt;iframe&gt;</code> will not be able to write the cookie, and Google Analytics tracking <strong>will fail</strong>.</p>
 
@@ -740,7 +743,8 @@
     
     <span style="color:#00a">var</span> createMessage = <span style="color:#00a">function</span>(obj) {
       <span style="color:#00a">if</span> (!<span style="color:#0aa">Array</span>.isArray(obj) &amp;&amp; <span style="color:#00a">typeof</span> obj === <span style="color:#a50">&#39;object&#39;</span>) {
-        <span style="color:#00a">var</span> message = {};
+        <span style="color:#00a">var</span> flattenObj = JSON.parse(JSON.stringify(obj));
+		<span style="color:#00a">var</span> message = {};
         <span style="color:#aaa;font-style:italic">// Add metadata about the page into the message
 </span><span style="color:#aaa;font-style:italic"></span>        message[dataLayerMessagePrefix] = {
           pageData: {
@@ -748,12 +752,12 @@
             title: <span style="color:#0aa">document</span>.title
           }
         };
-        <span style="color:#00a">for</span> (<span style="color:#00a">var</span> prop <span style="color:#00a">in</span> obj) {
-          <span style="color:#00a">if</span> (obj.hasOwnProperty(prop) &amp;&amp; prop !== <span style="color:#a50">&#39;gtm.uniqueEventId&#39;</span>) {
+        <span style="color:#00a">for</span> (<span style="color:#00a">var</span> prop <span style="color:#00a">in</span> flattenObj) {
+          <span style="color:#00a">if</span> (flattenObj.hasOwnProperty(prop) &amp;&amp; prop !== <span style="color:#a50">&#39;gtm.uniqueEventId&#39;</span>) {
             <span style="color:#00a">if</span> (prop === <span style="color:#a50">&#39;event&#39;</span>) {
-              message.event = dataLayerMessagePrefix + <span style="color:#a50">&#39;.&#39;</span> + obj[prop];
+              message.event = dataLayerMessagePrefix + <span style="color:#a50">&#39;.&#39;</span> + flattenObj[prop];
             } <span style="color:#00a">else</span> {
-              message[dataLayerMessagePrefix][prop] = obj[prop];
+              message[dataLayerMessagePrefix][prop] = flattenObj[prop];
             }
           }
         }
@@ -764,7 +768,7 @@
     };
     
     <span style="color:#00a">var</span> startDataLayerMessageCollection = <span style="color:#00a">function</span>() {
-      <span style="color:#aaa;font-style:italic">// Send the current dataLayer content to top frame
+      <span style="color:#aaa;font-style:italic">// Send the current dataLayer content to top frame, flatten the object
 </span><span style="color:#aaa;font-style:italic"></span>      <span style="color:#0aa">window</span>.dataLayer.forEach(<span style="color:#00a">function</span>(obj) {
         <span style="color:#00a">var</span> message = createMessage(obj);
         <span style="color:#00a">if</span> (message) <span style="color:#0aa">window</span>.top.postMessage(message, parentOrigin);
