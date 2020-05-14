@@ -20,11 +20,8 @@
       function gtag() { window.dataLayer = window.dataLayer || []; window.dataLayer.push(arguments); }
       gtag('event', 'optimize.callback', {
 	    callback: function(e) {
-	      window.dataLayer = window.dataLayer || [];
-          window.dataLayer.push({
-		    event: 'optimize.experimentLoaded',
-            experimentTime: new Date().getTime()
-	      });
+	      window.__flickerTestMilestones = window.__flickerTestMilestones || {};
+          window.__flickerTestMilestones.experimentLoaded = new Date().getTime();
 	    }
       });
     </script>
@@ -112,11 +109,28 @@
     <script>
       (function() {
         if (window.MutationObserver && window.IntersectionObserver) {
-          var dpush = function(event, time) {
+          window.__flickerTestMilestones = window.__flickerTestMilestones || {};
+          var dpush = function() {
+            
+            if (!window.__flickerTestMilestones.experimentLoaded ||
+                !window.__flickerTestMilestones.baseElementAddedToPage ||
+                !window.__flickerTestMilestones.testElementAddedToPage) return;
+            
+            
+            
+            
+            if (!window.__flickerTestMilestones.baseElementVisible) { window.__flickerTestMilestones = {}; return; }
+            
+            
             window.dataLayer = window.dataLayer || [];
             window.dataLayer.push({
-              event: 'optimize.' + event,
-              experimentTime: time
+              event: 'optimize_flicker_test',
+              testMilestones: {
+                baseElementAddedToPage: window.__flickerTestMilestones.baseElementAddedToPage,
+                baseElementVisible: window.__flickerTestMilestones.baseElementVisible,
+                experimentLoaded: window.__flickerTestMilestones.experimentLoaded,
+                testElementAddedToPage: window.__flickerTestMilestones.testElementAddedToPage
+              }
             });
           };
 
@@ -125,16 +139,17 @@
               var node = !!mutation.addedNodes.length && mutation.addedNodes[0];
               if (node && node.matches && node.matches('span.talks')) {
                 if (node.matches('[data-test]')) {
-                  dpush('testElementAddedToPage', new Date().getTime());
+                  window.__flickerTestMilestones.testElementAddedToPage = new Date().getTime();
+                  dpush();
                 } else {
-                  dpush('baseElementAddedToPage', new Date().getTime());
-
+                  window.__flickerTestMilestones.baseElementAddedToPage = new Date().getTime();
+                  dpush();
                   var intersectionObserver = new IntersectionObserver(function(entries) {
                     if (entries.some(function(e) {
                         return e.intersectionRatio > 0
                       })) {
-                      dpush('baseElementVisible', new Date().getTime());
-
+                      window.__flickerTestMilestones.baseElementVisible = new Date().getTime();
+                      dpush();
                     }
                   });
                   intersectionObserver.observe(node);
