@@ -108,32 +108,38 @@
   <body>
     <script>
       (function() {
-        if (window.MutationObserver && window.IntersectionObserver) {
-          window.__flickerTestMilestones = window.__flickerTestMilestones || {};
-          var dpush = function() {
+        window.__flickerTestMilestones = window.__flickerTestMilestones || {};
+        var testState = 'success';
+        var dpush = function() {
+          if (testState !== 'noObservers') {
             
             if (!window.__flickerTestMilestones.experimentLoaded ||
                 !window.__flickerTestMilestones.baseElementAddedToPage ||
                 !window.__flickerTestMilestones.testElementAddedToPage) return;
-            
-            
-            
-            
-            if (!window.__flickerTestMilestones.baseElementVisible) { window.__flickerTestMilestones = {}; return; }
-            
-            
-            window.dataLayer = window.dataLayer || [];
-            window.dataLayer.push({
-              event: 'optimize_flicker_test',
-              testMilestones: {
-                baseElementAddedToPage: window.__flickerTestMilestones.baseElementAddedToPage,
-                baseElementVisible: window.__flickerTestMilestones.baseElementVisible,
-                experimentLoaded: window.__flickerTestMilestones.experimentLoaded,
-                testElementAddedToPage: window.__flickerTestMilestones.testElementAddedToPage
-              }
-            });
-          };
 
+            
+            
+            if (!window.__flickerTestMilestones.baseElementVisible) { testState = 'baseNotVisible'; }
+          }
+
+          
+          window.dataLayer = window.dataLayer || [];
+          window.dataLayer.push({
+            event: 'optimize_flicker_test',
+            testMilestones: {
+              baseElementAddedToPage: window.__flickerTestMilestones.baseElementAddedToPage,
+              baseElementVisible: window.__flickerTestMilestones.baseElementVisible,
+              experimentLoaded: window.__flickerTestMilestones.experimentLoaded,
+              testElementAddedToPage: window.__flickerTestMilestones.testElementAddedToPage,
+              testState: testState
+            }
+          });
+          
+          
+          window.__flickerTestMilestones = {};
+        };
+
+        if (window.MutationObserver && window.IntersectionObserver) {
           var observer = new MutationObserver(function(mutations) {
             mutations.forEach(function(mutation) {
               var node = !!mutation.addedNodes.length && mutation.addedNodes[0];
@@ -161,6 +167,11 @@
             childList: true,
             subtree: true
           });
+        } else {
+          
+          window.__flickerTestMilestones = {};
+          testState = 'noObservers';
+          dpush();
         }
       })();
     </script>
