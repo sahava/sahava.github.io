@@ -16,7 +16,19 @@
 <html lang="en-us">
   <head>
 	<meta name="generator" content="Hugo 0.61.0" />
-    <script src="https://www.googleoptimize.com/optimize.js?id=GTM-NGM64B"></script>
+    <script>
+      function gtag() { window.dataLayer = window.dataLayer || []; window.dataLayer.push(arguments); }
+      gtag('event', 'optimize.callback', {
+	    callback: function(e) {
+	      window.dataLayer = window.dataLayer || [];
+          window.dataLayer.push({
+		    event: 'optimize.experimentLoaded',
+            experimentTime: new Date().getTime()
+	      });
+	    }
+      });
+    </script>
+    <script async src="https://www.googleoptimize.com/optimize.js?id=GTM-NGM64B"></script>
     <meta name="google-site-verification" content="xQwWI2KUfP9LbFKhw2CVLFtrMY6Czrla7L3PD2aBolA" />
 
 
@@ -97,6 +109,46 @@
   </head>
 
   <body>
+    <script>
+      (function() {
+        if (window.MutationObserver && window.IntersectionObserver) {
+          var dpush = function(event, time) {
+            window.dataLayer = window.dataLayer || [];
+            window.dataLayer.push({
+              event: 'optimize.' + event,
+              experimentTime: time
+            });
+          };
+
+          var observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+              var node = !!mutation.addedNodes.length && mutation.addedNodes[0];
+              if (node && node.matches && node.matches('span.talks')) {
+                if (node.matches('[data-test]')) {
+                  dpush('testElementAddedToPage', new Date().getTime());
+                } else {
+                  dpush('baseElementAddedToPage', new Date().getTime());
+
+                  var intersectionObserver = new IntersectionObserver(function(entries) {
+                    if (entries.some(function(e) {
+                        return e.intersectionRatio > 0
+                      })) {
+                      dpush('baseElementVisible', new Date().getTime());
+
+                    }
+                  });
+                  intersectionObserver.observe(node);
+                }
+              }
+            });
+          });
+          observer.observe(document.body, {
+            childList: true,
+            subtree: true
+          });
+        }
+      })();
+    </script>
     <div id="blog">
       <header id="header" data-behavior="1">
   <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
