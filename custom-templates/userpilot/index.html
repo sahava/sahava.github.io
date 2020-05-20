@@ -17,7 +17,52 @@
 <!DOCTYPE html>
 <html lang="en-us">
   <head>
-    <script async src="https://www.googleoptimize.com/optimize.js?id=GTM-NGM64B"></script>
+    
+    <style>.async-hide { opacity: 0 !important} </style>
+    <script>
+      (function() {
+        var optimizeId = 'GTM-NGM64B',
+            gtmId = 'GTM-PZ7GMV9',
+            dataLayerName = 'dataLayer',
+            hideObj = {},
+            hideGTMId = Math.random() < 0.5 ? optimizeId : gtmId;
+            hideObj[hideGTMId] = true;
+
+        var dPush = function(status) {
+          window[dataLayerName].push({
+            event: 'optimize_anti_flicker_test',
+            milestones: {
+              antiFlickerStart: window[dataLayerName].hide.start,
+              antiFlickerEnd: new Date().getTime(),
+              testStatus: status
+            }
+          });
+        };
+
+        (function(a,s,y,n,c,h,i,d,e){s.className+=' '+y;h.start=1*new Date;h.end=i=function(){clearTimeout(t); s.className=s.className.replace(RegExp(' ?'+y),'')};(a[n]=a[n]||[]).hide=h;var t = setTimeout(function(){dPush('timeout');i();h.end=null},c);h.timeout=c;})(window,document.documentElement,'async-hide',dataLayerName,4000,hideObj);
+
+        if (hideGTMId === optimizeId) {
+          var el = document.createElement('script');
+          el.src = 'https://www.googleoptimize.com/optimize.js?id=' + optimizeId;
+          el.addEventListener('error', function() {
+            dPush('optimizeSnippetError');
+            window[dataLayerName].hide.end && window[dataLayerName].hide.end();
+          });
+          document.head.appendChild(el);
+        } else {
+          window[dataLayerName].push({
+            gtmOptimize: true
+          });
+        }
+        function gtag() {dataLayer.push(arguments)};
+        gtag('event', 'optimize.callback', {
+          callback: function() {
+            dPush(hideGTMId === optimizeId ? 'optimizeSnippet' : 'gtmTag');
+          }
+        });
+      })();
+    </script>
+    
     <meta name="google-site-verification" content="xQwWI2KUfP9LbFKhw2CVLFtrMY6Czrla7L3PD2aBolA" />
 
 
