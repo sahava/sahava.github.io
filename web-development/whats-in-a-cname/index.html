@@ -1,0 +1,836 @@
+
+
+  
+    
+  
+
+
+  
+
+
+
+
+
+  
+
+
+  
+
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta name="google-site-verification" content="xQwWI2KUfP9LbFKhw2CVLFtrMY6Czrla7L3PD2aBolA" />
+
+
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org", 
+  "@type": "BlogPosting",
+  "headline": "What\x27s In A CNAME | Simo Ahava's blog",
+  "image": "https:\/\/www.simoahava.com\/images\/2020\/06\/whats-in-a-cname.jpg",
+  "editor": "Simo Ahava",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Simo Ahava's blog",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https:\/\/www.simoahava.com\/images\/simo.png",
+      "height": "393",
+      "width": "407"
+    }
+  },
+  "url": "https:\/\/www.simoahava.com\/web-development\/whats-in-a-cname\/",
+  "datePublished": "2020-07-01T07:00:00\x2b03:00",
+  "dateModified": "2020-07-01T07:00:00\x2b03:00",
+  "description": "Giving third-party services access to your domain namespace via CNAME redirects and other DNS records can potentially lead to severe data leaks and breaches. In this article, we take a closer look at this phenomenon.",
+  "author": {
+    "@type": "Person",
+    "name": "Simo Ahava"
+  }
+}
+</script>
+
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <title>What&#39;s In A CNAME | Simo Ahava's blog</title>
+    
+    <script>
+      window.dataLayer=window.dataLayer||[];window.dataLayer.push({pageType: 'article'});
+    </script>
+    
+
+    
+
+    <script src="https://www.simoahava.com/x-js/lazyload.iife.min.js"></script>
+
+    
+
+    
+    <script>
+      (function(S,i,m,o){
+        window[m]=window[m]||[];
+        window[m].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
+        var f=S.getElementsByTagName(i)[0],j=S.createElement(i),dl=m!='dataLayer'?'&l='+m:'';
+        j.async=true;
+        j.src='https://www.googletagmanager.com/gtm.js?id='+o+dl;
+        f.parentNode.insertBefore(j,f);
+      })(document,'script','dataLayer','GTM-PZ7GMV9');
+    </script>
+    
+    <meta name="author" content="Simo Ahava">
+    <meta name="keywords" content="">
+
+    <link rel="icon" href="https://www.simoahava.com/images/favicon.ico">
+    
+    <link rel="amphtml" href="https://www.simoahava.com/amp/web-development/whats-in-a-cname/">
+    
+    <meta name="description" content="Giving third-party services access to your domain namespace via CNAME redirects and other DNS records can potentially lead to severe data leaks and breaches. In this article, we take a closer look at this phenomenon.">
+    <meta property="og:description" content="Giving third-party services access to your domain namespace via CNAME redirects and other DNS records can potentially lead to severe data leaks and breaches. In this article, we take a closer look at this phenomenon.">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="What&#39;s In A CNAME">
+    <meta property="og:url" content="https://www.simoahava.com/web-development/whats-in-a-cname/">
+    <meta property="og:site_name" content="Simo Ahava&#39;s blog">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="What&#39;s In A CNAME">
+    <meta name="twitter:description" content="Giving third-party services access to your domain namespace via CNAME redirects and other DNS records can potentially lead to severe data leaks and breaches. In this article, we take a closer look at this phenomenon.">
+    
+      <meta name="twitter:creator" content="@SimoAhava">
+      
+    
+
+    
+    
+
+    
+      <meta property="og:image" content="https://www.simoahava.com/images/simo.png">
+    
+
+    
+      <meta name="twitter:image" content="https://www.simoahava.com/images/2020/06/whats-in-a-cname.jpg">  
+      <meta property="og:image" content="https://www.simoahava.com/images/2020/06/whats-in-a-cname.jpg">
+    
+    
+    
+
+    
+
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+    
+    
+    
+    <link rel="stylesheet" href="https://www.simoahava.com/css/style.css" />
+    
+    
+
+    
+      
+    
+    
+  </head>
+
+  <body>
+    <div id="blog">
+      <header id="header" data-behavior="4">
+  <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+  <div class="header-title">
+    <a class="header-title-link" href="https://www.simoahava.com/">Simo Ahava&#39;s blog</a>
+  </div>
+  
+</header>
+
+      <nav id="sidebar" data-behavior="4">
+  <div class="sidebar-container">
+    
+      <div class="sidebar-profile">
+        <a href="https://www.simoahava.com/">
+          <img class="sidebar-profile-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+        </a>
+        <h4 class="sidebar-profile-name">Simo Ahava</h4>
+        
+          <h5 class="sidebar-profile-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</h5>
+        
+      </div>
+    
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+      
+      <span class="sidebar-button-desc">Home</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+      
+      <span class="sidebar-button-desc">Categories</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tags/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Tags</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/gtm-tips/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-magic"></i>
+      
+      <span class="sidebar-button-desc">GTM Tips</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/about-simo-ahava/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+      
+      <span class="sidebar-button-desc">About</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tools/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-wrench"></i>
+      
+      <span class="sidebar-button-desc">Tools</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/blog-statistics/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bar-chart"></i>
+      
+      <span class="sidebar-button-desc">Blog statistics</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://github.com/sahava" target="_blank" rel="noopener">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+      
+      <span class="sidebar-button-desc">GitHub</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/upcoming-talks/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bullhorn"></i>
+      
+      <span class="sidebar-button-desc">Upcoming talks</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/custom-templates/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Templates</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
+
+    </ul>
+  </div>
+</nav>
+
+      
+
+      <div id="main" data-behavior="4"
+        class="
+               hasCoverMetaIn
+               ">
+        <article class="post">
+	  <form id="search" action="https://www.simoahava.com/search/">
+  <input name="q" type="text" class="form-control input--xlarge" placeholder="Search blog..." autocomplete="off">
+  </form>
+
+          
+          
+            <div class="post-header main-content-wrap text-left">
+
+  
+
+    <h1>
+      What&#39;s In A CNAME
+    </h1>
+  
+  
+  <div class="postShorten-meta post-meta">
+    
+      <time datetime="2020-07-01T07:00:00&#43;03:00">
+        
+  July 1, 2020
+
+      </time>
+      
+      
+  
+  
+    <span>in</span>
+    
+      <a class="category-link" href="https://www.simoahava.com/categories/web-development">Web development</a>
+    
+  
+
+
+       | <a href="https://www.simoahava.com/web-development/whats-in-a-cname/#commento">Comments</a>
+  </div>
+
+
+</div>
+
+          
+          <div class="post-content markdown">
+            <div class="main-content-wrap">
+              <p>With the rise of <strong>ad and content blockers</strong> (think <a href="https://www.ghostery.com/">Ghostery</a> and <a href="https://chrome.google.com/webstore/detail/ublock-origin/cjpalhdlnbpafiamejdnhcphjbkeiagm?hl=fi">uBlock Origin</a>), as well as <strong>browser tracking protections</strong> (see <a href="https://www.cookiestatus.com/">www.cookiestatus.com</a>), marketing technology vendors have their work cut out for them. And when I refer to <strong>&ldquo;their work&rdquo;</strong>, I mean they have to proactively identify and exploit any loopholes they can find to keep on collecting their precious data.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2020/06/whats-in-a-cname.jpg" title="What&#39;s in a CNAME">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2020/06/whats-in-a-cname.jpg#ZgotmplZ" alt="What&#39;s in a CNAME">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>In this article, I'll take a look at one such exploit vector, the Canonical Name (<code>CNAME</code>) DNS record, in particular.</p>
+<p>The phenomenon of mapping subdomains to third-party services isn't confined to just advertising and marketing technology industries, though. In this article, I'll also introduce you to the extensive body of research collected by <a href="https://medium.com/@thezedwards">Zach Edwards</a>.</p>
+<blockquote class="twitter-tweet"><p lang="en" dir="ltr">I wonder if it&#39;s bad that an Intranet subdomain for the Victoria, Australia government has been compromised by the Pick a Flick gang with all kinds of custom phishing &amp; weird stuff. I&#39;m sure this DDOS is unrelated but it&#39;s still interesting to see another massive gov hit by them. <a href="https://t.co/zg9jprJKqe">https://t.co/zg9jprJKqe</a> <a href="https://t.co/EqjNLZ9yNM">pic.twitter.com/EqjNLZ9yNM</a></p>&mdash; ℨ𝔞𝔠𝔥 𝔈𝔡𝔴𝔞𝔯𝔡𝔰 (@thezedwards) <a href="https://twitter.com/thezedwards/status/1273777866140905473?ref_src=twsrc%5Etfw">June 19, 2020</a></blockquote>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<p>This research shows how countless subdomains of high value and importance (think government, education) have been compromised and primed for stealing credentials written in first-party cookies.</p>
+<p>It's important to raise awareness of the risks involved with mapping subdomains to third party servers. Even though much of Zach's research concerns scenarios where subdomains have been taken over by attackers, the end result is the same: the third party has access to data beyond what the site owner or business might have considered.</p>
+<p>But before we dig into the risks themselves, it's important to understand how we got to the point of surrendering our own domain namespace to third-party vendors and services.</p>
+<h2 id="the-perils-of-the-third-party">The perils of the third-party</h2>
+<p>The fact is that <a href="https://www.cookiestatus.com/introduction/tracking-protection/#first-party-and-third-party-context">storage access in third-party context</a>, colloquially referred to as &ldquo;third-party cookies&rdquo;, has become unstable and unreliable as the foundation for any data collection scheme, regardless of browser vendor:</p>
+<ul>
+<li><strong>Safari</strong> blocks all third-party cookies. Sites and services can request access to third-party storage from the browser user with the <a href="https://www.cookiestatus.com/safari/#storage-access-api">Storage Access API</a>.</li>
+<li><strong>Brave</strong> blocks all third-party cookies.</li>
+<li><strong>Firefox</strong> blocks third-party cookies on domains that are in their <a href="https://www.cookiestatus.com/firefox/#classification-of-known-trackers">blocklist</a>.</li>
+<li><strong>Edge</strong> blocks third-party cookies on domains that are in their <a href="https://www.cookiestatus.com/edge/#classification-of-known-trackers">blocklist</a>, with some mitigations.</li>
+<li><strong>Chrome</strong> is planning to <a href="https://blog.chromium.org/2020/01/building-more-private-web-path-towards.html">phase out support for third-party cookies by 2022</a>. They are also <a href="https://www.chromium.org/updates/same-site">rolling out</a> a change to how browser cookies are processed in the browser, by defaulting all cookies to <a href="https://web.dev/samesite-cookies-explained/"><code>SameSite=Lax</code></a> unless the cookie is manually updated with the appropriate flag when set.</li>
+</ul>
+<blockquote>
+<p><code>SameSite=Lax</code> is an attribute that specifies the cookie can only be accessed in first-party context. While not a tracking protection per se, it's still a fairly significant move in helping auditors identify which cookies have been flagged for potential cross-site access.</p>
+</blockquote>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2020/06/firefox-report.jpg" title="Firefox report">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2020/06/firefox-report.jpg#ZgotmplZ" alt="Firefox report">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>What's the solution for vendors that want to continue with their <a href="https://www.cookiestatus.com/introduction/tracking-protection/#cross-site-tracking">cross-site tracking</a> shenanigans? Well, if <strong>third-party context</strong> is too unreliable to build any business logic for, it's time to take a look at <strong>first-party context</strong>.</p>
+<h2 id="the-bliss-of-the-first-party">The bliss of the first-party</h2>
+<p>When a vendor decides to move from third-party to first-party context, it typically means one or more of the following.</p>
+<p><strong>They start <a href="https://fbclid.com/">decorating incoming links</a></strong> to the site from the vendor's platform where the user has been identified e.g. via a login.</p>
+<p>This is how <strong>Facebook</strong> works, for example, as every single link you click in Facebook will be appended with the <code>fbclid</code> parameter. After that, any Facebook (or partner) script running on the site can take that parameter from the URL and send it back to the vendor. Thus Facebook will know that the person for whom the hash was created visited your site.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2020/06/facebook-link.jpg" title="Facebook link">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2020/06/facebook-link.jpg#ZgotmplZ" alt="Facebook link">
+  
+    </a>
+  
+  
+</div>
+
+
+<p><strong>They start utilizing <a href="https://www.cookiestatus.com/introduction/summary-of-exploits/#fingerprinting">browser fingerprints</a></strong> to identify the user from one HTTP request to the next. Fingerprinting is dangerous because it is completely stateless - there's no need to persist any information in the browser.</p>
+<p>The user is disarmed of options to actively prevent this. This has led fingerprinting to become one of the rare areas where there is practically universal consensus among browser vendors that it is a Bad Thing and must be prevented.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2020/06/browser-fingerprint.jpg" title="Browser fingerprint">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2020/06/browser-fingerprint.jpg#ZgotmplZ" alt="Browser fingerprint">
+  
+    </a>
+  
+  
+</div>
+
+
+<p><strong>They request the site owner to run their scripts locally or to use local routers</strong>. This way they can circumvent ad blockers targeting the vendor domains.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2020/06/router-script.jpg" title="Router script">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2020/06/router-script.jpg#ZgotmplZ" alt="Router script">
+  
+    </a>
+  
+  
+</div>
+
+
+<p><strong>They request the site owners to reserve a <em>subdomain</em> in their domain namespace</strong>, which is configured to point to the vendor's servers.</p>
+<p>All of these approaches have been designed to avoid the heuristics in browsers and browser extensions that target third-party trackers. The reliability of these workarounds depends on how easy the site owner is to hoodwink into actively participating in setting them up.</p>
+<p>Link decoration, for example, doesn't require the site owner to do anything but add the vendor JavaScript to the site. However, it's not the most reliable exploit since blockers are most likely already preventing access to the most popular CDNs owned by the tracking vendors.</p>
+<p>The last option in the list ends up being the most robust one because it requires the site owner to actively and knowingly collude with the third party to improve the quality of the data collection. This is the exploit we'll be discussing in the rest of the article, as it has the biggest ramifications for end-user privacy and data security.</p>
+<h2 id="subdomain-mappings">Subdomain mappings</h2>
+<p><a href="https://medium.com/nextdns/cname-cloaking-the-dangerous-disguise-of-third-party-trackers-195205dc522a">This article</a> shows you how some vendors in the advertising and marketing technology space are approaching the restrictions to third-party context. They are directly contacting their customers and asking for their help in keeping the service alive.</p>
+<p>The gist is typically that the site needs to reserve a subdomain (e.g. <code>tracking.domain.com</code>), which is then set to point to a vendor domain name (e.g. <code>identity.vendor.com</code>) using a Canonical Name (<code>CNAME</code>) DNS record.</p>
+<blockquote>
+<p>Alternatively, the site can set up <code>A/AAAA</code> records that point directly to the vendor server IP address, but this is rare. With a <code>CNAME</code>, the vendor has the liberty of shuffling around the IP ranges of their servers without breaking the link to the mapped domain names.</p>
+</blockquote>
+<p>Once the DNS record resolves, all requests to <code>tracking.domain.com</code> are received by the vendor server behind <code>identity.vendor.com</code>.</p>
+<p>So, why go through all this trouble? Well, there are a couple of reasons:</p>
+<ol>
+<li>
+<p>The site doesn't have to relax its <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP">Content Security Policies</a> to allow third-party domains to load and run their scripts on the site. This reduces the friction in deploying the third-party service on the site.</p>
+</li>
+<li>
+<p>It's <em>so easy</em> to setup a <code>CNAME</code> record. There's no need to configure complicated reverse proxies or to create multiple A/AAAA records. It's (typically) just a single DNS change that anyone with adequate access can do.</p>
+</li>
+<li>
+<p>While <code>identity.vendor.com</code> is most likely in most of the blocklists for browsers and browser extensions, <code>tracking.domain.com</code> most likely isn't. This is a pretty solid way to circumvent ad blockers.</p>
+</li>
+<li>
+<p>Since the service is now running in first-party context with the rest of the site, the service can leverage <strong>first-party cookies</strong>, even those set with the <a href="https://owasp.org/www-community/HttpOnly"><code>HttpOnly</code> flag</a>.</p>
+</li>
+</ol>
+<h2 id="first-party-cookies-and-data-leaks">First-party cookies and data leaks</h2>
+<p>When the browser sends an HTTP request to a target address, that request will include <strong>all the cookies</strong> written on the target domain and any domains &ldquo;higher&rdquo; in the hierarchy, all the way to the top-most privately controlled domain name.</p>
+<p>For example, when <code>owned.domain</code> sends an HTTP request to <code>sub.sub.owned.domain</code>, that request will include all the cookies written on <code>sub.sub.owned.domain</code>, <code>sub.owned.domain</code>, and <code>owned.domain</code>.</p>
+<p>If the source and target of the request are <strong>same-site</strong> (i.e. they share the top-most privately controlled domain name), the request happens in <strong>first-party context</strong>, which is largely <strong>unrestricted</strong> by browsers and plugins today.</p>
+<p>When you surrender, either willingly by mapping the domain yourself or inadvertently via a takeover, a subdomain to a third party, you open your business for potentially horrendous data and credential leaks.</p>
+
+
+
+<div class="figure " >
+  
+    <a href="https://www.simoahava.com/images/2020/06/sacsid.jpg" title="Authentication cookie with which the browser is logged in with my Google ID">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2020/06/sacsid.jpg#ZgotmplZ" alt="Authentication cookie with which the browser is logged in with my Google ID">
+  
+    </a>
+  
+   
+    <span class="caption">Authentication cookie with which the browser is logged in with my Google ID</span>
+  
+</div>
+
+
+<p>Since the web server at the end of an HTTP request is privy to a large subset of first-party cookies set on any given site, things like <strong>state</strong> and <strong>authentication tokens</strong> are automatically logged by the web server owned by the vendor. This is because many sites still set them on <code>owned.domain</code>, making them available to <em>all</em> subdomains of the domain name.</p>
+<p>Gaining control of a subdomain also opens up possibilities for a <a href="https://github.com/bugcrowd/vulnerability-rating-taxonomy/issues/183">number of different, very dangerous exploits</a>, ranging from cross-site scripting attacks to intentional brand defamation.</p>
+<p>Sometimes these cookies contain personally identifiable information such as <strong>email addresses</strong> and <strong>user names</strong>, allowing vendors to enhance the user's cross-site tracking profile without them being able to do anything about it.</p>
+
+
+
+<div class="figure " >
+  
+    <a href="https://www.simoahava.com/images/2020/06/cookies.jpg" title="PII and authentication information in first-party cookies">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2020/06/cookies.jpg#ZgotmplZ" alt="PII and authentication information in first-party cookies">
+  
+    </a>
+  
+   
+    <span class="caption">PII and authentication information in first-party cookies</span>
+  
+</div>
+
+
+<p>Typically, there are privacy policies and lots of red tape in place, where the vendors offer complicated promises that they will not misuse the information logged by their web servers. But these practices vary wildly.</p>
+<p>Furthermore, because everything happens behind the curtains of server-to-server communications, it's practically impossible for independent auditors to know what's going on.</p>
+<p>And this is the main warning of this article:</p>
+<p><strong>When you map your subdomain to a third-party service, you are sending much more data to the third party than you might have bargained for.</strong></p>
+<p>Compare this with sending the request directly to the vendor-specific domain. By default, these requests would only include (third-party) cookies written on the vendor domain. Any other information would need to be encoded with JavaScript, which can be parsed and audited by anyone visiting the site.</p>
+<p>But with a subdomain mapping, all first-party cookies available on that domain will be sent, including those flagged as <code>HttpOnly</code>. These <code>HttpOnly</code> cookies can't be accessed with client-side script at all, which might lull site owners to a false sense of security.</p>
+<h2 id="zach-edwards-research-on-the-pickaflickcom-crew">Zach Edwards&rsquo; research on the PickAFlick.com crew</h2>
+<p><a href="https://twitter.com/thezedwards">Zach Edwards</a> is one of those people on Twitter you simply <strong>must</strong> follow. He's been conducting <strong>exhaustive</strong> research into many areas intersecting internet security and digital marketing and analytics. One of his pet peeves at the moment is something he's dubbed the <strong>PickaFlick.com</strong> attacks.</p>
+<p>In these scenarios, an attacker takes control of subdomains (usually DNS records left <a href="https://shhaos.github.io/papers/ccs16-dares.pdf">dangling</a>), and then starts stuffing <strong>search engine results</strong> with bogus links, hoping the visitor will click one of them.</p>
+
+
+
+<div class="figure " >
+  
+    <a href="https://www.simoahava.com/images/2020/06/epic-games-hack.jpg" title="From https://bit.ly/epic-games-hack">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2020/06/epic-games-hack.jpg#ZgotmplZ" alt="From https://bit.ly/epic-games-hack">
+  
+    </a>
+  
+   
+    <span class="caption">From https://bit.ly/epic-games-hack</span>
+  
+</div>
+
+
+<p>If the visitor does click such a link, that HTTP request will include all the first-party cookies available on that particular subdomain. See the previous chapter for examples of what type of information can be encoded in these cookies.</p>
+<p>The screenshot above is from <code>thehousepartyapp.com</code>, which Zach <a href="https://medium.com/@thezedwards/epic-games-ignored-epic-subdomain-takeover-on-their-authentication-domain-promoted-1-million-b4d809039b0e">quite elaborately</a> reported to Epic Games as having been compromised by subdomain takeovers. This was initially in response to Epic Games&rsquo; ludicrous <strong>$1,000,000</strong> bounty for proof of a smear campaign related to a possible hacking incident.</p>
+<p>I recommend you read Zach's article, as it shows how widespread and long-standing the PickaFlick.com attacks (and similar) are. It's also shocking how oblivious so many site and service owners are to trouble brewing in their own backyards.</p>
+<p>Go through your site's search results with a search query like <code>site:mydomain.com &quot;free ebook&quot;</code> and see if bogus results turn up. If they do, it's time for a DNS record audit. Make sure to eliminate any that you don't recognize or control the endpoint for anymore.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2020/06/wichita-gov-attack.jpg" title="Wichita.gov subdomains taken over">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2020/06/wichita-gov-attack.jpg#ZgotmplZ" alt="Wichita.gov subdomains taken over">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>This diversion to Zach's research isn't necessarily an indictment of <code>CNAME</code> exploits themselves, but they do exemplify how perilous and fragile this aspect of the HTTP protocol is.</p>
+<h2 id="prevention-measures">Prevention measures</h2>
+<p>To avoid subdomain mappings from harming your business, there are some mitigations you can act upon.</p>
+<ol>
+<li>
+<p>Follow the instructions in the previous chapter to see if you have <strong>compromised subdomains</strong>. If so, make sure you remove these subdomains from your DNS registry. It would be a good idea to report this to the service you use for your DNS, so that they can take appropriate action with their other customers as well.</p>
+</li>
+<li>
+<p>Make sure all state and authentication tokens, and really <strong>anything that can be used to impersonate a user</strong>, are written on a subdomain that you have <strong>control over</strong>. Make sure they are <strong>not</strong> written directly on the top-most privately controlled domain name. Make sure they are <code>httpOnly</code> and <code>secure</code>. Make sure they are <code>SameSite=Strict</code>, unless you need them in a third-party context.</p>
+</li>
+<li>
+<p>Make sure your Content Security Policy doesn't just <strong>wildcard</strong> all your subdomains (<code>*.owned.domain</code>). Allow only those domains that you have <strong>vetted and have governance over</strong>.</p>
+</li>
+<li>
+<p>Periodically <a href="https://www.simoahava.com/google-cloud/cookie-audit-with-google-bigquery/"><strong>audit</strong></a> cookies accessed in both first- and third-party contexts across your sites.</p>
+</li>
+</ol>
+<p>It really boils down to the <strong>trust</strong> you place in the vendors to whom you are mapping subdomains, the <strong>governance</strong> you have over the data flows, assets, and storage access across your sites, and <strong>processes</strong> you have in place for periodically auditing these perilous gateways to potentially brand-decimating leaks.</p>
+<h2 id="closing-thoughts">Closing thoughts</h2>
+<p>Why go through the trouble of ranting about <code>CNAME</code> redirects, when they've been so eloquently covered by <a href="https://medium.com/nextdns/cname-cloaking-the-dangerous-disguise-of-third-party-trackers-195205dc522a">this incredible article by Romain Cointepas</a>? Why discuss subdomain takeover attacks when Zach Edwards has already done <a href="https://medium.com/@thezedwards/epic-games-ignored-epic-subdomain-takeover-on-their-authentication-domain-promoted-1-million-b4d809039b0e">all the legwork</a>?</p>
+<p>Well, this is an insidious attack vector because it can be orchestrated with the best of intentions. It needs more exposure. More and more vendors are requesting subdomain mappings, and it's important that site owners know what they're subscribing to.</p>
+<p>Moving vendor services to first-party context isn't necessarily a <em>universally bad thing</em>. As a site owner, you are actively participating in vetting the services integrated on your site, and by mapping DNS records to third parties, you are proactively taking responsibility for the data streams and flows to and from your site. At least, in theory.</p>
+<p>The problem isn't necessarily related to the contracts and terms of services you sign with the vendors, which promise to restrict the types of data accessed in these requests. No, the problem is with this aspect of the HTTP protocol in general.</p>
+<p>Allowing cookies to pass unchecked through <code>CNAME</code> redirects to possible tracking domains is where the problem lies. Browsers don't (yet) have the capability to detect hazardous <code>CNAME</code> chains, but it is a feature set I wouldn't be surprised to see in their roadmaps.</p>
+<p>In the European Union, the <strong>ePrivacy Directive</strong> guides businesses to be aware and audit <em>all</em> keys and values stored in <em>all</em> browser storage at <em>all</em> times. Having an up-to-date audit of first-party cookies, for example, reduces the risk of leaking this information to third parties.</p>
+<p>If you need to manage state, authentication, and/or personally identifiable information in cookies, make sure they're not set in the root of the domain namespace you control. That way you mitigate the risk of this information leaking to server endpoints you have no control over.</p>
+<p>Just <strong>be vigilant</strong> and <strong>map those data flows</strong>. That's a good way to reduce a <em>huge</em> amount of risk embedded in how your site, app, or service persists and processes user data.</p>
+
+              
+
+            </div>
+          </div>
+          <div id="post-footer" class="post-footer main-content-wrap">
+            
+              
+                
+                
+                  <div class="post-footer-tags">
+                    <span class="text-color-light text-small">TAGGED IN</span><br/>
+                    
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/cname/">cname</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/exploit/">exploit</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/cookies/">cookies</a>
+
+                  </div>
+                
+              
+            
+            
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--disabled">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/gtm-tips/fix-preview-google-chrome-incognito-mode/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/web-development/whats-in-a-cname/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=What%27s%20In%20A%20CNAME%20https://www.simoahava.com/web-development/whats-in-a-cname/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/web-development/whats-in-a-cname/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#commento_thread">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+            
+              <span id="commento_thread"></span>
+<div id="commento"></div>
+<script defer src="https://cdn.commento.io/js/commento.js"></script>
+
+            
+          </div>
+        </article>
+        <footer id="footer" class="main-content-wrap">
+  <span class="copyrights">
+    &copy; 2020 Simo Ahava. All Rights Reserved
+  </span>
+</footer>
+
+      </div>
+      
+      <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+        
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--disabled">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/gtm-tips/fix-preview-google-chrome-incognito-mode/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/web-development/whats-in-a-cname/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=What%27s%20In%20A%20CNAME%20https://www.simoahava.com/web-development/whats-in-a-cname/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/web-development/whats-in-a-cname/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#commento_thread">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+      </div>
+      
+      <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+  <i id="btn-close-shareoptions" class="fa fa-close"></i>
+  <ul class="share-options">
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/web-development/whats-in-a-cname/">
+          <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=What%27s%20In%20A%20CNAME%20https://www.simoahava.com/web-development/whats-in-a-cname/%20via%20@SimoAhava">
+          <i class="fa fa-twitter"></i><span>Share on Twitter</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/web-development/whats-in-a-cname/">
+          <i class="fa fa-linkedin"></i><span>Share on LinkedIn</span>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+<div id="share-options-mask" class="share-options-mask"></div>
+
+    </div>
+    
+    <div id="about">
+  <div id="about-card">
+    <div id="about-btn-close">
+      <i class="fa fa-remove"></i>
+    </div>
+    
+      <img id="about-card-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+    
+    <h4 id="about-card-name">Simo Ahava</h4>
+    
+      <div id="about-card-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</div>
+    
+    
+      <div id="about-card-job">
+        <i class="fa fa-briefcase"></i>
+        <br/>
+        Senior Data Advocate at Reaktor
+      </div>
+    
+    
+      <div id="about-card-location">
+        <i class="fa fa-map-marker"></i>
+        <br/>
+        Finland
+      </div>
+    
+  </div>
+</div>
+
+    
+  
+    
+    <div id="cover" style="background-image:url('https://www.simoahava.com/images/maisema.jpg');"></div>
+  
+
+
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+
+
+
+
+<script src="https://www.simoahava.com/js/script.js"></script>
+
+
+
+
+<script src="https://cdn.commento.io/js/count.js"></script>
+
+
+    <script>
+      var mylazyload = new LazyLoad({elements_selector: '.lazy'});
+      </script>
+
+    
+  </body>
+</html>
+
