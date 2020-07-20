@@ -40,8 +40,8 @@
     }
   },
   "url": "https:\/\/www.simoahava.com\/analytics\/improve-data-collection-with-four-custom-dimensions\/",
-  "datePublished": "2015-04-06T16:36:54\x2b00:00",
-  "dateModified": "2015-04-06T16:36:54\x2b00:00",
+  "datePublished": "2015-04-06T16:36:54\u002b00:00",
+  "dateModified": "2015-04-06T16:36:54\u002b00:00",
   "description": "Add four crucial custom dimensions to all your Google Analytics hits with Google Tag Manager. The dimensions include hit timestamp, session ID, client ID and user ID.",
   "author": {
     "@type": "Person",
@@ -62,7 +62,7 @@
     
 
     
-
+    
     <script src="https://www.simoahava.com/x-js/lazyload.iife.min.js"></script>
 
     
@@ -328,10 +328,10 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              <p>Since writing my rant about the <a href="https://www.simoahava.com/analytics/the-schema-conspiracy/"><em>schema conspiracy</em></a> of web analytics platforms, I've been giving the whole idea of hit-level data collection a lot of thought. Sessionization is very heavily implemented in <a href="http://analytics.google.com">Google Analytics</a>, which is understandable, but the regular Google Analytics API just doesn't give you the kind of information you'd need, if you wanted to stitch hits together differently in your own backend. In fact, there are <strong>four</strong> distinct levels of aggregation that are not exposed via the API, even though I think they should:</p>
+              <p>Since writing my rant about the <a href="https://www.simoahava.com/analytics/the-schema-conspiracy/"><em>schema conspiracy</em></a> of web analytics platforms, I&rsquo;ve been giving the whole idea of hit-level data collection a lot of thought. Sessionization is very heavily implemented in <a href="http://analytics.google.com">Google Analytics</a>, which is understandable, but the regular Google Analytics API just doesn&rsquo;t give you the kind of information you&rsquo;d need, if you wanted to stitch hits together differently in your own backend. In fact, there are <strong>four</strong> distinct levels of aggregation that are not exposed via the API, even though I think they should:</p>
 <ol>
 <li>
-<p><strong>Hit timestamp</strong> - You can't query for the exact <em>timestamp</em> of a Google Analytics hit via the API. You can't get it in your custom reports, either. However, this might be very meaningful information, especially if you want to verify data integrity across systems.</p>
+<p><strong>Hit timestamp</strong> - You can&rsquo;t query for the exact <em>timestamp</em> of a Google Analytics hit via the API. You can&rsquo;t get it in your custom reports, either. However, this might be very meaningful information, especially if you want to verify data integrity across systems.</p>
 </li>
 <li>
 <p><strong>Session ID</strong> - Hits are grouped together into <em>sessions</em>. However, using the API alone, you will not be able to easily identify if two distinct hits belong to the same session.</p>
@@ -383,9 +383,9 @@
     <li><a href="#6-summary">6. Summary</a></li>
   </ul>
 </nav>
-<p>In the following chapters, we'll build four <strong>Custom Dimensions</strong> and four data collection methods that will let you include this information in your data set. We will, of course, be using <a href="http://tagmanager.google.com">Google Tag Manager</a> to make things more manageable.</p>
+<p>In the following chapters, we&rsquo;ll build four <strong>Custom Dimensions</strong> and four data collection methods that will let you include this information in your data set. We will, of course, be using <a href="http://tagmanager.google.com">Google Tag Manager</a> to make things more manageable.</p>
 <h2 id="1-the-method">1. The Method</h2>
-<p>I've created a Custom Dimension for each of the four use cases. Two of the dimensions are session-scoped, and two are hit-scoped. The dimensions are:</p>
+<p>I&rsquo;ve created a Custom Dimension for each of the four use cases. Two of the dimensions are session-scoped, and two are hit-scoped. The dimensions are:</p>
 <ol>
 <li>
 <p><strong>Client ID</strong> - <em>session-scoped</em> Custom Dimension that collects the Client ID set by Google Analytics</p>
@@ -415,7 +415,7 @@
 </div>
 
 
-<p>Why a hit-scoped Custom Dimension for User ID, you ask? Well, the whole privacy discussion around user tracking is complicated, and I would rather be poked repeatedly in the eye with a dead ferret than be drawn into it. By tracking User ID with a hit-scoped Custom Dimension, you'll only collect the data from <em>logged-in users</em>. As soon as they log out, or if they re-enter the website having logged out, User ID will not be sent with the hits. If the Custom Dimension were <em>session-scoped</em>, or even <em>user-scoped</em>, you would be collecting User ID for potentially logged-out visitors as well, and that might be in the grey area privacy-wise.</p>
+<p>Why a hit-scoped Custom Dimension for User ID, you ask? Well, the whole privacy discussion around user tracking is complicated, and I would rather be poked repeatedly in the eye with a dead ferret than be drawn into it. By tracking User ID with a hit-scoped Custom Dimension, you&rsquo;ll only collect the data from <em>logged-in users</em>. As soon as they log out, or if they re-enter the website having logged out, User ID will not be sent with the hits. If the Custom Dimension were <em>session-scoped</em>, or even <em>user-scoped</em>, you would be collecting User ID for potentially logged-out visitors as well, and that might be in the grey area privacy-wise.</p>
 <p>The end result of combining all this information will be something like this:</p>
 
 
@@ -433,12 +433,12 @@
 
 
 <p>In this (fictional) data export, you can see 7 unique hits, made by two different client IDs (e.g. different browsers or devices), which span across three distinct sessions, but are all made by the same, logged-in user. With layered information like this, you can build intelligent models using GA data alone, but the possibilities it offers for data integration are remarkable as well.</p>
-<p>The most difficult one of these solutions to implement, by far, is Client ID collection, so we'll start with that.</p>
+<p>The most difficult one of these solutions to implement, by far, is Client ID collection, so we&rsquo;ll start with that.</p>
 <h2 id="2-client-id">2. Client ID</h2>
 <p>(<strong>UPDATE 5 April 2018</strong>: I recommend using <a href="https://www.simoahava.com/gtm-tips/use-customtask-access-tracker-values-google-tag-manager/">this <code>customTask</code> method</a> instead for sending the Client ID in a Custom Dimension. The tracker object method outlined below is more complicated and far more unreliable. With <code>customTask</code>, you can send the Client ID with any tag you want, with 100% accuracy each time.)</p>
-<p>The difficulty with Client ID is that the <code>ga</code> interface you use to retrieve the Client ID doesn't perform well in real time, especially for Tags firing very early in the page load sequence (e.g. your Page View Tag).</p>
-<p>You <em>could</em> get the Client ID from browser cookies, but if it's a first-time visitor to your site, chances are that the cookie hasn't been set by the time the Page View Tag fires, and you'll miss this information. Also, if there are multiple trackers on the page, how do you know which <code>_ga</code> cookie to access? You don't.</p>
-<p>So, I've opted for a different approach. I'm sending the Client ID using a <strong>non-interaction Event Tag</strong>, which fires when the page has loaded. This almost certainly guarantees that the <code>ga</code> interface is up and running, and I can use it to pull the Client ID for the correct tracker. The correct tracker is identified by querying the property ID (UA-XXXXXX-X) associated with the tracker object.</p>
+<p>The difficulty with Client ID is that the <code>ga</code> interface you use to retrieve the Client ID doesn&rsquo;t perform well in real time, especially for Tags firing very early in the page load sequence (e.g. your Page View Tag).</p>
+<p>You <em>could</em> get the Client ID from browser cookies, but if it&rsquo;s a first-time visitor to your site, chances are that the cookie hasn&rsquo;t been set by the time the Page View Tag fires, and you&rsquo;ll miss this information. Also, if there are multiple trackers on the page, how do you know which <code>_ga</code> cookie to access? You don&rsquo;t.</p>
+<p>So, I&rsquo;ve opted for a different approach. I&rsquo;m sending the Client ID using a <strong>non-interaction Event Tag</strong>, which fires when the page has loaded. This almost certainly guarantees that the <code>ga</code> interface is up and running, and I can use it to pull the Client ID for the correct tracker. The correct tracker is identified by querying the property ID (UA-XXXXXX-X) associated with the tracker object.</p>
 <p>This particular data collection method will require the following ingredients:</p>
 <ul>
 <li>
@@ -472,7 +472,7 @@
 
 
 <p>The important thing is to choose <strong>Session</strong> as the scope, and to make note of the index assigned to it.</p>
-<p>Note that if you wish, you could just as well scope this to <strong>User</strong> instead. The Client ID, by definition, is the same for the user throughout, so it might make sense to scope it accordingly. User-scoped dimensions are a bit questionable in terms of privacy, but in this case I don't see any issue, as you're just exposing a dimension that exists anyway. Thanks to Michael Hayes for pointing this out in the comments!</p>
+<p>Note that if you wish, you could just as well scope this to <strong>User</strong> instead. The Client ID, by definition, is the same for the user throughout, so it might make sense to scope it accordingly. User-scoped dimensions are a bit questionable in terms of privacy, but in this case I don&rsquo;t see any issue, as you&rsquo;re just exposing a dimension that exists anyway. Thanks to Michael Hayes for pointing this out in the comments!</p>
 <h3 id="22-custom-javascript-variable">2.2. Custom JavaScript Variable</h3>
 <p>The Custom JavaScript Variable is named <strong>{{Get Client ID for current Tracker}}</strong>, and it needs the following code:</p>
 <div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() {
@@ -488,11 +488,11 @@
   <span style="color:#00a">return</span> <span style="color:#a50">&#39;false&#39;</span>;
 }
 </code></pre></div>
-<p>The function contents are wrapped in a <code>try...catch</code> block, so any errors and problems with loading the <code>ga</code> interface are gobbled up. If you want, you can add your own error debugging code into the <code>catch</code> block. The key thing is to make sure the Event Tag doesn't fire if there's a problem with retrieving the Client ID. This means that you might miss some hits, but since we're sending the information to a <em>session-scoped</em> Custom Dimension, you only need one successful hit sent during the session.</p>
+<p>The function contents are wrapped in a <code>try...catch</code> block, so any errors and problems with loading the <code>ga</code> interface are gobbled up. If you want, you can add your own error debugging code into the <code>catch</code> block. The key thing is to make sure the Event Tag doesn&rsquo;t fire if there&rsquo;s a problem with retrieving the Client ID. This means that you might miss some hits, but since we&rsquo;re sending the information to a <em>session-scoped</em> Custom Dimension, you only need one successful hit sent during the session.</p>
 <p>The code is designed so that it cycles through all the GA trackers on the page. Once it encounters a tracker object which tracks to the property ID returned by the <strong>{{GA Tracking Code}}</strong> variable, it returns the Client ID associated with this object.</p>
-<p>This means that you will need to have a variable called <strong>{{GA Tracking Code}}</strong>, which returns a valid property ID (UA-XXXXXX-X). On my website, for example, it's a Lookup Table Variable, which returns my main property ID for everyone else, but for me it returns a different property ID. This is because I use this secondary property for debugging implementations.</p>
+<p>This means that you will need to have a variable called <strong>{{GA Tracking Code}}</strong>, which returns a valid property ID (UA-XXXXXX-X). On my website, for example, it&rsquo;s a Lookup Table Variable, which returns my main property ID for everyone else, but for me it returns a different property ID. This is because I use this secondary property for debugging implementations.</p>
 <h3 id="23-window-loaded-trigger">2.3. Window Loaded Trigger</h3>
-<p>The Window Loaded Trigger is pretty simple. It's your basic Page View Trigger, where you set the Trigger Type to <strong>Window Loaded</strong>. However, you will need an additional condition in it.</p>
+<p>The Window Loaded Trigger is pretty simple. It&rsquo;s your basic Page View Trigger, where you set the Trigger Type to <strong>Window Loaded</strong>. However, you will need an additional condition in it.</p>
 
 
 
@@ -511,7 +511,7 @@
 <p>The condition <strong><em>Get Client ID for current Tracker</em> does not equal false</strong> ensures that the Trigger only fires if the Custom JavaScript Variable you just created returns a valid value.</p>
 <h3 id="24-event-tag">2.4. Event Tag</h3>
 <p>The Event Tag is very basic, except for two customizations. First, you need set its <strong>Non-Interaction</strong> value to <strong>true</strong>. This prevents the Event from being calculated into interaction metrics like Session Duration and Bounce Rate.</p>
-<p>Also, you'll need to add a Custom Dimension to the Tag, via <strong>More Settings -&gt; Custom Dimensions</strong>. Add the index number of the dimension you created in step 1 to the <strong>Index</strong> field, and add the Variable reference you created in step 2 to the Value field.</p>
+<p>Also, you&rsquo;ll need to add a Custom Dimension to the Tag, via <strong>More Settings -&gt; Custom Dimensions</strong>. Add the index number of the dimension you created in step 1 to the <strong>Index</strong> field, and add the Variable reference you created in step 2 to the Value field.</p>
 
 
 
@@ -547,7 +547,7 @@
 
 <p>The dimension contains the Client ID of the visitor. You can then use this in your backend, for example, when you want to stitch hits sent from the same <code>_ga</code> cookie together in meaningful ways.</p>
 <h2 id="3-session-id">3. Session ID</h2>
-<p>For Session ID, we're using a randomized string that is sent with each Pageview hit to Google Analytics. The string changes with each Pageview, but this doesn't matter. Because you're sending it to a session-scoped Custom Dimension, only the last value you send will be applied to the hits in the session.</p>
+<p>For Session ID, we&rsquo;re using a randomized string that is sent with each Pageview hit to Google Analytics. The string changes with each Pageview, but this doesn&rsquo;t matter. Because you&rsquo;re sending it to a session-scoped Custom Dimension, only the last value you send will be applied to the hits in the session.</p>
 <p>The required components are:</p>
 <ul>
 <li>
@@ -584,11 +584,11 @@
     <span style="color:#00a">return</span> <span style="color:#00a">new</span> <span style="color:#0aa">Date</span>().getTime() + <span style="color:#a50">&#39;.&#39;</span> + <span style="color:#0aa">Math</span>.random().toString(<span style="color:#099">36</span>).substring(<span style="color:#099">5</span>);
 }
 </code></pre></div>
-<p>This script creates a pretty unique, randomized session ID. It does it by taking the hit timestamp in Unix time, adding a period, and following with a random string of alphanumeric characters. Because of the timestamp (accurate up to milliseconds), it's very improbable that two similar session IDs are ever created.</p>
+<p>This script creates a pretty unique, randomized session ID. It does it by taking the hit timestamp in Unix time, adding a period, and following with a random string of alphanumeric characters. Because of the timestamp (accurate up to milliseconds), it&rsquo;s very improbable that two similar session IDs are ever created.</p>
 <p>An example of a session ID would be: <strong>1427856715104.jdubr7umobt9</strong>.</p>
 <h3 id="33-modified-page-view-tag">3.3. Modified Page View Tag</h3>
 <p>In your Page View Tag, add a new Custom Dimension under <strong>More Settings -&gt; Custom Dimensions</strong>. Set the index number you got from step 1, and set the value to the Variable reference <strong>{{Random Session ID}}</strong> you just created.</p>
-<p>By using only the Page View Tag, you'll be sending the Session ID with each page load. Only the last Session ID you send will remain, however, and all the hits in the session will automatically be annotated with this ID, thanks to the session-scoped Custom Dimension. If this is confusing, remember to <a href="https://developers.google.com/analytics/devguides/platform/customdimsmets">read up on Custom Dimensions</a>!</p>
+<p>By using only the Page View Tag, you&rsquo;ll be sending the Session ID with each page load. Only the last Session ID you send will remain, however, and all the hits in the session will automatically be annotated with this ID, thanks to the session-scoped Custom Dimension. If this is confusing, remember to <a href="https://developers.google.com/analytics/devguides/platform/customdimsmets">read up on Custom Dimensions</a>!</p>
 <h3 id="34-end-result">3.4. End result</h3>
 <p>By virtue of the Custom Dimension, you now have an identifier with which you can stitch together arbitrary, discrete hits in Google Analytics.</p>
 
@@ -608,9 +608,9 @@
 
 <p>Together with the hit timestamp, you can start building realistic visit paths, if that suits your fancy.</p>
 <h2 id="4-hit-timestamp">4. Hit timestamp</h2>
-<p>Hit timestamp is something you should send with every single hit you send to Google Analytics. This means that you'll need to modify all your Google Analytics Tags, which might seem like a chore.</p>
+<p>Hit timestamp is something you should send with every single hit you send to Google Analytics. This means that you&rsquo;ll need to modify all your Google Analytics Tags, which might seem like a chore.</p>
 <p>Accuracy is, of course, completely up to you, and you can opt to only send the timestamp with Pageviews and Transactions, instead.</p>
-<p>What you'll need:</p>
+<p>What you&rsquo;ll need:</p>
 <ul>
 <li>
 <p><strong>Hit-scoped Custom Dimension</strong>, to collect the timestamp in Google Analytics</p>
@@ -623,7 +623,7 @@
 </li>
 </ul>
 <h3 id="41-hit-scoped-custom-dimension">4.1. Hit-scoped Custom Dimension</h3>
-<p>There's nothing spectacular about this one. Create a new Custom Dimension in GA Admin, and set its scope to <strong>Hit</strong>.</p>
+<p>There&rsquo;s nothing spectacular about this one. Create a new Custom Dimension in GA Admin, and set its scope to <strong>Hit</strong>.</p>
 
 
 
@@ -662,7 +662,7 @@
 <p>Something completely different</p>
 </li>
 </ul>
-<p>In my setup, I wanted the timestamp to be customized for my own tastes. That means that I'm parsing it to resemble an ISO timestamp, but I'm using client local time including the timezone offset, so I can see just which timezone the user is in. So, for example, if a visitor comes from Finland, which is GMT+3 (stupid daylight savings time), the hit timestamp might look like this:</p>
+<p>In my setup, I wanted the timestamp to be customized for my own tastes. That means that I&rsquo;m parsing it to resemble an ISO timestamp, but I&rsquo;m using client local time including the timezone offset, so I can see just which timezone the user is in. So, for example, if a visitor comes from Finland, which is GMT+3 (stupid daylight savings time), the hit timestamp might look like this:</p>
 <p><strong>2015-04-03T18:55:27.466+03:00</strong></p>
 <p>This translates to April 3rd, 2015, at 6:55PM Helsinki time.</p>
 <p>So, to get something like this, some JavaScript is required. Create a new Custom JavaScript Variable, and name it <strong>{{Hit Timestamp Local Time With Offset}}</strong>. Add the following code within:</p>
@@ -689,7 +689,7 @@
 <p>This code has been gratefully copy-pasted form <a href="http://stackoverflow.com/a/17415677">this StackOverflow discussion</a>.</p>
 <p>This script works across all browsers, and returns a parsed string timestamp, with the timezone offset appended to the string.</p>
 <h3 id="43-modified-tags">4.3. Modified Tags</h3>
-<p>I send this timestamp with every single Tag that's firing on my site, but if you feel like this is overkill, you can choose to only send it with business-critical hits you'll use with other backend data, for example.</p>
+<p>I send this timestamp with every single Tag that&rsquo;s firing on my site, but if you feel like this is overkill, you can choose to only send it with business-critical hits you&rsquo;ll use with other backend data, for example.</p>
 <p>The only thing you need to do is add the Custom Dimension to any Tag you want to send it with. The setting looks like this:</p>
 
 
@@ -708,7 +708,7 @@
 
 <p>Remember to set the Index accordingly. Go back to Google Analytics Admin, and look for the Custom Dimension you created in Step 1 to get the correct index number.</p>
 <h3 id="44-end-result">4.4. End result</h3>
-<p>What you'll get is something like this:</p>
+<p>What you&rsquo;ll get is something like this:</p>
 
 
 
@@ -724,12 +724,12 @@
 </div>
 
 
-<p>It's all your transactions, coupled with the accurate hit timestamp in local time when the transaction was recorded. The timezone offset helps you compare data with your backend, if it uses server time or some fixed timezone in its own data collection.</p>
+<p>It&rsquo;s all your transactions, coupled with the accurate hit timestamp in local time when the transaction was recorded. The timezone offset helps you compare data with your backend, if it uses server time or some fixed timezone in its own data collection.</p>
 <h2 id="5-user-id">5. User ID</h2>
-<p>For User ID, you'll need to have it already implemented in some way or another. In this example, we'll pull the ID from <code>dataLayer</code>, but you might be using a 1st Party Cookie instead, which means you'll need to modify the code accordingly.</p>
-<p>Remember that tracking Users across sessions and devices is a tricky business both technologically and ethically. I'll leave things like <em>consent</em>, <em>opt-out</em>, <em>anonymisation</em>, and <em>privacy</em> to linger in the nether regions of your mind, so remember to ensure that what you're doing is considered OK by at least one other person in the right state of mind.</p>
-<p>We're using a hit-scoped Custom Dimension again, but you can choose what level of accuracy and stitching to implement. I've reasoned for hit-level accuracy in the beginning of this article (wow, that was a LONG time ago), and I think the reasoning is well-founded. Also, depending on what you want to do with the data in the backend, you might choose to send the User ID with <em>all</em> hits or with just <em>some</em> hits.</p>
-<p>To expose User ID as a Custom Dimension in your hits, you'll need:</p>
+<p>For User ID, you&rsquo;ll need to have it already implemented in some way or another. In this example, we&rsquo;ll pull the ID from <code>dataLayer</code>, but you might be using a 1st Party Cookie instead, which means you&rsquo;ll need to modify the code accordingly.</p>
+<p>Remember that tracking Users across sessions and devices is a tricky business both technologically and ethically. I&rsquo;ll leave things like <em>consent</em>, <em>opt-out</em>, <em>anonymisation</em>, and <em>privacy</em> to linger in the nether regions of your mind, so remember to ensure that what you&rsquo;re doing is considered OK by at least one other person in the right state of mind.</p>
+<p>We&rsquo;re using a hit-scoped Custom Dimension again, but you can choose what level of accuracy and stitching to implement. I&rsquo;ve reasoned for hit-level accuracy in the beginning of this article (wow, that was a LONG time ago), and I think the reasoning is well-founded. Also, depending on what you want to do with the data in the backend, you might choose to send the User ID with <em>all</em> hits or with just <em>some</em> hits.</p>
+<p>To expose User ID as a Custom Dimension in your hits, you&rsquo;ll need:</p>
 <ul>
 <li>
 <p><strong>Hit-scoped Custom Dimension</strong>, to collect the User ID in Google Analytics</p>
@@ -777,7 +777,7 @@
 </div>
 
 
-<p>As you can see, I'm not setting a default value in the Variable. This means that if <strong>userId</strong> is <em>not</em> set in <code>dataLayer</code>, this Variable will resolve to <em>undefined</em>, and the Custom Dimension will be dropped from any Tag that uses it. This is a <a href="https://www.simoahava.com/gtm-tips/undefined-dimensions-wont-get-sent/">wonderful feature</a> of the <em>analytics.js</em> library, and it really helps in keeping your Tag setup nice and lean.</p>
+<p>As you can see, I&rsquo;m not setting a default value in the Variable. This means that if <strong>userId</strong> is <em>not</em> set in <code>dataLayer</code>, this Variable will resolve to <em>undefined</em>, and the Custom Dimension will be dropped from any Tag that uses it. This is a <a href="https://www.simoahava.com/gtm-tips/undefined-dimensions-wont-get-sent/">wonderful feature</a> of the <em>analytics.js</em> library, and it really helps in keeping your Tag setup nice and lean.</p>
 <h3 id="53-modified-tags">5.3. Modified Tags</h3>
 <p>Next, add the Variable you just created into all the Tags you want to associate with logged in users. I send it with every single hit, because I want a comprehensive analysis of what my visitors do on the site.</p>
 
@@ -797,7 +797,7 @@
 
 <p>Remember to set the Index correctly according to what you setup earlier in Google Analytics Admin.</p>
 <h3 id="54-end-result">5.4. End result</h3>
-<p>What you'll get is an extra annotation on all your hits from logged in users:</p>
+<p>What you&rsquo;ll get is an extra annotation on all your hits from logged in users:</p>
 
 
 
@@ -813,10 +813,10 @@
 </div>
 
 
-<p>Now, let's not kid ourselves. If you're sending User ID with just a handful of hits, and you're also collecting Client ID, you can extrapolate User ID in your backend to all the hits done by the Client IDs associated with the User ID dimension. Like I wrote in the beginning of this article, the ethical, legal, and privacy-related considerations are yours to make alone.</p>
+<p>Now, let&rsquo;s not kid ourselves. If you&rsquo;re sending User ID with just a handful of hits, and you&rsquo;re also collecting Client ID, you can extrapolate User ID in your backend to all the hits done by the Client IDs associated with the User ID dimension. Like I wrote in the beginning of this article, the ethical, legal, and privacy-related considerations are yours to make alone.</p>
 <h2 id="6-summary">6. Summary</h2>
-<p>This article explores something I feel passionate about: meaningful data collection. Google Analytics uses a lot of information that isn't exposed in the reporting interface or the APIs, even though this information is central to how the platform aggregates the hits coming in from digital properties.</p>
-<p>Being able to access this type of granular data shouldn't be reserved for BigQuery users alone, so the solutions in this post help you add an extra level of accuracy to the stream of data flowing to the tracking platform. You can then pull this data out, combine it with other backend data, and build powerful models that will allow you to optimize your digital properties better than before.</p>
+<p>This article explores something I feel passionate about: meaningful data collection. Google Analytics uses a lot of information that isn&rsquo;t exposed in the reporting interface or the APIs, even though this information is central to how the platform aggregates the hits coming in from digital properties.</p>
+<p>Being able to access this type of granular data shouldn&rsquo;t be reserved for BigQuery users alone, so the solutions in this post help you add an extra level of accuracy to the stream of data flowing to the tracking platform. You can then pull this data out, combine it with other backend data, and build powerful models that will allow you to optimize your digital properties better than before.</p>
 
               
 

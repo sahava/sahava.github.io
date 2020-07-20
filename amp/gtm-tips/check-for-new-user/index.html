@@ -134,7 +134,7 @@
 {
     "@context": "http://schema.org",
     "@type": "WebSite",
-    "name": "Simo Ahava\x27s blog :: Simo Ahava is a Google Developer Expert for Google Analytics and Google Tag Manager. This is a blog all about web analytics development.",
+    "name": "Simo Ahava\u0027s blog :: Simo Ahava is a Google Developer Expert for Google Analytics and Google Tag Manager. This is a blog all about web analytics development.",
     
     "url": "https:\/\/www.simoahava.com\/amp\/"
 }
@@ -158,9 +158,9 @@
     }
   },
   "url": "https:\/\/www.simoahava.com\/amp\/gtm-tips\/check-for-new-user\/",
-  "datePublished": "2015-09-17T11:13:14\x2b00:00",
-  "dateModified": "2015-09-17T11:13:14\x2b00:00",
-  "description": "How to check if a user is \x22New\x22 in terms of Universal Analytics tracking. This uses Google Tag Manager to collect and send the information to Google Analytics.",
+  "datePublished": "2015-09-17T11:13:14\u002b00:00",
+  "dateModified": "2015-09-17T11:13:14\u002b00:00",
+  "description": "How to check if a user is \u0022New\u0022 in terms of Universal Analytics tracking. This uses Google Tag Manager to collect and send the information to Google Analytics.",
   "author": {
     "@type": "Person",
     "name": "Simo Ahava"
@@ -934,7 +934,7 @@ on
 
     <section class="post-content">
       <p>Every now and then we want to create a bridge between the stateful machines we send data to (e.g. <a href="https://analytics.google.com/">Google Analytics</a>), and the stateless environment where we collect the data itself (e.g. <a href="https://tagmanager.google.com/">Google Tag Manager</a>). This <em>is not easy</em>. There is no synergy between Google Analytics and Google Tag Manager which would let the latter understand anything about things like <em>sessions</em> or <em>landing pages</em> or <em>Bounce Rates</em>.</p>
-<p>One thing we can reliably measure, however, is whether or not the visitor is a <strong>New User</strong> in Google Analytics. This is done by checking whether or not the Universal Analytics cookie <code>_ga</code> exists in the user's browser when they enter the site. Naturally, this check needs to happen before the Universal Analytics Tag has time to create the cookie, which is the only difficult thing to solve here.</p>
+<p>One thing we can reliably measure, however, is whether or not the visitor is a <strong>New User</strong> in Google Analytics. This is done by checking whether or not the Universal Analytics cookie <code>_ga</code> exists in the user&rsquo;s browser when they enter the site. Naturally, this check needs to happen before the Universal Analytics Tag has time to create the cookie, which is the only difficult thing to solve here.</p>
 <h2 id="tip-32-check-for-a-new-google-analytics-user">Tip 32: Check for a new Google Analytics user</h2>
 
 
@@ -945,7 +945,7 @@ on
     </a>
   
 
-<p>The process is quite simple. When the user lands on the page, check if they have the <code>_ga</code> cookie in their browser. If not, then they're a &ldquo;New User&rdquo; in Google Analytics. Once this check is made, you can do whatever you want with this information (with one caveat, see below).</p>
+<p>The process is quite simple. When the user lands on the page, check if they have the <code>_ga</code> cookie in their browser. If not, then they&rsquo;re a &ldquo;New User&rdquo; in Google Analytics. Once this check is made, you can do whatever you want with this information (with one caveat, see below).</p>
 <p>In any case, the first thing you need is a <strong>1st Party Cookie</strong> Variable, which checks for the existence of the <code>_ga</code> cookie:</p>
 
 
@@ -958,24 +958,24 @@ on
 
 <p>This would return <em>undefined</em> if the cookie does not exist, so we can check against this in a Custom HTML Tag.</p>
 <p>The only thing to solve here is <em>when</em> to fire the Custom HTML Tag. Basically, you have two options. Either upon an event that takes place <strong>before</strong> the first Universal Analytics Tag on the page fires, or upon the same event which fires the first Universal Analytics Tag.</p>
-<p>If you make the Custom HTML Tag fire upon an event which happens <strong>after</strong> the Universal Analytics Tag is fired, it's possible that a <em>race condition</em> emerges, and the UA Tag has time to create the cookie before the check is made.</p>
+<p>If you make the Custom HTML Tag fire upon an event which happens <strong>after</strong> the Universal Analytics Tag is fired, it&rsquo;s possible that a <em>race condition</em> emerges, and the UA Tag has time to create the cookie before the check is made.</p>
 <p>Still following?</p>
 <p>The Custom HTML Tag could look like this:</p>
-<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">script</span><span class="p"></span><span class="p">&gt;</span>
-  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="p">{</span><span class="p">{</span><span class="nx">Cookie</span> <span class="o">-</span> <span class="nx">_ga</span><span class="p">}</span><span class="p">}</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nb">window</span><span class="p">.</span><span class="nx">dataLayer</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="p">{{</span><span class="nx">Cookie</span> <span class="o">-</span> <span class="nx">_ga</span><span class="p">}})</span> <span class="p">{</span>
+    <span class="nb">window</span><span class="p">.</span><span class="nx">dataLayer</span><span class="p">.</span><span class="nx">push</span><span class="p">({</span>
       <span class="s1">&#39;event&#39;</span> <span class="o">:</span> <span class="s1">&#39;newUser&#39;</span><span class="p">,</span>
       <span class="s1">&#39;ga_newUser&#39;</span> <span class="o">:</span> <span class="s1">&#39;true&#39;</span>
-    <span class="p">}</span><span class="p">)</span><span class="p">;</span>
+    <span class="p">});</span>
   <span class="p">}</span>
-<span class="p">&lt;</span><span class="p">/</span><span class="nt">script</span><span class="p">&gt;</span></code></pre></div>
+<span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span></code></pre></div>
 <p>This Tag would push a <code>dataLayer</code> object which has an <code>event</code> and an arbitrary key (<code>ga_newUser</code> in the example). You can use these to fire some Tag or run some functions that you only want to run for Google Analytics &ldquo;New Users&rdquo;.</p>
 <h2 id="update">UPDATE</h2>
-<p>As pointed out by both <strong>dusoft</strong> and <strong>Stephen Harris</strong> in the comments (thanks guys!), you can use <a href="https://www.simoahava.com/amp/analytics/understanding-tag-sequencing-in-google-tag-manager/">tag sequencing</a> to send user status information to the main Tag without having to build a clumsy event chain. You can follow the guide linked to in the previous sentence, and simply update GTM's data model with <code>google_tag_manager[{{Container ID}}].dataLayer.set('ga_newUser', 'true')</code> in the Custom HTML tag.</p>
-<p>This way the Custom HTML tag, being the setup tag of the sequence, updates the value of <code>ga_newUser</code> in GTM's data model, and it is then available to the main tag to use in a Data Layer Variable.</p>
+<p>As pointed out by both <strong>dusoft</strong> and <strong>Stephen Harris</strong> in the comments (thanks guys!), you can use <a href="https://www.simoahava.com/amp/analytics/understanding-tag-sequencing-in-google-tag-manager/">tag sequencing</a> to send user status information to the main Tag without having to build a clumsy event chain. You can follow the guide linked to in the previous sentence, and simply update GTM&rsquo;s data model with <code>google_tag_manager[{{Container ID}}].dataLayer.set('ga_newUser', 'true')</code> in the Custom HTML tag.</p>
+<p>This way the Custom HTML tag, being the setup tag of the sequence, updates the value of <code>ga_newUser</code> in GTM&rsquo;s data model, and it is then available to the main tag to use in a Data Layer Variable.</p>
 <h2 id="caveats">Caveats</h2>
-<p>So, there are some caveats here. First, it's most likely that your Universal Analytics Tag fires on the &ldquo;All Pages&rdquo; Trigger. That's the most common setup. If you set the Custom HTML Tag to fire upon the All Pages Trigger as well, any information you push into <code>dataLayer</code> in the Custom HTML Tag will not be available to the Universal Analytics Tag. Google Tag Manager has a <a href="https://support.google.com/tagmanager/answer/6089629">fixed Data Layer for the duration of an event</a>, so any changes will not be available until the next Data Layer event.</p>
-<p>Also, it's possible that the user is a &ldquo;New User&rdquo; even if they have the <code>_ga</code> in the browser. The cookie lifetime is 2 years, so it's entirely possible that the cookie exists due to an older installation or something. Also, the page can collect to a number of Universal Analytics trackers, each with different cookie configurations. The cookie name could be different, or the cookie domain could vary. In this case, just looking for <code>_ga</code> might not be robust enough to identify a New User. You'll simply need to adapt to how your site's Universal Analytics configuration is setup.</p>
+<p>So, there are some caveats here. First, it&rsquo;s most likely that your Universal Analytics Tag fires on the &ldquo;All Pages&rdquo; Trigger. That&rsquo;s the most common setup. If you set the Custom HTML Tag to fire upon the All Pages Trigger as well, any information you push into <code>dataLayer</code> in the Custom HTML Tag will not be available to the Universal Analytics Tag. Google Tag Manager has a <a href="https://support.google.com/tagmanager/answer/6089629">fixed Data Layer for the duration of an event</a>, so any changes will not be available until the next Data Layer event.</p>
+<p>Also, it&rsquo;s possible that the user is a &ldquo;New User&rdquo; even if they have the <code>_ga</code> in the browser. The cookie lifetime is 2 years, so it&rsquo;s entirely possible that the cookie exists due to an older installation or something. Also, the page can collect to a number of Universal Analytics trackers, each with different cookie configurations. The cookie name could be different, or the cookie domain could vary. In this case, just looking for <code>_ga</code> might not be robust enough to identify a New User. You&rsquo;ll simply need to adapt to how your site&rsquo;s Universal Analytics configuration is setup.</p>
 
     </section>
 

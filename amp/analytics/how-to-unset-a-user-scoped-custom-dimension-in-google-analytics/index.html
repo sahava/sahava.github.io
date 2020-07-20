@@ -134,7 +134,7 @@
 {
     "@context": "http://schema.org",
     "@type": "WebSite",
-    "name": "Simo Ahava\x27s blog :: Simo Ahava is a Google Developer Expert for Google Analytics and Google Tag Manager. This is a blog all about web analytics development.",
+    "name": "Simo Ahava\u0027s blog :: Simo Ahava is a Google Developer Expert for Google Analytics and Google Tag Manager. This is a blog all about web analytics development.",
     
     "url": "https:\/\/www.simoahava.com\/amp\/"
 }
@@ -158,8 +158,8 @@
     }
   },
   "url": "https:\/\/www.simoahava.com\/amp\/analytics\/how-to-unset-a-user-scoped-custom-dimension-in-google-analytics\/",
-  "datePublished": "2018-12-20T10:20:20\x2b02:00",
-  "dateModified": "2018-12-20T10:20:20\x2b02:00",
+  "datePublished": "2018-12-20T10:20:20\u002b02:00",
+  "dateModified": "2018-12-20T10:20:20\u002b02:00",
   "description": "By sending a valueless Custom Dimension parameter with the hit payload to Google Analytics, you can unset any previous value held by the Custom Dimension.",
   "author": {
     "@type": "Person",
@@ -938,7 +938,7 @@ on
 <p><strong>Session</strong>-scoped Custom Dimensions apply the <em>last</em> value sent during the session to <em>all</em> the hits in that session.</p>
 <p><strong>User</strong>-scoped Custom Dimensions apply the <em>last</em> value set during the session to <em>all</em> the hits in the session <strong>AND</strong> to all future hits by the same client until a new value is sent.</p>
 <p>Until now, I was under the impression that <strong>User</strong>-scoped Custom Dimensions could never be <em>unset</em>, because I thought it was not possible to send a &ldquo;null&rdquo; or &ldquo;empty&rdquo; value to a Custom Dimension. The <strong>analytics.js</strong> library, used by GTM for web and on-page Universal Analytics, prevents null values from being sent with Custom Dimensions (but not <em>empty strings</em>), so this issue never manifested itself in my implementations.</p>
-<p>However, sending hits with <strong>Measurement Protocol</strong> or by using the <strong>legacy Google Tag Manager for iOS/Android SDKs</strong> can have you run into this issue. Here's what it looks like in reports:</p>
+<p>However, sending hits with <strong>Measurement Protocol</strong> or by using the <strong>legacy Google Tag Manager for iOS/Android SDKs</strong> can have you run into this issue. Here&rsquo;s what it looks like in reports:</p>
 
 
     <a href="https://www.simoahava.com/amp/images/2018/12/user-scoped-custom-dimension-reset.jpg" title="User-scoped Custom Dimension">
@@ -952,13 +952,13 @@ on
 <p>The data is from one single user who had two successive sessions, some four hours apart. The first session, at 10:49, had two screen views, and you could query this data with the user-scoped Custom Dimension, returning the value <code>b</code>.</p>
 <p>Then, in the latter session with just one screen view, you could no longer query this user-scoped Custom Dimension.</p>
 <h2 id="how-to-send-a-parameter-without-a-value">How to send a parameter without a value</h2>
-<p>If you're using <strong>Measurement Protocol</strong>, you can easily reproduce this. All you have to do is copy an existing hit from your website, which includes a user-scoped Custom Dimension, and resend it by replacing the Custom Dimension value with nothing.</p>
-<p>Let's say the request originally had these parameters:</p>
+<p>If you&rsquo;re using <strong>Measurement Protocol</strong>, you can easily reproduce this. All you have to do is copy an existing hit from your website, which includes a user-scoped Custom Dimension, and resend it by replacing the Custom Dimension value with nothing.</p>
+<p>Let&rsquo;s say the request originally had these parameters:</p>
 <p><code>&amp;cd5=page&amp;cd6=logged-in&amp;cd7=this-user-id&amp;cd8=hello</code></p>
 <p>Here, dimension <code>&amp;cd7</code> is user-scoped in Google Analytics, so if this were the last hit sent in the session, the user would have the value <code>this-user-id</code> until some other, valid value is sent to the Custom Dimension.</p>
 <p>However, if I now copy this hit request and replace the relevant part with this:</p>
 <p><code>&amp;cd5=page&amp;cd6=logged-in&amp;cd7&amp;cd8=hello</code></p>
-<p>You can see how I removed the value from the parameter, but <strong>I still include the parameter in the query string</strong> (you could also use <code>&amp;cd6=logged-in&amp;cd7=&amp;cd8=hello</code> and it will have the same result). Now, the value is sent to Google Analytics, and it essentially <strong>nulls</strong> the value from the GA reporting interface, meaning you no longer can query this user's user-scoped Custom Dimension.</p>
+<p>You can see how I removed the value from the parameter, but <strong>I still include the parameter in the query string</strong> (you could also use <code>&amp;cd6=logged-in&amp;cd7=&amp;cd8=hello</code> and it will have the same result). Now, the value is sent to Google Analytics, and it essentially <strong>nulls</strong> the value from the GA reporting interface, meaning you no longer can query this user&rsquo;s user-scoped Custom Dimension.</p>
 <p>In BigQuery, this manifests as something like:</p>
 
 
@@ -969,11 +969,11 @@ on
     </a>
   
 
-<p>As you can see, there's a bunch of Custom Dimension indices with empty strings as their values. If any one of these corresponds with a user-scoped or session-scoped Custom Dimension, it would reset any previous value this field had.</p>
+<p>As you can see, there&rsquo;s a bunch of Custom Dimension indices with empty strings as their values. If any one of these corresponds with a user-scoped or session-scoped Custom Dimension, it would reset any previous value this field had.</p>
 <h2 id="where-the-problem-lies">Where the problem lies</h2>
 <p>Naturally, most people will be using GTM and GA for the web, so this problem will never manifest.</p>
-<p>However, <a href="https://tagmanager.google.com/">Google Tag Manager's</a> legacy SDKs (<a href="https://developers.google.com/tag-manager/ios/v3/">iOS</a> and <a href="https://developers.google.com/tag-manager/android/v4/">Android</a>) have a quirky feature.</p>
-<p>If you've defined a Data Layer variable in your Google Analytics tag, and that Data Layer key is not populated with a value when the tag fires, then the SDK will automatically send the parameter without a value, thus <strong>nulling any user- or session-scoped Custom Dimensions that receive these empty parameters</strong>.</p>
+<p>However, <a href="https://tagmanager.google.com/">Google Tag Manager&rsquo;s</a> legacy SDKs (<a href="https://developers.google.com/tag-manager/ios/v3/">iOS</a> and <a href="https://developers.google.com/tag-manager/android/v4/">Android</a>) have a quirky feature.</p>
+<p>If you&rsquo;ve defined a Data Layer variable in your Google Analytics tag, and that Data Layer key is not populated with a value when the tag fires, then the SDK will automatically send the parameter without a value, thus <strong>nulling any user- or session-scoped Custom Dimensions that receive these empty parameters</strong>.</p>
 
 
     <a href="https://www.simoahava.com/amp/images/2018/12/ios-sdk-hit.jpg" title="iOS SDK hit">
@@ -983,24 +983,24 @@ on
     </a>
   
 
-<p>Here you can see an example of what a request to GA looks like when using the normal Universal Analytics tag in the legacy iOS SDK. As you can see, there's a bunch of Custom Dimensions (circled in red) which do not have any value. These are dimensions that had no value in <code>TAGDataLayer</code> when the hit was dispatched.</p>
+<p>Here you can see an example of what a request to GA looks like when using the normal Universal Analytics tag in the legacy iOS SDK. As you can see, there&rsquo;s a bunch of Custom Dimensions (circled in red) which do not have any value. These are dimensions that had no value in <code>TAGDataLayer</code> when the hit was dispatched.</p>
 <p>This issue is <strong>not</strong> present in the <a href="https://developers.google.com/tag-manager/ios/v5/">latest GTM SDK (Firebase)</a>, which is a good thing, of course.</p>
-<p>Also, I didn't test if this problem is present if using the native Google Analytics SDK. I would imagine that <strong>it is</strong>, because the legacy GTM SDK uses the <a href="https://developers.google.com/analytics/devguides/collection/ios/v3/sdk-download">Google Analytics Services SDK</a> to dispatch the hits to GA.</p>
+<p>Also, I didn&rsquo;t test if this problem is present if using the native Google Analytics SDK. I would imagine that <strong>it is</strong>, because the legacy GTM SDK uses the <a href="https://developers.google.com/analytics/devguides/collection/ios/v3/sdk-download">Google Analytics Services SDK</a> to dispatch the hits to GA.</p>
 <h2 id="what-this-means">What this means</h2>
 <p>This has two implications.</p>
-<p><strong>First</strong>, if you're using the <strong>legacy Google Tag Manager SDKs</strong> and most likely the <strong>Google Analytics Service SDK</strong>, too, it's possible that any user-scoped or session-scoped Custom Dimensions will have corrupt data.</p>
+<p><strong>First</strong>, if you&rsquo;re using the <strong>legacy Google Tag Manager SDKs</strong> and most likely the <strong>Google Analytics Service SDK</strong>, too, it&rsquo;s possible that any user-scoped or session-scoped Custom Dimensions will have corrupt data.</p>
 <p>It would be a fair assumption to make that <strong>if the key does not have a value in Data Layer, the key is not included in the hit</strong>, or that <strong>at the very least, a valueless parameter will NOT override a previously set value</strong>, but these assumptions are, based on my findings, <strong>wrong</strong>.</p>
-<p>Thus you'll need to rethink your approach in implementation, perhaps making sure that tags that should send user- and session-scoped Custom Dimensions do not fire unless the Data Layer variables resolve to proper values. This might mean creating new tags in your container.</p>
-<p><strong>Second</strong>, this can also be a <strong>good thing</strong>. There are times when resetting Custom Dimensions is necessary. For example, if you're using a user-scoped Custom Dimension to store <strong>experiment information from A/B tests</strong>, you might want to reset these fields for users who have been in an earlier test but are no longer included in a currently running test. You know, just to keep the amount of noise down in your reports.</p>
+<p>Thus you&rsquo;ll need to rethink your approach in implementation, perhaps making sure that tags that should send user- and session-scoped Custom Dimensions do not fire unless the Data Layer variables resolve to proper values. This might mean creating new tags in your container.</p>
+<p><strong>Second</strong>, this can also be a <strong>good thing</strong>. There are times when resetting Custom Dimensions is necessary. For example, if you&rsquo;re using a user-scoped Custom Dimension to store <strong>experiment information from A/B tests</strong>, you might want to reset these fields for users who have been in an earlier test but are no longer included in a currently running test. You know, just to keep the amount of noise down in your reports.</p>
 <p>To do this, you could write some code which checks if the user is included in a current experiment and if not, send the dimension without a value.</p>
 <p>You can do this easily in the web, too. Just set the dimension value to an empty string:</p>
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">ga</span><span class="p">(</span><span class="s1">&#39;tracker.set&#39;</span><span class="p">,</span> <span class="s1">&#39;dimension25&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="p">;</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">ga</span><span class="p">(</span><span class="s1">&#39;tracker.set&#39;</span><span class="p">,</span> <span class="s1">&#39;dimension25&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">);</span>
 
 <span class="c1">// or
 </span><span class="c1"></span>
-<span class="nx">ga</span><span class="p">(</span><span class="s1">&#39;send&#39;</span><span class="p">,</span> <span class="s1">&#39;event&#39;</span><span class="p">,</span> <span class="s1">&#39;resetDimension&#39;</span><span class="p">,</span> <span class="s1">&#39;reset&#39;</span><span class="p">,</span> <span class="p">{</span><span class="nx">dimension25</span><span class="o">:</span> <span class="s1">&#39;&#39;</span><span class="p">}</span><span class="p">)</span><span class="p">;</span>
+<span class="nx">ga</span><span class="p">(</span><span class="s1">&#39;send&#39;</span><span class="p">,</span> <span class="s1">&#39;event&#39;</span><span class="p">,</span> <span class="s1">&#39;resetDimension&#39;</span><span class="p">,</span> <span class="s1">&#39;reset&#39;</span><span class="p">,</span> <span class="p">{</span><span class="nx">dimension25</span><span class="o">:</span> <span class="s1">&#39;&#39;</span><span class="p">});</span>
 </code></pre></div>
-<p>If you're using Google Tag Manager for web, it's a bit more difficult since you can't set empty fields. However, it's easy enough to just create a Custom JavaScript variable which returns an empty string:</p>
+<p>If you&rsquo;re using Google Tag Manager for web, it&rsquo;s a bit more difficult since you can&rsquo;t set empty fields. However, it&rsquo;s easy enough to just create a Custom JavaScript variable which returns an empty string:</p>
 
 
     <a href="https://www.simoahava.com/amp/images/2018/12/gtm-empty-string.jpg" title="Empty string">
@@ -1011,15 +1011,15 @@ on
   
 
 <p>The Custom JavaScript variable would look like this:</p>
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span><span class="p">(</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
   <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div>
 <h2 id="final-thoughts">Final thoughts</h2>
-<p>I think it's <strong>good</strong> that we have the option to reset a Custom Dimension value. And yes, I know it's not technically <em>resetting</em> the value, but more about exploiting a feature of the Google Analytics reporting interface which prevents you from querying Custom Dimensions with empty values.</p>
-<p>However, I think it's <strong>bad</strong> that the mobile SDKs (Firebase excluded) are doing this automatically. It's always confusing when Google Tag Manager for apps diverges from how it works on the web, and this is another example of it doing so. Instead of dropping the parameter from the requests if no valid value is found, as it does on the web, the parameter is sent with an empty value.</p>
-<p>I don't expect this to be fixed in the legacy containers, since they are expected to move out of the way of Firebase, and this is certainly yet another reason to upgrade your setup.</p>
-<p>You should probably look through your data for this phenomenon, especially if you're collecting app data using one of the legacy SDKs. If you have GA360 and access to the BigQuery exports, you can query for Custom Dimension fields that have an empty string as their value.</p>
+<p>I think it&rsquo;s <strong>good</strong> that we have the option to reset a Custom Dimension value. And yes, I know it&rsquo;s not technically <em>resetting</em> the value, but more about exploiting a feature of the Google Analytics reporting interface which prevents you from querying Custom Dimensions with empty values.</p>
+<p>However, I think it&rsquo;s <strong>bad</strong> that the mobile SDKs (Firebase excluded) are doing this automatically. It&rsquo;s always confusing when Google Tag Manager for apps diverges from how it works on the web, and this is another example of it doing so. Instead of dropping the parameter from the requests if no valid value is found, as it does on the web, the parameter is sent with an empty value.</p>
+<p>I don&rsquo;t expect this to be fixed in the legacy containers, since they are expected to move out of the way of Firebase, and this is certainly yet another reason to upgrade your setup.</p>
+<p>You should probably look through your data for this phenomenon, especially if you&rsquo;re collecting app data using one of the legacy SDKs. If you have GA360 and access to the BigQuery exports, you can query for Custom Dimension fields that have an empty string as their value.</p>
 
 
     <a href="https://www.simoahava.com/amp/images/2018/12/ga-segment.jpg" title="GA segment">
@@ -1029,8 +1029,8 @@ on
     </a>
   
 
-<p>In the Google Analytics user interface, I originally found this problem by creating a segment where I include users that have a valid value for a user-scoped Custom Dimension but exclude sessions that don't have a valid value.</p>
-<p>This segment would thus include data from users with sessions that DO have a valid value and sessions that DON'T have a valid value. After that, it's a question of using the User Explorer report and drilling down to individual user journeys to see if the valueless sessions came <strong>after</strong> those that had a valid value.</p>
+<p>In the Google Analytics user interface, I originally found this problem by creating a segment where I include users that have a valid value for a user-scoped Custom Dimension but exclude sessions that don&rsquo;t have a valid value.</p>
+<p>This segment would thus include data from users with sessions that DO have a valid value and sessions that DON&rsquo;T have a valid value. After that, it&rsquo;s a question of using the User Explorer report and drilling down to individual user journeys to see if the valueless sessions came <strong>after</strong> those that had a valid value.</p>
 
     </section>
 

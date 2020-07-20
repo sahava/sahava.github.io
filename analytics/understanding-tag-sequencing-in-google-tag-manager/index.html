@@ -40,8 +40,8 @@
     }
   },
   "url": "https:\/\/www.simoahava.com\/analytics\/understanding-tag-sequencing-in-google-tag-manager\/",
-  "datePublished": "2015-08-19T06:18:10\x2b00:00",
-  "dateModified": "2015-08-19T06:18:10\x2b00:00",
+  "datePublished": "2015-08-19T06:18:10\u002b00:00",
+  "dateModified": "2015-08-19T06:18:10\u002b00:00",
   "description": "Guide to tag sequencing in Google Tag Manager. You can use this feature to set dependencies in the firing order of related tags.",
   "author": {
     "@type": "Person",
@@ -62,7 +62,7 @@
     
 
     
-
+    
     <script src="https://www.simoahava.com/x-js/lazyload.iife.min.js"></script>
 
     
@@ -328,7 +328,7 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              <p>A recent update to <a href="http://tagmanager.google.com">Google Tag Manager</a> introduced a feature which has been on the wishlist of many users for a long time. It's called <strong>Tag sequencing</strong>, and its purpose is to facilitate the sequential firing of Tags. The idea is that you can specify a <strong>setup</strong> and a <strong>cleanup</strong> for each Tag in your container.</p>
+              <p>A recent update to <a href="http://tagmanager.google.com">Google Tag Manager</a> introduced a feature which has been on the wishlist of many users for a long time. It&rsquo;s called <strong>Tag sequencing</strong>, and its purpose is to facilitate the sequential firing of Tags. The idea is that you can specify a <strong>setup</strong> and a <strong>cleanup</strong> for each Tag in your container.</p>
 
 
 
@@ -344,11 +344,11 @@
 </div>
 
 
-<p>This article is intended to function as a quick tour of the feature. It's not the simplest feature to understand, as Tag sequencing runs parallel but separate from the normal flow of your container. Don't worry, I'll get back to this soon.</p>
+<p>This article is intended to function as a quick tour of the feature. It&rsquo;s not the simplest feature to understand, as Tag sequencing runs parallel but separate from the normal flow of your container. Don&rsquo;t worry, I&rsquo;ll get back to this soon.</p>
 <h2 id="1sequence-in-a-nutshell">1.Sequence in a nutshell</h2>
 <p>A <em>sequence</em> comprises three phases:</p>
 <p>The <strong>setup</strong>, which is a Tag which must <em>successfully</em> complete before the main Tag fires.</p>
-<p>The <strong>main tag</strong>, which is the Tag with the dependencies. It's either dependent on the <strong>setup</strong>, or it establishes a dependency with the <strong>cleanup</strong>.</p>
+<p>The <strong>main tag</strong>, which is the Tag with the dependencies. It&rsquo;s either dependent on the <strong>setup</strong>, or it establishes a dependency with the <strong>cleanup</strong>.</p>
 <p>The <strong>cleanup</strong>, which is a Tag which fires after the <strong>main tag</strong> has completed successfully.</p>
 
 
@@ -393,16 +393,16 @@
 
 <p>In the sequence above, the Page View Tag (<strong>setup</strong>) must successfully complete before the Event Tag (<strong>main tag</strong>) fires. If the Page View Tag fails, the sequence is aborted. Similarly, the Event Tag must successfully complete before the final Event Tag (<strong>cleanup</strong>) fires. If the main Tag fails, the final Event Tag will not fire.</p>
 <p>You can, of course, specify that the Tags fire even if some member in the sequence fails.</p>
-<p>The key thing to understand about the sequence is that it's <em>isolated</em>. Using Tag sequencing lets you specify a sequence of hits that fire when the <strong>main tag</strong> is triggered. This means that the <strong>setup</strong> and <strong>cleanup</strong> Tags will act completely oblivious to any Triggers you might have added to them.</p>
-<p>Indeed, no matter what Triggers you have or have not equipped on them, they are completely ignored if the Tag is used as a <strong>setup</strong> or <strong>cleanup</strong>. For this reason, it might be prudent to <em>not</em> use <strong>setup</strong> and <strong>cleanup</strong> Tags for anything except sequencing, but there is a way to make it work both ways (I'll get back to this soon).</p>
-<p>I emphasize again that this is a difficult concept to grasp. I'm sure the UX / UI could be made more intuitive, but the reason it's difficult is that it relies on callbacks, which are invisible in actual GTM usage (unless you start debugging on a really granular level).</p>
+<p>The key thing to understand about the sequence is that it&rsquo;s <em>isolated</em>. Using Tag sequencing lets you specify a sequence of hits that fire when the <strong>main tag</strong> is triggered. This means that the <strong>setup</strong> and <strong>cleanup</strong> Tags will act completely oblivious to any Triggers you might have added to them.</p>
+<p>Indeed, no matter what Triggers you have or have not equipped on them, they are completely ignored if the Tag is used as a <strong>setup</strong> or <strong>cleanup</strong>. For this reason, it might be prudent to <em>not</em> use <strong>setup</strong> and <strong>cleanup</strong> Tags for anything except sequencing, but there is a way to make it work both ways (I&rsquo;ll get back to this soon).</p>
+<p>I emphasize again that this is a difficult concept to grasp. I&rsquo;m sure the UX / UI could be made more intuitive, but the reason it&rsquo;s difficult is that it relies on callbacks, which are invisible in actual GTM usage (unless you start debugging on a really granular level).</p>
 <h2 id="2-the-callbacks">2. The callbacks</h2>
 <p>We still have some theory to cover before delving deeper into the practical stuff.</p>
 <p>In GTM, each Tag has a callback. With Tag templates, these callbacks depend on how the Tag works. For example, the Google Analytics Tag uses the <a href="https://www.simoahava.com/gtm-tips/hitcallback-eventcallback/">hitCallback</a> feature as its callback.</p>
 <p>So, when you establish a <strong>setup</strong>, for example, the <strong>main tag</strong> will not fire until the <code>onSuccess</code> callback of <strong>setup</strong> is invoked. With the Google Analytics Tag template, the <strong>tag</strong> will be fired only after the hitCallback of the <strong>setup</strong> is executed successfully. Similarly, the <strong>cleanup</strong> will not be fired until the <code>onSuccess</code> callback of the <strong>main tag</strong> is called.</p>
 <p>Phew!</p>
 <p>The other callback is <code>onFailure</code>. This is invoked in case the Tag does not successfully complete. In the settings for Tag sequencing, you can specify that the <strong>main tag</strong> must not fire if <strong>setup</strong> fails, or you can choose to ignore the failure. Similarly, you can specify that the <strong>cleanup</strong> must not fire if <strong>main tag</strong> fails, or you can, again, choose to ignore the failure.</p>
-<p>You don't have to worry about these callbacks when using Tag templates. GTM takes care of calling <code>onSuccess</code> and <code>onFailure</code> for you, and all you need to do is make sure that you've checked the correct boxes in the settings (I promise, we're going to get to the settings very soon!).</p>
+<p>You don&rsquo;t have to worry about these callbacks when using Tag templates. GTM takes care of calling <code>onSuccess</code> and <code>onFailure</code> for you, and all you need to do is make sure that you&rsquo;ve checked the correct boxes in the settings (I promise, we&rsquo;re going to get to the settings very soon!).</p>
 <h2 id="3-the-custom-html-tag">3. The Custom HTML Tag</h2>
 <p>The exception is the <strong>Custom HTML Tag</strong>. Since you might want to tell Google Tag Manager not to proceed to the next tag until something has happened (e.g. an asynchronous operation has completed), a workaround is required. If you go to the <strong>Built-in Variables</strong>, you should see a new one: <strong>HTML ID</strong>:</p>
 
@@ -433,7 +433,7 @@
 <p>The <strong>Custom HTML Tag</strong> itself</p>
 </li>
 </ol>
-<p>In the following code example, I'm running some custom JavaScript, and once it's done, I'm letting the sequence know that <code>onSuccess</code> has been called.</p>
+<p>In the following code example, I&rsquo;m running some custom JavaScript, and once it&rsquo;s done, I&rsquo;m letting the sequence know that <code>onSuccess</code> has been called.</p>
 <div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
   (<span style="color:#00a">function</span>() {
     <span style="color:#00a">var</span> gtm = <span style="color:#0aa">window</span>.google_tag_manager[{{Container ID}}];
@@ -446,10 +446,10 @@
     }
   })();
 &lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
-<p>In the first line of the script, you copy a reference to the GTM container interface into the <code>gtm</code> variable. This is a very specific interface into GTM's mechanisms, so don't worry about it too much. Suffice to say that this reference allows you to pass the <code>onSuccess</code> and <code>onFailure</code> callbacks, which is why it's important here.</p>
-<p>Next, there's a <code>try...catch</code> block, where a DOM method is executed. Once it's completed, the <code>onHtmlSuccess()</code> method of the interface is invoked. The parameter to this method is the new <strong>HTML ID</strong> Built-In Variable. This way GTM will be able to communicate to the next member of the sequence that it was precisely <em>this</em> particular Custom HTML Tag that just completed.</p>
-<p>If there's an error, then the <code>onHtmlFailure()</code> method is invoked, and information is passed to the sequence that this Tag did not complete successfully.</p>
-<p>By now it shouldn't be too complicated anymore to understand what's happening. Each Tag template has an <code>onSuccess</code> and <code>onFailure</code> callback, except for the Custom HTML Tag, where you can to provide them yourself.</p>
+<p>In the first line of the script, you copy a reference to the GTM container interface into the <code>gtm</code> variable. This is a very specific interface into GTM&rsquo;s mechanisms, so don&rsquo;t worry about it too much. Suffice to say that this reference allows you to pass the <code>onSuccess</code> and <code>onFailure</code> callbacks, which is why it&rsquo;s important here.</p>
+<p>Next, there&rsquo;s a <code>try...catch</code> block, where a DOM method is executed. Once it&rsquo;s completed, the <code>onHtmlSuccess()</code> method of the interface is invoked. The parameter to this method is the new <strong>HTML ID</strong> Built-In Variable. This way GTM will be able to communicate to the next member of the sequence that it was precisely <em>this</em> particular Custom HTML Tag that just completed.</p>
+<p>If there&rsquo;s an error, then the <code>onHtmlFailure()</code> method is invoked, and information is passed to the sequence that this Tag did not complete successfully.</p>
+<p>By now it shouldn&rsquo;t be too complicated anymore to understand what&rsquo;s happening. Each Tag template has an <code>onSuccess</code> and <code>onFailure</code> callback, except for the Custom HTML Tag, where you can to provide them yourself.</p>
 <blockquote>
 <p><strong>UPDATE 23 July 2018</strong>: Be sure to read my article on <a href="https://www.simoahava.com/analytics/tag-sequencing-custom-html-tags/">Custom HTML tags with tag sequencing</a> for more details on how Custom HTML tags and tag sequencing work together.</p>
 </blockquote>
@@ -482,16 +482,16 @@
 </div>
 
 
-<p>That's how you set up a <strong>Tag Sequence</strong>.</p>
+<p>That&rsquo;s how you set up a <strong>Tag Sequence</strong>.</p>
 <p>Now, in the very beginning I mentioned that the sequence works in isolation. This means that the setup you establish for any particular Tag will run the sequence regardless of what other Triggers you might have attached to the <strong>setup</strong> or <strong>cleanup</strong>. This also means that a sequence is always bound to the event of the <strong>main tag</strong>. Thus, if the <strong>main tag</strong> fires upon the &ldquo;All Pages&rdquo; Trigger, for example, then the entire sequence will be completed during this event.</p>
 <p>Because you can use a Tag both independently and as part of a sequence, the new <strong>Tag firing options</strong> are very useful, indeed. For example, if you have Tag A as the <strong>setup</strong> for some Tag, as well as firing on its own, individual Trigger, you can specify that Tag A must only fire <em>Once per page</em> to prevent multiple hits from being sent. This means simply that after it has fired once, either independently or as part of a sequence, it will not fire again while the user is on the page.</p>
 <p>You can also specify <em>Once per event</em>, which means that the Tag will only fire once for any given <strong>data layer event</strong>. So, you might have Tag A firing on the &ldquo;All Pages&rdquo; Trigger, and you might also have it as the <strong>cleanup</strong> of some Tag which also fires on the &ldquo;All Pages&rdquo; Trigger. By using the <em>Once per event</em> setting, Tag A will only fire once during the &ldquo;All Pages&rdquo; event.</p>
 <h2 id="5-note-about-using-datalayerpush-in-the-sequence">5. Note about using <code>dataLayer.push()</code> in the sequence</h2>
 <p>One of the main use cases for using tag sequencing would be to have the <strong>setup</strong> Tag push something into <code>dataLayer</code> for the main Tag to use.</p>
 <p>Hold your horses!</p>
-<p>If you know your Google Tag Manager, you'll know that the Data Layer available to any Tag is fixed for the <strong>duration of the Data Layer Event</strong>! So any Tags which fire on the initial <code>dataLayer.push()</code> will only be able to access the values in this push. If some Tag tries to modify the values in the Data Layer, these values will not be registered until the <strong>next</strong> <code>dataLayer.push()</code> with an event.</p>
-<p>(<strong>UPDATE:</strong> Some time after this article was written, GTM's behavior changed so that variables are resolved separately for every tag in a sequence. This means that you <em>don't</em> need to use <code>google_tag_manager[...].dataLayer.get()</code> if you want to retrieve a variable that changed from one tag in the sequence to the next. Instead, you can just use regular Google Tag Manager Variables, as their values will update for each tag in the sequence!)</p>
-<p>This hampers development a little, since it sounds like <code>dataLayer</code> can't be used as a messaging medium within a sequence, as the entire sequence operates in the span of a single Data Layer Event (the one which fired the main Tag in the first place).</p>
+<p>If you know your Google Tag Manager, you&rsquo;ll know that the Data Layer available to any Tag is fixed for the <strong>duration of the Data Layer Event</strong>! So any Tags which fire on the initial <code>dataLayer.push()</code> will only be able to access the values in this push. If some Tag tries to modify the values in the Data Layer, these values will not be registered until the <strong>next</strong> <code>dataLayer.push()</code> with an event.</p>
+<p>(<strong>UPDATE:</strong> Some time after this article was written, GTM&rsquo;s behavior changed so that variables are resolved separately for every tag in a sequence. This means that you <em>don&rsquo;t</em> need to use <code>google_tag_manager[...].dataLayer.get()</code> if you want to retrieve a variable that changed from one tag in the sequence to the next. Instead, you can just use regular Google Tag Manager Variables, as their values will update for each tag in the sequence!)</p>
+<p>This hampers development a little, since it sounds like <code>dataLayer</code> can&rsquo;t be used as a messaging medium within a sequence, as the entire sequence operates in the span of a single Data Layer Event (the one which fired the main Tag in the first place).</p>
 <p>The <a href="https://support.google.com/tagmanager/answer/6238868?vid=1-635767739658514293-2846637075">developer guide</a> actually has a note about this:</p>
 
 
@@ -513,15 +513,15 @@
 </span><span style="color:#aaa;font-style:italic"></span>google_tag_manager[{{Container ID}}].dataLayer.set(<span style="color:#a50">&#39;someKey&#39;</span>, <span style="color:#a50">&#39;someValue&#39;</span>);
 </code></pre></div>
 <p>Once you use this, any Tag that fires after this one (in the same sequence), will have its Data Layer Variable reference to <strong>someKey</strong> updated to return <em>someValue</em>.</p>
-<p>If you want to retrieve this changed value in the <em>same</em> Tag it was changed in, you can't use a Data Layer Variable, since it's resolved before the Tag is executed (and the <code>set()</code> command is run). You'll need to use this syntax instead:</p>
+<p>If you want to retrieve this changed value in the <em>same</em> Tag it was changed in, you can&rsquo;t use a Data Layer Variable, since it&rsquo;s resolved before the Tag is executed (and the <code>set()</code> command is run). You&rsquo;ll need to use this syntax instead:</p>
 <div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#aaa;font-style:italic">// To get a value, use get() with the key as the parameter
 </span><span style="color:#aaa;font-style:italic"></span>google_tag_manager[{{Container ID}}].dataLayer.get(<span style="color:#a50">&#39;someKey&#39;</span>);
 </code></pre></div>
 <p>Remember to enable the <strong>Container ID</strong> Built-in Variable!</p>
-<p>These are fairly advanced use cases, but it's very good to keep this in mind when working with Tag sequences that are scoped to a single Data Layer event.</p>
+<p>These are fairly advanced use cases, but it&rsquo;s very good to keep this in mind when working with Tag sequences that are scoped to a single Data Layer event.</p>
 <h2 id="6-why-use-tag-sequencing">6. Why use tag sequencing?</h2>
-<p>The asynchronous loading of JavaScript is taken for granted these days. It's a nice way for browsers to ensure a decent browsing experience even with large, bulky linked assets.</p>
-<p>However, asynchronous JavaScript makes it difficult to establish <em>order</em>, as you can't predict when some script or library finishes loading. Order is introduced with <em>callbacks</em> or <em>promises</em>, but these are difficult concepts to manoeuvre around, and the Google Tag Manager UI doesn't necessarily let you take advantage of them, especially if using templates.</p>
+<p>The asynchronous loading of JavaScript is taken for granted these days. It&rsquo;s a nice way for browsers to ensure a decent browsing experience even with large, bulky linked assets.</p>
+<p>However, asynchronous JavaScript makes it difficult to establish <em>order</em>, as you can&rsquo;t predict when some script or library finishes loading. Order is introduced with <em>callbacks</em> or <em>promises</em>, but these are difficult concepts to manoeuvre around, and the Google Tag Manager UI doesn&rsquo;t necessarily let you take advantage of them, especially if using templates.</p>
 <p>Sequencing lets you tap into callbacks that GTM establishes by default (the tag templates), or that you create manually (Custom HTML Tags). It lets you chain Tags together, which is particularly useful if you want to establish dependencies.</p>
 
               

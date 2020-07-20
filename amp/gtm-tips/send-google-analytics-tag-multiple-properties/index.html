@@ -136,7 +136,7 @@
 {
     "@context": "http://schema.org",
     "@type": "WebSite",
-    "name": "Simo Ahava\x27s blog :: Simo Ahava is a Google Developer Expert for Google Analytics and Google Tag Manager. This is a blog all about web analytics development.",
+    "name": "Simo Ahava\u0027s blog :: Simo Ahava is a Google Developer Expert for Google Analytics and Google Tag Manager. This is a blog all about web analytics development.",
     
     "url": "https:\/\/www.simoahava.com\/amp\/"
 }
@@ -160,8 +160,8 @@
     }
   },
   "url": "https:\/\/www.simoahava.com\/amp\/gtm-tips\/send-google-analytics-tag-multiple-properties\/",
-  "datePublished": "2017-06-26T07:54:57\x2b00:00",
-  "dateModified": "2017-06-26T07:54:57\x2b00:00",
+  "datePublished": "2017-06-26T07:54:57\u002b00:00",
+  "dateModified": "2017-06-26T07:54:57\u002b00:00",
   "description": "Use customTask to automatically send each Google Analytics tag to multiple properties. Everything is done with Google Tag Manager.",
   "author": {
     "@type": "Person",
@@ -949,25 +949,25 @@ on
     </a>
   
 
-<p>With this solution, you're overriding <code>customTask</code> in the GA tags that you want to distribute to multiple properties. The new <code>customTask</code> modifies the Universal Analytics task queue, so that the original hit is first sent, then the payload is duplicated with a new tracking ID, and then the modified payload is sent to GA, too.</p>
+<p>With this solution, you&rsquo;re overriding <code>customTask</code> in the GA tags that you want to distribute to multiple properties. The new <code>customTask</code> modifies the Universal Analytics task queue, so that the original hit is first sent, then the payload is duplicated with a new tracking ID, and then the modified payload is sent to GA, too.</p>
 <p>The way it works is simple. In <strong>all your Universal Analytics tags that you want to duplicate</strong>, scroll down to <strong>Fields to set</strong>, and add a new field:</p>
 <p><strong>Field name:</strong> customTask<br>
 <strong>Value:</strong> {{JS - customTask hit duplicator}}</p>
 <p>The <strong>{{JS - customTask hit duplicator}}</strong> is a new, user-defined Custom JavaScript Variable that you need to create. The variable content should look like this:</p>
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span><span class="p">(</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
   <span class="c1">// Replace newTrackingId value with the UA property to which you want to duplicate this tag
 </span><span class="c1"></span>  <span class="kd">var</span> <span class="nx">newTrackingId</span> <span class="o">=</span> <span class="s1">&#39;UA-XXXXX-Y&#39;</span><span class="p">;</span>  
   <span class="kd">var</span> <span class="nx">globalSendTaskName</span> <span class="o">=</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="nx">newTrackingId</span> <span class="o">+</span> <span class="s1">&#39;_originalSendTask&#39;</span><span class="p">;</span>
   <span class="k">return</span> <span class="kd">function</span><span class="p">(</span><span class="nx">customModel</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nb">window</span><span class="p">[</span><span class="nx">globalSendTaskName</span><span class="p">]</span> <span class="o">=</span> <span class="nb">window</span><span class="p">[</span><span class="nx">globalSendTaskName</span><span class="p">]</span> <span class="o">||</span> <span class="nx">customModel</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;sendHitTask&#39;</span><span class="p">)</span><span class="p">;</span>
+    <span class="nb">window</span><span class="p">[</span><span class="nx">globalSendTaskName</span><span class="p">]</span> <span class="o">=</span> <span class="nb">window</span><span class="p">[</span><span class="nx">globalSendTaskName</span><span class="p">]</span> <span class="o">||</span> <span class="nx">customModel</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;sendHitTask&#39;</span><span class="p">);</span>
     <span class="nx">customModel</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&#39;sendHitTask&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">sendModel</span><span class="p">)</span> <span class="p">{</span>
-      <span class="kd">var</span> <span class="nx">hitPayload</span> <span class="o">=</span> <span class="nx">sendModel</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;hitPayload&#39;</span><span class="p">)</span><span class="p">;</span>
-      <span class="kd">var</span> <span class="nx">trackingId</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">RegExp</span><span class="p">(</span><span class="nx">sendModel</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;trackingId&#39;</span><span class="p">)</span><span class="p">,</span> <span class="s1">&#39;gi&#39;</span><span class="p">)</span><span class="p">;</span>
-      <span class="nb">window</span><span class="p">[</span><span class="nx">globalSendTaskName</span><span class="p">]</span><span class="p">(</span><span class="nx">sendModel</span><span class="p">)</span><span class="p">;</span>
-      <span class="nx">sendModel</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&#39;hitPayload&#39;</span><span class="p">,</span> <span class="nx">hitPayload</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="nx">trackingId</span><span class="p">,</span> <span class="nx">newTrackingId</span><span class="p">)</span><span class="p">,</span> <span class="kc">true</span><span class="p">)</span><span class="p">;</span>
-      <span class="nb">window</span><span class="p">[</span><span class="nx">globalSendTaskName</span><span class="p">]</span><span class="p">(</span><span class="nx">sendModel</span><span class="p">)</span><span class="p">;</span>
-    <span class="p">}</span><span class="p">)</span><span class="p">;</span>
-  <span class="p">}</span><span class="p">;</span>
+      <span class="kd">var</span> <span class="nx">hitPayload</span> <span class="o">=</span> <span class="nx">sendModel</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;hitPayload&#39;</span><span class="p">);</span>
+      <span class="kd">var</span> <span class="nx">trackingId</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">RegExp</span><span class="p">(</span><span class="nx">sendModel</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;trackingId&#39;</span><span class="p">),</span> <span class="s1">&#39;gi&#39;</span><span class="p">);</span>
+      <span class="nb">window</span><span class="p">[</span><span class="nx">globalSendTaskName</span><span class="p">](</span><span class="nx">sendModel</span><span class="p">);</span>
+      <span class="nx">sendModel</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&#39;hitPayload&#39;</span><span class="p">,</span> <span class="nx">hitPayload</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="nx">trackingId</span><span class="p">,</span> <span class="nx">newTrackingId</span><span class="p">),</span> <span class="kc">true</span><span class="p">);</span>
+      <span class="nb">window</span><span class="p">[</span><span class="nx">globalSendTaskName</span><span class="p">](</span><span class="nx">sendModel</span><span class="p">);</span>
+    <span class="p">});</span>
+  <span class="p">};</span>
 <span class="p">}</span>
 </code></pre></div>
 <p>Remember to change the value of the <code>newTrackingId</code> variable to contain the Property ID you want to send your duplicated hit data to!</p>
@@ -985,7 +985,7 @@ on
 </ol>
 <p>If you want, you can run this <code>sendModel.set('hitPayload'...) --&gt; window[globalSendTaskName](sendModel)</code> multiple times to send the data to even more Universal Analytics properties.</p>
 <p>When you add the <code>customTask</code> field with this variable to your Universal Analytics tags, these tags will automatically duplicate the entire hit payload to the new tracking ID you specified.</p>
-<p>Because you are overwriting the <code>sendHitTask</code> task, the hit payload has already been generated, which is why you need to modify it with regular expressions rather than being able to simply change values in the <code>model</code> object itself. It's not the most elegant option when you want to make other changes to the hit payload (e.g. change the index of a custom dimension), but it does its job.</p>
+<p>Because you are overwriting the <code>sendHitTask</code> task, the hit payload has already been generated, which is why you need to modify it with regular expressions rather than being able to simply change values in the <code>model</code> object itself. It&rsquo;s not the most elegant option when you want to make other changes to the hit payload (e.g. change the index of a custom dimension), but it does its job.</p>
 
     </section>
 

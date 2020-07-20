@@ -26,7 +26,7 @@
 {
   "@context": "http://schema.org", 
   "@type": "BlogPosting",
-  "headline": "\x27Still Running\x27 Google Tag Manager Tags – What To Do? | Simo Ahava's blog",
+  "headline": "\u0027Still Running\u0027 Google Tag Manager Tags – What To Do? | Simo Ahava's blog",
   "image": "https:\/\/www.simoahava.com\/images\/2019\/09\/still-running-tag.jpg",
   "editor": "Simo Ahava",
   "publisher": {
@@ -40,9 +40,9 @@
     }
   },
   "url": "https:\/\/www.simoahava.com\/analytics\/still-running-google-tag-manager-tags\/",
-  "datePublished": "2019-09-23T09:20:24\x2b03:00",
-  "dateModified": "2019-09-23T09:20:24\x2b03:00",
-  "description": "What does it mean and what can you do when Google Tag Manager reports a tag as \x27Still Running\x27 in Preview mode?",
+  "datePublished": "2019-09-23T09:20:24\u002b03:00",
+  "dateModified": "2019-09-23T09:20:24\u002b03:00",
+  "description": "What does it mean and what can you do when Google Tag Manager reports a tag as \u0027Still Running\u0027 in Preview mode?",
   "author": {
     "@type": "Person",
     "name": "Simo Ahava"
@@ -62,7 +62,7 @@
     
 
     
-
+    
     <script src="https://www.simoahava.com/x-js/lazyload.iife.min.js"></script>
 
     
@@ -328,7 +328,7 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              <p>Sometimes, in <a href="https://tagmanager.google.com/">Google Tag Manager's</a> Debug mode, you'll see tags appear with the status <strong>Still Running</strong>, and you'll (eventually) notice that these tags are not doing what they are supposed to be doing.</p>
+              <p>Sometimes, in <a href="https://tagmanager.google.com/">Google Tag Manager&rsquo;s</a> Debug mode, you&rsquo;ll see tags appear with the status <strong>Still Running</strong>, and you&rsquo;ll (eventually) notice that these tags are not doing what they are supposed to be doing.</p>
 
 
 
@@ -346,72 +346,72 @@
 
 <p>When you see this message on a tag, it technically means this:</p>
 <p><strong>The tag failed to signal Google Tag Manager that it is &ldquo;done&rdquo;.</strong></p>
-<p>The technical explanation is, naturally, too simple to be useful. In this article, I'll explore what &ldquo;done&rdquo; means, and how especially Google Analytics tags manifest this behavior.</p>
-<p>If you're only interested in the latter, feel free to <a href="#google-analytics-tags-still-running">jump to </a> the relevant section of this article.</p>
+<p>The technical explanation is, naturally, too simple to be useful. In this article, I&rsquo;ll explore what &ldquo;done&rdquo; means, and how especially Google Analytics tags manifest this behavior.</p>
+<p>If you&rsquo;re only interested in the latter, feel free to <a href="#google-analytics-tags-still-running">jump to </a> the relevant section of this article.</p>
 <h2 id="when-is-a-tag-done">When is a tag &ldquo;done&rdquo;?</h2>
 <p>By default, a tag is done when its code is executed, and the browser is ready to move on to the next script block in queue. This can happen if the browser reaches the end of the script in turn to be executed, <strong>or if the script throws an error that is not caught</strong>.</p>
 <p>For example, take a <strong>Custom HTML Tag</strong> that looks like this:</p>
 <div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
   console.log(<span style="color:#a50">&#39;Hello!&#39;</span>);
 &lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
-<p>When it's time to fire this tag, Google Tag Manager injects this tag to the end of <code>&lt;body&gt;</code> in the document object model, and then the browser proceeds to execute the code within the <code>&lt;script&gt;</code> block.</p>
-<p>As this is all run synchronously, by the time the browser has written <code>Hello!</code> to the console, it's ready to move to the next script waiting to be executed, and GTM will thus know that this tag is now &ldquo;done&rdquo;. Preview mode will show that the tag has <strong>Succeeded</strong>.</p>
+<p>When it&rsquo;s time to fire this tag, Google Tag Manager injects this tag to the end of <code>&lt;body&gt;</code> in the document object model, and then the browser proceeds to execute the code within the <code>&lt;script&gt;</code> block.</p>
+<p>As this is all run synchronously, by the time the browser has written <code>Hello!</code> to the console, it&rsquo;s ready to move to the next script waiting to be executed, and GTM will thus know that this tag is now &ldquo;done&rdquo;. Preview mode will show that the tag has <strong>Succeeded</strong>.</p>
 <p>What about if we have an asynchronous operation in the middle of the tag?</p>
-<p>Let's simulate async with a simple timeout.</p>
+<p>Let&rsquo;s simulate async with a simple timeout.</p>
 <div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
   <span style="color:#0aa">window</span>.setTimeout(<span style="color:#00a">function</span>() {
     console.log(<span style="color:#a50">&#39;Hello!&#39;</span>);
   }, <span style="color:#099">5000</span>);
 &lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
-<p>This time, when the tag's JavaScript is executed, the browser waits five seconds before writing to the console. So when does GTM signal tag completion? No, not after 5 seconds, but rather after the browser reaches the end of the <code>setTimeout</code> expression.</p>
-<p>With asynchronous operations, Google Tag Manager doesn't <em>wait</em>. As with synchronous scripting, as soon as the browser reaches the end of the code block, the tag has <strong>Succeeded</strong>, regardless of how many asynchronous operations are still waiting for completion.</p>
-<p>You can instruct Google Tag Manager to <strong>wait</strong> for an asynchronous operation to complete by utilizing <strong>callbacks</strong>. There are four different callbacks you'd use, depending on use case, to signal Google Tag Manager that a tag has run its course:</p>
+<p>This time, when the tag&rsquo;s JavaScript is executed, the browser waits five seconds before writing to the console. So when does GTM signal tag completion? No, not after 5 seconds, but rather after the browser reaches the end of the <code>setTimeout</code> expression.</p>
+<p>With asynchronous operations, Google Tag Manager doesn&rsquo;t <em>wait</em>. As with synchronous scripting, as soon as the browser reaches the end of the code block, the tag has <strong>Succeeded</strong>, regardless of how many asynchronous operations are still waiting for completion.</p>
+<p>You can instruct Google Tag Manager to <strong>wait</strong> for an asynchronous operation to complete by utilizing <strong>callbacks</strong>. There are four different callbacks you&rsquo;d use, depending on use case, to signal Google Tag Manager that a tag has run its course:</p>
 <ol>
 <li>
-<p><code>window.google_tag_manager[{{Container ID}}].onHtmlSuccess({{HTML ID}})</code> - this is the callback you'd use in <a href="https://www.simoahava.com/analytics/understanding-tag-sequencing-in-google-tag-manager/#2-the-callbacks">Tag Sequencing</a> to signal the next tag in the sequence that the current tag has completed successfully. It requires the <code>Container ID</code> and <code>HTML ID</code> Built-in Variables to be activated.</p>
+<p><code>window.google_tag_manager[{{Container ID}}].onHtmlSuccess({{HTML ID}})</code> - this is the callback you&rsquo;d use in <a href="https://www.simoahava.com/analytics/understanding-tag-sequencing-in-google-tag-manager/#2-the-callbacks">Tag Sequencing</a> to signal the next tag in the sequence that the current tag has completed successfully. It requires the <code>Container ID</code> and <code>HTML ID</code> Built-in Variables to be activated.</p>
 </li>
 <li>
-<p><code>window.google_tag_manager[{{Container ID}}].onHtmlFailure({{HTML ID}})</code> - this is the callback you'd use in Tag Sequencing to signal the next tag in the sequence that the current tag failed in its execution.</p>
+<p><code>window.google_tag_manager[{{Container ID}}].onHtmlFailure({{HTML ID}})</code> - this is the callback you&rsquo;d use in Tag Sequencing to signal the next tag in the sequence that the current tag failed in its execution.</p>
 </li>
 <li>
-<p><code>data.gtmOnSuccess()</code> - this is the callback you'd use in <a href="https://www.simoahava.com/analytics/custom-templates-guide-for-google-tag-manager/#tag-templates-in-the-code-editor">custom tag templates</a> to signal the tag has completed successfully.</p>
+<p><code>data.gtmOnSuccess()</code> - this is the callback you&rsquo;d use in <a href="https://www.simoahava.com/analytics/custom-templates-guide-for-google-tag-manager/#tag-templates-in-the-code-editor">custom tag templates</a> to signal the tag has completed successfully.</p>
 </li>
 <li>
-<p><code>data.gtmOnFailure()</code> - this is the callback you'd use in custom tag templates to signal the tag has failed in its execution.</p>
+<p><code>data.gtmOnFailure()</code> - this is the callback you&rsquo;d use in custom tag templates to signal the tag has failed in its execution.</p>
 </li>
 </ol>
-<p>So, if we wanted the browser to wait for the <code>setTimeout</code> call to complete, we'd use it like this:</p>
+<p>So, if we wanted the browser to wait for the <code>setTimeout</code> call to complete, we&rsquo;d use it like this:</p>
 <div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
   <span style="color:#0aa">window</span>.setTimeout(<span style="color:#00a">function</span>() {
     console.log(<span style="color:#a50">&#39;Hello!&#39;</span>);
     <span style="color:#0aa">window</span>.google_tag_manager[{{Container ID}}].onHtmlSuccess({{HTML ID}});
   }, <span style="color:#099">5000</span>);
 &lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
-<p>If invoking the callback with a significant delay (e.g. 5 seconds), you might see the tag as <strong>Still Running</strong> in Preview mode only for as long as the timeout lasts. As soon as the success callback is invoked, the status will change from <strong>Still Running</strong> to <strong>Succeeded</strong> (or <strong>Failure</strong> if that's the callback you ran with).</p>
+<p>If invoking the callback with a significant delay (e.g. 5 seconds), you might see the tag as <strong>Still Running</strong> in Preview mode only for as long as the timeout lasts. As soon as the success callback is invoked, the status will change from <strong>Still Running</strong> to <strong>Succeeded</strong> (or <strong>Failure</strong> if that&rsquo;s the callback you ran with).</p>
 <h2 id="so-why-do-tags-stay-in-still-running-state">So why do tags stay in &ldquo;Still running&rdquo; state?</h2>
-<p>If you recall from the previous chapter, if the tag has no callbacks, GTM will signal completion once it reaches the end of the code block or if the code block throws a syntax error. Thus there's no actual way for a tag like this to signal it is &ldquo;Still running&rdquo;, as if the browser never reaches the end of the code block and the code never throws an error, it means the code is stuck in an infinite loop or memory leak, and the whole browser would freeze as a result.</p>
+<p>If you recall from the previous chapter, if the tag has no callbacks, GTM will signal completion once it reaches the end of the code block or if the code block throws a syntax error. Thus there&rsquo;s no actual way for a tag like this to signal it is &ldquo;Still running&rdquo;, as if the browser never reaches the end of the code block and the code never throws an error, it means the code is stuck in an infinite loop or memory leak, and the whole browser would freeze as a result.</p>
 <p><strong>However</strong>, as soon as you add either the <code>google_tag_manager[...]</code> callbacks in a Custom HTML tag or <code>data</code> callbacks in a custom tag template, GTM will actively wait for these callbacks to execute before signalling the tag is done.</p>
 <p>Ergo, if the browser never <strong>reaches</strong> these callbacks when they are nevertheless present in the code, GTM will never receive the completion signal and will remain in &ldquo;Still running&rdquo; state.</p>
-<p>Here's an example that will result in the tag being stuck in &ldquo;Still running&rdquo; limbo.</p>
+<p>Here&rsquo;s an example that will result in the tag being stuck in &ldquo;Still running&rdquo; limbo.</p>
 <div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
   <span style="color:#00a">if</span> (<span style="color:#00a">false</span>) {
     <span style="color:#0aa">window</span>.google_tag_manager[{{Container ID}}].onHtmlSuccess({{HTML ID}});
   }
 &lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
-<p>The browser will never reach the expression within the <code>if {...}</code> block because <code>false</code> will never evaluate to <code>true</code>. Thus, GTM has detected a success callback written in the code block, and it anxiously waits for it to be executed, but it never will. Thus in GTM's view, the tag is perpetually running.</p>
-<p>You can replace the callback with <code>onHtmlFailure()</code> to achieve the same result. It's enough for either callback to be present for Google Tag Manager to actively wait for resolution.</p>
-<p>With <strong>tag templates</strong>, it's the same thing. If you run this:</p>
+<p>The browser will never reach the expression within the <code>if {...}</code> block because <code>false</code> will never evaluate to <code>true</code>. Thus, GTM has detected a success callback written in the code block, and it anxiously waits for it to be executed, but it never will. Thus in GTM&rsquo;s view, the tag is perpetually running.</p>
+<p>You can replace the callback with <code>onHtmlFailure()</code> to achieve the same result. It&rsquo;s enough for either callback to be present for Google Tag Manager to actively wait for resolution.</p>
+<p>With <strong>tag templates</strong>, it&rsquo;s the same thing. If you run this:</p>
 <div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">if</span> (<span style="color:#00a">false</span>) {
   data.gtmOnSuccess();
 }
 </code></pre></div>
-<p>This template would always have its tags be stuck in &ldquo;Still running&rdquo; state, since there's no way to reach that callback.</p>
+<p>This template would always have its tags be stuck in &ldquo;Still running&rdquo; state, since there&rsquo;s no way to reach that callback.</p>
 <p>The lesson to be learned here?</p>
 <p><strong>Whenever you use callbacks in Custom HTML tags, or whenever you create custom tag templates, make sure at least SOME callback is always reached.</strong></p>
 <h2 id="google-analytics-tags-still-running">Google Analytics tags &ldquo;Still running&rdquo;</h2>
 <p><a href="https://www.analyticsmania.com/post/google-analytics-tag-in-gtm-still-running/">Many of us</a> have experienced the &ldquo;Still running&rdquo; phenomenon with Google Analytics tags.</p>
-<p>Based on what we learned in the previous chapters, we're now at an impasse. Google Analytics tags are not Custom HTML tags that you can fix the callbacks in, nor are they custom tag templates that you can modify to have the callback be invoked. So what are they?</p>
-<p>They are tag templates, where the <strong>success</strong> callback is called as soon as the Google Analytics tag's <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/field-reference#hitCallback"><code>hitCallback</code></a> method is reached. This <code>hitCallback</code> is automatically added by Google Tag Manager (preserving any <code>hitCallback</code> you add manually to the tag).</p>
+<p>Based on what we learned in the previous chapters, we&rsquo;re now at an impasse. Google Analytics tags are not Custom HTML tags that you can fix the callbacks in, nor are they custom tag templates that you can modify to have the callback be invoked. So what are they?</p>
+<p>They are tag templates, where the <strong>success</strong> callback is called as soon as the Google Analytics tag&rsquo;s <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/field-reference#hitCallback"><code>hitCallback</code></a> method is reached. This <code>hitCallback</code> is automatically added by Google Tag Manager (preserving any <code>hitCallback</code> you add manually to the tag).</p>
 
 
 
@@ -430,9 +430,9 @@
 <p>So, when a Google Analytics tag is &ldquo;Still running&rdquo;, it means its <code>hitCallback</code> was never reached.</p>
 <p>How does this happen? Here are the three most common reasons.</p>
 <h3 id="1-using-an-incorrect-variable-in-the-tracking-id-field">1. Using an incorrect variable in the Tracking ID field</h3>
-<p>The <strong>Tracking ID</strong> field in your Google Analytics tags (in Google Tag Manager) is reserved for the tracking ID. The tracking ID is your property's <code>UA-XXXXXX-Y</code> string.</p>
+<p>The <strong>Tracking ID</strong> field in your Google Analytics tags (in Google Tag Manager) is reserved for the tracking ID. The tracking ID is your property&rsquo;s <code>UA-XXXXXX-Y</code> string.</p>
 <p>Thus, the <strong>only</strong> thing you can have in a Tracking ID field is that string, or a variable which returns that string <strong>and nothing else</strong>.</p>
-<p>It's still extremely common to see people add a <strong>Google Analytics Settings variable</strong> to the Tracking ID field. This results in the Tracking ID field value resolving to an <strong>object</strong> (of your Google Analytics settings) rather than the required <code>UA-XXXXX-Y</code> string.</p>
+<p>It&rsquo;s still extremely common to see people add a <strong>Google Analytics Settings variable</strong> to the Tracking ID field. This results in the Tracking ID field value resolving to an <strong>object</strong> (of your Google Analytics settings) rather than the required <code>UA-XXXXX-Y</code> string.</p>
 
 
 
@@ -488,7 +488,7 @@
 <div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">console.log(<span style="color:#0aa">window</span>[<span style="color:#0aa">window</span>[<span style="color:#a50">&#39;GoogleAnalyticsObject&#39;</span>]].answer);
 </code></pre></div>
 <p>If the method has <strong>not</strong> been overwritten, you should see the number <code>42</code> written into the console. This is a sign that the analytics.js library still works with the global method.</p>
-<p>If you see anything else, most likely either <code>undefined</code> or an error, it would mean that there's something wrong with the global method.</p>
+<p>If you see anything else, most likely either <code>undefined</code> or an error, it would mean that there&rsquo;s something wrong with the global method.</p>
 <p><strong>NOTE!</strong> Ad blockers should <em>not</em> have a say here. If the Google Analytics endpoint is blocked, the <code>hitCallback</code> would still be reached, and if the entire <strong>analytics.js</strong> library is blocked, the <code>ga()</code> command would never be invoked in the first place.</p>
 <h4 id="how-to-fix-this-1">How to fix this?</h4>
 <p>You can change the global method name to e.g. <code>my_ga</code> in your Google Analytics tags (in GTM) by expanding <strong>Advanced Configuration</strong> and updating the <strong>Global Function Name</strong> field. This must be done consistently in <strong>all your tags</strong>, so you might want to use a <a href="https://www.simoahava.com/analytics/google-analytics-settings-variable-in-gtm/">Google Analytics Settings variable</a>.</p>
@@ -507,13 +507,13 @@
 </div>
 
 
-<p>If you're using analytics.js, you can rename the method name in the <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/renaming-the-ga-object">snippet</a>.</p>
+<p>If you&rsquo;re using analytics.js, you can rename the method name in the <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/renaming-the-ga-object">snippet</a>.</p>
 <h3 id="3-nonexistent-optimize-container-loaded-on-the-site">3. Nonexistent Optimize container loaded on the site</h3>
-<p>This is super annoying. It's a bona fide bug in my opinion, and I've reported it as such.</p>
+<p>This is super annoying. It&rsquo;s a bona fide bug in my opinion, and I&rsquo;ve reported it as such.</p>
 <p>If you create a Google Optimize tag, it actually loads the Optimize container as a Universal Analytics <a href="https://www.simoahava.com/analytics/universal-analytics-plugins-explained/">plugin</a>. The reason for this is that the plugin is used to dispatch experiment data to Google Analytics.</p>
-<p>The problem is that in case the Optimize container does not exist (you've deleted it or you had a typo in the container ID), the plugin load is never resolved and the processing of the <code>ga()</code> queue is halted.</p>
+<p>The problem is that in case the Optimize container does not exist (you&rsquo;ve deleted it or you had a typo in the container ID), the plugin load is never resolved and the processing of the <code>ga()</code> queue is halted.</p>
 <p>This, in turn, means that <strong>any Google Analytics tags firing after the Optimize container tag has fired will fail to execute</strong>. Because the plugin is never loaded, the queue is perpetually waiting for the plugin load to resolve.</p>
-<p>You can see this by using the Google Analytics Debugger extension again. In the console, you'll see something like this:</p>
+<p>You can see this by using the Google Analytics Debugger extension again. In the console, you&rsquo;ll see something like this:</p>
 
 
 
@@ -530,14 +530,14 @@
 
 
 <h4 id="how-to-fix-this-2">How to fix this?</h4>
-<p>Best way to fix this is to avoid deleting Optimize containers when they are no longer in use. That way you'll avoid stalling the site.</p>
-<p>Next, make sure you've got the container ID correctly written in the tag.</p>
-<p>Finally, a good practice for site load as well is to only load the Optimize container on pages where you are running experiments. It doesn't make sense to introduce the extra load on pages where the container is not used.</p>
+<p>Best way to fix this is to avoid deleting Optimize containers when they are no longer in use. That way you&rsquo;ll avoid stalling the site.</p>
+<p>Next, make sure you&rsquo;ve got the container ID correctly written in the tag.</p>
+<p>Finally, a good practice for site load as well is to only load the Optimize container on pages where you are running experiments. It doesn&rsquo;t make sense to introduce the extra load on pages where the container is not used.</p>
 <h2 id="summary">Summary</h2>
-<p>For all the good that Google Tag Manager's debug mode does, it does leave something to be desired in terms of verbosity and identifying where the problem lies.</p>
-<p>Native templates especially are black boxes. There's no way to know why a Google Analytics tag signals completion or timeout without trial-and-error testing.</p>
+<p>For all the good that Google Tag Manager&rsquo;s debug mode does, it does leave something to be desired in terms of verbosity and identifying where the problem lies.</p>
+<p>Native templates especially are black boxes. There&rsquo;s no way to know why a Google Analytics tag signals completion or timeout without trial-and-error testing.</p>
 <p>With the instructions provided in this article, you should be able to debug and fix those pesky &ldquo;Still running&rdquo; problems you might have with your tags.</p>
-<p>Let me know in the comments if you run across a use case not covered by this article. I'll happily update the text with kudos to you for helping to identify an unexplored problem case!</p>
+<p>Let me know in the comments if you run across a use case not covered by this article. I&rsquo;ll happily update the text with kudos to you for helping to identify an unexplored problem case!</p>
 
               
 

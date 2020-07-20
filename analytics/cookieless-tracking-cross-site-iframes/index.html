@@ -40,8 +40,8 @@
     }
   },
   "url": "https:\/\/www.simoahava.com\/analytics\/cookieless-tracking-cross-site-iframes\/",
-  "datePublished": "2020-02-19T09:00:38\x2b02:00",
-  "dateModified": "2020-02-19T09:00:38\x2b02:00",
+  "datePublished": "2020-02-19T09:00:38\u002b02:00",
+  "dateModified": "2020-02-19T09:00:38\u002b02:00",
   "description": "How to track Google Analytics traffic within a cross-site iframe without using cookies. This is useful due to how browser tracking protections prevent access to cookies in third-party (cross-site) context.",
   "author": {
     "@type": "Person",
@@ -62,7 +62,7 @@
     
 
     
-
+    
     <script src="https://www.simoahava.com/x-js/lazyload.iife.min.js"></script>
 
     
@@ -331,9 +331,9 @@
               <blockquote>
 <p><strong>Updated 15 April 2020</strong>: Fix the message forwarder to properly clone objects before they are passed to <code>postMessage</code></p>
 </blockquote>
-<p>Here I am, back with <code>&lt;iframe&gt;</code> and <strong>cross-domain tracking</strong>. I've published a couple of articles before on the topic, with <a href="https://www.simoahava.com/analytics/tracking-cross-domain-iframes-upgraded-solution/">my upgraded solution</a> being the most recent one. These articles tackle the general problem of <strong>passing the Client ID from the parent to the <code>&lt;iframe&gt;</code></strong>.</p>
+<p>Here I am, back with <code>&lt;iframe&gt;</code> and <strong>cross-domain tracking</strong>. I&rsquo;ve published a couple of articles before on the topic, with <a href="https://www.simoahava.com/analytics/tracking-cross-domain-iframes-upgraded-solution/">my upgraded solution</a> being the most recent one. These articles tackle the general problem of <strong>passing the Client ID from the parent to the <code>&lt;iframe&gt;</code></strong>.</p>
 <p>By doing so, the <code>&lt;iframe&gt;</code> can take the Client ID from the frame URL and create the <code>_ga</code> cookie in the <code>&lt;iframe&gt;</code>, allowing hits from the parent <em>and</em> the <code>&lt;iframe&gt;</code> to use the same Client ID. Great.</p>
-<p>However, there's a catch that's become more and more troubling with the increase of <a href="https://www.cookiestatus.com">browsers&rsquo; tracking protection mechanisms</a>: if the <code>&lt;iframe&gt;</code> loads content <strong>cross-site</strong>, the browser must <strong>allow cookie access in third-party context</strong>. In other words, if the browser blocks <em>third-party cookies</em>, the <code>&lt;iframe&gt;</code> will not be able to write the cookie, and Google Analytics tracking <strong>will fail</strong>.</p>
+<p>However, there&rsquo;s a catch that&rsquo;s become more and more troubling with the increase of <a href="https://www.cookiestatus.com">browsers&rsquo; tracking protection mechanisms</a>: if the <code>&lt;iframe&gt;</code> loads content <strong>cross-site</strong>, the browser must <strong>allow cookie access in third-party context</strong>. In other words, if the browser blocks <em>third-party cookies</em>, the <code>&lt;iframe&gt;</code> will not be able to write the cookie, and Google Analytics tracking <strong>will fail</strong>.</p>
 
 
 
@@ -351,10 +351,10 @@
 
 <p>This article offers <strong>two</strong> solutions to this problem.</p>
 <p>The <strong>first</strong> is that it sends the Google Analytics Client ID from the parent to the <code>&lt;iframe&gt;</code> using <code>window.postMessage</code>, and the child frame can poll for this information on every page, meaning cookies are not needed to store the Client ID.</p>
-<p>The <strong>second</strong> solution is that the child frame actually sends every single <code>dataLayer</code> message to the parent, so that the child frame doesn't have to track anything by itself. The parent handles the tracking for the child frame instead.</p>
-<p>Using <code>window.postMessage</code> is more robust than the link decoration of my earlier proposals, because it doesn't force a reload of the frame, nor does it require the child frame to support cookies. It's a bit more elaborate to set up, however.</p>
+<p>The <strong>second</strong> solution is that the child frame actually sends every single <code>dataLayer</code> message to the parent, so that the child frame doesn&rsquo;t have to track anything by itself. The parent handles the tracking for the child frame instead.</p>
+<p>Using <code>window.postMessage</code> is more robust than the link decoration of my earlier proposals, because it doesn&rsquo;t force a reload of the frame, nor does it require the child frame to support cookies. It&rsquo;s a bit more elaborate to set up, however.</p>
 <blockquote>
-<p>Warning! I'm not kidding about that last statement. Setting this up requires quite a bit of custom code, and you're working with bilateral communication between two windows. Please read this article carefully so that you understand what's going on before copy-pasting any code to your Google Tag Manager container(s).</p>
+<p>Warning! I&rsquo;m not kidding about that last statement. Setting this up requires quite a bit of custom code, and you&rsquo;re working with bilateral communication between two windows. Please read this article carefully so that you understand what&rsquo;s going on before copy-pasting any code to your Google Tag Manager container(s).</p>
 </blockquote>
 <h1 id="table-of-contents">Table of Contents</h1><nav id="TableOfContents">
   <ul>
@@ -431,13 +431,13 @@
 </div>
 
 
-<p>Even though Google recently made a veritable non-announcement by saying they'll <a href="https://blog.chromium.org/2020/01/building-more-private-web-path-towards.html">phase out third-party cookies by 2022</a>, Google Chrome will actually make things harder for cross-site cookie access much, much sooner.</p>
+<p>Even though Google recently made a veritable non-announcement by saying they&rsquo;ll <a href="https://blog.chromium.org/2020/01/building-more-private-web-path-towards.html">phase out third-party cookies by 2022</a>, Google Chrome will actually make things harder for cross-site cookie access much, much sooner.</p>
 <p>Chrome v80 (released on February 4, 2020), enforces <a href="https://web.dev/samesite-cookies-explained/">SameSite cookie restrictions</a>, which means that if a cookie should be accessible in third-party context, it requires the <code>SameSite=None</code> and <code>Secure</code> flags set. By default, these are <em>not</em> set. Unfortunately, the <code>_ga</code> cookie used by Google Analytics does <em>not</em> have these flags set, and currently there is no timeline for when support for these flags are added.</p>
-<p>So that's the problem! On the majority of browsers, the <code>_ga</code> cookie does not (or will stop to) function in third-party context, which applies to all <strong>cross-site <code>&lt;iframe&gt;</code> embeds</strong>.</p>
-<p>Luckily, there's a way around this.</p>
+<p>So that&rsquo;s the problem! On the majority of browsers, the <code>_ga</code> cookie does not (or will stop to) function in third-party context, which applies to all <strong>cross-site <code>&lt;iframe&gt;</code> embeds</strong>.</p>
+<p>Luckily, there&rsquo;s a way around this.</p>
 <p>We can ignore cookies altogether.</p>
 <h2 id="solution-1-pass-the-client-id-from-the-parent-to-the-child">Solution 1: Pass the Client ID from the parent to the child</h2>
-<p>Let's take a look at another celebrated illustration from yours truly:</p>
+<p>Let&rsquo;s take a look at another celebrated illustration from yours truly:</p>
 
 
 
@@ -453,29 +453,29 @@
 </div>
 
 
-<p>There are many potential <strong>race conditions</strong> in the mix, so some precautions need to be taken. Here's how the parent page works:</p>
+<p>There are many potential <strong>race conditions</strong> in the mix, so some precautions need to be taken. Here&rsquo;s how the parent page works:</p>
 <ol>
 <li>The parent page starts listening for messages from the <code>&lt;iframe&gt;</code> as soon as Google Tag Manager loads.</li>
 <li>Once the parent page receives the <code>childReady</code> message, it starts polling for the Google Analytics tracker until a maximum timeout is reached.</li>
 <li>As soon as the Google Analytics tracker is available, the parent page sends the Client ID back to the <code>&lt;iframe&gt;</code>.</li>
 </ol>
-<p>And here's how the <code>&lt;iframe&gt;</code> page reacts:</p>
+<p>And here&rsquo;s how the <code>&lt;iframe&gt;</code> page reacts:</p>
 <ol>
 <li>The <code>&lt;iframe&gt;</code> page starts sending the <code>childReady</code> message as soon as Google Tag Manager loads.</li>
 <li>Once the parent page responds with the Client ID (or a timeout is reached), the child page stops sending the message.</li>
 <li>The child page writes the Client ID into <code>dataLayer</code>.</li>
 </ol>
-<p>So now we know how the Client ID will be passed to the <code>&lt;iframe&gt;</code>, but that's not enough, yet.</p>
+<p>So now we know how the Client ID will be passed to the <code>&lt;iframe&gt;</code>, but that&rsquo;s not enough, yet.</p>
 <p><strong>Every single Google Analytics tag in the <code>&lt;iframe&gt;</code> must be configured to work with this setup!</strong></p>
 <p>More specifically, they all need two <strong>fields</strong> set, preferably in a <a href="https://www.simoahava.com/analytics/google-analytics-settings-variable-in-gtm/">Google Analytics Settings variable</a>:</p>
 <ul>
-<li><code>storage</code> set to <code>none</code> to avoid the tracker failing if it can't write the Client ID cookie.</li>
+<li><code>storage</code> set to <code>none</code> to avoid the tracker failing if it can&rsquo;t write the Client ID cookie.</li>
 <li><code>clientId</code> set to the value from the <code>dataLayer</code>.</li>
 </ul>
-<p>We'll get to these <a href="#google-analytics-tags">shortly</a>, don't worry.</p>
+<p>We&rsquo;ll get to these <a href="#google-analytics-tags">shortly</a>, don&rsquo;t worry.</p>
 <h2 id="solution-2-forward-all-data-layer-messages-from-child-to-parent">Solution 2: Forward all Data Layer messages from child to parent</h2>
-<p>If you don't want to do any tracking within the <code>&lt;iframe&gt;</code> (I don't blame you), you can actually delegate tracking to the parent by sending all <code>dataLayer</code> messages to the parent for processing.</p>
-<p>This means the parent page would manage tags for both the parent page's native interactions <em>as well as</em> those that happen within the <code>&lt;iframe&gt;</code>.</p>
+<p>If you don&rsquo;t want to do any tracking within the <code>&lt;iframe&gt;</code> (I don&rsquo;t blame you), you can actually delegate tracking to the parent by sending all <code>dataLayer</code> messages to the parent for processing.</p>
+<p>This means the parent page would manage tags for both the parent page&rsquo;s native interactions <em>as well as</em> those that happen within the <code>&lt;iframe&gt;</code>.</p>
 
 
 
@@ -491,7 +491,7 @@
 </div>
 
 
-<p>The process is almost the same as with the first solution. Here's how the parent page works:</p>
+<p>The process is almost the same as with the first solution. Here&rsquo;s how the parent page works:</p>
 <ol>
 <li>The parent page starts listening for messages from the <code>&lt;iframe&gt;</code> as soon as Google Tag Manager loads.</li>
 <li>Once the parent page receives the <code>childReady</code> message, it responds with a <code>parentReady</code> message.</li>
@@ -502,7 +502,7 @@
 <li>The <code>&lt;iframe&gt;</code> page starts sending the <code>childReady</code> message as soon as Google Tag Manager loads.</li>
 <li>Once the parent page responds with <code>parentReady</code>, the child frame &ldquo;hijacks&rdquo; the <code>dataLayer.push()</code> method, and sends all the messages passed to it over to the parent page.</li>
 </ol>
-<p>The messages from the child frame are namespaced to keep them separate from the parent's &ldquo;native&rdquo; <code>dataLayer</code> messages, and they include some metadata about the <code>&lt;iframe&gt;</code> (mainly the URL and title).</p>
+<p>The messages from the child frame are namespaced to keep them separate from the parent&rsquo;s &ldquo;native&rdquo; <code>dataLayer</code> messages, and they include some metadata about the <code>&lt;iframe&gt;</code> (mainly the URL and title).</p>
 
 
 
@@ -584,9 +584,9 @@
 </span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#0aa">window</span>.addEventListener(<span style="color:#a50">&#39;message&#39;</span>, postCallback);
   })();
 &lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
-<p>There's quite a lot happening here, so let's walk through the code! If you don't care about this deep-dive, you can <a href="#configuring-the-message-forwarding-system">skip right to</a> how you might need to configure the parent page container to support the message forwarding setup.</p>
+<p>There&rsquo;s quite a lot happening here, so let&rsquo;s walk through the code! If you don&rsquo;t care about this deep-dive, you can <a href="#configuring-the-message-forwarding-system">skip right to</a> how you might need to configure the parent page container to support the message forwarding setup.</p>
 <h4 id="configuration">Configuration</h4>
-<p>First, there's the configuration stuff:</p>
+<p>First, there&rsquo;s the configuration stuff:</p>
 <div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#aaa;font-style:italic">// Tracking ID whose _ga cookie to use
 </span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">var</span> trackingId = <span style="color:#a50">&#39;UA-40669554-1&#39;</span>;
 
@@ -596,11 +596,11 @@
 <span style="color:#aaa;font-style:italic">// Set to the origin (&#34;https://www.domain.com&#34;) of the iframe you want to communicate with
 </span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">var</span> childOrigin = <span style="color:#a50">&#39;https://www.gtmtools.com&#39;</span>;
 </code></pre></div>
-<p>The <code>trackingId</code> should be set to the Google Analytics tracking ID of the tracker whose <code>_ga</code> cookie you want to use. This is because there might be multiple GA cookies each storing the Client ID for a different Tracking ID. If you're unsure, just type your regular tracking ID as the value of the <code>trackingId</code> variable.</p>
+<p>The <code>trackingId</code> should be set to the Google Analytics tracking ID of the tracker whose <code>_ga</code> cookie you want to use. This is because there might be multiple GA cookies each storing the Client ID for a different Tracking ID. If you&rsquo;re unsure, just type your regular tracking ID as the value of the <code>trackingId</code> variable.</p>
 <p>Set <code>maxGATime</code> to the maximum amount of time that the page waits for Google Analytics to load. You can certainly set this a lot higher than <em>2000</em> (2 seconds) if you want, but I would recommend against indefinite polling.</p>
 <p>Set the <code>childOrigin</code> to the <strong>origin</strong> of the <code>&lt;iframe&gt;</code> you want to send the data to. The <strong>origin</strong> is everything in the URL up to the first <em>path</em> slash. So, if the URL is <code>https://www.simoahava.com/my-home-page/</code>, the <strong>origin</strong> would be <code>https://www.simoahava.com</code>.</p>
 <blockquote>
-<p>It's important to <strong>not</strong> have the trailing slash, as that's part of the <em>path</em> component and not the <em>origin</em>.</p>
+<p>It&rsquo;s important to <strong>not</strong> have the trailing slash, as that&rsquo;s part of the <em>path</em> component and not the <em>origin</em>.</p>
 </blockquote>
 <h4 id="the-listener">The listener</h4>
 <p>On the last line of the main code block, we add the <code>message</code> listener:</p>
@@ -651,7 +651,7 @@
 };
 </code></pre></div>
 <p>First, if the message retrieved was not expected (e.g. coming from a different <code>&lt;iframe&gt;</code> or has the wrong content), the callback stops execution.</p>
-<p>If the message <em>was</em> from the <code>&lt;iframe&gt;</code>, the first thing that's done is notify the child frame that the parent has received the message and is ready to start bilateral communication.</p>
+<p>If the message <em>was</em> from the <code>&lt;iframe&gt;</code>, the first thing that&rsquo;s done is notify the child frame that the parent has received the message and is ready to start bilateral communication.</p>
 <p>Next, a <code>window.setInterval</code> starts polling the parent page every 200 milliseconds up to the default of 2 full seconds. With each poll, the script checks if the Google Analytics tracker has been created. If it has, the script takes the <code>clientId</code> from the tracker, and sends it back to the <code>&lt;iframe&gt;</code> using <code>event.source.postMessage()</code>. After this is done, the polling is manually stopped to avoid having the Client ID being sent multiple times to the <code>&lt;iframe&gt;</code>.</p>
 <p>In essence, the parent page needs to wait for two things:</p>
 <ol>
@@ -661,7 +661,7 @@
 <p>The last code block checks if the message from the child frame contains an object with the <code>event</code> property, in which case it pushes this entire object into the parent page <code>dataLayer</code>.</p>
 <h3 id="configuring-the-message-forwarding-system">Configuring the message forwarding system</h3>
 <p>The parent page listens for <code>dataLayer</code> messages forwarded from the embedded <code>&lt;iframe&gt;</code>. You can create tags, triggers, and variables that react to these messages.</p>
-<p>All triggers will be of type <strong>Custom Event trigger</strong>. That's because all the events sent from the frame will be appended with the <code>iframe.</code> prefix - even those without an <code>event</code> value (they'll be sent as <code>iframe.Message</code>). So, if you want to fire a tag when a link is clicked in the <code>&lt;iframe&gt;</code>, the trigger could look like this:</p>
+<p>All triggers will be of type <strong>Custom Event trigger</strong>. That&rsquo;s because all the events sent from the frame will be appended with the <code>iframe.</code> prefix - even those without an <code>event</code> value (they&rsquo;ll be sent as <code>iframe.Message</code>). So, if you want to fire a tag when a link is clicked in the <code>&lt;iframe&gt;</code>, the trigger could look like this:</p>
 
 
 
@@ -677,7 +677,7 @@
 </div>
 
 
-<p>It requires quite a bit of manual configuration to get the whole thing up and running. But it can make your whole setup run much smoother, as you won't need to embed any extra code within the <code>&lt;iframe&gt;</code>.</p>
+<p>It requires quite a bit of manual configuration to get the whole thing up and running. But it can make your whole setup run much smoother, as you won&rsquo;t need to embed any extra code within the <code>&lt;iframe&gt;</code>.</p>
 <p>Each message sent from the <code>&lt;iframe&gt;</code> is automatically enhanced with some page-level information:</p>
 <div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">{
   iframe: {
@@ -689,18 +689,18 @@
 }
 </code></pre></div>
 <p>If you want to update your parent page tags to use the <code>&lt;iframe&gt;</code> page-level data, you need to create Data Layer variables for <strong>iframe.pageData.url</strong> (the URL of the <code>&lt;iframe&gt;</code> page) and <strong>iframe.pageData.title</strong> (the page title).</p>
-<p>Once you have all these configured, you're ready to configure the <code>&lt;iframe&gt;</code> page!</p>
+<p>Once you have all these configured, you&rsquo;re ready to configure the <code>&lt;iframe&gt;</code> page!</p>
 <h2 id="the-embedded-child-page-setup">The embedded (child) page setup</h2>
-<p>This is where things get tricky. In this guide, we're covering a fairly typical use case where the <code>&lt;iframe&gt;</code> content is only ever interacted with as an embed. So there's no scenario where the user would visit the page loaded in the <code>&lt;iframe&gt;</code> in a first-party or top-frame context. I'll <a href="#multi-purpose-container">briefly discuss that scenario later</a> as well, but for now let's assume that the page in the <code>&lt;iframe&gt;</code> is only accessed as an embedded element.</p>
-<p>You'll need to do <strong>three</strong> things in the Google Tag Manager container of the <code>&lt;iframe&gt;</code> page.</p>
+<p>This is where things get tricky. In this guide, we&rsquo;re covering a fairly typical use case where the <code>&lt;iframe&gt;</code> content is only ever interacted with as an embed. So there&rsquo;s no scenario where the user would visit the page loaded in the <code>&lt;iframe&gt;</code> in a first-party or top-frame context. I&rsquo;ll <a href="#multi-purpose-container">briefly discuss that scenario later</a> as well, but for now let&rsquo;s assume that the page in the <code>&lt;iframe&gt;</code> is only accessed as an embedded element.</p>
+<p>You&rsquo;ll need to do <strong>three</strong> things in the Google Tag Manager container of the <code>&lt;iframe&gt;</code> page.</p>
 <ol>
 <li>Create a Custom HTML tag that communicates with the parent page.</li>
-<li>Update the settings for <strong>all</strong> of your Universal Analytics (and App+Web while you're at it) tags.</li>
-<li>Update the triggers for your Universal Analytics tags so they don't fire until they've received the Client ID from the parent.</li>
+<li>Update the settings for <strong>all</strong> of your Universal Analytics (and App+Web while you&rsquo;re at it) tags.</li>
+<li>Update the triggers for your Universal Analytics tags so they don&rsquo;t fire until they&rsquo;ve received the Client ID from the parent.</li>
 </ol>
 <h3 id="the-custom-html-tag-1">The Custom HTML tag</h3>
 <p>Create a new Custom HTML tag, and set it to fire on the <strong>All Pages</strong> trigger. If the <code>&lt;iframe&gt;</code> is a single-page app, you should still only fire the Custom HTML tag on the All Pages trigger, and not with every SPA page change, for example.</p>
-<p>Here's what you should copy-paste into the tag:</p>
+<p>Here&rsquo;s what you should copy-paste into the tag:</p>
 <div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
   (<span style="color:#00a">function</span>() {
     <span style="color:#aaa;font-style:italic">// If not in iframe, do nothing
@@ -802,7 +802,7 @@
 </span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#0aa">window</span>.addEventListener(<span style="color:#a50">&#39;message&#39;</span>, postCallback);
   })();
 &lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
-<p>The following chapters will walk through this code. You can skip right to <a href="#google-analytics-tags">configuring the Google Analytics tags</a> if you don't care about the walkthrough.</p>
+<p>The following chapters will walk through this code. You can skip right to <a href="#google-analytics-tags">configuring the Google Analytics tags</a> if you don&rsquo;t care about the walkthrough.</p>
 <h4 id="configuration-1">Configuration</h4>
 <p>This is the first code block:</p>
 <div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#aaa;font-style:italic">// If not in iframe, do nothing
@@ -814,7 +814,7 @@
 </span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">var</span> sendDataLayerMessages = <span style="color:#00a">true</span>;
 
 <span style="color:#aaa;font-style:italic">// Set the prefix that will be used in the event name, and under which all
-</span><span style="color:#aaa;font-style:italic"></span><span style="color:#aaa;font-style:italic">// the dataLayer properties will be embedded
+</span><span style="color:#aaa;font-style:italic">// the dataLayer properties will be embedded
 </span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">var</span> dataLayerMessagePrefix = <span style="color:#a50">&#39;iframe&#39;</span>;
 
 <span style="color:#aaa;font-style:italic">// Set to parent origin (&#34;https://www.domain.com&#34;)
@@ -823,13 +823,13 @@
 <span style="color:#aaa;font-style:italic">// Maximum time in milliseconds to poll the parent frame for ready signal
 </span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">var</span> maxTime = <span style="color:#099">2000</span>;
 </code></pre></div>
-<p>First of all, if the page is <strong>not</strong> loaded in an <code>&lt;iframe&gt;</code>, the code does not and should not execute at all. There's no parent page to communicate with, so executing any of the following code would be unnecessary.</p>
-<p>You can set <code>sendDataLayerMessages</code> to <code>false</code> if you <strong>don't</strong> want to forward the <code>dataLayer</code> messages from the child to the parent. This is useful if you're comfortable with tracking everything within the <code>&lt;iframe&gt;</code> itself, and don't want to bother with setting up the corresponding tags in the parent page.</p>
-<p>The <code>dataLayerMessagePrefix</code> value is what will be used to namespace the <code>dataLayer</code> messages that are forwarded from the child to the parent (if you haven't disabled forwarding per the previous paragraph).</p>
+<p>First of all, if the page is <strong>not</strong> loaded in an <code>&lt;iframe&gt;</code>, the code does not and should not execute at all. There&rsquo;s no parent page to communicate with, so executing any of the following code would be unnecessary.</p>
+<p>You can set <code>sendDataLayerMessages</code> to <code>false</code> if you <strong>don&rsquo;t</strong> want to forward the <code>dataLayer</code> messages from the child to the parent. This is useful if you&rsquo;re comfortable with tracking everything within the <code>&lt;iframe&gt;</code> itself, and don&rsquo;t want to bother with setting up the corresponding tags in the parent page.</p>
+<p>The <code>dataLayerMessagePrefix</code> value is what will be used to namespace the <code>dataLayer</code> messages that are forwarded from the child to the parent (if you haven&rsquo;t disabled forwarding per the previous paragraph).</p>
 <p>The <code>parentOrigin</code> should be set to the <strong>origin</strong> of the parent page, i.e. the page to which the messages are sent. Remember, <strong>origin</strong> is everything from the protocol to the first slash of the path component. In other words, the <strong>origin</strong> of <code>https://www.simoahava.com/some-page</code> is <code>https://www.simoahava.com</code>.</p>
 <p>Finally, the <code>maxTime</code> is how long the <code>&lt;iframe&gt;</code> tries to send the <code>childReady</code> message to the parent before it stops.</p>
 <h4 id="the-poller">The poller</h4>
-<p>The child frame polls the parent page with the <code>childReady</code> message to signal it's ready for the bilateral communication to start.</p>
+<p>The child frame polls the parent page with the <code>childReady</code> message to signal it&rsquo;s ready for the bilateral communication to start.</p>
 <div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">var</span> pollCallback = <span style="color:#00a">function</span>() {
   <span style="color:#aaa;font-style:italic">// If maximum time is reached, stop polling
 </span><span style="color:#aaa;font-style:italic"></span>  maxTime -= pollInterval;
@@ -881,7 +881,7 @@
 <li>Then the method rewrites the <code>dataLayer.push</code> function to send everything pushed into <code>dataLayer</code> to the parent page as well.</li>
 </ol>
 <p>In other words, everything added to the <code>dataLayer</code> array within the <code>&lt;iframe&gt;</code> is forwarded to the parent page, so that the parent page can handle tracking of interactions and events within the <code>&lt;iframe&gt;</code> as well.</p>
-<p>For example, here's how the forwarded transpiles and sends a <code>dataLayer</code> message to the parent page.</p>
+<p>For example, here&rsquo;s how the forwarded transpiles and sends a <code>dataLayer</code> message to the parent page.</p>
 <div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#aaa;font-style:italic">// This is what&#39;s pushed into dataLayer:
 </span><span style="color:#aaa;font-style:italic"></span>{
   event: <span style="color:#a50">&#39;userLogin&#39;</span>,
@@ -924,7 +924,7 @@
 
 
 <p>As the <code>&lt;iframe&gt;</code> will no longer use cookies to persist the Client ID, you need to set the <code>storage</code> field value to <code>none</code>.</p>
-<p>Then, because the child frame uses the Client ID pushed into <code>dataLayer</code> by the message listener, you'll need to update the <code>clientId</code> field to use a Data Layer variable for <code>clientId</code>. It should look like this:</p>
+<p>Then, because the child frame uses the Client ID pushed into <code>dataLayer</code> by the message listener, you&rsquo;ll need to update the <code>clientId</code> field to use a Data Layer variable for <code>clientId</code>. It should look like this:</p>
 
 
 
@@ -986,10 +986,10 @@
 <p>You can then check for this variable value in your tags, triggers, and variables, to make sure that tracking is configured correctly depending on how the page is accessed.</p>
 <h2 id="summary">Summary</h2>
 <p>This has been a difficult article to write, and I feel a bit embarrassed to leave so much work to you, my noble reader.</p>
-<p>The thing is - working with this type of a bilateral messaging setup requires both the parent page and the <code>&lt;iframe&gt;</code> page to be in sync. The Custom HTML tags I've designed have been built to naturally reject race conditions, but it's possible you'll need to modify one or the other (or both) to make things work on your site.</p>
-<p>Over the course of my career, and especially over the time I've been blogging about Google Tag Manager, trying to perfect tracking of <code>&lt;iframe&gt;</code> elements has been my personal Mount Everest. Cross-site tracking of embedded content has take over my life to such an extent that I'm losing sleep and seriously considering hunting down Ibrahim or Isabella Frame, or whoever the person is who thought the <code>&lt;iframe&gt;</code> is a great addition to the HTML spec.</p>
-<p>Regardless, it's still <em>such a common use case</em> on the SaaS- and micro service -rich web to embed cross-site content. Naturally, there's an incentive to know what happens in these <code>&lt;iframe&gt;</code> blocks that I consider the time I've spent trying to solve this particular riddle to be almost worthwhile.</p>
-<p>Anyway, I expect <em>and hope</em> that you have comments and/or questions about this setup. Let's continue the discussion in the comments of this article, thank you!</p>
+<p>The thing is - working with this type of a bilateral messaging setup requires both the parent page and the <code>&lt;iframe&gt;</code> page to be in sync. The Custom HTML tags I&rsquo;ve designed have been built to naturally reject race conditions, but it&rsquo;s possible you&rsquo;ll need to modify one or the other (or both) to make things work on your site.</p>
+<p>Over the course of my career, and especially over the time I&rsquo;ve been blogging about Google Tag Manager, trying to perfect tracking of <code>&lt;iframe&gt;</code> elements has been my personal Mount Everest. Cross-site tracking of embedded content has take over my life to such an extent that I&rsquo;m losing sleep and seriously considering hunting down Ibrahim or Isabella Frame, or whoever the person is who thought the <code>&lt;iframe&gt;</code> is a great addition to the HTML spec.</p>
+<p>Regardless, it&rsquo;s still <em>such a common use case</em> on the SaaS- and micro service -rich web to embed cross-site content. Naturally, there&rsquo;s an incentive to know what happens in these <code>&lt;iframe&gt;</code> blocks that I consider the time I&rsquo;ve spent trying to solve this particular riddle to be almost worthwhile.</p>
+<p>Anyway, I expect <em>and hope</em> that you have comments and/or questions about this setup. Let&rsquo;s continue the discussion in the comments of this article, thank you!</p>
 
               
 

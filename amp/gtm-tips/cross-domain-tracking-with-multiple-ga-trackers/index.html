@@ -134,7 +134,7 @@
 {
     "@context": "http://schema.org",
     "@type": "WebSite",
-    "name": "Simo Ahava\x27s blog :: Simo Ahava is a Google Developer Expert for Google Analytics and Google Tag Manager. This is a blog all about web analytics development.",
+    "name": "Simo Ahava\u0027s blog :: Simo Ahava is a Google Developer Expert for Google Analytics and Google Tag Manager. This is a blog all about web analytics development.",
     
     "url": "https:\/\/www.simoahava.com\/amp\/"
 }
@@ -158,8 +158,8 @@
     }
   },
   "url": "https:\/\/www.simoahava.com\/amp\/gtm-tips\/cross-domain-tracking-with-multiple-ga-trackers\/",
-  "datePublished": "2017-03-08T15:15:04\x2b00:00",
-  "dateModified": "2017-03-08T15:15:04\x2b00:00",
+  "datePublished": "2017-03-08T15:15:04\u002b00:00",
+  "dateModified": "2017-03-08T15:15:04\u002b00:00",
   "description": "How to setup cross-domain tracking to Google Analytics when you have more than one tracker running on the page.",
   "author": {
     "@type": "Person",
@@ -933,8 +933,8 @@ on
     </header>
 
     <section class="post-content">
-      <p>To be fair, this tip isn't just for <a href="https://tagmanager.google.com/">Google Tag Manager</a> but for regular old on-page <a href="https://analytics.google.com/">Google Analytics</a> as well. It's one of those little things that's corroding your data quality without you ever realizing it. Namely, this tip is about how to handle <strong>cross-domain tracking</strong> in situations where you are sending data to multiple Google Analytics properties on the same page.</p>
-<p>It's a very typical scenario - you have a &ldquo;local&rdquo; property, which tracks only the traffic of the current site, and then a &ldquo;rollup&rdquo; property, where you send data from all your organization's websites. The rollup property would need cross-domain tracking enabled, since you want to track users across your organization's many website domains.</p>
+      <p>To be fair, this tip isn&rsquo;t just for <a href="https://tagmanager.google.com/">Google Tag Manager</a> but for regular old on-page <a href="https://analytics.google.com/">Google Analytics</a> as well. It&rsquo;s one of those little things that&rsquo;s corroding your data quality without you ever realizing it. Namely, this tip is about how to handle <strong>cross-domain tracking</strong> in situations where you are sending data to multiple Google Analytics properties on the same page.</p>
+<p>It&rsquo;s a very typical scenario - you have a &ldquo;local&rdquo; property, which tracks only the traffic of the current site, and then a &ldquo;rollup&rdquo; property, where you send data from all your organization&rsquo;s websites. The rollup property would need cross-domain tracking enabled, since you want to track users across your organization&rsquo;s many website domains.</p>
 <h2 id="tip-56-manage-cross-domain-tracking-in-multi-property-setups">Tip 56: Manage Cross-domain Tracking In Multi-Property Setups</h2>
 
 
@@ -946,12 +946,12 @@ on
   
 
 <p>The problem, in a nutshell, is that your <strong>cross-domain tracking property has the power to overwrite the value of the <code>_ga</code> cookie</strong>. It does this with the combination of the <code>allowLinker: true</code> field and a linker parameter in the URL of the page.</p>
-<p>Since all of your trackers and tags, by default, use the <code>_ga</code>, it's possible this is wreaking havoc on your data quality.</p>
+<p>Since all of your trackers and tags, by default, use the <code>_ga</code>, it&rsquo;s possible this is wreaking havoc on your data quality.</p>
 <p>You see, when a URL is loaded with the linker parameter, such as when traffic from another domain to the current page is decorated with <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/linker#overview">cross-domain linker parameters</a>, any tracker on the page with <code>allowLinker: true</code> checks if the linker parameter is valid. If it is, the Client ID is grabbed from the linker parameter and used on the current page to replace the value of the <code>_ga</code> cookie.</p>
-<p>Thus, if there already WAS a <code>_ga</code> cookie with a different Client ID, tough luck. It's now overwritten with what was in the linker parameter.</p>
+<p>Thus, if there already WAS a <code>_ga</code> cookie with a different Client ID, tough luck. It&rsquo;s now overwritten with what was in the linker parameter.</p>
 <p>This means that any user who used to have a Client ID of X in your GA tracking will now have a Client ID of Y, meaning they are effectively treated as completely different users.</p>
 <p>Annoying, right?</p>
-<p>Well, there's a way to fix this. Basically, in all the trackers and tags that DO accept cross-domain tracking, you will need to use <strong>a different cookie name than <code>_ga</code></strong> to store the Client ID! This way the cross-domain Client ID will not overwrite any pre-existing user data stored in the browser, but will be isolated in its own cookie where it will harm no one.</p>
+<p>Well, there&rsquo;s a way to fix this. Basically, in all the trackers and tags that DO accept cross-domain tracking, you will need to use <strong>a different cookie name than <code>_ga</code></strong> to store the Client ID! This way the cross-domain Client ID will not overwrite any pre-existing user data stored in the browser, but will be isolated in its own cookie where it will harm no one.</p>
 <p>Here are the basic steps.</p>
 <ol>
 <li>
@@ -961,15 +961,15 @@ on
 <p>In every single tag (GTM) or tracker (regular GA) <strong>used for cross-domain tracking</strong>, make sure to set the <code>cookieName</code> field to something other than <code>_ga</code>, e.g. <code>_rollupGa</code>, and make sure to set the <code>allowLinker</code> field to <code>true</code>.</p>
 </li>
 </ol>
-<p>So in the end you should have two types of field configurations in your GA trackers and tags. One set has no cross-domain settings, no special cookie settings, and no <code>allowLinker</code> field set. The other set has a new cookie name and has the <code>allowLinker</code> field set to <code>true</code>. Here's an example using regular, on-page GA:</p>
+<p>So in the end you should have two types of field configurations in your GA trackers and tags. One set has no cross-domain settings, no special cookie settings, and no <code>allowLinker</code> field set. The other set has a new cookie name and has the <code>allowLinker</code> field set to <code>true</code>. Here&rsquo;s an example using regular, on-page GA:</p>
 <div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="c1">// Regular GA tracker, uses _ga cookie
-</span><span class="c1"></span><span class="nx">ga</span><span class="p">(</span><span class="s1">&#39;create&#39;</span><span class="p">,</span> <span class="s1">&#39;UA-12345-1&#39;</span><span class="p">,</span> <span class="p">{</span><span class="nx">allowLinker</span><span class="o">:</span> <span class="kc">false</span><span class="p">}</span><span class="p">)</span><span class="p">;</span>
+</span><span class="c1"></span><span class="nx">ga</span><span class="p">(</span><span class="s1">&#39;create&#39;</span><span class="p">,</span> <span class="s1">&#39;UA-12345-1&#39;</span><span class="p">,</span> <span class="p">{</span><span class="nx">allowLinker</span><span class="o">:</span> <span class="kc">false</span><span class="p">});</span>
 
 <span class="c1">// Rollup GA tracker
-</span><span class="c1"></span><span class="nx">ga</span><span class="p">(</span><span class="s1">&#39;create&#39;</span><span class="p">,</span> <span class="s1">&#39;UA-12345-2&#39;</span><span class="p">,</span> <span class="p">{</span><span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;rollup&#39;</span><span class="p">,</span> <span class="nx">cookieName</span><span class="o">:</span> <span class="s1">&#39;_rollupGa&#39;</span><span class="p">,</span> <span class="nx">allowLinker</span><span class="o">:</span> <span class="kc">true</span><span class="p">}</span><span class="p">)</span><span class="p">;</span>
+</span><span class="c1"></span><span class="nx">ga</span><span class="p">(</span><span class="s1">&#39;create&#39;</span><span class="p">,</span> <span class="s1">&#39;UA-12345-2&#39;</span><span class="p">,</span> <span class="p">{</span><span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;rollup&#39;</span><span class="p">,</span> <span class="nx">cookieName</span><span class="o">:</span> <span class="s1">&#39;_rollupGa&#39;</span><span class="p">,</span> <span class="nx">allowLinker</span><span class="o">:</span> <span class="kc">true</span><span class="p">});</span>
 </code></pre></div>
-<p>It's important that you audit all your tags and trackers and take extra care to see that not a single one of your <strong>non-cross-domain</strong> tags has the <code>allowLinker</code> field set to <code>true</code>, and that every single one of your <strong>cross-domain</strong> tags has the <code>cookieName</code> field set to the custom cookie name.</p>
-<p>There, I think I've repeated myself sufficiently to impress you with what you should do the next time you setup cross-domain tracking through GTM or on-page GA.</p>
+<p>It&rsquo;s important that you audit all your tags and trackers and take extra care to see that not a single one of your <strong>non-cross-domain</strong> tags has the <code>allowLinker</code> field set to <code>true</code>, and that every single one of your <strong>cross-domain</strong> tags has the <code>cookieName</code> field set to the custom cookie name.</p>
+<p>There, I think I&rsquo;ve repeated myself sufficiently to impress you with what you should do the next time you setup cross-domain tracking through GTM or on-page GA.</p>
 <p>Good luck!</p>
 
     </section>

@@ -136,7 +136,7 @@
 {
     "@context": "http://schema.org",
     "@type": "WebSite",
-    "name": "Simo Ahava\x27s blog :: Simo Ahava is a Google Developer Expert for Google Analytics and Google Tag Manager. This is a blog all about web analytics development.",
+    "name": "Simo Ahava\u0027s blog :: Simo Ahava is a Google Developer Expert for Google Analytics and Google Tag Manager. This is a blog all about web analytics development.",
     
     "url": "https:\/\/www.simoahava.com\/amp\/"
 }
@@ -160,8 +160,8 @@
     }
   },
   "url": "https:\/\/www.simoahava.com\/amp\/gtm-tips\/gtmtips-track-launch-campaigns-in-gtm-for-ios\/",
-  "datePublished": "2015-12-23T08:10:43\x2b00:00",
-  "dateModified": "2015-12-23T08:10:43\x2b00:00",
+  "datePublished": "2015-12-23T08:10:43\u002b00:00",
+  "dateModified": "2015-12-23T08:10:43\u002b00:00",
   "description": "How to track launch campaigns in Google Analytics, using Google Tag Manager for iOS (legacy SDK).",
   "author": {
     "@type": "Person",
@@ -937,9 +937,9 @@ on
     </header>
 
     <section class="post-content">
-      <p>In <a href="https://analytics.google.com">Google Analytics</a> for iOS, there are two types of campaign measurement. There's <a href="https://developers.google.com/analytics/devguides/collection/ios/v3/campaigns#ios-install">install campaign measurement</a>, which lets you track the channels which brought your visitors to the App Store, where they proceeded to download your app. There's also <a href="https://developers.google.com/analytics/devguides/collection/ios/v3/campaigns#general-campaigns">launch campaign tracking</a>, which lets you attribute app launches to specific campaigns.</p>
-<p>In this tip post, we'll tackle the latter. We'll leverage a feature of the <a href="https://developers.google.com/analytics/devguides/collection/ios/v3/">Google Analytics iOS SDK</a> to build the parameters, and then push them to <code>dataLayer</code> so that they can be used in the Tag.</p>
-<p>We'll be using Swift as the language of choice. Check out my <a href="https://www.simoahava.com/amp/tags/ios">previous two posts</a> on GTM for iOS if you need more information on how to make GTM work in your iOS / Swift app.</p>
+      <p>In <a href="https://analytics.google.com">Google Analytics</a> for iOS, there are two types of campaign measurement. There&rsquo;s <a href="https://developers.google.com/analytics/devguides/collection/ios/v3/campaigns#ios-install">install campaign measurement</a>, which lets you track the channels which brought your visitors to the App Store, where they proceeded to download your app. There&rsquo;s also <a href="https://developers.google.com/analytics/devguides/collection/ios/v3/campaigns#general-campaigns">launch campaign tracking</a>, which lets you attribute app launches to specific campaigns.</p>
+<p>In this tip post, we&rsquo;ll tackle the latter. We&rsquo;ll leverage a feature of the <a href="https://developers.google.com/analytics/devguides/collection/ios/v3/">Google Analytics iOS SDK</a> to build the parameters, and then push them to <code>dataLayer</code> so that they can be used in the Tag.</p>
+<p>We&rsquo;ll be using Swift as the language of choice. Check out my <a href="https://www.simoahava.com/amp/tags/ios">previous two posts</a> on GTM for iOS if you need more information on how to make GTM work in your iOS / Swift app.</p>
 <h2 id="tip-39-launch-campaign-tracking-in-google-tag-manager-for-ios">Tip 39: Launch campaign tracking in Google Tag Manager for iOS</h2>
 
 
@@ -960,25 +960,25 @@ on
 </li>
 </ol>
 <h3 id="1-modifying-the-app-code">1. Modifying the app code</h3>
-<p>To parse the URL, we'll leverage the <code>setCampaignParametersFromUrl</code> method in the <code>GAIDictionaryBuilder</code> class of the Google Analytics SDK. We won't use it for anything else except for parsing the URL. So, in your <strong>AppDelegate.swift</strong> file, locate the overloaded constructor with the <code>handleOpenURL</code> method, or create it yourself:</p>
+<p>To parse the URL, we&rsquo;ll leverage the <code>setCampaignParametersFromUrl</code> method in the <code>GAIDictionaryBuilder</code> class of the Google Analytics SDK. We won&rsquo;t use it for anything else except for parsing the URL. So, in your <strong>AppDelegate.swift</strong> file, locate the overloaded constructor with the <code>handleOpenURL</code> method, or create it yourself:</p>
 <div class="highlight"><pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">func</span> <span class="nf">application</span><span class="p">(</span><span class="n">application</span><span class="p">:</span> <span class="n">UIApplication</span><span class="p">,</span> <span class="n">handleOpenURL</span> <span class="n">url</span><span class="p">:</span> <span class="n">NSURL</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="nb">Bool</span> <span class="p">{</span>
-  <span class="p">.</span><span class="p">.</span><span class="p">.</span>
+  <span class="p">...</span>
 <span class="p">}</span></code></pre></div>
 <p>This is where the app parses any URL parameters used in the launch.</p>
-<p>So, now we need to leverage the GA SDK's built-in methods, and we need to push the parameters to <code>dataLayer</code>. The setup might look something like this:</p>
+<p>So, now we need to leverage the GA SDK&rsquo;s built-in methods, and we need to push the parameters to <code>dataLayer</code>. The setup might look something like this:</p>
 <div class="highlight"><pre class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">func</span> <span class="nf">application</span><span class="p">(</span><span class="n">application</span><span class="p">:</span> <span class="n">UIApplication</span><span class="p">,</span> <span class="n">handleOpenURL</span> <span class="n">url</span><span class="p">:</span> <span class="n">NSURL</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="nb">Bool</span> <span class="p">{</span>
   <span class="kd">let</span> <span class="nv">urlString</span> <span class="p">=</span> <span class="n">url</span><span class="p">.</span><span class="n">absoluteString</span>
-  <span class="kd">let</span> <span class="nv">hitParams</span> <span class="p">=</span> <span class="n">GAIDictionaryBuilder</span><span class="p">.</span><span class="kd">init</span><span class="p">(</span><span class="p">)</span>
-  <span class="kd">let</span> <span class="nv">dataLayer</span> <span class="p">=</span> <span class="n">TAGManager</span><span class="p">.</span><span class="n">instance</span><span class="p">(</span><span class="p">)</span><span class="p">.</span><span class="n">dataLayer</span>
+  <span class="kd">let</span> <span class="nv">hitParams</span> <span class="p">=</span> <span class="n">GAIDictionaryBuilder</span><span class="p">.</span><span class="kd">init</span><span class="p">()</span>
+  <span class="kd">let</span> <span class="nv">dataLayer</span> <span class="p">=</span> <span class="n">TAGManager</span><span class="p">.</span><span class="n">instance</span><span class="p">().</span><span class="n">dataLayer</span>
   <span class="n">hitParams</span><span class="p">.</span><span class="n">setCampaignParametersFromUrl</span><span class="p">(</span><span class="n">urlString</span><span class="p">)</span>
-  <span class="n">dataLayer</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="p">[</span>
-    <span class="s">&#34;</span><span class="s">campaignMedium</span><span class="s">&#34;</span> <span class="p">:</span> <span class="n">hitParams</span><span class="p">.</span><span class="kr">get</span><span class="p">(</span><span class="n">kGAICampaignMedium</span><span class="p">)</span> <span class="p">?</span><span class="p">?</span> <span class="s">&#34;</span><span class="s">&#34;</span><span class="p">,</span>
-    <span class="s">&#34;</span><span class="s">campaignName</span><span class="s">&#34;</span> <span class="p">:</span> <span class="n">hitParams</span><span class="p">.</span><span class="kr">get</span><span class="p">(</span><span class="n">kGAICampaignName</span><span class="p">)</span> <span class="p">?</span><span class="p">?</span> <span class="s">&#34;</span><span class="s">&#34;</span><span class="p">,</span>
-    <span class="s">&#34;</span><span class="s">campaignSource</span><span class="s">&#34;</span> <span class="p">:</span> <span class="n">hitParams</span><span class="p">.</span><span class="kr">get</span><span class="p">(</span><span class="n">kGAICampaignSource</span><span class="p">)</span> <span class="p">?</span><span class="p">?</span> <span class="s">&#34;</span><span class="s">&#34;</span>
-  <span class="p">]</span><span class="p">)</span>
+  <span class="n">dataLayer</span><span class="p">.</span><span class="n">push</span><span class="p">([</span>
+    <span class="s">&#34;campaignMedium&#34;</span> <span class="p">:</span> <span class="n">hitParams</span><span class="p">.</span><span class="kr">get</span><span class="p">(</span><span class="n">kGAICampaignMedium</span><span class="p">)</span> <span class="p">??</span> <span class="s">&#34;&#34;</span><span class="p">,</span>
+    <span class="s">&#34;campaignName&#34;</span> <span class="p">:</span> <span class="n">hitParams</span><span class="p">.</span><span class="kr">get</span><span class="p">(</span><span class="n">kGAICampaignName</span><span class="p">)</span> <span class="p">??</span> <span class="s">&#34;&#34;</span><span class="p">,</span>
+    <span class="s">&#34;campaignSource&#34;</span> <span class="p">:</span> <span class="n">hitParams</span><span class="p">.</span><span class="kr">get</span><span class="p">(</span><span class="n">kGAICampaignSource</span><span class="p">)</span> <span class="p">??</span> <span class="s">&#34;&#34;</span>
+  <span class="p">])</span>
   <span class="k">return</span> <span class="kc">true</span>
 <span class="p">}</span></code></pre></div>
-<p>Let's just quickly walk through this. <code>urlString</code> is the variable where we'll store the URL string itself (d'oh). <code>hitParams</code> is what we'll use to parse the URL, and <code>dataLayer</code> is where we'll push the information.</p>
+<p>Let&rsquo;s just quickly walk through this. <code>urlString</code> is the variable where we&rsquo;ll store the URL string itself (d&rsquo;oh). <code>hitParams</code> is what we&rsquo;ll use to parse the URL, and <code>dataLayer</code> is where we&rsquo;ll push the information.</p>
 <p>The <code>setCampaignParametersFromUrl()</code> method takes a URL string, and parses it for the <a href="https://support.google.com/analytics/answer/1033867?hl=en">regular UTM campaign parameters</a>. It stores them in a bunch of constants the GA SDK leverages to pass information between the app and Google Analytics.</p>
 <p>So, if your app is launched with something like:</p>
 <p><strong>awesomeApp://?utm_source=newsletter&amp;utm;_medium=email&amp;utm;_campaign=December_2015</strong></p>
@@ -1002,9 +1002,9 @@ on
 <strong>Value</strong>: {{DLV - campaignName}}</p>
 <p>Finally, publish the container, download the binary, update your app, and go crazy with launch campaign tracking.</p>
 <h2 id="summary">Summary</h2>
-<p>There's one thing you need to pay heed to. We're pushing the campaign parameters to <code>dataLayer</code> but we're not sending an &lsquo;event&rsquo; key. The reason for this is that we want the app to send its regular Screen View, using these values only if they're in the <code>dataLayer</code> when the Screen View is dispatched.</p>
-<p>You probably see how this can be a problem. If your app sends a Screen View as soon as the initial view appears, it's possible this <code>dataLayer.push()</code> happens <em>after</em> the Screen View hit is built, leading to a nasty race condition. The best way to ensure it works is to defer the initial hit to Google Analytics until the <code>handleOpenURL</code> method has completed.</p>
-<p>The whole thing is slightly more complex than when using just the GA SDK, as many things seem to be with the Google Tag Manager SDK, but it's still consistent with leveraging <code>dataLayer</code> for message passing, rather than communicating directly with the endpoint.</p>
+<p>There&rsquo;s one thing you need to pay heed to. We&rsquo;re pushing the campaign parameters to <code>dataLayer</code> but we&rsquo;re not sending an &lsquo;event&rsquo; key. The reason for this is that we want the app to send its regular Screen View, using these values only if they&rsquo;re in the <code>dataLayer</code> when the Screen View is dispatched.</p>
+<p>You probably see how this can be a problem. If your app sends a Screen View as soon as the initial view appears, it&rsquo;s possible this <code>dataLayer.push()</code> happens <em>after</em> the Screen View hit is built, leading to a nasty race condition. The best way to ensure it works is to defer the initial hit to Google Analytics until the <code>handleOpenURL</code> method has completed.</p>
+<p>The whole thing is slightly more complex than when using just the GA SDK, as many things seem to be with the Google Tag Manager SDK, but it&rsquo;s still consistent with leveraging <code>dataLayer</code> for message passing, rather than communicating directly with the endpoint.</p>
 
     </section>
 

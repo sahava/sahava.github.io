@@ -136,7 +136,7 @@
 {
     "@context": "http://schema.org",
     "@type": "WebSite",
-    "name": "Simo Ahava\x27s blog :: Simo Ahava is a Google Developer Expert for Google Analytics and Google Tag Manager. This is a blog all about web analytics development.",
+    "name": "Simo Ahava\u0027s blog :: Simo Ahava is a Google Developer Expert for Google Analytics and Google Tag Manager. This is a blog all about web analytics development.",
     
     "url": "https:\/\/www.simoahava.com\/amp\/"
 }
@@ -160,8 +160,8 @@
     }
   },
   "url": "https:\/\/www.simoahava.com\/amp\/analytics\/google-tag-manager-monitor\/",
-  "datePublished": "2019-07-07T11:49:15\x2b03:00",
-  "dateModified": "2019-07-07T11:49:15\x2b03:00",
+  "datePublished": "2019-07-07T11:49:15\u002b03:00",
+  "dateModified": "2019-07-07T11:49:15\u002b03:00",
   "description": "How to build a monitor system for Google Tag Manager, where the rate and success of tags firing on your website is logged into BigQuery for analysis and anomaly detection.",
   "author": {
     "@type": "Person",
@@ -937,7 +937,7 @@ on
     </header>
 
     <section class="post-content">
-      <p><a href="https://tagmanager.google.com/">Google Tag Manager</a> is strictly a <em>tag delivery system</em>, and it's very careful <a href="https://support.google.com/tagmanager/answer/9323295#data">not to collect any analytics data</a> on its own. This is most likely a deliberate choice, because if GTM was to start collecting data, it would introduce additional barriers to adoption.</p>
+      <p><a href="https://tagmanager.google.com/">Google Tag Manager</a> is strictly a <em>tag delivery system</em>, and it&rsquo;s very careful <a href="https://support.google.com/tagmanager/answer/9323295#data">not to collect any analytics data</a> on its own. This is most likely a deliberate choice, because if GTM was to start collecting data, it would introduce additional barriers to adoption.</p>
 <p>Nevertheless, being a tool that consolidates the design, development, deployment, and testing of all the marketing and analytics pixels, code snippets, and utilities running on a website or a mobile app, lacking the necessary features for auditing and monitoring has always seemed like an oversight.</p>
 
 
@@ -955,10 +955,10 @@ on
 
 <!-- raw HTML omitted -->
 <h2 id="guest-author-mark-edmondson">Guest author: Mark Edmondson</h2>
-<p><a href="https://twitter.com/holomarked">Mark Edmondson</a> is a former colleague of mine, a fellow <a href="https://google-developers.appspot.com/community/experts/directory/profile/profile-mark_edmondson">Google Developer Expert</a> for Google Analytics, and the owner of one of the most versatile skill sets in our industry. He's currently working as a data engineer at <a href="https://iihnordic.com/">IIH Nordic</a> (a great company full of nice folks in its own right!).</p>
+<p><a href="https://twitter.com/holomarked">Mark Edmondson</a> is a former colleague of mine, a fellow <a href="https://google-developers.appspot.com/community/experts/directory/profile/profile-mark_edmondson">Google Developer Expert</a> for Google Analytics, and the owner of one of the most versatile skill sets in our industry. He&rsquo;s currently working as a data engineer at <a href="https://iihnordic.com/">IIH Nordic</a> (a great company full of nice folks in its own right!).</p>
 <p>Mark is fluent in bridging together the worlds of marketing and analytics, and his reach extends far beyond, as evidenced by his <a href="https://github.com/MarkEdmondson1234/">prolific contributions to the open-source space</a>. He’s the author of the popular <a href="https://github.com/MarkEdmondson1234/googleAnalyticsR">googleAnalyticsR</a> library for R, and <a href="https://www.markedmondson.me/">his blog</a> is full of great walkthroughs for data engineering, data science, web analytics, and software development.</p>
 <p>Being one of the most humble people I’ve met, he’s probably royally embarrassed by this introduction. So I’ll just wrap up this introduction by making it clear how grateful I am for his contributions not just to this article but to our whole industry.</p>
-<h2 id="what-well-build-the-google-tag-manager-monitor">What we'll build: The Google Tag Manager Monitor</h2>
+<h2 id="what-well-build-the-google-tag-manager-monitor">What we&rsquo;ll build: The Google Tag Manager Monitor</h2>
 <p>The <strong>key deliverable</strong> of this little project is a <a href="https://cloud.google.com/bigquery/">BigQuery</a> view that collects data from your website. This data will be sent by way of a new Google Tag Manager custom template, and it will comprise statistics of all the tags that have fired on your site for any given <code>dataLayer</code> event.</p>
 
 
@@ -978,7 +978,7 @@ on
 <p>Tag ID, name, firing status, and execution time for every tag that fired for that event (or <code>null</code> if no tags fired for the event).</p>
 </li>
 </ul>
-<p>It's extremely easy to extend this solution to include things like Container ID or tag categorization information - we'll explore these later in the guide.</p>
+<p>It&rsquo;s extremely easy to extend this solution to include things like Container ID or tag categorization information - we&rsquo;ll explore these later in the guide.</p>
 <h2 id="why-do-we-need-a-monitor">Why do we need a monitor?</h2>
 <p>There aren’t that many ways to monitor the consistency of tags firing in your containers. Obviously, you can run reports against the various endpoints, such as Google Analytics or Facebook, and detect anomalous data collection through their reporting interfaces.</p>
 <p>But this has some problems:</p>
@@ -1166,16 +1166,16 @@ on
 <h3 id="12-code">1.2. Code</h3>
 <p>In the <strong>Code</strong> tab, add the following code:</p>
 <div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="c1">// Require the necessary APIs
-</span><span class="c1"></span><span class="kr">const</span> <span class="nx">addEventCallback</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;addEventCallback&#39;</span><span class="p">)</span><span class="p">;</span>
-<span class="kr">const</span> <span class="nx">readFromDataLayer</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;copyFromDataLayer&#39;</span><span class="p">)</span><span class="p">;</span>
-<span class="kr">const</span> <span class="nx">sendPixel</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;sendPixel&#39;</span><span class="p">)</span><span class="p">;</span>
-<span class="kr">const</span> <span class="nx">getTimestamp</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;getTimestamp&#39;</span><span class="p">)</span><span class="p">;</span>
+</span><span class="c1"></span><span class="kr">const</span> <span class="nx">addEventCallback</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;addEventCallback&#39;</span><span class="p">);</span>
+<span class="kr">const</span> <span class="nx">readFromDataLayer</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;copyFromDataLayer&#39;</span><span class="p">);</span>
+<span class="kr">const</span> <span class="nx">sendPixel</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;sendPixel&#39;</span><span class="p">);</span>
+<span class="kr">const</span> <span class="nx">getTimestamp</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;getTimestamp&#39;</span><span class="p">);</span>
 
 <span class="c1">// Get the dataLayer event that triggered the tag
-</span><span class="c1"></span><span class="kr">const</span> <span class="nx">event</span> <span class="o">=</span> <span class="nx">readFromDataLayer</span><span class="p">(</span><span class="s1">&#39;event&#39;</span><span class="p">)</span><span class="p">;</span>
+</span><span class="c1"></span><span class="kr">const</span> <span class="nx">event</span> <span class="o">=</span> <span class="nx">readFromDataLayer</span><span class="p">(</span><span class="s1">&#39;event&#39;</span><span class="p">);</span>
 
 <span class="c1">// Add a timestamp to separate events named the same way from each other
-</span><span class="c1"></span><span class="kr">const</span> <span class="nx">eventTimestamp</span> <span class="o">=</span> <span class="nx">getTimestamp</span><span class="p">(</span><span class="p">)</span><span class="p">;</span>
+</span><span class="c1"></span><span class="kr">const</span> <span class="nx">eventTimestamp</span> <span class="o">=</span> <span class="nx">getTimestamp</span><span class="p">();</span>
 
 <span class="kr">const</span> <span class="nx">endPoint</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">endPoint</span><span class="p">;</span>
 <span class="kr">const</span> <span class="nx">batchHits</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">batchHits</span> <span class="o">===</span> <span class="s1">&#39;yes&#39;</span><span class="p">;</span>
@@ -1183,64 +1183,64 @@ on
 
 <span class="c1">// Utility for splitting an array into multiple arrays of given size
 </span><span class="c1"></span><span class="kr">const</span> <span class="nx">splitToBatches</span> <span class="o">=</span> <span class="p">(</span><span class="nx">arr</span><span class="p">,</span> <span class="nx">size</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
-  <span class="kr">const</span> <span class="nx">newArr</span> <span class="o">=</span> <span class="p">[</span><span class="p">]</span><span class="p">;</span>
+  <span class="kr">const</span> <span class="nx">newArr</span> <span class="o">=</span> <span class="p">[];</span>
   <span class="k">for</span> <span class="p">(</span><span class="kd">let</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">len</span> <span class="o">=</span> <span class="nx">arr</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">len</span><span class="p">;</span> <span class="nx">i</span> <span class="o">+=</span> <span class="nx">size</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nx">newArr</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">arr</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="nx">i</span><span class="p">,</span> <span class="nx">i</span> <span class="o">+</span> <span class="nx">size</span><span class="p">)</span><span class="p">)</span><span class="p">;</span>
+    <span class="nx">newArr</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">arr</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="nx">i</span><span class="p">,</span> <span class="nx">i</span> <span class="o">+</span> <span class="nx">size</span><span class="p">));</span>
   <span class="p">}</span>
   <span class="k">return</span> <span class="nx">newArr</span><span class="p">;</span>
-<span class="p">}</span><span class="p">;</span>
+<span class="p">};</span>
 
 <span class="c1">// The addEventCallback gets two arguments: container ID and a data object with an array of tags that fired
-</span><span class="c1"></span><span class="nx">addEventCallback</span><span class="p">(</span><span class="p">(</span><span class="nx">ctid</span><span class="p">,</span> <span class="nx">eventData</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+</span><span class="c1"></span><span class="nx">addEventCallback</span><span class="p">((</span><span class="nx">ctid</span><span class="p">,</span> <span class="nx">eventData</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
 
   <span class="c1">// Filter out tags that have the &#34;exclude&#34; metadata set to true
-</span><span class="c1"></span>  <span class="kr">const</span> <span class="nx">tags</span> <span class="o">=</span> <span class="nx">eventData</span><span class="p">.</span><span class="nx">tags</span><span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="nx">t</span> <span class="p">=&gt;</span> <span class="nx">t</span><span class="p">.</span><span class="nx">exclude</span> <span class="o">!==</span> <span class="s1">&#39;true&#39;</span><span class="p">)</span><span class="p">;</span>
+</span><span class="c1"></span>  <span class="kr">const</span> <span class="nx">tags</span> <span class="o">=</span> <span class="nx">eventData</span><span class="p">.</span><span class="nx">tags</span><span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="nx">t</span> <span class="p">=&gt;</span> <span class="nx">t</span><span class="p">.</span><span class="nx">exclude</span> <span class="o">!==</span> <span class="s1">&#39;true&#39;</span><span class="p">);</span>
   
   <span class="c1">// If batching is enabled, split the tags into batches of the given size
-</span><span class="c1"></span>  <span class="kr">const</span> <span class="nx">batches</span> <span class="o">=</span> <span class="nx">batchHits</span> <span class="o">?</span> <span class="nx">splitToBatches</span><span class="p">(</span><span class="nx">tags</span><span class="p">,</span> <span class="nx">maxTags</span><span class="p">)</span> <span class="o">:</span> <span class="p">[</span><span class="nx">tags</span><span class="p">]</span><span class="p">;</span>
+</span><span class="c1"></span>  <span class="kr">const</span> <span class="nx">batches</span> <span class="o">=</span> <span class="nx">batchHits</span> <span class="o">?</span> <span class="nx">splitToBatches</span><span class="p">(</span><span class="nx">tags</span><span class="p">,</span> <span class="nx">maxTags</span><span class="p">)</span> <span class="o">:</span> <span class="p">[</span><span class="nx">tags</span><span class="p">];</span>
   
   <span class="c1">// For each batch, build a payload and dispatch to the endpoint as a GET request
 </span><span class="c1"></span>  <span class="nx">batches</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="nx">tags</span> <span class="p">=&gt;</span> <span class="p">{</span>
     <span class="kd">let</span> <span class="nx">payload</span> <span class="o">=</span> <span class="s1">&#39;?eventName=&#39;</span> <span class="o">+</span> <span class="nx">event</span> <span class="o">+</span> <span class="s1">&#39;&amp;eventTimestamp=&#39;</span> <span class="o">+</span> <span class="nx">eventTimestamp</span><span class="p">;</span>
-    <span class="nx">tags</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="p">(</span><span class="nx">tag</span><span class="p">,</span> <span class="nx">idx</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
-      <span class="kr">const</span> <span class="nx">tagPrefix</span> <span class="o">=</span> <span class="s1">&#39;&amp;tag&#39;</span> <span class="o">+</span> <span class="p">(</span><span class="nx">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="p">;</span>
+    <span class="nx">tags</span><span class="p">.</span><span class="nx">forEach</span><span class="p">((</span><span class="nx">tag</span><span class="p">,</span> <span class="nx">idx</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+      <span class="kr">const</span> <span class="nx">tagPrefix</span> <span class="o">=</span> <span class="s1">&#39;&amp;tag&#39;</span> <span class="o">+</span> <span class="p">(</span><span class="nx">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">);</span>
       <span class="nx">payload</span> <span class="o">+=</span>
         <span class="nx">tagPrefix</span> <span class="o">+</span> <span class="s1">&#39;id=&#39;</span> <span class="o">+</span> <span class="nx">tag</span><span class="p">.</span><span class="nx">id</span> <span class="o">+</span>
         <span class="nx">tagPrefix</span> <span class="o">+</span> <span class="s1">&#39;nm=&#39;</span> <span class="o">+</span> <span class="nx">tag</span><span class="p">.</span><span class="nx">name</span> <span class="o">+</span>
         <span class="nx">tagPrefix</span> <span class="o">+</span> <span class="s1">&#39;st=&#39;</span> <span class="o">+</span> <span class="nx">tag</span><span class="p">.</span><span class="nx">status</span> <span class="o">+</span>
         <span class="nx">tagPrefix</span> <span class="o">+</span> <span class="s1">&#39;et=&#39;</span> <span class="o">+</span> <span class="nx">tag</span><span class="p">.</span><span class="nx">executionTime</span><span class="p">;</span>
-    <span class="p">}</span><span class="p">)</span><span class="p">;</span>
-    <span class="nx">sendPixel</span><span class="p">(</span><span class="nx">endPoint</span> <span class="o">+</span> <span class="nx">payload</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="kc">null</span><span class="p">)</span><span class="p">;</span>
-  <span class="p">}</span><span class="p">)</span><span class="p">;</span>
-<span class="p">}</span><span class="p">)</span><span class="p">;</span>
+    <span class="p">});</span>
+    <span class="nx">sendPixel</span><span class="p">(</span><span class="nx">endPoint</span> <span class="o">+</span> <span class="nx">payload</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="kc">null</span><span class="p">);</span>
+  <span class="p">});</span>
+<span class="p">});</span>
 
 <span class="c1">// After adding the callback, signal tag completion
-</span><span class="c1"></span><span class="nx">data</span><span class="p">.</span><span class="nx">gtmOnSuccess</span><span class="p">(</span><span class="p">)</span><span class="p">;</span>
+</span><span class="c1"></span><span class="nx">data</span><span class="p">.</span><span class="nx">gtmOnSuccess</span><span class="p">();</span>
 </code></pre></div>
 <p>The functionally most significant part of this code is the <code>addEventCallback()</code> method. This invokes the API of the same name.</p>
 <p>The API checks the <code>dataLayer</code> event that triggered the tag created from this template, and then updates the <code>dataLayer</code> <code>eventCallback</code> with the function defined in the template.</p>
 <p>In other words, when whatever event that triggers this monitor tag is fully resolved (i.e. all tags have signalled completion), the callback function will execute with data about each of the tags that fired on the event.</p>
-<p>There's a provision in place to exclude any tags from the monitoring based on a tag metadata field you can set (more on this below). For some, it might make sense to exclude the monitoring tag itself from being monitored, even though there might be value in measuring its execution time along with all the other tags&rsquo;.</p>
+<p>There&rsquo;s a provision in place to exclude any tags from the monitoring based on a tag metadata field you can set (more on this below). For some, it might make sense to exclude the monitoring tag itself from being monitored, even though there might be value in measuring its execution time along with all the other tags&rsquo;.</p>
 <p>By far the most significant code is run when the payload is built:</p>
 <div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">batches</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="nx">tags</span> <span class="p">=&gt;</span> <span class="p">{</span>
    <span class="kd">let</span> <span class="nx">payload</span> <span class="o">=</span> <span class="s1">&#39;?eventName=&#39;</span> <span class="o">+</span> <span class="nx">event</span> <span class="o">+</span> <span class="s1">&#39;&amp;eventTimestamp=&#39;</span> <span class="o">+</span> <span class="nx">eventTimestamp</span><span class="p">;</span>
-   <span class="nx">tags</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="p">(</span><span class="nx">tag</span><span class="p">,</span> <span class="nx">idx</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
-      <span class="kr">const</span> <span class="nx">tagPrefix</span> <span class="o">=</span> <span class="s1">&#39;&amp;tag&#39;</span> <span class="o">+</span> <span class="p">(</span><span class="nx">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="p">;</span>
+   <span class="nx">tags</span><span class="p">.</span><span class="nx">forEach</span><span class="p">((</span><span class="nx">tag</span><span class="p">,</span> <span class="nx">idx</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+      <span class="kr">const</span> <span class="nx">tagPrefix</span> <span class="o">=</span> <span class="s1">&#39;&amp;tag&#39;</span> <span class="o">+</span> <span class="p">(</span><span class="nx">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">);</span>
       <span class="nx">payload</span> <span class="o">+=</span>
        <span class="nx">tagPrefix</span> <span class="o">+</span> <span class="s1">&#39;id=&#39;</span> <span class="o">+</span> <span class="nx">tag</span><span class="p">.</span><span class="nx">id</span> <span class="o">+</span>
        <span class="nx">tagPrefix</span> <span class="o">+</span> <span class="s1">&#39;nm=&#39;</span> <span class="o">+</span> <span class="nx">tag</span><span class="p">.</span><span class="nx">name</span> <span class="o">+</span>
        <span class="nx">tagPrefix</span> <span class="o">+</span> <span class="s1">&#39;st=&#39;</span> <span class="o">+</span> <span class="nx">tag</span><span class="p">.</span><span class="nx">status</span> <span class="o">+</span>
        <span class="nx">tagPrefix</span> <span class="o">+</span> <span class="s1">&#39;et=&#39;</span> <span class="o">+</span> <span class="nx">tag</span><span class="p">.</span><span class="nx">executionTime</span><span class="p">;</span>
-   <span class="p">}</span><span class="p">)</span><span class="p">;</span>
-   <span class="nx">sendPixel</span><span class="p">(</span><span class="nx">endPoint</span> <span class="o">+</span> <span class="nx">payload</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="kc">null</span><span class="p">)</span><span class="p">;</span>
-<span class="p">}</span><span class="p">)</span><span class="p">;</span>
+   <span class="p">});</span>
+   <span class="nx">sendPixel</span><span class="p">(</span><span class="nx">endPoint</span> <span class="o">+</span> <span class="nx">payload</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="kc">null</span><span class="p">);</span>
+<span class="p">});</span>
 </code></pre></div>
 <p>Here, every tag that fired on the event is parsed and concatenated into a URL query string payload. For example, a <code>dataLayer</code> event named <code>gtm.js</code> that fired two tags might have the following payload:</p>
 <!-- raw HTML omitted -->
 <!-- raw HTML omitted -->
 <p>This is then joined with the endpoint URL, and a GET request is dispatched.</p>
 <p>This is the payload that is captured by the endpoint in the Google Cloud, which Mark will show <a href="#step-3-creating-the-google-cloud-platform-endpoint">later</a> how to create.</p>
-<p>It's easy to extend this with additional metadata. Just update the <code>payload +=</code> concatenation with each additional metadata key you want to access from the tags.</p>
+<p>It&rsquo;s easy to extend this with additional metadata. Just update the <code>payload +=</code> concatenation with each additional metadata key you want to access from the tags.</p>
 <h3 id="13-permissions">1.3. Permissions</h3>
 <p>If you’ve added the code into the code editor without errors, you should see three permissions predefined in the <strong>Permissions</strong> tab.</p>
 
@@ -1347,11 +1347,11 @@ on
 <h2 id="step-3-creating-the-google-cloud-platform-endpoint">Step 3: Creating the Google Cloud Platform endpoint</h2>
 <p>The GCP endpoint needs to process the <strong>GET requests</strong> sent from the site, insert them into a <strong>BigQuery table</strong>, parse them into columns and rows, and finally connect the data to <strong>Google Data Studio</strong>.</p>
 <h3 id="31-choosing-the-gcp-solution-for-the-endpoint">3.1. Choosing the GCP solution for the endpoint</h3>
-<p>Boiling down the use case requirements here, we are looking to turn an API call containing the GTM tag data into useful data for analysis. There are many ways to solve this particular use case on GCP - we'll go through some and show why we eventually went for <a href="https://cloud.google.com/functions/">Cloud Functions</a>.</p>
+<p>Boiling down the use case requirements here, we are looking to turn an API call containing the GTM tag data into useful data for analysis. There are many ways to solve this particular use case on GCP - we&rsquo;ll go through some and show why we eventually went for <a href="https://cloud.google.com/functions/">Cloud Functions</a>.</p>
 <p>The general solution requirements were:</p>
 <ul>
 <li>
-<p><strong>Serverless</strong>: so we don't babysit a server but are able to deal with high traffic and/or scale down to <em>zero cost</em> when no data is collected.</p>
+<p><strong>Serverless</strong>: so we don&rsquo;t babysit a server but are able to deal with high traffic and/or scale down to <em>zero cost</em> when no data is collected.</p>
 </li>
 <li>
 <p><strong>Low-code</strong>: easy to deploy and maintain.</p>
@@ -1384,11 +1384,11 @@ on
   
 
 <p>It may cost more per call than the solutions above, but it scales down to zero meaning you can deploy and wait for traffic without incurring any costs for downtime.</p>
-<p>Note that Cloud Functions can take <a href="https://cloud.google.com/functions/quotas">100 million calls per 100 seconds</a> in hits, but BigQuery itself accepts only (!) up to <a href="https://cloud.google.com/bigquery/quotas#streaming_inserts">100,000 rows per second</a> per project which equates to 10 million calls per 100 seconds. If this is a limitation you might find yourself struggling with, you'll need to start batching the data to BigQuery instead of streaming it.</p>
+<p>Note that Cloud Functions can take <a href="https://cloud.google.com/functions/quotas">100 million calls per 100 seconds</a> in hits, but BigQuery itself accepts only (!) up to <a href="https://cloud.google.com/bigquery/quotas#streaming_inserts">100,000 rows per second</a> per project which equates to 10 million calls per 100 seconds. If this is a limitation you might find yourself struggling with, you&rsquo;ll need to start batching the data to BigQuery instead of streaming it.</p>
 <h3 id="32-bigquery-setup">3.2. BigQuery setup</h3>
 <p>With the API endpoint technology selected, we turn to configuring <a href="https://console.cloud.google.com/bigquery/"><strong>BigQuery</strong></a>.</p>
-<p>Loading data into BigQuery requires a <strong>schema</strong> for the data (<code>STRING</code>, <code>INT</code>, <code>TIMESTAMP</code>, etc.) which can be tricky if you are sending in a lot of data with untidy types (most data, that is) - one mistake and the data won't load. We're accepting data from an open HTTP endpoint so we are almost certain to get messy data and thus want to be able to modify sent data without reconfiguring everything.</p>
-<p>To account for the above, we favor loading data into BigQuery with as few restrictions as possible, but then use BigQuery's SQL to parse or transform the raw data into tidier forms. If you don't know SQL but are better with JavaScript, you may prefer to do that data tidying logic in the Google Tag Manager code sending the data, or if better at Python perhaps in the Cloud Function collecting it. We still recommend to do this kind of data cleaning in BigQuery since otherwise changes need code updates in harder-to-reach places.</p>
+<p>Loading data into BigQuery requires a <strong>schema</strong> for the data (<code>STRING</code>, <code>INT</code>, <code>TIMESTAMP</code>, etc.) which can be tricky if you are sending in a lot of data with untidy types (most data, that is) - one mistake and the data won&rsquo;t load. We&rsquo;re accepting data from an open HTTP endpoint so we are almost certain to get messy data and thus want to be able to modify sent data without reconfiguring everything.</p>
+<p>To account for the above, we favor loading data into BigQuery with as few restrictions as possible, but then use BigQuery&rsquo;s SQL to parse or transform the raw data into tidier forms. If you don&rsquo;t know SQL but are better with JavaScript, you may prefer to do that data tidying logic in the Google Tag Manager code sending the data, or if better at Python perhaps in the Cloud Function collecting it. We still recommend to do this kind of data cleaning in BigQuery since otherwise changes need code updates in harder-to-reach places.</p>
 <p>To achieve this, the BigQuery table accepting the GTM data will have as simple a data schema as possible: it will accept the entire URL as a string and not try to parse out the tag names or GTM events quite yet. We shall then create a <a href="https://cloud.google.com/bigquery/docs/views">BigQuery View</a> on top of that data which will split the URL into a workable, tidy format.</p>
 
 
@@ -1412,35 +1412,35 @@ on
     </a>
   
 
-<p>The partition will put each hit's data into a partition of today's date, e.g. <code>20190703</code>, which you can use to query particular time periods via BigQuery's <code>_PARTITIONDATE</code> field.</p>
+<p>The partition will put each hit&rsquo;s data into a partition of today&rsquo;s date, e.g. <code>20190703</code>, which you can use to query particular time periods via BigQuery&rsquo;s <code>_PARTITIONDATE</code> field.</p>
 <p>Make note of the <strong>project</strong> name, <strong>dataset</strong> name, and <strong>table</strong> name. You are naturally free to choose whatever you want for these, but you need the values when configuring the Cloud Function code next.</p>
 <h3 id="33-the-cloud-function-code">3.3. The Cloud Function Code</h3>
-<p>Now let us get some data into the table. This is the Python code we'll use to update the Cloud Function with. You don't need to store any code locally - you can use the <a href="https://console.cloud.google.com/functions/add">web UI</a>. The code below is based on the examples given using the <a href="https://googlecloudplatform.github.io/google-cloud-python/latest/bigquery/index.html">Python SDK for BigQuery</a>.</p>
+<p>Now let us get some data into the table. This is the Python code we&rsquo;ll use to update the Cloud Function with. You don&rsquo;t need to store any code locally - you can use the <a href="https://console.cloud.google.com/functions/add">web UI</a>. The code below is based on the examples given using the <a href="https://googlecloudplatform.github.io/google-cloud-python/latest/bigquery/index.html">Python SDK for BigQuery</a>.</p>
 <p>See the next chapter for information on where to copy-paste this code.</p>
 <div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">google.cloud</span> <span class="kn">import</span> <span class="n">bigquery</span>
 <span class="kn">import</span> <span class="nn">datetime</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 
-<span class="n">PROJECT</span><span class="o">=</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">me-gtm-monitoring</span><span class="s1">&#39;</span> <span class="c1"># Update to match your project name</span>
-<span class="n">DATASET</span><span class="o">=</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">gtm_monitoring</span><span class="s1">&#39;</span>    <span class="c1"># Update to match your dataset name</span>
-<span class="n">TABLE</span><span class="o">=</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">raw_data</span><span class="s1">&#39;</span>            <span class="c1"># Update to match your table name</span>
+<span class="n">PROJECT</span><span class="o">=</span><span class="s1">&#39;me-gtm-monitoring&#39;</span> <span class="c1"># Update to match your project name</span>
+<span class="n">DATASET</span><span class="o">=</span><span class="s1">&#39;gtm_monitoring&#39;</span>    <span class="c1"># Update to match your dataset name</span>
+<span class="n">TABLE</span><span class="o">=</span><span class="s1">&#39;raw_data&#39;</span>            <span class="c1"># Update to match your table name</span>
 
-<span class="k">def</span> <span class="nf">stream_bq</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">stream_bq</span><span class="p">(</span><span class="n">uri</span><span class="p">):</span>
 
-    <span class="n">client</span> <span class="o">=</span> <span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">(</span><span class="p">)</span>
+    <span class="n">client</span> <span class="o">=</span> <span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">()</span>
 
     <span class="n">table_ref</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">dataset</span><span class="p">(</span><span class="n">DATASET</span><span class="p">)</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="n">TABLE</span><span class="p">)</span>
     <span class="n">table</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_table</span><span class="p">(</span><span class="n">table_ref</span><span class="p">)</span>
 
     <span class="c1"># Stream the URI of the request</span>
-    <span class="n">errors</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">insert_rows</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="p">[</span><span class="p">{</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">URI</span><span class="s1">&#39;</span><span class="p">:</span><span class="n">uri</span><span class="p">,</span> 
-                                         <span class="sa"></span><span class="s1">&#39;</span><span class="s1">timestamp</span><span class="s1">&#39;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="p">)</span><span class="p">}</span><span class="p">]</span><span class="p">)</span>
+    <span class="n">errors</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">insert_rows</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="p">[{</span><span class="s1">&#39;URI&#39;</span><span class="p">:</span><span class="n">uri</span><span class="p">,</span> 
+                                         <span class="s1">&#39;timestamp&#39;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()}])</span>
 
     <span class="k">if</span> <span class="n">errors</span><span class="p">:</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">gtm_monitor</span><span class="p">(</span><span class="n">request</span><span class="p">)</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">gtm_monitor</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
 
     <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">url</span><span class="p">:</span>
         <span class="n">stream_bq</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">url</span><span class="p">)</span></code></pre></div>
@@ -1451,32 +1451,32 @@ on
 <span class="kn">import</span> <span class="nn">datetime</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 
-<span class="n">PROJECT</span><span class="o">=</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">your-project</span><span class="s1">&#39;</span> <span class="c1"># Update to match your project name</span>
-<span class="n">DATASET</span><span class="o">=</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">your_dataset</span><span class="s1">&#39;</span> <span class="c1"># Update to match your dataset name</span>
-<span class="n">TABLE</span><span class="o">=</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">your_table</span><span class="s1">&#39;</span>     <span class="c1"># Update to match your table name</span></code></pre></div>
+<span class="n">PROJECT</span><span class="o">=</span><span class="s1">&#39;your-project&#39;</span> <span class="c1"># Update to match your project name</span>
+<span class="n">DATASET</span><span class="o">=</span><span class="s1">&#39;your_dataset&#39;</span> <span class="c1"># Update to match your dataset name</span>
+<span class="n">TABLE</span><span class="o">=</span><span class="s1">&#39;your_table&#39;</span>     <span class="c1"># Update to match your table name</span></code></pre></div>
 <p>As you can see, you actually need to create the table first - you can see the settings for the table in the previous chapter. Once you have the project, dataset, and table created, update the Cloud Function code above with the correct values.</p>
 <p>Below is the function <code>stream_bq()</code> to stream data into BigQuery. As we are deploying the Cloud Function in the same project that hosts the BigQuery table, Cloud Functions will handle authentication for us. All we need is the <code>bigquery.Client()</code> call, and the Cloud Function will handle authentication and identity management using the default service account set for the project.</p>
 <p>We then create the table object, and stream the data into the table using the <code>client.insert_rows()</code> method. This will return errors if it fails, in which case we’ll log them.</p>
-<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">stream_bq</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span><span class="p">:</span>
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">stream_bq</span><span class="p">(</span><span class="n">uri</span><span class="p">):</span>
 
-    <span class="n">client</span> <span class="o">=</span> <span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">(</span><span class="p">)</span>
+    <span class="n">client</span> <span class="o">=</span> <span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">()</span>
 
     <span class="n">table_ref</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">dataset</span><span class="p">(</span><span class="n">DATASET</span><span class="p">)</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="n">TABLE</span><span class="p">)</span>
     <span class="n">table</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_table</span><span class="p">(</span><span class="n">table_ref</span><span class="p">)</span>
 
     <span class="c1"># Stream the URI of the request</span>
-    <span class="n">errors</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">insert_rows</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="p">[</span><span class="p">{</span><span class="sa"></span><span class="s1">&#39;</span><span class="s1">URI</span><span class="s1">&#39;</span><span class="p">:</span><span class="n">uri</span><span class="p">,</span> 
-                                         <span class="sa"></span><span class="s1">&#39;</span><span class="s1">timestamp</span><span class="s1">&#39;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="p">)</span><span class="p">}</span><span class="p">]</span><span class="p">)</span>
+    <span class="n">errors</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">insert_rows</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="p">[{</span><span class="s1">&#39;URI&#39;</span><span class="p">:</span><span class="n">uri</span><span class="p">,</span> 
+                                         <span class="s1">&#39;timestamp&#39;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()}])</span>
 
     <span class="k">if</span> <span class="n">errors</span><span class="p">:</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span></code></pre></div>
 <p>Next, <code>gtm_monitor()</code> is the main function that will be the <strong>entry point</strong> to the Cloud Function. We define this in the web UI (see below). The function checks if the request had a URL, and if it did, it sends this to the <code>stream_bq()</code> method described above.</p>
-<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">gtm_monitor</span><span class="p">(</span><span class="n">request</span><span class="p">)</span><span class="p">:</span>
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">gtm_monitor</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
 
     <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">url</span><span class="p">:</span>
         <span class="n">stream_bq</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">url</span><span class="p">)</span></code></pre></div>
 <p>Finally we also need to modify the <code>requirements.txt</code> file in the Cloud Function - we can do this in the web UI as well. Cloud Functions automatically parses this file to install any necessary python libraries through <code>pip</code>.</p>
-<p>The only external dependency we need is the BigQuery SDK. The beauty of Cloud Functions is that you don't need to install this locally and then deploy the whole project at once - you can simply edit the <code>requirements.txt</code> file in the online editor to have the Cloud Function automatically install the dependency before running any code.</p>
+<p>The only external dependency we need is the BigQuery SDK. The beauty of Cloud Functions is that you don&rsquo;t need to install this locally and then deploy the whole project at once - you can simply edit the <code>requirements.txt</code> file in the online editor to have the Cloud Function automatically install the dependency before running any code.</p>
 
 
     <a href="https://www.simoahava.com/amp/images/2019/07/requirements-txt.jpg" title="Requirements.txt">
@@ -1560,7 +1560,7 @@ on
     </a>
   
 
-<p>In your Google Tag Manager Monitor tag, update the <strong>GET request endpoint</strong> to reflect the correct Cloud Function HTTP endpoint and save the tag. You'll then need to <strong>edit the Custom Template</strong> and open its <strong>Permissions</strong> tab. Update the <strong>Sends Pixels</strong> permission with the correct endpoint URL.</p>
+<p>In your Google Tag Manager Monitor tag, update the <strong>GET request endpoint</strong> to reflect the correct Cloud Function HTTP endpoint and save the tag. You&rsquo;ll then need to <strong>edit the Custom Template</strong> and open its <strong>Permissions</strong> tab. Update the <strong>Sends Pixels</strong> permission with the correct endpoint URL.</p>
 
 
     <a href="https://www.simoahava.com/amp/images/2019/07/update-permission.jpg" title="Update permission">
@@ -1601,10 +1601,10 @@ on
   <span class="k">timestamp</span><span class="p">,</span>
   <span class="n">eventName</span><span class="p">,</span>
   <span class="n">eventTimestamp</span><span class="p">,</span>
-  <span class="p">(</span><span class="k">SELECT</span> <span class="n">REGEXP_EXTRACT</span><span class="p">(</span><span class="n">tagString</span><span class="p">,</span> <span class="s2">&#34;</span><span class="s2">&amp;tag\\d+id=([^&amp;]+)</span><span class="s2">&#34;</span><span class="p">)</span><span class="p">)</span> <span class="k">as</span> <span class="n">tagId</span><span class="p">,</span>
-  <span class="p">(</span><span class="k">SELECT</span> <span class="n">REGEXP_EXTRACT</span><span class="p">(</span><span class="n">tagString</span><span class="p">,</span> <span class="s2">&#34;</span><span class="s2">&amp;tag\\d+nm=([^&amp;]+)</span><span class="s2">&#34;</span><span class="p">)</span><span class="p">)</span> <span class="k">as</span> <span class="n">tagName</span><span class="p">,</span>
-  <span class="p">(</span><span class="k">SELECT</span> <span class="n">REGEXP_EXTRACT</span><span class="p">(</span><span class="n">tagString</span><span class="p">,</span> <span class="s2">&#34;</span><span class="s2">&amp;tag\\d+st=([^&amp;]+)</span><span class="s2">&#34;</span><span class="p">)</span><span class="p">)</span> <span class="k">as</span> <span class="n">tagStatus</span><span class="p">,</span>
-  <span class="p">(</span><span class="k">SELECT</span> <span class="n">REGEXP_EXTRACT</span><span class="p">(</span><span class="n">tagString</span><span class="p">,</span> <span class="s2">&#34;</span><span class="s2">&amp;tag\\d+et=([^&amp;]+)</span><span class="s2">&#34;</span><span class="p">)</span><span class="p">)</span> <span class="k">as</span> <span class="n">tagExecutionTime</span>
+  <span class="p">(</span><span class="k">SELECT</span> <span class="n">REGEXP_EXTRACT</span><span class="p">(</span><span class="n">tagString</span><span class="p">,</span> <span class="s2">&#34;&amp;tag\\d+id=([^&amp;]+)&#34;</span><span class="p">))</span> <span class="k">as</span> <span class="n">tagId</span><span class="p">,</span>
+  <span class="p">(</span><span class="k">SELECT</span> <span class="n">REGEXP_EXTRACT</span><span class="p">(</span><span class="n">tagString</span><span class="p">,</span> <span class="s2">&#34;&amp;tag\\d+nm=([^&amp;]+)&#34;</span><span class="p">))</span> <span class="k">as</span> <span class="n">tagName</span><span class="p">,</span>
+  <span class="p">(</span><span class="k">SELECT</span> <span class="n">REGEXP_EXTRACT</span><span class="p">(</span><span class="n">tagString</span><span class="p">,</span> <span class="s2">&#34;&amp;tag\\d+st=([^&amp;]+)&#34;</span><span class="p">))</span> <span class="k">as</span> <span class="n">tagStatus</span><span class="p">,</span>
+  <span class="p">(</span><span class="k">SELECT</span> <span class="n">REGEXP_EXTRACT</span><span class="p">(</span><span class="n">tagString</span><span class="p">,</span> <span class="s2">&#34;&amp;tag\\d+et=([^&amp;]+)&#34;</span><span class="p">))</span> <span class="k">as</span> <span class="n">tagExecutionTime</span>
 <span class="k">FROM</span> <span class="p">(</span>
   <span class="k">SELECT</span>
     <span class="k">timestamp</span><span class="p">,</span>
@@ -1615,9 +1615,9 @@ on
   <span class="k">FROM</span> <span class="p">(</span>
     <span class="k">SELECT</span> 
       <span class="k">timestamp</span><span class="p">,</span>
-      <span class="p">(</span><span class="k">SELECT</span> <span class="n">REGEXP_EXTRACT</span><span class="p">(</span><span class="n">URI</span><span class="p">,</span> <span class="s2">&#34;</span><span class="s2">eventName=([^&amp;]+)</span><span class="s2">&#34;</span><span class="p">)</span><span class="p">)</span> <span class="k">as</span> <span class="n">eventName</span><span class="p">,</span>
-      <span class="p">(</span><span class="k">SELECT</span> <span class="n">REGEXP_EXTRACT</span><span class="p">(</span><span class="n">URI</span><span class="p">,</span> <span class="s2">&#34;</span><span class="s2">eventTimestamp=([^&amp;]+)</span><span class="s2">&#34;</span><span class="p">)</span><span class="p">)</span> <span class="k">as</span> <span class="n">eventTimestamp</span><span class="p">,</span>
-      <span class="p">(</span><span class="k">SELECT</span> <span class="n">REGEXP_EXTRACT_ALL</span><span class="p">(</span><span class="n">URI</span><span class="p">,</span> <span class="s2">&#34;</span><span class="s2">&amp;tag\\d+id=[^&amp;]+&amp;tag\\d+nm=[^&amp;]+&amp;tag\\d+st=[^&amp;]+&amp;tag\\d+et=[^&amp;]+</span><span class="s2">&#34;</span><span class="p">)</span><span class="p">)</span> <span class="k">as</span> <span class="n">tagStringRegex</span><span class="p">,</span>
+      <span class="p">(</span><span class="k">SELECT</span> <span class="n">REGEXP_EXTRACT</span><span class="p">(</span><span class="n">URI</span><span class="p">,</span> <span class="s2">&#34;eventName=([^&amp;]+)&#34;</span><span class="p">))</span> <span class="k">as</span> <span class="n">eventName</span><span class="p">,</span>
+      <span class="p">(</span><span class="k">SELECT</span> <span class="n">REGEXP_EXTRACT</span><span class="p">(</span><span class="n">URI</span><span class="p">,</span> <span class="s2">&#34;eventTimestamp=([^&amp;]+)&#34;</span><span class="p">))</span> <span class="k">as</span> <span class="n">eventTimestamp</span><span class="p">,</span>
+      <span class="p">(</span><span class="k">SELECT</span> <span class="n">REGEXP_EXTRACT_ALL</span><span class="p">(</span><span class="n">URI</span><span class="p">,</span> <span class="s2">&#34;&amp;tag\\d+id=[^&amp;]+&amp;tag\\d+nm=[^&amp;]+&amp;tag\\d+st=[^&amp;]+&amp;tag\\d+et=[^&amp;]+&#34;</span><span class="p">))</span> <span class="k">as</span> <span class="n">tagStringRegex</span><span class="p">,</span>
       <span class="nb">DATE</span><span class="p">(</span><span class="n">_PARTITIONTIME</span><span class="p">)</span> <span class="k">as</span> <span class="n">pt</span>
     <span class="k">FROM</span>
       <span class="o">`</span><span class="n">your</span><span class="o">-</span><span class="n">project</span><span class="p">.</span><span class="n">gtm_monitoring</span><span class="p">.</span><span class="n">raw_data</span><span class="o">`</span>
@@ -1645,8 +1645,8 @@ on
   
 
 <h2 id="step-4-visualize-the-data">Step 4: Visualize the data</h2>
-<p>For most use cases, having the data in a BigQuery view is already more than enough. That's the data set you can query for anomaly detection, or plug into a pipeline for automated alerts.</p>
-<p>Nevertheless, we can see how useful a proper visualization of the data could potentially be. For this purpose, Google's <a href="https://datastudio.google.com/">Data Studio</a> is an excellent project for quickly delivering useful visualizations. Best of all, it already has a built-in <a href="https://support.google.com/datastudio/answer/6370296?hl=en">BigQuery connector</a> for querying your BQ data with.</p>
+<p>For most use cases, having the data in a BigQuery view is already more than enough. That&rsquo;s the data set you can query for anomaly detection, or plug into a pipeline for automated alerts.</p>
+<p>Nevertheless, we can see how useful a proper visualization of the data could potentially be. For this purpose, Google&rsquo;s <a href="https://datastudio.google.com/">Data Studio</a> is an excellent project for quickly delivering useful visualizations. Best of all, it already has a built-in <a href="https://support.google.com/datastudio/answer/6370296?hl=en">BigQuery connector</a> for querying your BQ data with.</p>
 
 
     <a href="https://www.simoahava.com/amp/images/2019/07/data-studio-dashboard.jpg" title="Data Studio Dashboard">
@@ -1656,28 +1656,28 @@ on
     </a>
   
 
-<p>As a demo, we've created a <strong>starter</strong> dashboard for you to check out. Feel free to copy it and modify it to suit your own purposes.</p>
+<p>As a demo, we&rsquo;ve created a <strong>starter</strong> dashboard for you to check out. Feel free to copy it and modify it to suit your own purposes.</p>
 <p><a href="https://datastudio.google.com/u/0/reporting/1qcyKjq_44_VIeIxL4BTQm6kKnBaH5a7p/page/xsws">Visit the dashboard here.</a></p>
 <h2 id="summary">Summary</h2>
-<p>Maybe we haven't said this enough yet, but this is a <strong>proof-of-concept</strong>. This article serves a number of purposes:</p>
+<p>Maybe we haven&rsquo;t said this enough yet, but this is a <strong>proof-of-concept</strong>. This article serves a number of purposes:</p>
 <ul>
 <li>
-<p>You'll learn how to set up a pipeline of data collection from the website, via Google Tag Manager, to a data warehouse located in the Google Cloud.</p>
+<p>You&rsquo;ll learn how to set up a pipeline of data collection from the website, via Google Tag Manager, to a data warehouse located in the Google Cloud.</p>
 </li>
 <li>
-<p>You'll learn about the new <code>addEventCallback</code> API in Google Tag Manager's custom templates.</p>
+<p>You&rsquo;ll learn about the new <code>addEventCallback</code> API in Google Tag Manager&rsquo;s custom templates.</p>
 </li>
 <li>
-<p>You'll learn about the new <strong>Additional Tag Metadata</strong> field in GTM's tags.</p>
+<p>You&rsquo;ll learn about the new <strong>Additional Tag Metadata</strong> field in GTM&rsquo;s tags.</p>
 </li>
 <li>
-<p>You'll learn how to efficiently monitor the success rates and execution times of your Google Tag Manager tags.</p>
+<p>You&rsquo;ll learn how to efficiently monitor the success rates and execution times of your Google Tag Manager tags.</p>
 </li>
 </ul>
 <p>We can only hope that others build much cooler and more useful solutions than this simple MVP. Some features we considered useful but not in the scope of this introductory article:</p>
 <ol>
 <li>
-<p>Report that compares data from the respective end points with that of GTM's monitor system to see if tags are firing but not sending the correct data.</p>
+<p>Report that compares data from the respective end points with that of GTM&rsquo;s monitor system to see if tags are firing but not sending the correct data.</p>
 </li>
 <li>
 <p>Utilize a pixel file stored in Google Cloud Storage, behind a load balancer, to achieve a zero-code setup with superior performance compared to a Cloud Function.</p>
