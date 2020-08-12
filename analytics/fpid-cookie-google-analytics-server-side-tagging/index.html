@@ -1,0 +1,716 @@
+
+
+  
+    
+  
+
+
+  
+
+
+
+
+
+  
+
+
+  
+
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta name="google-site-verification" content="xQwWI2KUfP9LbFKhw2CVLFtrMY6Czrla7L3PD2aBolA" />
+
+
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org", 
+  "@type": "BlogPosting",
+  "headline": "The FPID Cookie For Google Analytics In Server-side Tagging | Simo Ahava's blog",
+  "image": "https:\/\/www.simoahava.com\/images\/2020\/08\/fpid-server-side.jpg",
+  "editor": "Simo Ahava",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Simo Ahava's blog",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https:\/\/www.simoahava.com\/images\/simo.png",
+      "height": "393",
+      "width": "407"
+    }
+  },
+  "url": "https:\/\/www.simoahava.com\/analytics\/fpid-cookie-google-analytics-server-side-tagging\/",
+  "datePublished": "2020-08-12T07:04:01\u002b03:00",
+  "dateModified": "2020-08-12T07:04:01\u002b03:00",
+  "description": "The new FPID HttpOnly cookie is used by Google Analytics to replace the script-readable _ga cookie. It requires a Server-side tagging setup to work. In this article, I\u0027ll show you how FPID works, and how to set it up.",
+  "author": {
+    "@type": "Person",
+    "name": "Simo Ahava"
+  }
+}
+</script>
+
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <title>The FPID Cookie For Google Analytics In Server-side Tagging | Simo Ahava's blog</title>
+    
+    <script>
+      window.dataLayer=window.dataLayer||[];window.dataLayer.push({pageType: 'article', environment:  null });
+    </script>
+    
+
+    
+    
+    <script src="https://www.simoahava.com/x-js/lazyload.iife.min.js"></script>
+
+    
+
+    
+    <script>
+      (function(S,i,m,o){
+        window[m]=window[m]||[];
+        window[m].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
+        var f=S.getElementsByTagName(i)[0],j=S.createElement(i),dl=m!='dataLayer'?'&l='+m:'';
+        j.async=true;
+        j.src='https://www.googletagmanager.com/gtm.js?id='+o+dl;
+        f.parentNode.insertBefore(j,f);
+      })(document,'script','dataLayer','GTM-PZ7GMV9');
+    </script>
+    
+    <meta name="author" content="Simo Ahava">
+    <meta name="keywords" content="">
+
+    <link rel="icon" href="https://www.simoahava.com/images/favicon.ico">
+    
+    <link rel="amphtml" href="https://www.simoahava.com/amp/analytics/fpid-cookie-google-analytics-server-side-tagging/">
+    
+    <meta name="description" content="The new FPID HttpOnly cookie is used by Google Analytics to replace the script-readable _ga cookie. It requires a Server-side tagging setup to work. In this article, I&#39;ll show you how FPID works, and how to set it up.">
+    <meta property="og:description" content="The new FPID HttpOnly cookie is used by Google Analytics to replace the script-readable _ga cookie. It requires a Server-side tagging setup to work. In this article, I&#39;ll show you how FPID works, and how to set it up.">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="The FPID Cookie For Google Analytics In Server-side Tagging">
+    <meta property="og:url" content="https://www.simoahava.com/analytics/fpid-cookie-google-analytics-server-side-tagging/">
+    <meta property="og:site_name" content="Simo Ahava&#39;s blog">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="The FPID Cookie For Google Analytics In Server-side Tagging">
+    <meta name="twitter:description" content="The new FPID HttpOnly cookie is used by Google Analytics to replace the script-readable _ga cookie. It requires a Server-side tagging setup to work. In this article, I&#39;ll show you how FPID works, and how to set it up.">
+    
+      <meta name="twitter:creator" content="@SimoAhava">
+      
+    
+
+    
+    
+
+    
+      <meta property="og:image" content="https://www.simoahava.com/images/simo.png">
+    
+
+    
+      <meta name="twitter:image" content="https://www.simoahava.com/images/2020/08/fpid-server-side.jpg">  
+      <meta property="og:image" content="https://www.simoahava.com/images/2020/08/fpid-server-side.jpg">
+    
+    
+    
+
+    
+
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+    
+    
+    
+    <link rel="stylesheet" href="https://www.simoahava.com/css/style.css" />
+    
+    
+
+    
+      
+    
+    
+  </head>
+
+  <body>
+    <div id="blog">
+      <header id="header" data-behavior="4">
+  <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+  <div class="header-title">
+    <a class="header-title-link" href="https://www.simoahava.com/">Simo Ahava&#39;s blog</a>
+  </div>
+  
+</header>
+
+      <nav id="sidebar" data-behavior="4">
+  <div class="sidebar-container">
+    
+      <div class="sidebar-profile">
+        <a href="https://www.simoahava.com/">
+          <img class="sidebar-profile-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+        </a>
+        <h4 class="sidebar-profile-name">Simo Ahava</h4>
+        
+          <h5 class="sidebar-profile-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</h5>
+        
+      </div>
+    
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+      
+      <span class="sidebar-button-desc">Home</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+      
+      <span class="sidebar-button-desc">Categories</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tags/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Tags</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/gtm-tips/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-magic"></i>
+      
+      <span class="sidebar-button-desc">GTM Tips</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/about-simo-ahava/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+      
+      <span class="sidebar-button-desc">About</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tools/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-wrench"></i>
+      
+      <span class="sidebar-button-desc">Tools</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/blog-statistics/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bar-chart"></i>
+      
+      <span class="sidebar-button-desc">Blog statistics</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://github.com/sahava" target="_blank" rel="noopener">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+      
+      <span class="sidebar-button-desc">GitHub</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/upcoming-talks/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bullhorn"></i>
+      
+      <span class="sidebar-button-desc">Upcoming talks</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/custom-templates/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Templates</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
+
+    </ul>
+  </div>
+</nav>
+
+      
+
+      <div id="main" data-behavior="4"
+        class="
+               hasCoverMetaIn
+               ">
+        <article class="post">
+	  <form id="search" action="https://www.simoahava.com/search/">
+  <input name="q" type="text" class="form-control input--xlarge" placeholder="Search blog..." autocomplete="off">
+  </form>
+
+          
+          
+            <div class="post-header main-content-wrap text-left">
+
+  
+
+    <h1>
+      The FPID Cookie For Google Analytics In Server-side Tagging
+    </h1>
+  
+  
+  <div class="postShorten-meta post-meta">
+    
+      <time datetime="2020-08-12T07:04:01&#43;03:00">
+        
+  August 12, 2020
+
+      </time>
+      
+      
+  
+  
+    <span>in</span>
+    
+      <a class="category-link" href="https://www.simoahava.com/categories/analytics">Analytics</a>
+    
+  
+
+
+      | <a href="https://www.simoahava.com/analytics/fpid-cookie-google-analytics-server-side-tagging/#commento">Comments</a>
+      
+  </div>
+
+
+</div>
+
+          
+          <div class="post-content markdown">
+            <div class="main-content-wrap">
+              <p>With <a href="https://www.simoahava.com/analytics/server-side-tagging-google-tag-manager/">Server-side tagging</a>, the developer community has a chance to vastly improve the data collection capabilities of Google&rsquo;s analytics platforms (<a href="https://support.google.com/analytics/answer/2790010">Universal Analytics</a> and <a href="https://support.google.com/analytics/answer/9306384">App+Web</a>). The ability to build <a href="https://www.simoahava.com/gtm-tips/build-custom-universal-analytics-client-server-side-tagging/">our own templates</a> is particularly potent with a Server container.</p>
+<p>However, it&rsquo;s not as if Google themselves are just sitting idly by and seeing what the community can come up with.</p>
+<p>In the built-in <strong>Universal Analytics Client</strong> template in a Server container, there&rsquo;s an option to migrate to a <strong>Server Managed</strong> Client ID.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2020/08/fpid-server-side.jpg" title="FPID server-side">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2020/08/fpid-server-side.jpg#ZgotmplZ" alt="FPID server-side">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>When using this particular Client for proxying Google Analytics requests, the Server container introduces a new cookie that <strong>is only accessible to the webserver</strong> and not to browser JavaScript. This cookie is named <code>FPID</code> (First Party Identifier) by default. The value stored in <code>FPID</code> will be used for setting the <a href="https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters#cid">Client ID</a> in the request to Google&rsquo;s servers.</p>
+<p>In this article, I&rsquo;ll walk you through how this works and what its implications are for data collection and security.</p>
+<h2 id="how-it-works">How it works</h2>
+<p>Be sure to check out the <a href="https://www.simoahava.com/analytics/server-side-tagging-google-tag-manager/#what-is-server-side-tagging">main guide</a> for an introduction to Server-side tagging. An understanding of hor <a href="https://www.simoahava.com/analytics/server-side-tagging-google-tag-manager/#clients-and-tags">Clients and tags</a> work will make following this article much easier.</p>
+<p>Google Analytics uses the <code>&amp;cid</code> URL parameter in its data collection HTTP request to pass the Client ID from the browser (or device) to Google Analytics&rsquo; servers. This Client ID is persisted in a first-party cookie written (and read) with JavaScript.</p>
+<p>With <code>FPID</code>, Google is moving away from the JavaScript-accessible cookie to an HTTP-set one, which is further secured with the <code>HttpOnly</code> flag. The new setting in the Universal Analytics Client gives you a couple of approaches to how to migrate (or not).</p>
+<h3 id="javascript-managed---business-as-usual">JavaScript Managed - business as usual</h3>
+<p>When you set the configuration in the Client to <strong>JavaScript Managed</strong>, the Client will read the incoming request as usual, use the <code>&amp;cid</code> parameter from the request to set the Client ID in the outgoing request to Google Analytics, and then not really do anything else. So if you don&rsquo;t want to use this new way of storing the client identifier, you need to set the option to <strong>JavaScript Managed</strong>.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2020/08/fpid-javascript-managed.jpg" title="JavaScript managed cookie">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2020/08/fpid-javascript-managed.jpg#ZgotmplZ" alt="JavaScript managed cookie">
+  
+    </a>
+  
+  
+</div>
+
+
+<h3 id="server-managed---new-http-cookie">Server Managed - new HTTP cookie</h3>
+<p>However, when you set it to <strong>Server Managed</strong>, the Client will now parse the identifier from a new cookie and prefer that to what the browser (or device) sends as the value of the <code>&amp;cid</code> parameter. The new cookie is written in the <code>Set-Cookie</code> HTTP header in the response back to the browser or other network source.</p>
+<p>In other words, without making adjustments (see below), the Server container will generate a new <code>FPID</code> cookie (if one doesn&rsquo;t already exist) and use that to populate the Client ID of the outgoing request to Google Analytics servers.</p>
+<p>The cookie is set with the <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#Restrict_access_to_cookies"><code>HttpOnly</code></a> flag, which means it is not accessible to browser JavaScript. Only the webserver can read the value of the cookie. This mitigates against <a href="https://www.cookiestatus.com/introduction/tracking-protection/#cross-site-tracking">cross-site tracking</a>, as first-party JavaScript-readable cookies are often repurposed for building cross-site profiles.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2020/08/fpid-cookie.jpg" title="FPID cookie">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2020/08/fpid-cookie.jpg#ZgotmplZ" alt="FPID cookie">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Setting the cookie in the HTTP response also makes it a bit more resilient against browsers with measures in place to reduce the utility of JavaScript cookies (see e.g. Apple&rsquo;s <a href="https://www.cookiestatus.com/safari/">Intelligent Tracking Prevention</a>).</p>
+<h3 id="migrating-from-javascript-managed-to-server-managed">Migrating from JavaScript Managed to Server Managed</h3>
+<p>To ensure that the Server container doesn&rsquo;t just start creating new Google Analytics users en masse, you can select the <strong>Migrate from JavaScript Managed Client ID</strong> option.</p>
+<p>With this option, the Universal Analytics Client will continue using the original JavaScript Managed Client ID value until such a time that the <code>_ga</code> cookie is deleted or the Client ID is reset. At that point, the system will migrate to the new Server Managed option stored in the <code>FPID</code> cookie.</p>
+<p>Here&rsquo;s what it does in detail:</p>
+<ol>
+<li><strong>IF</strong> the incoming HTTP request doesn&rsquo;t have the <code>FPID</code> cookie but does have the <code>&amp;cid</code> parameter set in the request, a new <code>FPID</code> cookie is created with a hash from the value of the <code>&amp;cid</code> parameter in the incoming request. This <code>&amp;cid</code> value is passed through to Google Analytics as the Client ID, thus not resetting the user.</li>
+<li><strong>IF</strong> the incoming HTTP request has both the <code>FPID</code> cookie and the <code>&amp;cid</code> parameter <strong>AND</strong> the <code>FPID</code> hash has been generated from this precise <code>&amp;cid</code> parameter, the value of the <code>&amp;cid</code> in the incoming request is passed through to Google Analytics as the Client ID, thus not resetting the user.</li>
+<li><strong>IF</strong> the incoming HTTP request has the <code>FPID</code> cookie and either doesn&rsquo;t have the <code>&amp;cid</code> parameter <strong>OR</strong> the values differ, then the hash stored in <code>FPID</code> is sent to Google Analytics as the Client ID. This <em>technically</em> &ldquo;resets&rdquo; the user, but since the <code>&amp;cid</code> already has a different value than what the <code>FPID</code> was originally derived from, the user would have been reset anyway.</li>
+</ol>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2020/08/fpid-process.jpg" title="FPID process">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2020/08/fpid-process.jpg#ZgotmplZ" alt="FPID process">
+  
+    </a>
+  
+  
+</div>
+
+
+<blockquote>
+<p>Note that the <code>FPID</code> hash generated from the <code>&amp;cid</code> value also includes a server-side seed, making it impossible to deduce the <code>FPID</code> value from that stored in the <code>_ga</code> cookie using client-side code.</p>
+</blockquote>
+<p>If these hits sent by the Server container are collected in a <strong>new</strong> Google Analytics property, it makes no sense to enable the <em>migration option</em>, as there would be no pre-existing users. Just use the <strong>Server Managed</strong> option without the migration selection checked.</p>
+<p>On the other hand, if you start with a Server Managed setup but then want to switch to the migration flow, perhaps because you decide to start collecting to your main Google Analytics property instead of a test property, you can enable the migration option. However, you&rsquo;ll first want to <strong>rename the <code>FPID</code> cookie</strong> or else the value stored in <code>FPID</code> from the original setup will be used instead of the Client ID of the incoming request. Renaming the <code>FPID</code> cookie essentially <em>resets</em> it.</p>
+<h2 id="caveat-1-multiple-google-analytics-cookies">Caveat 1: Multiple Google Analytics cookies</h2>
+<p>One problem that arises with the Server Managed <code>FPID</code> cookie is when your site&rsquo;s trackers use different Client IDs. This is quite common, especially with <a href="https://www.simoahava.com/gtm-tips/cross-domain-tracking-with-multiple-ga-trackers/">cross-domain tracking</a>, where the roll-up cookie is kept separate from the regular Google Analytics cookie to avoid cross-domain tracking from overwriting the Client ID for trackers that don&rsquo;t want to use cross-domain tracking.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2020/08/rollup-cookie.jpg" title="Roll-up cookie">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2020/08/rollup-cookie.jpg#ZgotmplZ" alt="Roll-up cookie">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>There is no support for multiple Client IDs in the Server Managed <code>FPID</code> option, so if you don&rsquo;t want the Server Managed option to break your multi-cookie setup, you need to hold off until a solution is released.</p>
+<h2 id="caveat-2-cross-domain-tracking">Caveat 2: Cross-domain tracking</h2>
+<p>Similarly, because <code>FPID</code> is <code>HttpOnly</code>, it doesn&rsquo;t lend itself to cross-domain tracking. Cross-domain tracking is enabled with client-side code, and the <code>HttpOnly</code> flag makes it impossible for client-side code to access the Client ID for cross-domain link decoration.</p>
+<p>There is very likely a feature being designed to support cross-domain tracking, but until such a feature is released, you should hold off from running with the Server Managed option.</p>
+<h2 id="caveat-3-no-cookieless-option">Caveat 3: No cookieless option</h2>
+<p>Client-side Google Analytics can be used <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/cookies-user-id#disabling_cookies"><em>without cookies</em></a>. This is a viable option in the EU if the user hasn&rsquo;t given consent for storing or persisting any data in the browser or device.</p>
+<p>Unfortunately, the Server Managed <code>FPID</code> cookie doesn&rsquo;t currently have a way to comply with this wish. Incoming HTTP requests claimed by the Client with the Server Managed option activated generate the <code>FPID</code> cookie in all cases.</p>
+<p>Again, if this is a deal-breaker for you, you&rsquo;ll need to wait for the Client to support a cookieless option.</p>
+<h2 id="summary">Summary</h2>
+<p>If Google Analytics engineers were given a chance to redesign how GA persists the client identifier, they would build GA with the <code>FPID</code> (or something similar) and steer far away from JavaScript cookies.</p>
+<p>Cookies are notoriously tricky to <em>get right</em>, but the fact is that the closer they are to client-side access, the less secure they are. Even though the Google Analytics identifier doesn&rsquo;t have any personal data encoded within, nor can it be used as an access key for any authentication systems, it&rsquo;s still a vector for <strong>cross-site tracking</strong>.</p>
+<p>The Google Analytics cookie is a persistent first-party identifier that can be repurposed for cross-site tracking in cookie syncing setups, for example.</p>
+<p>By moving the identifier to an <code>HttpOnly</code> cookie, the identifier is protected from misuse.</p>
+<p>Give <code>FPID</code> a spin - you can use the JavaScript Managed option for best compatibility. Just be mindful of the caveats listed in this article.</p>
+
+              
+
+            </div>
+          </div>
+          <div id="post-footer" class="post-footer main-content-wrap">
+            
+              
+                
+                
+                  <div class="post-footer-tags">
+                    <span class="text-color-light text-small">TAGGED IN</span><br/>
+                    
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/google-tag-manager/">google tag manager</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/server-side-tagging/">server-side tagging</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/universal-analytics/">universal analytics</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/client-id/">client id</a>
+
+                  </div>
+                
+              
+            
+            
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--disabled">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/gtm-tips/build-custom-universal-analytics-client-server-side-tagging/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/fpid-cookie-google-analytics-server-side-tagging/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=The%20FPID%20Cookie%20For%20Google%20Analytics%20In%20Server-side%20Tagging%20https://www.simoahava.com/analytics/fpid-cookie-google-analytics-server-side-tagging/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/fpid-cookie-google-analytics-server-side-tagging/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#commento_thread">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+            
+              <span id="commento_thread"></span>
+<div id="commento"></div>
+<script defer src="https://cdn.commento.io/js/commento.js"></script>
+
+            
+          </div>
+        </article>
+        <footer id="footer" class="main-content-wrap">
+  <span class="copyrights">
+    &copy; 2020 Simo Ahava. All Rights Reserved
+  </span>
+</footer>
+
+      </div>
+      
+      <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+        
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--disabled">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/gtm-tips/build-custom-universal-analytics-client-server-side-tagging/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/fpid-cookie-google-analytics-server-side-tagging/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=The%20FPID%20Cookie%20For%20Google%20Analytics%20In%20Server-side%20Tagging%20https://www.simoahava.com/analytics/fpid-cookie-google-analytics-server-side-tagging/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/fpid-cookie-google-analytics-server-side-tagging/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#commento_thread">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+      </div>
+      
+      <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+  <i id="btn-close-shareoptions" class="fa fa-close"></i>
+  <ul class="share-options">
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/fpid-cookie-google-analytics-server-side-tagging/">
+          <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=The%20FPID%20Cookie%20For%20Google%20Analytics%20In%20Server-side%20Tagging%20https://www.simoahava.com/analytics/fpid-cookie-google-analytics-server-side-tagging/%20via%20@SimoAhava">
+          <i class="fa fa-twitter"></i><span>Share on Twitter</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/fpid-cookie-google-analytics-server-side-tagging/">
+          <i class="fa fa-linkedin"></i><span>Share on LinkedIn</span>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+<div id="share-options-mask" class="share-options-mask"></div>
+
+    </div>
+    
+    <div id="about">
+  <div id="about-card">
+    <div id="about-btn-close">
+      <i class="fa fa-remove"></i>
+    </div>
+    
+      <img id="about-card-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+    
+    <h4 id="about-card-name">Simo Ahava</h4>
+    
+      <div id="about-card-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</div>
+    
+    
+      <div id="about-card-job">
+        <i class="fa fa-briefcase"></i>
+        <br/>
+        Senior Data Advocate at Reaktor
+      </div>
+    
+    
+      <div id="about-card-location">
+        <i class="fa fa-map-marker"></i>
+        <br/>
+        Finland
+      </div>
+    
+  </div>
+</div>
+
+    
+  
+    
+    <div id="cover" style="background-image:url('https://www.simoahava.com/images/maisema.jpg');"></div>
+  
+
+
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+
+
+
+
+<script src="https://www.simoahava.com/js/script.js"></script>
+
+
+
+
+<script src="https://cdn.commento.io/js/count.js"></script>
+
+
+    <script>
+      var mylazyload = new LazyLoad({elements_selector: '.lazy'});
+      </script>
+
+    
+  </body>
+</html>
+
