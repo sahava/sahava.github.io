@@ -1,10 +1,10 @@
 [
 {
-	"uri": "https://www.simoahava.com/categories/analytics/",
-	"title": "Analytics",
-	"tags": [],
-	"description": "",
-	"content": ""
+	"uri": "https://www.simoahava.com/gtm-tips/get-true-ip-anonymization-server-side-tagging/",
+	"title": "#GTMTips: Get True IP Anonymization With Server-side Tagging",
+	"tags": ["google tag manager", "gtmtips", "server-side tagging"],
+	"description": "With Server-side tagging, you can get unprecendented amount of control over the hits passed through Google Tag Manager to third-party platforms like Google Analytics and Facebook. In this article, I&#39;ll show you how to eliminate all traces of the user&#39;s actual IP address and User Agent from the outgoing hit to Google Analytics.",
+	"content": "Since the release of Server-side tagging in Google Tag Manager, I\u0026rsquo;ve jumped at every opportunity to celebrate the tools it provides for improving end-user privacy and data security.\nOne of the biggest benefits is obfuscation-by-default. Since all hits are passed through the server-side proxy, the default view for any third-party tool (such as Google Analytics) is that of the server in the Google Cloud rather than the browser and device with which the user was browsing the site.\nIn other words, by using the Server container as a proxy, you are \u0026ldquo;hiding\u0026rdquo; the actual user, as all hits seem to come from the virtual machine rather than the user\u0026rsquo;s browser.\nHowever, the Universal Analytics tag in the Server container copies the user\u0026rsquo;s IP address and User Agent into the outgoing Measurement Protocol request using the \u0026amp;uip and \u0026amp;ua parameters. This means that even though the outgoing HTTP request to Google Analytics originates from the virtual machine in Google Cloud, the Google Analytics data payload is updated to reference the user\u0026rsquo;s actual device and IP address.\nIn this article, I\u0026rsquo;ll show you how to override this behavior and prevent Universal Analytics from doing this copy-paste operation.\nTip 118: Remove IP address and User Agent overrides from Universal Analytics tags   It\u0026rsquo;s very easy to accomplish this. In the Universal Analytics tag that fires in the Server container, you need to do the following.\nFirst, check Enable overriding settings in this tag. This allows you to set individual fields in the tag which override those set by the Client.\n  Then, expand Override Fields to Set, and add the following two fields without any values (leave the value fields empty).\nuser_agent\nip_override\n NOTE! These fields are not the same as analytics.js fields. They are fields established in the event model used in Server-side tagging. There is still a lack of exhaustive documentation about what fields are available, but digging into Debug mode in the Server container and exploring the Event Data tab will get you a long way.\n By setting the fields empty, you are essentially preventing the tag from setting those fields with values from the incoming request, i.e. the user\u0026rsquo;s actual browser and device.\nThis is enough to prevent the override, and you can guarantee the actual user\u0026rsquo;s IP address and User Agent string are not passed to Google Analytics in any shape or size.\nBut what about if you want variable behavior. Prevent the override in some cases, but allow it in others?\nWell, while we\u0026rsquo;re waiting for a Lookup Table variable type to be added to the Server container, there\u0026rsquo;s no way to set variable values for these fields based on, for example, the existence of the \u0026amp;aip (Anonymize IP) parameter.\nSo if you wanted to allow the IP and User Agent transfer except when the event data has anonymize_ip set to true (this is what the \u0026amp;aip parameter is turned into in the event object), you\u0026rsquo;d need two tags.\nOne sends the data to Google Analytics without the overrides (i.e. default Universal Analytics tag behavior without any overridden settings), and fires when an Event Data variable set for the key anonymize_ip is not true.\n    The other tag sends the data to Google Analytics following the instructions in this article. It needs to have the ip_override and user_agent fields set to blank values. The trigger for it is the reverse of the one for the other tag, so you need to check if anonymize_ip is actually true.\n  Yes, a Lookup Table variable would make this much smoother as you\u0026rsquo;d need just one tag and one trigger and set the value of ip_override and user_agent to blank or default values depending on whether the IP should be anonymized or not.\nI hope you find this tip useful. At the very least, it should reinforce the notion that Google Tag Manager\u0026rsquo;s Server-side Tagging can be used to improve the prospects of user anonymization and obfuscation of personal data.\n"
 },
 {
 	"uri": "https://www.simoahava.com/categories/",
@@ -14,8 +14,8 @@
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/tags/client-id/",
-	"title": "client id",
+	"uri": "https://www.simoahava.com/tags/gtmtips/",
+	"title": "gtmtips",
 	"tags": [],
 	"description": "",
 	"content": ""
@@ -37,6 +37,20 @@
 {
 	"uri": "https://www.simoahava.com/tags/",
 	"title": "Tags",
+	"tags": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "https://www.simoahava.com/categories/analytics/",
+	"title": "Analytics",
+	"tags": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "https://www.simoahava.com/tags/client-id/",
+	"title": "client id",
 	"tags": [],
 	"description": "",
 	"content": ""
@@ -65,13 +79,6 @@
 {
 	"uri": "https://www.simoahava.com/tags/cookie/",
 	"title": "cookie",
-	"tags": [],
-	"description": "",
-	"content": ""
-},
-{
-	"uri": "https://www.simoahava.com/tags/gtmtips/",
-	"title": "gtmtips",
 	"tags": [],
 	"description": "",
 	"content": ""
