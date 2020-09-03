@@ -125,7 +125,7 @@
 <meta itemprop="description" content="Use customTask and a dummy Universal Analytics tag in Google Tag Manager to trigger JavaScript code without having to use a Custom HTML tag.">
 <meta itemprop="datePublished" content="2019-01-17T19:39:15&#43;02:00" />
 <meta itemprop="dateModified" content="2019-01-17T19:39:15&#43;02:00" />
-<meta itemprop="wordCount" content="537">
+<meta itemprop="wordCount" content="568">
 
 
 
@@ -935,7 +935,10 @@ on
     </header>
 
     <section class="post-content">
-      <p>The <strong>Custom HTML tag</strong> in <a href="https://tagmanager.google.com/">Google Tag Manager</a> is splendid. It&rsquo;s your go-to tool when you need to run arbitrary JavaScript on the webpage. Some might even use it to actually add HTML elements to the page, but I&rsquo;m willing to bet running JavaScript is its most common use.</p>
+      <blockquote>
+<p><strong>Last updated 3 September 2020</strong>: <code>customTask</code> has changed how it exposes the model object, so the code in this article has been updated. Thanks to <strong>Ritvik Sharma</strong> for the solution.</p>
+</blockquote>
+<p>The <strong>Custom HTML tag</strong> in <a href="https://tagmanager.google.com/">Google Tag Manager</a> is splendid. It&rsquo;s your go-to tool when you need to run arbitrary JavaScript on the webpage. Some might even use it to actually add HTML elements to the page, but I&rsquo;m willing to bet running JavaScript is its most common use.</p>
 <p>However, there&rsquo;s a downside to Custom HTML tags, which is only made more apparent on single-page apps which do not clear the full page when transitioning from one state to another. Custom HTML tags are <strong>injected to the end of <code>&lt;body&gt;</code></strong>, which means you might end up with a <strong>lot</strong> of clutter in your Document Object Model.</p>
 <p>In this article, I&rsquo;ll show you a pretty neat trick. We&rsquo;ll use <a href="https://www.simoahava.com/amp/analytics/customtask-the-guide/"><code>customTask</code></a> to run a &ldquo;dummy&rdquo; Universal Analytics tag, whose only purpose is to execute your JavaScript code when the tag is triggered. This way, nothing is injected into the DOM, and the only overhead you&rsquo;ll run is the initial effort of creating the Google Analytics tracker.</p>
 <h2 id="tip-94-trigger-custom-javascript-without-using-a-custom-html-tag">Tip 94: Trigger custom JavaScript without using a Custom HTML tag</h2>
@@ -952,8 +955,8 @@ on
 <div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
   <span class="k">return</span> <span class="kd">function</span><span class="p">(</span><span class="nx">model</span><span class="p">)</span> <span class="p">{</span>
     <span class="c1">// Prevent task queue from being run
-</span><span class="c1"></span>    <span class="nx">model</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">keys</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">key</span><span class="p">)</span> <span class="p">{</span>
-      <span class="nx">model</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="kc">null</span><span class="p">);</span>
+</span><span class="c1"></span>	<span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="nx">model</span><span class="p">.</span><span class="nx">data</span><span class="p">).</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">key</span><span class="p">)</span> <span class="p">{</span>
+	  <span class="nx">model</span><span class="p">.</span><span class="nx">data</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
     <span class="p">});</span>
 
     <span class="c1">// The code you want to execute
