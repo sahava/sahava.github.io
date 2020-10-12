@@ -361,6 +361,7 @@
     </li>
     <li><a href="#what-happens-when-consent-is-updated">What happens when consent is updated</a></li>
     <li><a href="#url-passthrough">URL passthrough</a></li>
+    <li><a href="#google-tag-manager-support">Google Tag Manager support</a></li>
     <li><a href="#summary">Summary</a></li>
   </ul>
 </nav></div>
@@ -370,7 +371,7 @@
 </blockquote>
 <p>Make sure you read the official <a href="https://support.google.com/analytics/answer/9976101">support documentation</a> as well as the <a href="https://developers.google.com/gtagjs/devguide/consent">developer guide</a> to get up to speed.</p>
 <h2 id="how-consent-mode-works">How consent mode works</h2>
-<p>First of all, <strong>consent mode</strong> is not a <strong>consent management solution</strong>. For consent mode to be effective, you need to already have a system or solution in place for collecting and resolving the user&rsquo;s consent with regard to the data being collected on your site.</p>
+<p>First of all, <strong>consent mode</strong> is not a <strong>consent management platform</strong>. For consent mode to be effective, you need to already have a system or solution in place for collecting and resolving the user&rsquo;s consent with regard to the data being collected on your site.</p>
 <p>Consent mode has two variants. There are the <strong>default</strong> settings the page will use while waiting for the user&rsquo;s consent status to be resolved. Then there are the <strong>updated</strong> settings that are sent as soon as consent has been resolved.</p>
 <p>Default settings should be established as early as possible in the page load. Ideally, you&rsquo;d add a new <code>gtag</code> snippet to the top of the page template, and establish the default consent settings in that snippet.</p>
 <blockquote>
@@ -379,7 +380,7 @@
 <p>When Google&rsquo;s tags fire, they will check the consent status from the default settings and act accordingly.</p>
 <p>Once you&rsquo;ve established the user&rsquo;s consent, you can call the <code>update</code> command. This lets you change (or keep) the status of <strong>advertising storage</strong> and of <strong>analytics storage</strong>.</p>
 <h3 id="the-gtag-call">The gtag() call</h3>
-<p>As mentioned above, consent mode utilizes the <code>gtag()</code> API. This, in turn, pushes the information into <code>dataLayer</code> for Google Tag Manager to utilize.</p>
+<p>As mentioned above, consent mode utilizes the <code>gtag()</code> API. The Google tags firing on the site will automatically read the consent status from this API when determining whether to read or write cookies and how to compile the network request to Google&rsquo;s servers.</p>
 <p>Here&rsquo;s what the <strong>default</strong> snippet would look like. Remember, ideally this would be positioned at the top of the page. You can also fire it through Google Tag Manager using a Custom HTML tag or a custom template, but in that case you must make sure that it fires before any Google tags fire.</p>
 <div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#0aa">window</span>.dataLayer = <span style="color:#0aa">window</span>.dataLayer || [];
 <span style="color:#00a">function</span> gtag() { <span style="color:#0aa">window</span>.dataLayer.push(arguments); }
@@ -436,7 +437,7 @@ gtag(<span style="color:#a50">&#39;consent&#39;</span>, <span style="color:#a50"
 </blockquote>
 <p>When you do this, the following additional restrictions will apply:</p>
 <ul>
-<li><strong>Advertising hits will be routed through a new cookieless domain</strong>. Instead of routing them to <code>doubleclick.net</code> or <code>google.com</code>, the requests are sent to <code>googleadsyndication.com</code>, which will not have any cookies set on it.</li>
+<li><strong>Advertising hits will be routed through a new cookieless domain</strong>. Instead of routing them to <code>doubleclick.net</code> or <code>google.com</code>, the requests are sent to <code>googleadsyndication.com</code>, which would not have any (advertising-related) cookies set on it by Google.</li>
 <li><strong>Ad click identifiers will be redacted from advertising requests and consent pings</strong>.</li>
 <li><strong>Page URLs with click identifiers will be redacted</strong>. Note that Google Analytics will still collect the full page URL with click identifiers in place.</li>
 </ul>
@@ -460,10 +461,8 @@ gtag(<span style="color:#a50">&#39;consent&#39;</span>, <span style="color:#a50"
 <p>This means that <strong>all hits</strong> that fire before the user <strong>reloads or navigates to another page</strong> will have the same client identifier (because it&rsquo;s stored in a global variable). However, as soon as the user navigates away from the current page or reloads the page, a new client identifier will be sent with the hits on this new page load.</p>
 <p>In other words, Google Analytics will not read or write the <code>_ga</code> cookie (even if one already exists). Instead, it will use an ephemeral identifier that exists solely for the duration of the current page load.</p>
 <p>Importantly, <strong>restricting analytics STORAGE will not prevent hits to Google Analytics from being sent</strong>. The consent mode setting solely prevents Google Analytics from storing data in or reading data from browser cookies (or other storage).</p>
-<blockquote>
-<p>Update 7 October 2020: It looks like even though the hits are being collected by Google Analytics, they&rsquo;re not actually surfaced in the reports (apart from Real Time). We&rsquo;ll see if Google uses this data to model behavior out of the cookieless pings at some point, but for now you can ignore the warning below.</p>
-</blockquote>
-<p><del>Data collected like this will mess up your <strong>Users</strong> and <strong>Sessions</strong> counts and should be isolated to its own Google Analytics property. It&rsquo;s thus a good idea to push something to dataLayer to reflect the consent status, so that you can use this to redirect the hits to a new web property and not mess up your data.</del></p>
+<p>However, these cookieless hits are sent to Google Analytics with a new <code>gcs</code> parameter, which includes the consent status of the hit. The cookieless hits are thus identified by Google Analytics and <strong>for now</strong> are not collected or exposed in reporting at all.</p>
+<p>Most likely Google will at some point build actionable data out of the cookieless data set as well, perhaps after applying extensive modelling to make it align with the data that was collected with storage consent.</p>
 <h2 id="what-happens-when-consent-is-updated">What happens when consent is updated</h2>
 <p>If you send the <code>update</code> command, you will be able to either <strong>deny</strong> or <strong>grant</strong> advertising and analytics storage access to all Google tags regardless of region.</p>
 
@@ -492,9 +491,22 @@ gtag(<span style="color:#a50">&#39;consent&#39;</span>, <span style="color:#a50"
 </code></pre></div>
 <p>For this to work, the site <strong>must</strong> load a <code>gtag.js</code> library, so just using the <code>gtag()</code> API will not work.</p>
 <p>If you&rsquo;re using Google Tag Manager, you can achieve the same functionality by using the cross-domain linking capabilities of the <a href="https://support.google.com/tagmanager/answer/7549390?hl=en">Conversion Linker tag</a>.</p>
+<h2 id="google-tag-manager-support">Google Tag Manager support</h2>
+<p>As you might have surmised, for now the Google Tag Manager support for consent mode is a bit flaky. Being forced to use the <code>gtag()</code> API is a bit backwards, considering we already have a global message queue named <code>dataLayer</code> at our disposal.</p>
+<p>I&rsquo;m absolutely positive that a more tightly-knit integration with GTM is on the way. I&rsquo;m particularly hoping to see some or all of the following features:</p>
+<ul>
+<li><strong>Consent status exposed in <code>dataLayer</code></strong>. Right now the <code>gtag()</code> consent commands are not available in <code>dataLayer</code>, making it impossible to check advertising and analytics storage status in case one wanted to apply them to other, non-Google tags as well.</li>
+<li><strong>Pre-load trigger</strong>. This is something I&rsquo;ve been wanting to see for years. It would be so useful to have a trigger event for which <strong>all</strong> other Google Tag Manager events have to wait to complete before being initialized. It would be the perfect place for a consent mode tag, as all the other tags in the container would not be able to fire until the pre-load event has been completed.</li>
+<li><strong>First-class consent awareness</strong>. With this I mean it should be possible to have tags be consent-aware <em>without</em> having to build elaborate trigger setups. One of the most difficult things to set up when using GTM with a consent management platform is the conditional firing of tags depending on consent status.</li>
+<li><strong>Consent-aware APIs for templates</strong>. A logical extension of consent mode is that it should apply to non-Google tags as well. A perfect place for this would be in <a href="https://www.simoahava.com/analytics/custom-templates-guide-for-google-tag-manager/">custom templates</a>, where consent mode status could be applied to the APIs and network requests generated by custom templates as well.</li>
+</ul>
 <h2 id="summary">Summary</h2>
 <p>First of all, remember that <strong>consent mode</strong> is a <strong>beta</strong> feature. It&rsquo;s likely to change before it&rsquo;s officially out of beta (at which point I&rsquo;ll update this article accordingly).</p>
-<p>Nevertheless, it gives you a nice way to control storage especially with advertising tags. You&rsquo;ve already been able to control Google Analytics storage with the <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/cookies-user-id#disabling_cookies"><code>storage</code></a> tracker setting, but now it&rsquo;s also configurable via this <code>gtag()</code> API.</p>
+<p>In addition to a better Google Tag Manager integration, I&rsquo;m also looking forward to more consent options, as limiting just &ldquo;advertising storage&rdquo; and &ldquo;analytics storage&rdquo; doesn&rsquo;t really cut it when it comes to the granularity of how users should be able to decide how their data is collected and processed.</p>
+<p>Nevertheless, consent mode gives you a nice way to control storage especially with advertising tags. You&rsquo;ve already been able to control Google Analytics storage with the <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/cookies-user-id#disabling_cookies"><code>storage</code></a> tracker setting, but now it&rsquo;s also configurable via this <code>gtag()</code> API.</p>
+<blockquote>
+<p>The main difference between consent mode and using the <code>storage</code> field to block analytics tags from having access to storage is that consent mode will not surface the data in reports whereas setting <code>storage</code> to <code>none</code> will.</p>
+</blockquote>
 <p>It&rsquo;s important to note that consent mode mostly applies to <strong>storage</strong> access and doesn&rsquo;t actually block any requests. I&rsquo;m certain there will be debate about whether this is enough or not. However, especially in the European Union the laws seem to be rather clear that as long as the nothing is stored (or read from storage), and as long as only ephemeral identifiers that can in no way be linked back to a natural person are used, this approach should be good enough.</p>
 <p>You will need to trust Google on the <code>ad_storage</code> bit, though. Google promises they won&rsquo;t use third-party cookies for other than spam and fraud detection, but this is difficult to audit.</p>
 <p>Similarly, consent mode only covers the identifiers <strong>that we know about</strong>. There might be data leaks, intentional and unintentional, in requests to Google that allow far more data controlling options than the user has opted in to.</p>
