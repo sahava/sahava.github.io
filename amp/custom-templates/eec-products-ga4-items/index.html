@@ -109,7 +109,7 @@
 <meta itemprop="description" content="This variable templates takes an Enhanced Ecommerce products/impressions/promotions array as an input, and outputs it in the updated &ldquo;items&rdquo; format for Google Analytics 4 Ecommerce.">
 <meta itemprop="datePublished" content="2020-10-17T07:51:19&#43;00:00" />
 <meta itemprop="dateModified" content="2020-10-17T07:51:19&#43;00:00" />
-<meta itemprop="wordCount" content="176">
+<meta itemprop="wordCount" content="430">
 
 
 
@@ -914,13 +914,86 @@ Simo Ahava
 </tbody>
 </table>
 <h3 id="description">Description</h3>
-<p>This template has four options.</p>
+<p>This template has four main options.</p>
 <ul>
 <li><strong>Map ecommerce object automatically</strong> - the template looks into the <em>latest</em> <code>ecommerce</code> object pushed into <code>dataLayer</code>, and takes its products, impressions, or promotions array (whichever is found). It returns the array mapped into the format required by the <code>items</code> parameter in GA4 ecommerce.</li>
 <li><strong>Map products array</strong> - Select a variable from the drop-down which returns a valid Enhanced Ecommerce <code>products</code> array. The variable will be mapped into the format required by the <code>items</code> parameter.</li>
 <li><strong>Map impressions array</strong> - Select a variable from the drop-down which returns a valid Enhanced Ecommerce <code>impressions</code> array. The variable will be mapped into the format required by the <code>items</code> parameter.</li>
 <li><strong>Map promotions array</strong> - Select a variable from the drop-down which returns a valid Enhanced Ecommerce <code>promotions</code> array. The variable will be mapped into the format required by the <code>items</code> parameter.</li>
 </ul>
+<p>The items are mapped as closely as possible, using the following pairs:</p>
+<table>
+<thead>
+<tr>
+<th>EEC parameter</th>
+<th>GA4 parameter</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td><code>item_id</code> or <code>promotion_id</code></td>
+<td>The ID of the product, impression, or promotion.</td>
+</tr>
+<tr>
+<td><code>name</code></td>
+<td><code>item_name</code> or <code>promotion_name</code></td>
+<td>The name of the product, impression, or promotion.</td>
+</tr>
+<tr>
+<td><code>brand</code></td>
+<td><code>item_brand</code></td>
+<td>The brand of the product or impression.</td>
+</tr>
+<tr>
+<td><code>variant</code></td>
+<td><code>item_variant</code></td>
+<td>The variant of the product or impression.</td>
+</tr>
+<tr>
+<td><code>category</code></td>
+<td><code>item_category(_[2-5])</code></td>
+<td>The category of the product or impression, automatically split into <code>item_category</code> to <code>item_category_5</code>.</td>
+</tr>
+<tr>
+<td><code>price</code></td>
+<td><code>price</code></td>
+<td>The price of the product or impression.</td>
+</tr>
+<tr>
+<td><code>quantity</code></td>
+<td><code>quantity</code></td>
+<td>The quantity of the product or impression.</td>
+</tr>
+<tr>
+<td><code>list</code></td>
+<td><code>item_list_name</code></td>
+<td>The product list of the product or impression - taken from either the product/impression object if available, or from <code>actionField</code> if present there.</td>
+</tr>
+<tr>
+<td><code>position</code></td>
+<td><code>index</code> or <code>creative_slot</code></td>
+<td>The index of the impression or the slot of the promotion.</td>
+</tr>
+<tr>
+<td><code>creative</code></td>
+<td><code>creative_name</code></td>
+<td>The name of the promotion creative.</td>
+</tr>
+</tbody>
+</table>
+<p>In addition to this, you can <strong>map</strong> <a href="https://www.simoahava.com/amp/analytics/enhanced-ecommerce-guide-for-google-tag-manager/#product-scoped-custom-dimensions-and-metrics">product-scoped custom dimensions and metrics</a> to proper item parameter names. To create a mapping, you need to provide the <strong>index number</strong> of the custom dimension or metric (e.g. the <code>1</code> in <code>dimension1</code>) in the first field, and then an <strong>item parameter name</strong> in the second. To map a custom metric in index <code>13</code> to an item parameter named <code>quantity_in_stock</code>, you&rsquo;d create the mapping like this:</p>
+
+
+    <a href="https://www.simoahava.com/amp/images/2020/10/custom-metric-map.jpg" title="Custom Metric map">
+  
+    <amp-img src="https://www.simoahava.com/amp/images/2020/10/custom-metric-map.jpg" layout="responsive" alt="Custom Metric map" height="264" width="2338"></amp-img>
+  
+    </a>
+  
+
+<p>All custom dimensions and metrics that are <strong>not</strong> mapped will be added into the item object with their original names (so <code>dimension17</code>, <code>metric23</code> for example).</p>
 <h3 id="release-notes">Release notes</h3>
 <table>
 <thead>
@@ -930,6 +1003,10 @@ Simo Ahava
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>21 October 2020</td>
+<td>Add option to map custom dimensions and metrics to proper item parameter names.</td>
+</tr>
 <tr>
 <td>17 October 2020</td>
 <td>Initial release.</td>
