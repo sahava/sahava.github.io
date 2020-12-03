@@ -126,7 +126,7 @@ The purpose of ITP is to prevent tracking tools&amp;rsquo; access to data stored
 The purpose of ITP is to prevent tracking tools&rsquo; access to data stored and processed in the browser. This involves things like blocking all third-party cookies and restricting the lifetime of first-party cookies.">
 <meta itemprop="datePublished" content="2020-12-02T09:00:56&#43;02:00" />
 <meta itemprop="dateModified" content="2020-12-02T09:00:56&#43;02:00" />
-<meta itemprop="wordCount" content="1294">
+<meta itemprop="wordCount" content="1333">
 
 
 
@@ -1053,8 +1053,10 @@ on
 <p>The main impact of this is on <strong>first-party storage</strong>, as traffic from a flagged domain can result in first-party cookies being restricted to a lifetime of just <a href="https://www.cookiestatus.com/safari/#first-party-cookies">24 hours</a>. There is some impact on the <a href="https://www.cookiestatus.com/safari/#referrer">referrer string</a> as well.</p>
 <p>Notably, Safari doesn&rsquo;t use ITP to block third-party cookies anymore. Instead, <strong>all third-party cookies</strong> are blocked without exception on Safari, and the site needs to use the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Storage_Access_API">Storage Access API</a> to gain access.</p>
 <h3 id="about-to-remove-data-records-for">About to remove data records for&hellip;</h3>
-<p>Safari removes all script-writable storage from a site if the site hasn&rsquo;t been interacted with in <strong>first-party context</strong> for the last 7 days.</p>
+<p>Safari removes all script-writable storage (<code>localStorage</code>, <code>indexedDB</code> etc.) from a site if the site hasn&rsquo;t been interacted with in <strong>first-party context</strong> for the last 7 days.</p>
 <p>This means that the user has to actually visit the site and perform a meaningful interaction (e.g. click, scroll) to have the timer reset.</p>
+<p>JavaScript cookies can have their expiration reset with the <code>document.cookie</code> API, but the maximum expiration is always enforced at 7 days by Safari.</p>
+<blockquote>
 
 
     <a href="https://www.simoahava.com/amp/images/2020/12/about-to-remove-data-records.jpg" title="About to remove data records for">
@@ -1064,7 +1066,11 @@ on
     </a>
   
 
-<p>Note that cookies are an exemption here, as if the cookies have been written with HTTP headers rather than with JavaScript, they will not be purged (unless <a href="https://www.cookiestatus.com/safari/#cname-cloaking">CNAME cloaking</a> is used).</p>
+</blockquote>
+<p>Safari also removes <strong>all website data</strong> (including cookies set with HTTP headers) if the domain has been classified by ITP AND if the domain hasn&rsquo;t been interacted with in first-party context in the last 30 days.</p>
+<blockquote>
+<p>Thanks to <a href="https://www.twitter.com/kyotonio/">Antoine Bourlon</a> for the clarification above.</p>
+</blockquote>
 <h3 id="storage-access-api">Storage Access API</h3>
 <p>Interactions with the <strong>Storage Access API</strong> have their own debug logging.</p>
 
