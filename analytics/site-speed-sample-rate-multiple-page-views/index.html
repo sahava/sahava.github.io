@@ -206,6 +206,16 @@
     </a>
   </li>
 
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
 
     </ul>
     <ul class="sidebar-buttons">
@@ -260,20 +270,20 @@
     </a>
   </li>
 
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/newsletter/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bell"></i>
+      
+      <span class="sidebar-button-desc">Newsletter</span>
+    </a>
+  </li>
+
 
     </ul>
     <ul class="sidebar-buttons">
       
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
-      
-      <span class="sidebar-button-desc">RSS</span>
-    </a>
-  </li>
-
 
     </ul>
   </div>
@@ -329,7 +339,9 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              <p><a href="https://analytics.google.com/">Google Analytics&rsquo;</a> <a href="https://support.google.com/analytics/answer/1205784?hl=en">Site Speed reports</a> are pretty darn great. They report automatically on various milestones in the process the browser undertakes when rendering content. These reports leverage the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Navigation_timing_API">Navigation Timing API</a> of the web browser, and they are (typically) collected on the first Page View hit of a page.</p>
+	      
+                
+  	        <p><a href="https://analytics.google.com/">Google Analytics&rsquo;</a> <a href="https://support.google.com/analytics/answer/1205784?hl=en">Site Speed reports</a> are pretty darn great. They report automatically on various milestones in the process the browser undertakes when rendering content. These reports leverage the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Navigation_timing_API">Navigation Timing API</a> of the web browser, and they are (typically) collected on the first Page View hit of a page.</p>
 <p>And this is all fine. As I said, it&rsquo;s a great feature of Google Analytics, and lends itself handily to spotting issues in the quite complex client-server negotiation that goes on when your web browser requests content from the web server.</p>
 
 
@@ -378,7 +390,20 @@
 </li>
 </ol>
 <p>If any of these rang true, you might have a data quality issue that should be fixed immediately.</p>
-<h2 id="framing-the-problem">Framing the problem</h2>
+
+                <span class="simmer">
+  <span class="close">X</span>
+  <p>
+    <span class="fa fa-md fa-bell"></span>
+    <strong>The Simmer Newsletter</strong>
+  </p>
+  <p>
+    Subscribe to the <a href="https://www.simoahava.com/newsletter/">Simmer newsletter</a> to get the latest news and content from Simo Ahava into your email inbox!
+  </p>
+  </span>
+
+                
+                  <h2 id="framing-the-problem">Framing the problem</h2>
 <p><a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/field-reference#siteSpeedSampleRate">By default</a>, 1% of Page View hits are sampled for page timings. So if you have the following code on the site:</p>
 <div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">ga(<span style="color:#a50">&#39;send&#39;</span>, <span style="color:#a50">&#39;pageview&#39;</span>);
 </code></pre></div>
@@ -393,13 +418,17 @@ ga(<span style="color:#a50">&#39;secondTracker.send&#39;</span>, <span style="co
 </code></pre></div>
 <p>If both these trackers collect to the same Google Analytics property (UA-XXXXXX-Y), and if both trackers manage to somehow make the 1/100 cut, you will be sending the same page timing data <em>twice</em>, just for different page paths. And that will warp your data!</p>
 <p>It gets worse&hellip;</p>
-<h2 id="the-problem-with-google-tag-manager">The problem with Google Tag Manager</h2>
+
+                
+                  <h2 id="the-problem-with-google-tag-manager">The problem with Google Tag Manager</h2>
 <p><a href="https://tagmanager.google.com/">Google Tag Manager</a>, for all the good it does, has one complication that makes a lot of things difficult: it assigns a unique tracker object for every single tag that fires - even if it&rsquo;s the same tag firing multiple times.</p>
 <p>Take another look at the image at the beginning of this article. There you have a Page View Tag which has the <code>siteSpeedSampleRate</code> set to 100%, which means that every single time the Page View hit is sent, it should be used to sample page timing data. It also has a Trigger which fires whenever a Custom Event is pushed into <code>dataLayer</code>. So this is your typical &ldquo;virtual&rdquo; Page View (man I hate that term - all Page Views are virtual!) Tag, set to fire with a custom page path whenever the event triggers.</p>
 <p>Now, here&rsquo;s the issue: because it has <code>siteSpeedSampleRate</code> set to 100, and because it will fire multiple times on the page, and because each time it fires it will have a unique tracker name:</p>
 <p><strong>Every single time this Page View Tag fires, it will send the same page timing data to Google Analytics!</strong></p>
 <p>That&rsquo;s multiplication on a grand level! It&rsquo;s even more confusing since the <em>same</em> page timing data is sent to multiple page paths, making deduplication in the reports really difficult to do.</p>
-<h2 id="fixes">Fixes</h2>
+
+                
+                  <h2 id="fixes">Fixes</h2>
 <p>Here are some obvious fixes to this issue.</p>
 <h3 id="1-only-sample-a-single-tracker">1. Only sample a single tracker</h3>
 <p>This is pretty easy if you&rsquo;re using the Universal Analytics snippet. Set <code>siteSpeedSampleRate</code> to a proper value in only one tracker, and set all other trackers to 0.</p>
@@ -470,10 +499,14 @@ ga(<span style="color:#a50">&#39;create&#39;</span>, <span style="color:#a50">&#
 
 <p>You can set it to whatever value you wish, though I advice against leaving it blank. If you do leave it blank, it uses the default Universal Analytics tracker and can lead to issues, unless you are really on top of your site&rsquo;s GA implementation.</p>
 <p>There are risks when setting the Tracker Name field, and I recommend you read <a href="https://www.simoahava.com/gtm-tips/be-careful-with-the-tracker-name-setting/">my article on the topic</a> before proceeding with the method.</p>
-<h2 id="summary">Summary</h2>
+
+                
+                  <h2 id="summary">Summary</h2>
 <p>The Site Speed reports are really great, but you might want to go over your Universal Analytics implementation to make sure you&rsquo;re not involuntarily collecting bogus data.</p>
 <p>As long as you keep in mind that the page speed sample is collected <em>once per page per tracker</em>, you should be able to identify if there are issues in your setup. In this article, I have outlined three different things you can try, but there are other methods you can employ too, with just a little creativity.</p>
 
+                
+              
               
 
             </div>
@@ -728,7 +761,9 @@ ga(<span style="color:#a50">&#39;create&#39;</span>, <span style="color:#a50">&#
 
 <script src="https://cdn.commento.io/js/count.js"></script>
 
-
+    <script>
+      !function(){var e=document.querySelector(".simmer"),t=document.querySelector(".simmer .close"),o=window.sessionStorage&&window.sessionStorage.getItem("nosimmer");if(e){if(o){e.style.display="none"}t.addEventListener("click",function(){window.sessionStorage.setItem("nosimmer","true"),e.style.display="none"})}}();
+    </script>
     <script>
       var mylazyload = new LazyLoad({elements_selector: '.lazy'});
       </script>

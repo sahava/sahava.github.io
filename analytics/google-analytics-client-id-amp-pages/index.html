@@ -206,6 +206,16 @@
     </a>
   </li>
 
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
 
     </ul>
     <ul class="sidebar-buttons">
@@ -260,20 +270,20 @@
     </a>
   </li>
 
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/newsletter/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bell"></i>
+      
+      <span class="sidebar-button-desc">Newsletter</span>
+    </a>
+  </li>
+
 
     </ul>
     <ul class="sidebar-buttons">
       
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
-      
-      <span class="sidebar-button-desc">RSS</span>
-    </a>
-  </li>
-
 
     </ul>
   </div>
@@ -329,7 +339,9 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              <p>This article is a collaboration between Simo and <a href="https://www.bounteous.com/insights/author/danwilkerson/">Dan Wilkerson</a>. Dan&rsquo;s one of the smartest analytics developers out there, and he&rsquo;s already contributed a great <a href="https://www.simoahava.com/gtm-tips/using-document-write-safely-gtm-tags/">#GTMTips guest post</a>. It&rsquo;s great to have him back here sharing his insight on working with <a href="https://www.ampproject.org/">Accelerated Mobile Pages</a> (AMP).</p>
+	      
+                
+  	        <p>This article is a collaboration between Simo and <a href="https://www.bounteous.com/insights/author/danwilkerson/">Dan Wilkerson</a>. Dan&rsquo;s one of the smartest analytics developers out there, and he&rsquo;s already contributed a great <a href="https://www.simoahava.com/gtm-tips/using-document-write-safely-gtm-tags/">#GTMTips guest post</a>. It&rsquo;s great to have him back here sharing his insight on working with <a href="https://www.ampproject.org/">Accelerated Mobile Pages</a> (AMP).</p>
 <p>So, we&rsquo;re back on AMP! Simo wrote a long, sprawling <a href="https://www.simoahava.com/analytics/accelerated-mobile-pages-via-google-tag-manager/">AMP for Google Tag Manager guide</a> a while ago, and Dan has also contributed to the space with his guide for <a href="https://www.bounteous.com/insights/2015/12/08/google-analytics-using-amp/">AMP and Google Analytics</a>. Both of these guides touched upon a subject that might be one of the reasons to stay away from AMP for now: Client ID matching across AMP, your regular website, and any caches or CDNs that serve the AMP version.</p>
 
 
@@ -349,7 +361,20 @@
 <p>Not only does AMP have its own, unique syntax for the Client ID, it also stores it in different ways. For example, in the <a href="https://developers.google.com/amp/cache/">AMP Cache</a> (and thus via Google search, too), it&rsquo;s stored in <code>localStorage</code>. If someone visits your site directly and accesses AMP pages, the Client ID is stored in the <code>AMP_ECID_GOOGLE</code> cookie. And then if someone visits a regular page on your site, the Client ID can be found in the <code>_ga</code> cookie.</p>
 <p>In this article, Dan and Simo tackle this issue by showing how to serve the Client ID <em>consistently</em> from the <code>_ga</code> cookie written on your website&rsquo;s actual domain. This way, AMP pages will use the same Client ID that regular Google Analytics uses, and you will be able to identify customer journeys that may pass through both your regular site as well as your AMP content.</p>
 <p>The examples are provided in NodeJS and PHP (WordPress), but the methodology is universal and quite simple to do with any web server software.</p>
-<h2 id="overview">Overview</h2>
+
+                <span class="simmer">
+  <span class="close">X</span>
+  <p>
+    <span class="fa fa-md fa-bell"></span>
+    <strong>The Simmer Newsletter</strong>
+  </p>
+  <p>
+    Subscribe to the <a href="https://www.simoahava.com/newsletter/">Simmer newsletter</a> to get the latest news and content from Simo Ahava into your email inbox!
+  </p>
+  </span>
+
+                
+                  <h2 id="overview">Overview</h2>
 <p>To recap, <a href="https://analytics.google.com/">Google Analytics</a> stores a unique identifier for every user who visits your site within a first-party <a href="http://www.allaboutcookies.org/cookies/">cookie</a>. This value, in GA parlance, is called the <strong>Client ID</strong>, and the name of the cookie is <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/cookies-user-id"><code>_ga</code></a>. Here&rsquo;s what the entire cookie string looks like, with the actual Client ID bolded.</p>
 <p>GA1.2.<strong>1789536866.1471440764</strong></p>
 <p>The <strong>GA1</strong> value denotes this is version 1 of the <code>_ga</code> cookie. The <strong>2</strong> denotes the number of dot-separated components in the URL the cookie is stored at. For example, if GA were instructed to store the cookie at <strong>shop.example.com</strong>, the number would be 3, instead.</p>
@@ -440,7 +465,9 @@
 </li>
 </ul>
 <p>For a full example, <a href="https://github.com/DanWilkerson/amp-config-example">check out this repository on GitHub</a>. If you&rsquo;re using the Google Analytics vendor configuration, this is all you need to do. If you&rsquo;d like to combine this concept with Google Tag Manager, read on!</p>
-<h2 id="google-tag-manager-proxy-using-nodejs">Google Tag Manager proxy using NodeJS</h2>
+
+                
+                  <h2 id="google-tag-manager-proxy-using-nodejs">Google Tag Manager proxy using NodeJS</h2>
 <p>As Simo covered in his <a href="https://www.simoahava.com/analytics/accelerated-mobile-pages-via-google-tag-manager/">GTM/AMP guide</a>, Google Tag Manager allows us to build Tags and Triggers in a web UI, then compile those down into a JSON configuration in the format AMP expects. If we used the standard GTM implementation, however, the container request is done directly to GTM&rsquo;s server, which means our custom API wouldn&rsquo;t be able to serve the proper Client ID. That said, you can still combine both techniques. You&rsquo;ve just got to roll up your sleeves a little.</p>
 <p>Here&rsquo;s a truncated example, using <a href="https://nodejs.org/en/">Node</a> and <a href="http://expressjs.com/">Express</a>. For the complete code, <a href="https://github.com/DanWilkerson/amp-config-example">visit this GitHub repository</a>.</p>
 <div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">app.get(<span style="color:#a50">&#39;/gtm-analytics.config.json&#39;</span>, (req, res) =&gt; {
@@ -543,7 +570,9 @@
 <div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html"><span style="color:#aaa;font-style:italic">&lt;!-- Google Tag Manager --&gt;</span>
 &lt;<span style="color:#1e90ff;font-weight:bold">amp-analytics</span> <span style="color:#1e90ff">config</span>=<span style="color:#a50">&#34;//www.yourdomain.com/gtm-analytics.config.json?id=GTM-XXXXX&amp;gtm.url=SOURCE_URL&#34;</span> <span style="color:#1e90ff">data-credentials</span>=<span style="color:#a50">&#34;include&#34;</span>&gt;&lt;/<span style="color:#1e90ff;font-weight:bold">amp-analytics</span>&gt;</code></pre></div>
 <p>Congratulations, you have created a web proxy that fetches the Google Tag Manager container from Google&rsquo;s servers and modifies the JSON to leverage the value stored in the <code>_ga</code> cookie.</p>
-<h2 id="google-tag-manager-proxy-with-wordpress">Google Tag Manager proxy with WordPress</h2>
+
+                
+                  <h2 id="google-tag-manager-proxy-with-wordpress">Google Tag Manager proxy with WordPress</h2>
 <p>This blog is running on WordPress, so Simo wanted to see how trivial it would be to create the endpoint. As it turns out, it&rsquo;s very simple indeed.</p>
 <p>WordPress provides the <a href="https://developer.wordpress.org/reference/hooks/rest_api_init/"><code>rest_api_init</code></a> hook, which lets you create an HTTP request endpoint on your web server:</p>
 <div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-php" data-lang="php">// REST API for GTM container
@@ -622,16 +651,22 @@ function retrieve_gtm_json( $data ) {
 <div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html"><span style="color:#aaa;font-style:italic">&lt;!-- Google Tag Manager --&gt;</span>
 &lt;<span style="color:#1e90ff;font-weight:bold">amp-analytics</span> <span style="color:#1e90ff">config</span>=<span style="color:#a50">&#34;//www.yourdomain.com/wp-json/amp-gtm/amp.json?id=GTM-XXXXX&amp;gtm.url=SOURCE_URL&#34;</span> <span style="color:#1e90ff">data-credentials</span>=<span style="color:#a50">&#34;include&#34;</span>&gt;&lt;/<span style="color:#1e90ff;font-weight:bold">amp-analytics</span>&gt;</code></pre></div>
 <p>This request is then passed to your endpoint, and the process described above will take place.</p>
-<h2 id="google-analytics-setup">Google Analytics setup</h2>
+
+                
+                  <h2 id="google-analytics-setup">Google Analytics setup</h2>
 <p>Not much has to be done in Google Analytics, but you will want to add <strong>ampproject.org</strong> into the <strong>Referral Exclusion List</strong> of your Google Analytics property settings. Otherwise, if the user follows any link from the cached AMP page to the rest of your site, the click will start a new session with a referral from ampproject.org.</p>
 <p>Thanks to Adrian Vender for this tip!</p>
-<h2 id="summary">Summary</h2>
+
+                
+                  <h2 id="summary">Summary</h2>
 <p>This is a fairly technical topic, but we, the authors, found it necessary to point out this potential flaw in how doing analytics in Accelerated Mobile Pages might be detrimental to your overall tracking plan.</p>
 <p>The fact that AMP doesn&rsquo;t automatically leverage the <code>_ga</code> cookie if the request is to Google Analytics, for example, is a bit odd. Similarly, Google Tag Manager defaulting to <code>AMP_ECID_GOOGLE</code> is weird too, considering how much easier things would be if you could provide a cookie name or an AMP variable for the Client ID in the request.</p>
 <p>Because Google&rsquo;s AMP cache is a different domain from your own, there&rsquo;s really no way around Client ID stitching that wouldn&rsquo;t involve the type of third-party cookie scheme as described in this guide. The request must be allowed to process the cookies written on your domain, so that the same <code>_ga</code> cookie value can be used on the pages in the external domain.</p>
 <p>Luckily the technical solution to this dilemma is not too complicated. The proxy you create in your web server is simple, and should be easy to configure with any web server software. You might want to add some enhancements of your own, such as caching the Google Tag Manager container locally, and we&rsquo;d love to hear your tips and experiences in the comments below.</p>
 <p>We hope this article gets your stAMP of approval, and that you&rsquo;ve learned an AMPle amount of new things. Sorry for the puns.</p>
 
+                
+              
               
 
             </div>
@@ -890,7 +925,9 @@ function retrieve_gtm_json( $data ) {
 
 <script src="https://cdn.commento.io/js/count.js"></script>
 
-
+    <script>
+      !function(){var e=document.querySelector(".simmer"),t=document.querySelector(".simmer .close"),o=window.sessionStorage&&window.sessionStorage.getItem("nosimmer");if(e){if(o){e.style.display="none"}t.addEventListener("click",function(){window.sessionStorage.setItem("nosimmer","true"),e.style.display="none"})}}();
+    </script>
     <script>
       var mylazyload = new LazyLoad({elements_selector: '.lazy'});
       </script>

@@ -206,6 +206,16 @@
     </a>
   </li>
 
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
 
     </ul>
     <ul class="sidebar-buttons">
@@ -260,20 +270,20 @@
     </a>
   </li>
 
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/newsletter/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bell"></i>
+      
+      <span class="sidebar-button-desc">Newsletter</span>
+    </a>
+  </li>
+
 
     </ul>
     <ul class="sidebar-buttons">
       
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
-      
-      <span class="sidebar-button-desc">RSS</span>
-    </a>
-  </li>
-
 
     </ul>
   </div>
@@ -329,7 +339,9 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              <p><em>Last updated 2 March 2018.</em></p>
+	      
+                
+  	        <p><em>Last updated 2 March 2018.</em></p>
 <p>Every now and then you might be urged to run <a href="https://tagmanager.google.com/">Google Tag Manager</a> and/or <a href="https://analytics.google.com">Google Analytics</a> <em>locally</em>, meaning without the benefit of a web server serving your files. In other words, you&rsquo;re loading an HTML file from your computer in the web browser. You can identify a locally run file by the <strong>file:///</strong> <em>protocol</em> in the address bar.</p>
 
 
@@ -350,7 +362,20 @@
 <blockquote>
 <p><strong>Note!</strong> You will <strong>not</strong> be able to run <strong>Preview</strong> mode with local files. GTM automatically uses relative protocol when downloading the preview library, and relative protocol on local files falls back to <code>file:///</code> for the HTTP requests. If someone comes up with an elegant workaround, please let me know in the comments!</p>
 </blockquote>
-<h2 id="1-modify-the-gtm-container-snippet">1. Modify the GTM Container Snippet</h2>
+
+                <span class="simmer">
+  <span class="close">X</span>
+  <p>
+    <span class="fa fa-md fa-bell"></span>
+    <strong>The Simmer Newsletter</strong>
+  </p>
+  <p>
+    Subscribe to the <a href="https://www.simoahava.com/newsletter/">Simmer newsletter</a> to get the latest news and content from Simo Ahava into your email inbox!
+  </p>
+  </span>
+
+                
+                  <h2 id="1-modify-the-gtm-container-snippet">1. Modify the GTM Container Snippet</h2>
 <p>First of all, you need to modify the Google Tag Manager container snippet itself. It uses <em>relative protocol</em> in the script loader URLs, and since local files use the <strong>file</strong> URI scheme, you need to explicitly tell Google Tag Manager from where to fetch the library.</p>
 <p>So, if this is the container snippet:</p>
 <div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html"><span style="color:#aaa;font-style:italic">&lt;!-- Google Tag Manager --&gt;</span>
@@ -364,7 +389,9 @@ j=d.createElement(s),dl=l!=<span style="color:#a50">&#39;dataLayer&#39;</span>?<
 <span style="color:#aaa;font-style:italic">&lt;!-- End Google Tag Manager --&gt;</span></code></pre></div>
 <p>You can see how the two URLs embedded within (<code>//www.googletagmanager.com/ns.html...</code> in the iframe and <code>//www.googletagmanager.com/gtm.js...</code> in the script loader itself) do not have an explicit protocol set. So, you need to change these two strings to become <code>https://www.googletagmanager.com/ns.html...</code> and <code>https://www.googletagmanager.com/gtm.js...</code>, respectively. That is the only change you need to make to load Google Tag Manager.</p>
 <p>So, well done!</p>
-<h2 id="2-configure-the-google-analytics-tags">2. Configure the Google Analytics Tag(s)</h2>
+
+                
+                  <h2 id="2-configure-the-google-analytics-tags">2. Configure the Google Analytics Tag(s)</h2>
 <p>The next step is to configure the Google Analytics Tags. GA places some restrictions on the web browser if loaded with its default settings:</p>
 <ol>
 <li>
@@ -410,7 +437,9 @@ Field value: <strong>{{Page Path}}</strong></p>
 
 
 <p>And that&rsquo;s it! With these steps, you can track your Pageviews and Events in your local files, if you are so inclined.</p>
-<h2 id="3-persist-client-id">3. Persist Client ID</h2>
+
+                
+                  <h2 id="3-persist-client-id">3. Persist Client ID</h2>
 <p>However, the downside of setting <code>storage : none</code> is that you won&rsquo;t have a persistent Client ID anymore. Thus, every single page load will reset the Client ID, resulting in a new User and new Session with every single page.</p>
 <p>We don&rsquo;t want that.</p>
 <p>Instead, we can hack around that using the browser&rsquo;s <code>localStorage</code> API to store the Client ID and fetch it with each request.</p>
@@ -439,10 +468,14 @@ Field value: <strong>{{JS - Set _clientId}}</strong></p>
 <p>Field name: <strong>clientId</strong><br>
 Field value: <strong>{{JS - Get _clientId}}</strong></p>
 <p>And there you go! Now, the first time a Google Analytics Tag fires, it stores the Client ID created in the process into the browser&rsquo;s <code>localStorage</code>. For each subsequent Tag, until <code>localStorage</code> is manually purged, the Tags fetch the stored Client ID from <code>localStorage</code> and send it with the requests. This way sessions and users stay intact, and you&rsquo;ll be able to derive proper insights from the data.</p>
-<h2 id="summary">Summary</h2>
+
+                
+                  <h2 id="summary">Summary</h2>
 <p>This hack probably has only marginal use, but it&rsquo;s still a valid way of tracking Google Analytics in local files. You don&rsquo;t always have the benefit of (or the skills to deploy) a web server, so running files locally is, if nothing else, a hat tip to the Notepad + FTP content management systems from the 1990s.</p>
 <p>Also, you can use the Client ID hack in your regular trackers, too, if you have some reason to avoid browser cookies for persisting data.</p>
 
+                
+              
               
 
             </div>
@@ -697,7 +730,9 @@ Field value: <strong>{{JS - Get _clientId}}</strong></p>
 
 <script src="https://cdn.commento.io/js/count.js"></script>
 
-
+    <script>
+      !function(){var e=document.querySelector(".simmer"),t=document.querySelector(".simmer .close"),o=window.sessionStorage&&window.sessionStorage.getItem("nosimmer");if(e){if(o){e.style.display="none"}t.addEventListener("click",function(){window.sessionStorage.setItem("nosimmer","true"),e.style.display="none"})}}();
+    </script>
     <script>
       var mylazyload = new LazyLoad({elements_selector: '.lazy'});
       </script>

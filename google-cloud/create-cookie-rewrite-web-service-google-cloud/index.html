@@ -206,6 +206,16 @@
     </a>
   </li>
 
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
 
     </ul>
     <ul class="sidebar-buttons">
@@ -260,20 +270,20 @@
     </a>
   </li>
 
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/newsletter/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bell"></i>
+      
+      <span class="sidebar-button-desc">Newsletter</span>
+    </a>
+  </li>
+
 
     </ul>
     <ul class="sidebar-buttons">
       
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
-      
-      <span class="sidebar-button-desc">RSS</span>
-    </a>
-  </li>
-
 
     </ul>
   </div>
@@ -329,7 +339,9 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              <blockquote>
+	      
+                
+  	        <blockquote>
 <p><strong>Last updated 11 September 2020</strong>: Added <a href="#step-4-map-the-custom-domain-to-the-endpoint">important note</a> about how the custom domain should be mapped with A/AAAA DNS records rather than a CNAME record.</p>
 </blockquote>
 <p>Ah, Safari&rsquo;s <a href="https://webkit.org/blog/category/privacy/">Intelligent Tracking Prevention</a> - the gift that <a href="https://www.simoahava.com/analytics/itp-2-1-and-web-analytics/">keeps on giving</a>. Having almost milked this cow for all it&rsquo;s worth, I was sure there would be little need to revisit the topic. Maybe, I thought, it would be better to just sit back and watch the world burn.</p>
@@ -380,7 +392,20 @@
     <li><a href="#final-thoughts">Final thoughts</a></li>
   </ul>
 </nav></div>
-<h2 id="but-why">But why?</h2>
+
+                <span class="simmer">
+  <span class="close">X</span>
+  <p>
+    <span class="fa fa-md fa-bell"></span>
+    <strong>The Simmer Newsletter</strong>
+  </p>
+  <p>
+    Subscribe to the <a href="https://www.simoahava.com/newsletter/">Simmer newsletter</a> to get the latest news and content from Simo Ahava into your email inbox!
+  </p>
+  </span>
+
+                
+                  <h2 id="but-why">But why?</h2>
 <p>With ITP 2.1, Safari caps first party cookies written with JavaScript to a <a href="https://webkit.org/blog/8613/intelligent-tracking-prevention-2-1/">maximum 7-day expiration</a>. The <a href="https://analytics.google.com/">Google Analytics</a> library writes its cookie with JavaScript. Ergo, on Safari, the Google Analytics cookie persists user data for only 7 days at a time, meaning if the user visits the site with more than 7 days between visits, they will be considered a new user in their return visit.</p>
 <p>With <a href="https://webkit.org/blog/8828/intelligent-tracking-prevention-2-2/">ITP 2.2</a>, expiration of some cookies is set to 24 hours.</p>
 
@@ -404,7 +429,9 @@
 <p>ITP&rsquo;s main beef is against third-party JavaScript libraries executing code that repurposes first-party storage for something other than first-party data collection (namely, <a href="https://webkit.org/blog/8613/intelligent-tracking-prevention-2-1/">cross-site tracking</a>).</p>
 <p>So when you have a site deliberately building or using a web service which requires the extension of resources to things like the creation of new DNS records, I guess Safari thinks that by doing all this work, you&rsquo;re accepting responsibility for any of the scummy things that can be done on top of such a setup.</p>
 <p>But I don&rsquo;t care about any of that. I just want to tackle the problem itself and then share the solution.</p>
-<h2 id="how-does-it-work">How does it work?</h2>
+
+                
+                  <h2 id="how-does-it-work">How does it work?</h2>
 
 
 
@@ -440,7 +467,9 @@
 </li>
 </ol>
 <p>The only way the above works smoothly is by adding the new (and poorly documented) <code>cookieUpdate</code> field to the tag settings. This field ensures that the tracker does <strong>not</strong> update the expiration of the cookie if one is found. This is instrumental, as otherwise each time a tracker is initialized the cookie is updated from an HTTP cookie back to a JavaScript cookie.</p>
-<h2 id="what-youll-need">What you&rsquo;ll need</h2>
+
+                
+                  <h2 id="what-youll-need">What you&rsquo;ll need</h2>
 <p>For the solution to work, you&rsquo;ll need the following:</p>
 <ol>
 <li>
@@ -454,7 +483,9 @@
 </li>
 </ol>
 <p>The domain mapping is important. Since the web service uses the <code>Set-Cookie</code> header to set the cookie, it can only do so in a first-party context if the header sets the cookie on a hostname shared by both the domain from where the request is originating (e.g. <strong><a href="http://www.website.com">www.website.com</a></strong>) and the domain you have mapped to the web service (e.g. <strong>tracker.website.com</strong>).</p>
-<h2 id="step-1-set-up-google-cloud">Step 1: Set up Google Cloud</h2>
+
+                
+                  <h2 id="step-1-set-up-google-cloud">Step 1: Set up Google Cloud</h2>
 <p>First, visit <a href="https://console.cloud.google.com/billing">Billing management</a> with your favorite Google ID and create a new Billing Account for your Google Cloud organization or project. If you already have billing accounts setup, you can skip this step. You&rsquo;ll need to add your credit card details for situations where you blow past the free quotas. Don&rsquo;t worry! You can add <a href="https://cloud.google.com/billing/docs/how-to/budgets">budgets</a> to your billing account to avoid surprises.</p>
 <p>Next, visit <a href="https://console.cloud.google.com/cloud-resource-manager">the Google Cloud console</a> with the same login, and click to <strong>Create project</strong>.</p>
 
@@ -476,7 +507,9 @@
 <p>Next, visit <a href="https://console.cloud.google.com/apis/api/cloudbuild.googleapis.com/overview">https://console.cloud.google.com/apis/api/cloudbuild.googleapis.com/overview</a> and click <strong>Enable API</strong> to enable the Cloud Build API. We&rsquo;ll need this to upload our configurations to the cloud.</p>
 <p>Finally, go to <a href="https://cloud.google.com/sdk/install">https://cloud.google.com/sdk/install</a> and follow the steps. You&rsquo;ll want to install the Google Cloud SDK so that you can run most of the necessary commands from the command line.</p>
 <p>After installing the SDK, run <code>gcloud init</code> in your terminal or command-line program. This will initialize the Google Cloud SDK for you, and it will let you choose which project to activate (choose the one you created earlier in this chapter).</p>
-<h2 id="step-2-clone-the-github-repository">Step 2: Clone the GitHub repository</h2>
+
+                
+                  <h2 id="step-2-clone-the-github-repository">Step 2: Clone the GitHub repository</h2>
 <p>First, make sure you have the <code>git</code> client <a href="https://git-scm.com/book/en/v2/Getting-Started-Installing-Git">installed</a>. I&rsquo;m using the command-line client in these examples, but feel free to use a GUI (graphical user interface) client if you wish.</p>
 <p>Once the <code>git</code> client is installed, run <code>git clone https://github.com/sahava/cookie-bouncer-service.git</code> in a directory of your choice to clone the source code to your computer.</p>
 
@@ -506,7 +539,9 @@
 <p>You have cloned the GitHub repository.</p>
 </li>
 </ul>
-<h2 id="step-3-create-and-deploy-the-app-engine-application">Step 3: Create and deploy the App Engine application</h2>
+
+                
+                  <h2 id="step-3-create-and-deploy-the-app-engine-application">Step 3: Create and deploy the App Engine application</h2>
 <p>Your next step is to create an <strong>App Engine</strong> application. <a href="https://cloud.google.com/appengine/">App Engine</a> is Google&rsquo;s fully managed, serverless application platform. It&rsquo;s like a light-weight virtual machine environment, where Google handles things like scaling and instance generation for you.</p>
 <p>The web service we&rsquo;ll create in this exercise will run on the App Engine Standard environment.</p>
 <p>While in the folder where you cloned the Git repository, run the following command:</p>
@@ -584,7 +619,9 @@
 
 <p>The reason it complains about GET is because the endpoint isn&rsquo;t configured to handle GET requests. It&rsquo;s only meant to handle POST requests.</p>
 <p>You&rsquo;re almost done with the web service. The one piece of the puzzle that&rsquo;s missing is to map the web service to your custom domain, so that it can set cookies on your site with the <code>Set-Cookie</code> header.</p>
-<h2 id="step-4-map-the-custom-domain-to-the-endpoint">Step 4: Map the custom domain to the endpoint</h2>
+
+                
+                  <h2 id="step-4-map-the-custom-domain-to-the-endpoint">Step 4: Map the custom domain to the endpoint</h2>
 <p>Browse to <a href="https://console.cloud.google.com/appengine/settings/domains">https://console.cloud.google.com/appengine/settings/domains</a> and make sure you&rsquo;ve got your App Engine project selected.</p>
 <p>Click <strong>Add a custom domain</strong> to get the domain verification process started.</p>
 <p>From the <strong>Select the domain you want to use</strong>, choose <strong>Verify a new domain</strong>, and type the domain name into the respective field. Click <strong>Verify</strong>.</p>
@@ -688,7 +725,9 @@
 
 
 <p>Now, again, it&rsquo;s a question of just waiting for the records to propagate. Once everything works, typically well within 24 hours of making the changes, you should be able to visit <code>https://tracker.yourdomain.com</code>, i.e. the custom domain you just mapped, and it should return the similar GET error you saw when visiting the App Engine endpoint directly.</p>
-<h2 id="step-5-test-in-the-browser">Step 5: Test in the browser</h2>
+
+                
+                  <h2 id="step-5-test-in-the-browser">Step 5: Test in the browser</h2>
 <p>Now it&rsquo;s time to do a quick browser test. Browse to one of the domains that you configured in <code>app.js</code> in the <code>allowedHosts</code> array (see <a href="#step-3-create-and-deploy-the-app-engine-application">this chapter</a> for a refresher). Use the Safari browser.</p>
 <p>Then, open the <strong>JavaScript Console</strong> - that&rsquo;s CMD-OPT-C on a Mac, but you can also find it in the <a href="http://osxdaily.com/2011/11/03/enable-the-develop-menu-in-safari/">Develop menu</a>.</p>
 <p>In the console, copy-paste this code. You need to change the value of the <code>endpoint</code> variable to the web service domain you configured in the App Engine domain mappings, and you need to change the value of the <code>domain</code> variable to match the root domain your site and the endpoint have in common.</p>
@@ -749,7 +788,9 @@ xhr.send(JSON.stringify({name: <span style="color:#a50">&#39;testCookie&#39;</sp
 
 <p>So <strong>that&rsquo;s how you create first-party cookies with no expiration limitations in Safari post-ITP-2.1!</strong>.</p>
 <p>But let&rsquo;s check out the final step - how to enable this in Google Analytics.</p>
-<h2 id="step-6-modify-google-analytics-tags">Step 6: Modify Google Analytics tags</h2>
+
+                
+                  <h2 id="step-6-modify-google-analytics-tags">Step 6: Modify Google Analytics tags</h2>
 <p>To make the <code>_ga</code> cookie work with the web service, you need to do two things.</p>
 <ol>
 <li>
@@ -916,7 +957,9 @@ Value: <code>{{hitCallback - Cookie rewrite}}</code></p>
 </div>
 
 
-<h2 id="troubleshooting">Troubleshooting</h2>
+
+                
+                  <h2 id="troubleshooting">Troubleshooting</h2>
 <h3 id="i-dont-see-any-requests-to-trackermywebservicecom">I don&rsquo;t see any requests to tracker.mywebservice.com</h3>
 <p>Make sure you configure the <code>hitCallback</code> variable correctly and that you add it to the tag.</p>
 <h3 id="i-see-a-request-to-trackermywebservicecom-but-it-fails">I see a request to tracker.mywebservice.com but it fails</h3>
@@ -926,13 +969,17 @@ Value: <code>{{hitCallback - Cookie rewrite}}</code></p>
 <p>Make sure you&rsquo;ve set the <code>cookieUpdate</code> field to <code>false</code> in <strong>all</strong> your GA tags.</p>
 <h3 id="i-have-problems-setting-up-the-app-engine-application-or-something-else">I have problems setting up the App Engine application or something else</h3>
 <p>Leave a question in the comments and I&rsquo;ll try to help you out.</p>
-<h2 id="final-thoughts">Final thoughts</h2>
+
+                
+                  <h2 id="final-thoughts">Final thoughts</h2>
 <p>I hope you find this exercise useful - it should give you some idea about what the technical steps are for creating some type of cookie routing service.</p>
 <p>There are other ways to handle this, listed in <a href="https://www.simoahava.com/analytics/itp-2-1-and-web-analytics/#technical-implications-and-solutions">this article</a>. However, the beauty of an API service like this is that it&rsquo;s as scalable as you like (or as your budget allows).</p>
 <p>Using App Engine Standard environment isn&rsquo;t too expensive. For example, the modest amount of hits my site is generating for the API (around 7000 requests per day) is well within the free quota. App Engine charges based on instance hours, and you&rsquo;re given 28 instance hours for free per day. I&rsquo;m barely hitting 25 with this load.</p>
 <p>Naturally, there are ways to optimize this even further. For example, you could check if the user&rsquo;s browser is Safari and only use the API then. Similarly, you could extend the API poll cookie from six days to far longer expirations by setting THAT cookie with the web service, too. Though it might create some sort of temporal cosmic paradox, I don&rsquo;t know.</p>
 <p>Regardless, let me know in the comments what you think of this solution!</p>
 
+                
+              
               
 
             </div>
@@ -1187,7 +1234,9 @@ Value: <code>{{hitCallback - Cookie rewrite}}</code></p>
 
 <script src="https://cdn.commento.io/js/count.js"></script>
 
-
+    <script>
+      !function(){var e=document.querySelector(".simmer"),t=document.querySelector(".simmer .close"),o=window.sessionStorage&&window.sessionStorage.getItem("nosimmer");if(e){if(o){e.style.display="none"}t.addEventListener("click",function(){window.sessionStorage.setItem("nosimmer","true"),e.style.display="none"})}}();
+    </script>
     <script>
       var mylazyload = new LazyLoad({elements_selector: '.lazy'});
       </script>

@@ -206,6 +206,16 @@
     </a>
   </li>
 
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
 
     </ul>
     <ul class="sidebar-buttons">
@@ -260,20 +270,20 @@
     </a>
   </li>
 
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/newsletter/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bell"></i>
+      
+      <span class="sidebar-button-desc">Newsletter</span>
+    </a>
+  </li>
+
 
     </ul>
     <ul class="sidebar-buttons">
       
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
-      
-      <span class="sidebar-button-desc">RSS</span>
-    </a>
-  </li>
-
 
     </ul>
   </div>
@@ -329,7 +339,9 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              <p>It&rsquo;s time for <a href="http://www.measurecamp.org/">MeasureCamp</a> again! As <a href="https://www.simoahava.com/analytics/macro-magic-google-tag-manager/">before</a>, I want to write an accompanying post for my session, since there&rsquo;s always so much more to say than the time slot allows for. So, the topic of this article is the data model used by <a href="http://www.google.com/tagmanager">Google Tag Manager</a> to process digital data in your data layer.</p>
+	      
+                
+  	        <p>It&rsquo;s time for <a href="http://www.measurecamp.org/">MeasureCamp</a> again! As <a href="https://www.simoahava.com/analytics/macro-magic-google-tag-manager/">before</a>, I want to write an accompanying post for my session, since there&rsquo;s always so much more to say than the time slot allows for. So, the topic of this article is the data model used by <a href="http://www.google.com/tagmanager">Google Tag Manager</a> to process digital data in your data layer.</p>
 <p>This post also picks up where I left in my previous foray into the <a href="https://www.simoahava.com/analytics/data-layer/">data layer</a>. However, where the first article aimed to be generic (since the data layer should be generic), this post will look at how GTM uses the information in the generic data layer, and how it processes this information to work with the proprietary features of the tool.</p>
 
 
@@ -377,7 +389,20 @@
 </tbody>
 </table>
 <p>There&rsquo;s a difference between data layer and data model. To some it might seem very subtle, but in reality it&rsquo;s what ensures that the data layer remains a free-for-all, standardized container for data. The data model, on the other hand, is built according to each platform&rsquo;s own specifications, but the way it communicates with the data layer must be clean and perhaps even standardized, since only that way can we ensure that a single tool doesn&rsquo;t ruin the data layer for all.</p>
-<h2 id="setting-up-the-test">Setting up the test</h2>
+
+                <span class="simmer">
+  <span class="close">X</span>
+  <p>
+    <span class="fa fa-md fa-bell"></span>
+    <strong>The Simmer Newsletter</strong>
+  </p>
+  <p>
+    Subscribe to the <a href="https://www.simoahava.com/newsletter/">Simmer newsletter</a> to get the latest news and content from Simo Ahava into your email inbox!
+  </p>
+  </span>
+
+                
+                  <h2 id="setting-up-the-test">Setting up the test</h2>
 <p>The most familiar way of accessing GTM&rsquo;s data model is through the Data Layer Variable Macro. When you call this macro type, the following happens:</p>
 <ul>
 <li>
@@ -441,7 +466,9 @@
 
 
 <p>The <code>undefined</code> is what the macro actually returns. <strong>false</strong> is returned because the event push triggered a tag.</p>
-<h2 id="add-and-modify-the-key">Add and modify the key</h2>
+
+                
+                  <h2 id="add-and-modify-the-key">Add and modify the key</h2>
 <p>Let&rsquo;s start simple. I&rsquo;ll add some values to the key, and see how the macro reacts:</p>
 
 
@@ -555,7 +582,9 @@ Key 0 : Value 4
 Key 1 : Value 5</p>
 <p>Now, the recursive merge spots these shared keys (0 and 1), and updates their values accordingly. The third key (2) is not touched, since the Array that was pushed second had no value for it.</p>
 <p>We&rsquo;ll explore how to add data to existing Arrays soon enough.</p>
-<h2 id="removing-a-key-from-the-data-model">Removing a key from the data model</h2>
+
+                
+                  <h2 id="removing-a-key-from-the-data-model">Removing a key from the data model</h2>
 <p>If you have a single page app, and the data layer persist throughout the session, you might want to delete some variables from the data model every now and then. Just removing the key from <code>dataLayer</code> won&rsquo;t be enough:</p>
 
 
@@ -606,7 +635,9 @@ Key 1 : Value 5</p>
 
 
 <p>That&rsquo;s how simple it is.</p>
-<h2 id="the-command-array">The command array</h2>
+
+                
+                  <h2 id="the-command-array">The command array</h2>
 <p>This is where I left you hanging earlier. Say you want to update an Array by adding members to the end or into the middle. It&rsquo;s very difficult to do in a generic way, since you first need to retrieve the Array from the data model, add members to the end or to the middle, and then push it back. And all has to happen within the data layer, because you don&rsquo;t want all the other tools and platforms that use the data layer to be left outside.</p>
 <p>The way to do this is to use a special <em>command array</em>. It enables you to access methods of the value type you have stored in the data model.</p>
 <p>Here&rsquo;s how it works. I&rsquo;m going to update an Array <code>[1, 3]</code> first with two new members using <code>push()</code>, so that it becomes <code>[1, 3, 4, 5]</code>. Next I&rsquo;ll do a <code>splice()</code>, where I add the number 2 to its rightful place. Observe closely.</p>
@@ -629,7 +660,9 @@ Key 1 : Value 5</p>
 <p>Next, the first member of the Array needs to be a string which holds the actual command. All the rest of the members in the command array are arguments to this command.</p>
 <p>Thus, <code>testKey.push(4,5)</code> becomes <code>['testKey.push', 4, 5]</code>, and <code>testKey.splice(1,0,2)</code> becomes <code>['testKey.splice', 1, 0, 2]</code>.</p>
 <p>This way you can do some cool things with the values stored in the data model without having to access them directly. Using the data layer ensures that other tools and applications can benefit from your modifications as well.</p>
-<h2 id="custom-methods">Custom methods</h2>
+
+                
+                  <h2 id="custom-methods">Custom methods</h2>
 <p>The last thing I&rsquo;ll show you is how to perform some custom transformations on the values stored in the data model.</p>
 <p>Let&rsquo;s say I&rsquo;m storing a bunch of products and stores in the data layer. This data is provided by the backend system. As it turns out, one of the store names is misspelled, and this needs to be fixed in the data model. Performing a series of gets and sets would be cumbersome and very ineffective. Instead, I can just push a function which does this whole thing in a simple for-loop.</p>
 
@@ -650,7 +683,9 @@ Key 1 : Value 5</p>
 <p>When you push a function into the data layer, <code>this</code> will be the interface of the data model on the page. It exposes two methods: <code>get(key)</code> and <code>set(key, value)</code>.</p>
 <p>First, I use <code>get()</code> to retrieve the value of <code>'testKey'</code>. Then, I do a for-loop which goes over each member in the <code>'testKey'</code> Array, looking for the typo. If a typo is found, then it&rsquo;s corrected there and then. Because I&rsquo;m dealing with objects, you don&rsquo;t have to push anything back into the data model, since you&rsquo;ve actually copied an object reference, not the object itself.</p>
 <p>Don&rsquo;t worry about that object mumbo-jumbo. The key here is that I performed a transformation on the data in the data model by using the data layer. This way other vendors and tools can benefit from the change as well. I could have just as well directly accessed the public method of the interface, but that would not be the generic way to do things.</p>
-<h2 id="summary">Summary</h2>
+
+                
+                  <h2 id="summary">Summary</h2>
 <p>This has been a complicated post, I know, but here are the things you should have learned.</p>
 <ul>
 <li>
@@ -673,6 +708,8 @@ Key 1 : Value 5</p>
 <p>It&rsquo;s so important to understand the subtleties of the data layer and the data model. The one is (or should be) tool-independent, the other is a proprietary feature of the tool. One can be standardized to serve multiple vendors and platforms, the other should cater to the idiosyncrasies of each tool separately.</p>
 <p><a href="http://www.slideshare.net/mobile/SimoAhava/google-tag-manager-for-nerds">My presentation &ldquo;Google Tag Manager For Nerds&rdquo; from MeasureCamp V</a></p>
 
+                
+              
               
 
             </div>
@@ -927,7 +964,9 @@ Key 1 : Value 5</p>
 
 <script src="https://cdn.commento.io/js/count.js"></script>
 
-
+    <script>
+      !function(){var e=document.querySelector(".simmer"),t=document.querySelector(".simmer .close"),o=window.sessionStorage&&window.sessionStorage.getItem("nosimmer");if(e){if(o){e.style.display="none"}t.addEventListener("click",function(){window.sessionStorage.setItem("nosimmer","true"),e.style.display="none"})}}();
+    </script>
     <script>
       var mylazyload = new LazyLoad({elements_selector: '.lazy'});
       </script>

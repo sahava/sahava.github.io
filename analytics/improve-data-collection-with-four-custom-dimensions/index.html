@@ -206,6 +206,16 @@
     </a>
   </li>
 
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
 
     </ul>
     <ul class="sidebar-buttons">
@@ -260,20 +270,20 @@
     </a>
   </li>
 
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/newsletter/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bell"></i>
+      
+      <span class="sidebar-button-desc">Newsletter</span>
+    </a>
+  </li>
+
 
     </ul>
     <ul class="sidebar-buttons">
       
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
-      
-      <span class="sidebar-button-desc">RSS</span>
-    </a>
-  </li>
-
 
     </ul>
   </div>
@@ -329,7 +339,9 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              <p>Since writing my rant about the <a href="https://www.simoahava.com/analytics/the-schema-conspiracy/"><em>schema conspiracy</em></a> of web analytics platforms, I&rsquo;ve been giving the whole idea of hit-level data collection a lot of thought. Sessionization is very heavily implemented in <a href="http://analytics.google.com">Google Analytics</a>, which is understandable, but the regular Google Analytics API just doesn&rsquo;t give you the kind of information you&rsquo;d need, if you wanted to stitch hits together differently in your own backend. In fact, there are <strong>four</strong> distinct levels of aggregation that are not exposed via the API, even though I think they should:</p>
+	      
+                
+  	        <p>Since writing my rant about the <a href="https://www.simoahava.com/analytics/the-schema-conspiracy/"><em>schema conspiracy</em></a> of web analytics platforms, I&rsquo;ve been giving the whole idea of hit-level data collection a lot of thought. Sessionization is very heavily implemented in <a href="http://analytics.google.com">Google Analytics</a>, which is understandable, but the regular Google Analytics API just doesn&rsquo;t give you the kind of information you&rsquo;d need, if you wanted to stitch hits together differently in your own backend. In fact, there are <strong>four</strong> distinct levels of aggregation that are not exposed via the API, even though I think they should:</p>
 <ol>
 <li>
 <p><strong>Hit timestamp</strong> - You can&rsquo;t query for the exact <em>timestamp</em> of a Google Analytics hit via the API. You can&rsquo;t get it in your custom reports, either. However, this might be very meaningful information, especially if you want to verify data integrity across systems.</p>
@@ -385,7 +397,20 @@
   </ul>
 </nav></div>
 <p>In the following chapters, we&rsquo;ll build four <strong>Custom Dimensions</strong> and four data collection methods that will let you include this information in your data set. We will, of course, be using <a href="http://tagmanager.google.com">Google Tag Manager</a> to make things more manageable.</p>
-<h2 id="1-the-method">1. The Method</h2>
+
+                <span class="simmer">
+  <span class="close">X</span>
+  <p>
+    <span class="fa fa-md fa-bell"></span>
+    <strong>The Simmer Newsletter</strong>
+  </p>
+  <p>
+    Subscribe to the <a href="https://www.simoahava.com/newsletter/">Simmer newsletter</a> to get the latest news and content from Simo Ahava into your email inbox!
+  </p>
+  </span>
+
+                
+                  <h2 id="1-the-method">1. The Method</h2>
 <p>I&rsquo;ve created a Custom Dimension for each of the four use cases. Two of the dimensions are session-scoped, and two are hit-scoped. The dimensions are:</p>
 <ol>
 <li>
@@ -435,7 +460,9 @@
 
 <p>In this (fictional) data export, you can see 7 unique hits, made by two different client IDs (e.g. different browsers or devices), which span across three distinct sessions, but are all made by the same, logged-in user. With layered information like this, you can build intelligent models using GA data alone, but the possibilities it offers for data integration are remarkable as well.</p>
 <p>The most difficult one of these solutions to implement, by far, is Client ID collection, so we&rsquo;ll start with that.</p>
-<h2 id="2-client-id">2. Client ID</h2>
+
+                
+                  <h2 id="2-client-id">2. Client ID</h2>
 <p>(<strong>UPDATE 5 April 2018</strong>: I recommend using <a href="https://www.simoahava.com/gtm-tips/use-customtask-access-tracker-values-google-tag-manager/">this <code>customTask</code> method</a> instead for sending the Client ID in a Custom Dimension. The tracker object method outlined below is more complicated and far more unreliable. With <code>customTask</code>, you can send the Client ID with any tag you want, with 100% accuracy each time.)</p>
 <p>The difficulty with Client ID is that the <code>ga</code> interface you use to retrieve the Client ID doesn&rsquo;t perform well in real time, especially for Tags firing very early in the page load sequence (e.g. your Page View Tag).</p>
 <p>You <em>could</em> get the Client ID from browser cookies, but if it&rsquo;s a first-time visitor to your site, chances are that the cookie hasn&rsquo;t been set by the time the Page View Tag fires, and you&rsquo;ll miss this information. Also, if there are multiple trackers on the page, how do you know which <code>_ga</code> cookie to access? You don&rsquo;t.</p>
@@ -547,7 +574,9 @@
 
 
 <p>The dimension contains the Client ID of the visitor. You can then use this in your backend, for example, when you want to stitch hits sent from the same <code>_ga</code> cookie together in meaningful ways.</p>
-<h2 id="3-session-id">3. Session ID</h2>
+
+                
+                  <h2 id="3-session-id">3. Session ID</h2>
 <p>For Session ID, we&rsquo;re using a randomized string that is sent with each Pageview hit to Google Analytics. The string changes with each Pageview, but this doesn&rsquo;t matter. Because you&rsquo;re sending it to a session-scoped Custom Dimension, only the last value you send will be applied to the hits in the session.</p>
 <p>The required components are:</p>
 <ul>
@@ -608,7 +637,9 @@
 
 
 <p>Together with the hit timestamp, you can start building realistic visit paths, if that suits your fancy.</p>
-<h2 id="4-hit-timestamp">4. Hit timestamp</h2>
+
+                
+                  <h2 id="4-hit-timestamp">4. Hit timestamp</h2>
 <p>Hit timestamp is something you should send with every single hit you send to Google Analytics. This means that you&rsquo;ll need to modify all your Google Analytics Tags, which might seem like a chore.</p>
 <p>Accuracy is, of course, completely up to you, and you can opt to only send the timestamp with Pageviews and Transactions, instead.</p>
 <p>What you&rsquo;ll need:</p>
@@ -726,7 +757,9 @@
 
 
 <p>It&rsquo;s all your transactions, coupled with the accurate hit timestamp in local time when the transaction was recorded. The timezone offset helps you compare data with your backend, if it uses server time or some fixed timezone in its own data collection.</p>
-<h2 id="5-user-id">5. User ID</h2>
+
+                
+                  <h2 id="5-user-id">5. User ID</h2>
 <p>For User ID, you&rsquo;ll need to have it already implemented in some way or another. In this example, we&rsquo;ll pull the ID from <code>dataLayer</code>, but you might be using a 1st Party Cookie instead, which means you&rsquo;ll need to modify the code accordingly.</p>
 <p>Remember that tracking Users across sessions and devices is a tricky business both technologically and ethically. I&rsquo;ll leave things like <em>consent</em>, <em>opt-out</em>, <em>anonymisation</em>, and <em>privacy</em> to linger in the nether regions of your mind, so remember to ensure that what you&rsquo;re doing is considered OK by at least one other person in the right state of mind.</p>
 <p>We&rsquo;re using a hit-scoped Custom Dimension again, but you can choose what level of accuracy and stitching to implement. I&rsquo;ve reasoned for hit-level accuracy in the beginning of this article (wow, that was a LONG time ago), and I think the reasoning is well-founded. Also, depending on what you want to do with the data in the backend, you might choose to send the User ID with <em>all</em> hits or with just <em>some</em> hits.</p>
@@ -815,10 +848,14 @@
 
 
 <p>Now, let&rsquo;s not kid ourselves. If you&rsquo;re sending User ID with just a handful of hits, and you&rsquo;re also collecting Client ID, you can extrapolate User ID in your backend to all the hits done by the Client IDs associated with the User ID dimension. Like I wrote in the beginning of this article, the ethical, legal, and privacy-related considerations are yours to make alone.</p>
-<h2 id="6-summary">6. Summary</h2>
+
+                
+                  <h2 id="6-summary">6. Summary</h2>
 <p>This article explores something I feel passionate about: meaningful data collection. Google Analytics uses a lot of information that isn&rsquo;t exposed in the reporting interface or the APIs, even though this information is central to how the platform aggregates the hits coming in from digital properties.</p>
 <p>Being able to access this type of granular data shouldn&rsquo;t be reserved for BigQuery users alone, so the solutions in this post help you add an extra level of accuracy to the stream of data flowing to the tracking platform. You can then pull this data out, combine it with other backend data, and build powerful models that will allow you to optimize your digital properties better than before.</p>
 
+                
+              
               
 
             </div>
@@ -1075,7 +1112,9 @@
 
 <script src="https://cdn.commento.io/js/count.js"></script>
 
-
+    <script>
+      !function(){var e=document.querySelector(".simmer"),t=document.querySelector(".simmer .close"),o=window.sessionStorage&&window.sessionStorage.getItem("nosimmer");if(e){if(o){e.style.display="none"}t.addEventListener("click",function(){window.sessionStorage.setItem("nosimmer","true"),e.style.display="none"})}}();
+    </script>
     <script>
       var mylazyload = new LazyLoad({elements_selector: '.lazy'});
       </script>

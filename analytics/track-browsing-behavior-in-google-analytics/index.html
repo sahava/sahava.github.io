@@ -206,6 +206,16 @@
     </a>
   </li>
 
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
 
     </ul>
     <ul class="sidebar-buttons">
@@ -260,20 +270,20 @@
     </a>
   </li>
 
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/newsletter/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bell"></i>
+      
+      <span class="sidebar-button-desc">Newsletter</span>
+    </a>
+  </li>
+
 
     </ul>
     <ul class="sidebar-buttons">
       
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
-      
-      <span class="sidebar-button-desc">RSS</span>
-    </a>
-  </li>
-
 
     </ul>
   </div>
@@ -329,7 +339,9 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              <blockquote>
+	      
+                
+  	        <blockquote>
 <p><strong>Last updated 22 May 2019</strong>: Added expiration of currently open tabs.</p>
 </blockquote>
 <p>In this article, <a href="https://github.com/jethron">Jethro Nederhof</a> of <a href="https://www.snowflake-analytics.com/about/">Snowflake Analytics</a> fame and I will introduce you to some pretty neat web browser APIs. The purpose of these APIs is to find out more about <strong>how the user navigated to the current page</strong>, and <strong>what&rsquo;s going on with their browser tabs</strong>.</p>
@@ -405,7 +417,20 @@
 </nav></div>
 <p>You can skip directly to the Solutions chapter, but I do recommend reading the Theory first. At the very least, make sure you read the Caveats chapter, because there are a couple of gotchas you need to be aware of if implementing this solution.</p>
 <p>Ah, damn it. Just read the whole thing, will you?</p>
-<h2 id="1-the-why-and-how-theory">1. The why and how (theory)</h2>
+
+                <span class="simmer">
+  <span class="close">X</span>
+  <p>
+    <span class="fa fa-md fa-bell"></span>
+    <strong>The Simmer Newsletter</strong>
+  </p>
+  <p>
+    Subscribe to the <a href="https://www.simoahava.com/newsletter/">Simmer newsletter</a> to get the latest news and content from Simo Ahava into your email inbox!
+  </p>
+  </span>
+
+                
+                  <h2 id="1-the-why-and-how-theory">1. The why and how (theory)</h2>
 <p>The web, by default, is <strong>stateless</strong>. Your browsing behavior is confined to the current page only, and it&rsquo;s difficult to programmatically peer into the past (never mind into the future).</p>
 <p>Tools like <a href="https://analytics.google.com/">Google Analytics</a> try to make sense of this stateless mess by collecting information in a chronological order. You send a <strong>pageview</strong>, then you send another <strong>pageview</strong>. Google Analytics interprets this as navigational behavior where you first viewed the first page and then the second page. Makes sense, right?</p>
 <p>But what about if you opened the second page <strong>in a tab</strong> and never even glanced at it? GA still interprets it as a page being viewed.</p>
@@ -567,7 +592,9 @@
 <p>Enter <code>sessionStorage</code>! It&rsquo;s a browser storage API that is unique to each tab in your web browser. By storing the tab ID in <code>sessionStorage</code>, we can always check if the tab already has an ID (existing tab), or if we need to generate a new one (new tab).</p>
 <p>Combine this with some <code>localStorage</code> logic, where we keep a running tally of how many tab IDs have been generated, remembering to remove any tab ID once that tab is closed, and we can also get a fairly reliable count of tabs open on your website at any given time.</p>
 <p>So, now we are getting close to having all the bits and pieces at hand. Once we combine the tabbed browsing metadata with that provided by the <code>PerformanceNavigation</code> API, we can get a nice set of Custom Dimensions that expose a great deal of interesting information about how your visitors navigate your site.</p>
-<h2 id="2-caveats">2. Caveats</h2>
+
+                
+                  <h2 id="2-caveats">2. Caveats</h2>
 <p>Oh, there are <strong>plenty</strong> of caveats. The solutions below rely on a number of fragile components, which can get easily messed up due to how browsers act differently in certain circumstances.</p>
 <h3 id="21-cross-domain-browsing">2.1. Cross-domain browsing</h3>
 <p>If your tracking crosses multiple domains, then each domain will get their own tab ID. That&rsquo;s because <code>sessionStorage</code> and <code>localStorage</code> are confined to the current domain only. And if your current domain sails between HTTP and HTTPS protocols, then <em>those</em> will get their own storages, too. You could fix this by using URL parameters on the domain boundaries to pass the metadata from one domain to the next, but this is something you&rsquo;ll need to figure out by yourself.</p>
@@ -617,7 +644,9 @@
 <h3 id="25-single-page-apps">2.5. Single-page apps</h3>
 <p>You could implement this solution for single-page apps, but in that case you should add an additional, custom navigation type called <code>VIRTUAL</code>, or something similar, if the navigation was a single-page transition and not a proper page load.</p>
 <p>Do note that <code>window.performance.navigation.type</code> does <strong>not</strong> update when the user uses the browser&rsquo;s Back / Forward buttons and the transition is from one single-page app state to another. So you&rsquo;d need to code the logic for Back / Forward use when no page load is recorded.</p>
-<h2 id="3-solutions">3. Solutions</h2>
+
+                
+                  <h2 id="3-solutions">3. Solutions</h2>
 <p>OK, let&rsquo;s get to the good stuff! In this chapter, we&rsquo;ll introduce the technical solution in <a href="https://tagmanager.google.com">Google Tag Manager</a> (Custom HTML tag) that orchestrates the whole thing. In addition to that, each sub-section will detail how to send the respective piece of information to Google Analytics as a Custom Dimension. Basically, all you&rsquo;ll need to edit is your main Page View tag, since that&rsquo;s the only one that will be sending this data to Google Analytics.</p>
 <h3 id="31-the-custom-html-tag">3.1. The Custom HTML tag</h3>
 <p>First, <strong>create a new Custom HTML tag</strong>, and add the following code within.</p>
@@ -1038,13 +1067,17 @@
 
 
 <p>Do note that Snowplow doesn&rsquo;t differentiate between different <em>scopes</em> of Custom Dimensions, since scope is a concept applied in Google Analytics processing. So if you are sending an identifier into a session-scoped Custom Dimension (e.g. Session ID), the hit stream to Snowplow will interpret this as hit-scoped data, and thus the identifier is pretty useless.</p>
-<h2 id="4-summary">4. Summary</h2>
+
+                
+                  <h2 id="4-summary">4. Summary</h2>
 <p>First of all, I&rsquo;m hugely indebted to Jethro Nederhof for agreeing to draft this solution with me. I really love the community of analytics developers - seems like everyone is giddy with excitement when figuring out new solutions to age-old questions, and the amount of knowledge being shared across blogs, Slack channels, and social media is a testament to the selflessness of these good men and women.</p>
 <p>In my humble opinion, anyone interested in proper page navigation analysis should try out this solution. Understanding things like browser tab usage and Back / Forward browsing can help you figure out where the information architecture blind spots of your site are or whether you need to fix the navigation options you offer your visitors, for example.</p>
 <p>But, as always on this particular blog, this is a technical solution first and foremost. Jethro and I wanted to highlight some cool tricks you can do with the web browser, and we fully expect others to refine these methods even further.</p>
 <p>It would be cool if the APIs were developed even further, such as by automatically distinguishing between Back and Forward of the browser. Right now, they&rsquo;re bunched together which is why we need the workaround of managing the navigation path in <code>sessionStorage</code>, and that&rsquo;s a fragile solution indeed.</p>
 <p>Let us know in the comments what you think of this trick, and whether you have suggestions on how to improve it!</p>
 
+                
+              
               
 
             </div>
@@ -1299,7 +1332,9 @@
 
 <script src="https://cdn.commento.io/js/count.js"></script>
 
-
+    <script>
+      !function(){var e=document.querySelector(".simmer"),t=document.querySelector(".simmer .close"),o=window.sessionStorage&&window.sessionStorage.getItem("nosimmer");if(e){if(o){e.style.display="none"}t.addEventListener("click",function(){window.sessionStorage.setItem("nosimmer","true"),e.style.display="none"})}}();
+    </script>
     <script>
       var mylazyload = new LazyLoad({elements_selector: '.lazy'});
       </script>

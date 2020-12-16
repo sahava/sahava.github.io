@@ -206,6 +206,16 @@
     </a>
   </li>
 
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
 
     </ul>
     <ul class="sidebar-buttons">
@@ -260,20 +270,20 @@
     </a>
   </li>
 
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/newsletter/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bell"></i>
+      
+      <span class="sidebar-button-desc">Newsletter</span>
+    </a>
+  </li>
+
 
     </ul>
     <ul class="sidebar-buttons">
       
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
-      
-      <span class="sidebar-button-desc">RSS</span>
-    </a>
-  </li>
-
 
     </ul>
   </div>
@@ -329,7 +339,9 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              <p>I really like <a href="https://optimize.google.com/optimize/home/">Google Optimize</a>. It has a fairly intuitive UI, setting up experiments is easy, and there&rsquo;s integrations for both <a href="https://tagmanager.google.com/">Google Tag Manager</a> and <a href="https://analytics.google.com/">Google Analytics</a> built into the system. It&rsquo;s still a JavaScript-based, client-side A/B-testing tool, so problems with flicker and asynchronous loading are ever-present (though this is somewhat mitigated by the <a href="https://developers.google.com/optimize/#the_page-hiding_snippet_code">page-hiding snippet</a>).</p>
+	      
+                
+  	        <p>I really like <a href="https://optimize.google.com/optimize/home/">Google Optimize</a>. It has a fairly intuitive UI, setting up experiments is easy, and there&rsquo;s integrations for both <a href="https://tagmanager.google.com/">Google Tag Manager</a> and <a href="https://analytics.google.com/">Google Analytics</a> built into the system. It&rsquo;s still a JavaScript-based, client-side A/B-testing tool, so problems with flicker and asynchronous loading are ever-present (though this is somewhat mitigated by the <a href="https://developers.google.com/optimize/#the_page-hiding_snippet_code">page-hiding snippet</a>).</p>
 <p>One issue with the Google Analytics integration is the difficulty of creating segments for sessions where the users were actively participating in the experiment. In fact, there&rsquo;s no specific signal in Google Analytics that tells you the <strong>NOW</strong> the user is &ldquo;experiencing&rdquo; an experiment. You&rsquo;ll find the <strong>Experiment Name</strong> and <strong>Experiment ID</strong> dimensions, yes, but they have one drawback:</p>
 <p><strong>The <em>Experiment Name</em> and <em>Experiment ID</em> dimensions are <em>user-scoped</em> for the duration of the experiment!</strong></p>
 <p>So if the user takes part in an experiment, all their hits and sessions from that moment on until the experiment is over will be annotated with the Experiment Name and Experiment ID values.</p>
@@ -351,7 +363,20 @@
 <p>But I want to know <em>exactly</em> and <em>only</em> the sessions where my users were seeing the experiment content. I want to use this information to create segments where I can view other conversion goals or funnels than those configured into Optimize. This is increasingly important if you want to use Optimize for some quick personalization proofs-of-concept, since then it&rsquo;s vital to know how the user reacted during the session when they saw the change in the content.</p>
 <p>Anyway, to make this whole thing work with the rarified <strong>analytics.js</strong> snippet and <strong>Google Tag Manager</strong>, we will use a feature I have seldom written about: <code>customTask</code>. OK, I&rsquo;ve written about it <a href="https://www.simoahava.com/tags/customtask/">plenty</a>.</p>
 <p>With <code>customTask</code>, we can automatically add a session-scoped Custom Dimension to all hits that took part in an experiment, and in some edge cases we&rsquo;ll also send an event to GA to make sure the data is carried over.</p>
-<h2 id="how-it-works">How it works</h2>
+
+                <span class="simmer">
+  <span class="close">X</span>
+  <p>
+    <span class="fa fa-md fa-bell"></span>
+    <strong>The Simmer Newsletter</strong>
+  </p>
+  <p>
+    Subscribe to the <a href="https://www.simoahava.com/newsletter/">Simmer newsletter</a> to get the latest news and content from Simo Ahava into your email inbox!
+  </p>
+  </span>
+
+                
+                  <h2 id="how-it-works">How it works</h2>
 <p>When you land on a page where an Optimize experiment is running (i.e. the page is (one of) the target(s) of the experiment), your Google Analytics hits will contain the <strong>&amp;exp</strong> parameter with a value consisting of all the experiment IDs and variant IDs the user is participating in:</p>
 
 
@@ -387,7 +412,9 @@
 
 
 <p>Unfortunately for us, this <code>data</code> hit type is not exposed in Google Analytics, so we can&rsquo;t use that to segment our visitors, nor does piggy-backing it with a Custom Dimension do anything. So, we need to configure Google Tag Manager to actually send an extra <strong>event</strong> when a <code>data</code> hit is encountered that also has the <strong>&amp;exp</strong> parameter with it.</p>
-<h2 id="implement-via-analyticsjs">Implement via analytics.js</h2>
+
+                
+                  <h2 id="implement-via-analyticsjs">Implement via analytics.js</h2>
 <p>If you&rsquo;re using the <strong>analytics.js</strong> snippet, here&rsquo;s what you need to do:</p>
 <div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
   <span style="color:#aaa;font-style:italic">// Analytics.js snippet
@@ -452,7 +479,9 @@ m=s.getElementsByTagName(o)[<span style="color:#099">0</span>];a.async=<span sty
 
 
 <p>That&rsquo;s all you need to do with <strong>analytics.js</strong>. On pages not included in the experiment, no Custom Dimension or any extra hit is sent. Business will be as usual.</p>
-<h2 id="implement-via-google-tag-manager">Implement via Google Tag Manager</h2>
+
+                
+                  <h2 id="implement-via-google-tag-manager">Implement via Google Tag Manager</h2>
 <p>In Google Tag Manager, you need to create a new <strong>Custom JavaScript variable</strong>, and give it a name like <strong>{{JS - customTask - Optimize experiment}}</strong>. The variable should look like this:</p>
 <div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() {
   <span style="color:#00a">return</span> <span style="color:#00a">function</span>(model) {
@@ -523,10 +552,14 @@ Value: <strong>{{JS - customTask - Optimize experiment}}</strong></p>
 </div>
 
 
-<h2 id="summary">Summary</h2>
+
+                
+                  <h2 id="summary">Summary</h2>
 <p>I really wish that the Optimize / Google Analytics integration would give us a hit or dimension we could use to segment sessions that actively participated in an experiment. Right now you either need to replicate the test conditions in a segment (and if you sample only a part of your visitors even this won&rsquo;t cut it), or use a solution like the one described in this article.</p>
 <p>Even if this were superfluous and unnecessary, I&rsquo;m giddy with excitement to show yet another cool use case for <code>customTask</code>. I&rsquo;m fairly certain that if we hadn&rsquo;t already given our baby boy a gorgeous name, the world would have come to know him as <strong>customTask Ahava</strong>. For now, it will have to do as his nickname. That&rsquo;s how much I love <code>customTask</code>!</p>
 
+                
+              
               
 
             </div>
@@ -783,7 +816,9 @@ Value: <strong>{{JS - customTask - Optimize experiment}}</strong></p>
 
 <script src="https://cdn.commento.io/js/count.js"></script>
 
-
+    <script>
+      !function(){var e=document.querySelector(".simmer"),t=document.querySelector(".simmer .close"),o=window.sessionStorage&&window.sessionStorage.getItem("nosimmer");if(e){if(o){e.style.display="none"}t.addEventListener("click",function(){window.sessionStorage.setItem("nosimmer","true"),e.style.display="none"})}}();
+    </script>
     <script>
       var mylazyload = new LazyLoad({elements_selector: '.lazy'});
       </script>

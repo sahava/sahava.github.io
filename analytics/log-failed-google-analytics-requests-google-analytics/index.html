@@ -206,6 +206,16 @@
     </a>
   </li>
 
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
 
     </ul>
     <ul class="sidebar-buttons">
@@ -260,20 +270,20 @@
     </a>
   </li>
 
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/newsletter/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bell"></i>
+      
+      <span class="sidebar-button-desc">Newsletter</span>
+    </a>
+  </li>
+
 
     </ul>
     <ul class="sidebar-buttons">
       
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
-      
-      <span class="sidebar-button-desc">RSS</span>
-    </a>
-  </li>
-
 
     </ul>
   </div>
@@ -329,7 +339,9 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              <blockquote>
+	      
+                
+  	        <blockquote>
 <p><strong>READ THIS (26 Aug 2019)!!</strong> Unfortunately, the update I made in 2016 contained code that was incomplete and broken. I nevert noticed this until it was pointed out to me almost three years later. At this point, I don&rsquo;t have a working backup of the solution, so unless some internet archive / cache service manages to surface the code, this article is basically lost.</p>
 </blockquote>
 <p><em>UPDATE 20 December 2016: I made some fixes to the solution - be sure to grab the latest code snippet from below!</em></p>
@@ -372,7 +384,20 @@
 
 
 <p>Read on, my friend!</p>
-<h2 id="the-solution">The solution</h2>
+
+                <span class="simmer">
+  <span class="close">X</span>
+  <p>
+    <span class="fa fa-md fa-bell"></span>
+    <strong>The Simmer Newsletter</strong>
+  </p>
+  <p>
+    Subscribe to the <a href="https://www.simoahava.com/newsletter/">Simmer newsletter</a> to get the latest news and content from Simo Ahava into your email inbox!
+  </p>
+  </span>
+
+                
+                  <h2 id="the-solution">The solution</h2>
 <p>Here&rsquo;s how it works.</p>
 <ol>
 <li>
@@ -440,7 +465,9 @@
 <p>I can then go to GTM, find the offending tag, and fix it to always send some value in Event Action.</p>
 <p>Due to the abstraction of <code>dataLayer</code>, you don&rsquo;t have to log this information in Google Analytics. In fact, you might not <em>want</em> to, since you might already have some sort of logging rig setup in your development process. Thanks to Google Tag Manager, you can push the data to any endpoint that supports JavaScript-generated data transfer (e.g. HTTP requests).</p>
 <p>However, I&rsquo;ve elected to send the information to Google Analytics. Doing so, I can align these validation errors with all the other hits that this particular user has sent to GA, and I can thus potentially identify bigger issues that these validation errors might only be a symptom of. For example, it&rsquo;s possible that an Ecommerce tag only fails if the user has followed a specific funnel on the site. By sending the validation error to Google Analytics, I can see if it occurred during one of these broken funnels, giving me more information to fix it in the end.</p>
-<h2 id="how-to-do-it">How to do it</h2>
+
+                
+                  <h2 id="how-to-do-it">How to do it</h2>
 <p>You basically need a <strong>Custom HTML Tag</strong> that fires on the <strong>All Pages</strong> trigger, with a higher <a href="https://support.google.com/tagmanager/answer/2772421?hl=en">Tag Priority</a> than any of your Google Analytics tags that might also fire on this event.</p>
 <p>It&rsquo;s important that this code starts its execution before your Google Analytics tags have a chance to start up. This code overwrites the <code>ga()</code> method, and any tag that has already fired will not be debugged with this solution.</p>
 <p>You&rsquo;ll first need the actual code for GA Spy, and you can download the latest version from <a href="https://github.com/smhmic/ga-spy/blob/master/ga-spy.js">Stephen&rsquo;s repository</a>. You need to copy-paste the JavaScript into a Custom HTML Tag, and then add the custom listener below it. Here&rsquo;s the full example, where I&rsquo;ve minified the GA Spy code to make it more compact. Scroll down past the GA Spy part to find the actual magic.</p>
@@ -546,12 +573,16 @@
 
 
 <p>This particular tag will send each validation error as a <a href="https://support.google.com/analytics/answer/1033068#NonInteractionEvents"><em>non-interaction event</em></a> to Google Analytics, with the error description as the Event Action and the broken hit payload as the Event Label.</p>
-<h2 id="summary">Summary</h2>
+
+                
+                  <h2 id="summary">Summary</h2>
 <p>This solution relies on the awesomeness of <a href="https://www.simoahava.com/analytics/introducing-ga-spy-for-google-analytics/">GA Spy</a>. The script basically hijacks the GA global method, and copies all commands to the debug endpoint.</p>
 <p>What this solution does is give you yet another tool for validating your Google Analytics setup. When working with complex Google Tag Manager setups, it might be difficult to keep tabs on all the variables you are using. This might lead to problems in your tags, when a required field ends up with a blank value just because a variable didn&rsquo;t resolve in an expected way. This solution lets you find these cases with ease, giving you a clear path to fixing them before they become a real data quality problem.</p>
 <p>It would be pretty neat to have the <code>/debug/</code> interface as a tool you could install locally. That way you wouldn&rsquo;t need to do the trip to Google Analytics servers, and instead validate the hits in your own web server. On the other hand, the logic isn&rsquo;t probably that complex, so having it as a dedicated JavaScript library would be great as well. In any case, the endpoint debugger is a really smooth tool, especially when combined with GA Spy as illustrated in this article.</p>
 <p>Another thing that would make this whole thing easier was if the original request to <code>/collect</code> simply returned the debug payload automatically. That way you could just look at the responses to the GA requests without having to do the extra trip to <code>/debug/</code>. I understand this doesn&rsquo;t exist because of latency and how most hits to GA are still done with a GET request. Still, Google could at least make it a configurable setting in the GA request.</p>
 
+                
+              
               
 
             </div>
@@ -806,7 +837,9 @@
 
 <script src="https://cdn.commento.io/js/count.js"></script>
 
-
+    <script>
+      !function(){var e=document.querySelector(".simmer"),t=document.querySelector(".simmer .close"),o=window.sessionStorage&&window.sessionStorage.getItem("nosimmer");if(e){if(o){e.style.display="none"}t.addEventListener("click",function(){window.sessionStorage.setItem("nosimmer","true"),e.style.display="none"})}}();
+    </script>
     <script>
       var mylazyload = new LazyLoad({elements_selector: '.lazy'});
       </script>

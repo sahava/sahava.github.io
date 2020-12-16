@@ -206,6 +206,16 @@
     </a>
   </li>
 
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
 
     </ul>
     <ul class="sidebar-buttons">
@@ -260,20 +270,20 @@
     </a>
   </li>
 
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/newsletter/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bell"></i>
+      
+      <span class="sidebar-button-desc">Newsletter</span>
+    </a>
+  </li>
+
 
     </ul>
     <ul class="sidebar-buttons">
       
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
-      
-      <span class="sidebar-button-desc">RSS</span>
-    </a>
-  </li>
-
 
     </ul>
   </div>
@@ -329,11 +339,26 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              <p>In this post, I&rsquo;ll walk you through a tutorial on how to create a <a href="http://www.google.com/tagmanager">Google Tag Manager</a> extension. This extension will be a <a href="https://www.simoahava.com/analytics/auto-event-tracking-google-tag-manager/">new listener</a>, whose sole job is to listen for changes in the HTML and CSS markup on the page.</p>
+	      
+                
+  	        <p>In this post, I&rsquo;ll walk you through a tutorial on how to create a <a href="http://www.google.com/tagmanager">Google Tag Manager</a> extension. This extension will be a <a href="https://www.simoahava.com/analytics/auto-event-tracking-google-tag-manager/">new listener</a>, whose sole job is to listen for changes in the HTML and CSS markup on the page.</p>
 <p>The reason I&rsquo;m teaching you how to create a DOM listener is simple. Ever so often I come across people asking for help, but they are unable to touch on-page code. Usually the problem is magnified with <a href="https://www.simoahava.com/analytics/form-tracking-google-tag-manager/">form handlers</a>, since the developers might have installed some custom jQuery form manager, for instance, which simply refuses to cooperate with GTM&rsquo;s form listeners. That is why you might want to fire a GTM event when a certain message pops up on the screen, for example.</p>
 <p>With a DOM listener, you can fire a GTM event every time something changes on the page. Well, not <em>every time</em>. Actually, in this example you&rsquo;re restricted to element insertion and attribute changes. A working use case might be form validation: if you want to track invalid forms, maybe by sending the content of the validation error message with an event, you might just as well create a DOM listener. This listener will then trigger when an error message appears on the page.</p>
 <p><strong>DISCLAIMER</strong>: To be truthful, I feel quite strongly about using hacks such as this to fix faulty markup or an otherwise shoddy tag implementation. The main idea behind this post is to introduce a feature of JavaScript which can alleviate some of your tag management pains. However, if you find that you need hacks such as the DOM listener to circumvent development problems on your website, I would strongly suggest that you take this up with your developers and try to come up with a solution which works with GTM&rsquo;s standard features.</p>
-<h2 id="the-premise">The premise</h2>
+
+                <span class="simmer">
+  <span class="close">X</span>
+  <p>
+    <span class="fa fa-md fa-bell"></span>
+    <strong>The Simmer Newsletter</strong>
+  </p>
+  <p>
+    Subscribe to the <a href="https://www.simoahava.com/newsletter/">Simmer newsletter</a> to get the latest news and content from Simo Ahava into your email inbox!
+  </p>
+  </span>
+
+                
+                  <h2 id="the-premise">The premise</h2>
 <p>To create the DOM listener, I will leverage an API known as <a href="https://developer.mozilla.org/en/docs/Web/API/MutationObserver">MutationObserver</a>. This little piece of magic will create an observer object, which triggers every time a <em>mutation</em> takes place. This mutation can come in different sizes and shapes, but for the purposes of this guide, I will listen for two kinds of mutations, for two kinds of use cases:</p>
 <ol>
 <li>
@@ -346,7 +371,9 @@
 <p>So the first use case is when your form injects a new SPAN element into the DOM upon an error. The script will check if the injected node is really the error message, and if it is, it pushes a dataLayer event with the content of the SPAN (the message itself).</p>
 <p>The second use case is when an invalid form causes a hidden SPAN to appear, with the error message within.</p>
 <p>Listening for node insertion is a bit different than listening to an attribute change. A node insertion listener can be primed on any node on the DOM, meaning you have much more to work with in terms of flexibility. Listening for attribute changes requires you to pinpoint exactly which node you want to observe, and the attribute change will be reported for that node only.</p>
-<h2 id="preparations">Preparations</h2>
+
+                
+                  <h2 id="preparations">Preparations</h2>
 <p>Here are the ingredients:</p>
 <ol>
 <li>
@@ -397,7 +424,9 @@
 
 <p>This is just my test page. Obviously you&rsquo;ll need to navigate around your current implementation to make things work.</p>
 <p>Finally, you&rsquo;ll need your custom HTML magic. The next two chapters will go over the tags and the code you&rsquo;ll need to write for them.</p>
-<h2 id="case-1-node-insertion">Case 1: node insertion</h2>
+
+                
+                  <h2 id="case-1-node-insertion">Case 1: node insertion</h2>
 <p>In this use case, a new node (<code>&lt;span class=&quot;error&quot;&gt;</code>) is inserted into a DIV on the page. The markup on the page looks something like this:</p>
 <div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
 <span style="color:#00a">function</span> addHTML() {
@@ -449,7 +478,9 @@
 </div>
 
 
-<h2 id="case-2-css-change">Case 2: CSS change</h2>
+
+                
+                  <h2 id="case-2-css-change">Case 2: CSS change</h2>
 <p>In this case, you have a hidden SPAN with the error message, which is then revealed when the form validation fails. Here&rsquo;s what the HTML might look like:</p>
 <div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
 <span style="color:#00a">function</span> changeCSS() {
@@ -496,11 +527,15 @@
 </div>
 
 
-<h2 id="conclusions">Conclusions</h2>
+
+                
+                  <h2 id="conclusions">Conclusions</h2>
 <p>This might seem like a cool hack to you. After all, you&rsquo;re listening for changes on the page without actually any page refresh happening! Also, you&rsquo;re extending GTM&rsquo;s default listeners so you&rsquo;re kind of like a Google engineer, right?</p>
 <p>Well, remember what I said in the disclaimer of this text. This is a hack, a circumvention, a <em>band-aid</em>, designed to overcome problems with your markup or your JavaScript. Having a custom form handler which doesn&rsquo;t propagate a proper form submit event (which is required by GTM&rsquo;s default form submit listener) is a bit suspect and reeks of bad practices. So before you resort to this DOM listener, make sure you exhaust all other, more orthodox possibilities with your developers.</p>
 <p>Then again, you might not need this to overcome any development problems, but rather to complement your current tag setup. In that case, go crazy! It&rsquo;s an excellent way to add more flexibility to your tags. Do note the <a href="https://developer.mozilla.org/en/docs/Web/API/MutationObserver#Browser_compatibility">cross-browser support</a>, however. Support is not comprehensive enough to warrant using this listener as a firing rule for some business-critical tag.</p>
 
+                
+              
               
 
             </div>
@@ -755,7 +790,9 @@
 
 <script src="https://cdn.commento.io/js/count.js"></script>
 
-
+    <script>
+      !function(){var e=document.querySelector(".simmer"),t=document.querySelector(".simmer .close"),o=window.sessionStorage&&window.sessionStorage.getItem("nosimmer");if(e){if(o){e.style.display="none"}t.addEventListener("click",function(){window.sessionStorage.setItem("nosimmer","true"),e.style.display="none"})}}();
+    </script>
     <script>
       var mylazyload = new LazyLoad({elements_selector: '.lazy'});
       </script>

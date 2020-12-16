@@ -206,6 +206,16 @@
     </a>
   </li>
 
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
 
     </ul>
     <ul class="sidebar-buttons">
@@ -260,20 +270,20 @@
     </a>
   </li>
 
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/newsletter/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bell"></i>
+      
+      <span class="sidebar-button-desc">Newsletter</span>
+    </a>
+  </li>
+
 
     </ul>
     <ul class="sidebar-buttons">
       
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
-      
-      <span class="sidebar-button-desc">RSS</span>
-    </a>
-  </li>
-
 
     </ul>
   </div>
@@ -329,12 +339,27 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              <p><em>There is a new version of this post for GTM V2 <a href="https://www.simoahava.com/analytics/send-weather-data-to-google-analytics-in-gtm-v2/">here</a>.</em></p>
+	      
+                
+  	        <p><em>There is a new version of this post for GTM V2 <a href="https://www.simoahava.com/analytics/send-weather-data-to-google-analytics-in-gtm-v2/">here</a>.</em></p>
 <p>While going over my previous post about using <a href="https://www.simoahava.com/web-development/universal-analytics-weather-custom-dimension/">weather conditions to segment data</a> in Google Analytics, I started thinking about performance issues. Since I&rsquo;m using a visit-scope custom dimension, it seems futile to have it send the weather details with every single page load. The odds of the weather changing drastically during one visit are slim (unless you live in the UK), and I have yet to come up with a good reason to change my on-site behavior because the weather changed from a drizzle to a downpour.</p>
 <p>With Universal Analytics, it&rsquo;s not possible to mine session data from the cookie set by the service. This is because the custom client ID set by the cookie is &ldquo;later used by Google Analytics <strong>servers</strong> to calculate visitor, <strong>session</strong>, and campaign data.&rdquo; (emphasis mine; see <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/domains">the developer guide</a>). This is relevant because I want my custom JavaScript to <strong>only fire once, at the beginning of a session (visit)</strong>. I have no way to use the <strong>_ga</strong>-cookie since, as stated above, it calculates session data in the bowels of Google Analytics servers.</p>
 <p>To overcome this problem, I create a custom session cookie, which mimics the default properties of the Google Analytics cookie mainly in that it expires after 30 minutes of inactivity as well.</p>
 <p>Do note that this is not a 100 % accurate emulation of how Google Analytics calculates sessions. The cookie doesn&rsquo;t take into account changing campaign sources which, by default, always initiate a new session in Google Analytics. Preliminary research shows that the accuracy is around 95 %, though I&rsquo;m getting some missed hits to the Open Weather API as well, which means that the cookie is actually even more accurate.</p>
-<h2 id="how-it-works">How it works</h2>
+
+                <span class="simmer">
+  <span class="close">X</span>
+  <p>
+    <span class="fa fa-md fa-bell"></span>
+    <strong>The Simmer Newsletter</strong>
+  </p>
+  <p>
+    Subscribe to the <a href="https://www.simoahava.com/newsletter/">Simmer newsletter</a> to get the latest news and content from Simo Ahava into your email inbox!
+  </p>
+  </span>
+
+                
+                  <h2 id="how-it-works">How it works</h2>
 <p>I&rsquo;m trying to be generic here, but I will use a real-life example from the weather script I created previously.</p>
 <p>Here&rsquo;s how the implementation basically works:</p>
 <ol>
@@ -350,7 +375,9 @@
 </ol>
 <p>If you try to create a cookie which already exists, it overwrites the original cookie. This is why I can use the same cookie setup code for both (2) and (3) above.</p>
 <p>Since it&rsquo;s a first-party cookie, and since it&rsquo;s set on the root path of the site (/), there&rsquo;s no risk of overwriting any other cookies (unless some other site plugin has a cookie named &ldquo;session&rdquo;).</p>
-<h2 id="the-cookie-code">The cookie code</h2>
+
+                
+                  <h2 id="the-cookie-code">The cookie code</h2>
 <p>My original weather tracking solution fired on every single page load. This creates quite a burden on the API as well as site performance (since it might take almost half a second for the API script to fire). My new code looks like this:</p>
 <div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
   <span style="color:#00a">if</span> (<span style="color:#00a">typeof</span>({{Session alive}}) == <span style="color:#a50">&#34;undefined&#34;</span>) {
@@ -392,13 +419,17 @@
 <p>So what you do here is create a macro which returns the &ldquo;session&rdquo; cookie value. Whenever this macro is referenced to in code, you are actually using the cookie value.</p>
 <p>When I poll for this cookie in the code above, I&rsquo;m actually only interested in whether this cookie exists or not. That is why I use the if(<strong>typeof({{Session alive}}) == &ldquo;undefined&rdquo;</strong>) structure. If the cookie doesn&rsquo;t exist, the macro has no reference, which means that it is an <em>undefined</em> structure.</p>
 <p>Finally, regardless of whether the cookie was found or not, a cookie named &ldquo;session&rdquo; is created with an expiration date 30 minutes in the future (1 800 000 milliseconds later).</p>
-<h2 id="pros-and-cons">Pros and cons</h2>
+
+                
+                  <h2 id="pros-and-cons">Pros and cons</h2>
 <p>Well obviously, having the cumbersome API call fire just once per session is a victory for site performance and for &ldquo;best practices&rdquo; analytics. Because I already have a <em>visit</em>-scoped dimension, it would be counter-intuitive to send it with every single page view hit.</p>
 <p>The main problems, as I see them, have to do with maintenance. If you have a custom expiration time for the GA session, you need to remember to modify the expiration date (now 1800000 milliseconds) in the &ldquo;session&rdquo; cookie as well, if you want it to mimic Google Analytics performance. Also, if you already have a cookie named &ldquo;session&rdquo; firing on your site, you need to change this one&rsquo;s name.</p>
 <p>One more problem was discussed in the opening paragraphs of this post. This is not a 100 % accurate emulation of Google Analytics session computation, so you will have a slight margin of error in the number of visits with weather as a dimension vs. the number of visits to your site. Feel free to explore how to make calculating a GA session even more accurate, and drop me a line if you find something interesting :)</p>
 <p>I would really like it if I could bind my code to the actual <strong>_ga</strong>-cookie, but as far as I know, that&rsquo;s not possible.</p>
 <p><strong>EDIT</strong>: See this post on <a href="https://www.simoahava.com/analytics/universal-analytics-send-custom-dimension-event/">sending custom dimensions with events</a> for a smarter implementation of the idea above.</p>
 
+                
+              
               
 
             </div>
@@ -655,7 +686,9 @@
 
 <script src="https://cdn.commento.io/js/count.js"></script>
 
-
+    <script>
+      !function(){var e=document.querySelector(".simmer"),t=document.querySelector(".simmer .close"),o=window.sessionStorage&&window.sessionStorage.getItem("nosimmer");if(e){if(o){e.style.display="none"}t.addEventListener("click",function(){window.sessionStorage.setItem("nosimmer","true"),e.style.display="none"})}}();
+    </script>
     <script>
       var mylazyload = new LazyLoad({elements_selector: '.lazy'});
       </script>

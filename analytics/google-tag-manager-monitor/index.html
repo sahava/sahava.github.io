@@ -206,6 +206,16 @@
     </a>
   </li>
 
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
 
     </ul>
     <ul class="sidebar-buttons">
@@ -260,20 +270,20 @@
     </a>
   </li>
 
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/newsletter/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bell"></i>
+      
+      <span class="sidebar-button-desc">Newsletter</span>
+    </a>
+  </li>
+
 
     </ul>
     <ul class="sidebar-buttons">
       
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
-      
-      <span class="sidebar-button-desc">RSS</span>
-    </a>
-  </li>
-
 
     </ul>
   </div>
@@ -329,7 +339,9 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              <p><a href="https://tagmanager.google.com/">Google Tag Manager</a> is strictly a <em>tag delivery system</em>, and it&rsquo;s very careful <a href="https://support.google.com/tagmanager/answer/9323295#data">not to collect any analytics data</a> on its own. This is most likely a deliberate choice, because if GTM was to start collecting data, it would introduce additional barriers to adoption.</p>
+	      
+                
+  	        <p><a href="https://tagmanager.google.com/">Google Tag Manager</a> is strictly a <em>tag delivery system</em>, and it&rsquo;s very careful <a href="https://support.google.com/tagmanager/answer/9323295#data">not to collect any analytics data</a> on its own. This is most likely a deliberate choice, because if GTM was to start collecting data, it would introduce additional barriers to adoption.</p>
 <p>Nevertheless, being a tool that consolidates the design, development, deployment, and testing of all the marketing and analytics pixels, code snippets, and utilities running on a website or a mobile app, lacking the necessary features for auditing and monitoring has always seemed like an oversight.</p>
 
 
@@ -403,11 +415,26 @@
     <li><a href="#summary">Summary</a></li>
   </ul>
 </nav></div>
-<h2 id="guest-author-mark-edmondson">Guest author: Mark Edmondson</h2>
+
+                <span class="simmer">
+  <span class="close">X</span>
+  <p>
+    <span class="fa fa-md fa-bell"></span>
+    <strong>The Simmer Newsletter</strong>
+  </p>
+  <p>
+    Subscribe to the <a href="https://www.simoahava.com/newsletter/">Simmer newsletter</a> to get the latest news and content from Simo Ahava into your email inbox!
+  </p>
+  </span>
+
+                
+                  <h2 id="guest-author-mark-edmondson">Guest author: Mark Edmondson</h2>
 <p><a href="https://twitter.com/holomarked">Mark Edmondson</a> is a former colleague of mine, a fellow <a href="https://google-developers.appspot.com/community/experts/directory/profile/profile-mark_edmondson">Google Developer Expert</a> for Google Analytics, and the owner of one of the most versatile skill sets in our industry. He&rsquo;s currently working as a data engineer at <a href="https://iihnordic.com/">IIH Nordic</a> (a great company full of nice folks in its own right!).</p>
 <p>Mark is fluent in bridging together the worlds of marketing and analytics, and his reach extends far beyond, as evidenced by his <a href="https://github.com/MarkEdmondson1234/">prolific contributions to the open-source space</a>. He’s the author of the popular <a href="https://github.com/MarkEdmondson1234/googleAnalyticsR">googleAnalyticsR</a> library for R, and <a href="https://www.markedmondson.me/">his blog</a> is full of great walkthroughs for data engineering, data science, web analytics, and software development.</p>
 <p>Being one of the most humble people I’ve met, he’s probably royally embarrassed by this introduction. So I’ll just wrap up this introduction by making it clear how grateful I am for his contributions not just to this article but to our whole industry.</p>
-<h2 id="what-well-build-the-google-tag-manager-monitor">What we&rsquo;ll build: The Google Tag Manager Monitor</h2>
+
+                
+                  <h2 id="what-well-build-the-google-tag-manager-monitor">What we&rsquo;ll build: The Google Tag Manager Monitor</h2>
 <p>The <strong>key deliverable</strong> of this little project is a <a href="https://cloud.google.com/bigquery/">BigQuery</a> view that collects data from your website. This data will be sent by way of a new Google Tag Manager custom template, and it will comprise statistics of all the tags that have fired on your site for any given <code>dataLayer</code> event.</p>
 
 
@@ -434,7 +461,9 @@
 </li>
 </ul>
 <p>It&rsquo;s extremely easy to extend this solution to include things like Container ID or tag categorization information - we&rsquo;ll explore these later in the guide.</p>
-<h2 id="why-do-we-need-a-monitor">Why do we need a monitor?</h2>
+
+                
+                  <h2 id="why-do-we-need-a-monitor">Why do we need a monitor?</h2>
 <p>There aren’t that many ways to monitor the consistency of tags firing in your containers. Obviously, you can run reports against the various endpoints, such as Google Analytics or Facebook, and detect anomalous data collection through their reporting interfaces.</p>
 <p>But this has some problems:</p>
 <ul>
@@ -467,7 +496,9 @@
 
 <p>Why have a separate endpoint for monitoring? Well, it wouldn’t really make sense to collect data about Google Analytics’ data collection in Google Analytics itself (a custom reporting property, for example), because if the analytics data collection fails due to not being able to connect to the GA endpoint, then the monitoring data collection would fail as well.</p>
 <p>That is why this article utilizes an endpoint in the Google Cloud Platform to collect the data. It’s not failsafe, either, since if the data collection fails due to a network outage, the collection to GCP would fail, too. Even though there are ways to tackle this problem as well, we’ll try to keep things at an MVP (minimum viable product) level, and you can then extend the solution to fit your more elaborate needs.</p>
-<h2 id="step-1-build-the-custom-template">Step 1: Build the custom template</h2>
+
+                
+                  <h2 id="step-1-build-the-custom-template">Step 1: Build the custom template</h2>
 <p>The custom <strong>tag</strong> template will create a <strong>callback</strong> that is called every time a <code>dataLayer</code> event reaches conclusion. This is basically the same thing as the <a href="https://www.simoahava.com/gtm-tips/hitcallback-eventcallback/">eventCallback</a> of Google Tag Manager, just wrapped in a template API.</p>
 
 
@@ -785,7 +816,9 @@
 <p>Naturally, you won’t know the endpoint until you’ve created it, so if you want to test the template before creating the endpoint, you can just a placeholder in the permissions such as <code>https://placeholder.com/collect</code>.</p>
 <p>You can <a href="https://www.simoahava.com/analytics/custom-templates-guide-for-google-tag-manager/#testing-the-template"><strong>Test</strong></a> the template if you wish, but it won’t really do anything, as the callback requires an event to be pushed into <code>dataLayer</code> to trigger.</p>
 <p><strong>Save</strong> the template once you’re done.</p>
-<h2 id="step-2-tags-and-triggers">Step 2: Tags and triggers</h2>
+
+                
+                  <h2 id="step-2-tags-and-triggers">Step 2: Tags and triggers</h2>
 <p>The first thing we’ll need to do is create the <strong>monitor tag</strong> itself.</p>
 <h3 id="21-create-the-monitor-tag">2.1. Create the monitor tag</h3>
 <p>In GTM, go to <strong>Tags</strong> and create a new tag. Select the template you just created from the tag type selector.</p>
@@ -893,7 +926,9 @@
 
 <p>Feel free to test in Preview mode to see if the endpoint is invoked with a proper query string. You should see something like this in the Network logs of your browser, assuming you used the placeholder URL of <code>https://placeholder.com/collect</code>.</p>
 <p>Next up, <strong>Mark</strong> will show us how to get the Google Cloud Platform endpoint up and running!</p>
-<h2 id="step-3-creating-the-google-cloud-platform-endpoint">Step 3: Creating the Google Cloud Platform endpoint</h2>
+
+                
+                  <h2 id="step-3-creating-the-google-cloud-platform-endpoint">Step 3: Creating the Google Cloud Platform endpoint</h2>
 <p>The GCP endpoint needs to process the <strong>GET requests</strong> sent from the site, insert them into a <strong>BigQuery table</strong>, parse them into columns and rows, and finally connect the data to <strong>Google Data Studio</strong>.</p>
 <h3 id="31-choosing-the-gcp-solution-for-the-endpoint">3.1. Choosing the GCP solution for the endpoint</h3>
 <p>Boiling down the use case requirements here, we are looking to turn an API call containing the GTM tag data into useful data for analysis. There are many ways to solve this particular use case on GCP - we&rsquo;ll go through some and show why we eventually went for <a href="https://cloud.google.com/functions/">Cloud Functions</a>.</p>
@@ -1271,7 +1306,9 @@ TABLE=<span style="color:#a50">&#39;your_table&#39;</span>     <span style="colo
 </div>
 
 
-<h2 id="step-4-visualize-the-data">Step 4: Visualize the data</h2>
+
+                
+                  <h2 id="step-4-visualize-the-data">Step 4: Visualize the data</h2>
 <p>For most use cases, having the data in a BigQuery view is already more than enough. That&rsquo;s the data set you can query for anomaly detection, or plug into a pipeline for automated alerts.</p>
 <p>Nevertheless, we can see how useful a proper visualization of the data could potentially be. For this purpose, Google&rsquo;s <a href="https://datastudio.google.com/">Data Studio</a> is an excellent project for quickly delivering useful visualizations. Best of all, it already has a built-in <a href="https://support.google.com/datastudio/answer/6370296?hl=en">BigQuery connector</a> for querying your BQ data with.</p>
 
@@ -1291,7 +1328,9 @@ TABLE=<span style="color:#a50">&#39;your_table&#39;</span>     <span style="colo
 
 <p>As a demo, we&rsquo;ve created a <strong>starter</strong> dashboard for you to check out. Feel free to copy it and modify it to suit your own purposes.</p>
 <p><a href="https://datastudio.google.com/u/0/reporting/1qcyKjq_44_VIeIxL4BTQm6kKnBaH5a7p/page/xsws">Visit the dashboard here.</a></p>
-<h2 id="summary">Summary</h2>
+
+                
+                  <h2 id="summary">Summary</h2>
 <p>Maybe we haven&rsquo;t said this enough yet, but this is a <strong>proof-of-concept</strong>. This article serves a number of purposes:</p>
 <ul>
 <li>
@@ -1322,6 +1361,8 @@ TABLE=<span style="color:#a50">&#39;your_table&#39;</span>     <span style="colo
 <p>Let us know in the comments what you think of this, and how you would improve it if you had the chance!</p>
 <p><strong>Final note from Simo</strong>: I am truly grateful to get the great Mark Edmondson to co-author this article and design the monitor solution with me. As the editor, I take full responsibility for any errors and mistakes in the final draft of the article.</p>
 
+                
+              
               
 
             </div>
@@ -1578,7 +1619,9 @@ TABLE=<span style="color:#a50">&#39;your_table&#39;</span>     <span style="colo
 
 <script src="https://cdn.commento.io/js/count.js"></script>
 
-
+    <script>
+      !function(){var e=document.querySelector(".simmer"),t=document.querySelector(".simmer .close"),o=window.sessionStorage&&window.sessionStorage.getItem("nosimmer");if(e){if(o){e.style.display="none"}t.addEventListener("click",function(){window.sessionStorage.setItem("nosimmer","true"),e.style.display="none"})}}();
+    </script>
     <script>
       var mylazyload = new LazyLoad({elements_selector: '.lazy'});
       </script>

@@ -206,6 +206,16 @@
     </a>
   </li>
 
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
 
     </ul>
     <ul class="sidebar-buttons">
@@ -260,20 +270,20 @@
     </a>
   </li>
 
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/newsletter/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bell"></i>
+      
+      <span class="sidebar-button-desc">Newsletter</span>
+    </a>
+  </li>
+
 
     </ul>
     <ul class="sidebar-buttons">
       
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
-      
-      <span class="sidebar-button-desc">RSS</span>
-    </a>
-  </li>
-
 
     </ul>
   </div>
@@ -329,7 +339,9 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              <p>Maybe you knew this, maybe you didn&rsquo;t, but requests sent from your website (or app) to <a href="https://analytics.google.com/">Google Analytics</a> have a maximum size. Or, more specifically, the <em>payload</em> size (meaning the actual content body of the request) has a maximum.</p>
+	      
+                
+  	        <p>Maybe you knew this, maybe you didn&rsquo;t, but requests sent from your website (or app) to <a href="https://analytics.google.com/">Google Analytics</a> have a maximum size. Or, more specifically, the <em>payload</em> size (meaning the actual content body of the request) has a maximum.</p>
 <p>This maximum size of the payload is <strong>8192 bytes</strong>. This means, basically, that the entire parameter string sent to Google Analytics servers can be no longer than 8192 characters in length. The thing is, if the payload exceeds this, <strong>Google Analytics simply drops the hit</strong>. There&rsquo;s no warning, no error, nothing. The hit just doesn&rsquo;t get sent. If you are running the <a href="https://chrome.google.com/webstore/detail/google-analytics-debugger/jnkmfdileelhofjcijamephohjechhna?hl=en">Google Analytics debugger</a> browser extension, you <em>can</em> actually see a warning when the payload size is exceeded:</p>
 
 
@@ -354,10 +366,25 @@
 <blockquote>
 <p><strong>UPDATE</strong>: Check out Angela Grammatas&rsquo; <a href="https://angelagrammatas.com/2018/03/13/tracking-hit-size-in-gtm-with-the-ga-tasks-api/">excellent article</a> on the very same topic. She uses a slightly different tactic, appending the data in the <code>buildHitTask</code>, which works just as well.</p>
 </blockquote>
-<h2 id="important-request">IMPORTANT REQUEST</h2>
+
+                <span class="simmer">
+  <span class="close">X</span>
+  <p>
+    <span class="fa fa-md fa-bell"></span>
+    <strong>The Simmer Newsletter</strong>
+  </p>
+  <p>
+    Subscribe to the <a href="https://www.simoahava.com/newsletter/">Simmer newsletter</a> to get the latest news and content from Simo Ahava into your email inbox!
+  </p>
+  </span>
+
+                
+                  <h2 id="important-request">IMPORTANT REQUEST</h2>
 <p>Before I get started, I have a request to make. Some time ago, I was contacted by someone (Googler, I think), who shared with me a similar solution. For the life of me, I can&rsquo;t find this communication anywhere, because I don&rsquo;t even remember what medium I was contacted over (I&rsquo;ve gone through my mailbox to no avail).</p>
 <p>This solution was definitely inspired by this person&rsquo;s idea, so I want to give credit where credit is due. So, if you remember approaching me with a solution you used to work on that did something similar, please be in touch and I will update this article with my thanks for your inspirational example.</p>
-<h2 id="send-the-hit-payload-length-using-customtask">Send the hit payload length using <code>customTask</code></h2>
+
+                
+                  <h2 id="send-the-hit-payload-length-using-customtask">Send the hit payload length using <code>customTask</code></h2>
 <p>If you don&rsquo;t know what <code>customTask</code> is, please check out my <a href="https://www.simoahava.com/analytics/customtask-the-guide/">guide</a> on the topic. In a nutshell, <code>customTask</code> lets you modify, among other things, the request sent to Google Analytics <em>before</em> it is sent, adding information dynamically to the payload. This information could be anything from a <a href="https://www.simoahava.com/gtm-tips/remove-pii-google-analytics-hits/">PII-purged payload</a> to the <a href="https://www.simoahava.com/gtm-tips/use-customtask-access-tracker-values-google-tag-manager/">Client ID</a>.</p>
 <p><code>customTask</code> works with a <strong>Custom JavaScript variable</strong>. To send the hit payload length as a Custom Dimension, you&rsquo;ll first need to <a href="https://support.google.com/analytics/answer/2709829">create a new <strong>hit-scoped</strong> Custom Dimension</a> in Google Analytics admin. Once you&rsquo;ve created it, make note of the <strong>index</strong> assigned to the new dimension.</p>
 
@@ -461,7 +488,9 @@
 </div>
 
 
-<h2 id="other-ideas">Other ideas</h2>
+
+                
+                  <h2 id="other-ideas">Other ideas</h2>
 <p>You could actually rewrite the <code>customTask</code> to add some further logic if you are nearing the <strong>8192</strong> byte maximum size. For example, it doesn&rsquo;t really help you to add the payload length as a Custom Dimension, if the payload is never sent due to exceeding the size requirement.</p>
 <p>By adding some custom code, you could do things like:</p>
 <ol>
@@ -474,11 +503,15 @@
 </ol>
 <p>A typical reason for exceeding payload length is if you are sending <a href="https://www.savio.no/analytics/easier-enhanced-ecommerce-product-promo-tracking">Enhanced Ecommerce</a> impression data, or just very large shopping carts. It only takes something like 50-60 products for you to be approaching the limit of 8192 bytes. Unless you can decrease the size of the product payload using regular means, you could do something like drop all non-critical fields from the product objects (e.g. <code>brand</code>, <code>category</code>, <code>variant</code>), and just include the <code>id</code>, <code>name</code>, <code>price</code>, and <code>quantity</code>.</p>
 <p>Or you could drop all product data except for <code>id</code> in these cases, and then use <a href="https://support.google.com/analytics/answer/6066852?hl=en&amp;ref_topic=6231233">Data Import</a> to refresh the additional data.</p>
-<h2 id="summary">Summary</h2>
+
+                
+                  <h2 id="summary">Summary</h2>
 <p>Well, it looks like <code>customTask</code> to the rescue again. It&rsquo;s such a powerful feature, and I just love the fact that you can get all <em>meta</em> with your Google Analytics data.</p>
 <p>Peppering the payload with details that are otherwise obfuscated is a great way to add a whole new level of debugging opportunities to your data collection.</p>
 <p>Hit payload size limit is nasty in that you won&rsquo;t be alerted if a problem surfaces. The Google Analytics UI won&rsquo;t be able to inform you about this problem because the requests are never sent to GA in the first place. With this Custom Dimension, you can add this information to the payload as a Custom Dimension, and then prepare in advance for the eventuality that you might be hitting the payload maximum size sometime soon.</p>
 
+                
+              
               
 
             </div>
@@ -731,7 +764,9 @@
 
 <script src="https://cdn.commento.io/js/count.js"></script>
 
-
+    <script>
+      !function(){var e=document.querySelector(".simmer"),t=document.querySelector(".simmer .close"),o=window.sessionStorage&&window.sessionStorage.getItem("nosimmer");if(e){if(o){e.style.display="none"}t.addEventListener("click",function(){window.sessionStorage.setItem("nosimmer","true"),e.style.display="none"})}}();
+    </script>
     <script>
       var mylazyload = new LazyLoad({elements_selector: '.lazy'});
       </script>

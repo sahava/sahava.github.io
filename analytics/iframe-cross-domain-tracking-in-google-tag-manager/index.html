@@ -206,6 +206,16 @@
     </a>
   </li>
 
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
 
     </ul>
     <ul class="sidebar-buttons">
@@ -260,20 +270,20 @@
     </a>
   </li>
 
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/newsletter/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bell"></i>
+      
+      <span class="sidebar-button-desc">Newsletter</span>
+    </a>
+  </li>
+
 
     </ul>
     <ul class="sidebar-buttons">
       
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
-      
-      <span class="sidebar-button-desc">RSS</span>
-    </a>
-  </li>
-
 
     </ul>
   </div>
@@ -329,7 +339,9 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              <blockquote>
+	      
+                
+  	        <blockquote>
 <p><strong>NOTE!</strong> This solution has been upgraded, and the new approach can be found <a href="https://www.simoahava.com/analytics/tracking-cross-domain-iframes-upgraded-solution/">here</a>.</p>
 </blockquote>
 <p>If you&rsquo;re unfamiliar with the lingo, <a href="https://support.google.com/analytics/answer/1034342?hl=en">cross-domain tracking</a> is a hack used by <a href="https://analytics.google.com/">Google Analytics</a> to circumvent the web browser&rsquo;s <a href="https://developer.mozilla.org/en-US/docs/Web/Security/Same-origin_policy">same-origin policy</a>. Essentially, the policy dictates that browser cookies can only be shared with a parent domain and all its sub-domains. In other words, <strong>domainA.com</strong> and <strong>domainB.com</strong> do not share cookies.</p>
@@ -351,9 +363,24 @@
 
 
 <p>In this article, I want to go over iframe tracking once again, and update the method to GTM V2. We&rsquo;ll be using the <a href="https://www.simoahava.com/gtm-tips/hitcallback-eventcallback/"><code>hitCallback</code></a> method to decorate the iframe properly with cross-domain tracking parameters, to ensure that any tracking that takes place within is attributed to the original session (and user).</p>
-<h2 id="quick-note-on-sub-domain-tracking">Quick note on SUB-domain tracking</h2>
+
+                <span class="simmer">
+  <span class="close">X</span>
+  <p>
+    <span class="fa fa-md fa-bell"></span>
+    <strong>The Simmer Newsletter</strong>
+  </p>
+  <p>
+    Subscribe to the <a href="https://www.simoahava.com/newsletter/">Simmer newsletter</a> to get the latest news and content from Simo Ahava into your email inbox!
+  </p>
+  </span>
+
+                
+                  <h2 id="quick-note-on-sub-domain-tracking">Quick note on SUB-domain tracking</h2>
 <p>Remember, cross-domain tracking applies <strong>only to separate parent domains</strong>. If you want to track traffic across sub-domains, you <em>don&rsquo;t need cross-domain tracking</em>. Instead, you just need the <code>cookieDomain</code> field set in your Tags and you&rsquo;re good to go. Luckily some visionary has already written a <a href="https://www.simoahava.com/analytics/cross-domain-tracking-across-subdomains/">simple guide</a> about this.</p>
-<h2 id="custom-javascript-variable">Custom JavaScript Variable</h2>
+
+                
+                  <h2 id="custom-javascript-variable">Custom JavaScript Variable</h2>
 <p>To make it all work, all you&rsquo;ll need is a Custom JavaScript Variable. Well, and a simple tweak to your Page View Tag. And some testing. And good luck. But anyway, the Custom JavaScript Variable is what patches everything together.</p>
 <p>We&rsquo;ll use the Variable in the <code>hitCallback</code> field of the very first Tag that fires on your site (should be the Page View Tag). This callback function will reload any iframe of your choice with linker parameters, meaning the Tags in the iframe will run nicely as part of the ongoing session.</p>
 <p><strong>Linker parameter</strong> is basically your browser&rsquo;s unique client ID (with some other stuff), attached as a query parameter to the iframe <code>src</code> value. This is then picked up by the tracker in the iframe and used to recreate the <strong>_ga</strong> cookie in the iframe. That&rsquo;s how Google Analytics&rsquo; cross-domain hack works!</p>
@@ -419,7 +446,9 @@
 
 
 <p>There we go! We have now successfully set the stage for one of nature&rsquo;s most spectacular ev&hellip; Sorry, been watching too much Planet Earth.</p>
-<h2 id="what-will-happen">What will happen</h2>
+
+                
+                  <h2 id="what-will-happen">What will happen</h2>
 <p>Here&rsquo;s the process of what happens when you next browse the site:</p>
 <ol>
 <li>
@@ -435,7 +464,9 @@
 <p>The iframe will reload (because its <code>src</code> value changed) with the cross-domain tracking parameters</p>
 </li>
 </ol>
-<h2 id="what-else-youll-need">What else you&rsquo;ll need</h2>
+
+                
+                  <h2 id="what-else-youll-need">What else you&rsquo;ll need</h2>
 <p>Now, any Tags firing in the iframe should have the <strong>allowLinker : true</strong> field set. You can find instructions for this in the <a href="https://www.bounteous.com/insights/2015/06/16/cross-domain-tracking-with-google-tag-manager/">Bounteous guide</a>, for example. This simple little field will ensure that the Universal Analytics library looks for cross-domain tracking parameters in the URL, and uses them to set up the tracker in the iframe.</p>
 <p>In other words, we&rsquo;ve circumvented the crippling effect of same-origin policy on cookie sharing by, well, sharing a cookie <em>value</em> as a URL parameter. The wonderfully robust Universal Analytics library takes care of the rest.</p>
 <p>Also, you will want to <strong>defer</strong> the Page View Tag from firing on the landing page of the iframe. Why? Because if you didn&rsquo;t, the iframe might send a Page View when it&rsquo;s first loaded, and then again when the iframe is reloaded with the hack. By preventing the iframe from firing on any page whose referrer is <em>not</em> the iframe URL <strong>and</strong> <a href="https://www.simoahava.com/gtm-tips/prevent-tag-from-firing-in-iframe/">when the page is in an iframe</a>, you&rsquo;ll prevent double- or triple-counting your page views in the iframe. For subsequent page views you&rsquo;d want to fire the Tag, because it reflects actual browsing behavior.</p>
@@ -444,13 +475,17 @@
 <p>If you have a situation where the iframe isn&rsquo;t in the DOM in time, you might also need to add a <code>setTimeout</code> in the <code>hitCallback</code> to allow time for the DOM to complete. However, this is very rare in my experience.</p>
 <p>Anyway, working with iframes is quite difficult, as you can probably guess. Lots of things to pay attention to.</p>
 <p>That was a perfect segue to the final chapter and a well-deserved rant.</p>
-<h2 id="summary">Summary</h2>
+
+                
+                  <h2 id="summary">Summary</h2>
 <p>This was a rather simple guide for setting up iframe tracking with cross-domain parameters. Let me be clear and on-the-record about something:</p>
 <p><strong>IFRAMES SUCK!</strong></p>
 <p>They are horrible, Lovecraftian subterranean beings of horror that crawl from the nether pits of darkness after the tolling of the midnight bell. They are playground bullies; entitled little brats that wreak havoc on innocent markup. They are artefacts of human laziness, true examples of <a href="https://en.wikipedia.org/wiki/Conway%27s_law">Conway&rsquo;s Law</a> in motion. They are, in essence, untrackable little shit-monsters that exist in the void between websites, accountable to none and hazardous to all.</p>
 <p>I can personally attribute some 45% of my hair loss to working with iframes, and they have ruined my day far too many times to call it coincidence.</p>
 <p>If you are forced to work with iframes, cross-domain tracking might be the least of your worries.</p>
 
+                
+              
               
 
             </div>
@@ -705,7 +740,9 @@
 
 <script src="https://cdn.commento.io/js/count.js"></script>
 
-
+    <script>
+      !function(){var e=document.querySelector(".simmer"),t=document.querySelector(".simmer .close"),o=window.sessionStorage&&window.sessionStorage.getItem("nosimmer");if(e){if(o){e.style.display="none"}t.addEventListener("click",function(){window.sessionStorage.setItem("nosimmer","true"),e.style.display="none"})}}();
+    </script>
     <script>
       var mylazyload = new LazyLoad({elements_selector: '.lazy'});
       </script>

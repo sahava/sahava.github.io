@@ -206,6 +206,16 @@
     </a>
   </li>
 
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
 
     </ul>
     <ul class="sidebar-buttons">
@@ -260,20 +270,20 @@
     </a>
   </li>
 
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/newsletter/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bell"></i>
+      
+      <span class="sidebar-button-desc">Newsletter</span>
+    </a>
+  </li>
+
 
     </ul>
     <ul class="sidebar-buttons">
       
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
-      
-      <span class="sidebar-button-desc">RSS</span>
-    </a>
-  </li>
-
 
     </ul>
   </div>
@@ -329,12 +339,27 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              <p>Single-page sites (or single-page apps) typically have just one page load. When navigating the site, subsequent content is either uncovered from the DOM, where it&rsquo;s been in a hidden state, or loaded from the server using HTTP requests that do not invoke a new page refresh. This behavior, however, has some implications for <a href="https://analytics.google.com/">Google Analytics</a> tracking, especially when configured via <a href="https://tagmanager.google.com/">Google Tag Manager</a>.</p>
+	      
+                
+  	        <p>Single-page sites (or single-page apps) typically have just one page load. When navigating the site, subsequent content is either uncovered from the DOM, where it&rsquo;s been in a hidden state, or loaded from the server using HTTP requests that do not invoke a new page refresh. This behavior, however, has some implications for <a href="https://analytics.google.com/">Google Analytics</a> tracking, especially when configured via <a href="https://tagmanager.google.com/">Google Tag Manager</a>.</p>
 <p>The crux of the problem is this: When you create a <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/creating-trackers">Google Analytics tracker</a>, the URL of the page (without a possible #hash) from when the tracker was created is sent as the value of the <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/field-reference#location">Document Location</a> field with every hit that uses this tracker. This is used for a number of things, most significantly attributing the session to the campaign specified by URL parameters such as <code>gclid</code> (AdWords) or <code>utm_source, utm_medium</code>.</p>
 <p>Now, on single-page sites you send &ldquo;virtual&rdquo; pageviews whenever new content is loaded from the server. The reason this works fine with on-page GA is because you&rsquo;re always using the same tracker object to send the hits. Google even recommends this in their <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/single-page-applications">developer guide</a>. Thus the Document Location field stays the same, and campaigns are attributed correctly.</p>
 <p>With Google Tag Manager, every single Universal Analytics Tag that fires on the site creates a new, unique tracker object. This means that the Document Location field is updated with every Tag you fire, which is a problem if the URL changes due to browser history manipulation. Thus you can end up with a situation where the first Universal Analytics Tag has <code>gclid</code> in the URL, attributing the session to AdWords, but the next pageview doesn&rsquo;t have this in the URL anymore, as you would not include it in the &ldquo;virtual&rdquo; pageview path names. Instead, since <code>gclid</code> is no longer in the URL, GA looks at the <em>HTTP referrer</em> of the page to see what the previous page was for attribution. It finds <code>google.com</code>, as you came from the search engine (HTTP referrer is not updated when manipulating the URL with the browser History API). Thus a new session starts with attribution to Google Organic! I&rsquo;ve dubbed this as the <em>Rogue Referral</em> problem.</p>
 <p>There are ways to combat this. David Vallejo&rsquo;s written a <a href="https://www.thyngster.com/tips-to-track-an-ajax-based-website-using-gtm-and-universal-analytics/">great article on setting the Tracker Name</a> in your GTM Tags. This will effectively work like on-page GA, maintaining the initial value of Document Location throughout the page load. However, there are some <a href="https://www.simoahava.com/gtm-tips/be-careful-with-the-tracker-name-setting/">risks with the tracker name setting</a>, so I wanted to offer an alternative.</p>
-<h2 id="tip-51-manually-set-document-location-to-prevent-rogue-referrals">Tip 51: Manually Set Document Location To Prevent Rogue Referrals</h2>
+
+                <span class="simmer">
+  <span class="close">X</span>
+  <p>
+    <span class="fa fa-md fa-bell"></span>
+    <strong>The Simmer Newsletter</strong>
+  </p>
+  <p>
+    Subscribe to the <a href="https://www.simoahava.com/newsletter/">Simmer newsletter</a> to get the latest news and content from Simo Ahava into your email inbox!
+  </p>
+  </span>
+
+                
+                  <h2 id="tip-51-manually-set-document-location-to-prevent-rogue-referrals">Tip 51: Manually Set Document Location To Prevent Rogue Referrals</h2>
 
 
 
@@ -391,17 +416,23 @@
 
 
 <p>That way the original URL is stored into <code>dataLayer</code> before the Page View Tag fires, and is thus available for all the Universal Analytics tags that fire on the page.</p>
-<h2 id="caveat">Caveat</h2>
+
+                
+                  <h2 id="caveat">Caveat</h2>
 <p>If you&rsquo;re pushing the <code>originalLocation</code> via GTM and not the page template, there might be a race condition between when the <code>originalLocation</code> variable is pushed into <code>dataLayer</code>, and when Tags try to access it. In these cases, analytics.js does <em>not</em> default to the current URL, resulting in a <strong>missing Document Location field</strong>! To fix this, instead of adding <code>{{Data Layer Variable - originalLocation}}</code> directly to the <strong>location</strong> field in your GA Tags, you might want to add a Custom JavaScript Variable instead:</p>
 <div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() {
   <span style="color:#00a">return</span> {{Data Layer Variable - originalLocation}} || <span style="color:#0aa">window</span>.location.protocol + <span style="color:#a50">&#39;//&#39;</span> + <span style="color:#0aa">window</span>.location.hostname + <span style="color:#0aa">window</span>.location.pathname + <span style="color:#0aa">window</span>.location.search;
 }
 </code></pre></div>
 <p>This returns either <code>{{Data Layer Variable - originalLocation}}</code> or, if that hasn&rsquo;t been set yet, the current URL without hash.</p>
-<h2 id="summary">Summary</h2>
+
+                
+                  <h2 id="summary">Summary</h2>
 <p>If you have a single-page site and you&rsquo;re sending &ldquo;virtual&rdquo; pageviews, you might want to check if you have the rogue referral problem. A quick way to identify it is to use the new <a href="https://support.google.com/analytics/answer/6339208?hl=en">User Explorer</a> reports, looking for sessions which start with an AdWords hit, but then quickly turn into a new session with Google Organic as the campaign.</p>
 <p>Actually, if you&rsquo;re using Google Tag Manager and you&rsquo;re sending virtual pageviews, you will most certainly suffer from the rogue referral problem, unless you&rsquo;ve set the Tracker Name or the Document Location as instructed in this guide.</p>
 
+                
+              
               
 
             </div>
@@ -658,7 +689,9 @@
 
 <script src="https://cdn.commento.io/js/count.js"></script>
 
-
+    <script>
+      !function(){var e=document.querySelector(".simmer"),t=document.querySelector(".simmer .close"),o=window.sessionStorage&&window.sessionStorage.getItem("nosimmer");if(e){if(o){e.style.display="none"}t.addEventListener("click",function(){window.sessionStorage.setItem("nosimmer","true"),e.style.display="none"})}}();
+    </script>
     <script>
       var mylazyload = new LazyLoad({elements_selector: '.lazy'});
       </script>

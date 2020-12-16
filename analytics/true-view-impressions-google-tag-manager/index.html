@@ -206,6 +206,16 @@
     </a>
   </li>
 
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
 
     </ul>
     <ul class="sidebar-buttons">
@@ -260,20 +270,20 @@
     </a>
   </li>
 
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/newsletter/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bell"></i>
+      
+      <span class="sidebar-button-desc">Newsletter</span>
+    </a>
+  </li>
+
 
     </ul>
     <ul class="sidebar-buttons">
       
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
-      
-      <span class="sidebar-button-desc">RSS</span>
-    </a>
-  </li>
-
 
     </ul>
   </div>
@@ -329,7 +339,9 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              <blockquote>
+	      
+                
+  	        <blockquote>
 <p><strong>Last updated 9 October 2020</strong>: <code>customTask</code> updated to a more stable version.</p>
 </blockquote>
 <p>I&rsquo;m a big fan of <a href="https://www.simoahava.com/analytics/enhanced-ecommerce-guide-for-google-tag-manager/">Enhanced Ecommerce</a> in <a href="https://analytics.google.com/">Google Analytics</a>. In fact, I think it&rsquo;s the <strong>only</strong> valid way to deploy Ecommerce tracking today, especially when using <a href="https://tagmanager.google.com/">Google Tag Manager</a>. The ability to use a <a href="https://www.simoahava.com/analytics/enhanced-ecommerce-guide-for-google-tag-manager/#send-the-data-to-google-analytics-using-a-custom-javascript-variable">Custom JavaScript variable</a> and the possibility to tackle the <em>full</em> ecommerce funnel are some of the benefits of using Enhanced Ecommerce.</p>
@@ -393,7 +405,20 @@
     <li><a href="#final-words">Final words</a></li>
   </ul>
 </nav></div>
-<h2 id="how-it-works">How it works</h2>
+
+                <span class="simmer">
+  <span class="close">X</span>
+  <p>
+    <span class="fa fa-md fa-bell"></span>
+    <strong>The Simmer Newsletter</strong>
+  </p>
+  <p>
+    Subscribe to the <a href="https://www.simoahava.com/newsletter/">Simmer newsletter</a> to get the latest news and content from Simo Ahava into your email inbox!
+  </p>
+  </span>
+
+                
+                  <h2 id="how-it-works">How it works</h2>
 <p>The solution relies on the <a href="https://www.simoahava.com/analytics/element-visibility-trigger-google-tag-manager/"><strong>Element Visibility trigger</strong></a> to identify impressions in the viewport and push them into a <strong>batch queue</strong>. A <a href="https://www.simoahava.com/gtm-tips/timer-trigger/"><strong>Timer trigger</strong></a> is also used to purge the batch queue in case the user is inactive. Finally, if a user <strong>clicks</strong> on an impression, all the items in the batch queue are sent, as are they if the user leaves the page.</p>
 <p>A <strong>batch queue</strong> is what we&rsquo;ll use to group the viewed impressions together into units of certain size, so that the request to GA is neither too crowded (risking going past the payload length limit) or too sparse (risking having too many hits in the session).</p>
 
@@ -437,7 +462,9 @@
 </ol>
 <p>The end result is that as impressions are viewed by the visitor, items are added to the batch queue and sent whenever the queue fills up. There are safeguards (timer, <code>beforeunload</code>) which ensure that items are never forgotten in the queue.</p>
 <p>It&rsquo;s not trivial to set up, so let&rsquo;s get to it.</p>
-<h2 id="what-you-need">What you need</h2>
+
+                
+                  <h2 id="what-you-need">What you need</h2>
 <p>First of all, you need a fairly solid understanding of what Enhanced Ecommerce impressions are, how they are (traditionally) tracked, and how they appear in your GA reports. This guide will <strong>not</strong> go over the basics. Check out my <a href="https://www.simoahava.com/analytics/enhanced-ecommerce-guide-for-google-tag-manager/">Enhanced Ecommerce guide</a>, as well as Google&rsquo;s <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/enhanced-ecommerce">official support documentation</a> for more information.</p>
 <p>For the solution to work &ldquo;out-of-the-box&rdquo;, you will need a <strong>properly formatted</strong> <code>ecommerce.impressions</code> object in the <code>dataLayer</code> deployed into the page template preferably <strong>before the GTM container snippet</strong>. This is what you should already have if you&rsquo;ve implemented Enhanced Ecommerce impressions <a href="https://developers.google.com/tag-manager/enhanced-ecommerce#product-impressions">by the book</a>.</p>
 
@@ -475,7 +502,9 @@
 <p>As you can see, the value in <code>data-productid</code> corresponds with the individual <code>id</code> values in the <code>ecommerce.impressions</code> object.</p>
 <p>You could add these dynamically using a Custom HTML tag and some DOM manipulation magic, but I do recommend doing this <strong>correctly</strong> from the start. Adding the attributes directly into template code prevent any race conditions from emerging, such as the Element Visibility trigger not identifying the items to which you dynamically added the new attributes.</p>
 <p>Once you have the <code>dataLayer</code> object and the data attributes in place, you can get to work on the Google Tag Manager tags, triggers, and variables.</p>
-<h2 id="create-the-variables">Create the variables</h2>
+
+                
+                  <h2 id="create-the-variables">Create the variables</h2>
 <p>We&rsquo;re going to need a handful of variables. Two <strong>Lookup Table</strong> variables will handle some of the event tag logic. A <strong>Custom JavaScript</strong> variable for the <code>customTask</code> will be where most of the magic happens. Then, we&rsquo;ll also need a <strong>Custom JavaScript</strong> variable to handle the Enhanced Ecommerce object compilation.</p>
 <p>There are many moving parts here, so let&rsquo;s get to work.</p>
 <h3 id="lookup---get-impression-label">{{Lookup - Get Impression Label}}</h3>
@@ -685,7 +714,9 @@
 </code></pre></div>
 <p>As you can see, you&rsquo;ll need to configure the <strong>exact</strong> same settings (<code>maxBatch</code>, <code>batchVariableName</code>, <code>productIdAttribute</code>) in the beginning of this script as you had to in the <a href="https://www.simoahava.com/analytics/true-view-impressions-google-tag-manager/#js-function-true-view-impression-handler">previous Custom JavaScript variable</a>. It&rsquo;s important that these match <strong>exactly</strong> to the settings you configured earlier, so double-check to make sure they are the same.</p>
 <p>Other than that, the purpose of the JavaScript is to compile the impression product IDs in the batch queue to the corresponding Enhanced Ecommerce objects. If the event was a click, then the impression that was clicked will be sent as the Product Click target.</p>
-<h2 id="create-the-triggers">Create the triggers</h2>
+
+                
+                  <h2 id="create-the-triggers">Create the triggers</h2>
 <p>We&rsquo;ll need a whopping <strong>four</strong> triggers all attached to the tag.</p>
 <p>An <strong>Element Visibility</strong> trigger will handle building the batch queue from product impression views.</p>
 <p>A <strong>Custom Event</strong> trigger will fire the tag when the user is trying to leave the page.</p>
@@ -766,7 +797,9 @@
 </div>
 
 
-<h2 id="create-the-tag">Create the tag</h2>
+
+                
+                  <h2 id="create-the-tag">Create the tag</h2>
 <p>Finally, the tag itself. Now that you have all the necessary variables and triggers created, it&rsquo;s just a question of putting them all together in the tag.</p>
 <p>Feel free to modify what you send with <strong>Event Category</strong>, <strong>Event Action</strong>, and <strong>Event Label</strong>.</p>
 <p>Make sure you have the <code>transport</code> field set to <code>beacon</code>, since you&rsquo;ll want those <code>beforeunload</code> hits to be sent <a href="https://www.simoahava.com/analytics/fire-trigger-when-user-about-to-leave-page/#set-the-transport-field-in-google-analytics-tags">even if the page has already been unloaded</a>.</p>
@@ -837,7 +870,9 @@
 
 
 <p>And you&rsquo;re all set! Then it&rsquo;s time to test things out.</p>
-<h2 id="how-to-test">How to test</h2>
+
+                
+                  <h2 id="how-to-test">How to test</h2>
 <p>It&rsquo;s important <strong>not</strong> to rely on Google Tag Manager&rsquo;s debug mode to test this out. Why? Because even if it says that a Google Analytics tag has fired, it&rsquo;s <code>customTask</code> that governs whether the request was completed or not.</p>
 <p>So, I recommend you install David Vallejo&rsquo;s excellent <a href="https://chrome.google.com/webstore/detail/gtmga-debug/ilnpmccnfdjdjjikgkefkcegefikecdc?hl=en">GTM/GA Debug</a> extension. It shows you what hits are actually sent to Google Analytics, and it has an excellent Enhanced Ecommerce tab for seeing exactly what impressions are dispatched.</p>
 <h3 id="test-the-batch-queue-first">Test the batch queue first</h3>
@@ -912,13 +947,17 @@
 </div>
 
 
-<h2 id="final-words">Final words</h2>
+
+                
+                  <h2 id="final-words">Final words</h2>
 <p>This is a fairly simple implementation. The &ldquo;catch&rdquo; is that it doesn&rsquo;t use a Custom HTML tag. Everything is handled through a single Universal Analytics tag, utilizing the power of <code>customTask</code> to get the work done.</p>
 <p>It&rsquo;s not perfect. Without a Custom HTML tag, you&rsquo;ll need to use the default Timer trigger which leaves a lot to be desired. For example, optimally I&rsquo;d want to create a custom timer that would let me reset it whenever the batch queue is cleared and the first new item is added. That way the timer would not fire needlessly on the page. This isn&rsquo;t really doable in the <code>customTask</code> - you would need a Custom HTML tag to do it.</p>
 <p>And why not use a Custom HTML tag? For one, this is a fun exercise to do. The other reason is that GTM has a fairly robust thing going on with the Element Visibility trigger, and I want to make use of it without polluting the page with numerous Custom HTML tags; one for every product impression found by the Element Visibility trigger.</p>
 <p>Some might also consider the prerequisites unreasonable. Being forced to have an Enhanced Ecommerce <code>dataLayer</code> object AND the HTML elements decorated with custom data attributes might seem like too much work. It&rsquo;s a lot of work, but not <strong>too much</strong> work. Tracking impressions reliably by utilizing the Element Visibility trigger requires a strong link between the items on the page and those in the <code>dataLayer</code>. You could build your own custom system to support DOM scraping and custom <code>dataLayer</code> object compositions, but I&rsquo;ll leave that to your capable hands.</p>
 <p>Anyway, I hope you found this guide inspiring. Let me know in the comments what you think!</p>
 
+                
+              
               
 
             </div>
@@ -1171,7 +1210,9 @@
 
 <script src="https://cdn.commento.io/js/count.js"></script>
 
-
+    <script>
+      !function(){var e=document.querySelector(".simmer"),t=document.querySelector(".simmer .close"),o=window.sessionStorage&&window.sessionStorage.getItem("nosimmer");if(e){if(o){e.style.display="none"}t.addEventListener("click",function(){window.sessionStorage.setItem("nosimmer","true"),e.style.display="none"})}}();
+    </script>
     <script>
       var mylazyload = new LazyLoad({elements_selector: '.lazy'});
       </script>

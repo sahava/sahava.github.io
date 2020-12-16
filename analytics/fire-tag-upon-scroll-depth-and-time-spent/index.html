@@ -206,6 +206,16 @@
     </a>
   </li>
 
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
 
     </ul>
     <ul class="sidebar-buttons">
@@ -260,20 +270,20 @@
     </a>
   </li>
 
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/newsletter/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bell"></i>
+      
+      <span class="sidebar-button-desc">Newsletter</span>
+    </a>
+  </li>
+
 
     </ul>
     <ul class="sidebar-buttons">
       
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
-      
-      <span class="sidebar-button-desc">RSS</span>
-    </a>
-  </li>
-
 
     </ul>
   </div>
@@ -329,7 +339,9 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              <p>Over 5 years ago, I wrote an article titled <a href="https://www.simoahava.com/analytics/track-adjusted-bounce-rate-universal-analytics/">Track Adjusted Bounce Rate In Universal Analytics</a>. It basically explored a number of different methods to tweak the Bounce Rate metric so that it becomes more meaningful in your <a href="https://analytics.google.com/">Google Analytics</a> reports.</p>
+	      
+                
+  	        <p>Over 5 years ago, I wrote an article titled <a href="https://www.simoahava.com/analytics/track-adjusted-bounce-rate-universal-analytics/">Track Adjusted Bounce Rate In Universal Analytics</a>. It basically explored a number of different methods to tweak the Bounce Rate metric so that it becomes more meaningful in your <a href="https://analytics.google.com/">Google Analytics</a> reports.</p>
 <p>Now, writing that article wasn&rsquo;t necessarily my proudest moment. It&rsquo;s not because the solution was poor, but rather because I was suggesting it makes sense to <strong>tweak a metric</strong>. The concept of &ldquo;adjusted Bounce Rate&rdquo; sounds like the analyst is fixing a metric to be more beneficial to their cause, rather than fixing the business problem that caused the metric to be poor in the first place.</p>
 <p>Anyway, the combination of time spent and scroll depth reached is great for evaluating content digestion, and in some cases it might even make sense to use this combination to make Bounce Rate more meaningful.</p>
 
@@ -348,12 +360,27 @@
 
 
 <p>With the introduction of the <a href="https://www.simoahava.com/gtm-tips/timer-trigger/">Timer trigger</a> and the <a href="https://www.simoahava.com/analytics/scroll-depth-trigger-google-tag-manager/">Scroll Depth trigger</a>, we now have a more elegant way of implementing the combination of time spent and scroll threshold reached using <a href="https://www.simoahava.com/analytics/scroll-depth-trigger-google-tag-manager/">Google Tag Manager</a>. In this article, I&rsquo;ll show you how to do it.</p>
-<h2 id="the-logic">The logic</h2>
+
+                <span class="simmer">
+  <span class="close">X</span>
+  <p>
+    <span class="fa fa-md fa-bell"></span>
+    <strong>The Simmer Newsletter</strong>
+  </p>
+  <p>
+    Subscribe to the <a href="https://www.simoahava.com/newsletter/">Simmer newsletter</a> to get the latest news and content from Simo Ahava into your email inbox!
+  </p>
+  </span>
+
+                
+                  <h2 id="the-logic">The logic</h2>
 <p>The idea is simple. Knowing that in GTM, multiple triggers attached to a tag follow OR-logic, we can add both a Scroll Depth trigger and a Timer trigger to the tag, but establish a dependency between these two triggers so that the tag doesn&rsquo;t execute until both of the triggers have fired.</p>
 <p>Basically, in the <strong>Scroll Depth trigger</strong>, we also check whether the Timer trigger has fired, by querying if <code>gtm.timerInterval</code> has been pushed into <code>dataLayer</code> with a value that equals the interval we set for the Timer trigger.</p>
 <p>Conversely, in the <strong>Timer trigger</strong>, we check if <code>gtm.scrollDepthThreshold</code> has been pushed into <code>dataLayer</code> with the threshold we are waiting for the user to scroll past.</p>
 <p>In other words, the tag will not execute until both of these triggers have fired.</p>
-<h2 id="create-the-variables">Create the variables</h2>
+
+                
+                  <h2 id="create-the-variables">Create the variables</h2>
 <p>For this, you&rsquo;ll first need to activate the <strong>Scroll Depth Threshold</strong> Built-in variable by browsing to <strong>Variables</strong> in the GTM user interface, and then clicking the red <strong>CONFIGURE</strong> button under the Built-in Variables heading.</p>
 <p>In the overlay that opens, check the box next to Scroll Depth Threshold, like so:</p>
 
@@ -388,7 +415,9 @@
 
 
 <p>And that&rsquo;s it for the variables you&rsquo;ll need for this guide.</p>
-<h2 id="create-the-triggers">Create the triggers</h2>
+
+                
+                  <h2 id="create-the-triggers">Create the triggers</h2>
 <p>You&rsquo;ll need two triggers for this. First, a <strong>Scroll Depth trigger</strong>, where you establish the scroll depth threshold you want the user to scroll past for it to count as engagement. Second, a <strong>Timer trigger</strong>, where you establish the minimum amount of time the user needs to spend on the page for it to count as engagement.</p>
 <p>Remember, it&rsquo;s the combination of these two that will fire your tag.</p>
 <p>For example, I&rsquo;m going to set the scroll depth requirement to <strong>50 percent scrolled</strong>, and I only want to fire the trigger on my article pages. In addition to this, I want the user to spend a minimum of <strong>30 seconds</strong> on the page for the combination to count as engagement.</p>
@@ -431,7 +460,9 @@
 <p>As you can see, the Timer has a <strong>Limit</strong> of <code>1</code> (i.e. it will only fire once), and an <strong>Interval</strong> of <code>30000</code> (i.e. it will fire 30 seconds after it was activated).</p>
 <p>The <strong>Fire this trigger when&hellip;</strong> condition for the Timer trigger is similar to the logic of the Scroll Depth trigger. When the Timer trigger fires, it will <strong>not</strong> fire any tags to which it is attached, unless a Scroll Depth trigger has laready fired with a scroll threshold of <code>50</code> (the percentage I configured in the Scroll Depth trigger).</p>
 <p>Now, let&rsquo;s add these two triggers to a tag, and perhaps the logic will become clearer.</p>
-<h2 id="finalizing-the-setup">Finalizing the setup</h2>
+
+                
+                  <h2 id="finalizing-the-setup">Finalizing the setup</h2>
 <p>Create a new Google Analytics Event tag (or whatever tag you want to fire when this engagement is recorded), and add both of the two triggers you created to that tag, like so:</p>
 
 
@@ -452,7 +483,9 @@
 <p>However, in both of these two triggers, you&rsquo;ve set the condition that the trigger <strong>will not fire the tag</strong> until the other trigger has already triggered.</p>
 <p>In other words, the tag will <strong>not</strong> fire until <strong>both</strong> triggers have fired, which means it will fire for the <strong>last of the two</strong> that fires on the page.</p>
 <p>Clear? Good.</p>
-<h2 id="preview-it">Preview it!</h2>
+
+                
+                  <h2 id="preview-it">Preview it!</h2>
 <p>Here&rsquo;s what it looks like in Preview mode.</p>
 
 
@@ -471,11 +504,15 @@
 
 <p>The Preview mode output is easy to interpret. The tag has only fired once on the page, even though it had two triggers. When the <code>gtm.scrollDepth</code> event was pushed into <code>dataLayer</code>, the tag did <strong>not</strong> fire, because the <code>gtm.timer</code> even hadn&rsquo;t happened yet.</p>
 <p>Finally, after 30 seconds, the <code>gtm.timer</code> event is pushed into <code>dataLayer</code>, the trigger finds that the Scroll Depth threshold had already been passed a long time ago, and thus the tag fires.</p>
-<h2 id="summary">Summary</h2>
+
+                
+                  <h2 id="summary">Summary</h2>
 <p>I hope this trick proves useful. It&rsquo;s a great way to understand better how GTM&rsquo;s triggers can work in unison.</p>
 <p>I still wouldn&rsquo;t hinge my entire content engagement measurement plan around this (there are <a href="https://www.simoahava.com/analytics/track-content-engagement-part-2/">far more useful ways to measure engagement</a>), but it can definitely be a great way to make your Scroll depth trigger more meaningful (or, conversely, your Timer trigger more useful).</p>
 <p>What do you think of this solution? Do you have suggestions for how to improve it? Sound off in the comments, please!</p>
 
+                
+              
               
 
             </div>
@@ -730,7 +767,9 @@
 
 <script src="https://cdn.commento.io/js/count.js"></script>
 
-
+    <script>
+      !function(){var e=document.querySelector(".simmer"),t=document.querySelector(".simmer .close"),o=window.sessionStorage&&window.sessionStorage.getItem("nosimmer");if(e){if(o){e.style.display="none"}t.addEventListener("click",function(){window.sessionStorage.setItem("nosimmer","true"),e.style.display="none"})}}();
+    </script>
     <script>
       var mylazyload = new LazyLoad({elements_selector: '.lazy'});
       </script>

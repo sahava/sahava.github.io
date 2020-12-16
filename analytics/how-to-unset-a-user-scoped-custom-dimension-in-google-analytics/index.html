@@ -206,6 +206,16 @@
     </a>
   </li>
 
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
 
     </ul>
     <ul class="sidebar-buttons">
@@ -260,20 +270,20 @@
     </a>
   </li>
 
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/newsletter/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bell"></i>
+      
+      <span class="sidebar-button-desc">Newsletter</span>
+    </a>
+  </li>
+
 
     </ul>
     <ul class="sidebar-buttons">
       
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
-      
-      <span class="sidebar-button-desc">RSS</span>
-    </a>
-  </li>
-
 
     </ul>
   </div>
@@ -329,7 +339,9 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              <p><strong>Scope</strong> in <a href="https://analytics.google.com/">Google Analytics&rsquo;</a> Custom Dimensions refers to how the value in the Custom Dimension is extended to all hits in the same scope.</p>
+	      
+                
+  	        <p><strong>Scope</strong> in <a href="https://analytics.google.com/">Google Analytics&rsquo;</a> Custom Dimensions refers to how the value in the Custom Dimension is extended to all hits in the same scope.</p>
 <p><strong>Hit</strong>- and <strong>product</strong>-scoped Custom Dimensions apply to the given hit alone - they are not extended to any other hits in the session or by the same user.</p>
 <p><strong>Session</strong>-scoped Custom Dimensions apply the <em>last</em> value sent during the session to <em>all</em> the hits in that session.</p>
 <p><strong>User</strong>-scoped Custom Dimensions apply the <em>last</em> value set during the session to <em>all</em> the hits in the session <strong>AND</strong> to all future hits by the same client until a new value is sent.</p>
@@ -353,7 +365,20 @@
 <p>I ran into this problem while looking at some erratic client data. For some reason, it looked like a user-scoped Custom Dimension that was set in one session was no longer available at a later session. In the image above, you can see what this looks like.</p>
 <p>The data is from one single user who had two successive sessions, some four hours apart. The first session, at 10:49, had two screen views, and you could query this data with the user-scoped Custom Dimension, returning the value <code>b</code>.</p>
 <p>Then, in the latter session with just one screen view, you could no longer query this user-scoped Custom Dimension.</p>
-<h2 id="how-to-send-a-parameter-without-a-value">How to send a parameter without a value</h2>
+
+                <span class="simmer">
+  <span class="close">X</span>
+  <p>
+    <span class="fa fa-md fa-bell"></span>
+    <strong>The Simmer Newsletter</strong>
+  </p>
+  <p>
+    Subscribe to the <a href="https://www.simoahava.com/newsletter/">Simmer newsletter</a> to get the latest news and content from Simo Ahava into your email inbox!
+  </p>
+  </span>
+
+                
+                  <h2 id="how-to-send-a-parameter-without-a-value">How to send a parameter without a value</h2>
 <p>If you&rsquo;re using <strong>Measurement Protocol</strong>, you can easily reproduce this. All you have to do is copy an existing hit from your website, which includes a user-scoped Custom Dimension, and resend it by replacing the Custom Dimension value with nothing.</p>
 <p>Let&rsquo;s say the request originally had these parameters:</p>
 <p><code>&amp;cd5=page&amp;cd6=logged-in&amp;cd7=this-user-id&amp;cd8=hello</code></p>
@@ -378,7 +403,9 @@
 
 
 <p>As you can see, there&rsquo;s a bunch of Custom Dimension indices with empty strings as their values. If any one of these corresponds with a user-scoped or session-scoped Custom Dimension, it would reset any previous value this field had.</p>
-<h2 id="where-the-problem-lies">Where the problem lies</h2>
+
+                
+                  <h2 id="where-the-problem-lies">Where the problem lies</h2>
 <p>Naturally, most people will be using GTM and GA for the web, so this problem will never manifest.</p>
 <p>However, <a href="https://tagmanager.google.com/">Google Tag Manager&rsquo;s</a> legacy SDKs (<a href="https://developers.google.com/tag-manager/ios/v3/">iOS</a> and <a href="https://developers.google.com/tag-manager/android/v4/">Android</a>) have a quirky feature.</p>
 <p>If you&rsquo;ve defined a Data Layer variable in your Google Analytics tag, and that Data Layer key is not populated with a value when the tag fires, then the SDK will automatically send the parameter without a value, thus <strong>nulling any user- or session-scoped Custom Dimensions that receive these empty parameters</strong>.</p>
@@ -400,7 +427,9 @@
 <p>Here you can see an example of what a request to GA looks like when using the normal Universal Analytics tag in the legacy iOS SDK. As you can see, there&rsquo;s a bunch of Custom Dimensions (circled in red) which do not have any value. These are dimensions that had no value in <code>TAGDataLayer</code> when the hit was dispatched.</p>
 <p>This issue is <strong>not</strong> present in the <a href="https://developers.google.com/tag-manager/ios/v5/">latest GTM SDK (Firebase)</a>, which is a good thing, of course.</p>
 <p>Also, I didn&rsquo;t test if this problem is present if using the native Google Analytics SDK. I would imagine that <strong>it is</strong>, because the legacy GTM SDK uses the <a href="https://developers.google.com/analytics/devguides/collection/ios/v3/sdk-download">Google Analytics Services SDK</a> to dispatch the hits to GA.</p>
-<h2 id="what-this-means">What this means</h2>
+
+                
+                  <h2 id="what-this-means">What this means</h2>
 <p>This has two implications.</p>
 <p><strong>First</strong>, if you&rsquo;re using the <strong>legacy Google Tag Manager SDKs</strong> and most likely the <strong>Google Analytics Service SDK</strong>, too, it&rsquo;s possible that any user-scoped or session-scoped Custom Dimensions will have corrupt data.</p>
 <p>It would be a fair assumption to make that <strong>if the key does not have a value in Data Layer, the key is not included in the hit</strong>, or that <strong>at the very least, a valueless parameter will NOT override a previously set value</strong>, but these assumptions are, based on my findings, <strong>wrong</strong>.</p>
@@ -435,7 +464,9 @@ ga(<span style="color:#a50">&#39;send&#39;</span>, <span style="color:#a50">&#39
   <span style="color:#00a">return</span> <span style="color:#a50">&#39;&#39;</span>;
 }
 </code></pre></div>
-<h2 id="final-thoughts">Final thoughts</h2>
+
+                
+                  <h2 id="final-thoughts">Final thoughts</h2>
 <p>I think it&rsquo;s <strong>good</strong> that we have the option to reset a Custom Dimension value. And yes, I know it&rsquo;s not technically <em>resetting</em> the value, but more about exploiting a feature of the Google Analytics reporting interface which prevents you from querying Custom Dimensions with empty values.</p>
 <p>However, I think it&rsquo;s <strong>bad</strong> that the mobile SDKs (Firebase excluded) are doing this automatically. It&rsquo;s always confusing when Google Tag Manager for apps diverges from how it works on the web, and this is another example of it doing so. Instead of dropping the parameter from the requests if no valid value is found, as it does on the web, the parameter is sent with an empty value.</p>
 <p>I don&rsquo;t expect this to be fixed in the legacy containers, since they are expected to move out of the way of Firebase, and this is certainly yet another reason to upgrade your setup.</p>
@@ -458,6 +489,8 @@ ga(<span style="color:#a50">&#39;send&#39;</span>, <span style="color:#a50">&#39
 <p>In the Google Analytics user interface, I originally found this problem by creating a segment where I include users that have a valid value for a user-scoped Custom Dimension but exclude sessions that don&rsquo;t have a valid value.</p>
 <p>This segment would thus include data from users with sessions that DO have a valid value and sessions that DON&rsquo;T have a valid value. After that, it&rsquo;s a question of using the User Explorer report and drilling down to individual user journeys to see if the valueless sessions came <strong>after</strong> those that had a valid value.</p>
 
+                
+              
               
 
             </div>
@@ -712,7 +745,9 @@ ga(<span style="color:#a50">&#39;send&#39;</span>, <span style="color:#a50">&#39
 
 <script src="https://cdn.commento.io/js/count.js"></script>
 
-
+    <script>
+      !function(){var e=document.querySelector(".simmer"),t=document.querySelector(".simmer .close"),o=window.sessionStorage&&window.sessionStorage.getItem("nosimmer");if(e){if(o){e.style.display="none"}t.addEventListener("click",function(){window.sessionStorage.setItem("nosimmer","true"),e.style.display="none"})}}();
+    </script>
     <script>
       var mylazyload = new LazyLoad({elements_selector: '.lazy'});
       </script>

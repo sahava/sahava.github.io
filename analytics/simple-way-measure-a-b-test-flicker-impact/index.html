@@ -206,6 +206,16 @@
     </a>
   </li>
 
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
 
     </ul>
     <ul class="sidebar-buttons">
@@ -260,20 +270,20 @@
     </a>
   </li>
 
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/newsletter/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bell"></i>
+      
+      <span class="sidebar-button-desc">Newsletter</span>
+    </a>
+  </li>
+
 
     </ul>
     <ul class="sidebar-buttons">
       
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
-      
-      <span class="sidebar-button-desc">RSS</span>
-    </a>
-  </li>
-
 
     </ul>
   </div>
@@ -329,7 +339,9 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              <p>&ldquo;Flickering&rdquo; or &ldquo;Flash Of Original Content&rdquo; (<a href="https://reflectivedata.com/what-is-fooc-flicker-how-to-get-rid-of-it/">FOOC</a>) is a phenomenon where there&rsquo;s a (typically) slight but observable delay in the browser updating the site or element layout if the user is included in a variant group for experimentation. This manifests in the original, unmodified element being rendered in the visible portion of the page before the experiment library updates it with the variant.</p>
+	      
+                
+  	        <p>&ldquo;Flickering&rdquo; or &ldquo;Flash Of Original Content&rdquo; (<a href="https://reflectivedata.com/what-is-fooc-flicker-how-to-get-rid-of-it/">FOOC</a>) is a phenomenon where there&rsquo;s a (typically) slight but observable delay in the browser updating the site or element layout if the user is included in a variant group for experimentation. This manifests in the original, unmodified element being rendered in the visible portion of the page before the experiment library updates it with the variant.</p>
 <p>There are ways to mitigate the flicker:</p>
 <ol>
 <li>Add the A/B testing library directly into the page template and don&rsquo;t load it via some other, asynchronously loaded dependency (e.g. <a href="https://tagmanager.google.com/">Google Tag Manager</a>).</li>
@@ -378,7 +390,20 @@
     <li><a href="#summary">Summary</a></li>
   </ul>
 </nav></div>
-<h2 id="introducing-the-problem">Introducing the problem</h2>
+
+                <span class="simmer">
+  <span class="close">X</span>
+  <p>
+    <span class="fa fa-md fa-bell"></span>
+    <strong>The Simmer Newsletter</strong>
+  </p>
+  <p>
+    Subscribe to the <a href="https://www.simoahava.com/newsletter/">Simmer newsletter</a> to get the latest news and content from Simo Ahava into your email inbox!
+  </p>
+  </span>
+
+                
+                  <h2 id="introducing-the-problem">Introducing the problem</h2>
 <p>With JavaScript-based experimentation libraries, you&rsquo;re subject to the rules and limitations of the page render in the browser. The <strong>flicker</strong> happens because the page with the modified element is being rendered from the page HTML source, but the experimentation library needs to wait for an opening to allow the browser to process the experiment data.</p>
 <p>This is most often a problem when you&rsquo;re running scripts <strong>asynchronously</strong>. Async load means that once the browser starts to download the library, it doesn&rsquo;t wait for the download to complete. Instead, it proceeds with the page render. Once the download is complete, and as soon as the browser has an available slot in its single thread of execution, it will start parsing and executing the JavaScript within the library.</p>
 <p>By moving from asynchronous to synchronous loading, you solve part of this issue. However, it&rsquo;s not like synchronous loading actually fixes anything automatically. Since the library is loaded at the top of <code>&lt;head&gt;</code>, a synchronously loaded library doesn&rsquo;t have access to the elements it&rsquo;s designed to modify (since those elements are created in the <code>&lt;body&gt;</code>, which hasn&rsquo;t yet been generated).</p>
@@ -402,7 +427,9 @@
 <blockquote>
 <p>Considering how crucial page performance and <em>perceived</em> page performance is these days, I steer clear of anti-flicker snippets that hide the entire page. It doesn&rsquo;t matter if there are mitigations in place for ad blockers and download errors. If the endpoint is unresponsive or lags, <a href="https://support.google.com/optimize/answer/7100284?hl=en">Google Optimize&rsquo;s default anti-flicker snippet</a> has the page wait for a maximum of <strong>4 seconds</strong> (this is adjustable) before revealing the content. Naturally, if the container loads before that, the page is revealed faster. But still, OUCH!</p>
 </blockquote>
-<h2 id="measuring-the-impact-of-flicker">Measuring the impact of flicker</h2>
+
+                
+                  <h2 id="measuring-the-impact-of-flicker">Measuring the impact of flicker</h2>
 <p>So, let&rsquo;s assume the situation is as follows:</p>
 <p>You&rsquo;ve got an experiment running that treats a home page element, which is visible above the fold if the page is loaded without a scroll threshold in place.</p>
 <p>You&rsquo;ve deployed Google Optimize using the <a href="https://support.google.com/optimize/answer/7513085?hl=en">new snippet</a>. You&rsquo;ve deployed the <strong>asynchronous</strong> snippet, and you are <strong>not</strong> using the anti-flicker JavaScript, so there&rsquo;s a visible and measurable flicker in place.</p>
@@ -462,7 +489,9 @@
 <blockquote>
 <p>You could just as well calculate the delta directly in the client and send it to, for example, Universal Analytics as an event. This is entirely up to you. I opted for the BigQuery approach - I justify this <a href="#things-to-note">later</a> in the article.</p>
 </blockquote>
-<h2 id="installing-the-optimize-library-and-callback">Installing the Optimize library and callback</h2>
+
+                
+                  <h2 id="installing-the-optimize-library-and-callback">Installing the Optimize library and callback</h2>
 <p>To install the Optimize library, I&rsquo;m adding the <code>&lt;script&gt;</code> element with the <code>async</code> attribute to the top of <code>&lt;head&gt;</code>.</p>
 
 
@@ -499,7 +528,9 @@
 &lt;/<span style="color:#1e90ff;font-weight:bold">html</span>&gt;</code></pre></div>
 <p>Here, we first create the <code>gtag</code> queue (because that&rsquo;s what Optimize uses for its API control). Then, we push a callback in the shape of a gtag event. I&rsquo;m passing an anonymous function to the callback argument. This function references a global object which we&rsquo;ll use to collect the milestones. The only milestone we populate in this callback is <code>experimentLoaded</code>, and we attach the current timestamp to it.</p>
 <p>The callback is invoked as soon as the experiment library has loaded and Optimize has established to which variant the user belongs (and thus which version of the element to show to them).</p>
-<h2 id="installing-the-observer-scripts">Installing the observer scripts</h2>
+
+                
+                  <h2 id="installing-the-observer-scripts">Installing the observer scripts</h2>
 <p>Here&rsquo;s the tricky bit. You need to install <strong>two</strong> observers (a <code>MutationObserver</code> and an <code>IntersectionObserver</code>). The first checks if an element has been added to the page, and the second checks if an element is in the viewport. I&rsquo;ll show you the code first and then explain what it does.</p>
 <div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">body</span>&gt;
   &lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
@@ -629,7 +660,9 @@ intersectionObserver.observe(node);
 <li>Sometimes the user has scrolled beyond the fold, and the <code>baseElementVisible</code> simply does not fire (because the base element is not, well, visible).</li>
 </ul>
 <p>Both of these mean that the flicker is basically a non-issue, so it&rsquo;s OK for me to just collect a <code>null</code> in these cases. I update <code>testState</code> with <code>&quot;baseNotVisible&quot;</code> to make it easier to parse these in the analysis.</p>
-<h2 id="setting-up-the-google-tag-manager-assets">Setting up the Google Tag Manager assets</h2>
+
+                
+                  <h2 id="setting-up-the-google-tag-manager-assets">Setting up the Google Tag Manager assets</h2>
 <p>In GTM, the <strong>trigger</strong> I need looks like this:</p>
 
 
@@ -712,7 +745,9 @@ intersectionObserver.observe(node);
 </div>
 
 
-<h2 id="bigquery-output">BigQuery output</h2>
+
+                
+                  <h2 id="bigquery-output">BigQuery output</h2>
 <p>In BigQuery, our event parameters are added into the <code>event_parameters</code> record. It&rsquo;s not the classiest way to pass key-value pairs, especially since values are distributed as columns with one column per (potential) type. However, it is the only supported way of exporting custom parameters for now.</p>
 <h3 id="full-table-output">Full table output</h3>
 <p>Here&rsquo;s what those <code>optimize_flicker_test</code> hits look like in our event table:</p>
@@ -855,14 +890,18 @@ intersectionObserver.observe(node);
 
 
 <p>Nothing ground-breaking analysis-wise, but this shows what you could do with the data.</p>
-<h2 id="things-to-note">Things to note</h2>
+
+                
+                  <h2 id="things-to-note">Things to note</h2>
 <p>OK, so I misled you a bit with the title of this article. The purpose wasn&rsquo;t to show you how to measure the <strong>impact</strong> of the flicker, but rather how to collect the data that <em>allows</em> you to measure the impact of the flicker.</p>
 <p>With the raw data about element visibility and element injection, you can measure what the delta is and how it impacts conversions, for example. However, this analysis is left for you to calibrate against your unique data set and your unique experiments.</p>
 <p>You probably also wondered when reading the setup, &ldquo;Why isn&rsquo;t this guy just calculating the delta in the client and sending <em>that</em> to App+Web? Or, better yet, why isn&rsquo;t he just sending it to Google Analytics?&rdquo;. Totally valid questions.</p>
 <p>I decided to build this experiment around <strong>raw, uncalculated data</strong>. Many analytics tools have happily promoted the idea that calculated metrics don&rsquo;t need to be reverse engineerable. This has led to confusion around things like the <a href="https://www.simoahava.com/analytics/the-schema-conspiracy/">sessionization schema</a> of Google Analytics, and the weird, quantum fluctuations that seem to govern any data set when you zoom in close enough.</p>
 <p>With App+Web, <em>everybody</em> has access to the raw data dump in BigQuery, so I want to start pushing forward the approach where the <strong>data you collect is as raw as possible</strong>, so that you have <strong>full freedom</strong> for parsing the data as you wish in BQ.</p>
 <p>You are, of course, free to modify the solution however you wish.</p>
-<h2 id="summary">Summary</h2>
+
+                
+                  <h2 id="summary">Summary</h2>
 <p>There are some <strong>caveats</strong> to this experiment. <a href="https://caniuse.com/#feat=intersectionobserver">Not all browsers support Mutation- and IntersectionObservers</a>.</p>
 <p>There might also be cases where the <code>baseElementVisible</code> simply refuses to fire in time, even if there was a flicker. The single-threadedness of JavaScript has the tendency to mess with callbacks. That&rsquo;s why I opted to throw the <code>baseElementVisible</code> baby out with the bathwater - if this metric hasn&rsquo;t been collected by the time all the other metrics have, I&rsquo;d rather not send it at all rather than send confusing values where the base element became visible <em>after</em> the test element was added.</p>
 <p>When setting up this test, just remember these key points:</p>
@@ -876,6 +915,8 @@ intersectionObserver.observe(node);
 </ol>
 <p>Let me know in the comments if you have additional insights to setting up the test or the subsequent analysis.</p>
 
+                
+              
               
 
             </div>
@@ -1130,7 +1171,9 @@ intersectionObserver.observe(node);
 
 <script src="https://cdn.commento.io/js/count.js"></script>
 
-
+    <script>
+      !function(){var e=document.querySelector(".simmer"),t=document.querySelector(".simmer .close"),o=window.sessionStorage&&window.sessionStorage.getItem("nosimmer");if(e){if(o){e.style.display="none"}t.addEventListener("click",function(){window.sessionStorage.setItem("nosimmer","true"),e.style.display="none"})}}();
+    </script>
     <script>
       var mylazyload = new LazyLoad({elements_selector: '.lazy'});
       </script>

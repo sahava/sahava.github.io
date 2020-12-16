@@ -206,6 +206,16 @@
     </a>
   </li>
 
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
 
     </ul>
     <ul class="sidebar-buttons">
@@ -260,20 +270,20 @@
     </a>
   </li>
 
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/newsletter/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bell"></i>
+      
+      <span class="sidebar-button-desc">Newsletter</span>
+    </a>
+  </li>
+
 
     </ul>
     <ul class="sidebar-buttons">
       
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
-      
-      <span class="sidebar-button-desc">RSS</span>
-    </a>
-  </li>
-
 
     </ul>
   </div>
@@ -329,7 +339,9 @@
           
           <div class="post-content markdown">
             <div class="main-content-wrap">
-              <p>In this article, I&rsquo;m going to tackle one of the most frequently asked questions out there:</p>
+	      
+                
+  	        <p>In this article, I&rsquo;m going to tackle one of the most frequently asked questions out there:</p>
 <p><strong>Can you run <a href="https://analytics.google.com">Google Analytics</a> using the snippet AND using a <a href="https://tagmanager.google.com/">Google Tag Manager</a> Tag <em>on the same page</em>?</strong></p>
 
 
@@ -350,7 +362,20 @@
 <p>First, a terminology rant. You hear lots of talk about &ldquo;on-page&rdquo; and &ldquo;inline&rdquo; Google Analytics tracking, as that&rsquo;s what&rsquo;s used to describe the non-GTM way of tracking Google Analytics. Well, all the power to you, but I think they&rsquo;re just adding to the confusion. GTM is just as &ldquo;on-page&rdquo; and &ldquo;inline&rdquo; as GA&rsquo;s own snippet, as both are based on injecting an asynchronous HTTP request that downloads the respective library.</p>
 <p>I&rsquo;ve chosen to use <em>snippet-based tracking</em> to describe Google Analytics tracking that&rsquo;s outside GTM, and <em>Tag-based tracking</em> to describe Tags run through GTM. Note the capital &lsquo;T&rsquo;, as that&rsquo;s the syntax I most commonly use in this blog to denote Google Tag Manager assets.</p>
 <p>I&rsquo;m fully aware this distinction can cause confusion as well, but since I&rsquo;d hesitate to ever call the <code>ga('send',...)</code> commands on the page &ldquo;tags&rdquo; of any kind, I think this makes a bit more sense.</p>
-<h2 id="the-premise-what-the-problem-really-is">The premise: what the problem really is</h2>
+
+                <span class="simmer">
+  <span class="close">X</span>
+  <p>
+    <span class="fa fa-md fa-bell"></span>
+    <strong>The Simmer Newsletter</strong>
+  </p>
+  <p>
+    Subscribe to the <a href="https://www.simoahava.com/newsletter/">Simmer newsletter</a> to get the latest news and content from Simo Ahava into your email inbox!
+  </p>
+  </span>
+
+                
+                  <h2 id="the-premise-what-the-problem-really-is">The premise: what the problem really is</h2>
 <p>Most often this question gets asked when migrating to Google Tag Manager. There was a <em>crazy</em> amount of questions about this in the <a href="https://analyticsacademy.withgoogle.com/course05">Google Tag Manager Fundamentals</a> course forums, where I was volunteering my help. There were so many questions about it that I felt the need to write the following intro to course participants:</p>
 
 
@@ -388,7 +413,9 @@
 </ol>
 <p>The last question is just the best, I can&rsquo;t wait to get to it!</p>
 <p>OK, I&rsquo;ll start with it! That&rsquo;s how crazy and unpredictable I am.</p>
-<h2 id="5-snippet-based-vs-tag-based-tracking">5. Snippet-based vs. Tag-based tracking</h2>
+
+                
+                  <h2 id="5-snippet-based-vs-tag-based-tracking">5. Snippet-based vs. Tag-based tracking</h2>
 <p>When you create your Google Analytics tracker using the given <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/?hl=en">snippet</a>, you have the option of providing a <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/creating-trackers#naming_trackers">tracker name</a> vs. using the default name.</p>
 <p>For example, if you want to name the tracker <strong>SuperTracker</strong>, you&rsquo;d use the following syntax in the tracker creation command:</p>
 <div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">ga(<span style="color:#a50">&#39;create&#39;</span>, <span style="color:#a50">&#39;UA-12345-1&#39;</span>, {<span style="color:#a50">&#39;name&#39;</span> : <span style="color:#a50">&#39;SuperTracker&#39;</span>});
@@ -435,13 +462,17 @@ ga(<span style="color:#a50">&#39;t0.send&#39;</span>, <span style="color:#a50">&
 <p>GTM, on the other hand, creates a new, unique tracker name for every single Tag on the page - even when the same Tag is injected multiple times.</p>
 <p>This is, in fact, how GTM manages to navigate through one of the biggest flaws of the platform. I&rsquo;ve outlined this in a previous article on the dangers of <a href="https://www.simoahava.com/gtm-tips/be-careful-with-the-tracker-name-setting/">messing with the tracker name</a> setting in GTM&rsquo;s GA Tags. In a nutshell, GTM doesn&rsquo;t let you assign settings, fields, custom dimensions and the ilk on the hit itself, but they&rsquo;re always set on the tracker object. This means that they are &ldquo;hit-scoped&rdquo; by default, since each Tag has its own tracker, but if you mess with the tracker name you&rsquo;ll run into some unexpected side effects.</p>
 <p>Now that we have the basics sorted out, let&rsquo;s jump into the queries themselves.</p>
-<h2 id="1-will-google-analytics-break-if-just-google-tag-manager-is-installed-on-the-page">1. Will Google Analytics break if just Google Tag Manager is installed on the page?</h2>
+
+                
+                  <h2 id="1-will-google-analytics-break-if-just-google-tag-manager-is-installed-on-the-page">1. Will Google Analytics break if just Google Tag Manager is installed on the page?</h2>
 <p>This is easy to answer:</p>
 <p><strong>NO, IT WILL NOT!</strong></p>
 <p>Remember, Google Tag Manager has nothing to do with Google Analytics when you add the container on the page. It&rsquo;s just a container, a chassis, a receptacle, a vehicle, a <em>vessel</em> (making the most out of my thesaurus here) for your Tags and other arbitrary JavaScript you want to execute on the page.</p>
 <p>When you add the Google Tag Manager container snippet to the page, all it does is load a library from Google servers. It doesn&rsquo;t create any Google Analytics trackers, it doesn&rsquo;t mess with your tracking code, it doesn&rsquo;t interfere with other JavaScript running on the site, or anything like that.</p>
 <p>In other words, <strong>feel free to add the container snippet to the page the minute you&rsquo;ve created the container</strong>.</p>
-<h2 id="2-will-adding-a-google-analytics-tag-in-gtm-break-my-existing-tracking">2. Will adding a Google Analytics Tag in GTM break my existing tracking?</h2>
+
+                
+                  <h2 id="2-will-adding-a-google-analytics-tag-in-gtm-break-my-existing-tracking">2. Will adding a Google Analytics Tag in GTM break my existing tracking?</h2>
 <p>This is also easy to answer:</p>
 <p><strong>NO, IT WILL NOT!</strong></p>
 <p>Now, choose your favorite conjunct: &ldquo;However&hellip;&rdquo; / &ldquo;But&hellip;&rdquo; / &ldquo;Unless&hellip;&rdquo;. I&rsquo;ll go with the first one.</p>
@@ -472,7 +503,9 @@ ga(<span style="color:#a50">&#39;t0.send&#39;</span>, <span style="color:#a50">&
 <p>You can see how this is potentially a huge problem.</p>
 <p>But like I wrote in the beginning of this chapter, if you <strong>don&rsquo;t</strong> mess with the tracker name setting, there will be no interference. You can freely track via Google Tag Manager to a Google Analytics property, and then keep the snippet-based tracker collecting data to some other property, if you wish.</p>
 <p>This is a great segue to the next question.</p>
-<h2 id="3-run-the-bulk-of-tracking-via-the-snippet-and-use-gtm-for-specific-things">3. Run the bulk of tracking via the snippet, and use GTM for specific things</h2>
+
+                
+                  <h2 id="3-run-the-bulk-of-tracking-via-the-snippet-and-use-gtm-for-specific-things">3. Run the bulk of tracking via the snippet, and use GTM for specific things</h2>
 <p>In this case, we want to <strong>combine</strong> snippet-based GA tracking with Google Tag Manager Tags.</p>
 <p>Interesting!</p>
 <p>Well, it&rsquo;s certainly doable. You can easily have a snippet-based tracker track to UA-12345-1, and then add the occasional Tag via GTM to also track to UA-12345-1, and you don&rsquo;t have to make any changes if working with default settings. Google Analytics uses a combination of <strong>Client ID</strong> found in the <code>_ga</code> cookie together with the UA-XXXXX-Y code to make sure hits are attributed to the same session and the same user.</p>
@@ -486,7 +519,9 @@ ga(<span style="color:#a50">&#39;t0.send&#39;</span>, <span style="color:#a50">&
 </li>
 </ul>
 <p>All in all, try to make all fields and settings match between the trackers. This way you won&rsquo;t run into surprises when one creates a session and the other one creates a new session immediately after due to a discrepancy in the tracker settings.</p>
-<h2 id="4-using-gtm-to-drive-tracking-and-occasionally-resorting-to-snippet-based-commands">4. Using GTM to drive tracking, and occasionally resorting to snippet-based commands</h2>
+
+                
+                  <h2 id="4-using-gtm-to-drive-tracking-and-occasionally-resorting-to-snippet-based-commands">4. Using GTM to drive tracking, and occasionally resorting to snippet-based commands</h2>
 <p>This is a tricky one. Usually it&rsquo;s because there&rsquo;s a huge, sprawling legacy library for snippet-based tracking, and the user wants to migrate one command at a time.</p>
 <p>The easiest way to make it work is to remember to have the Google Analytics snippet and tracker creation commands on each page as before. If you do this, there won&rsquo;t be any conflicts as long as you respect the tips in the previous chapter.</p>
 <p>However, if you&rsquo;re in a jam where you only have a <code>ga('send',...)</code> command here or there, without any tracker creation via the snippet, things get much more complicated. To make it work, the following things need to happen:</p>
@@ -507,7 +542,9 @@ ga(<span style="color:#a50">&#39;t0.send&#39;</span>, <span style="color:#a50">&
 &lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
 <p>This is taken from the <a href="https://www.thyngster.com/how-does-the-universal-analytics-snippet-work/">Universal Analytics snippet</a>, and it basically creates a temporary data store for all <code>ga()</code> commands that exist before the <strong>analytics.js</strong> library has been created.</p>
 <p>If you take all the previous tips into account, then there should be minimal problems with combining tracking methods like this. However, it&rsquo;s still suboptimal, and can lead to unexpected problems due to the complexity of the code you need to manage and maintain.</p>
-<h2 id="summary">Summary</h2>
+
+                
+                  <h2 id="summary">Summary</h2>
 <p>What started as a simple foray into tracker discrepancies blossomed into a sprawling, overly complex account of how tracking works across the Google Analytics snippet and Google Tag Manager&rsquo;s Tag templates.</p>
 <p>Bottom line is, if you <strong>do</strong> want to combine tracking across the two methods, you need to make sure that tracker settings match across the board.</p>
 <p>On the other hand, if you want to track each tracker method to a different Google Analytics property, you need to make sure that certain tracker settings <strong>do NOT match</strong> across the trackers.</p>
@@ -515,6 +552,8 @@ ga(<span style="color:#a50">&#39;t0.send&#39;</span>, <span style="color:#a50">&
 <p>Whenever I do a migration from snippet-based to Google Tag Manager -based tracking, I run the two simultaneously (to different properties) until I&rsquo;m satisfied the migration has been a success.</p>
 <p>Similarly, it&rsquo;s not an altogether bad idea to keep the snippet-based tracker on the page for a while, just so you can benchmark the two different tracker setups in your data, and perhaps use the information to improve overall data quality.</p>
 
+                
+              
               
 
             </div>
@@ -769,7 +808,9 @@ ga(<span style="color:#a50">&#39;t0.send&#39;</span>, <span style="color:#a50">&
 
 <script src="https://cdn.commento.io/js/count.js"></script>
 
-
+    <script>
+      !function(){var e=document.querySelector(".simmer"),t=document.querySelector(".simmer .close"),o=window.sessionStorage&&window.sessionStorage.getItem("nosimmer");if(e){if(o){e.style.display="none"}t.addEventListener("click",function(){window.sessionStorage.setItem("nosimmer","true"),e.style.display="none"})}}();
+    </script>
     <script>
       var mylazyload = new LazyLoad({elements_selector: '.lazy'});
       </script>
