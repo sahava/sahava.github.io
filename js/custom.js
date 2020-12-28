@@ -12,17 +12,19 @@
   });
 })(jQuery)
 
-document.addEventListener(
-  "scroll",
-  function() {
-    var scrollTop =
-      document.documentElement["scrollTop"] || document.body["scrollTop"];
-    var scrollBottom =
+if (!!document.querySelector('#commento')) {
+  document.addEventListener(
+    "scroll",
+    function() {
+      var scrollTop =
+        document.documentElement["scrollTop"] || document.body["scrollTop"];
+      var scrollBottom =
 	(document.documentElement["scrollHeight"] || document.body["scrollHeight"]) - document.documentElement.clientHeight - document.querySelector('#commento').scrollHeight;
-    scrollPercent = scrollTop / scrollBottom * 100 + "%";
-    document
-      .getElementById("_progress")
-      .style.setProperty("--scroll", scrollPercent);
-  },
-  { passive: true }
-);
+      scrollPercent = scrollTop / scrollBottom * 100 + "%";
+      document
+        .getElementById("_progress")
+        .style.setProperty("--scroll", scrollPercent);
+    },
+    { passive: true }
+  );
+}
