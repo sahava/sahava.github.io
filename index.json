@@ -1,5 +1,19 @@
 [
 {
+	"uri": "https://www.simoahava.com/analytics/tips-for-logging-server-side-tagging/",
+	"title": "#GTMTips: Tips For Logging In Server-side Tagging",
+	"tags": ["google tag manager", "server-side tagging"],
+	"description": "Tips for how to use and optimize logging in your Server-side Tagging Google Cloud project.",
+	"content": "One of the largest costs in a server-side tagging can be logging. Google warns about this in their official documentation, and it\u0026rsquo;s definitely something to keep a keen eye on if your server-side endpoint processes enough data per month.\nHow much should it process for logging to become an issue? It depends, but you could start seeing some impact once the endpoint processes \u0026gt;1 million incoming requests per month. The best way to find out if logging is a problem is to visit the Billing dashboard in your server-side tagging Google Cloud project and check what the portion of Log Volume is in your monthly costs.\n  In the image above, the endpoint processes around 10-20 million requests per month. Logging isn\u0026rsquo;t a cost factor until the last 10 days of the month, because App Engine doesn\u0026rsquo;t charge the project for the first 50 GiB (gibibytes) of logs. In this particular case, logging costs around 12 euros per month, which is 10% of their monthly cost.\nOnce the property collects more than 100 million hits per month, logs can essentially duplicate the monthly cost, and once you\u0026rsquo;re collecting even larger amounts of data, the logging costs can bankrupt your company.\nIn this article, I\u0026rsquo;ll share with you three tips regarding logging. Two on how to keep the costs down, and one on how to find log output in a production environment (i.e. without the benefit of the Preview mode\u0026rsquo;s Console tab.)\nTip 122: Tips for logging in server-side tagging Note! You should only filter out request logs if they are a cost for you. Otherwise, let them be logged – it\u0026rsquo;s excellent data for debugging.\nTip #1: Suppress all request logging The easiest way to get the costs down is to prevent App Engine from logging anything about the incoming requests. This will essentially take your log expenses to zero.\nThe downside is that, well, you lose the log. You won\u0026rsquo;t be able to view incoming request details, which might be useful for error logging (see below).\nTo do this, open the Logs Router for your Google Cloud project (the one for which your server-side tagging setup is configured).\nClick the overflow menu at the end of the row for the bucket named _Default, and choose Edit sink.\n  In the Choose logs to include in sink section, edit the Build inclusion filter text area, and add a new row to the end. In this new row, add the following text:\nNOT (LOG_ID(\u0026quot;appengine.googleapis.com/nginx.request\u0026quot;) OR LOG_ID(\u0026quot;requests\u0026quot;) OR LOG_ID(\u0026quot;appengine.googleapis.com/request_log\u0026quot;))\n  Then click DONE and finally the UPDATE SINK button at the bottom of the view.\nThe filter prevents the logs for the incoming requests from being stored in your log storage.\nTip #2: Suppress all request logging except errors If you want the logs to still be moderately useful while cutting down on the costs, you can reach an easy compromise: suppress all the request logs except for the errors. This way you can still use the logs for detecting what types of errors the endpoint is throwing while still saving a penny or two by not logging everything.\nTo do this, follow the steps in the previous tip to open the Build inclusion filter area for editing. Instead of the filter expression detailed in the previous tip, add the following to a new row:\nNOT ((LOG_ID(\u0026quot;appengine.googleapis.com/nginx.request\u0026quot;) OR LOG_ID(\u0026quot;requests\u0026quot;) OR LOG_ID(\u0026quot;appengine.googleapis.com/request_log\u0026quot;)) AND httpRequest.status \u0026lt; 400)\n  Click DONE and then UPDATE SINK.\nNow your requests will not be logged unless they returned an HTTP status code of 400 or greater.\n Note! It might take a while for the new filter to start working, so don\u0026rsquo;t be surprised if you keep seeing log entries for the requests for the next minute or so.\n Tip #3: Find console logs from your production traffic When in Preview mode, you can easily find the log output from the templates in your container by looking at the Console tab.\nBut where can you view logs for hits that are not available in preview mode?\nYou\u0026rsquo;ll need to run a query in your project\u0026rsquo;s Logs Explorer.\nIn the Query preview field, add the following query:\nlogName =~ \u0026quot;stdout\u0026quot;\n  The template logs are written into a log with the ID stdout (short for standard output). If your templates utilize the logToConsole API, the messages logged with the API will appear with this query (even those logged in Preview mode).\nSummary I hope these quick tips have been useful!\nIf tinkering with the server-side environment is something you\u0026rsquo;re interested in doing more, I recommend enrolling in the Server-side Tagging In Google Tag Manager course on Simmer. Enrollment is open until March 14th, 2021 (course materials become available on March 1st), and there\u0026rsquo;s a lot of useful lessons in addition to logging tips in the course curriculum!\nLogging can be one of the largest costs in a server-side tagging project, but correctly used it can also give you a lot of insight into how your endpoint works and how your tags and Clients perform.\n"
+},
+{
+	"uri": "https://www.simoahava.com/categories/analytics/",
+	"title": "Analytics",
+	"tags": [],
+	"description": "",
+	"content": ""
+},
+{
 	"uri": "https://www.simoahava.com/categories/",
 	"title": "Categories",
 	"tags": [],
@@ -7,15 +21,29 @@
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/categories/personal/",
-	"title": "Personal",
+	"uri": "https://www.simoahava.com/post/",
+	"title": "Posts",
 	"tags": [],
 	"description": "",
 	"content": ""
 },
 {
-	"uri": "https://www.simoahava.com/post/",
-	"title": "Posts",
+	"uri": "https://www.simoahava.com/tags/server-side-tagging/",
+	"title": "server-side tagging",
+	"tags": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "https://www.simoahava.com/tags/",
+	"title": "Tags",
+	"tags": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "https://www.simoahava.com/categories/personal/",
+	"title": "Personal",
 	"tags": [],
 	"description": "",
 	"content": ""
@@ -33,20 +61,6 @@
 	"tags": ["google tag manager", "simmer"],
 	"description": "Our new brand and online course platform, Simmer, is live!",
 	"content": "This will likely be the shortest blog article I have ever written, but I have just one short thing to say:\nSIMMER IS LIVE!\nSimmer is a new online course platform, where we bring technical marketing courses to your computer (or mobile device) screen with a straightforward, task-based approach.\nOur first class is aptly Server-side Tagging In Google Tag Manager, and it is open for enrollment right now, all the way until March 14th.\nYou can find the Simmer website at https://www.teamsimmer.com/, and you can enroll to the Server-side Tagging course at https://www.teamsimmer.com/courses/server-side-tagging/.\nI hope to see you in our community!\n"
-},
-{
-	"uri": "https://www.simoahava.com/tags/",
-	"title": "Tags",
-	"tags": [],
-	"description": "",
-	"content": ""
-},
-{
-	"uri": "https://www.simoahava.com/categories/analytics/",
-	"title": "Analytics",
-	"tags": [],
-	"description": "",
-	"content": ""
 },
 {
 	"uri": "https://www.simoahava.com/tags/core-web-vitals/",
@@ -180,13 +194,6 @@
 	"tags": ["google tag manager", "server-side tagging"],
 	"description": "Introducing the new",
 	"content": "With the introduction of server-side tagging in Google Tag Manager, the variety of things you can do with your own server-side proxy is mind-boggling:\n Reduce client-side bloat by consolidating data streams and distributing them to vendor endpoints server-side. Improve data security by adding safeguards and validations to prevent harmful data from being sent to vendor endpoints. Enrich data server-side, by combining the incoming data stream with data from APIs and data stores that you own and control. Remove third-party downloads from the browser by proxying them via the server-side container.  This last point is what this article expands on. If you check out this video (jumps straight to the relevant part), you can see how it\u0026rsquo;s possible to already proxy popular libraries like analytics.js and gtag.js.\nIn essence, the server-side container downloads the library from Google and then serves it to the browser. This way the library download happens in first-party context (assuming you\u0026rsquo;ve configured the endpoint to run on your own domain namespace), and you can freely adjust things like cache headers.\n  With a recent update, Google Tag Manager\u0026rsquo;s server container now allows you to proxy a Google Tag Manager web container as well.\nHow it works The Google Tag Manager: Web Container client template comes pre-built in Server containers. To activate it, you need to create a new client with it.\nBrowse to Clients in the Google Tag Manager UI and click to create a new client.\n  Click the Client Configuration box to open a selector. Find the Google Tag Manager: Web Container client template, and click to choose it.\n  To configure the client, you basically need to list the Google Tag Manager Container IDs that should be proxied via this client.\nTo add a new ID, simply click Add Container ID, and add it to the list.\n Since the Allowed Container IDs field can take variables as well, you could theoretically create a variable that fetches the container ID from the request URL directly (i.e. anything after ?id= in https://server-container.com/gtm.js?id=GTM-ABCDEFG). However, I think it\u0026rsquo;s a good idea to not create a system like that to avoid the endpoint being spammed with requests for containers that are unrelated to your setup.\n   Once you Save this client, your Server container has now been enabled to respond to requests for Google Tag Manager web containers. A regular request for a web container would look like this:\nhttps://www.googletagmanager.com/gtm.js?id=GTM-ABCDEFG\nWith the client you configured, you can now issue the request like this:\nhttps://your.server.container.com/gtm.js?ID=GTM-ABCDEFG\nYour server-side endpoint will return the Google Tag Manager library in the exact same format that the regular snippet would, with the difference that it\u0026rsquo;s served from your endpoint and not Google\u0026rsquo;s CDN.\nUpdate the snippet You will, of course, need to update your Google Tag Manager container snippet as a result.\n NOTE! The update below applies to environments as well, as the new client template has been designed to work with environments, too.\n This is what a regular Google Tag Manager container snippet looks like:\n\u0026lt;!-- Google Tag Manager --\u0026gt; \u0026lt;script\u0026gt;(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({\u0026#39;gtm.start\u0026#39;: new Date().getTime(),event:\u0026#39;gtm.js\u0026#39;});var f=d.getElementsByTagName(s)[0], j=d.createElement(s),dl=l!=\u0026#39;dataLayer\u0026#39;?\u0026#39;\u0026amp;l=\u0026#39;+l:\u0026#39;\u0026#39;;j.async=true;j.src= \u0026#39;https://www.googletagmanager.com/gtm.js?id=\u0026#39;+i+dl;f.parentNode.insertBefore(j,f); })(window,document,\u0026#39;script\u0026#39;,\u0026#39;dataLayer\u0026#39;,\u0026#39;GTM-PZ7GMV9\u0026#39;);\u0026lt;/script\u0026gt; \u0026lt;!-- End Google Tag Manager --\u0026gt; You need to change the string 'https://www.googletagmanager.com/gtm.js?id=' to correspond with the domain you\u0026rsquo;ve created for your server-side endpoint. If your container serves from https://sgtm.simoahava.com, the updated snippet would look like this:\n\u0026lt;!-- Google Tag Manager --\u0026gt; \u0026lt;script\u0026gt;(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({\u0026#39;gtm.start\u0026#39;: new Date().getTime(),event:\u0026#39;gtm.js\u0026#39;});var f=d.getElementsByTagName(s)[0], j=d.createElement(s),dl=l!=\u0026#39;dataLayer\u0026#39;?\u0026#39;\u0026amp;l=\u0026#39;+l:\u0026#39;\u0026#39;;j.async=true;j.src= \u0026#39;https://sgtm.simoahava.com/gtm.js?id=\u0026#39;+i+dl;f.parentNode.insertBefore(j,f); })(window,document,\u0026#39;script\u0026#39;,\u0026#39;dataLayer\u0026#39;,\u0026#39;GTM-PZ7GMV9\u0026#39;);\u0026lt;/script\u0026gt; \u0026lt;!-- End Google Tag Manager --\u0026gt; Once you\u0026rsquo;ve updated the snippet, you can take the Server container to debug mode, and see if it responds to requests for the GTM container:\n  You need to also check where the request for the gtm.js library is sent using your browser\u0026rsquo;s network tools:\n  And, of course, make sure that all your tags work as they should by using whatever debugging tools you have at your disposal.\nThings to note Currently, zone containers will still load from googletagmanager.com, but this will likely be fixed shortly to load these also from your server-side endpoint.\nWhen you choose to serve the Google Tag Manager container from your own first-party domain and you\u0026rsquo;re also sending data to a Universal Analytics and/or GA4 client, you need to make sure you enable the gtag paths in these clients. This is because once you move to loading the Google Tag Manager container from your first-party domain, any gtag.js libraries that are loaded via this container will also need to be loaded from your first-party domain. So make sure you check the relevant options if you\u0026rsquo;re using these two clients.\n    Final thing to note is that the \u0026lt;noscript\u0026gt; snippet can also be modified to load the iframe from your first-party endpoint. The only caveat is that the HTML page in the iframe will continue loading items from googletagmanager.com.\n In case you\u0026rsquo;re wondering, yes: search console verification WILL work with your new first-party \u0026lt;noscript\u0026gt; snippet as well!\n Summary Even though you absolutely don\u0026rsquo;t have to use a web container when working with server-side tagging, I think that many people do and will continue doing so because of the ease that Google Tag Manager brings to tagging a website.\nBeing able to proxy the Google Tag Manager container introduces obvious benefits for moving third-party scripts to a first-party context.\nYou are, of course, technically still downloading vendor JavaScript from their CDN. However, this download happens in the server container, and the browser will only be privy to a request-response pathway with your server container and not the vendor endpoint itself.\nIntroducing the Google Tag Manager container proxy to your Server container might have an impact on the costs associated with your server-side tagging setup, so be sure to monitor the billing in your Google Cloud Platform dashboard.\nLet me know in the comments what you think about this new addition to the server-side tagging built-in client mix!\n"
-},
-{
-	"uri": "https://www.simoahava.com/tags/server-side-tagging/",
-	"title": "server-side tagging",
-	"tags": [],
-	"description": "",
-	"content": ""
 },
 {
 	"uri": "https://www.simoahava.com/tags/intelligent-tracking-prevention/",
