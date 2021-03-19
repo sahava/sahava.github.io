@@ -1,0 +1,1611 @@
+
+
+  
+    
+  
+
+
+  
+
+
+
+
+
+  
+
+
+  
+
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta name="google-site-verification" content="xQwWI2KUfP9LbFKhw2CVLFtrMY6Czrla7L3PD2aBolA" />
+
+
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org", 
+  "@type": "BlogPosting",
+  "headline": "Facebook Conversions API Using GA4 Web Tags And A GTM Server | Simo Ahava's blog",
+  "image": "https:\/\/www.simoahava.com\/images\/2021\/03\/facebook-conversions-api-tag.jpg",
+  "editor": "Simo Ahava",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Simo Ahava's blog",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https:\/\/www.simoahava.com\/images\/simo.png",
+      "height": "393",
+      "width": "407"
+    }
+  },
+  "url": "https:\/\/www.simoahava.com\/analytics\/facebook-conversions-api-gtm-server-side-tagging\/",
+  "datePublished": "2021-03-19T07:42:34\u002b02:00",
+  "dateModified": "2021-03-19T07:42:34\u002b02:00",
+  "description": "A guide for working with the Facebook Conversions API tag template in Google Tag Manager\u0027s Server-side Tagging.",
+  "author": {
+    "@type": "Person",
+    "name": "Simo Ahava"
+  }
+}
+</script>
+
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <title>Facebook Conversions API Using GA4 Web Tags And A GTM Server | Simo Ahava's blog</title>
+    
+    <script>
+      window.dataLayer=window.dataLayer||[];window.dataLayer.push({pageType: 'article', environment:  null });
+    </script>
+    
+
+    
+    
+    <script src="https://www.simoahava.com/x-js/lazyload.iife.min.js"></script>
+
+    
+
+    
+    <script>
+      (function(S,i,m,o){
+        window[m]=window[m]||[];
+        window[m].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
+        var f=S.getElementsByTagName(i)[0],j=S.createElement(i),dl=m!='dataLayer'?'&l='+m:'';
+        j.async=true;
+        j.src='https://sgtm.simoahava.com/gtm.js?id='+o+dl;
+        f.parentNode.insertBefore(j,f);
+      })(document,'script','dataLayer','GTM-PZ7GMV9');
+    </script>
+    
+    <meta name="author" content="Simo Ahava">
+    <meta name="keywords" content="">
+
+    <link rel="icon" href="https://www.simoahava.com/images/favicon.ico">
+    
+    <link rel="amphtml" href="https://www.simoahava.com/amp/analytics/facebook-conversions-api-gtm-server-side-tagging/">
+    
+    <meta name="description" content="A guide for working with the Facebook Conversions API tag template in Google Tag Manager&#39;s Server-side Tagging.">
+    <meta property="og:description" content="A guide for working with the Facebook Conversions API tag template in Google Tag Manager&#39;s Server-side Tagging.">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="Facebook Conversions API Using GA4 Web Tags And A GTM Server">
+    <meta property="og:url" content="https://www.simoahava.com/analytics/facebook-conversions-api-gtm-server-side-tagging/">
+    <meta property="og:site_name" content="Simo Ahava&#39;s blog">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Facebook Conversions API Using GA4 Web Tags And A GTM Server">
+    <meta name="twitter:description" content="A guide for working with the Facebook Conversions API tag template in Google Tag Manager&#39;s Server-side Tagging.">
+    
+      <meta name="twitter:creator" content="@SimoAhava">
+      
+    
+
+    
+    
+
+    
+	  <meta property="og:image" content="https://www.simoahava.com/images/2021/03/facebook-conversions-api-server-side-tagging.jpg">
+      <meta name="twitter:image" content="https://www.simoahava.com/images/2021/03/facebook-conversions-api-server-side-tagging.jpg">
+    
+
+
+    
+
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+    
+    
+    
+    <link rel="stylesheet" href="https://www.simoahava.com/css/style.css" />
+    
+    
+
+    
+      
+    
+    
+  </head>
+
+  <body>
+    
+    <div id="_progress"></div>
+    
+    <div id="blog">
+      <header id="header" data-behavior="4">
+  <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+  <div class="header-title">
+    <a class="header-title-link" href="https://www.simoahava.com/">Simo Ahava&#39;s blog</a>
+  </div>
+  
+</header>
+
+      <nav id="sidebar" data-behavior="4">
+  <div class="sidebar-container">
+    
+      <div class="sidebar-profile">
+        <a href="https://www.simoahava.com/">
+          <img class="sidebar-profile-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+        </a>
+        <h4 class="sidebar-profile-name">Simo Ahava</h4>
+        
+          <h5 class="sidebar-profile-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</h5>
+        
+      </div>
+    
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+      
+      <span class="sidebar-button-desc">Home</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+      
+      <span class="sidebar-button-desc">Categories</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tags/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Tags</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/gtm-tips/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-magic"></i>
+      
+      <span class="sidebar-button-desc">GTM Tips</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/about-simo-ahava/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+      
+      <span class="sidebar-button-desc">About</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tools/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-wrench"></i>
+      
+      <span class="sidebar-button-desc">Tools</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/blog-statistics/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bar-chart"></i>
+      
+      <span class="sidebar-button-desc">Blog statistics</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://github.com/sahava" target="_blank" rel="noopener">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+      
+      <span class="sidebar-button-desc">GitHub</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/upcoming-talks/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bullhorn"></i>
+      
+      <span class="sidebar-button-desc">Upcoming talks</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/custom-templates/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Templates</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/newsletter/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bell"></i>
+      
+      <span class="sidebar-button-desc">Newsletter</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+
+    </ul>
+  </div>
+</nav>
+
+      
+
+      <div id="main" data-behavior="4"
+        class="
+               hasCoverMetaIn
+               ">
+        <article class="post">
+	  <form id="search" action="https://www.simoahava.com/search/">
+  <input name="q" type="text" class="form-control input--xlarge" placeholder="Search blog..." autocomplete="off">
+  </form>
+
+          <div class="post-header main-content-wrap text-left">
+  
+    <div class="figure nocaption">
+      <img class="cover" src="https://www.simoahava.com/images/2021/03/facebook-conversions-api-server-side-tagging.jpg">
+    </div>
+  
+  
+
+    <h1>
+      Facebook Conversions API Using GA4 Web Tags And A GTM Server
+    </h1>
+  
+  
+  <div class="postShorten-meta post-meta">
+    
+      <time datetime="2021-03-19T07:42:34&#43;02:00">
+        
+  March 19, 2021
+
+      </time>
+      
+      
+  
+  
+    <span>in</span>
+    
+      <a class="category-link" href="https://www.simoahava.com/categories/analytics">Analytics</a>
+    
+  
+
+
+      | <a href="https://www.simoahava.com/analytics/facebook-conversions-api-gtm-server-side-tagging/#commento">Comments</a>
+      
+  </div>
+
+
+</div>
+
+          <div class="post-content markdown">
+            <div class="main-content-wrap">
+	      
+                
+  	        <p>Facebook has now <strong>officially</strong> released their <a href="https://www.facebook.com/business/help/702509907046774"><strong>Conversions API tag template</strong></a> for <a href="https://www.simoahava.com/analytics/server-side-tagging-google-tag-manager/">server-side tagging in Google Tag Manager</a>.</p>
+<p>With this tag template, you can create a server-side tag that fires with any <a href="https://www.simoahava.com/analytics/server-side-tagging-google-tag-manager/#clients-and-tags">Client</a> designed to parse requests into a <a href="https://www.simoahava.com/analytics/server-side-tagging-google-tag-manager/#event-model">unified event model</a>.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/03/facebook-conversions-api-tag.jpg" title="Facebook Conversions API Tag">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/03/facebook-conversions-api-tag.jpg#ZgotmplZ" alt="Facebook Conversions API Tag" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1802 1192'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>One such Client already exists, and every single Server container has it built-in: the <strong>GA4 Client</strong>.</p>
+<blockquote>
+<p>If you haven&rsquo;t yet deployed a Server container, check out <a href="https://youtu.be/6OGbOh216mU">this video walkthrough</a> for more details on how to do it.</p>
+</blockquote>
+<p>In this guide, I will walk you through the steps you need to take to get Facebook&rsquo;s Conversions API working in unison with a GA4 Client.</p>
+<p>This means one simple but powerful thing:</p>
+<p><strong>You don&rsquo;t need to run <em>any</em> Facebook JavaScript in the web browser</strong>. The Facebook server-side tag will be able to utilize your existing GA4 data streams, albeit with some small modifications to cater to Facebook&rsquo;s unique requirements for the payload.</p>
+<div id="toc-container"><h1 id="table-of-contents">Table of Contents</h1> <input type="checkbox" id="show"><label for="show" id="showbtn"><h1 id="table-of-contents-mobile">Table of Contents</h1><span class="show">&nbsp;[+show]</span><span class="hide">&nbsp;[–hide]</span></label><nav id="TableOfContents">
+  <ul>
+    <li><a href="#how-it-works">How it works</a>
+      <ul>
+        <li><a href="#the-ga4-web-tag-records-the-event">The GA4 web tag records the event</a></li>
+        <li><a href="#the-ga4-client-captures-the-request">The GA4 Client captures the request</a></li>
+        <li><a href="#the-facebook-tag-takes-the-data-and-forwards-it-to-facebook">The Facebook tag takes the data and forwards it to Facebook</a></li>
+      </ul>
+    </li>
+    <li><a href="#update-the-ga4-web-tag">Update the GA4 web tag</a>
+      <ul>
+        <li><a href="#event-name">Event Name</a></li>
+        <li><a href="#general-parameters">General parameters</a>
+          <ul>
+            <li><a href="#event_time">event_time</a></li>
+            <li><a href="#event_id">event_id</a></li>
+            <li><a href="#page_location">page_location</a></li>
+            <li><a href="#action_source">action_source</a></li>
+          </ul>
+        </li>
+        <li><a href="#user-data-parameters">User data parameters</a>
+          <ul>
+            <li><a href="#user-ip-address-and-user-agent-string">User IP address and User-Agent string</a></li>
+            <li><a href="#user-data-parameters-in-the-common-event-schema">User data parameters in the common event schema</a></li>
+            <li><a href="#facebook-specific-parameters">Facebook-specific parameters</a></li>
+          </ul>
+        </li>
+        <li><a href="#custom-data-parameters">Custom data parameters</a>
+          <ul>
+            <li><a href="#general-parameters-1">General parameters</a></li>
+            <li><a href="#items">Items</a></li>
+            <li><a href="#facebook-specific-custom-data-parameters">Facebook-specific custom data parameters</a></li>
+          </ul>
+        </li>
+        <li><a href="#test-event-code">Test event code</a></li>
+      </ul>
+    </li>
+    <li><a href="#make-sure-the-ga4-client-is-running-in-the-server-container">Make sure the GA4 Client is running in the server container</a></li>
+    <li><a href="#load-the-facebook-conversions-api-tag-template-from-the-template-gallery">Load the Facebook Conversions API Tag template from the template gallery</a></li>
+    <li><a href="#create-and-configure-the-facebook-conversions-api-tag">Create and configure the Facebook Conversions API Tag</a>
+      <ul>
+        <li><a href="#trigger-when-any-ga4-request-is-received">Trigger when any GA4 request is received</a></li>
+        <li><a href="#trigger-conditionally">Trigger conditionally</a></li>
+      </ul>
+    </li>
+    <li><a href="#modify-any-possible-ga4-server-side-tags">Modify any possible GA4 server-side tags</a></li>
+    <li><a href="#test-the-setup">Test the setup</a></li>
+    <li><a href="#summary">Summary</a></li>
+  </ul>
+</nav></div>
+<p>If you want to use the <strong>Facebook web pixel</strong> to handle both the web stream <em>and</em> the server-side data dispatch, you will have to wait a while until Facebook officially releases their solution for splitting the web pixel stream into both a Facebook server request and a custom endpoint request (e.g. your server-side endpoint).</p>
+
+                <span class="simmer">
+  <span class="close">X</span>
+  <p>
+    <span class="fa fa-md fa-bell"></span>
+    <strong>The Simmer Newsletter</strong>
+  </p>
+  <p>
+    Subscribe to the <a href="https://www.simoahava.com/newsletter/">Simmer newsletter</a> to get the latest news and content from Simo Ahava into your email inbox!
+  </p>
+  </span>
+
+                
+                  <h2 id="how-it-works">How it works</h2>
+<p>Here&rsquo;s a brief overview of how the process works.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/03/facebook-process.jpg" title="Facebook process">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/03/facebook-process.jpg#ZgotmplZ" alt="Facebook process" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4986 2422'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<blockquote>
+<p>Almost 10 years of blogging and this is still the quality of my process diagrams&hellip;</p>
+</blockquote>
+<h3 id="the-ga4-web-tag-records-the-event">The GA4 web tag records the event</h3>
+<p>Your <strong>GA4 tags</strong> running in the <em>web browser</em> will collect events as they have done until now.</p>
+<p>However, instead of sending the events directly to Google Analytics servers, you&rsquo;ll configure the <a href="https://www.simoahava.com/gtm-tips/send-google-analytics-requests-custom-endpoint/"><code>transport_url</code> field</a> in the <strong>GA4 Config tag</strong> (preferably) to dispatch the requests to your Server container instead.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/03/transport-url.jpg" title="The transport_url field">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/03/transport-url.jpg#ZgotmplZ" alt="The transport_url field" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1782 834'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>In addition to this, you&rsquo;ll need to add some <strong>new fields</strong> to the GA4 requests, so that the Facebook tag template will be able to access this information. This includes things like <strong>User Data</strong> parameters (used for user matching), and certain <strong>Facebook custom data parameters</strong> you want the server-side tag to collect as well.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/03/ga4-event-parameters.jpg" title="GA4 event parameters">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/03/ga4-event-parameters.jpg#ZgotmplZ" alt="GA4 event parameters" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1442 794'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>You don&rsquo;t have to worry about sending any of this Facebook-specific information to GA4! We&rsquo;ll clean up the payload in the Server container.</p>
+<h3 id="the-ga4-client-captures-the-request">The GA4 Client captures the request</h3>
+<p>Once you configure the <code>transport_url</code> in your GA4 Config tag, it will be sent to your Server container.</p>
+<p>In the Server container, you need a <strong>GA4 Client</strong> with <strong>Default GA4 paths</strong> selected.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/03/ga4-client-ready.jpg" title="GA4 Client ready">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/03/ga4-client-ready.jpg#ZgotmplZ" alt="GA4 Client ready" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1804 892'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<blockquote>
+<p>You can also proxy the gtag.js container by checking the <strong>Default gtag.js paths for specific IDs</strong>, and you can also utilize the Server container&rsquo;s cookie capabilities by expanding <strong>More Settings</strong> and exploring the <a href="https://www.simoahava.com/analytics/fpid-cookie-google-analytics-server-side-tagging/">FPID option</a>.</p>
+</blockquote>
+<h3 id="the-facebook-tag-takes-the-data-and-forwards-it-to-facebook">The Facebook tag takes the data and forwards it to Facebook</h3>
+<p>In the Server container, the GA4 Client parses the incoming HTTP request sent by the GA4 web tag and converts it into an <strong>event data object</strong>.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/03/event-data-object.jpg" title="Event data object">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/03/event-data-object.jpg#ZgotmplZ" alt="Event data object" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2740 1270'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>This object triggers the <strong>Facebook server-side tag</strong> (the template for which you can find in the <a href="https://tagmanager.google.com/gallery/#/owners/facebookincubator/templates/ConversionsAPI-Tag-for-GoogleTagManager">Community Template Gallery</a>), which reads the event data and finally sends the payload to Facebook.</p>
+<p>If you have (as you should) a GA4 tag running in the Server container, dispatching the GA4 Client&rsquo;s output to GA4 servers as well, you might want to clean up some of the parameters reserved for Facebook to prevent them from &ldquo;leaking&rdquo; into your GA4 data.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/03/clear-facebook-parameters.jpg" title="Clear FB parameters">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/03/clear-facebook-parameters.jpg#ZgotmplZ" alt="Clear FB parameters" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1394 800'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>And that&rsquo;s it for the overview! Let&rsquo;s jump into each part in more detail.</p>
+
+                
+                  <h2 id="update-the-ga4-web-tag">Update the GA4 web tag</h2>
+<p>Let&rsquo;s start with modifying the GA4 web tag.</p>
+<p>If you&rsquo;re just <em>starting</em> to work with Server containers, it might be wise to <em>copy</em> your existing GA4 web tags rather than replace their functionality with the <code>transport_url</code> field.</p>
+<p>That way you can &ldquo;parallel track&rdquo; via the web tag AND the Server container. You might want to create a new data stream in GA4 just for your server-side hits.</p>
+<p>But this isn&rsquo;t a guide on how to create a GA4 server-side setup. Instead, we&rsquo;ll focus on utilizing the GA4 web tag for <strong>Facebook&rsquo;s purposes</strong>.</p>
+<p>The Facebook server-side tag has a limited inventory of parameters it can make use of.</p>
+<h3 id="event-name">Event Name</h3>
+<p>First, there&rsquo;s the <strong>Event Name</strong> field in the GA4 web tag itself. You can set <em>anything</em> you like into this and it will work with Facebook&rsquo;s endpoint. However, <em>some</em> event names have special functionality, and they are automatically converted to Facebook&rsquo;s standard event name format. Here&rsquo;s the list:</p>
+<table>
+<thead>
+<tr>
+<th>Event name in GA4 tag</th>
+<th>Event name converted by Facebook&rsquo;s tag</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>add_payment_info</code></td>
+<td><code>AddPaymentInfo</code></td>
+</tr>
+<tr>
+<td><code>add_to_cart</code></td>
+<td><code>AddToCart</code></td>
+</tr>
+<tr>
+<td><code>add_to_wishlist</code></td>
+<td><code>AddToWishlist</code></td>
+</tr>
+<tr>
+<td><code>begin_checkout</code></td>
+<td><code>InitiateCheckout</code></td>
+</tr>
+<tr>
+<td><code>generate_lead</code></td>
+<td><code>Lead</code></td>
+</tr>
+<tr>
+<td><code>page_view</code></td>
+<td><code>PageView</code></td>
+</tr>
+<tr>
+<td><code>purchase</code></td>
+<td><code>Purchase</code></td>
+</tr>
+<tr>
+<td><code>search</code></td>
+<td><code>Search</code></td>
+</tr>
+<tr>
+<td><code>signup</code></td>
+<td><code>CompleteRegistration</code></td>
+</tr>
+<tr>
+<td><code>view_item</code></td>
+<td><code>ViewContent</code></td>
+</tr>
+</tbody>
+</table>
+<p>So if you use any of the event name values in the <em>left</em> column, Facebook will convert them to the corresponding values in the <em>right</em> column when collecting the data.</p>
+<p>Any other event names will be used as-is without modifications when collecting the data to Facebook.</p>
+<h3 id="general-parameters">General parameters</h3>
+<p>There are a handful of <em>utility</em> parameters that you can set as GA4 event parameters, and they will be handled in a special way by the Facebook tag.</p>
+<h4 id="event_time">event_time</h4>
+
+
+
+<div class="figure " >
+  
+    <a href="https://www.simoahava.com/images/2021/03/event-time-fb.jpg" title="event_time in the GA4 web tag">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/03/event-time-fb.jpg#ZgotmplZ" alt="event_time in the GA4 web tag" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1746 242'%3E%3C/svg%3E">
+  
+    </a>
+  
+   
+    <span class="caption">event_time in the GA4 web tag</span>
+  
+</div>
+
+
+<p>The <code>event_time</code> parameter should be set to the moment when the data was collected on the website. The format is <strong>UNIX (epoch) time</strong> <em>in seconds</em>. In other words, to get the current timestamp with a Custom JavaScript variable, for example, you could use this:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() {
+  <span style="color:#00a">return</span> <span style="color:#0aa">Math</span>.round(<span style="color:#00a">new</span> <span style="color:#0aa">Date</span>().getTime() / <span style="color:#099">1000</span>);
+}
+</code></pre></div>
+<p>Note that you don&rsquo;t <strong>have</strong> to send this. If it&rsquo;s not part of the GA4 hit, then the Facebook tag will simply set the timestamp to the moment the server-side tag was executed.</p>
+<h4 id="event_id">event_id</h4>
+
+
+
+<div class="figure " >
+  
+    <a href="https://www.simoahava.com/images/2021/03/event-id-facebook.jpg" title="event_id in the GA4 web tag">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/03/event-id-facebook.jpg#ZgotmplZ" alt="event_id in the GA4 web tag" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1748 234'%3E%3C/svg%3E">
+  
+    </a>
+  
+   
+    <span class="caption">event_id in the GA4 web tag</span>
+  
+</div>
+
+
+<p><a href="https://developers.facebook.com/docs/marketing-api/conversions-api/deduplicate-pixel-and-server-events"><code>event_id</code> is used for <strong>deduplicating identical events</strong></a> collected from more than one source (e.g. web site and Server container).</p>
+<p>This is <strong>only</strong> relevant if you are duplicating data collection between the web pixel and the Server container, for example. If you are only collecting events using one or the other, you do <strong>not</strong> have to use <code>event_id</code>!</p>
+<p>The <code>event_id</code> must be unique for all the events that should be deduplicated. Each set of events that needs to be deduplicated must have its own unique event ID, otherwise Facebook will not be able to consistently deduplicate the data.</p>
+<p>With Google Tag Manager, creating a consistently unique event ID is a bit difficult, as variables are resolved each time they are invoked. So if you have, for example, the <strong>{{Random Number}}</strong> variable used as Event ID in a web pixel and a server-side call, then it will return a different number for both times the variable is called.</p>
+<p>A fairly simple way to create the Event ID would be to generate a random Page ID for every page load, and then concatenate this with a sequence number that is increased by one for each set of Facebook events that needs to be deduplicated. Another option is to push an event to <code>dataLayer</code> for each set of Facebook tags that needs to be deduplicated, and with that event also push the random, unique Event ID. That way all the Facebook hits (that require deduplication) can fire on the event and use the Event ID in the pushed object.</p>
+<h4 id="page_location">page_location</h4>
+
+
+
+<div class="figure " >
+  
+    <a href="https://www.simoahava.com/images/2021/03/page-location-fb.jpg" title="page_location in the GA4 web tag">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/03/page-location-fb.jpg#ZgotmplZ" alt="page_location in the GA4 web tag" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1742 226'%3E%3C/svg%3E">
+  
+    </a>
+  
+   
+    <span class="caption">page_location in the GA4 web tag</span>
+  
+</div>
+
+
+<p>Even though <code>page_location</code> is automatically collected from the URL of the page when the GA4 tag fires, you can also override it with a custom value as in the screenshot above.</p>
+<p>This is collected as the <code>event_source_url</code> by the Facebook server-side tag.</p>
+<h4 id="action_source">action_source</h4>
+
+
+
+<div class="figure " >
+  
+    <a href="https://www.simoahava.com/images/2021/03/action-source-fb.jpg" title="action_source in the GA4 web tag">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/03/action-source-fb.jpg#ZgotmplZ" alt="action_source in the GA4 web tag" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1746 246'%3E%3C/svg%3E">
+  
+    </a>
+  
+   
+    <span class="caption">action_source in the GA4 web tag</span>
+  
+</div>
+
+
+<p>You can set <code>action_source</code> to one of:</p>
+<ul>
+<li><code>email</code></li>
+<li><code>website</code></li>
+<li><code>app</code></li>
+<li><code>phone_call</code></li>
+<li><code>chat</code></li>
+<li><code>physical_store</code></li>
+<li><code>system_generated</code></li>
+<li><code>other</code></li>
+</ul>
+<p>This field is optional, and it specifies the context of the hit: where did the conversion happen.</p>
+<p>You can <em>also</em> configure the Action Source in the server-side Facebook tag. However, if you do send the <code>action_source</code> in the GA4 hit, it overrides the server-side tag setting.</p>
+<h3 id="user-data-parameters">User data parameters</h3>
+<p>With appropriate consent and/or other legal premise checked, you can also send user data parameters to Facebook to help match the conversion with the user who performed the action.</p>
+<blockquote>
+<p>Please, please, <strong>please</strong> make sure that you have the legal right to send end users&rsquo; personal data to Facebook. Don&rsquo;t follow the instructions below blindly – make sure you are not breaching the users&rsquo; right to privacy.</p>
+</blockquote>
+<p>For user data parameters to work in the server-side setup, you <strong>must</strong> add the following field to the event parameters of the GA4 tag sending the user data:</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/03/first-party-collection-facebook.jpg" title="first_party_collection in the GA4 web tag">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/03/first-party-collection-facebook.jpg#ZgotmplZ" alt="first_party_collection in the GA4 web tag" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1754 232'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Set the field name to <code>first_party_collection</code> and value to <code>true</code>.</p>
+<h4 id="user-ip-address-and-user-agent-string">User IP address and User-Agent string</h4>
+<p>If you want, you can <strong>override</strong> the IP address and User-Agent string sent to Facebook using the GA4 web tag as well. This is a nice way of anonymizing the request if you don&rsquo;t want Facebook to use the user&rsquo;s actual IP and User-Agent.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/03/ip-override-user-agent.jpg" title="ip override and user agent">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/03/ip-override-user-agent.jpg#ZgotmplZ" alt="ip override and user agent" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1750 468'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>To override the IP address, set the field <code>ip_override</code>, and to override the User-Agent string, set the field <code>user_agent</code>.</p>
+<p>If you don&rsquo;t override these fields, the server-side tag will forward the user&rsquo;s actual IP address and User-Agent to Facebook to help with user matching.</p>
+<h4 id="user-data-parameters-in-the-common-event-schema">User data parameters in the common event schema</h4>
+<p>You can also explicitly send personal data about the user to Facebook. The server-side tag will <strong>hash</strong> the data, so Facebook will never receive the data in a readable format.</p>
+<blockquote>
+<p>If the data is already hashed when sent with the GA4 tag, the Facebook tag won&rsquo;t hash it again.</p>
+</blockquote>
+<p>Here are the parameters you can set:</p>
+<ul>
+<li><code>user_data.email_address</code></li>
+<li><code>user_data.phone_number</code></li>
+<li><code>user_data.address.first_name</code></li>
+<li><code>user_data.address.last_name</code></li>
+<li><code>user_data.address.city</code></li>
+<li><code>user_data.address.region</code></li>
+<li><code>user_data.address.postal_code</code></li>
+<li><code>user_data.address.country</code></li>
+</ul>
+<p>This is what it might look in the GA4 web tag:</p>
+
+
+
+<div class="figure " >
+  
+    <a href="https://www.simoahava.com/images/2021/03/user-data-schema.jpg" title="User Data parameters following the common event schema">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/03/user-data-schema.jpg#ZgotmplZ" alt="User Data parameters following the common event schema" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1742 574'%3E%3C/svg%3E">
+  
+    </a>
+  
+   
+    <span class="caption">User Data parameters following the common event schema</span>
+  
+</div>
+
+
+<h4 id="facebook-specific-parameters">Facebook-specific parameters</h4>
+<p>There are also a handful of Facebook-specific parameters you can set. These are <strong>not</strong> hashed automatically.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>x-fb-ud-ge</code></td>
+<td>User gender. <strong>Hashing is needed</strong>.</td>
+</tr>
+<tr>
+<td><code>x-fb-ud-db</code></td>
+<td>User date of birth. <strong>Hashing is needed</strong>.</td>
+</tr>
+<tr>
+<td><code>x-fb-ud-external_id</code></td>
+<td><a href="https://developers.facebook.com/docs/marketing-api/conversions-api/parameters/customer-information-parameters#external-id">External ID</a>, e.g. advertiser loyalty ID. <strong>Hashing is recommended</strong>.</td>
+</tr>
+<tr>
+<td><code>x-fb-ud-subscription_id</code></td>
+<td><a href="https://developers.facebook.com/docs/marketing-api/conversions-api/parameters/customer-information-parameters#subscription-id">Subscription ID</a>, e.g. a subscription ID for the user in the transaction. This <strong>should not be hashed</strong>.</td>
+</tr>
+<tr>
+<td><code>x-fb-ck-fbp</code></td>
+<td>The <code>_fbp</code> cookie value. See below.</td>
+</tr>
+<tr>
+<td><code>x-fb-ck-fbc</code></td>
+<td>The <code>_fbc</code> cookie value. See below.</td>
+</tr>
+</tbody>
+</table>
+<p>You can send the <code>_fbp</code> and <code>_fbc</code> cookie values with the parameters listed above. If you don&rsquo;t explicitly set them, and the user has those cookies in their browser, and the server-side tagging endpoint is first-party, then the Facebook tag will <em>automatically</em> read the cookie values from the user&rsquo;s cookies.</p>
+<blockquote>
+<p>Note that currently, the Facebook tag does <strong>not</strong> <em>set</em> the cookies in the response. I&rsquo;ve submitted an Issue about this to Facebook, as I think it would make a lot of sense to have the tag add the <code>Set-Cookie</code> headers in the HTTP response back from the Server container.</p>
+</blockquote>
+<p>Here&rsquo;s what some of these parameters might look like in the GA4 event tag:</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/03/user-data-special-parameters.jpg" title="Facebook-specific user data parameters in the GA4 web tag">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/03/user-data-special-parameters.jpg#ZgotmplZ" alt="Facebook-specific user data parameters in the GA4 web tag" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1756 452'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<h3 id="custom-data-parameters">Custom data parameters</h3>
+<p>You can also send <strong>custom data parameters</strong> to Facebook by setting them as fields in the GA4 web tag.</p>
+<h4 id="general-parameters-1">General parameters</h4>
+<p>There are a handful of general parameters that can be set in the GA4 web tag. The Facebook server-side tag will be able to read these and send them to Facebook.</p>
+<table>
+<thead>
+<tr>
+<th>GA4 parameter name</th>
+<th>Converted by the Facebook tag</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>currency</code></td>
+<td><code>currency</code></td>
+<td>Currency code of the transaction (or other event with a monetary value).</td>
+</tr>
+<tr>
+<td><code>value</code></td>
+<td><code>value</code></td>
+<td>Total value of the transaction (or other event with a monetary value).</td>
+</tr>
+<tr>
+<td><code>search_term</code></td>
+<td><code>search_string</code></td>
+<td>What the user searched for with the site search.</td>
+</tr>
+<tr>
+<td><code>transaction_id</code></td>
+<td><code>order_id</code></td>
+<td>Unique order / transaction ID.</td>
+</tr>
+</tbody>
+</table>
+<p>This is what these parameters would look like in the GA4 event tag:</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/03/general-custom-parameters.jpg" title="Parameters in the GA4 tag">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/03/general-custom-parameters.jpg#ZgotmplZ" alt="Parameters in the GA4 tag" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1746 584'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<h4 id="items">Items</h4>
+<p>If you&rsquo;re collecting <a href="https://www.simoahava.com/analytics/google-analytics-4-ecommerce-guide-google-tag-manager/">Ecommerce to GA4</a>, you might already have an <code>items</code> array in place.</p>
+<p>Well, the server-side Facebook tag can <strong>automatically</strong> take the contents of this <code>items</code> array and turn it into a <code>contents</code> array!</p>
+<p>This is how the mapping is done:</p>
+<table>
+<thead>
+<tr>
+<th>Key in <code>items</code></th>
+<th>Mapped to in <code>contents</code></th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>item_id</code></td>
+<td><code>id</code></td>
+<td>Item ID (e.g. SKU).</td>
+</tr>
+<tr>
+<td><code>item_name</code></td>
+<td><code>title</code></td>
+<td>Item title or name.</td>
+</tr>
+<tr>
+<td><code>price</code></td>
+<td><code>item_price</code></td>
+<td>Item price.</td>
+</tr>
+<tr>
+<td><code>item_brand</code></td>
+<td><code>brand</code></td>
+<td>Item brand label.</td>
+</tr>
+<tr>
+<td><code>quantity</code></td>
+<td><code>quantity</code></td>
+<td>Number of items in the event.</td>
+</tr>
+<tr>
+<td><code>item_category</code></td>
+<td><code>category</code></td>
+<td>Item category label.</td>
+</tr>
+</tbody>
+</table>
+<p>This is by far the easiest way to build the <code>contents</code> array.</p>
+<p>Naturally, you can also send the <code>contents</code> array with a custom parameter named <code>x-fb-cd-contents</code>.</p>
+
+
+
+<div class="figure " >
+  
+    <a href="https://www.simoahava.com/images/2021/03/contents-facebook.jpg" title="x-fb-cd-contents in the GA4 web tag">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/03/contents-facebook.jpg#ZgotmplZ" alt="x-fb-cd-contents in the GA4 web tag" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1742 236'%3E%3C/svg%3E">
+  
+    </a>
+  
+   
+    <span class="caption">x-fb-cd-contents in the GA4 web tag</span>
+  
+</div>
+
+
+<h4 id="facebook-specific-custom-data-parameters">Facebook-specific custom data parameters</h4>
+<p>You can also send a number of Facebook-specific custom data parameters. These are:</p>
+<table>
+<thead>
+<tr>
+<th>Parameter name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>x-fb-cd-content_category</code></td>
+<td>Content category.</td>
+</tr>
+<tr>
+<td><code>x-fb-cd-content_ids</code></td>
+<td>Content IDs.</td>
+</tr>
+<tr>
+<td><code>x-fb-cd-content_name</code></td>
+<td>Content name.</td>
+</tr>
+<tr>
+<td><code>x-fb-cd-content_type</code></td>
+<td>Content type.</td>
+</tr>
+<tr>
+<td><code>x-fb-cd-contents</code></td>
+<td>Contents array.</td>
+</tr>
+<tr>
+<td><code>x-fb-cd-num_items</code></td>
+<td>Number of items.</td>
+</tr>
+<tr>
+<td><code>x-fb-cd-predicted_ltv</code></td>
+<td>Predicted lifetime value.</td>
+</tr>
+<tr>
+<td><code>x-fb-cd-status</code></td>
+<td>Status.</td>
+</tr>
+<tr>
+<td><code>x-fb-cd-delivery_category</code></td>
+<td>Delivery category.</td>
+</tr>
+</tbody>
+</table>
+<p>You can read more about these parameters as well as about their expected formats <a href="https://developers.facebook.com/docs/marketing-api/conversions-api/parameters/custom-data/">behind this link</a>.</p>
+<p>Here&rsquo;s an example of what these might look like in the GA4 event tag:</p>
+
+
+
+<div class="figure " >
+  
+    <a href="https://www.simoahava.com/images/2021/03/custom-data-parameters.jpg" title="Custom data parameters in the event tag">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/03/custom-data-parameters.jpg#ZgotmplZ" alt="Custom data parameters in the event tag" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1752 460'%3E%3C/svg%3E">
+  
+    </a>
+  
+   
+    <span class="caption">Custom data parameters in the event tag</span>
+  
+</div>
+
+
+<h3 id="test-event-code">Test event code</h3>
+<p>If you&rsquo;re testing the Conversions API endpoint, you can use the <a href="https://developers.facebook.com/docs/marketing-api/conversions-api/parameters/main-body#test_event_code">test event code</a> to collect <strong>mock hits</strong> that will not be counted by the actual pixel endpoint.</p>
+<p>You <em>can</em> set the test event code in the GA4 web tag if you wish. All you need to do is set the event parameter <code>test_event_code</code> like this:</p>
+
+
+
+<div class="figure " >
+  
+    <a href="https://www.simoahava.com/images/2021/03/test-event-code.jpg" title="test_event_code in the GA4 web tag">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/03/test-event-code.jpg#ZgotmplZ" alt="test_event_code in the GA4 web tag" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1752 230'%3E%3C/svg%3E">
+  
+    </a>
+  
+   
+    <span class="caption">test_event_code in the GA4 web tag</span>
+  
+</div>
+
+
+<p>However, it might be easier to configure the test event code in the Facebook server-side tag (see below).</p>
+
+                
+                  <h2 id="make-sure-the-ga4-client-is-running-in-the-server-container">Make sure the GA4 Client is running in the server container</h2>
+<p>When the GA4 web tag has the <code>transport_url</code> field set to point at your server-side endpoint, the endpoint will receive a GA4 request whenever such a tag fires in the website.</p>
+<p>If the server-side endpoint <em>doesn&rsquo;t</em> have a GA4 Client configured, the request will fail with a <code>400</code> error.</p>
+<p>Make sure that you have a GA4 Client running in the Server container. If not, create one by choosing the <strong>New</strong>.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/03/ga4-clients.jpg" title="GA4 Client">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/03/ga4-clients.jpg#ZgotmplZ" alt="GA4 Client" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2514 714'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Next, open the Client and make sure the <strong>Default GA4 paths</strong> option is checked.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/03/default-ga4-paths.jpg" title="Default GA4 tags">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/03/default-ga4-paths.jpg#ZgotmplZ" alt="Default GA4 tags" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 896 390'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>This should be enough to make your endpoint claim the incoming GA4 requests and parse them into the format required by the Facebook tag.</p>
+
+                
+                  <h2 id="load-the-facebook-conversions-api-tag-template-from-the-template-gallery">Load the Facebook Conversions API Tag template from the template gallery</h2>
+<p>Next, head on to <strong>Templates</strong> in the Server container.</p>
+<p>In the <strong>Tag Templates</strong> box, click the <strong>Search Gallery</strong> button.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/03/search-tag-gallery.jpg" title="Search tag gallery">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/03/search-tag-gallery.jpg#ZgotmplZ" alt="Search tag gallery" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2534 458'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Search for the <strong>Facebook Conversions API Tag</strong> template, select it, and click <strong>Add to workspace</strong>.</p>
+
+
+
+<div class="figure " >
+  
+    <a href="https://www.simoahava.com/images/2021/03/facebook-tag-gallery.jpg" title="Facebook tag in the gallery">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/03/facebook-tag-gallery.jpg#ZgotmplZ" alt="Facebook tag in the gallery" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1254 770'%3E%3C/svg%3E">
+  
+    </a>
+  
+   
+    <span class="caption">Facebook tag in the gallery</span>
+  
+</div>
+
+
+
+                
+                  <h2 id="create-and-configure-the-facebook-conversions-api-tag">Create and configure the Facebook Conversions API Tag</h2>
+<p>In the Server container, go to <strong>Tags</strong> and create a new tag.</p>
+<p>Choose the <strong>Facebook Conversions API Tag</strong> as the type.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/03/new-tag.jpg" title="New tag">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/03/new-tag.jpg#ZgotmplZ" alt="New tag" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1586 476'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>To send data to the <strong>Conversions API</strong>, you will need the following information:</p>
+<ul>
+<li>The <strong>Pixel ID</strong> to which the data is sent.</li>
+<li>An <a href="https://developers.facebook.com/docs/marketing-api/conversions-api/get-started#access-token"><strong>API Access Token</strong></a> for interacting with the Conversions API.</li>
+<li>(Optionally) a <a href="https://developers.facebook.com/docs/marketing-api/conversions-api/using-the-api#testEvents">Test Event Code</a> with which to test the Conversions API without actually causing data to be collected against your pixel.</li>
+</ul>
+<p>You can also set the <strong>Action Source</strong> explicitly here, if you wish.</p>
+<p>For more information on how to get the required values, consult <a href="https://developers.facebook.com/docs/marketing-api/conversions-api/get-started">Facebook&rsquo;s documentation</a>.</p>
+<p>Finally, you&rsquo;ll want to <strong>trigger</strong> the tag when the <strong>GA4 Client</strong> fires.</p>
+<h3 id="trigger-when-any-ga4-request-is-received">Trigger when any GA4 request is received</h3>
+<p>The simplest way to work with the Facebook tag is to trigger it whenever <em>any</em> GA4 request is processed by the GA4 Client.</p>
+<p>You&rsquo;d need to create a new <strong>Custom</strong> trigger, where the condition is:</p>
+<p><strong>Client Name</strong> equals <strong>&lt;your GA4 Client name&gt;</strong></p>
+<p>For example, I&rsquo;ve created a GA4 Client named <code>GA4</code>. Thus, my trigger looks like this:</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/03/ga4-client.jpg" title="GA4 Client trigger">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/03/ga4-client.jpg#ZgotmplZ" alt="GA4 Client trigger" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1810 682'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>When you add this trigger to the Facebook tag, it will (try to) send data to Facebook when <em>any</em> GA4 event is retrieved.</p>
+<h3 id="trigger-conditionally">Trigger conditionally</h3>
+<p>However, you might want to fire the tag only when <em>some</em> GA4 requests are received by the GA4 Client. For example, perhaps you only want to fire the tag when it has one of those Facebook-specific parameters included. Or perhaps you want to fire the tag only for a given event name.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/03/x-fb-trigger.jpg" title="Trigger for x-fb-">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/03/x-fb-trigger.jpg#ZgotmplZ" alt="Trigger for x-fb-" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1804 774'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>The trigger above will fire only when the GA4 Client receives a request <strong>and</strong> when the request&rsquo;s query string has a query parameter that begins with either <code>ep.x-fb-</code> or <code>epn.x-fb-</code>. The first is for custom text parameters sent with the GA4 tag, and the second is for custom number parameters.</p>
+<blockquote>
+<p><strong>Query String</strong> is a built-in variable you can enable in the <strong>Variables</strong> section of the Server container.</p>
+</blockquote>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/03/fb-event-lookup-table.jpg" title="FB Event Lookup Table">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/03/fb-event-lookup-table.jpg#ZgotmplZ" alt="FB Event Lookup Table" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1810 1496'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>The Lookup Table variable above could be used to set the tag to fire for only a specific set of event names. In the Facebook tag&rsquo;s trigger, you would add the condition that this Lookup Table variable needs to resolve to the <code>true</code> value for the tag to fire.</p>
+<p><strong>Note that the event names need to match those set in the GA4 web tag</strong>. So if you want a <code>page_view</code> GA4 web event to fire the Facebook server-side tag, you would need to add <code>page_view</code> to the list of allowed events.</p>
+<p>There are many ways to tackle this, and you need to consider how and when you want Facebook to receive data from the Server container. There are similarly many ways to add Facebook-specific parameters to the GA4 web tag so that you can &ldquo;flag&rdquo; certain requests to be intended only for Facebook.</p>
+
+                
+                  <h2 id="modify-any-possible-ga4-server-side-tags">Modify any possible GA4 server-side tags</h2>
+<p>Because you&rsquo;re adding all these new parameters to the GA4 web tag, it&rsquo;s possible you <em>don&rsquo;t</em> want to send them to GA4 as well. This is particularly true for all those <code>x-fb-</code> prefixed parameters.</p>
+<p>First, calm yourself. The <strong>GA4 server-side tag will NOT send any User Data parameters</strong>, meaning those prefixed with <code>user_data</code>. So if you send an email address unhashed to your Server container as the <code>user_data.email_address</code> parameter (following <a href="#user-data-parameters-in-the-common-event-schema">this</a>), those will <strong>not</strong> be processed by the server-side GA4 tag!</p>
+<p>But for all the others, you&rsquo;ll need to add the parameters you <strong>want to exclude</strong> into the respective setting of your GA4 server-side tag(s). For example, here I&rsquo;m making sure that the <code>x-fb-cd-ge</code> (for Gender), <code>x-fb-cd-db</code> (for Date Of Birth), and <code>x-fb-cd-content_type</code> (for Content Type) are <strong>not</strong> sent to GA4:</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/03/exclude-x-fb-cd.jpg" title="Exclude x-fb- parameters">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/03/exclude-x-fb-cd.jpg#ZgotmplZ" alt="Exclude x-fb- parameters" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1784 1206'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>I wish there was a way to specify a regular expression match, for example, but for now you just need to explicitly list the parameters you want to exclude.</p>
+<p>The best way to get a list of parameters that are processed by the GA4 Client is to take a look at the Server container&rsquo;s Preview mode and specifically the <strong>Event Data</strong> tab for any given event that fires the GA4 tag.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/03/event-data-tab-fb.jpg" title="Event Data tab with FB parameters">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/03/event-data-tab-fb.jpg#ZgotmplZ" alt="Event Data tab with FB parameters" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 3328 1800'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Here you can see how I have the three <code>x-fb-...</code> parameters generated by the GA4 Client, so I need to add those to the exclusion list in the GA4 server-side tag.</p>
+<blockquote>
+<p>There&rsquo;s one more Facebook-specific parameter in the screenshot above which I should probably also exclude. Can you spot which one it is?</p>
+</blockquote>
+
+                
+                  <h2 id="test-the-setup">Test the setup</h2>
+<p>Once you have the <a href="#update-the-ga4-web-tag"><strong>GA4 web tag configured</strong></a>, the <a href="#make-sure-the-ga4-client-is-running-in-the-server-container"><strong>GA4 server-side Client set up</strong></a>, the <a href="#create-and-configure-the-facebook-conversions-api-tag"><strong>Facebook server-side tag ready to go</strong></a>, and the <a href="#modify-any-possible-ga4-server-side-tags"><strong>GA4 server-side tag updated</strong></a>, you&rsquo;re ready to <em>test everything</em>.</p>
+<p>Take both the Server container and the web container to Preview mode, and do something that causes a GA4 event designed for Facebook&rsquo;s data collection to fire in the web container.</p>
+<p>In the web container&rsquo;s preview mode, you should see a GA4 request to the Server container. To see this, make sure you have the <strong>GA4 Measurement ID</strong> selected in the Preview filters rather than the GTM container ID (see how it&rsquo;s done in the screenshot below).</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/03/event-data-tab-fb.jpg" title="GA4 web preview">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/03/event-data-tab-fb.jpg#ZgotmplZ" alt="GA4 web preview" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 3328 1800'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>In the Server container&rsquo;s preview mode, you should see an incoming HTTP request, where the <strong>Event Name</strong> you configured in the GA4 web tag is shown beneath the request.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/03/ga4-purchase.jpg" title="GA4 purchase">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/03/ga4-purchase.jpg#ZgotmplZ" alt="GA4 purchase" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1080 570'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>When you select the request, you should see an outgoing request to Facebook (and possibly to GA4 as well):</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/03/request-to-fb-ga4.jpg" title="Request to FB and GA4">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/03/request-to-fb-ga4.jpg#ZgotmplZ" alt="Request to FB and GA4" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1908 1278'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>When you select the Facebook request, you should see the correct access token in the URL, a nicely formed request body with all the parameters you included (user data parameters being <strong>hashed</strong>), and finally a status code of <code>200</code> to indicate a successful request.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/03/facebook-request-details.jpg" title="Facebook request details">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/03/facebook-request-details.jpg#ZgotmplZ" alt="Facebook request details" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1792 924'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<blockquote>
+<p>You should also check the outgoing request to GA4 to make sure all the parameters you wanted to exclude are, indeed, excluded.</p>
+</blockquote>
+<p>Finally, in Facebook you should see your event come in to the test event tool (assuming you were using the <strong>Test Event Code</strong>).</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/03/fb-events-manager.jpg" title="Facebook events manager">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/03/fb-events-manager.jpg#ZgotmplZ" alt="Facebook events manager" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2568 946'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>If it doesn&rsquo;t work, be sure to check for possible error responses from Facebook by opening the request details in the Server container&rsquo;s Preview mode.</p>
+
+                
+                  <h2 id="summary">Summary</h2>
+<p>Setting up Facebook data collection using a GA4 data stream from the web to the Server container has its perks.</p>
+<p>The biggest one, by far, is that you won&rsquo;t be loading <em>any</em> Facebook JavaScript in the browser. This alone should make this convoluted data collection scheme worth the effort to set it up.</p>
+<p>You&rsquo;ll also be able to build a <em>consolidated</em> data collection model where redundancy is minimized. After all, the semantic content of conversion data whether to Facebook or to GA4 is always roughly the same – the keys and labels just have different names.</p>
+<p>It&rsquo;s still a fairly new and rough solution, though. For one, the Facebook server-side tag does not currently write the <code>_fbc</code> and <code>_fbp</code> cookies, so if you are <em>not</em> running Facebook JavaScript in the browser, it&rsquo;s possible these identifiers are lost. I&rsquo;ve <a href="https://github.com/facebookincubator/ConversionsAPI-Tag-for-GoogleTagManager/issues/5">submitted an issue about this</a> to Facebook&rsquo;s GitHub project, so hopefully it will be sorted out at some point.</p>
+<p>It&rsquo;s also a bit of a chore to first allowlist the parameters for Facebook and then to blocklist them in GA4. But that&rsquo;s unavoidable for now. Perhaps at some point the Server container will give more tools for building parameter maps between Clients and tags, rather than having to add them one-by-one into all the tags separately.</p>
+<p>I hope you enjoyed this article. Once Facebook releases a way to leverage the <strong>Facebook web pixel</strong> to send data to the Server container, I will follow-up with another guide about this method, too. But personally I&rsquo;m a huge fan of piggy-backing off the GA4 tag due to the perks listed at the beginning of this chapter.</p>
+<p>What do you think about Facebook&rsquo;s entry into the Google Tag Manager Server container? What features are you missing?</p>
+
+                
+              
+              
+
+            </div>
+          </div>
+          <div id="post-footer" class="post-footer main-content-wrap">
+            
+              
+                
+                
+                  <div class="post-footer-tags">
+                    <span class="text-color-light text-small">TAGGED IN</span><br/>
+                    
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/google-tag-manager/">google tag manager</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/facebook/">facebook</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/server-side-tagging/">server-side tagging</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/conversions-api/">conversions api</a>
+
+                  </div>
+                
+              
+            
+            
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--disabled">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/gtm-tips/map-multiple-domains-server-side-tagging-endpoint/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/facebook-conversions-api-gtm-server-side-tagging/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Facebook%20Conversions%20API%20Using%20GA4%20Web%20Tags%20And%20A%20GTM%20Server%20https://www.simoahava.com/analytics/facebook-conversions-api-gtm-server-side-tagging/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/facebook-conversions-api-gtm-server-side-tagging/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#commento_thread">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+            
+              <span id="commento_thread"></span>
+<div id="commento"></div>
+<script defer src="https://cdn.commento.io/js/commento.js"></script>
+
+            
+          </div>
+        </article>
+        <footer id="footer" class="main-content-wrap">
+  <span class="copyrights">
+    &copy; 2021 Simo Ahava. All Rights Reserved
+  </span>
+</footer>
+
+      </div>
+      
+      <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+        
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--disabled">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/gtm-tips/map-multiple-domains-server-side-tagging-endpoint/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/facebook-conversions-api-gtm-server-side-tagging/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Facebook%20Conversions%20API%20Using%20GA4%20Web%20Tags%20And%20A%20GTM%20Server%20https://www.simoahava.com/analytics/facebook-conversions-api-gtm-server-side-tagging/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/facebook-conversions-api-gtm-server-side-tagging/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#commento_thread">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+      </div>
+      
+      <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+  <i id="btn-close-shareoptions" class="fa fa-close"></i>
+  <ul class="share-options">
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/facebook-conversions-api-gtm-server-side-tagging/">
+          <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=Facebook%20Conversions%20API%20Using%20GA4%20Web%20Tags%20And%20A%20GTM%20Server%20https://www.simoahava.com/analytics/facebook-conversions-api-gtm-server-side-tagging/%20via%20@SimoAhava">
+          <i class="fa fa-twitter"></i><span>Share on Twitter</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/facebook-conversions-api-gtm-server-side-tagging/">
+          <i class="fa fa-linkedin"></i><span>Share on LinkedIn</span>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+<div id="share-options-mask" class="share-options-mask"></div>
+
+    </div>
+    
+    <div id="about">
+  <div id="about-card">
+    <div id="about-btn-close">
+      <i class="fa fa-remove"></i>
+    </div>
+    
+      <img id="about-card-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+    
+    <h4 id="about-card-name">Simo Ahava</h4>
+    
+      <div id="about-card-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</div>
+    
+    
+      <div id="about-card-job">
+        <i class="fa fa-briefcase"></i>
+        <br/>
+        Senior Data Advocate at Reaktor
+      </div>
+    
+    
+      <div id="about-card-location">
+        <i class="fa fa-map-marker"></i>
+        <br/>
+        Finland
+      </div>
+    
+  </div>
+</div>
+
+    
+  
+    
+    <div id="cover" style="background-image:url('https://www.simoahava.com/images/maisema.jpg');"></div>
+  
+
+
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+
+
+
+
+<script src="https://www.simoahava.com/js/script.js"></script>
+
+
+
+
+<script src="https://cdn.commento.io/js/count.js"></script>
+
+    <script>
+      !function(){var e=document.querySelector(".simmer"),t=document.querySelector(".simmer .close"),o=window.sessionStorage&&window.sessionStorage.getItem("nosimmer");if(e){if(o){e.style.display="none"}t.addEventListener("click",function(){window.sessionStorage.setItem("nosimmer","true"),e.style.display="none"})}}();
+    </script>
+    <script>
+      var mylazyload = new LazyLoad({elements_selector: '.lazy'});
+      </script>
+
+    
+  </body>
+</html>
+
