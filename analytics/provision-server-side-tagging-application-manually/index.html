@@ -1,0 +1,1023 @@
+
+
+  
+    
+  
+
+
+  
+
+
+
+
+
+  
+
+
+  
+
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta name="google-site-verification" content="xQwWI2KUfP9LbFKhw2CVLFtrMY6Czrla7L3PD2aBolA" />
+
+
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org", 
+  "@type": "BlogPosting",
+  "headline": "Provision Server-side Tagging Application Manually | Simo Ahava's blog",
+  "image": "https:\/\/www.simoahava.com\/images\/2021\/03\/manual-app-engine-region.jpg",
+  "editor": "Simo Ahava",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Simo Ahava's blog",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https:\/\/www.simoahava.com\/images\/simo.png",
+      "height": "393",
+      "width": "407"
+    }
+  },
+  "url": "https:\/\/www.simoahava.com\/analytics\/provision-server-side-tagging-application-manually\/",
+  "datePublished": "2021-04-15T07:48:42\u002b02:00",
+  "dateModified": "2021-04-15T07:48:42\u002b02:00",
+  "description": "A guide for how to manually provision or upgrade a Google Tag Manager server-side tagging server. This is particularly useful if you already have a Google Cloud Platform project, or if you want to choose the region where the application is created in.",
+  "author": {
+    "@type": "Person",
+    "name": "Simo Ahava"
+  }
+}
+</script>
+
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <title>Provision Server-side Tagging Application Manually | Simo Ahava's blog</title>
+    
+    <script>
+      window.dataLayer=window.dataLayer||[];window.dataLayer.push({pageType: 'article', environment:  null });
+    </script>
+    
+
+    
+    
+    <script src="https://www.simoahava.com/x-js/lazyload.iife.min.js"></script>
+
+    
+
+    
+    <script>
+      (function(S,i,m,o){
+        window[m]=window[m]||[];
+        window[m].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
+        var f=S.getElementsByTagName(i)[0],j=S.createElement(i),dl=m!='dataLayer'?'&l='+m:'';
+        j.async=true;
+        j.src='https://sgtm.simoahava.com/gtm.js?id='+o+dl;
+        f.parentNode.insertBefore(j,f);
+      })(document,'script','dataLayer','GTM-PZ7GMV9');
+    </script>
+    
+    <meta name="author" content="Simo Ahava">
+    <meta name="keywords" content="">
+
+    <link rel="icon" href="https://www.simoahava.com/images/favicon.ico">
+    
+    <link rel="amphtml" href="https://www.simoahava.com/amp/analytics/provision-server-side-tagging-application-manually/">
+    
+    <meta name="description" content="A guide for how to manually provision or upgrade a Google Tag Manager server-side tagging server. This is particularly useful if you already have a Google Cloud Platform project, or if you want to choose the region where the application is created in.">
+    <meta property="og:description" content="A guide for how to manually provision or upgrade a Google Tag Manager server-side tagging server. This is particularly useful if you already have a Google Cloud Platform project, or if you want to choose the region where the application is created in.">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="Provision Server-side Tagging Application Manually">
+    <meta property="og:url" content="https://www.simoahava.com/analytics/provision-server-side-tagging-application-manually/">
+    <meta property="og:site_name" content="Simo Ahava&#39;s blog">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Provision Server-side Tagging Application Manually">
+    <meta name="twitter:description" content="A guide for how to manually provision or upgrade a Google Tag Manager server-side tagging server. This is particularly useful if you already have a Google Cloud Platform project, or if you want to choose the region where the application is created in.">
+    
+      <meta name="twitter:creator" content="@SimoAhava">
+      
+    
+
+    
+    
+
+    
+	  <meta property="og:image" content="https://www.simoahava.com/images/2021/03/provision-server-side-tagging-application-manually.jpg">
+      <meta name="twitter:image" content="https://www.simoahava.com/images/2021/03/provision-server-side-tagging-application-manually.jpg">
+    
+
+
+    
+
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+    
+    
+    
+    <link rel="stylesheet" href="https://www.simoahava.com/css/style.css" />
+    
+    
+
+    
+      
+    
+    
+  </head>
+
+  <body>
+    
+    <div id="_progress"></div>
+    
+    <div id="blog">
+      <header id="header" data-behavior="4">
+  <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+  <div class="header-title">
+    <a class="header-title-link" href="https://www.simoahava.com/">Simo Ahava&#39;s blog</a>
+  </div>
+  
+</header>
+
+      <nav id="sidebar" data-behavior="4">
+  <div class="sidebar-container">
+    
+      <div class="sidebar-profile">
+        <a href="https://www.simoahava.com/">
+          <img class="sidebar-profile-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+        </a>
+        <h4 class="sidebar-profile-name">Simo Ahava</h4>
+        
+          <h5 class="sidebar-profile-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</h5>
+        
+      </div>
+    
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+      
+      <span class="sidebar-button-desc">Home</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+      
+      <span class="sidebar-button-desc">Categories</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tags/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Tags</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/gtm-tips/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-magic"></i>
+      
+      <span class="sidebar-button-desc">GTM Tips</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/about-simo-ahava/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+      
+      <span class="sidebar-button-desc">About</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tools/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-wrench"></i>
+      
+      <span class="sidebar-button-desc">Tools</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/blog-statistics/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bar-chart"></i>
+      
+      <span class="sidebar-button-desc">Blog statistics</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://github.com/sahava" target="_blank" rel="noopener">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+      
+      <span class="sidebar-button-desc">GitHub</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/upcoming-talks/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bullhorn"></i>
+      
+      <span class="sidebar-button-desc">Upcoming talks</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/custom-templates/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Templates</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/newsletter/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bell"></i>
+      
+      <span class="sidebar-button-desc">Newsletter</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+
+    </ul>
+  </div>
+</nav>
+
+      
+
+      <div id="main" data-behavior="4"
+        class="
+               hasCoverMetaIn
+               ">
+        <article class="post">
+	  <form id="search" action="https://www.simoahava.com/search/">
+  <input name="q" type="text" class="form-control input--xlarge" placeholder="Search blog..." autocomplete="off">
+  </form>
+
+          <div class="post-header main-content-wrap text-left">
+  
+    <div class="figure nocaption">
+      <img class="cover" src="https://www.simoahava.com/images/2021/03/provision-server-side-tagging-application-manually.jpg">
+    </div>
+  
+  
+
+    <h1>
+      Provision Server-side Tagging Application Manually
+    </h1>
+  
+  
+  <div class="postShorten-meta post-meta">
+    
+      <time datetime="2021-04-15T07:48:42&#43;02:00">
+        
+  April 15, 2021
+
+      </time>
+      
+      
+  
+  
+    <span>in</span>
+    
+      <a class="category-link" href="https://www.simoahava.com/categories/analytics">Analytics</a>
+    
+  
+
+
+      | <a href="https://www.simoahava.com/analytics/provision-server-side-tagging-application-manually/#commento">Comments</a>
+      
+  </div>
+
+
+</div>
+
+          <div class="post-content markdown">
+            <div class="main-content-wrap">
+	      
+                
+  	        <p>The <a href="https://developers.google.com/tag-manager/serverside#create_a_google_cloud_platform_gcp_server">automatic provisioning process</a> of the <strong>Google Tag Manager server-side tagging service</strong> is extremely useful.</p>
+<p>With just a few clicks of the button, you can have a fully functional (albeit limited to testing use) server-side tagging endpoint on the Google Cloud Platform (GCP).</p>
+<blockquote>
+<p>For a video overview of the automatic deployment, see <a href="https://www.youtube.com/watch?v=6OGbOh216mU">this video</a>.</p>
+</blockquote>
+<p>However, the automatic provisioning process creates <strong>a new Google Cloud Platform project</strong> and, at the time of writing, always deploys the App Engine application (on which the tagging server runs) in the <code>us-central-1</code> GCP region.</p>
+<p>The latter can prove especially problematic in case you have a lot of traffic from non-US locations, as the longer the route for the network traffic, the more you&rsquo;ll have to pay for it. Once the region is set for an App Engine application <strong>it cannot be changed</strong>.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/03/manual-app-engine-region.jpg" title="Manually provision app engine application">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/03/manual-app-engine-region.jpg#ZgotmplZ" alt="Manually provision app engine application" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 930 410'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>In this article, I&rsquo;ll show you how you can <strong>manually create the tagging server</strong> either in an existing GCP project or a completely new project that you&rsquo;ve created.</p>
+<p>Among other things, this way you&rsquo;ll get to <strong>choose the geographical region for the tagging server</strong> during the provisioning process, as long as the project doesn&rsquo;t have a previously deployed App Engine application.</p>
+<div id="toc-container"><h1 id="table-of-contents">Table of Contents</h1> <input type="checkbox" id="show"><label for="show" id="showbtn"><h1 id="table-of-contents-mobile">Table of Contents</h1><span class="show">&nbsp;[+show]</span><span class="hide">&nbsp;[–hide]</span></label><nav id="TableOfContents">
+  <ul>
+    <li><a href="#add-the-application-to-a-gcp-project">Add the application to a GCP project</a>
+      <ul>
+        <li><a href="#open-the-project-in-google-cloud-console">Open the project in Google Cloud Console</a></li>
+        <li><a href="#check-for-a-previous-app-engine-application">Check for a previous App Engine application</a></li>
+        <li><a href="#run-the-upgrade-script">Run the upgrade script</a>
+          <ul>
+            <li><a href="#open-cloud-shell">Open Cloud Shell</a></li>
+            <li><a href="#run-the-script">Run the script</a></li>
+            <li><a href="#copy-the-container-config-string">Copy the Container Config string</a></li>
+            <li><a href="#configure-the-rest-of-the-upgrade-script">Configure the rest of the upgrade script</a></li>
+            <li><a href="#choose-the-app-engine-region">Choose the App Engine region</a></li>
+          </ul>
+        </li>
+        <li><a href="#test-the-endpoint">Test the endpoint</a></li>
+      </ul>
+    </li>
+    <li><a href="#reconfigure-the-google-tag-manager-container">Reconfigure the Google Tag Manager container</a></li>
+    <li><a href="#summary">Summary</a></li>
+  </ul>
+</nav></div>
+<p>It&rsquo;s basically the same process you&rsquo;ll follow when <a href="https://developers.google.com/tag-manager/serverside/script-user-guide">upgrading the server to a production deployment</a>, with the difference that you&rsquo;ll need to do a little bit more manual work to get things up and running.</p>
+
+                <span class="simmer">
+  <span class="close">X</span>
+  <p>
+    <span class="fa fa-md fa-bell"></span>
+    <strong>The Simmer Newsletter</strong>
+  </p>
+  <p>
+    Subscribe to the <a href="https://www.simoahava.com/newsletter/">Simmer newsletter</a> to get the latest news and content from Simo Ahava into your email inbox!
+  </p>
+  </span>
+
+                
+                  <h2 id="add-the-application-to-a-gcp-project">Add the application to a GCP project</h2>
+<p>As you are building the application manually, you either <a href="https://console.cloud.google.com/cloud-resource-manager">already have a Google Cloud Platform project</a> to which you want to add the Server container application, or you want to <a href="https://console.cloud.google.com/projectcreate">create a completely new project</a> for this application.</p>
+<p>Whichever route you want to take, you need to do <strong>two things</strong>.</p>
+<p>First, visit the <strong>Cloud Build API</strong> page by following <a href="https://console.cloud.google.com/apis/api/cloudbuild.googleapis.com/overview">this link</a>. Then, make sure you are in the correct project, and finally choose <strong>Enable</strong> to enable the API.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/04/link-billing-account.jpg" title="Link billing account">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/04/link-billing-account.jpg#ZgotmplZ" alt="Link billing account" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1064 420'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Second, you need to link the project to a <strong>Billing Account</strong> by following <a href="https://console.cloud.google.com/billing/linkedaccount">this link</a>. You need to enable billing for the project in order to run the provisioning setup.</p>
+<h3 id="open-the-project-in-google-cloud-console">Open the project in Google Cloud Console</h3>
+<p>Double-check that you are in the correct project in the Google Cloud Console.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/04/select-project.jpg" title="Select project">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/04/select-project.jpg#ZgotmplZ" alt="Select project" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1922 598'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Find the project in the <a href="https://console.cloud.google.com/cloud-resource-manager">Cloud Resource Manager</a> and click to open it.</p>
+<h3 id="check-for-a-previous-app-engine-application">Check for a previous App Engine application</h3>
+<p>Before going any further, visit the <a href="https://console.cloud.google.com/appengine">App Engine dashboard</a> of the project. If you see a proper dashboard with data from an existing application, <strong>be warned</strong>.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/04/ae-dashboard.jpg" title="App Engine dashboard">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/04/ae-dashboard.jpg#ZgotmplZ" alt="App Engine dashboard" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1708 1272'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p><strong>If you try to add the GTM Server application to a project with an existing App Engine app, the GTM Server will completely overwrite any previously installed service.</strong></p>
+<p>Make sure you communicate with the application owner that this is about to happen.</p>
+<h3 id="run-the-upgrade-script">Run the upgrade script</h3>
+<p>Once you&rsquo;ve checked and double-checked that the App Engine application can be installed in the project, you can go ahead and run the script that handles the provisioning process for you.</p>
+<p>The following chapters outline the steps you need to take.</p>
+<h4 id="open-cloud-shell">Open Cloud Shell</h4>
+<p>In the Google Cloud console for the project you want to create the application in, fire up an instance of <strong>Cloud Shell</strong> by clicking the dedicated icon in the top bar.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/03/manual-cloud-shell.jpg" title="Cloud Shell">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/03/manual-cloud-shell.jpg#ZgotmplZ" alt="Cloud Shell" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1100 292'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Cloud Shell is a command-line shell prompt where you can run commands and execute scripts <strong>with all the Google Cloud API components</strong> pre-installed. So you don&rsquo;t have to worry about installing dependencies such as the <code>gcloud</code> tool, as they are all preconfigured for you.</p>
+<p>You <em>can</em> do most of this stuff outside the Cloud Shell (e.g. in a local shell prompt or in the Google Cloud console), but running the upgrade script in the Cloud Shell means you don&rsquo;t have to worry about <em>any</em> of the overhead of setting up the necessary tools and dependencies.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/03/manual-authorize-cloud-shell.jpg" title="Authorize Cloud Shell">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/03/manual-authorize-cloud-shell.jpg#ZgotmplZ" alt="Authorize Cloud Shell" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1382 448'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>If you see a prompt such as the one above, make sure you click <strong>Authorize</strong> to give Cloud Shell all the necessary access to your Google Cloud project.</p>
+<h4 id="run-the-script">Run the script</h4>
+<p>After the shell instance has finished loading, you should find yourself in a command-line interpreter within your GCP project.</p>
+<p>Now, copy the following <strong>shell command</strong>, paste it into the Cloud Shell command-line, and press enter:</p>
+<p><code>bash -c &quot;$(curl -fsSL https://googletagmanager.com/static/serverjs/setup.sh)&quot;</code></p>
+<blockquote>
+<p>Double-check the <a href="https://developers.google.com/tag-manager/serverside/script-user-guide#configure_the_tagging_server_url">official documentation</a> to make sure you are running the most recent version of the shell command. I will, of course, make sure this guide is as up-to-date as possible.</p>
+</blockquote>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/03/manual-upgrade-script.jpg" title="Manual upgrade script">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/03/manual-upgrade-script.jpg#ZgotmplZ" alt="Manual upgrade script" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2218 342'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>This script has been created by Google, and it contains all the necessary Google Cloud API commands to create the App Engine application in your project.</p>
+<p>If the project already had an App Engine application, and that application was not a previous GTM server, you&rsquo;ll see the following warning:</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/04/existing-application.jpg" title="Existing application">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/04/existing-application.jpg#ZgotmplZ" alt="Existing application" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1864 314'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Remember that by pressing <code>y</code>, the previous application will be removed and replaced with the GTM server. <strong>Only proceed if you have permission to do this!</strong></p>
+<h4 id="copy-the-container-config-string">Copy the Container Config string</h4>
+<p>The very first setting you need to respond to is the <strong>Container Config</strong>. This is what links the Google Cloud project (your GTM server endpoint) with your Google Tag Manager container.</p>
+<p>With this configuration, you can control how the GTM server works through the familiar Google Tag Manager user interface.</p>
+<p>To find the <strong>Container Config</strong>, go to the Google Tag Manager container for which you are creating the GTM server, and click the container ID in the header.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/04/container-id-header.jpg" title="Container ID header">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/04/container-id-header.jpg#ZgotmplZ" alt="Container ID header" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1244 240'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Alternatively, if you are just in the process of <strong>creating a new container</strong>, once you get to the <strong>Install Google Tag Manager</strong> overlay, do <em>not</em> click <code>Automatically provision tagging server</code>. Instead, click <code>Manually provision tagging server</code>.</p>
+<p>Regardless of which way you go about it, you should see an overlay appear where a <strong>Container Configuration</strong> (or <strong>Container Config</strong>) is displayed. It&rsquo;s a nonsensical string of alphanumeric characters.</p>
+
+
+
+<div class="figure " >
+  
+    <a href="https://www.simoahava.com/images/2021/03/manual-container-configuration.jpg" title="The Container Config parameter in the overlay you see when creating a new container">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/03/manual-container-configuration.jpg#ZgotmplZ" alt="The Container Config parameter in the overlay you see when creating a new container" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1414 790'%3E%3C/svg%3E">
+  
+    </a>
+  
+   
+    <span class="caption">The Container Config parameter in the overlay you see when creating a new container</span>
+  
+</div>
+
+
+<p><strong>Copy</strong> that to the clipboard, and <strong>paste</strong> it into the Cloud Shell where you are asked for the Container Config.</p>
+<h4 id="configure-the-rest-of-the-upgrade-script">Configure the rest of the upgrade script</h4>
+<p>Provide the rest of the configurations for the upgrade script:</p>
+<table>
+<thead>
+<tr>
+<th>Configuration</th>
+<th>Description</th>
+<th>Note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Policy Script URL</td>
+<td>Provide a URL to a <a href="https://developers.google.com/tag-manager/serverside/configure-a-policy">policy script</a> if you wish.</td>
+<td>Optional.</td>
+</tr>
+<tr>
+<td>Request Logging</td>
+<td>Whether App Engine will log all incoming HTTP requests to the GTM server.</td>
+<td>If you find logging costs accumulating, you can <a href="https://www.simoahava.com/analytics/tips-for-logging-server-side-tagging/">optimize logging</a>.</td>
+</tr>
+<tr>
+<td>Deployment Type</td>
+<td><code>testing</code> fires up a single App Engine Standard instance. <code>production</code> spins up additional App Engine Flexible instances.</td>
+<td>Don&rsquo;t use <code>testing</code> if you want to handle production traffic.</td>
+</tr>
+<tr>
+<td>Autoscaling</td>
+<td>Whether the system should automatically scale up instances to accommodate for traffic spikes.</td>
+<td>Only for <code>production</code> deployments.</td>
+</tr>
+<tr>
+<td>Minimum Number of Servers</td>
+<td>What the minimum number of App Engine Flexible instances is at any given time.</td>
+<td>Only for <code>production</code> deployments.</td>
+</tr>
+<tr>
+<td>Maximum Number of Servers</td>
+<td>What the maximum number of App Engine Flexible instances is that the system can auto-scale to.</td>
+<td>Only for <code>production</code> deployments.</td>
+</tr>
+<tr>
+<td>CPU Target Utilization</td>
+<td>What the threshold for CPU Utilization is (between 0.0 and 1.0) before a new App Engine instance is scaled up to.</td>
+<td>Only for <code>production</code> deployments.</td>
+</tr>
+</tbody>
+</table>
+<p>Here is an example of what the configuration might look like:</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/03/manual-configuration-done.jpg" title="Manual configuration done">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/03/manual-configuration-done.jpg#ZgotmplZ" alt="Manual configuration done" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2170 936'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>If you are ready to continue, type <code>y</code> and press enter.</p>
+<h4 id="choose-the-app-engine-region">Choose the App Engine region</h4>
+<blockquote>
+<p>If you are creating the application in a project that already has / had a previous App Engine application, <strong>it&rsquo;s not possible to change its region anymore</strong>. App Engine regions are set for good when first created. The only option currently is to create a new project from scratch.</p>
+</blockquote>
+<p>If this is a brand new App Engine application, you will get your pick of the geographical region for the application.</p>
+<p>There are many things to consider when doing this, but the most important question is <strong>from which region is the majority of requests originating from</strong>. For example, if the bulk of your traffic is from the US, you&rsquo;ll want to pick a US region. If the bulk is from Europe, you&rsquo;ll want to pick an EU region.</p>
+<p>If you are unsure, if it fluctuates, or if the distribution is fairly even, pick a region close to you.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/03/manual-choose-region.jpg" title="Choose Region">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/03/manual-choose-region.jpg#ZgotmplZ" alt="Choose Region" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1432 882'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>The region selection has an impact on <strong>network egress costs</strong>, as if the App Engine application needs to send an HTTP request across regions, it will cost more than if the request is sent within the current region.</p>
+<h3 id="test-the-endpoint">Test the endpoint</h3>
+<p>Once the script has run (it will take a few minutes), you can <strong>test the endpoint</strong>.</p>
+<p>By configuring the <strong>Container Config</strong> in the upgrade script, your App Engine application should be serving requests to your Server container.</p>
+<p>Of course, if you haven&rsquo;t created any <a href="https://www.simoahava.com/analytics/server-side-tagging-google-tag-manager/#clients-and-tags">Clients or tags</a>, the endpoint won&rsquo;t actually <em>do</em> anything.</p>
+<p>An easy way to test that your endpoint has been configured against the GTM server correctly is to do the following:</p>
+<ol>
+<li>While still in <strong>Cloud Shell</strong>, type <code>gcloud app browse</code> and press enter. This will provide you with the custom URL set for your endpoint as a link.</li>
+<li>Click the link to open your endpoint URL in a new tab – you should see an <strong>HTTP ERROR 400</strong> page.</li>
+<li>Add the path <code>/healthy</code> to the URL – you should see a page with the message <code>ok</code>.</li>
+</ol>
+
+
+
+<div class="figure " >
+  
+    <a href="https://www.simoahava.com/images/2021/04/gcloud-app-browse.jpg" title="1. Run the &#34;gcloud app browse&#34; command">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/04/gcloud-app-browse.jpg#ZgotmplZ" alt="1. Run the &#34;gcloud app browse&#34; command" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1012 278'%3E%3C/svg%3E">
+  
+    </a>
+  
+   
+    <span class="caption">1. Run the &#34;gcloud app browse&#34; command</span>
+  
+</div>
+
+
+
+
+
+<div class="figure " >
+  
+    <a href="https://www.simoahava.com/images/2021/04/http-error-400.jpg" title="2. See the HTTP ERROR 400 page">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/04/http-error-400.jpg#ZgotmplZ" alt="2. See the HTTP ERROR 400 page" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1342 694'%3E%3C/svg%3E">
+  
+    </a>
+  
+   
+    <span class="caption">2. See the HTTP ERROR 400 page</span>
+  
+</div>
+
+
+
+
+
+<div class="figure " >
+  
+    <a href="https://www.simoahava.com/images/2021/04/healthy-ok.jpg" title="3. Visit the /healthy endpoint and see the &#34;ok&#34; message">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/04/healthy-ok.jpg#ZgotmplZ" alt="3. Visit the /healthy endpoint and see the &#34;ok&#34; message" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1130 374'%3E%3C/svg%3E">
+  
+    </a>
+  
+   
+    <span class="caption">3. Visit the /healthy endpoint and see the &#34;ok&#34; message</span>
+  
+</div>
+
+
+<p>The <code>HTTP ERROR 400</code> just means that there was no Client to claim the request. The <code>/healthy</code> endpoint is built into the GTM Server application and is used to verify that the GTM Server works as it should.</p>
+
+                
+                  <h2 id="reconfigure-the-google-tag-manager-container">Reconfigure the Google Tag Manager container</h2>
+<p>Finally, you need to tell the Google Tag Manager container what the new URL for the endpoint is.</p>
+<p>For testing, you can continue to use the <code>appspot.com</code> URL. However, you should configure the endpoint with a custom domain as soon as possible (see <a href="https://www.simoahava.com/analytics/server-side-tagging-google-tag-manager/#full-control-and-ownership-of-the-data-collected-by-the-container">this chapter</a> for some reasons).</p>
+<p>To configure the GTM container to always open Preview mode with your new App Engine application URL, go to <strong>Admin</strong> in the GTM UI and choose <strong>Container Settings</strong>. Here, type the <code>appspot.com</code> (or your custom domain) URL into the respective field:</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/04/tagging-server-url.jpg" title="Tagging Server URL">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/04/tagging-server-url.jpg#ZgotmplZ" alt="Tagging Server URL" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1224 622'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<blockquote>
+<p>Remember that you can actually configure more than one URL for the endpoint – see <a href="https://www.simoahava.com/gtm-tips/map-multiple-domains-server-side-tagging-endpoint/">this article</a> for more information.</p>
+</blockquote>
+
+                
+                  <h2 id="summary">Summary</h2>
+<p>In this article, we&rsquo;ve walked through the steps it takes to manually set up an App Engine Application for the Google Tag Manager server.</p>
+<p>In most cases, the <em>automatic provisioning process</em> is more than enough to get things started. However, if you want to set the App Engine region to something other than <code>us-central-1</code>, you <strong>must</strong> run the manual upgrade setup.</p>
+<p>Similarly, if you want to install the application to a pre-existing GCP project, you <strong>must</strong> run the manual upgrade setup.</p>
+<p>Hopefully, the automatic provisioning process will be improved in the future to allow for project and region selection as well.</p>
+
+                
+              
+              
+
+            </div>
+          </div>
+          <div id="post-footer" class="post-footer main-content-wrap">
+            
+              
+                
+                
+                  <div class="post-footer-tags">
+                    <span class="text-color-light text-small">TAGGED IN</span><br/>
+                    
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/google-tag-manager/">google tag manager</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/server-side-tagging/">server-side tagging</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/google-cloud-platform/">google cloud platform</a>
+
+                  </div>
+                
+              
+            
+            
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--disabled">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/gtm-tips/url-parser-variable-template-server-containers/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/provision-server-side-tagging-application-manually/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Provision%20Server-side%20Tagging%20Application%20Manually%20https://www.simoahava.com/analytics/provision-server-side-tagging-application-manually/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/provision-server-side-tagging-application-manually/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#commento_thread">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+            
+              <span id="commento_thread"></span>
+<div id="commento"></div>
+<script defer src="https://cdn.commento.io/js/commento.js"></script>
+
+            
+          </div>
+        </article>
+        <footer id="footer" class="main-content-wrap">
+  <span class="copyrights">
+    &copy; 2021 Simo Ahava. All Rights Reserved
+  </span>
+</footer>
+
+      </div>
+      
+      <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+        
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--disabled">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/gtm-tips/url-parser-variable-template-server-containers/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/provision-server-side-tagging-application-manually/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Provision%20Server-side%20Tagging%20Application%20Manually%20https://www.simoahava.com/analytics/provision-server-side-tagging-application-manually/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/provision-server-side-tagging-application-manually/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#commento_thread">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+      </div>
+      
+      <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+  <i id="btn-close-shareoptions" class="fa fa-close"></i>
+  <ul class="share-options">
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/provision-server-side-tagging-application-manually/">
+          <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=Provision%20Server-side%20Tagging%20Application%20Manually%20https://www.simoahava.com/analytics/provision-server-side-tagging-application-manually/%20via%20@SimoAhava">
+          <i class="fa fa-twitter"></i><span>Share on Twitter</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/provision-server-side-tagging-application-manually/">
+          <i class="fa fa-linkedin"></i><span>Share on LinkedIn</span>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+<div id="share-options-mask" class="share-options-mask"></div>
+
+    </div>
+    
+    <div id="about">
+  <div id="about-card">
+    <div id="about-btn-close">
+      <i class="fa fa-remove"></i>
+    </div>
+    
+      <img id="about-card-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+    
+    <h4 id="about-card-name">Simo Ahava</h4>
+    
+      <div id="about-card-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</div>
+    
+    
+      <div id="about-card-job">
+        <i class="fa fa-briefcase"></i>
+        <br/>
+        Senior Data Advocate at Reaktor
+      </div>
+    
+    
+      <div id="about-card-location">
+        <i class="fa fa-map-marker"></i>
+        <br/>
+        Finland
+      </div>
+    
+  </div>
+</div>
+
+    
+  
+    
+    <div id="cover" style="background-image:url('https://www.simoahava.com/images/maisema.jpg');"></div>
+  
+
+
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+
+
+
+
+<script src="https://www.simoahava.com/js/script.js"></script>
+
+
+
+
+<script src="https://cdn.commento.io/js/count.js"></script>
+
+    <script>
+      !function(){var e=document.querySelector(".simmer"),t=document.querySelector(".simmer .close"),o=window.sessionStorage&&window.sessionStorage.getItem("nosimmer");if(e){if(o){e.style.display="none"}t.addEventListener("click",function(){window.sessionStorage.setItem("nosimmer","true"),e.style.display="none"})}}();
+    </script>
+    <script>
+      var mylazyload = new LazyLoad({elements_selector: '.lazy'});
+      </script>
+
+    
+  </body>
+</html>
+
