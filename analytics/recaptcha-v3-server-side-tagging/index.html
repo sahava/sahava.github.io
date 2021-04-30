@@ -1,0 +1,1105 @@
+
+
+  
+    
+  
+
+
+  
+
+
+
+
+
+  
+
+
+  
+
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta name="google-site-verification" content="xQwWI2KUfP9LbFKhw2CVLFtrMY6Czrla7L3PD2aBolA" />
+
+
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org", 
+  "@type": "BlogPosting",
+  "headline": "reCAPTCHA v3 With Google Tag Manager Server-side Tagging | Simo Ahava's blog",
+  "image": "https:\/\/www.simoahava.com\/images\/2021\/04\/recaptcha-v3-template.jpg",
+  "editor": "Simo Ahava",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Simo Ahava's blog",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https:\/\/www.simoahava.com\/images\/simo.png",
+      "height": "393",
+      "width": "407"
+    }
+  },
+  "url": "https:\/\/www.simoahava.com\/analytics\/recaptcha-v3-server-side-tagging\/",
+  "datePublished": "2021-04-30T07:00:58\u002b03:00",
+  "dateModified": "2021-04-30T07:00:58\u002b03:00",
+  "description": "Load and utilize the reCAPTCHA v3 bot detection algorithm using a Google Tag Manager server-side tagging endpoint as the proxy.",
+  "author": {
+    "@type": "Person",
+    "name": "Simo Ahava"
+  }
+}
+</script>
+
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <title>reCAPTCHA v3 With Google Tag Manager Server-side Tagging | Simo Ahava's blog</title>
+    
+    <script>
+      window.dataLayer=window.dataLayer||[];window.dataLayer.push({pageType: 'article', environment:  null });
+    </script>
+    
+
+    
+    
+    <script src="https://www.simoahava.com/x-js/lazyload.iife.min.js"></script>
+
+    
+
+    
+    <script>
+      (function(S,i,m,o){
+        window[m]=window[m]||[];
+        window[m].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
+        var f=S.getElementsByTagName(i)[0],j=S.createElement(i),dl=m!='dataLayer'?'&l='+m:'';
+        j.async=true;
+        j.src='https://sgtm.simoahava.com/gtm.js?id='+o+dl;
+        f.parentNode.insertBefore(j,f);
+      })(document,'script','dataLayer','GTM-PZ7GMV9');
+    </script>
+    
+    <meta name="author" content="Simo Ahava">
+    <meta name="keywords" content="">
+
+    <link rel="icon" href="https://www.simoahava.com/images/favicon.ico">
+    
+    <link rel="amphtml" href="https://www.simoahava.com/amp/analytics/recaptcha-v3-server-side-tagging/">
+    
+    <meta name="description" content="Load and utilize the reCAPTCHA v3 bot detection algorithm using a Google Tag Manager server-side tagging endpoint as the proxy.">
+    <meta property="og:description" content="Load and utilize the reCAPTCHA v3 bot detection algorithm using a Google Tag Manager server-side tagging endpoint as the proxy.">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="reCAPTCHA v3 With Google Tag Manager Server-side Tagging">
+    <meta property="og:url" content="https://www.simoahava.com/analytics/recaptcha-v3-server-side-tagging/">
+    <meta property="og:site_name" content="Simo Ahava&#39;s blog">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="reCAPTCHA v3 With Google Tag Manager Server-side Tagging">
+    <meta name="twitter:description" content="Load and utilize the reCAPTCHA v3 bot detection algorithm using a Google Tag Manager server-side tagging endpoint as the proxy.">
+    
+      <meta name="twitter:creator" content="@SimoAhava">
+      
+    
+
+    
+    
+
+    
+	  <meta property="og:image" content="https://www.simoahava.com/images/2021/04/recaptcha-v3-with-google-tag-manager-server-side-tagging.jpg">
+      <meta name="twitter:image" content="https://www.simoahava.com/images/2021/04/recaptcha-v3-with-google-tag-manager-server-side-tagging.jpg">
+    
+
+
+    
+
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+    
+    
+    
+    <link rel="stylesheet" href="https://www.simoahava.com/css/style.css" />
+    
+    
+
+    
+      
+    
+    
+  </head>
+
+  <body>
+    
+    <div id="_progress"></div>
+    
+    <div id="blog">
+      <header id="header" data-behavior="4">
+  <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+  <div class="header-title">
+    <a class="header-title-link" href="https://www.simoahava.com/">Simo Ahava&#39;s blog</a>
+  </div>
+  
+</header>
+
+      <nav id="sidebar" data-behavior="4">
+  <div class="sidebar-container">
+    
+      <div class="sidebar-profile">
+        <a href="https://www.simoahava.com/">
+          <img class="sidebar-profile-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+        </a>
+        <h4 class="sidebar-profile-name">Simo Ahava</h4>
+        
+          <h5 class="sidebar-profile-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</h5>
+        
+      </div>
+    
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+      
+      <span class="sidebar-button-desc">Home</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+      
+      <span class="sidebar-button-desc">Categories</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tags/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Tags</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/gtm-tips/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-magic"></i>
+      
+      <span class="sidebar-button-desc">GTM Tips</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/about-simo-ahava/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+      
+      <span class="sidebar-button-desc">About</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tools/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-wrench"></i>
+      
+      <span class="sidebar-button-desc">Tools</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/blog-statistics/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bar-chart"></i>
+      
+      <span class="sidebar-button-desc">Blog statistics</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://github.com/sahava" target="_blank" rel="noopener">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+      
+      <span class="sidebar-button-desc">GitHub</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/upcoming-talks/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bullhorn"></i>
+      
+      <span class="sidebar-button-desc">Upcoming talks</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/custom-templates/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Templates</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/newsletter/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bell"></i>
+      
+      <span class="sidebar-button-desc">Newsletter</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+
+    </ul>
+  </div>
+</nav>
+
+      
+
+      <div id="main" data-behavior="4"
+        class="
+               hasCoverMetaIn
+               ">
+        <article class="post">
+	  <form id="search" action="https://www.simoahava.com/search/">
+  <input name="q" type="text" class="form-control input--xlarge" placeholder="Search blog..." autocomplete="off">
+  </form>
+
+          <div class="post-header main-content-wrap text-left">
+  
+    <div class="figure nocaption">
+      <img class="cover" src="https://www.simoahava.com/images/2021/04/recaptcha-v3-with-google-tag-manager-server-side-tagging.jpg">
+    </div>
+  
+  
+
+    <h1>
+      reCAPTCHA v3 With Google Tag Manager Server-side Tagging
+    </h1>
+  
+  
+  <div class="postShorten-meta post-meta">
+    
+      <time datetime="2021-04-30T07:00:58&#43;03:00">
+        
+  April 30, 2021
+
+      </time>
+      
+      
+  
+  
+    <span>in</span>
+    
+      <a class="category-link" href="https://www.simoahava.com/categories/analytics">Analytics</a>
+    
+  
+
+
+      | <a href="https://www.simoahava.com/analytics/recaptcha-v3-server-side-tagging/#commento">Comments</a>
+      
+  </div>
+
+
+</div>
+
+          <div class="post-content markdown">
+            <div class="main-content-wrap">
+	      
+                
+  	        <p>I&rsquo;ve written about Google&rsquo;s <a href="https://www.simoahava.com/analytics/improve-google-analytics-bot-detection-with-recaptcha/">reCAPTCHA v3</a> before. It&rsquo;s a <em>verification API</em>, which analyzes the signals fed into it and returns a <strong>bot score</strong>, based on how &ldquo;bot-like&rdquo; the hits are.</p>
+<p>It&rsquo;s a great way to validate whether or not to collect data from certain sources that exhibit bot-like behavior. You&rsquo;ll want to ignore those in your analytics tools, for example, as they tend to add a lot of (unrealistic) noise to the data set.</p>
+<p>You can read more about how reCAPTCHA v3 works <a href="https://developers.google.com/recaptcha/docs/v3">here</a>.</p>
+<p>In my <a href="(/analytics/improve-google-analytics-bot-detection-with-recaptcha/)">previous article</a>, you had to build the server endpoint for processing the reCAPTCHA requests yourself. If you remember, reCAPTCHA requires a custom-built API endpoint to process the verification requests.</p>
+<p>Luckily, with the advent of the <a href="https://www.simoahava.com/analytics/server-side-tagging-google-tag-manager/">Google Tag Manager Server container</a>, it&rsquo;s now trivial to build &ldquo;local&rdquo; APIs yourself using the power of <a href="https://www.simoahava.com/analytics/custom-templates-guide-for-google-tag-manager/">custom templates</a>.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/04/recaptcha-v3-template.jpg" title="reCATPCHA v3 template">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/04/recaptcha-v3-template.jpg#ZgotmplZ" alt="reCATPCHA v3 template" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1796 1534'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>In this guide, I&rsquo;ll show you how a new <strong>Client template</strong> I&rsquo;ve created does the legwork for you. It&rsquo;s designed to <strong>proxy</strong> the reCAPTCHA client-side library <em>and</em> to <strong>process</strong> the verification requests.</p>
+<div id="toc-container"><h1 id="table-of-contents">Table of Contents</h1> <input type="checkbox" id="show"><label for="show" id="showbtn"><h1 id="table-of-contents-mobile">Table of Contents</h1><span class="show">&nbsp;[+show]</span><span class="hide">&nbsp;[–hide]</span></label><nav id="TableOfContents">
+  <ul>
+    <li><a href="#prerequisites">Prerequisites</a></li>
+    <li><a href="#import-the-client-template">Import the Client template</a></li>
+    <li><a href="#generate-the-secrets-for-recaptcha-v3">Generate the secrets for reCAPTCHA v3</a></li>
+    <li><a href="#create-the-client-in-your-server-container">Create the Client in your Server container</a>
+      <ul>
+        <li><a href="#add-the-keys-to-the-client">Add the keys to the Client</a></li>
+        <li><a href="#configure-the-rest-of-the-settings">Configure the rest of the settings</a></li>
+      </ul>
+    </li>
+    <li><a href="#configure-the-browser-side-code">Configure the browser-side code</a>
+      <ul>
+        <li><a href="#create-the-script-loader">Create the script loader</a></li>
+        <li><a href="#create-the-verification-tag">Create the verification tag</a></li>
+      </ul>
+    </li>
+    <li><a href="#test-everything">Test everything</a></li>
+    <li><a href="#summary">Summary</a></li>
+  </ul>
+</nav></div>
+<p>At the time of writing, Client templates are not yet available in the <a href="https://tagmanager.google.com/gallery/">Community Template Gallery</a>, so you&rsquo;ll need to do some <strong>manual importing</strong> instead.</p>
+
+                <span class="simmer">
+  <span class="close">X</span>
+  <p>
+    <span class="fa fa-md fa-bell"></span>
+    <strong>The Simmer Newsletter</strong>
+  </p>
+  <p>
+    Subscribe to the <a href="https://www.simoahava.com/newsletter/">Simmer newsletter</a> to get the latest news and content from Simo Ahava into your email inbox!
+  </p>
+  </span>
+
+                
+                  <h2 id="prerequisites">Prerequisites</h2>
+<p>At this point I&rsquo;m assuming you already have a Google Tag Manager Server container. If not, check <a href="https://www.youtube.com/watch?v=6OGbOh216mU">this video</a> for instructions on how to get started with the deployment.</p>
+<p>If you want to write the bot score <strong>in a first-party cookie</strong>, I&rsquo;m also assuming you&rsquo;ve already <a href="https://developers.google.com/tag-manager/serverside/custom-domain">mapped a custom domain to your server-side endpoint</a>. As it currently stands, the template can <em>only</em> write same-site cookies.</p>
+
+                
+                  <h2 id="import-the-client-template">Import the Client template</h2>
+<p>The first thing you&rsquo;ll need to do is <strong>import the Client template</strong> into your Server container.</p>
+<p>Open <a href="https://raw.githubusercontent.com/gtm-templates-simo-ahava/recaptcha-v3/main/template.tpl">this link</a> in a new browser tab, and then <strong>save the page as <code>template.tpl</code></strong>. Make sure the file extension is <code>.tpl</code> and not something else.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/04/save-page-as.jpg" title="Save Page As">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/04/save-page-as.jpg#ZgotmplZ" alt="Save Page As" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 936 820'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Next, in the <strong>Server container</strong>, browse to <strong>Templates</strong>, and click <strong>New</strong> in the <strong>Client Templates</strong> section.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/04/templates-new-client.jpg" title="Templates new client">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/04/templates-new-client.jpg#ZgotmplZ" alt="Templates new client" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2492 976'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>The <strong>Template Editor</strong> will now open. In the Template Editor, click open the overflow menu in the top-right corner, and choose <strong>Import</strong>.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/04/import-client-template.jpg" title="Import client template">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/04/import-client-template.jpg#ZgotmplZ" alt="Import client template" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1006 710'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>On your computer, locate the <code>template.tpl</code> file you downloaded earlier, and import that file into the editor.</p>
+<p>You should see the Template Editor change to reflect the contents of the reCAPTCHA v3 template.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/04/recaptcha-v3.jpg" title="recaptcha ready for edit">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/04/recaptcha-v3.jpg#ZgotmplZ" alt="recaptcha ready for edit" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1492 1012'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Finally, click the blue <strong>Save</strong> button in the top-right corner of the Template Editor and close the editor.</p>
+<p>You&rsquo;ve now managed to import the Client template into your container, and it&rsquo;s time to configure it.</p>
+
+                
+                  <h2 id="generate-the-secrets-for-recaptcha-v3">Generate the secrets for reCAPTCHA v3</h2>
+<p>To work with reCAPTCHA v3, you need to generate a <strong>Site key</strong> and a <strong>Secret key</strong>.</p>
+<p>Browse to <a href="https://www.google.com/recaptcha/admin/create">https://www.google.com/recaptcha/admin/create</a> to register a new site.</p>
+<blockquote>
+<p>This is completely free to do!</p>
+</blockquote>
+<p>Fill in the fields as suggested. Make sure you&rsquo;ve selected <strong>reCAPTCHA v3</strong> as the service version, and add the domain(s) from which you will be communicating with the API into the <strong>Domains</strong> part. This is what the configuration looks like for <a href="https://www.teamsimmer.com/">https://www.teamsimmer.com/</a>:</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/04/register-new-site-recaptcha.jpg" title="Register new site">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/04/register-new-site-recaptcha.jpg#ZgotmplZ" alt="Register new site" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2004 2192'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Once you click <strong>Submit</strong>, you&rsquo;ll see a screen with your <strong>Site Key</strong> and your <strong>Secret Key</strong>.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/04/recaptcha-keys.jpg" title="reCAPTCHA keys">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/04/recaptcha-keys.jpg#ZgotmplZ" alt="reCAPTCHA keys" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1598 1070'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<blockquote>
+<p><strong>Don&rsquo;t close this tab!</strong> You&rsquo;ll need this information shortly. You can find your reCAPTCHA site via the <a href="https://www.google.com/recaptcha/admin/">admin panel</a> as well.</p>
+</blockquote>
+
+                
+                  <h2 id="create-the-client-in-your-server-container">Create the Client in your Server container</h2>
+<p>Back in the Google Tag Manager Server container, browse to <strong>Clients</strong> and click to create a new Client.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/04/create-new-client.jpg" title="Create new client">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/04/create-new-client.jpg#ZgotmplZ" alt="Create new client" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2498 826'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Choose the <strong>reCAPTCHA v3</strong> Client template from the <strong>Custom</strong> category of Client types. You should now see the Client ready for configuring.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/04/client-ready-for-edit.jpg" title="Client ready for editing">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/04/client-ready-for-edit.jpg#ZgotmplZ" alt="Client ready for editing" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1804 1540'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<h3 id="add-the-keys-to-the-client">Add the keys to the Client</h3>
+<p>Open the tab with the reCAPTCHA v3 site configuration.</p>
+<p>Remember, if you accidentally closed the tab, you can always locate the keys by opening the <a href="https://www.google.com/recaptcha/admin/">reCAPTCHA admin page</a>, choosing the <strong>Site</strong> you want to work with, and then clicking the settings cogwheel in the top bar.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/04/recaptcha-admin.jpg" title="reCAPTCHA admin">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/04/recaptcha-admin.jpg#ZgotmplZ" alt="reCAPTCHA admin" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1782 510'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Copy-paste the <strong>Site key</strong> and the <strong>Secret key</strong> from the reCAPTCHA site configuration to their respective fields in the Client.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/04/keys-added.jpg" title="Keys added">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/04/keys-added.jpg#ZgotmplZ" alt="Keys added" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 898 322'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<h3 id="configure-the-rest-of-the-settings">Configure the rest of the settings</h3>
+<p>If you want to write the bot score in a browser cookie in order to, for example, access the bot score in your GTM Server (if you want to enrich other hits with the information), keep the <strong>Write bot score in a cookie</strong> option checked.</p>
+<p>If you also want to return the bot score in the HTTP response itself for processing client-side, check the <strong>Return the bot score in the HTTP response</strong> option.</p>
+<p>If you <em>do</em> choose to set the cookie, you can customize the cookie further by setting its <strong>name</strong>, its expiration (in seconds), and whether or not it should be an <strong>HttpOnly</strong> cookie.</p>
+<blockquote>
+<p>Note! If you choose the <strong>HttpOnly</strong> option, remember that the cookie <em>will not</em> be accessible with JavaScript in the browser.</p>
+</blockquote>
+<p>In the screenshot below, I&rsquo;ve set the cookie name as <code>__r_b_s</code>, I&rsquo;ve set it to be a <strong>session cookie</strong> (by setting the lifetime to <code>0</code>), and I&rsquo;ve configured it to be an <code>HttpOnly</code> cookie.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/04/extra-settings.jpg" title="Extra settings">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/04/extra-settings.jpg#ZgotmplZ" alt="Extra settings" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1388 640'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Once you&rsquo;re happy with your configuration, <strong>Save</strong> the Client.</p>
+
+                
+                  <h2 id="configure-the-browser-side-code">Configure the browser-side code</h2>
+<p>You&rsquo;ve now configured your Google Tag Manager Server container to listen for requests for both the reCAPTCHA library and for the bot verification itself. Here&rsquo;s how it works:</p>
+<ol>
+<li>The browser has to fetch the <strong>client-side library</strong> which is used to generate the <strong>verification token</strong>.</li>
+<li>Once the token is generated, the browsers sends it to the <strong>verification API</strong> and receives the bot score in the response.</li>
+</ol>
+<p>Both the library fetch and the verification API are handled by the <strong>reCAPTCHA v3</strong> Client you&rsquo;ve now added to your Server container.</p>
+<p>In this example, we&rsquo;ll be creating the browser-side code in a <strong>Google Tag Manager web container</strong>, but you might as well run it directly in the page template or in some other linked JavaScript file.</p>
+<p>The solution comprises <strong>two</strong> Custom HTML tags. The first one is the <strong>script loader</strong>, run just once per page, and the second is the <strong>verification request</strong>, run whenever an action happens which you&rsquo;d like to contribute to the bot score calculation.</p>
+<h3 id="create-the-script-loader">Create the script loader</h3>
+<blockquote>
+<p>You can build a simple <strong>Custom Template</strong> to load the reCAPTCHA v3 library, if you like.</p>
+</blockquote>
+<p>Before getting started with the tag, you need to go into <strong>Variables</strong> in the Google Tag Manager container, and click <strong>Configure</strong> for Built-in Variables.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/04/configure-built-in-variables.jpg" title="Configure built-in variables">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/04/configure-built-in-variables.jpg#ZgotmplZ" alt="Configure built-in variables" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1978 408'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Make sure to enable <strong>Container ID</strong> and <strong>HTML ID</strong>.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/04/container-id-html-id.jpg" title="Container ID HTML ID">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/04/container-id-html-id.jpg#ZgotmplZ" alt="Container ID HTML ID" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1514 1192'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Next, go to <strong>Tags</strong>, create a new Custom HTML tag and copy-paste the following code into the tag:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+  (<span style="color:#00a">function</span>() {
+    <span style="color:#aaa;font-style:italic">// Replace with the Site Key you got when registering the site for reCAPTCHA v3
+</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">var</span> siteKey = <span style="color:#a50">&#39;aaaabbbbccccdddd&#39;</span>;
+    <span style="color:#aaa;font-style:italic">// Replace with your server-side origin (just the https and domain name).
+</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">var</span> serverSideOrigin = <span style="color:#a50">&#39;https://sgtm.mydomain.com&#39;</span>;
+    
+    <span style="color:#00a">var</span> script = <span style="color:#0aa">document</span>.createElement(<span style="color:#a50">&#39;script&#39;</span>);
+    script.src = serverSideOrigin + <span style="color:#a50">&#39;/recaptcha/api.js?render=&#39;</span> + siteKey;
+    script.async = <span style="color:#00a">true</span>;
+    script.addEventListener(<span style="color:#a50">&#39;load&#39;</span>, <span style="color:#00a">function</span>() {
+      <span style="color:#0aa">window</span>.google_tag_manager[{{Container ID}}].onHtmlSuccess({{HTML ID}});
+    });
+    <span style="color:#0aa">document</span>.head.appendChild(script);
+  })();
+&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
+<blockquote>
+<p>Update the <code>siteKey</code> and <code>serverSideOrigin</code> variables per the instructions in the code.</p>
+</blockquote>
+<p>This tag loads the library from your endpoint, and it adds a listener for the script load, signalling <strong>success</strong> once the library is fully loaded.</p>
+<p>Once done, <strong>do not add a trigger to this tag</strong>. Instead, <strong>Save</strong> the tag, ignoring the warning about no triggers having been set.</p>
+<h3 id="create-the-verification-tag">Create the verification tag</h3>
+<p>Next, create a new Custom HTML tag and copy-paste the following code within:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
+  (<span style="color:#00a">function</span>() {
+    <span style="color:#aaa;font-style:italic">// Replace with the Site Key you got when registering the site for reCAPTCHA v3
+</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">var</span> siteKey = <span style="color:#a50">&#39;aaaabbbbccccdddd&#39;</span>;
+    <span style="color:#aaa;font-style:italic">// Replace with your server-side origin (just the https and domain name).
+</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">var</span> serverSideOrigin = <span style="color:#a50">&#39;https://sgtm.mydomain.com&#39;</span>;
+    <span style="color:#aaa;font-style:italic">// Replace this with the action type
+</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#aaa;font-style:italic">// See: https://developers.google.com/recaptcha/docs/v3#actions
+</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">var</span> action = <span style="color:#a50">&#39;page&#39;</span>;
+
+    <span style="color:#aaa;font-style:italic">// The following callback is invoked with the bot score as a function argument.
+</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#aaa;font-style:italic">// Feel free to change the dataLayer.push() to your liking.
+</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#aaa;font-style:italic">// Note! The callback is only invoked if you&#39;ve configured the Server container
+</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#aaa;font-style:italic">// Client template to return a response back to the browser.
+</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">var</span> callback = <span style="color:#00a">function</span>(score) {
+      <span style="color:#0aa">window</span>.dataLayer.push({
+        event: <span style="color:#a50">&#39;recaptcha&#39;</span>,
+        recaptchaScore: score
+      });
+    };
+
+    <span style="color:#00a">if</span> (<span style="color:#0aa">window</span>.grecaptcha &amp;&amp; <span style="color:#00a">typeof</span> <span style="color:#0aa">window</span>.grecaptcha.ready === <span style="color:#a50">&#39;function&#39;</span>) {
+      <span style="color:#0aa">window</span>.grecaptcha.ready(<span style="color:#00a">function</span>() {
+        <span style="color:#0aa">window</span>.grecaptcha.execute(siteKey, {action: action}).then(<span style="color:#00a">function</span>(token) {
+          <span style="color:#00a">var</span> xhr = <span style="color:#00a">new</span> XMLHttpRequest();
+          xhr.withCredentials = <span style="color:#00a">true</span>;
+          xhr.open(<span style="color:#a50">&#39;POST&#39;</span>, serverSideOrigin + <span style="color:#a50">&#39;/recaptcha?token=&#39;</span> + token, <span style="color:#00a">true</span>);
+          xhr.onreadystatechange = <span style="color:#00a">function</span>() {
+            <span style="color:#00a">if</span> (xhr.readyState === XMLHttpRequest.DONE &amp;&amp; xhr.status === <span style="color:#099">200</span>) {
+              <span style="color:#00a">var</span> response = JSON.parse(xhr.responseText);
+              <span style="color:#00a">if</span> (response.score) callback(response.score);
+            }
+          };
+          xhr.send();
+        });
+      });
+    }
+  })();
+&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
+<blockquote>
+<p>Update the <code>siteKey</code> and <code>serverSideOrigin</code> variables per the instructions in the code.</p>
+</blockquote>
+<p>Then, go to <strong>Advanced Settings</strong> -&gt; <strong>Tag Sequencing</strong>, and set the <strong>Setup Tag</strong> to be the script loader you created in the previous section.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/04/recaptcha-tag-sequencing.jpg" title="reCAPTCHA tag sequencing">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/04/recaptcha-tag-sequencing.jpg#ZgotmplZ" alt="reCAPTCHA tag sequencing" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1620 1076'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Finally, set this Custom HTML tag to trigger whenever an interaction happens that should contribute to the bot score. These interactions could be:</p>
+<ol>
+<li>Page load (set the <code>action</code> to e.g. <code>page</code>)</li>
+<li>Form submission (set the <code>action</code> to e.g. <code>submit</code>)</li>
+<li>Purchase (set the <code>action</code> to e.g. <code>purchase</code>)</li>
+</ol>
+<p>And so forth. If you like, you can have a separate Custom HTML tag for each action type, or you can use a Lookup Table to set the <code>action</code> variable value dynamically based on the trigger event, for example.</p>
+
+                
+                  <h2 id="test-everything">Test everything</h2>
+<p>Once you&rsquo;ve created the script loader and you also have the verification tags running, enter Preview mode in both your Server container and in the web container.</p>
+<p>Load a page (or do something else that should make the verification tag fire).</p>
+<p>In the web container Preview, you should see both the script loader and the verification tag fire:</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/04/tags-fired.jpg" title="Tags fired">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/04/tags-fired.jpg#ZgotmplZ" alt="Tags fired" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1724 846'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>In the Server container Preview, you should first see a request for <strong>api.js</strong>, which is responded to with a status code of <code>200</code>.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/04/api-js-success.jpg" title="api.js success">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/04/api-js-success.jpg#ZgotmplZ" alt="api.js success" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2192 1130'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Then, if you expand the verification API request in the Server container (the request to path <code>recaptcha</code>), you can expand the <strong>Outgoing HTTP Request</strong> and check the response from the Google reCAPTCHA server:</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/04/recaptcha-response.jpg" title="reCAPTCHA response">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/04/recaptcha-response.jpg#ZgotmplZ" alt="reCAPTCHA response" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1486 1144'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>This indicates that the verification request worked and a valid bot score was returned.</p>
+<p>Finally, in your web container you should see a new Data Layer message with event name <code>recaptcha</code> (assuming you went with the default callback) and a <code>recaptchaScore</code> key containing the bot score for this particular request.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/04/recaptcha-score.jpg" title="reCAPTCHA score">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/04/recaptcha-score.jpg#ZgotmplZ" alt="reCAPTCHA score" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1900 432'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>If you configure the cookie to be set, you can find it in your browser&rsquo;s cookie list, too:</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/04/cookie-set-recaptcha.jpg" title="Cookie set for recaptcha">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/04/cookie-set-recaptcha.jpg#ZgotmplZ" alt="Cookie set for recaptcha" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2882 482'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+
+                
+                  <h2 id="summary">Summary</h2>
+<p>Once you&rsquo;ve got the reCAPTCHA system up and running, you can use the bot score to selectively fire your tags either in the web container or in the Server container.</p>
+<p>You can also use the <code>__r_b_s</code> cookie value to send with your Server container tags, in case you want to add additional metadata about the &ldquo;bot-ness&rdquo; of the user. Might be useful information in a GA4 custom dimension, for example!</p>
+<p>As you collect more and more bot score data, make sure you visit the <a href="https://www.google.com/recaptcha/admin/">reCAPTCHA admin site</a> to check out metrics about the bot score distribution for your site visitors. If you&rsquo;ve diligently set the <code>action</code> variable in your requests, you&rsquo;ll be able to see the distribution segmented by the action type, too.</p>
+<p>Let me know in the comments what you think of this solution. It would be interesting to hear what use cases you have in mind for the bot score – would you use it to <em>block</em> requests or to <em>annotate</em> them, and why?</p>
+
+                
+              
+              
+
+            </div>
+          </div>
+          <div id="post-footer" class="post-footer main-content-wrap">
+            
+              
+                
+                
+                  <div class="post-footer-tags">
+                    <span class="text-color-light text-small">TAGGED IN</span><br/>
+                    
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/google-tag-manager/">google tag manager</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/server-side-tagging/">server-side tagging</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/client-template/">client template</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/recaptcha/">recaptcha</a>
+
+                  </div>
+                
+              
+            
+            
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--disabled">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/provision-server-side-tagging-application-manually/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/recaptcha-v3-server-side-tagging/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=reCAPTCHA%20v3%20With%20Google%20Tag%20Manager%20Server-side%20Tagging%20https://www.simoahava.com/analytics/recaptcha-v3-server-side-tagging/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/recaptcha-v3-server-side-tagging/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#commento_thread">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+            
+              <span id="commento_thread"></span>
+<div id="commento"></div>
+<script defer src="https://cdn.commento.io/js/commento.js"></script>
+
+            
+          </div>
+        </article>
+        <footer id="footer" class="main-content-wrap">
+  <span class="copyrights">
+    &copy; 2021 Simo Ahava. All Rights Reserved
+  </span>
+</footer>
+
+      </div>
+      
+      <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+        
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--disabled">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/provision-server-side-tagging-application-manually/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/recaptcha-v3-server-side-tagging/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=reCAPTCHA%20v3%20With%20Google%20Tag%20Manager%20Server-side%20Tagging%20https://www.simoahava.com/analytics/recaptcha-v3-server-side-tagging/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/recaptcha-v3-server-side-tagging/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#commento_thread">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+      </div>
+      
+      <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+  <i id="btn-close-shareoptions" class="fa fa-close"></i>
+  <ul class="share-options">
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/recaptcha-v3-server-side-tagging/">
+          <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=reCAPTCHA%20v3%20With%20Google%20Tag%20Manager%20Server-side%20Tagging%20https://www.simoahava.com/analytics/recaptcha-v3-server-side-tagging/%20via%20@SimoAhava">
+          <i class="fa fa-twitter"></i><span>Share on Twitter</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/recaptcha-v3-server-side-tagging/">
+          <i class="fa fa-linkedin"></i><span>Share on LinkedIn</span>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+<div id="share-options-mask" class="share-options-mask"></div>
+
+    </div>
+    
+    <div id="about">
+  <div id="about-card">
+    <div id="about-btn-close">
+      <i class="fa fa-remove"></i>
+    </div>
+    
+      <img id="about-card-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+    
+    <h4 id="about-card-name">Simo Ahava</h4>
+    
+      <div id="about-card-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</div>
+    
+    
+      <div id="about-card-job">
+        <i class="fa fa-briefcase"></i>
+        <br/>
+        Senior Data Advocate at Reaktor
+      </div>
+    
+    
+      <div id="about-card-location">
+        <i class="fa fa-map-marker"></i>
+        <br/>
+        Finland
+      </div>
+    
+  </div>
+</div>
+
+    
+  
+    
+    <div id="cover" style="background-image:url('https://www.simoahava.com/images/maisema.jpg');"></div>
+  
+
+
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+
+
+
+
+<script src="https://www.simoahava.com/js/script.js"></script>
+
+
+
+
+<script src="https://cdn.commento.io/js/count.js"></script>
+
+    <script>
+      !function(){var e=document.querySelector(".simmer"),t=document.querySelector(".simmer .close"),o=window.sessionStorage&&window.sessionStorage.getItem("nosimmer");if(e){if(o){e.style.display="none"}t.addEventListener("click",function(){window.sessionStorage.setItem("nosimmer","true"),e.style.display="none"})}}();
+    </script>
+    <script>
+      var mylazyload = new LazyLoad({elements_selector: '.lazy'});
+      </script>
+
+    
+  </body>
+</html>
+
