@@ -138,7 +138,7 @@
 <meta itemprop="description" content="How to track Google Analytics traffic within a cross-site iframe without using cookies. This is useful due to how browser tracking protections prevent access to cookies in third-party (cross-site) context.">
 <meta itemprop="datePublished" content="2020-02-19T09:00:38&#43;02:00" />
 <meta itemprop="dateModified" content="2020-02-19T09:00:38&#43;02:00" />
-<meta itemprop="wordCount" content="4270">
+<meta itemprop="wordCount" content="4361">
 
 
 
@@ -985,7 +985,7 @@ on
         
         
           <blockquote>
-<p><strong>Updated 15 April 2020</strong>: Fix the message forwarder to properly clone objects before they are passed to <code>postMessage</code></p>
+<p><strong>Updated 25 May 2021</strong>: Added information about using this with GA4. As Google Analytics 4 does not have a mechanism to disable cookie storage, only the second solution (send <code>dataLayer</code> events from iframe to the parent) described in this article will work for GA4.</p>
 </blockquote>
 <p>Here I am, back with <code>&lt;iframe&gt;</code> and <strong>cross-domain tracking</strong>. I&rsquo;ve published a couple of articles before on the topic, with <a href="https://www.simoahava.com/amp/analytics/tracking-cross-domain-iframes-upgraded-solution/">my upgraded solution</a> being the most recent one. These articles tackle the general problem of <strong>passing the Client ID from the parent to the <code>&lt;iframe&gt;</code></strong>.</p>
 <p>By doing so, the <code>&lt;iframe&gt;</code> can take the Client ID from the frame URL and create the <code>_ga</code> cookie in the <code>&lt;iframe&gt;</code>, allowing hits from the parent <em>and</em> the <code>&lt;iframe&gt;</code> to use the same Client ID. Great.</p>
@@ -1053,13 +1053,18 @@ on
   
 
 <p>Even though Google recently made a veritable non-announcement by saying they&rsquo;ll <a href="https://blog.chromium.org/2020/01/building-more-private-web-path-towards.html">phase out third-party cookies by 2022</a>, Google Chrome will actually make things harder for cross-site cookie access much, much sooner.</p>
-<p>Chrome v80 (released on February 4, 2020), enforces <a href="https://web.dev/samesite-cookies-explained/">SameSite cookie restrictions</a>, which means that if a cookie should be accessible in third-party context, it requires the <code>SameSite=None</code> and <code>Secure</code> flags set. By default, these are <em>not</em> set. Unfortunately, the <code>_ga</code> cookie used by Google Analytics does <em>not</em> have these flags set, and currently there is no timeline for when support for these flags are added.</p>
-<p>So that&rsquo;s the problem! On the majority of browsers, the <code>_ga</code> cookie does not (or will stop to) function in third-party context, which applies to all <strong>cross-site <code>&lt;iframe&gt;</code> embeds</strong>.</p>
+<p>Chrome v80 (released on February 4, 2020), enforces <a href="https://web.dev/samesite-cookies-explained/">SameSite cookie restrictions</a>, which means that if a cookie should be accessible in third-party context, it requires the <code>SameSite=None</code> and <code>Secure</code> flags set. By default, these are <em>not</em> set.</p>
+<blockquote>
+<p>You <strong>can</strong> set those flags with the <a href="https://www.simoahava.com/amp/analytics/cookieflags-field-google-analytics/"><code>cookieFlags</code></a> setting, but do note that this only fixes the &ldquo;problem&rdquo; for Google Chrome. It doesn&rsquo;t make those cookies work in browsers that block third-party cookies.</p>
+</blockquote>
 <p>Luckily, there&rsquo;s a way around this.</p>
 <p>We can ignore cookies altogether.</p>
 
         
           <h2 id="solution-1-pass-the-client-id-from-the-parent-to-the-child">Solution 1: Pass the Client ID from the parent to the child</h2>
+<blockquote>
+<p><strong>NOTE!</strong> As there is currently no mechanism to disable cookie storage from Google Analytics 4 deployments, this solution will only work for Universal Analytics. For GA4, you need to use <a href="#solution-2-forward-all-data-layer-messages-from-child-to-parent">Solution 2</a> below.</p>
+</blockquote>
 <p>Let&rsquo;s take a look at another celebrated illustration from yours truly:</p>
 
 
@@ -1094,6 +1099,9 @@ on
         
           <h2 id="solution-2-forward-all-data-layer-messages-from-child-to-parent">Solution 2: Forward all Data Layer messages from child to parent</h2>
 <p>If you don&rsquo;t want to do any tracking within the <code>&lt;iframe&gt;</code> (I don&rsquo;t blame you), you can actually delegate tracking to the parent by sending all <code>dataLayer</code> messages to the parent for processing.</p>
+<blockquote>
+<p>This is the only viable solution for tracking cross-site iframe traffic with GA4.</p>
+</blockquote>
 <p>This means the parent page would manage tags for both the parent page&rsquo;s native interactions <em>as well as</em> those that happen within the <code>&lt;iframe&gt;</code>.</p>
 
 
@@ -1134,14 +1142,16 @@ on
 <p>The Custom HTML tag itself should contain the following code:</p>
 <div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
   <span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-    <span class="c1">// Tracking ID whose _ga cookie to use
-</span><span class="c1"></span>    <span class="kd">var</span> <span class="nx">trackingId</span> <span class="o">=</span> <span class="s1">&#39;UA-40669554-1&#39;</span><span class="p">;</span>
+    <span class="c1">// Universal Analytics tracking ID whose _ga cookie to use.
+</span><span class="c1"></span>    <span class="c1">// If using GA4, you can leave this setting untouched.
+</span><span class="c1"></span>    <span class="kd">var</span> <span class="nx">trackingId</span> <span class="o">=</span> <span class="s1">&#39;UA-XXXXX-Y&#39;</span><span class="p">;</span>
     
-    <span class="c1">// Maximum time in milliseconds to wait for GA tracker to load
+    <span class="c1">// Maximum time in milliseconds to wait for GA tracker to load.
+</span><span class="c1"></span>    <span class="c1">// Again, irrelevant for GA4.
 </span><span class="c1"></span>    <span class="kd">var</span> <span class="nx">maxGATime</span> <span class="o">=</span> <span class="mi">2000</span><span class="p">;</span>
     
     <span class="c1">// Set to the origin (&#34;https://www.domain.com&#34;) of the iframe you want to communicate with
-</span><span class="c1"></span>    <span class="kd">var</span> <span class="nx">childOrigin</span> <span class="o">=</span> <span class="s1">&#39;https://www.gtmtools.com&#39;</span><span class="p">;</span>
+</span><span class="c1"></span>    <span class="kd">var</span> <span class="nx">childOrigin</span> <span class="o">=</span> <span class="s1">&#39;https://www.iframe-domain.com&#39;</span><span class="p">;</span>
     
     <span class="c1">// Don&#39;t touch anything that follows
 </span><span class="c1"></span>    <span class="kd">var</span> <span class="nx">pollInterval</span> <span class="o">=</span> <span class="mi">200</span><span class="p">;</span>
@@ -1197,16 +1207,19 @@ on
 <h4 id="configuration">Configuration</h4>
 <p>First, there&rsquo;s the configuration stuff:</p>
 <div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="c1">// Tracking ID whose _ga cookie to use
-</span><span class="c1"></span><span class="kd">var</span> <span class="nx">trackingId</span> <span class="o">=</span> <span class="s1">&#39;UA-40669554-1&#39;</span><span class="p">;</span>
+</span><span class="c1"></span><span class="kd">var</span> <span class="nx">trackingId</span> <span class="o">=</span> <span class="s1">&#39;UA-XXXXX-Y&#39;</span><span class="p">;</span>
 
 <span class="c1">// Maximum time in milliseconds to wait for GA tracker to load
 </span><span class="c1"></span><span class="kd">var</span> <span class="nx">maxGATime</span> <span class="o">=</span> <span class="mi">2000</span><span class="p">;</span>
 
 <span class="c1">// Set to the origin (&#34;https://www.domain.com&#34;) of the iframe you want to communicate with
-</span><span class="c1"></span><span class="kd">var</span> <span class="nx">childOrigin</span> <span class="o">=</span> <span class="s1">&#39;https://www.gtmtools.com&#39;</span><span class="p">;</span>
+</span><span class="c1"></span><span class="kd">var</span> <span class="nx">childOrigin</span> <span class="o">=</span> <span class="s1">&#39;https://www.iframe-domain.com&#39;</span><span class="p">;</span>
 </code></pre></div>
 <p>The <code>trackingId</code> should be set to the Google Analytics tracking ID of the tracker whose <code>_ga</code> cookie you want to use. This is because there might be multiple GA cookies each storing the Client ID for a different Tracking ID. If you&rsquo;re unsure, just type your regular tracking ID as the value of the <code>trackingId</code> variable.</p>
 <p>Set <code>maxGATime</code> to the maximum amount of time that the page waits for Google Analytics to load. You can certainly set this a lot higher than <em>2000</em> (2 seconds) if you want, but I would recommend against indefinite polling.</p>
+<blockquote>
+<p>The <code>trackingId</code> and <code>maxGATime</code> settings are only relevant for Universal Analytics. If tracking to GA4, you do not need to change these from their default values.</p>
+</blockquote>
 <p>Set the <code>childOrigin</code> to the <strong>origin</strong> of the <code>&lt;iframe&gt;</code> you want to send the data to. The <strong>origin</strong> is everything in the URL up to the first <em>path</em> slash. So, if the URL is <code>https://www.simoahava.com/my-home-page/</code>, the <strong>origin</strong> would be <code>https://www.simoahava.com</code>.</p>
 <blockquote>
 <p>It&rsquo;s important to <strong>not</strong> have the trailing slash, as that&rsquo;s part of the <em>path</em> component and not the <em>origin</em>.</p>
@@ -1321,7 +1334,7 @@ on
 </span><span class="c1"></span>    <span class="kd">var</span> <span class="nx">dataLayerMessagePrefix</span> <span class="o">=</span> <span class="s1">&#39;iframe&#39;</span><span class="p">;</span>
     
     <span class="c1">// Set to parent origin (&#34;https://www.domain.com&#34;)
-</span><span class="c1"></span>    <span class="kd">var</span> <span class="nx">parentOrigin</span> <span class="o">=</span> <span class="s1">&#39;https://www.simoahava.com&#39;</span><span class="p">;</span>
+</span><span class="c1"></span>    <span class="kd">var</span> <span class="nx">parentOrigin</span> <span class="o">=</span> <span class="s1">&#39;https://www.parent-domain.com&#39;</span><span class="p">;</span>
 
     <span class="c1">// Maximum time in milliseconds to poll the parent frame for ready signal
 </span><span class="c1"></span>    <span class="kd">var</span> <span class="nx">maxTime</span> <span class="o">=</span> <span class="mi">2000</span><span class="p">;</span>
@@ -1423,7 +1436,7 @@ on
 </span><span class="c1"></span><span class="kd">var</span> <span class="nx">dataLayerMessagePrefix</span> <span class="o">=</span> <span class="s1">&#39;iframe&#39;</span><span class="p">;</span>
 
 <span class="c1">// Set to parent origin (&#34;https://www.domain.com&#34;)
-</span><span class="c1"></span><span class="kd">var</span> <span class="nx">parentOrigin</span> <span class="o">=</span> <span class="s1">&#39;https://www.simoahava.com&#39;</span><span class="p">;</span>
+</span><span class="c1"></span><span class="kd">var</span> <span class="nx">parentOrigin</span> <span class="o">=</span> <span class="s1">&#39;https://www.parent-domain.com&#39;</span><span class="p">;</span>
 
 <span class="c1">// Maximum time in milliseconds to poll the parent frame for ready signal
 </span><span class="c1"></span><span class="kd">var</span> <span class="nx">maxTime</span> <span class="o">=</span> <span class="mi">2000</span><span class="p">;</span>
