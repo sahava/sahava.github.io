@@ -138,7 +138,7 @@
 <meta itemprop="description" content="A guide for measuring Core Web Vitals (LCP, FID, and CLS) in Google Analytics 4 using Google Tag Manager and a custom template from the template gallery.">
 <meta itemprop="datePublished" content="2021-01-26T07:00:00&#43;02:00" />
 <meta itemprop="dateModified" content="2021-01-26T07:00:00&#43;02:00" />
-<meta itemprop="wordCount" content="1534">
+<meta itemprop="wordCount" content="1726">
 
 
 
@@ -984,7 +984,10 @@ on
       
         
         
-          <p><strong>Core Web Vitals</strong> is described on the dedicated <a href="https://web.dev/vitals/">web.dev resource</a> as (emphasis mine):</p>
+          <blockquote>
+<p><strong>Updated 26 May 2021</strong>: Added details about the new <strong>Namespace Objects</strong> option in the template.</p>
+</blockquote>
+<p><strong>Core Web Vitals</strong> is described on the dedicated <a href="https://web.dev/vitals/">web.dev resource</a> as (emphasis mine):</p>
 <blockquote>
 <p>&ldquo;Core Web Vitals are the subset of Web Vitals that apply to all pages, <strong>should be measured by all site owners</strong>, and will be surfaced across all Google tools.&rdquo;</p>
 </blockquote>
@@ -1074,13 +1077,13 @@ on
     </a>
   
 
-<p>The tag itself doesn&rsquo;t take any customization - it will just <em>work</em> (see the <a href="https://www.simoahava.com/amp/custom-templates/core-web-vitals/">template description</a> for more details).</p>
+<p>The only configuration in the tag is the <strong>Namespace Objects</strong> setting, which is <strong>off</strong> by default. If you check the box, then the object pushed into <code>dataLayer</code> will store each measurement <em>type</em> (LCP, CLS, FID) in its own namespace under the <code>webVitalsMeasurement</code> top-level Data Layer key. See below for an example.</p>
 <p>Add the <strong>All Pages</strong> trigger to it. If you only want it to work on certain pages, use a Page View trigger with a suitable trigger condition instead.</p>
 
 
-    <a href="https://www.simoahava.com/amp/images/2021/01/all-pages-trigger.jpg" title="All Pages Trigger">
+    <a href="https://www.simoahava.com/amp/images/2021/05/core-web-vitals-tag-example.jpg" title="All Pages Trigger with tag">
   
-    <amp-img src="https://www.simoahava.com/amp/images/2021/01/all-pages-trigger.jpg" layout="responsive" alt="All Pages Trigger" height="1786" width="1866"></amp-img>
+    <amp-img src="https://www.simoahava.com/amp/images/2021/05/core-web-vitals-tag-example.jpg" layout="responsive" alt="All Pages Trigger with tag" height="1242" width="1870"></amp-img>
   
     </a>
   
@@ -1167,6 +1170,10 @@ on
 </tr>
 </tbody>
 </table>
+<p>If you have <strong>Namespace Objects</strong> selected, the measurement keys themselves (<code>name</code>, <code>id</code>, <code>value</code>, etc.) will be nested under the measurement name. So instead of <code>webVitalsMeasurement.id</code>, the key path would be <code>webVitalsMeasurement.FID.id</code>, if the measurement was for First Input Delay.</p>
+<blockquote>
+<p>One use case for checking <strong>Namespace Objects</strong> is if you want to send all CWV measurements with a single event. If you don&rsquo;t have Namespace Objects checked, each CWV measurement will overwrite the previous measurement in the Data Layer, meaning you&rsquo;ll only ever be able to access the most recent measurement, regardless of type.</p>
+</blockquote>
 
         
           <h2 id="create-the-google-tag-manager-trigger-and-variables">Create the Google Tag Manager trigger and variables</h2>
@@ -1225,6 +1232,41 @@ on
 <tr>
 <td>DLV - webVitalsMeasurement.deltaRounded</td>
 <td><code>webVitalsMeasurement.deltaRounded</code></td>
+</tr>
+</tbody>
+</table>
+<p>Remember, if you have <strong>Namespace Objects</strong> selected, the variable names are different. Here&rsquo;s what you&rsquo;d need to create for FID, for example:</p>
+<table>
+<thead>
+<tr>
+<th>Variable name</th>
+<th>Data Layer Variable Name</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DLV - webVitalsMeasurement.FID.name</td>
+<td><code>webVitalsMeasurement.FID.name</code></td>
+</tr>
+<tr>
+<td>DLV - webVitalsMeasurement.FID.id</td>
+<td><code>webVitalsMeasurement.FID.id</code></td>
+</tr>
+<tr>
+<td>DLV - webVitalsMeasurement.FID.value</td>
+<td><code>webVitalsMeasurement.FID.value</code></td>
+</tr>
+<tr>
+<td>DLV - webVitalsMeasurement.FID.delta</td>
+<td><code>webVitalsMeasurement.FID.delta</code></td>
+</tr>
+<tr>
+<td>DLV - webVitalsMeasurement.FID.valueRounded</td>
+<td><code>webVitalsMeasurement.FID.valueRounded</code></td>
+</tr>
+<tr>
+<td>DLV - webVitalsMeasurement.FID.deltaRounded</td>
+<td><code>webVitalsMeasurement.FID.deltaRounded</code></td>
 </tr>
 </tbody>
 </table>
