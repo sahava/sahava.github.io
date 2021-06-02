@@ -1,0 +1,1714 @@
+
+
+  
+    
+  
+
+
+  
+
+
+
+
+
+  
+
+
+  
+
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta name="google-site-verification" content="xQwWI2KUfP9LbFKhw2CVLFtrMY6Czrla7L3PD2aBolA" />
+
+
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org", 
+  "@type": "BlogPosting",
+  "headline": "Deploy Server-side Google Tag Manager In AWS | Simo Ahava's blog",
+  "image": "https:\/\/www.simoahava.com\/images\/2021\/06\/aws-gtm-server.jpg",
+  "editor": "Simo Ahava",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Simo Ahava's blog",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https:\/\/www.simoahava.com\/images\/simo.png",
+      "height": "393",
+      "width": "407"
+    }
+  },
+  "url": "https:\/\/www.simoahava.com\/analytics\/deploy-server-side-google-tag-manager-aws\/",
+  "datePublished": "2021-06-02T07:00:00\u002b03:00",
+  "dateModified": "2021-06-02T07:00:00\u002b03:00",
+  "description": "How to deploy a Google Tag Manager server-side tagging environment in Amazon\u0027s AWS cloud using Elastic Beanstalk.",
+  "author": {
+    "@type": "Person",
+    "name": "Simo Ahava"
+  }
+}
+</script>
+
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <title>Deploy Server-side Google Tag Manager In AWS | Simo Ahava's blog</title>
+    
+    <script>
+      window.dataLayer=window.dataLayer||[];window.dataLayer.push({pageType: 'article', environment:  null });
+    </script>
+    
+
+    
+    
+    <script src="https://www.simoahava.com/x-js/lazyload.iife.min.js"></script>
+
+    
+
+    
+    <script>
+      (function(S,i,m,o){
+        window[m]=window[m]||[];
+        window[m].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
+        var f=S.getElementsByTagName(i)[0],j=S.createElement(i),dl=m!='dataLayer'?'&l='+m:'';
+        j.async=true;
+        j.src='https://sgtm.simoahava.com/gtm.js?id='+o+dl;
+        f.parentNode.insertBefore(j,f);
+      })(document,'script','dataLayer','GTM-PZ7GMV9');
+    </script>
+    
+    <meta name="author" content="Simo Ahava">
+    <meta name="keywords" content="">
+
+    <link rel="icon" href="https://www.simoahava.com/images/favicon.ico">
+    
+    <link rel="amphtml" href="https://www.simoahava.com/amp/analytics/deploy-server-side-google-tag-manager-aws/">
+    
+    <meta name="description" content="How to deploy a Google Tag Manager server-side tagging environment in Amazon&#39;s AWS cloud using Elastic Beanstalk.">
+    <meta property="og:description" content="How to deploy a Google Tag Manager server-side tagging environment in Amazon&#39;s AWS cloud using Elastic Beanstalk.">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="Deploy Server-side Google Tag Manager In AWS">
+    <meta property="og:url" content="https://www.simoahava.com/analytics/deploy-server-side-google-tag-manager-aws/">
+    <meta property="og:site_name" content="Simo Ahava&#39;s blog">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Deploy Server-side Google Tag Manager In AWS">
+    <meta name="twitter:description" content="How to deploy a Google Tag Manager server-side tagging environment in Amazon&#39;s AWS cloud using Elastic Beanstalk.">
+    
+      <meta name="twitter:creator" content="@SimoAhava">
+      
+    
+
+    
+    
+
+    
+	  <meta property="og:image" content="https://www.simoahava.com/images/2021/06/deploy-server-side-gtm-in-aws.jpg">
+      <meta name="twitter:image" content="https://www.simoahava.com/images/2021/06/deploy-server-side-gtm-in-aws.jpg">
+    
+
+
+    
+
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+    
+    
+    
+    <link rel="stylesheet" href="https://www.simoahava.com/css/style.css" />
+    
+    
+
+    
+      
+    
+    
+  </head>
+
+  <body>
+    
+    <div id="_progress"></div>
+    
+    <div id="blog">
+      <header id="header" data-behavior="4">
+  <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+  <div class="header-title">
+    <a class="header-title-link" href="https://www.simoahava.com/">Simo Ahava&#39;s blog</a>
+  </div>
+  
+</header>
+
+      <nav id="sidebar" data-behavior="4">
+  <div class="sidebar-container">
+    
+      <div class="sidebar-profile">
+        <a href="https://www.simoahava.com/">
+          <img class="sidebar-profile-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+        </a>
+        <h4 class="sidebar-profile-name">Simo Ahava</h4>
+        
+          <h5 class="sidebar-profile-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</h5>
+        
+      </div>
+    
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+      
+      <span class="sidebar-button-desc">Home</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+      
+      <span class="sidebar-button-desc">Categories</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tags/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Tags</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/gtm-tips/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-magic"></i>
+      
+      <span class="sidebar-button-desc">GTM Tips</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/about-simo-ahava/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+      
+      <span class="sidebar-button-desc">About</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tools/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-wrench"></i>
+      
+      <span class="sidebar-button-desc">Tools</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/blog-statistics/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bar-chart"></i>
+      
+      <span class="sidebar-button-desc">Blog statistics</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://github.com/sahava" target="_blank" rel="noopener">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+      
+      <span class="sidebar-button-desc">GitHub</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/upcoming-talks/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bullhorn"></i>
+      
+      <span class="sidebar-button-desc">Upcoming talks</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/custom-templates/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Templates</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/newsletter/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bell"></i>
+      
+      <span class="sidebar-button-desc">Newsletter</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+
+    </ul>
+  </div>
+</nav>
+
+      
+
+      <div id="main" data-behavior="4"
+        class="
+               hasCoverMetaIn
+               ">
+        <article class="post">
+	  <form id="search" action="https://www.simoahava.com/search/">
+  <input name="q" type="text" class="form-control input--xlarge" placeholder="Search blog..." autocomplete="off">
+  </form>
+
+          <div class="post-header main-content-wrap text-left">
+  
+    <div class="figure nocaption">
+      <img class="cover" src="https://www.simoahava.com/images/2021/06/deploy-server-side-gtm-in-aws.jpg">
+    </div>
+  
+  
+
+    <h1>
+      Deploy Server-side Google Tag Manager In AWS
+    </h1>
+  
+  
+  <div class="postShorten-meta post-meta">
+    
+      <time datetime="2021-06-02T07:00:00&#43;03:00">
+        
+  June 2, 2021
+
+      </time>
+      
+      
+  
+  
+    <span>in</span>
+    
+      <a class="category-link" href="https://www.simoahava.com/categories/analytics">Analytics</a>
+    
+  
+
+
+      | <a href="https://www.simoahava.com/analytics/deploy-server-side-google-tag-manager-aws/#commento">Comments</a>
+      
+  </div>
+
+
+</div>
+
+          <div class="post-content markdown">
+            <div class="main-content-wrap">
+	      
+                
+  	        <p>Since Google Tag Manager released the <a href="https://developers.google.com/tag-manager/serverside/manual-setup-guide">manual setup guide</a> for <a href="server-side-tagging-google-tag-manager">server-side tagging</a>, my mind has been spinning with the idea of walking through the deployment into Amazon&rsquo;s <a href="https://aws.amazon.com/">AWS</a>.</p>
+<p>I personally prefer <a href="https://cloud.google.com/">Google Cloud Platform</a> over AWS, because I think it&rsquo;s so much more user-friendly. Even though in this guide we&rsquo;ll be utilizing one of the simplest AWS services, <a href="https://aws.amazon.com/elasticbeanstalk/">Elastic Beanstalk</a>, the deployment is still <em>much</em> more complex than if you were to use GCP&rsquo;s <a href="https://cloud.google.com/appengine">App Engine</a>.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/06/aws-gtm-server.jpg" title="GTM server on AWS">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/06/aws-gtm-server.jpg#ZgotmplZ" alt="GTM server on AWS" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2806 584'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>In this guide, I&rsquo;ll show you how to deploy the server-side tagging application into AWS.</p>
+<p>It won&rsquo;t be a <strong>complete</strong> approach, as I won&rsquo;t go into the weeds of showing you how to <a href="https://developers.google.com/tag-manager/serverside/manual-setup-guide#optional_include_bigquery_credentials">add the credentials to get the BigQuery API to work</a> (there&rsquo;s going to be other guides for this).</p>
+<p>We&rsquo;ll use <strong>Elastic Beanstalk</strong>, which is the closest analogy to Google App Engine that AWS has to offer. It&rsquo;s a very simple, almost turnkey way of deploying web applications, and it&rsquo;s <em>perfect</em> for our needs. If you want to get down and dirty with the setup, you can use the <a href="https://aws.amazon.com/ecs/">Elastic Container Service</a>, but we will not be covering ECS in this guide.</p>
+<p>You&rsquo;ll be able to do everything through the AWS console, so there&rsquo;s no need to install any new software on your computer.</p>
+<div id="toc-container"><h1 id="table-of-contents">Table of Contents</h1> <input type="checkbox" id="show"><label for="show" id="showbtn"><h1 id="table-of-contents-mobile">Table of Contents</h1><span class="show">&nbsp;[+show]</span><span class="hide">&nbsp;[–hide]</span></label><nav id="TableOfContents">
+  <ul>
+    <li><a href="#what-you-will-need">What you will need</a></li>
+    <li><a href="#the-outline">The outline</a>
+      <ul>
+        <li><a href="#1-create-the-ssl-certificates">1. Create the SSL certificates</a></li>
+      </ul>
+    </li>
+    <li><a href="#2-create-a-hosted-zone-for-the-custom-domains">2. Create a hosted zone for the custom domains</a></li>
+    <li><a href="#3-create-the-elastic-beanstalk-application">3. Create the Elastic Beanstalk application</a></li>
+    <li><a href="#4-create-the-preview-server-environment">4. Create the Preview server environment</a>
+      <ul>
+        <li><a href="#download-the-dockerrunawsjson-file">Download the Dockerrun.aws.json file</a></li>
+        <li><a href="#upload-the-json">Upload the JSON</a></li>
+        <li><a href="#modify-software-settings">Modify Software settings</a></li>
+        <li><a href="#modify-capacity-settings">Modify Capacity settings</a></li>
+        <li><a href="#modify-load-balancer-settings">Modify Load balancer settings</a></li>
+        <li><a href="#create-the-environment">Create the environment</a></li>
+        <li><a href="#test-the-environment">Test the environment</a></li>
+      </ul>
+    </li>
+    <li><a href="#5-map-a-domain-to-the-preview-server">5. Map a domain to the preview server</a>
+      <ul>
+        <li><a href="#test-the-domain">Test the domain</a></li>
+      </ul>
+    </li>
+    <li><a href="#6-create-the-tagging-server-environment">6. Create the tagging server environment</a>
+      <ul>
+        <li><a href="#configure-software-settings">Configure Software settings</a></li>
+        <li><a href="#configure-capacity-settings">Configure Capacity settings</a></li>
+        <li><a href="#configure-load-balancer-settings">Configure Load balancer settings</a></li>
+        <li><a href="#create-the-environment-1">Create the environment</a></li>
+        <li><a href="#test-the-environment-1">Test the environment</a></li>
+      </ul>
+    </li>
+    <li><a href="#7-map-a-domain-to-the-tagging-server">7. Map a domain to the tagging server</a>
+      <ul>
+        <li><a href="#test-the-domain-1">Test the domain</a></li>
+      </ul>
+    </li>
+    <li><a href="#8-final-steps">8. Final steps</a>
+      <ul>
+        <li><a href="#update-auto-scaling-groups-health-checks">Update auto-scaling groups&rsquo; health checks</a></li>
+        <li><a href="#update-google-tag-manager-container-settings">Update Google Tag Manager container settings</a></li>
+      </ul>
+    </li>
+    <li><a href="#summary">Summary</a></li>
+  </ul>
+</nav></div>
+<p>This will <strong>not</strong> be an AWS guide. I&rsquo;m only going to show you how to get things running, and hopefully you&rsquo;ll understand how the server container application works. But tweaking the instances and making it work in your overall AWS infrastructure is up to you.</p>
+
+                <span class="simmer">
+  <span class="close">X</span>
+  <p>
+    <span class="fa fa-md fa-bell"></span>
+    <strong>The Simmer Newsletter</strong>
+  </p>
+  <p>
+    Subscribe to the <a href="https://www.simoahava.com/newsletter/">Simmer newsletter</a> to get the latest news and content from Simo Ahava into your email inbox!
+  </p>
+  </span>
+
+                
+                  <h2 id="what-you-will-need">What you will need</h2>
+<p>If you don&rsquo;t already have an AWS account, go ahead <a href="https://portal.aws.amazon.com/billing/signup">and create one</a>. You&rsquo;ll need to provide a credit card for billing as well.</p>
+<p>Once you&rsquo;ve created the account (or signed in), make sure you select a <strong>region</strong> you want to work in. All the services you enable should run within the same region for the purposes of this exercise. If you are unsure which region to select, choose one that is geographically closest to you.</p>
+
+
+
+<div class="figure " >
+  
+    <a href="https://www.simoahava.com/images/2021/06/aws-region.jpg" title="I&#39;m working in the eu-central-1 region (Frankfurt)">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/06/aws-region.jpg#ZgotmplZ" alt="I&#39;m working in the eu-central-1 region (Frankfurt)" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1638 596'%3E%3C/svg%3E">
+  
+    </a>
+  
+   
+    <span class="caption">I&#39;m working in the eu-central-1 region (Frankfurt)</span>
+  
+</div>
+
+
+<p>The final <strong>mandatory</strong> thing you&rsquo;ll need is access to a <strong>custom domain</strong> and the rights to modify its <strong>DNS records</strong>. In this exercise, you&rsquo;ll be mapping <strong>two</strong> domains:</p>
+<ul>
+<li>The main tagging server domain (e.g. <code>tagging.domain.com</code>)</li>
+<li>The preview server domain, which should be a subdomain of the main tagging server domain (e.g. <code>debug.tagging.domain.com</code>)</li>
+</ul>
+<blockquote>
+<p>Important! If you don&rsquo;t know how to update DNS records, <strong>work with someone who does</strong>. Also, make sure you are working with a domain namespace that is <strong>not being used for something else</strong>. In the example above, I might be using <code>domain.com</code> for my main site, so that&rsquo;s why I&rsquo;ve reserved the <code>tagging.domain.com</code> for my tagging server. The tagging server and the website sending data to the tagging server <strong>should</strong> share the main (naked) domain name, though.</p>
+</blockquote>
+<p>Unlike with GCP App Engine, it&rsquo;s <strong>not possible</strong> to setup the server container application without HTTPS-protected custom domains.</p>
+
+                
+                  <h2 id="the-outline">The outline</h2>
+<p>You are going to create an <strong>Elastic Beanstalk</strong> application, which runs on <strong>two environments</strong>. One environment will be for your auto-scaling <strong>tagging server</strong>, and one for your single-instance <strong>preview server</strong>.</p>
+<p>Both environments are created with a <strong>Docker container image</strong> provided by Google. This Docker container is configured with some <strong>environment variables</strong> – mainly the link to your actual Google Tag Manager container and details about the preview server setup.</p>
+<p>Once everything is done, your <strong>tagging server</strong> will be able to process incoming HTTP requests just like a regular Google Tag Manager server container. Requests sent while in preview mode will be automatically processed by the <strong>preview server</strong> (this logic is handled by the servers themselves – you don&rsquo;t have to write any routing rules).</p>
+<p>The actual steps we&rsquo;ll take are:</p>
+<ol>
+<li>Create the SSL certificates for the domains you&rsquo;ll need using Certificate Manager (you&rsquo;ll need to make <strong>DNS changes</strong>)</li>
+<li>Create a hosted zone for the custom domains using Route53 (you&rsquo;ll need to make <strong>DNS changes</strong>)</li>
+<li>Create the Elastic Beanstalk <strong>application</strong></li>
+<li>Create the <strong>environment</strong> for the <strong>preview server</strong></li>
+<li>Map a custom domain to the preview server</li>
+<li>Create the <strong>environment</strong> for the <strong>tagging server</strong></li>
+<li>Map a custom domain to the tagging server</li>
+<li>Finish up with some configuring</li>
+</ol>
+<p>Yes, it&rsquo;s a lot to cover, and yes, it&rsquo;s somewhat complicated. However, the steps to create the two servers are almost identical. Once you actually start working through the process, it should all make some sense.</p>
+<h3 id="1-create-the-ssl-certificates">1. Create the SSL certificates</h3>
+<p>The first thing you&rsquo;ll need to do is request an SSL certificate from Amazon so that the traffic to both your tagging server and your preview server will be behind HTTPS.</p>
+<p>While this is optional (but highly recommended) for the tagging server, it&rsquo;s <strong>required</strong> for the preview server. If the preview server is not behind HTTPS, the deployment will not work.</p>
+<p>Unlike App Engine, the default URL provided by Elastic Beanstalk can <strong>not</strong> be protected by HTTPS, which is why we need to map the custom domains before we can even test our setup properly.</p>
+<p>To get started, go to <a href="https://eu-central-1.console.aws.amazon.com/acm/home">AWS Certificate Manager</a> and choose to provision / request a new certificate. Select the <strong>public certificate</strong> option.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/06/public-certificate.jpg" title="request a public certificate">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/06/public-certificate.jpg#ZgotmplZ" alt="request a public certificate" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2338 586'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>In the next screen, add both of the domains you want to register for your servers. As mentioned before, make sure the <strong>preview</strong> server is a subdomain of the <strong>tagging</strong> server. For example, this is the configuration I chose for this demo:</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/06/certificate-domains.jpg" title="choose domains for the certificate">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/06/certificate-domains.jpg#ZgotmplZ" alt="choose domains for the certificate" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1510 658'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>In the next view, select the <strong>DNS validation</strong> option and proceed.</p>
+<p>Skip through the <strong>Add tags</strong> and <strong>Review</strong> screens, and click <strong>Confirm and request</strong> to start the process.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/06/confirm-and-request.jpg" title="Confirm and request">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/06/confirm-and-request.jpg#ZgotmplZ" alt="Confirm and request" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2876 1124'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>In the <strong>Validation</strong> view, expand both of the domains.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/06/dns-records.jpg" title="DNS records">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/06/dns-records.jpg#ZgotmplZ" alt="DNS records" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2854 1110'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>You&rsquo;ll need to create <strong>CNAME records</strong> for both of these domains in your DNS settings. For example, as the DNS records for my <code>teamsimmer.com</code> domain are managed through <a href="https://www.godaddy.com/">GoDaddy</a>, I need to create the two records like this:</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/06/godaddy-records.jpg" title="GoDaddy records">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/06/godaddy-records.jpg#ZgotmplZ" alt="GoDaddy records" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1986 236'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Once done, you can click <strong>Continue</strong> to complete the certificate request in AWS Certificate Manager.</p>
+<p>If your certificates aren&rsquo;t immediately validated, it means that the DNS changes haven&rsquo;t propagated yet. It might take anything from a few seconds to some hours, depending on if the domain names are being reused. You can click the <strong>refresh</strong> button to update the validation status.</p>
+<p>However, you can actually continue with the setup even if the validation isn&rsquo;t complete, so proceed to the next step when ready!</p>
+
+                
+                  <h2 id="2-create-a-hosted-zone-for-the-custom-domains">2. Create a hosted zone for the custom domains</h2>
+<p>The final DNS update you need to do is to <strong>register a hosted zone</strong> in AWS Route53.</p>
+<p>A hosted zone is where you basically point the <strong>name servers</strong> of your custom domains to AWS. This way you delegate AWS with full control over the DNS of these domains. This is pretty much mandatory if you want to map custom domains to the Beanstalk environments you&rsquo;ll be creating soon.</p>
+<p>Head on over to <a href="https://console.aws.amazon.com/route53/v2/home">Route53</a> and click <strong>Create hosted zone</strong>.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/06/route53-create-hosted-zone.jpg" title="Create hosted zone">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/06/route53-create-hosted-zone.jpg#ZgotmplZ" alt="Create hosted zone" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1630 612'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>In the <strong>Hosted zone configuration</strong>, add the domain of your <strong>tagging server</strong> (e.g. <code>tagging.teamsimmer.com</code>) into the <strong>Domain name</strong> field, keep the default settings, and click <strong>Create hosted zone</strong>.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/06/create-hosted-zone.jpg" title="Hosted zone configuration">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/06/create-hosted-zone.jpg#ZgotmplZ" alt="Hosted zone configuration" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1666 1706'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Once done, you need to make some <strong>DNS record updates</strong> again. In your DNS provider, add the four <strong>NS</strong> records to your tagging server domain.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/06/add-ns-records.jpg" title="Add NS records">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/06/add-ns-records.jpg#ZgotmplZ" alt="Add NS records" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2316 690'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>In GoDaddy, this is what the records from the example above look like:</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/06/ns-records-in-godaddy.jpg" title="NS records in GoDaddy">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/06/ns-records-in-godaddy.jpg#ZgotmplZ" alt="NS records in GoDaddy" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1992 450'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Once you&rsquo;ve done these changes, we&rsquo;re ready to create the Beanstalk environments. We&rsquo;ll return to Route53 once we need to make the actual tagging and preview server domain mappings, but these can be done through Route53 and you won&rsquo;t need to make any more DNS changes outside AWS.</p>
+
+                
+                  <h2 id="3-create-the-elastic-beanstalk-application">3. Create the Elastic Beanstalk application</h2>
+<p>Our setup will be a <strong>single</strong> Elastic Beanstalk application running an <em>environment</em> for the <strong>preview server</strong> and another <em>environment</em> for the <strong>tagging server</strong>.</p>
+<p>So the first thing you&rsquo;ll need to do is head on over to <a href="https://eu-central-1.console.aws.amazon.com/elasticbeanstalk/home">Elastic Beanstalk</a> and create a new application.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/06/create-beanstalk-application.jpg" title="Create Beanstalk application">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/06/create-beanstalk-application.jpg#ZgotmplZ" alt="Create Beanstalk application" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2054 604'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Give the application a name.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/06/application-name.jpg" title="Application name">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/06/application-name.jpg#ZgotmplZ" alt="Application name" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1856 646'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Under <strong>Platform</strong>, choose <strong>Docker</strong> and keep the default settings.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/06/docker-platform.jpg" title="Docker platform">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/06/docker-platform.jpg#ZgotmplZ" alt="Docker platform" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1818 608'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>At this point, we&rsquo;ll just want to create the application and <em>not</em> worry about the environments, so scroll all the way down and click <strong>Configure more options</strong>. This creates the application.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/06/application-configure-more-options.jpg" title="Configure more options">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/06/application-configure-more-options.jpg#ZgotmplZ" alt="Configure more options" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1868 544'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>In this next screen, scroll all the way down and click <strong>Cancel</strong> – we want to create the environment manually.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/06/click-cancel.jpg" title="Click cancel">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/06/click-cancel.jpg#ZgotmplZ" alt="Click cancel" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1900 638'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>If you now go to <a href="https://eu-central-1.console.aws.amazon.com/elasticbeanstalk/home#/applications">Applications</a>, you should see your new Beanstalk application. Nice work!</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/06/beanstalk-applications.jpg" title="Beanstalk applications">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/06/beanstalk-applications.jpg#ZgotmplZ" alt="Beanstalk applications" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2844 542'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>It might take some time for the application to appear, so be patient.</p>
+
+                
+                  <h2 id="4-create-the-preview-server-environment">4. Create the Preview server environment</h2>
+<p>The first thing we&rsquo;ll do is create an environment for the <strong>Preview server</strong>.</p>
+<p>It has just a single <em>gotcha</em>: it needs a <strong>Load Balancer</strong> (so that you can map a custom domain to it), but it <strong>must not</strong> scale beyond one instance.</p>
+<p>Click your application name in the list of Beanstalk applications to enter the application&rsquo;s environment list. The list should be empty, so click <strong>Create a new environment</strong>.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/06/create-preview-server-environment.jpg" title="Create preview server environment">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/06/create-preview-server-environment.jpg#ZgotmplZ" alt="Create preview server environment" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2824 540'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Choose <strong>Web server environment</strong> and click <strong>Select</strong>.</p>
+<p>Set the <strong>Environment name</strong> to something useful, such as <code>tagging-server-gtm-debug</code>. You don&rsquo;t need to change the <strong>Domain</strong> setting as we&rsquo;ll be using a custom domain anyway.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/06/environment-name.jpg" title="Environment name">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/06/environment-name.jpg#ZgotmplZ" alt="Environment name" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1336 778'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Under <strong>Platform</strong>, choose <strong>Docker</strong> and keep the default settings.</p>
+<h3 id="download-the-dockerrunawsjson-file">Download the Dockerrun.aws.json file</h3>
+<p>Before proceeding, follow <a href="https://gist.githubusercontent.com/sahava/f3d1baedf7d775dccf52feb57fa64416/raw/8126571d8c45bacb8bfacda391cad3faa77cf484/Dockerrun.aws.json">this link</a> and download the file as <code>Dockerrun.aws.json</code> somewhere on your computer.</p>
+<p>This file describes the <strong>Docker container</strong> for the GTM tagging server and how to fetch it from Google&rsquo;s public Docker repository. We&rsquo;ll be using this file to actually deploy the Google Tag Manager container into the environment.</p>
+<h3 id="upload-the-json">Upload the JSON</h3>
+<p>Once downloaded, back in the AWS Console, select <strong>Upload your code</strong> in the <strong>Application Code</strong> Settings. Click <strong>Choose file</strong> and locate the <code>Dockerrun.aws.json</code> to upload it to the environment.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/06/dockerrun-uploaded.jpg" title="Dockerrun uploaded">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/06/dockerrun-uploaded.jpg#ZgotmplZ" alt="Dockerrun uploaded" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1828 1234'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Next, click <strong>Configure more options</strong>.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/06/configure-debug-options.jpg" title="Configure debug options">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/06/configure-debug-options.jpg#ZgotmplZ" alt="Configure debug options" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1798 306'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<h3 id="modify-software-settings">Modify Software settings</h3>
+<p>Click <strong>Edit</strong> in the Software box.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/06/edit-software.jpg" title="Edit software">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/06/edit-software.jpg#ZgotmplZ" alt="Edit software" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 926 518'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Scroll down to <strong>Environment properties</strong>. These are environment variables passed to the Docker deployment.</p>
+<p>You need to set <strong>two</strong> properties:</p>
+<table>
+<thead>
+<tr>
+<th>Property name</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>RUN_AS_PREVIEW_SERVER</code></td>
+<td><code>true</code></td>
+</tr>
+<tr>
+<td><code>CONTAINER_CONFIG</code></td>
+<td>The container configuration string from Google Tag Manager Container Settings.</td>
+</tr>
+</tbody>
+</table>
+<p>The first is easy enough to set, but for the <code>CONTAINER_CONFIG</code> you need to head on over to the Google Tag Manager Server container (or create one if you haven&rsquo;t yet done so), and then copy the <strong>Container Configuration</strong> string from the container settings (Admin -&gt; Container Settings).</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/06/container-settings.jpg" title="Container configuration">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/06/container-settings.jpg#ZgotmplZ" alt="Container configuration" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1858 1476'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>This is what my Software settings look like:</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/06/environment-properties.jpg" title="Environment properties">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/06/environment-properties.jpg#ZgotmplZ" alt="Environment properties" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1836 712'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Click <strong>Save</strong> when done.</p>
+<h3 id="modify-capacity-settings">Modify Capacity settings</h3>
+<p>Next, click <strong>Edit</strong> in the Capacity box.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/06/edit-capacity.jpg" title="Edit capacity">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/06/edit-capacity.jpg#ZgotmplZ" alt="Edit capacity" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 932 520'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Choose <strong>Load balanced</strong> as the <strong>Environment type</strong>, and set both <strong>Min</strong> and <strong>Max</strong> instances to <code>1</code>.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/06/load-balanced-environment.jpg" title="Load balanced environment">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/06/load-balanced-environment.jpg#ZgotmplZ" alt="Load balanced environment" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 838 530'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Scroll all the way down and click <strong>Save</strong>.</p>
+<h3 id="modify-load-balancer-settings">Modify Load balancer settings</h3>
+<p>Now, click <strong>Edit</strong> in the Load balancer box.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/06/edit-load-balancer.jpg" title="Edit load balancer">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/06/edit-load-balancer.jpg#ZgotmplZ" alt="Edit load balancer" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 886 424'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>In the <strong>Listeners</strong> section click <strong>+ Add Listener</strong>.</p>
+<p>Set <strong>Port</strong> to <code>443</code>, <strong>Protocol</strong> to <code>HTTPS</code>, and choose the <strong>SSL certificate</strong> you provisioned earlier from the respective menu. Click <strong>Add</strong> when done.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/06/https-listener-debug.jpg" title="HTTPS Listener settings">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/06/https-listener-debug.jpg#ZgotmplZ" alt="HTTPS Listener settings" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1190 1138'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Under <strong>Processes</strong>, select the <code>default</code> process and click <strong>Edit</strong> in the Actions menu.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/06/edit-default-process.jpg" title="Edit default process">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/06/edit-default-process.jpg#ZgotmplZ" alt="Edit default process" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1748 460'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Set <code>200</code> as the value of the <strong>HTTP code</strong> for the health check, and set the path to <code>/healthz</code>. Click <strong>Save</strong>.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/06/health-check-options-process.jpg" title="Health check options">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/06/health-check-options-process.jpg#ZgotmplZ" alt="Health check options" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1162 1104'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Next, click <strong>+ Add process</strong> to add a new process.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/06/add-new-process.jpg" title="Add new process">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/06/add-new-process.jpg#ZgotmplZ" alt="Add new process" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1776 494'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Set <strong>Name</strong> to <code>https</code>. Set <strong>Port</strong> to <code>443</code>. Set <strong>Protocol</strong> to <code>HTTPS</code>.</p>
+<p>Then, set <strong>Path</strong> to <code>/healthz</code> (under <strong>Health check</strong>), and click <strong>Add</strong>.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/06/new-https-process.jpg" title="New https process">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/06/new-https-process.jpg#ZgotmplZ" alt="New https process" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1196 1616'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Finally, click <strong>Save</strong> at the bottom of the <strong>Modify load balancer</strong> page.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/06/save-load-balancer-settings.jpg" title="Save load balancer settings">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/06/save-load-balancer-settings.jpg#ZgotmplZ" alt="Save load balancer settings" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1862 460'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<h3 id="create-the-environment">Create the environment</h3>
+<p>Once you&rsquo;ve modified the <strong>Software</strong>, <strong>Capacity</strong>, and <strong>Load balancer</strong> settings, you are ready to create the environment, so click the <strong>Create environment</strong> button in the bottom right corner.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/06/create-the-debug-env.jpg" title="Create the debug environment">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/06/create-the-debug-env.jpg#ZgotmplZ" alt="Create the debug environment" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1876 646'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>You&rsquo;ll end up on a screen that shows a running log of the environment creation process. You&rsquo;ll need to wait some minutes for the environment to start. When finished, this is what you should see:</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/06/debug-server-done.jpg" title="Debug server done">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/06/debug-server-done.jpg#ZgotmplZ" alt="Debug server done" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2808 778'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<h3 id="test-the-environment">Test the environment</h3>
+<p>Once the debug environment is created, you can visit the environment URL (the one automatically generated by Elastic Beanstalk) and add the path <code>/healthz</code>.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/06/tagging-server-url-test.jpg" title="Test the tagging server URL">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/06/tagging-server-url-test.jpg#ZgotmplZ" alt="Test the tagging server URL" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1206 316'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>By visiting the path <code>/healthz</code>, you should see a response <code>ok</code> in the page body.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/06/test-healthz.jpg" title="Test /healthz">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/06/test-healthz.jpg#ZgotmplZ" alt="Test /healthz" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1602 196'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>You can also test the <code>https</code> URL, but as the endpoint is not secured by an SSL certificate, you&rsquo;ll need to click through the warnings that appear.</p>
+<p>Well done, the <strong>debug</strong> server has been created! Now you just need to map a custom domain to it.</p>
+
+                
+                  <h2 id="5-map-a-domain-to-the-preview-server">5. Map a domain to the preview server</h2>
+<p>Luckily, once the Hosted Zone has been created (see <a href="#2-create-a-hosted-zone-for-the-custom-domains">chapter 2</a>), mapping a custom domain to the preview server is very easy to do.</p>
+<p>Head on over to <a href="https://console.aws.amazon.com/route53/v2/hostedzones">Route53</a> and select the Hosted Zone you created earlier.</p>
+<p>Here, click to <strong>Create</strong> a new record.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/06/create-debug-server-record.jpg" title="Create Debug Server record">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/06/create-debug-server-record.jpg#ZgotmplZ" alt="Create Debug Server record" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1368 468'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Set the <strong>Record name</strong> to the subdomain name of the preview server. In my example, this would be <code>debug</code>, as the hosted zone has been created for <code>tagging.teamsimmer.com</code>. This means that the fully qualified domain name of the preview server becomes <code>debug.tagging.teamsimmer.com</code>.</p>
+<p>Keep <strong>Record type</strong> as <code>A</code>, and toggle the <strong>Alias</strong> toggle on.</p>
+<p>In the <strong>Route traffic to</strong> drop-down that appears, select <strong>Alias to Elastic Beanstalk environment</strong>.</p>
+<p>In the <strong>Choose Region</strong> drop-down, select the region where the Elastic Beanstalk application was created (<code>eu-central-1</code> in my case).</p>
+<p>Finally, in the Choose Environment field, select the preview server environment you created in the previous chapter.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/06/quick-create-debug-a-record.jpg" title="Create A record for debug server">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/06/quick-create-debug-a-record.jpg#ZgotmplZ" alt="Create A record for debug server" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2192 854'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Click <strong>Create records</strong> when done.</p>
+<h3 id="test-the-domain">Test the domain</h3>
+<p>Now browse to the <strong>HTTPS</strong> URL of the domain whose name you just registered in the DNS record, and add the path <code>/healthz</code>. You should be able to visit this domain without an SSL warning (because the certificate was applied to the load balancer of the environment).</p>
+<p>This is what I see when I visit <code>https://debug.tagging.teamsimmer.com/healthz</code>:</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/06/mapped-debug-domain-works.jpg" title="Mapped debug domain works">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/06/mapped-debug-domain-works.jpg#ZgotmplZ" alt="Mapped debug domain works" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 906 174'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Congratulations, you have now created the <strong>preview server</strong> for your server-side tagging environment!</p>
+<p>It&rsquo;s time to create the actual <strong>tagging server</strong>. Luckily the steps are almost exactly the same, with just a few modifications here and there.</p>
+
+                
+                  <h2 id="6-create-the-tagging-server-environment">6. Create the tagging server environment</h2>
+<p>Go to the <a href="https://eu-central-1.console.aws.amazon.com/elasticbeanstalk/home#/applications">Applications page</a> of Elastic Beanstalk, and select the GTM server application.</p>
+<p>Here, click <strong>Create a new environment</strong>.</p>
+<p>Keep <strong>Web server environment</strong> selected and click <strong>Select</strong>.</p>
+<p>Give the environment a name. I followed the naming schema of the preview server and ended up with <code>tagging-server-gtm-prod</code>.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/06/tagging-server-gtm-prod.jpg" title="Tagging server production">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/06/tagging-server-gtm-prod.jpg#ZgotmplZ" alt="Tagging server production" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1322 290'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>For <strong>Platform</strong>, choose <strong>Docker</strong> and keep the other platform settings with their default values.</p>
+<p>Under <strong>Application code</strong>, Select <strong>Existing version</strong> and choose the source file you used for the preview server. You can reuse this because the container image is exactly the same for both the preview server and the tagging server.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/06/application-code-existing-version.jpg" title="Application code existing version">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/06/application-code-existing-version.jpg#ZgotmplZ" alt="Application code existing version" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1468 602'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Next, click <strong>Configure more options</strong>.</p>
+<h3 id="configure-software-settings">Configure Software settings</h3>
+<p>In the <strong>Software</strong> box, click <strong>Edit</strong>.</p>
+<p>You need to add two <strong>Environment properties</strong>.</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CONTAINER_CONFIG</code></td>
+<td>Set to the container configuration string from the Google Tag Manager Container settings.</td>
+</tr>
+<tr>
+<td><code>PREVIEW_SERVER_URL</code></td>
+<td>Set to the HTTPS URL to the preview server.</td>
+</tr>
+</tbody>
+</table>
+<p>The <code>CONTAINER_CONFIG</code> is retrieved the same way you fetched it for the preview server. Go to the Container Settings in your Google Tag Manager Server container, and copy the Container Configuration string from there.</p>
+<p>The <code>PREVIEW_SERVER_URL</code> needs to be set to the <strong>origin</strong> of your preview server, which is the protocol (https) and the full hostname. As my preview server runs on <code>debug.tagging.teamsimmer.com</code>, the value of <code>PREVIEW_SERVER_URL</code> would be <code>https://debug.tagging.teamsimmer.com</code>.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/06/preview-server-url-settings.jpg" title="Preview server URL">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/06/preview-server-url-settings.jpg#ZgotmplZ" alt="Preview server URL" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1756 620'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Click <strong>Save</strong> when done.</p>
+<h3 id="configure-capacity-settings">Configure Capacity settings</h3>
+<p>Next, click <strong>Edit</strong> in the <strong>Capacity</strong> box.</p>
+<p>Choose <strong>Load balancing</strong> from the <strong>Environment type</strong>.</p>
+<p>The rest is really up to you! You can choose how the environment should auto-scale by setting the minimum and maximum number of instances.</p>
+<p>You can also choose how much &ldquo;firepower&rdquo; the environment has by selecting the instance type from the list.</p>
+<p>I wanted to go with a very simple, quite flimsy setup for demo purposes, and chose a min-max of 1–3 instances, and kept the default instance type of <code>t2.micro</code>.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/06/instance-setup-demo.jpg" title="Instance setup example">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/06/instance-setup-demo.jpg#ZgotmplZ" alt="Instance setup example" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1762 1384'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Once you&rsquo;ve decided what to go with (you can always update the environment configuration later), click <strong>Save</strong>.</p>
+<h3 id="configure-load-balancer-settings">Configure Load balancer settings</h3>
+<p>Now, click <strong>Edit</strong> in the <strong>Load balancer</strong> box.</p>
+<p>First, click <strong>+ Add listener</strong> in the <strong>Listeners</strong> section.</p>
+<p>Set <strong>Port</strong> to <code>443</code>, <strong>Protocol</strong> to <code>HTTPS</code>, and choose the <strong>SSL Certificate</strong> you provisioned earlier from the drop-down list. Click <strong>Add</strong>.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/06/add-load-balancer-listener-prod.jpg" title="Add load balancer listener to prod">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/06/add-load-balancer-listener-prod.jpg#ZgotmplZ" alt="Add load balancer listener to prod" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1182 1130'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Next, in <strong>Processes</strong>, select the <code>default</code> process, and click <strong>Edit</strong> from the <strong>Actions</strong> menu.</p>
+<p>Set the Health Check <strong>HTTP code</strong> to <code>200</code> and the <strong>Path</strong> to <code>/healthz</code>. Click <strong>Save</strong>.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/06/health-check-healthz.jpg" title="Health check healthz">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/06/health-check-healthz.jpg#ZgotmplZ" alt="Health check healthz" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1150 1032'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Click <strong>+ Add process</strong> to add a new process.</p>
+<p>Set <strong>Name</strong> to <code>https</code>, <strong>Port</strong> to <code>443</code>, and <strong>Protocol</strong> to <code>HTTPS</code>. Change <strong>Path</strong> to <code>/healthz</code> and click <strong>Add</strong>.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/06/add-https-process-prod.jpg" title="Add https process to prod">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/06/add-https-process-prod.jpg#ZgotmplZ" alt="Add https process to prod" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1166 1684'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Finally, click <strong>Save</strong> to close the Load balancer settings.</p>
+<h3 id="create-the-environment-1">Create the environment</h3>
+<p>Click <strong>Create environment</strong> to have AWS deploy the Docker container to your new tagging server environment. Again, this will take some minutes to complete. Once it&rsquo;s done, you should find yourself in the Environment dashboard with a healthy environment created for you.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/06/prod-environment-created.jpg" title="Production environment created">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/06/prod-environment-created.jpg#ZgotmplZ" alt="Production environment created" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2814 758'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<h3 id="test-the-environment-1">Test the environment</h3>
+<p>Test the tagging server the same way you tested the preview server. Copy the automatically generated <code>*.elasticbeanstalk.com</code> URL and add <code>/healthz</code> as the path. You should see the <code>ok</code> message.</p>
+<p>You can also test with HTTPS, but you need to click through the SSL warnings.</p>
+<p>If everything works, you&rsquo;re ready to map the tagging server domain to this environment.</p>
+
+                
+                  <h2 id="7-map-a-domain-to-the-tagging-server">7. Map a domain to the tagging server</h2>
+<p>Go to your <a href="https://console.aws.amazon.com/route53/v2/hostedzones">Hosted Zones</a> in Route53 and click the domain name you&rsquo;ve created the Hosted Zone for.</p>
+<p>Click <strong>Create record</strong>.</p>
+<p>Assuming the tagging server will be the same domain you configured the zone for, leave the <strong>Record name</strong> field empty. In my case, this means that the mapped domain will be <code>tagging.teamsimmer.com</code>.</p>
+<p>Keep <code>A</code> as the <strong>Record type</strong>, and toggle the <strong>Alias</strong> switch on.</p>
+<p>Set the endpoint to <strong>Alias to Elastic Beanstalk environment</strong>.</p>
+<p>Set the region to the region where your Elastic Beanstalk application is running.</p>
+<p>Select the <strong>tagging server</strong> as the target environment.</p>
+<p>Click <strong>Create records</strong>.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/06/tagging-server-dns-record.jpg" title="Tagging server DNS record">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/06/tagging-server-dns-record.jpg#ZgotmplZ" alt="Tagging server DNS record" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2148 696'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<h3 id="test-the-domain-1">Test the domain</h3>
+<p>Now, browse to your <strong>tagging server</strong> domain using HTTPS, and add the path <code>/healthz</code>. Do you see the <code>ok</code> message? If so, <strong>well done</strong>!</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/06/tagging-server-healthy.jpg" title="Tagging server healthy">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/06/tagging-server-healthy.jpg#ZgotmplZ" alt="Tagging server healthy" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 770 174'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+
+                
+                  <h2 id="8-final-steps">8. Final steps</h2>
+<p>There are some final steps you need to do before everything starts working together.</p>
+<h3 id="update-auto-scaling-groups-health-checks">Update auto-scaling groups&rsquo; health checks</h3>
+<p>First, you need to go to the <a href="https://eu-central-1.console.aws.amazon.com/ec2autoscaling/home">Auto-scaling Groups configuration in EC2</a>.</p>
+<p>Elastic Beanstalk actually uses EC2 virtual machines to run the instances. These <strong>auto-scaling groups</strong> need to be updated so that <em>unhealthy</em> servers are redeployed with the latest changes in the server runtime.</p>
+<p>One after the other, click open the two groups assigned to your server-side GTM application (one group for the preview server and one for the tagging server). If you have more groups here than just the two, you&rsquo;ll need to do some digging to identify the ones that correspond with your setup.</p>
+<p>In the <strong>Health checks</strong> box of both groups, click <strong>Edit</strong>.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/06/health-checks-auto-scaling-groups.jpg" title="Health checks for auto-scaling groups">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/06/health-checks-auto-scaling-groups.jpg#ZgotmplZ" alt="Health checks for auto-scaling groups" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1318 316'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Check the <strong>ELB</strong> checkbox and click <strong>Update</strong>.</p>
+<blockquote>
+<p>Remember, this needs to be done for <strong>both</strong> groups used by your application.</p>
+</blockquote>
+<h3 id="update-google-tag-manager-container-settings">Update Google Tag Manager container settings</h3>
+<p>Finally, you can edit the Server container settings for your Google Tag Manager container, and add your new <strong>tagging server URL</strong>.</p>
+<p>Go to <strong>Container Settings</strong> in the <strong>Admin</strong> section of your Server container in the Google Tag Manager UI, and add the URL to your tagging server in the respective field.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/06/tagging-server-url.jpg" title="Tagging server URL">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/06/tagging-server-url.jpg#ZgotmplZ" alt="Tagging server URL" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1136 638'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>You can test that everything works by clicking the <strong>Preview</strong> button.</p>
+<p>Debug mode should open, and you should see your tagging server URL in the address bar.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/06/gtm-preview-mode-works.jpg" title="GTM preview mode works">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/06/gtm-preview-mode-works.jpg#ZgotmplZ" alt="GTM preview mode works" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1936 610'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+
+                
+                  <h2 id="summary">Summary</h2>
+<p>If you&rsquo;re an AWS pro, setting up the server application in Elastic Beanstalk should be quite easy to do. After all, it runs on a very straightforward Docker container image with hardly any customizations necessary.</p>
+<p>If you&rsquo;re an AWS novice, then hopefully after this guide you&rsquo;ll understand a bit better how the different components play together. It&rsquo;s quite a world apart from the user experience of the Google Cloud Platform, isn&rsquo;t it?</p>
+<p>In any case, this guide should have given you enough information to keep configuring the setup by yourself. You might want to tweak the environment configuration for your tagging server, in case you need more instances or more computation power.</p>
+<p>You might also want to setup some request logging (you can configure this in the environment settings, too).</p>
+<p>To get the BigQuery API to work, you&rsquo;ll basically need to add two new environment variables: <code>GOOGLE_APPLICATION_CREDENTIALS</code>, which needs to point to a file in the environment file system, and <code>GOOGLE_CLOUD_PROJECT</code> which is set to the project ID of the Google Cloud project where BigQuery is running.</p>
+<p>The easiest way to do this is to create a new <code>Dockerfile</code> with the service account credentials added to the image, and then deploy both the credentials and the image from the command-line into the Elastic Beanstalk environment. This will be the subject of a new guide, or if someone else does the documentation for how to deploy the GTM server using the command-line interface, I&rsquo;ll link to it here.</p>
+<p>Hopefully we&rsquo;ll see more guides for deploying the GTM server to other environments than Google&rsquo;s App Engine. <a href="https://www.twitter.com/holomarked">Mark Edmondson</a> has already released a walkthrough for <a href="https://code.markedmondson.me/gtm-serverside-cloudrun/">deploying to Google Cloud Run</a>, so that&rsquo;s something you might want to take a look at as well!</p>
+
+                
+              
+              
+
+            </div>
+          </div>
+          <div id="post-footer" class="post-footer main-content-wrap">
+            
+              
+                
+                
+                  <div class="post-footer-tags">
+                    <span class="text-color-light text-small">TAGGED IN</span><br/>
+                    
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/google-tag-manager/">google tag manager</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/server-side-tagging/">server-side tagging</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/aws/">aws</a>
+
+                  </div>
+                
+              
+            
+            
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--disabled">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/consent-settings-google-tag-manager/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/deploy-server-side-google-tag-manager-aws/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Deploy%20Server-side%20Google%20Tag%20Manager%20In%20AWS%20https://www.simoahava.com/analytics/deploy-server-side-google-tag-manager-aws/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/deploy-server-side-google-tag-manager-aws/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#commento_thread">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+            
+              <span id="commento_thread"></span>
+<div id="commento"></div>
+<script defer src="https://cdn.commento.io/js/commento.js"></script>
+
+            
+          </div>
+        </article>
+        <footer id="footer" class="main-content-wrap">
+  <span class="copyrights">
+    &copy; 2021 Simo Ahava. All Rights Reserved
+  </span>
+</footer>
+
+      </div>
+      
+      <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+        
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--disabled">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/consent-settings-google-tag-manager/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/deploy-server-side-google-tag-manager-aws/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Deploy%20Server-side%20Google%20Tag%20Manager%20In%20AWS%20https://www.simoahava.com/analytics/deploy-server-side-google-tag-manager-aws/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/deploy-server-side-google-tag-manager-aws/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#commento_thread">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+      </div>
+      
+      <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+  <i id="btn-close-shareoptions" class="fa fa-close"></i>
+  <ul class="share-options">
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/deploy-server-side-google-tag-manager-aws/">
+          <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=Deploy%20Server-side%20Google%20Tag%20Manager%20In%20AWS%20https://www.simoahava.com/analytics/deploy-server-side-google-tag-manager-aws/%20via%20@SimoAhava">
+          <i class="fa fa-twitter"></i><span>Share on Twitter</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/deploy-server-side-google-tag-manager-aws/">
+          <i class="fa fa-linkedin"></i><span>Share on LinkedIn</span>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+<div id="share-options-mask" class="share-options-mask"></div>
+
+    </div>
+    
+    <div id="about">
+  <div id="about-card">
+    <div id="about-btn-close">
+      <i class="fa fa-remove"></i>
+    </div>
+    
+      <img id="about-card-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+    
+    <h4 id="about-card-name">Simo Ahava</h4>
+    
+      <div id="about-card-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</div>
+    
+    
+      <div id="about-card-job">
+        <i class="fa fa-briefcase"></i>
+        <br/>
+        Senior Data Advocate at Reaktor
+      </div>
+    
+    
+      <div id="about-card-location">
+        <i class="fa fa-map-marker"></i>
+        <br/>
+        Finland
+      </div>
+    
+  </div>
+</div>
+
+    
+  
+    
+    <div id="cover" style="background-image:url('https://www.simoahava.com/images/maisema.jpg');"></div>
+  
+
+
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+
+
+
+
+<script src="https://www.simoahava.com/js/script.js"></script>
+
+
+
+
+<script src="https://cdn.commento.io/js/count.js"></script>
+
+    <script>
+      !function(){var e=document.querySelector(".simmer"),t=document.querySelector(".simmer .close"),o=window.sessionStorage&&window.sessionStorage.getItem("nosimmer");if(e){if(o){e.style.display="none"}t.addEventListener("click",function(){window.sessionStorage.setItem("nosimmer","true"),e.style.display="none"})}}();
+    </script>
+    <script>
+      var mylazyload = new LazyLoad({elements_selector: '.lazy'});
+      </script>
+
+    
+  </body>
+</html>
+
