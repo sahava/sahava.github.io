@@ -1,0 +1,224 @@
+---
+author: Simo Ahava
+description: How to run Google Ads Conversion Tracking in Google Tag Manager's Server-side Tagging environment.
+categories:
+- Analytics
+comments: true
+slug: google-ads-server-side-tagging-google-tag-manager
+url: /analytics/google-ads-server-side-tagging-google-tag-manager/
+tags:
+- google tag manager
+- server-side tagging
+- google ads
+draft: false
+title: "Google Ads Conversion Tracking With Server-side Tagging In Google Tag Manager"
+date: 2021-07-16T07:00:00+03:00
+cover_image: /images/2021/06/google-ads-server-side-tagging-google-tag-manager.jpg
+---
+One of the biggest blockers for [Google Tag Manager's](https://tagmanager.google.com/) [server-side tagging]({{< relref "server-side-tagging-google-tag-manager.md" >}}) to slip out of *beta* is **Google Ads**. Until server-side tagging supports a solution for both **conversions** and **remarketing** capabilities to be reproduced server-side, it's unlikely that Server containers will lose their beta label.
+
+{{< image src="/images/2021/06/google-ads-tag-manager.jpg" ampheight="806" ampwidth="1138" title="Google Ads server-side tagging" classes="nocaption" >}}
+
+While I can't say what will happen to the beta label now, the fact is that Google Tag Manager **has now released support for Conversion tracking and Remarketing** using server-side tagging.
+
+The whole thing is quite ... interesting, as it involves not just **server-to-vendor** calls, but also **browser-to-server-to-browser-to-vendor** requests. Why? Maybe you guessed it: *third-party cookies*. Yuck!
+
+<!-- toc -->
+
+In this article, I'll show you how to set things up (surprisingly simple), and I'll also try to shed some light on how the whole setup actually works (surprisingly difficult).
+
+## The components you'll need
+
+In the **web container**, you need to reconfigure the **Google Analytics 4** Config tag to send the data to the Server container using the new **Send to server container** option. This replaces the `transport_url` setting you'll have used until now.
+
+> **Note!** Server-side tagging with Google Ads *only works with Google Analytics 4*. It will **not** work with Universal Analytics tags.
+
+The point here is that you'll use your GA4 web tag(s) to send the conversion and remarketing events to the Server container, where they will then be mapped accordingly.
+
+In the **Server** container, you'll need 1–3 new tags, depending on what you're trying to do.
+
+* A **Conversion Linker** tag for sending the landing page beacons to Google as well as for writing the first-party cookies with the ad click information.
+* **Google Ads Conversion Tracking** tag(s) in case you want to track conversions.
+* **Google Ads Remarketing** tag(s) in case you want to build remarketing audiences.
+
+Let's start from the top.
+
+## Web: Update the GA4 Config tag
+
+For the Google Ads setup to work, you'll need to update the **Google Analytics: GA4 Configuration** tag to use the new **Send to server container** setting, and you'll need to **remove** the `transport_url` field.
+
+{{< image src="/images/2021/06/send-to-server-container.jpg" ampheight="1254" ampwidth="1788" title="Send to server container" classes="nocaption" >}}
+
+You need to populate the **Send to server container** setting with the exact same value you populated `transport_url` with: the *origin* of the Server container, i.e. the URL up to the path selector. See the image above for an example.
+
+### How it works
+
+When you set the new **Send to server container** setting, it does two things.
+
+1. It sets the `transport_url` to point to the Server container.
+2. It sets the `first_party_collection` field to `true`.
+
+The second is quite important in this scenario. The purpose of the field is to tell GA4 (in the web) that the target machine is **not** a computer owned by Google Analytics. This means that it enables the protocol to share potentially sensitive data, as the Server container is something owned by the company running the website (hopefully) and not Google Analytics.
+
+When `first_party_collection` is enabled, GA4 will use a new protocol that allows the Server container to communicate *back* to the browser. 
+
+{{< image src="/images/2021/06/server-container-response.jpg" ampheight="268" ampwidth="2044" title="Server container response" classes="nocaption" >}}
+
+This protocol is essentially a response message, which is then parsed by the GA4 web tags, and they will react accordingly (e.g. send the request to the DoubleClick domain as in the example above). 
+
+We'll return to this topic, but suffice to say this is done *because both Conversion Tracking and Remarketing still make use of **third-party cookies***.
+
+## Server: Create a Conversion Linker tag
+
+In the **Server container**, create a new Conversion Linker tag. You'll find it in the list of built-in tag templates.
+
+{{< image src="/images/2021/06/conversion-linker.jpg" ampheight="1042" ampwidth="1846" title="Conversion Linker" classes="nocaption" >}}
+
+There's a new built-in trigger called **All Pages** in the Server container. Add that to the tag, as you'll want the Conversion Linker to activate on all pages.
+
+The **All Pages** trigger fires whenever there's an event named `page_view` generated by a Server container Client.
+
+### How it works
+
+The Conversion Linker tag does two things.
+
+1. It sends a **landing page beacon** to the Google Ads server.
+2. If the page URL has the `gclid` parameter, or if there are Google Ads' first-party cookies in the request, the tag will set the new `FPGCLAW` cookie in the response, writing the click ID to storage.
+
+{{< image src="/images/2021/06/landing-page-beacon.jpg" ampheight="586" ampwidth="1806" title="The landing page beacon sent to Google Ads servers" >}}
+
+The landing page beacon is very non-descript. It's just a ping to Google Ads with the current URL. Naturally, the URL might contain the `gclid` parameter, so I'm guessing this is used to validate clicks on ads.
+
+{{< image src="/images/2021/06/fpgclaw-cookie.jpg" ampheight="70" ampwidth="1924" title="The FPGCLAW cookie written with a 3-month expiration" >}}
+
+The `FPGCLAW` cookie seems to just replicate the pre-existing Google Ads cookies in that it writes the Google Ads Click ID into a first-party cookie. Naturally, as it's done in a `Set-Cookie` server response, it's better warded against [tracking protections](https://www.cookiestatus.com/).
+
+## Server: Create a Google Ads Conversion Tracking tag
+
+**If** you want to track conversions to Google Ads, you can go ahead and create a **Google Ads Conversion Tracking** tag in the server. You configure it exactly as you would configure the same tag in a web container.
+
+{{< image src="/images/2021/06/google-ads-conversion-tag.jpg" ampheight="2094" ampwidth="1862" title="Google Ads Conversion tag" classes="nocaption" >}}
+
+Set it to fire on whatever trigger you want to use for this particular conversion. In the example above, I'm using an `add_to_cart` event generated by the GA4 Client.
+
+### How it works
+
+This is where things get interesting.
+
+If there's a first-party click ID available, such as the one stored in `FPGCLAW` by the Conversion Linker tag, the Server container sends the conversion event directly to Google Ads servers.
+
+{{< image src="/images/2021/06/google-ads-conversion.jpg" ampheight="582" ampwidth="1790" title="Google Ads Conversion hit" classes="nocaption" >}}
+
+This is a "normal" Google Ads Conversion request. It contains the conversion ID, the conversion label, and the Click ID in the `gclaw` parameter, among other things.
+
+But when you then look at the *response* back from the Google server, you'll see it's a 302 redirect to the DoubleClick domain.
+
+{{< image src="/images/2021/06/conversion-doubleclick.jpg" ampheight="914" ampwidth="1780" title="Conversion DoubleClick" classes="nocaption" >}}
+
+Why? Because the Google Ads Conversion tag needs to communicate with the DoubleClick domain to stitch the conversion information with the user's identity, and this requires DoubleClick to read its cookies in third-party context.
+
+**However**, since the Server container can't work with third-party cookies, things get complicated.
+
+What happens is that the **HTTP response** back from the Server (i.e. for the `add_to_cart` event) contains a message that instructs the GA4 library **in the browser** to compose the DoubleClick request instead.
+
+{{< image src="/images/2021/06/server-response-add-to-cart.jpg" ampheight="254" ampwidth="2698" title="Server response to add to cart" classes="nocaption" >}}
+
+And sure enough, if you look at the network requests (in a browser that supports third-party cookies), you'll see the browser requests to Google servers:
+
+{{< image src="/images/2021/06/google-server-requests.jpg" ampheight="146" ampwidth="3300" title="Google server requests" classes="nocaption" >}}
+
+In case the browser **doesn't** have first-party click ID information stored, the Server container **doesn't** send a direct request to Google servers. Instead, it just instructs the browser to send the requests, so that the third-party cookies can be picked up.
+
+Please don't ask me what happens if the browser doesn't support third-party cookies. My guess is that if the Click ID is present, your conversion measurement will work just fine. However, there might be limitations on what type of audiences you can use or build for conversion tracking, because the click and the conversion can't be attributed to a generic Google user without third-party cookies.
+
+Similarly, if the first-party Click ID is *not* available, I'm guessing Google uses third-party cookies to see if the user has interacted with the ad nevertheless. So you'll lose that fallback if third-party cookies are not supported.
+
+## Server: Create a Google Ads Remarketing tag
+
+Remarketing is very similar to Conversion Tracking. **If** you want to build remarketing audiences, you need to create a **Google Ads Remarketing** tag in the Server container. Again, you'd need to configure it exactly as you would if you added the tag in a web container.
+
+{{< image src="/images/2021/06/google-ads-remarketing.jpg" ampheight="1448" ampwidth="1856" title="Google Ads remarketing" classes="nocaption" >}}
+
+Set the tag to fire on whatever event you want to use for your remarketing efforts. In the example above, I'm using the All Pages trigger again, but it could just as well be the `add_to_cart` trigger again, for example.
+
+### How it works
+
+Unlike the Conversion Tracking tag, the Remarketing tag will simply **not** work without third-party cookies. That's why a Remarketing tag doesn't initiate a server-to-server call *at all*. Instead, it sends the message back to the browser in the HTTP response, instructing the browser to send the request to Google servers.
+
+{{< image src="/images/2021/06/remarketing-response.jpg" ampheight="244" ampwidth="3044" title="Remarketing response" classes="nocaption" >}}
+
+And, again, the browser proceeds to send the request to Google servers, picking up any third-party cookies that might be set on the DoubleClick domain.
+
+{{< image src="/images/2021/06/remarketing-request-browser.jpg" ampheight="580" ampwidth="2940" title="Remarketing request in the browser" classes="nocaption" >}}
+
+Again, I don't know what happens if the browser doesn't support third-party cookies. I'm pretty sure remarketing is a dud in that case, as there's no way to link the user on the website with the related Google identity required for showing them ads across Google's display network.
+
+## Interaction with Consent Mode
+
+What about [Consent Mode]({{< relref "consent-mode-google-tags.md" >}})? What happens if `ad_storage` is denied? Or what if it's subsequently granted?
+
+### If consent is denied
+
+First, the **Conversion Linker** tag sends the *landing beacon* ping to Google servers, but it *doesn't write the `FPGCLAW` cookie* in the HTTP response.
+
+The landing page beacon includes parameters which state that Consent Mode is active. These instruct Google to ignore any identifiers in the request and only collect anonymous data for conversion modeling.
+
+{{< image src="/images/2021/06/consent-mode-linker-ping.jpg" ampheight="598" ampwidth="1794" title="Consent mode parameters in the linker ping" classes="nocaption" >}}
+
+The **Remarketing tag** doesn't do anything when consent mode is *denied*. As it relies solely on third-party cookies, no data is sent to Google servers.
+
+The **Conversion Tracking tag** sends the server-to-server request normally, whether a first-party click identifier is available or not:
+
+{{< image src="/images/2021/06/conversion-consent-mode.jpg" ampheight="704" ampwidth="1798" title="Conversion tracking without consent" classes="nocaption" >}}
+
+If the page URL has the `gclid` parameter, then that is sent to Google Ads (as it doesn't require a cookie being in the page URL itself).
+
+{{< image src="/images/2021/06/conversion-ping-with-click-id-consent.jpg" ampheight="714" ampwidth="1810" title="Conversion ping with the Click ID" classes="nocaption" >}}
+
+### If consent changes to granted
+
+If, however, consent *changes* to **granted**, the GA4 web tag reacts.
+
+The `page_view` hit is immediately resent to the Server container. This time it doesn't have the consent restrictions in place, so both GA4 tags and Google Ads tags will be able to benefit from the regular, cookies-enabled ping.
+
+This means that the Conversion Linker (assuming it fired on All Pages) will rewrite the `FPGCLAW` cookie, and if you had your Remarketing tag firing on the `page_view` event, it will fire again and this time instructs the browser to send the DoubleClick ping.
+
+In addition to this, **any other event you have [marked as a conversion](https://support.google.com/analytics/answer/9267568?hl=en#zippy=%2Cin-this-article) in the Google Analytics 4 user interface** will *also* get sent again.
+
+In other words, if you want your `add_to_cart` Google Ads conversion event to be sent with cookies and full capabilities as soon as consent is granted, you need to go into the Google Analytics 4 UI and mark the `add_to_cart` event as a conversion.
+
+{{< image src="/images/2021/06/add_to_cart-conversion.jpg" ampheight="482" ampwidth="2278" title="add_to_cart as a conversion" classes="nocaption" >}}
+
+The GA4 UI will instruct the `gtag.js` library to account for the `add_to_cart` conversion event when sending the hits again after consent is granted. You need to do this for **all** events that you want the library to send again once consent is granted!
+
+> Note! Even though the hits are sent again, the Server container will prevent tags from triggering again unless they support `ad_storage`.
+
+## New API
+
+Finally, there's a new [Custom Template]({{< relref "custom-templates-guide-for-google-tag-manager.md" >}}) API: `sendPixelFromBrowser`. This API works together with a GA4 web tag. If the API is invoked and the request originated from a GA4 web tag, the API sends the pixel request back to the browser using the same protocol as the Google Ads tags above.
+
+The GA4 web tag then picks up this instruction and sends the request via the browser.
+
+This means that other vendors that require third-party cookies to run can utilize this API to engineer their templates to use the browser rather than direct server-to-server hits.
+
+Note! This *only* works with a GA4 web tag. If the request originates from some other dispatch source, the API will not work as intended.
+
+## Summary
+
+As you can see, setting up Google Ads tracking is quite simple. But understanding the *flow* is another thing indeed.
+
+I'm actually really disappointed at how the setup works. I'm not saying I don't think it's a good piece of software – it is! I just hate the fact that it relies on third-party cookies.
+
+I understand that remarketing specifically requires those DoubleClick pings to take place, because remarketing relies on a vast display network to follow the user around with relevant ads.
+
+But forcing the browser to do all the legwork means that some of the most important security benefits of server-side tagging (reliance on first-party connections only, stricter Content-Security Policies) need to be abandoned in favor of getting more data.
+
+I'm wondering why Google isn't pushing more aggressively for a first-party-only approach, using things like hashed emails for identity stitching. I wouldn't be a big fan of this, either, but at least the website and server-side tagging setup would retain control, rather than having it relinquished to third-party requests that originate in the browser.
+
+Maybe Google is waiting for a resolution on the [Privacy Sandbox](https://privacysandbox.com/) initiative before making drastic changes to their data collection methods. Who knows?
+
+Well, anyway. I think this setup for Google Ads is pretty neat simply because it's very *frictionless* (the above issues with security notwithstanding). Setting it up is just as "easy" as setting up the respective components in the web container.
+
+I think the protocol for instructing the browser to do something is a genius piece of work, but I do worry about the increased reliance on GA4 and gtag.js for server-side tagging to work its magic. It's not a trend I'd like to see more of in the future, but I have a hunch that Google will push for a tighter and tighter integration as time goes by.
+
+Please let me know in the comments if you have any thoughts to share on this topic!
