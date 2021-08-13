@@ -1,0 +1,710 @@
+
+
+  
+    
+  
+
+
+  
+
+
+
+
+
+  
+
+
+  
+
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta name="google-site-verification" content="xQwWI2KUfP9LbFKhw2CVLFtrMY6Czrla7L3PD2aBolA" />
+
+
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org", 
+  "@type": "BlogPosting",
+  "headline": "#GTMTips: Cross-domain Tracking With Server-side FPID Cookie | Simo Ahava's blog",
+  "image": "https:\/\/www.simoahava.com\/images\/2021\/08\/cross-domain-tracking-with-server-side-fpid-cookie.jpg",
+  "editor": "Simo Ahava",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Simo Ahava's blog",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https:\/\/www.simoahava.com\/images\/simo.png",
+      "height": "393",
+      "width": "407"
+    }
+  },
+  "url": "https:\/\/www.simoahava.com\/gtm-tips\/cross-domain-tracking-server-side-fpid-cookie\/",
+  "datePublished": "2021-08-13T07:00:00\u002b03:00",
+  "dateModified": "2021-08-13T07:00:00\u002b03:00",
+  "description": "A walkthrough of how cross-domain tracking works when running a Server-side Google Tag Manager setup for Google Analytics and using the Server-Managed ID option for the GA cookie.",
+  "author": {
+    "@type": "Person",
+    "name": "Simo Ahava"
+  }
+}
+</script>
+
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <title>#GTMTips: Cross-domain Tracking With Server-side FPID Cookie | Simo Ahava's blog</title>
+    
+    <script>
+      window.dataLayer=window.dataLayer||[];window.dataLayer.push({pageType: 'article', environment:  null });
+    </script>
+    
+
+    
+    
+    <script src="https://www.simoahava.com/x-js/lazyload.iife.min.js"></script>
+
+    
+
+    
+    <script>
+      (function(S,i,m,o){
+        window[m]=window[m]||[];
+        window[m].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
+        var f=S.getElementsByTagName(i)[0],j=S.createElement(i),dl=m!='dataLayer'?'&l='+m:'';
+        j.async=true;
+        j.src='https://sgtm.simoahava.com/gtm.js?id='+o+dl;
+        f.parentNode.insertBefore(j,f);
+      })(document,'script','dataLayer','GTM-PZ7GMV9');
+    </script>
+    
+    <meta name="author" content="Simo Ahava">
+    <meta name="keywords" content="">
+
+    <link rel="icon" href="https://www.simoahava.com/images/favicon.ico">
+    
+    <link rel="amphtml" href="https://www.simoahava.com/amp/gtm-tips/cross-domain-tracking-server-side-fpid-cookie/">
+    
+    <meta name="description" content="A walkthrough of how cross-domain tracking works when running a Server-side Google Tag Manager setup for Google Analytics and using the Server-Managed ID option for the GA cookie.">
+    <meta property="og:description" content="A walkthrough of how cross-domain tracking works when running a Server-side Google Tag Manager setup for Google Analytics and using the Server-Managed ID option for the GA cookie.">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="#GTMTips: Cross-domain Tracking With Server-side FPID Cookie">
+    <meta property="og:url" content="https://www.simoahava.com/gtm-tips/cross-domain-tracking-server-side-fpid-cookie/">
+    <meta property="og:site_name" content="Simo Ahava&#39;s blog">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="#GTMTips: Cross-domain Tracking With Server-side FPID Cookie">
+    <meta name="twitter:description" content="A walkthrough of how cross-domain tracking works when running a Server-side Google Tag Manager setup for Google Analytics and using the Server-Managed ID option for the GA cookie.">
+    
+      <meta name="twitter:creator" content="@SimoAhava">
+      
+    
+
+    
+    
+
+    
+	  <meta property="og:image" content="https://www.simoahava.com/images/2021/08/cross-domain-tracking-with-server-side-fpid-cookie.jpg">
+      <meta name="twitter:image" content="https://www.simoahava.com/images/2021/08/cross-domain-tracking-with-server-side-fpid-cookie.jpg">
+    
+
+
+    
+
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+    
+    
+    
+    <link rel="stylesheet" href="https://www.simoahava.com/css/style.css" />
+    
+    
+
+    
+      
+    
+    
+  </head>
+
+  <body>
+    
+    <div id="_progress"></div>
+    
+    <div id="blog">
+      <header id="header" data-behavior="4">
+  <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+  <div class="header-title">
+    <a class="header-title-link" href="https://www.simoahava.com/">Simo Ahava&#39;s blog</a>
+  </div>
+  
+</header>
+
+      <nav id="sidebar" data-behavior="4">
+  <div class="sidebar-container">
+    
+      <div class="sidebar-profile">
+        <a href="https://www.simoahava.com/">
+          <img class="sidebar-profile-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+        </a>
+        <h4 class="sidebar-profile-name">Simo Ahava</h4>
+        
+          <h5 class="sidebar-profile-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</h5>
+        
+      </div>
+    
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+      
+      <span class="sidebar-button-desc">Home</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+      
+      <span class="sidebar-button-desc">Categories</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tags/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Tags</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/gtm-tips/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-magic"></i>
+      
+      <span class="sidebar-button-desc">GTM Tips</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/about-simo-ahava/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+      
+      <span class="sidebar-button-desc">About</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tools/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-wrench"></i>
+      
+      <span class="sidebar-button-desc">Tools</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/blog-statistics/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bar-chart"></i>
+      
+      <span class="sidebar-button-desc">Blog statistics</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://github.com/sahava" target="_blank" rel="noopener">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+      
+      <span class="sidebar-button-desc">GitHub</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/upcoming-talks/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bullhorn"></i>
+      
+      <span class="sidebar-button-desc">Upcoming talks</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/custom-templates/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Templates</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/newsletter/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bell"></i>
+      
+      <span class="sidebar-button-desc">Newsletter</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+
+    </ul>
+  </div>
+</nav>
+
+      
+
+      <div id="main" data-behavior="4"
+        class="
+               hasCoverMetaIn
+               ">
+        <article class="post">
+	  <form id="search" action="https://www.simoahava.com/search/">
+  <input name="q" type="text" class="form-control input--xlarge" placeholder="Search blog..." autocomplete="off">
+  </form>
+
+          <div class="post-header main-content-wrap text-left">
+  
+    <div class="figure nocaption">
+      <img class="cover" src="https://www.simoahava.com/images/2021/08/cross-domain-tracking-with-server-side-fpid-cookie.jpg">
+    </div>
+  
+  
+
+    <h1>
+      #GTMTips: Cross-domain Tracking With Server-side FPID Cookie
+    </h1>
+  
+  
+  <div class="postShorten-meta post-meta">
+    
+      <time datetime="2021-08-13T07:00:00&#43;03:00">
+        
+  August 13, 2021
+
+      </time>
+      
+      
+  
+  
+    <span>in</span>
+    
+      <a class="category-link" href="https://www.simoahava.com/categories/gtm-tips">GTM Tips</a>
+    
+  
+
+
+      | <a href="https://www.simoahava.com/gtm-tips/cross-domain-tracking-server-side-fpid-cookie/#commento">Comments</a>
+      
+  </div>
+
+
+</div>
+
+          <div class="post-content markdown">
+            <div class="main-content-wrap">
+	      
+                
+  	        <p>The <strong>FPID cookie</strong> in <a href="https://www.simoahava.com/analytics/server-side-tagging-google-tag-manager/">server-side tagging</a> for <a href="https://tagmanager.google.com/">Google Tag Manager</a> is an <code>HttpOnly</code>, <strong>server-managed</strong> ID cookie that&rsquo;s designed to replace the <em>JavaScript-managed</em> <code>_ga</code> cookie used by Google Analytics 4 and Universal Analytics.</p>
+<p>For more details about the cookie itself, check out my <a href="https://www.simoahava.com/analytics/fpid-cookie-google-analytics-server-side-tagging/">previous article on FPID</a>.</p>
+<p>In that article, I mentioned one caveat for adopting FPID being the fact that <a href="https://support.google.com/analytics/answer/10071811?hl=en">cross-domain tracking</a> will not work.</p>
+<p>I mean, how could it? FPID is an <code>HttpOnly</code> cookie, which means it&rsquo;s not available to JavaScript in the browser. Cross-domain tracking, on the other hand, decorates links dynamically as users click them, which means it needs the cookie to be available via JavaScript so that it could be decorated into the target page URL.</p>
+<p>Well, Google have now released a solution for cross-domain tracking with FPID, and it&rsquo;s probably something you already expected (if you know your way around cookies).</p>
+
+                <span class="simmer">
+  <span class="close">X</span>
+  <p>
+    <span class="fa fa-md fa-bell"></span>
+    <strong>The Simmer Newsletter</strong>
+  </p>
+  <p>
+    Subscribe to the <a href="https://www.simoahava.com/newsletter/">Simmer newsletter</a> to get the latest news and content from Simo Ahava into your email inbox!
+  </p>
+  </span>
+
+                
+                  <h2 id="tip-126-cross-domain-tracking-with-the-fpid-cookie">Tip 126: Cross-domain tracking with the FPID cookie</h2>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/08/cross-domain-tracking-with-server-side-fpid-cookie.jpg" title="Cross-domain tracking with server-side FPID cookie">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/08/cross-domain-tracking-with-server-side-fpid-cookie.jpg#ZgotmplZ" alt="Cross-domain tracking with server-side FPID cookie" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 960 540'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>So, how do you make an <code>HttpOnly</code> cookie available to JavaScript?</p>
+<p>By creating a version of the cookie that <em>isn&rsquo;t</em> <code>HttpOnly</code>!</p>
+<p>And that&rsquo;s what Google have done.</p>
+<p>If you have the <strong>Server Managed</strong> option selected in your GA4 or UA Client in the Server container, it means that the Client will write the <code>FPID</code> cookie and use it instead of the JavaScript-accessible <code>_ga</code> cookie (with some nuance in case you have the <a href="https://www.simoahava.com/analytics/fpid-cookie-google-analytics-server-side-tagging/#migrating-from-javascript-managed-to-server-managed">JavaScript migration option enabled</a>, but I digress).</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/08/server-managed-id.jpg" title="Server Managed ID">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/08/server-managed-id.jpg#ZgotmplZ" alt="Server Managed ID" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1144 340'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Now, you&rsquo;ll see how in addition to the <code>FPID</code> cookie, the HTTP response from the Client back to the browser also includes the <code>FPLC</code> cookie in some requests:</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/08/fplc-linker.jpg" title="FPLC cookie in the response">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/08/fplc-linker.jpg#ZgotmplZ" alt="FPLC cookie in the response" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1786 536'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>This <strong>FPLC</strong> cookie is the cross-domain linker cookie hashed from the <code>FPID</code> cookie. It&rsquo;s not <code>HttpOnly</code>, which means it can be read with JavaScript. It has a relatively short lifetime, just <strong>20 hours</strong>.</p>
+<blockquote>
+<p>This means that if the page is loaded and the user stays on the page for 20 hours and 1 minute, then cross-domain tracking will not work even if they click a link with a flagged URL. They&rsquo;ll need to reload the page to get the FPLC cookie again. But this is probably quite rare.</p>
+</blockquote>
+<p>If you have configured <strong>cross-domain tracking</strong> in either <a href="https://support.google.com/analytics/answer/10071811?hl=en">Google Analytics 4 admin</a> or in the <a href="https://support.google.com/tagmanager/answer/6164469?hl=en">Universal Analytics web tag</a>, the corresponding JavaScript library is configured to read this new cookie.</p>
+<p>So, when the user then clicks a link that has been flagged for cross-domain tracking, the URL will include a hash of the FPLC cookie (which is, in turn, a hash of the FPID cookie) in addition to the regular Google Analytics linker parameters.</p>
+
+
+
+<div class="figure " >
+  
+    <a href="https://www.simoahava.com/images/2021/08/fplc-in-url.jpg" title="Google Analytics parameters in green, FPLC in red">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/08/fplc-in-url.jpg#ZgotmplZ" alt="Google Analytics parameters in green, FPLC in red" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 3794 90'%3E%3C/svg%3E">
+  
+    </a>
+  
+   
+    <span class="caption">Google Analytics parameters in green, FPLC in red</span>
+  
+</div>
+
+
+<p>For cross-domain linking to work in the target URL, the page must of course be running a <strong>Server container</strong>, as that&rsquo;s the only place where FPID is relevant. The server container picks up the <code>FPLC</code> cookie in the request headers, checks that it&rsquo;s valid, and then creates the <code>FPID</code> cookie with it, if all goes well.</p>
+<p>There&rsquo;s an important catch here.</p>
+<p><strong>The Server containers running on the source and target sites MUST belong to the same Google Tag Manager account!</strong></p>
+<p>In other words, it&rsquo;s OK to have <strong>different containers</strong>, but they must belong to the <strong>same GTM account</strong>. I&rsquo;m guessing it has something to do with how the hash is calculated.</p>
+<p>And that&rsquo;s how cross-domain tracking with the server-side FPID cookie works!</p>
+<p>It&rsquo;s of course a bit disappointing that a new cookie is required, when the whole point of FPID was to move the ID away from the client. Well, FPLC isn&rsquo;t the ID itself – it&rsquo;s a hash of the ID and will never be used as the identifier in the requests.</p>
+<p>Also, cross-domain tracking just happens to always require a client-side component! Due to how browsers work, the only alternative would be to add <strong>fingerprinting</strong> into the mix of ID resolution, and that&rsquo;s a nasty can of worms I&rsquo;m sure the Google Analytics team doesn&rsquo;t want to touch with a long pole. Although, technically they already do some fingerprinting in the linker parameter (to make sure that the browser is the same between the source and target URLs).</p>
+<p>Anyway, this feature is certainly something that many have been waiting for since FPID was released, myself included.</p>
+
+                
+              
+              
+
+            </div>
+          </div>
+          <div id="post-footer" class="post-footer main-content-wrap">
+            
+              
+                
+                
+                  <div class="post-footer-tags">
+                    <span class="text-color-light text-small">TAGGED IN</span><br/>
+                    
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/google-tag-manager/">google tag manager</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/gtmtips/">gtmtips</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/server-side-tagging/">server-side tagging</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/fpid/">fpid</a>
+
+                  </div>
+                
+              
+            
+            
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--disabled">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/google-ads-server-side-tagging-google-tag-manager/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/gtm-tips/cross-domain-tracking-server-side-fpid-cookie/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=%23GTMTips:%20Cross-domain%20Tracking%20With%20Server-side%20FPID%20Cookie%20https://www.simoahava.com/gtm-tips/cross-domain-tracking-server-side-fpid-cookie/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/gtm-tips/cross-domain-tracking-server-side-fpid-cookie/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#commento_thread">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+            
+              <span id="commento_thread"></span>
+<div id="commento"></div>
+<script defer src="https://cdn.commento.io/js/commento.js"></script>
+
+            
+          </div>
+        </article>
+        <footer id="footer" class="main-content-wrap">
+  <span class="copyrights">
+    &copy; 2021 Simo Ahava. All Rights Reserved
+  </span>
+</footer>
+
+      </div>
+      
+      <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+        
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--disabled">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/google-ads-server-side-tagging-google-tag-manager/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/gtm-tips/cross-domain-tracking-server-side-fpid-cookie/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=%23GTMTips:%20Cross-domain%20Tracking%20With%20Server-side%20FPID%20Cookie%20https://www.simoahava.com/gtm-tips/cross-domain-tracking-server-side-fpid-cookie/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/gtm-tips/cross-domain-tracking-server-side-fpid-cookie/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#commento_thread">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+      </div>
+      
+      <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+  <i id="btn-close-shareoptions" class="fa fa-close"></i>
+  <ul class="share-options">
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/gtm-tips/cross-domain-tracking-server-side-fpid-cookie/">
+          <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=%23GTMTips:%20Cross-domain%20Tracking%20With%20Server-side%20FPID%20Cookie%20https://www.simoahava.com/gtm-tips/cross-domain-tracking-server-side-fpid-cookie/%20via%20@SimoAhava">
+          <i class="fa fa-twitter"></i><span>Share on Twitter</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/gtm-tips/cross-domain-tracking-server-side-fpid-cookie/">
+          <i class="fa fa-linkedin"></i><span>Share on LinkedIn</span>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+<div id="share-options-mask" class="share-options-mask"></div>
+
+    </div>
+    
+    <div id="about">
+  <div id="about-card">
+    <div id="about-btn-close">
+      <i class="fa fa-remove"></i>
+    </div>
+    
+      <img id="about-card-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+    
+    <h4 id="about-card-name">Simo Ahava</h4>
+    
+      <div id="about-card-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</div>
+    
+    
+      <div id="about-card-job">
+        <i class="fa fa-briefcase"></i>
+        <br/>
+        Senior Data Advocate at Reaktor
+      </div>
+    
+    
+      <div id="about-card-location">
+        <i class="fa fa-map-marker"></i>
+        <br/>
+        Finland
+      </div>
+    
+  </div>
+</div>
+
+    
+  
+    
+    <div id="cover" style="background-image:url('https://www.simoahava.com/images/maisema.jpg');"></div>
+  
+
+
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+
+
+
+
+<script src="https://www.simoahava.com/js/script.js"></script>
+
+
+
+
+<script src="https://cdn.commento.io/js/count.js"></script>
+
+    <script>
+      !function(){var e=document.querySelector(".simmer"),t=document.querySelector(".simmer .close"),o=window.sessionStorage&&window.sessionStorage.getItem("nosimmer");if(e){if(o){e.style.display="none"}t.addEventListener("click",function(){window.sessionStorage.setItem("nosimmer","true"),e.style.display="none"})}}();
+    </script>
+    <script>
+      var mylazyload = new LazyLoad({elements_selector: '.lazy'});
+      </script>
+
+    
+  </body>
+</html>
+
