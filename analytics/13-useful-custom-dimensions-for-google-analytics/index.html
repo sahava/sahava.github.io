@@ -419,6 +419,10 @@
 <p><strong>Original source</strong>: <a href="https://www.simoahava.com/analytics/improve-data-collection-with-four-custom-dimensions/#4-hit-timestamp">Link</a></p>
 <p><strong>Custom Dimension scope</strong>: Hit</p>
 <p>Hit Timestamp outputs the <strong>local</strong> time (i.e. visitor&rsquo;s browser time) of the hit in standardized format. An example would be <code>2018-05-29T15:04:51.361+03:00</code> (year-month-dayThour:minutes:seconds.milliseconds timezone_offset). Since it&rsquo;s <strong>hit</strong> timestamp, it&rsquo;s important that you add this Custom Dimensions to every single Google Analytics tag that fires on your site. Easiest way to do it is to add it to a <a href="https://www.simoahava.com/analytics/google-analytics-settings-variable-in-gtm/">Google Analytics Settings variable</a>.</p>
+<blockquote>
+<p>Note! It might actually be wiser to just send the UNIX timestamp (<code>new Date().getTime()</code>) instead of a preformatted date/time string as below. That way it&rsquo;s easier to apply normalizations and transformations to the value when passed to a data warehouse, for example. But the preformatted option is better if you&rsquo;re just interested in viewing the data in Google Analytics.</p>
+</blockquote>
+<p><em>Thanks to <a href="https://www.aivosto.com/"><strong>Tuomas Salste</strong></a> for pointing out some bugs in the code!</em></p>
 <p><strong>Custom JavaScript variable</strong>: {{Hit timestamp}}</p>
 <p><strong>Contents</strong>:</p>
 <div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() {
@@ -426,8 +430,9 @@
 </span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">var</span> now = <span style="color:#00a">new</span> <span style="color:#0aa">Date</span>();
     <span style="color:#00a">var</span> tzo = -now.getTimezoneOffset();
     <span style="color:#00a">var</span> dif = tzo &gt;= <span style="color:#099">0</span> ? <span style="color:#a50">&#39;+&#39;</span> : <span style="color:#a50">&#39;-&#39;</span>;
-    <span style="color:#00a">var</span> pad = <span style="color:#00a">function</span>(num) {
-        <span style="color:#00a">var</span> norm = <span style="color:#0aa">Math</span>.abs(<span style="color:#0aa">Math</span>.floor(num));
+    <span style="color:#00a">var</span> pad = <span style="color:#00a">function</span>(num, ms) {
+        <span style="color:#00a">var</span> norm = <span style="color:#0aa">Math</span>.floor(<span style="color:#0aa">Math</span>.abs(num));
+        <span style="color:#00a">if</span> (ms) <span style="color:#00a">return</span> (norm &lt; <span style="color:#099">10</span> ? <span style="color:#a50">&#39;00&#39;</span> : norm &lt; <span style="color:#099">100</span> ? <span style="color:#a50">&#39;0&#39;</span> : <span style="color:#a50">&#39;&#39;</span>) + norm;
         <span style="color:#00a">return</span> (norm &lt; <span style="color:#099">10</span> ? <span style="color:#a50">&#39;0&#39;</span> : <span style="color:#a50">&#39;&#39;</span>) + norm;
     };
     <span style="color:#00a">return</span> now.getFullYear() 
@@ -436,7 +441,7 @@
         + <span style="color:#a50">&#39;T&#39;</span> + pad(now.getHours())
         + <span style="color:#a50">&#39;:&#39;</span> + pad(now.getMinutes()) 
         + <span style="color:#a50">&#39;:&#39;</span> + pad(now.getSeconds())
-        + <span style="color:#a50">&#39;.&#39;</span> + pad(now.getMilliseconds())
+        + <span style="color:#a50">&#39;.&#39;</span> + pad(now.getMilliseconds(), <span style="color:#00a">true</span>)
         + dif + pad(tzo / <span style="color:#099">60</span>) 
         + <span style="color:#a50">&#39;:&#39;</span> + pad(tzo % <span style="color:#099">60</span>);
 }

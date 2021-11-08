@@ -692,14 +692,16 @@
 <p>In my setup, I wanted the timestamp to be customized for my own tastes. That means that I&rsquo;m parsing it to resemble an ISO timestamp, but I&rsquo;m using client local time including the timezone offset, so I can see just which timezone the user is in. So, for example, if a visitor comes from Finland, which is GMT+3 (stupid daylight savings time), the hit timestamp might look like this:</p>
 <p><strong>2015-04-03T18:55:27.466+03:00</strong></p>
 <p>This translates to April 3rd, 2015, at 6:55PM Helsinki time.</p>
+<p><em>Thanks to <a href="https://www.aivosto.com/"><strong>Tuomas Salste</strong></a> for spotting a couple of bugs in the code!.</em></p>
 <p>So, to get something like this, some JavaScript is required. Create a new Custom JavaScript Variable, and name it <strong>{{Hit Timestamp Local Time With Offset}}</strong>. Add the following code within:</p>
 <div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() {
     <span style="color:#aaa;font-style:italic">// Get local time as ISO string with offset at the end
 </span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">var</span> now = <span style="color:#00a">new</span> <span style="color:#0aa">Date</span>();
     <span style="color:#00a">var</span> tzo = -now.getTimezoneOffset();
     <span style="color:#00a">var</span> dif = tzo &gt;= <span style="color:#099">0</span> ? <span style="color:#a50">&#39;+&#39;</span> : <span style="color:#a50">&#39;-&#39;</span>;
-    <span style="color:#00a">var</span> pad = <span style="color:#00a">function</span>(num) {
-        <span style="color:#00a">var</span> norm = <span style="color:#0aa">Math</span>.abs(<span style="color:#0aa">Math</span>.floor(num));
+    <span style="color:#00a">var</span> pad = <span style="color:#00a">function</span>(num, ms) {
+        <span style="color:#00a">var</span> norm = <span style="color:#0aa">Math</span>.floor(<span style="color:#0aa">Math</span>.abs(num));
+        <span style="color:#00a">if</span> (ms) <span style="color:#00a">return</span> (norm &lt; <span style="color:#099">10</span> ? <span style="color:#a50">&#39;00&#39;</span> : norm &lt; <span style="color:#099">100</span> ? <span style="color:#a50">&#39;0&#39;</span> : <span style="color:#a50">&#39;&#39;</span>) + norm;
         <span style="color:#00a">return</span> (norm &lt; <span style="color:#099">10</span> ? <span style="color:#a50">&#39;0&#39;</span> : <span style="color:#a50">&#39;&#39;</span>) + norm;
     };
     <span style="color:#00a">return</span> now.getFullYear() 
@@ -708,7 +710,7 @@
         + <span style="color:#a50">&#39;T&#39;</span> + pad(now.getHours())
         + <span style="color:#a50">&#39;:&#39;</span> + pad(now.getMinutes()) 
         + <span style="color:#a50">&#39;:&#39;</span> + pad(now.getSeconds())
-        + <span style="color:#a50">&#39;.&#39;</span> + pad(now.getMilliseconds())
+        + <span style="color:#a50">&#39;.&#39;</span> + pad(now.getMilliseconds(), <span style="color:#00a">true</span>)
         + dif + pad(tzo / <span style="color:#099">60</span>) 
         + <span style="color:#a50">&#39;:&#39;</span> + pad(tzo % <span style="color:#099">60</span>);
 }

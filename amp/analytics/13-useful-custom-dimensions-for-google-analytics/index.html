@@ -134,7 +134,7 @@
 <meta itemprop="description" content="Implementation guide for useful Google Analytics Custom Dimensions, such as Hit Type, Session ID, Payload Length, and many more. The guide is for Google Tag Manager.">
 <meta itemprop="datePublished" content="2018-05-29T11:08:09&#43;03:00" />
 <meta itemprop="dateModified" content="2018-05-29T11:08:09&#43;03:00" />
-<meta itemprop="wordCount" content="2766">
+<meta itemprop="wordCount" content="2857">
 
 
 
@@ -1024,6 +1024,10 @@ on
 <p><strong>Original source</strong>: <a href="https://www.simoahava.com/amp/analytics/improve-data-collection-with-four-custom-dimensions/#4-hit-timestamp">Link</a></p>
 <p><strong>Custom Dimension scope</strong>: Hit</p>
 <p>Hit Timestamp outputs the <strong>local</strong> time (i.e. visitor&rsquo;s browser time) of the hit in standardized format. An example would be <code>2018-05-29T15:04:51.361+03:00</code> (year-month-dayThour:minutes:seconds.milliseconds timezone_offset). Since it&rsquo;s <strong>hit</strong> timestamp, it&rsquo;s important that you add this Custom Dimensions to every single Google Analytics tag that fires on your site. Easiest way to do it is to add it to a <a href="https://www.simoahava.com/amp/analytics/google-analytics-settings-variable-in-gtm/">Google Analytics Settings variable</a>.</p>
+<blockquote>
+<p>Note! It might actually be wiser to just send the UNIX timestamp (<code>new Date().getTime()</code>) instead of a preformatted date/time string as below. That way it&rsquo;s easier to apply normalizations and transformations to the value when passed to a data warehouse, for example. But the preformatted option is better if you&rsquo;re just interested in viewing the data in Google Analytics.</p>
+</blockquote>
+<p><em>Thanks to <a href="https://www.aivosto.com/"><strong>Tuomas Salste</strong></a> for pointing out some bugs in the code!</em></p>
 <p><strong>Custom JavaScript variable</strong>: {{Hit timestamp}}</p>
 <p><strong>Contents</strong>:</p>
 <div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
@@ -1031,8 +1035,9 @@ on
 </span><span class="c1"></span>    <span class="kd">var</span> <span class="nx">now</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">();</span>
     <span class="kd">var</span> <span class="nx">tzo</span> <span class="o">=</span> <span class="o">-</span><span class="nx">now</span><span class="p">.</span><span class="nx">getTimezoneOffset</span><span class="p">();</span>
     <span class="kd">var</span> <span class="nx">dif</span> <span class="o">=</span> <span class="nx">tzo</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="o">?</span> <span class="s1">&#39;+&#39;</span> <span class="o">:</span> <span class="s1">&#39;-&#39;</span><span class="p">;</span>
-    <span class="kd">var</span> <span class="nx">pad</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">num</span><span class="p">)</span> <span class="p">{</span>
-        <span class="kd">var</span> <span class="nx">norm</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">abs</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nx">num</span><span class="p">));</span>
+    <span class="kd">var</span> <span class="nx">pad</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">num</span><span class="p">,</span> <span class="nx">ms</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">norm</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">abs</span><span class="p">(</span><span class="nx">num</span><span class="p">));</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">ms</span><span class="p">)</span> <span class="k">return</span> <span class="p">(</span><span class="nx">norm</span> <span class="o">&lt;</span> <span class="mi">10</span> <span class="o">?</span> <span class="s1">&#39;00&#39;</span> <span class="o">:</span> <span class="nx">norm</span> <span class="o">&lt;</span> <span class="mi">100</span> <span class="o">?</span> <span class="s1">&#39;0&#39;</span> <span class="o">:</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="nx">norm</span><span class="p">;</span>
         <span class="k">return</span> <span class="p">(</span><span class="nx">norm</span> <span class="o">&lt;</span> <span class="mi">10</span> <span class="o">?</span> <span class="s1">&#39;0&#39;</span> <span class="o">:</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="nx">norm</span><span class="p">;</span>
     <span class="p">};</span>
     <span class="k">return</span> <span class="nx">now</span><span class="p">.</span><span class="nx">getFullYear</span><span class="p">()</span> 
@@ -1041,7 +1046,7 @@ on
         <span class="o">+</span> <span class="s1">&#39;T&#39;</span> <span class="o">+</span> <span class="nx">pad</span><span class="p">(</span><span class="nx">now</span><span class="p">.</span><span class="nx">getHours</span><span class="p">())</span>
         <span class="o">+</span> <span class="s1">&#39;:&#39;</span> <span class="o">+</span> <span class="nx">pad</span><span class="p">(</span><span class="nx">now</span><span class="p">.</span><span class="nx">getMinutes</span><span class="p">())</span> 
         <span class="o">+</span> <span class="s1">&#39;:&#39;</span> <span class="o">+</span> <span class="nx">pad</span><span class="p">(</span><span class="nx">now</span><span class="p">.</span><span class="nx">getSeconds</span><span class="p">())</span>
-        <span class="o">+</span> <span class="s1">&#39;.&#39;</span> <span class="o">+</span> <span class="nx">pad</span><span class="p">(</span><span class="nx">now</span><span class="p">.</span><span class="nx">getMilliseconds</span><span class="p">())</span>
+        <span class="o">+</span> <span class="s1">&#39;.&#39;</span> <span class="o">+</span> <span class="nx">pad</span><span class="p">(</span><span class="nx">now</span><span class="p">.</span><span class="nx">getMilliseconds</span><span class="p">(),</span> <span class="kc">true</span><span class="p">)</span>
         <span class="o">+</span> <span class="nx">dif</span> <span class="o">+</span> <span class="nx">pad</span><span class="p">(</span><span class="nx">tzo</span> <span class="o">/</span> <span class="mi">60</span><span class="p">)</span> 
         <span class="o">+</span> <span class="s1">&#39;:&#39;</span> <span class="o">+</span> <span class="nx">pad</span><span class="p">(</span><span class="nx">tzo</span> <span class="o">%</span> <span class="mi">60</span><span class="p">);</span>
 <span class="p">}</span>
