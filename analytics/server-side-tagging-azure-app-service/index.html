@@ -1,0 +1,1626 @@
+
+
+  
+    
+  
+
+
+  
+
+
+
+
+
+  
+
+
+  
+
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta name="google-site-verification" content="xQwWI2KUfP9LbFKhw2CVLFtrMY6Czrla7L3PD2aBolA" />
+
+
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org", 
+  "@type": "BlogPosting",
+  "headline": "Server-side Tagging With Azure App Service | Simo Ahava's blog",
+  "image": "https:\/\/www.simoahava.com\/images\/2021\/11\/server-side-gtm-azure.jpg",
+  "editor": "Simo Ahava",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Simo Ahava's blog",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https:\/\/www.simoahava.com\/images\/simo.png",
+      "height": "393",
+      "width": "407"
+    }
+  },
+  "url": "https:\/\/www.simoahava.com\/analytics\/server-side-tagging-azure-app-service\/",
+  "datePublished": "2021-11-26T07:00:00\u002b02:00",
+  "dateModified": "2021-11-26T07:00:00\u002b02:00",
+  "description": "A guide for setting up Google Tag Manager server-side tagging in an Azure environment. The container is setup with Azure\u0027s App Service.",
+  "author": {
+    "@type": "Person",
+    "name": "Simo Ahava"
+  }
+}
+</script>
+
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <title>Server-side Tagging With Azure App Service | Simo Ahava's blog</title>
+    
+    <script>
+      window.dataLayer=window.dataLayer||[];window.dataLayer.push({pageType: 'article', environment:  null });
+    </script>
+    
+
+    
+    
+    <script src="https://www.simoahava.com/x-js/lazyload.iife.min.js"></script>
+
+    
+
+    
+    <script>
+      (function(S,i,m,o){
+        window[m]=window[m]||[];
+        window[m].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
+        var f=S.getElementsByTagName(i)[0],j=S.createElement(i),dl=m!='dataLayer'?'&l='+m:'';
+        j.async=true;
+        j.src='https://sgtm.simoahava.com/gtm.js?id='+o+dl;
+        f.parentNode.insertBefore(j,f);
+      })(document,'script','dataLayer','GTM-PZ7GMV9');
+    </script>
+    
+    <meta name="author" content="Simo Ahava">
+    <meta name="keywords" content="">
+
+    <link rel="icon" href="https://www.simoahava.com/images/favicon.ico">
+    
+    <link rel="amphtml" href="https://www.simoahava.com/amp/analytics/server-side-tagging-azure-app-service/">
+    
+    <meta name="description" content="A guide for setting up Google Tag Manager server-side tagging in an Azure environment. The container is setup with Azure&#39;s App Service.">
+    <meta property="og:description" content="A guide for setting up Google Tag Manager server-side tagging in an Azure environment. The container is setup with Azure&#39;s App Service.">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="Server-side Tagging With Azure App Service">
+    <meta property="og:url" content="https://www.simoahava.com/analytics/server-side-tagging-azure-app-service/">
+    <meta property="og:site_name" content="Simo Ahava&#39;s blog">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Server-side Tagging With Azure App Service">
+    <meta name="twitter:description" content="A guide for setting up Google Tag Manager server-side tagging in an Azure environment. The container is setup with Azure&#39;s App Service.">
+    
+      <meta name="twitter:creator" content="@SimoAhava">
+      
+    
+
+    
+    
+
+    
+	  <meta property="og:image" content="https://www.simoahava.com/images/2021/11/server-side-tagging-with-azure-app-service.jpg">
+      <meta name="twitter:image" content="https://www.simoahava.com/images/2021/11/server-side-tagging-with-azure-app-service.jpg">
+    
+
+
+    
+
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+    
+    
+    
+    <link rel="stylesheet" href="https://www.simoahava.com/css/style.css" />
+    
+    
+
+    
+      
+    
+    
+  </head>
+
+  <body>
+    
+    <div id="_progress"></div>
+    
+    <div id="blog">
+      <header id="header" data-behavior="4">
+  <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+  <div class="header-title">
+    <a class="header-title-link" href="https://www.simoahava.com/">Simo Ahava&#39;s blog</a>
+  </div>
+  
+</header>
+
+      <nav id="sidebar" data-behavior="4">
+  <div class="sidebar-container">
+    
+      <div class="sidebar-profile">
+        <a href="https://www.simoahava.com/">
+          <img class="sidebar-profile-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+        </a>
+        <h4 class="sidebar-profile-name">Simo Ahava</h4>
+        
+          <h5 class="sidebar-profile-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</h5>
+        
+      </div>
+    
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+      
+      <span class="sidebar-button-desc">Home</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+      
+      <span class="sidebar-button-desc">Categories</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tags/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Tags</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/gtm-tips/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-magic"></i>
+      
+      <span class="sidebar-button-desc">GTM Tips</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/about-simo-ahava/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+      
+      <span class="sidebar-button-desc">About</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tools/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-wrench"></i>
+      
+      <span class="sidebar-button-desc">Tools</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/blog-statistics/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bar-chart"></i>
+      
+      <span class="sidebar-button-desc">Blog statistics</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://github.com/sahava" target="_blank" rel="noopener">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+      
+      <span class="sidebar-button-desc">GitHub</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/upcoming-talks/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bullhorn"></i>
+      
+      <span class="sidebar-button-desc">Upcoming talks</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/custom-templates/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Templates</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/newsletter/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bell"></i>
+      
+      <span class="sidebar-button-desc">Newsletter</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+
+    </ul>
+  </div>
+</nav>
+
+      
+
+      <div id="main" data-behavior="4"
+        class="
+               hasCoverMetaIn
+               ">
+        <article class="post">
+	  <form id="search" action="https://www.simoahava.com/search/">
+  <input name="q" type="text" class="form-control input--xlarge" placeholder="Search blog..." autocomplete="off">
+  </form>
+
+          <div class="post-header main-content-wrap text-left">
+  
+    <div class="figure nocaption">
+      <img class="cover" src="https://www.simoahava.com/images/2021/11/server-side-tagging-with-azure-app-service.jpg">
+    </div>
+  
+  
+
+    <h1>
+      Server-side Tagging With Azure App Service
+    </h1>
+  
+  
+  <div class="postShorten-meta post-meta">
+    
+      <time datetime="2021-11-26T07:00:00&#43;02:00">
+        
+  November 26, 2021
+
+      </time>
+      
+      
+  
+  
+    <span>in</span>
+    
+      <a class="category-link" href="https://www.simoahava.com/categories/analytics">Analytics</a>
+    
+  
+
+
+      | <a href="https://www.simoahava.com/analytics/server-side-tagging-azure-app-service/#commento">Comments</a>
+      
+  </div>
+
+
+</div>
+
+          <div class="post-content markdown">
+            <div class="main-content-wrap">
+	      
+                
+  	        <p>To continue my extensive collection of <a href="https://tagmanager.google.com/">Google Tag Manager&rsquo;s</a> <a href="https://www.simoahava.com/tags/server-side-tagging/">server-side tagging articles</a>, in this guide I&rsquo;ll walk you through how to set up a Server container in <a href="https://azure.microsoft.com/en-us/services/app-service/">Microsoft Azure&rsquo;s App Service</a> platform.</p>
+<p>For my previous guides on manually provisioning a Server container, follow these links:</p>
+<ul>
+<li>Amazon AWS (Elastic Beanstalk): <a href="https://www.simoahava.com/analytics/deploy-server-side-google-tag-manager-aws/">Deploy Server-side Google Tag Manager In AWS</a></li>
+<li>Google Cloud (App Engine): <a href="https://www.simoahava.com/analytics/provision-server-side-tagging-application-manually/">Provision Server-side Tagging Application Manually</a></li>
+</ul>
+<p>Azure&rsquo;s App Service is similar to AWS Elastic Beanstalk and GCP App Engine, in that it lets you create a web application from scratch with minimal effort.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/11/server-side-gtm-azure.jpg" title="Server-side Google Tag Manager for Azure">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/11/server-side-gtm-azure.jpg#ZgotmplZ" alt="Server-side Google Tag Manager for Azure" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1856 612'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Out of these three competitors, I found Azure&rsquo;s setup to be the smoothest and the fastest. It&rsquo;s probably not <strong>the cheapest</strong>, and there are some roadblocks related to securing your tagging domains behind <strong>HTTPS</strong> (more on this later), but other than that it&rsquo;s a very pleasant ride.</p>
+<div id="toc-container"><h1 id="table-of-contents">Table of Contents</h1> <input type="checkbox" id="show"><label for="show" id="showbtn"><h1 id="table-of-contents-mobile">Table of Contents</h1><span class="show">&nbsp;[+show]</span><span class="hide">&nbsp;[–hide]</span></label><nav id="TableOfContents">
+  <ul>
+    <li><a href="#what-youll-need">What you&rsquo;ll need</a></li>
+    <li><a href="#step-1-create-a-new-azure-account">Step 1: Create a new Azure account</a></li>
+    <li><a href="#azure-hierarchy">Azure hierarchy</a></li>
+    <li><a href="#step-2-create-a-new-resource-group">Step 2: Create a new Resource Group</a></li>
+    <li><a href="#step-3-create-the-preview-server">Step 3: Create the Preview server</a>
+      <ul>
+        <li><a href="#create-the-app-service">Create the App Service</a></li>
+        <li><a href="#configure-the-instance">Configure the instance</a></li>
+        <li><a href="#configure-the-docker-container">Configure the Docker container</a></li>
+        <li><a href="#configure-application-settings">Configure Application Settings</a></li>
+        <li><a href="#configure-health-check">Configure Health check</a></li>
+        <li><a href="#test-the-preview-server">Test the Preview server</a></li>
+      </ul>
+    </li>
+    <li><a href="#step-4-create-the-tagging-server">Step 4: Create the Tagging server</a>
+      <ul>
+        <li><a href="#create-the-app-service-1">Create the App Service</a></li>
+        <li><a href="#configure-the-instance-1">Configure the instance</a></li>
+        <li><a href="#configure-the-docker-container-1">Configure the Docker container</a></li>
+        <li><a href="#configure-the-application-settings">Configure the Application settings</a></li>
+        <li><a href="#configure-the-health-check">Configure the Health Check</a></li>
+        <li><a href="#configure-autoscaling">Configure autoscaling</a></li>
+        <li><a href="#test-the-server">Test the server</a></li>
+      </ul>
+    </li>
+    <li><a href="#optional-configure-a-custom-domain">(Optional) Configure a custom domain</a></li>
+    <li><a href="#summary">Summary</a></li>
+  </ul>
+</nav></div>
+
+                <span class="simmer">
+  <span class="close">X</span>
+  <p>
+    <span class="fa fa-md fa-bell"></span>
+    <strong>The Simmer Newsletter</strong>
+  </p>
+  <p>
+    Subscribe to the <a href="https://www.simoahava.com/newsletter/">Simmer newsletter</a> to get the latest news and content from Simo Ahava into your email inbox!
+  </p>
+  </span>
+
+                
+                  <h2 id="what-youll-need">What you&rsquo;ll need</h2>
+<p>The prerequisites are similar to the other cloud stacks:</p>
+<ul>
+<li>A <strong>credit card</strong> to set up billing (if you&rsquo;re a first-time user, you&rsquo;ll get <a href="https://azure.microsoft.com/en-us/free/">USD200 trial credit</a>).</li>
+<li>A <strong>custom domain name</strong> to map the endpoint to (optional but strongly recommended).</li>
+<li>Some way of securing the custom domain name behind <strong>HTTPS</strong>.</li>
+<li>A <strong>Google Tag Manager Server container</strong>, created through the regular GTM container creation flow.</li>
+</ul>
+<p>If you recall from previous guides, a Google Tag Manager server-side tagging setup comprises <strong>two</strong> servers:</p>
+<ul>
+<li>The <strong>Preview server</strong>, which <em>must</em> be behind HTTPS, but doesn&rsquo;t need to be running on a custom domain.</li>
+<li>The <strong>Tagging server</strong>, which <em>should</em> be behind HTTPS, and <em>should</em> run on a custom (sub)domain.</li>
+</ul>
+<p>I will <em>not</em> be instructing you on how to integrate the <a href="https://developers.google.com/tag-platform/tag-manager/server-side/api#bigquery">BigQuery API</a> – you can follow the <a href="https://developers.google.com/tag-platform/tag-manager/server-side/manual-setup-guide">official documentation</a> for details on how to add service account credentials to your Azure service.</p>
+<p>In this guide, I&rsquo;ll walk you through the setup as a completely new user, so that you can follow the flow if you&rsquo;ve never tried Azure before. If you already <em>are</em> an established Azure user, you can skip to the beginning of the actual setup.</p>
+
+                
+                  <h2 id="step-1-create-a-new-azure-account">Step 1: Create a new Azure account</h2>
+<p>Browse to <a href="https://portal.azure.com/"><strong>https://portal.azure.com/</strong></a>. You need to log in with a <strong>Microsoft</strong> account.</p>
+<p>If necessary, follow the prompts to create a new Microsoft account with the email address of your choice.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/11/sign-in-azure.jpg" title="Sign in to Azure">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/11/sign-in-azure.jpg#ZgotmplZ" alt="Sign in to Azure" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 503 586'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>If you&rsquo;re a new Azure user, you can start with the free trial, which gives you <strong>$200</strong> credit to your billing.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/11/azure-free-trial.jpg" title="Azure free trial">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/11/azure-free-trial.jpg#ZgotmplZ" alt="Azure free trial" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1061 433'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>When you click through to the free trial, you need to input some information to create your new Azure account.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/11/free-trial.jpg" title="Sign up for free account">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/11/free-trial.jpg#ZgotmplZ" alt="Sign up for free account" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1281 934'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>After the credit runs out or you use the services paste the first <strong>30 days</strong>, Azure will prompt you if you want to continue with <strong>pay-as-you-go</strong>, so that you&rsquo;ll only pay for the actual services you use (beyond the free tiers).</p>
+<p>You&rsquo;ll need to also provide your <strong>credit card information</strong> for identity verification. Azure will also use this card for billing you for services when necessary.</p>
+<p>Once you&rsquo;re done inputting the credit card information, click <strong>Sign up</strong> to finally create the account.</p>
+
+                
+                  <h2 id="azure-hierarchy">Azure hierarchy</h2>
+<p>In Azure, the hierarchy of management is this:</p>
+<ul>
+<li>
+<p><strong>Management groups</strong> let you group together <strong>subscriptions</strong> to manage access, policy, and compliance across subscriptions. In this guide, we&rsquo;ll use the default <strong>Root</strong> management group.</p>
+</li>
+<li>
+<p><strong>Subscriptions</strong> associate users with the <strong>resources</strong> they create. With subscriptions, you can set budgets and policies that cover the resources you create in the subscription. A subscription should have been automatically created for you when you set up your Azure account.</p>
+</li>
+<li>
+<p><strong>Resource groups</strong> group <strong>resources</strong> (d&rsquo;oh) that have a similar purpose. In this guide, we&rsquo;ll create a single resource group to contain all the resources we create for the server-side tagging setup.</p>
+</li>
+<li>
+<p><strong>Resources</strong> are the individual cloud components you work with while in Azure. We&rsquo;re going to create a bunch of resources as we walk through the steps of this guide.</p>
+</li>
+</ul>
+<p>When you created the Azure account, a new subscription was automatically created for you, typically named <code>Azure subscription 1</code>.</p>
+<p>To find it, type <code>subscriptions</code> into the search bar in the top, and click the link to <strong>Subscriptions</strong>.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/11/subscriptions.jpg" title="Subscriptions">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/11/subscriptions.jpg#ZgotmplZ" alt="Subscriptions" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 952 390'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>You might need to uncheck the &ldquo;Show only subscriptions selected in the global subscriptions filter&rdquo; option to see your subscription listed.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/11/azure-subscription-1.jpg" title="Azure subscription 1">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/11/azure-subscription-1.jpg#ZgotmplZ" alt="Azure subscription 1" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1659 382'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>If you don&rsquo;t have any subscriptions listed, you can click <strong>+ Add</strong> to create a new one. Just follow the prompts and you&rsquo;ll be fine.</p>
+<p>If you click to open the subscription in the list, you can rename it, check its billing, and/or set cost alerts and budgets!</p>
+
+                
+                  <h2 id="step-2-create-a-new-resource-group">Step 2: Create a new Resource Group</h2>
+<blockquote>
+<p>Note! You <em>could</em> simply go ahead and directly create a new <strong>App Service</strong> resource and a resource group would be automatically generated for you. But I like a more methodological approach, which is why I want to create all the assets manually.</p>
+</blockquote>
+<p>Type <code>resource groups</code> in the search bar and click the corresponding icon to open the <strong>Resource groups</strong> dashboard.</p>
+<p>Here, click the <strong>+ Create</strong> button to start creating a new resource group.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/11/create-resource-group.jpg" title="Create resource group">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/11/create-resource-group.jpg#ZgotmplZ" alt="Create resource group" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 493 289'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>In the creation process, the three selections you need to make are:</p>
+<ul>
+<li><strong>Subscription</strong> – Select the <code>Azure subscription 1</code> or whatever subscription you want to use.</li>
+<li><strong>Resource group</strong> – Give the resource group a name (e.g. <code>gtm-server-side-tagging</code>).</li>
+<li><strong>Region</strong> – Choose the Azure region that&rsquo;s best for your use case.</li>
+</ul>
+<p>For more details about region selection, see <a href="https://azure.microsoft.com/en-us/global-infrastructure/geographies/">this page</a>.</p>
+<p>Here&rsquo;s what I selected:</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/11/resource-group-options.jpg" title="Resource group options">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/11/resource-group-options.jpg#ZgotmplZ" alt="Resource group options" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 738 333'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Once finished configuring, click <strong>Review + create</strong> in the bottom bar.</p>
+<p>Once validation passes, click <strong>Create</strong> in the bottom bar.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/11/create-group.jpg" title="Create resource group">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/11/create-group.jpg#ZgotmplZ" alt="Create resource group" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 675 533'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>You should see your new resource group listed in the dashboard:</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/11/resource-group-done.jpg" title="Resource group created">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/11/resource-group-done.jpg#ZgotmplZ" alt="Resource group created" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 608 293'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+
+                
+                  <h2 id="step-3-create-the-preview-server">Step 3: Create the Preview server</h2>
+<p>The first thing we&rsquo;ll create is the <strong>Preview</strong> server.</p>
+<p>This is an HTTP endpoint to which the <em>tagging</em> server forwards all requests that need to be exposed in preview mode. The main requirement is that it&rsquo;s behind <strong>HTTPS</strong>. It does <em>not</em> need to reside on a custom domain, and you can just use the default domain that Azure provides (which is, conveniently, automatically accessible through HTTPS).</p>
+<h3 id="create-the-app-service">Create the App Service</h3>
+<p>To create the server, type <code>app services</code> into the search bar and click the <strong>App Services</strong> link.</p>
+<p>In the dashboard, click <strong>+ Create</strong> to create a new App Service.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/11/create-app-service.jpg" title="Create App Service">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/11/create-app-service.jpg#ZgotmplZ" alt="Create App Service" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 439 291'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<h3 id="configure-the-instance">Configure the instance</h3>
+<p>The first thing to do in the creation flow is to select your <strong>subscription</strong> and <strong>resource group</strong>.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/11/select-subscription-and-resource-group.jpg" title="Select subscription and resource group">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/11/select-subscription-and-resource-group.jpg#ZgotmplZ" alt="Select subscription and resource group" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 729 197'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Next, give the Preview server a <strong>name</strong>. This will become the subdomain under <code>azurewebsites.net</code> you&rsquo;ll use to access the server.</p>
+<p>Select <strong>Docker Container</strong> as the publish option. Keep <strong>Linux</strong> checked for the operating system.</p>
+<p>Select the App Service <strong>region</strong> you want to use – might make sense to select the same one you configured for the resource group earlier.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/11/instance-details.jpg" title="Instance details">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/11/instance-details.jpg#ZgotmplZ" alt="Instance details" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 715 264'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Finally, click <strong>Create new</strong> for the <strong>Linux Plan</strong> option. Give the plan a name – you can just use the same name you gave to the instance previously.</p>
+<p>For <strong>Sku and size</strong>, click <strong>Change size</strong>. Under <strong>Dev / Test</strong>, choose <strong>B1</strong> (one of the lowest specs).</p>
+<blockquote>
+<p>We can choose a flimsy spec like this because the Preview server is only used occasionally and does not need to be that responsive. <strong>F1</strong> might be tempting, but the lack of compute minutes will really make it difficult to use Preview mode for longer stretches.</p>
+</blockquote>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/11/select-b1.jpg" title="Select B1">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/11/select-b1.jpg#ZgotmplZ" alt="Select B1" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1364 552'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>This is what <strong>App Service Plan</strong> should look like now:</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/11/app-service-plan.jpg" title="App Service Plan">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/11/app-service-plan.jpg#ZgotmplZ" alt="App Service Plan" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1454 488'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>When happy, click the <strong>Next : Docker &gt;</strong> button in the bottom bar to open the Docker tab.</p>
+<h3 id="configure-the-docker-container">Configure the Docker container</h3>
+<p>Docker is a technology that uses <em>containers</em> to provide all-inclusive application setups. For example, the entire Google Tag Manager server-side tagging infrastructure is handily available in a public Docker container, which you can configure with just a few environment variables (more on these in a bit).</p>
+<p>In the Docker tab, keep <strong>Options</strong> as it is (&ldquo;Single Container&rdquo;), but choose <strong>Docker Hub</strong> as the Image source.</p>
+<p>Keep <strong>Access Type</strong> as Public, and past the following container URI into the <strong>Image and tag</strong> field:</p>
+<p><code>gcr.io/cloud-tagging-10302018/gtm-cloud-image:stable</code></p>
+<p>This is the public URL to the server-side GTM Docker container.</p>
+<p>Here&rsquo;s what your settings should look like:</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/11/docker-tab.jpg" title="Docker tab">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/11/docker-tab.jpg#ZgotmplZ" alt="Docker tab" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 728 354'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Now, you can click the <strong>Review + create</strong> button in the bottom bar. Review your configuration, and then click <strong>Create</strong> in the bottom bar to create the Preview server!</p>
+<h3 id="configure-application-settings">Configure Application Settings</h3>
+<p>It will take a while for the service to deploy. Once it&rsquo;s done, the dashboard should have a button <strong>Go to resource</strong>, so click that.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/11/go-to-resource.jpg" title="Go to resource">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/11/go-to-resource.jpg#ZgotmplZ" alt="Go to resource" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 847 417'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<blockquote>
+<p>If, for some reason, you can&rsquo;t see this button or you close the tab, you can always find your server by typing <code>app services</code> in the Azure search bar, clicking over to App Services, and then selecting the Preview server service from the list.</p>
+</blockquote>
+<p>The next thing we need to do is configure some <em>environment variables</em>, known as <strong>Application settings</strong> in Azure. These establish certain conditions for the Docker container.</p>
+<p>Click <strong>Configuration</strong> in the navigation.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/11/preview-configuration.jpg" title="Preview server configuration">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/11/preview-configuration.jpg#ZgotmplZ" alt="Preview server configuration" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 435 282'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>You&rsquo;re going to be adding <strong>two</strong> new Application settings here. The first instructs the service that this particular server is the <strong>Preview server</strong>. The second instructs the service to which <strong>Google Tag Manager server container</strong> this server should be linked.</p>
+<p>Click <strong>+ New application setting</strong>.</p>
+<p>For <strong>Name</strong>, type <code>RUN_AS_PREVIEW_SERVER</code>. For <strong>Value</strong>, type <code>true</code>.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/11/run-as-preview-server.jpg" title="Run as preview server">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/11/run-as-preview-server.jpg#ZgotmplZ" alt="Run as preview server" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 421 210'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Click <strong>OK</strong>.</p>
+<p>Click <strong>+ New application setting</strong> to add another environment variable.</p>
+<p>For <strong>Name</strong>, type <code>CONTAINER_CONFIG</code>.</p>
+<p>For <strong>Value</strong>, open the <strong>Server container</strong> you&rsquo;ve created in the <a href="https://tagmanager.google.com/"><strong>Google Tag Manager</strong> user interface</a>.</p>
+<p>Click the Container ID in the top bar to open the container information overlay.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/11/container-id.jpg" title="Container ID">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/11/container-id.jpg#ZgotmplZ" alt="Container ID" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2450 960'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>If you&rsquo;re prompted about how to install Google Tag Manager, choose <strong>Manually provision tagging server</strong>.</p>
+<p>In any case, what you&rsquo;re looking for is the <strong>Container Config</strong> string. Copy it to the clipboard once you find it.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/11/copy-container-config.jpg" title="Copy container config">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/11/copy-container-config.jpg#ZgotmplZ" alt="Copy container config" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1024 392'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Back in Azure, set this Container Config string as the <strong>Value</strong> of the <code>CONTAINER_CONFIG</code> application setting. Click <strong>OK</strong>.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/11/container-config-setting.jpg" title="Container Config Setting">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/11/container-config-setting.jpg#ZgotmplZ" alt="Container Config Setting" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1564 392'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Finally, click <strong>Save</strong> in the top bar to save the new settings and force a redeployment of the Preview server.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/11/save-application-settings.jpg" title="Save application settings">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/11/save-application-settings.jpg#ZgotmplZ" alt="Save application settings" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 942 492'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<h3 id="configure-health-check">Configure Health check</h3>
+<p>The last thing you need to do before being able to test your setup is to configure the <strong>Health check</strong>.</p>
+<p>Azure can periodically ping a specific endpoint in your service to make sure that the service is up and running. If the service doesn&rsquo;t respond with a valid status, Azure flags it as <em>unhealthy</em>, forcing a scale-down and redeployment of the instance.</p>
+<p>This is <em>very</em> important, because Google Tag Manager also uses this mechanism to get your service to fetch the latest version of the server-side tagging software from Google server.</p>
+<p>In your Preview server service, scroll down the menu until you find the <strong>Health check</strong> option. Click it.</p>
+<p>Click <strong>Enable</strong> to activate the health check and type <code>/healthz</code> as the <strong>Path</strong>.</p>
+<p>Finally, click <strong>Save</strong> to save the changes and force yet another redeployment of the service.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/11/configure-health-check.jpg" title="Configure health check">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/11/configure-health-check.jpg#ZgotmplZ" alt="Configure health check" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1616 1320'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<h3 id="test-the-preview-server">Test the Preview server</h3>
+<p>You&rsquo;re finally ready to test the server!</p>
+<p>Browse to the <strong>Overview</strong> dashboard of your App Service.</p>
+<p>Here, keep hitting the <strong>Refresh</strong> button in the top bar of the dashboard until the <strong>Health Check</strong> response is good. It might take a while!</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/11/health-check-ok.jpg" title="Health check OK">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/11/health-check-ok.jpg#ZgotmplZ" alt="Health check OK" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2072 674'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>The health check might even indicate that there&rsquo;s a <strong>Degraded</strong> instance, but keep hitting Refresh. If you&rsquo;ve followed these steps it <em>will</em> show <strong>Healthy</strong> soon.</p>
+<p>Finally, click the <strong>URL</strong> to open the <code>.azurewebsites.net</code> URL for your Preview server in a new tab. You should see a <code>Not Found</code> message on the page.</p>
+<p>Add the path <code>/healthy</code> to the end of the URL and load the page. Now you should see <code>ok</code>.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/11/healthy-ok.jpg" title="Healthy OK">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/11/healthy-ok.jpg#ZgotmplZ" alt="Healthy OK" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1604 256'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Congratulations! You&rsquo;ve created the Preview server. Now it&rsquo;s just the <strong>Tagging server</strong> left – luckily it&rsquo;s <em>almost</em> exactly the same steps, so it should be easy to do.</p>
+
+                
+                  <h2 id="step-4-create-the-tagging-server">Step 4: Create the Tagging server</h2>
+<p>The Tagging server becomes the actual endpoint with which you&rsquo;ll be communicating.</p>
+<p>This means that <em>ideally</em>, you&rsquo;d map one or more <strong>custom domains</strong> to this server, each of which is a subdomain of whatever website is sending data to your container. This is to ensure the data stream happens in a <em>first-party HTTP request-response context</em>.</p>
+<p>But let&rsquo;s not get ahead of ourselves.</p>
+<p>Setting up the Tagging server is remarkably similar to setting up the Preview server.</p>
+<h3 id="create-the-app-service-1">Create the App Service</h3>
+<p>Type <code>app services</code> into the search bar, and click the <strong>App Services</strong> option.</p>
+<p>As before, click <strong>+ Create</strong> to create a new service.</p>
+<h3 id="configure-the-instance-1">Configure the instance</h3>
+<p>Under <strong>Project Details</strong>, choose the <strong>Subscription</strong> you used before, and choose the <strong>Resource Group</strong> you used for the Preview server, too.</p>
+<p>Under <strong>Instance Details</strong>, give the server a descriptive name. It&rsquo;s a good idea to mirror the name you gave to the Preview server, so in my case the name would be <code>sgtm-ahava-tagging-server</code>.</p>
+<p>Choose <strong>Docker Container</strong> as the Publish type, keep <strong>Linux</strong> as the OS, and select the same region from the <strong>Region</strong> selector that you configured for the Preview server.</p>
+<p>This is what the setup should look like thus far:</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/11/tagging-server-details.jpg" title="Tagging server details">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/11/tagging-server-details.jpg#ZgotmplZ" alt="Tagging server details" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1472 1268'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>For <strong>App Service Plan</strong>, click <strong>Create new</strong>. Give it a descriptive name, such as the same one you set for the service instance. In my case, I set the name to <code>gtm-ahava-tagging-server</code>.</p>
+<p>Click <strong>Change size</strong> under <strong>Sku and size</strong> to choose the instance profile.</p>
+<p>For this example, I chose the <strong>S1</strong> instance type, which is the smallest instance type for <strong>Production</strong> setups.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/11/instance-s1.jpg" title="Instance S1">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/11/instance-s1.jpg#ZgotmplZ" alt="Instance S1" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1582 1222'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Whatever you choose, make sure it supports <strong>Custom domains</strong> and <strong>Auto scale</strong>.</p>
+<p>Click <strong>Apply</strong> when you&rsquo;ve selected the instance type.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/11/app-service-plan-tagging-server.jpg" title="Tagging server app service plan">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/11/app-service-plan-tagging-server.jpg#ZgotmplZ" alt="Tagging server app service plan" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1472 462'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Click the <strong>Next : Docker &gt;</strong> button in the bottom bar when ready.</p>
+<h3 id="configure-the-docker-container-1">Configure the Docker container</h3>
+<p>Here, set the exact same settings as with the Preview server.</p>
+<p>Remember to set <code>gcr.io/cloud-tagging-10302018/gtm-cloud-image:stable</code> as the value of the <strong>Image and tag</strong> field.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/11/docker-settings-tagging.jpg" title="Docker settings tagging">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/11/docker-settings-tagging.jpg#ZgotmplZ" alt="Docker settings tagging" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1442 678'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Finally, click <strong>Review + create</strong> in the bottom bar. Click <strong>Create</strong> if you&rsquo;re happy with your configuration overview.</p>
+<p>Once the instance has been deployed, click <strong>Go to resource</strong> on the deployment overview page.</p>
+<h3 id="configure-the-application-settings">Configure the Application settings</h3>
+<p>It&rsquo;s time to add the environment variables again.</p>
+<p>Choose <strong>Configuration</strong> from the service navigation.</p>
+<p>Click <strong>+ New application setting</strong>.</p>
+<p>As the <strong>Name</strong>, set <code>PREVIEW_SERVER_URL</code>.</p>
+<p>As the value, add the <strong>origin URL</strong> of your Preview server. That is, everything up to the first <code>/</code> path divider. This is what my setting looks like:</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/11/preview-server-url-setting.jpg" title="Preview server URL setting">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/11/preview-server-url-setting.jpg#ZgotmplZ" alt="Preview server URL setting" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1134 400'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Then, click <strong>+ New application setting</strong> to add a second setting.</p>
+<p>This is <code>CONTAINER_CONFIG</code> again, so copy-paste the Container Config string from the Google Tag Manager user interface as you did before.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/11/container-config-setting.jpg" title="Container config setting">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/11/container-config-setting.jpg#ZgotmplZ" alt="Container config setting" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1564 392'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Click <strong>Save</strong> to apply the settings.</p>
+<h3 id="configure-the-health-check">Configure the Health Check</h3>
+<p>Next, browse to the <strong>Health check</strong> settings in the service navigation.</p>
+<p>Configure this exactly as you did before. Here&rsquo;s a reminder of what it should look like:</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/11/configure-health-check.jpg" title="Configure health check">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/11/configure-health-check.jpg#ZgotmplZ" alt="Configure health check" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1616 1320'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Click <strong>Save</strong> to apply the settings.</p>
+<h3 id="configure-autoscaling">Configure autoscaling</h3>
+<p><strong>Autoscaling</strong> means that the number of instances your app uses should scale <strong>out</strong> when the need for more instances arises (e.g. CPU utilization passes a threshold), and scale <strong>in</strong> when it&rsquo;s OK to decrease the number of instances.</p>
+<p>You don&rsquo;t <em>have</em> to configure autoscaling. You could use just the single instance you started with if it&rsquo;s powerful enough to handle your traffic.</p>
+<p>However, having <em>at least one instance</em> for redundancy is a good idea, especially if there are resource availability issues in your Azure region.</p>
+<p>Autoscaling is also a good idea to adjust to potential traffic peaks that you need to quickly react to with enough capacity to make sure that your endpoint doesn&rsquo;t become unresponsive.</p>
+<p>To configure autoscaling, choose <strong>Scale out (App Service plan)</strong> from the Tagging server navigation.</p>
+<blockquote>
+<p>Autoscaling needs to be done <em>only</em> to the Tagging server. Your Preview server is always going to have minimal utilization, so it does not need the type of power that your Tagging server requires.</p>
+</blockquote>
+<p>Here, choose <strong>Custom autoscale</strong> to configure autoscaling settings.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/11/set-custom-autoscale.jpg" title="Set custom autoscale">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/11/set-custom-autoscale.jpg#ZgotmplZ" alt="Set custom autoscale" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1644 1252'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>You need to add <strong>two rules</strong>: a Scale Out rule and a Scale In rule. Click <strong>+ Add a rule</strong> to begin.</p>
+<p>How you configure these rules is really a matter of experience and preference. You can add more than one Scale Out rule, for example, to account for larger increases in utilization (i.e. larger traffic spikes), adding multiple instances in one go.</p>
+<p>I&rsquo;m just going to use a very simple setup here. When CPU utilization is greater than or equal to <strong>60%</strong>, I want to scale out to one additional instance. This is what the configuration looks like:</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/11/scale-out.jpg" title="Scale Out">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/11/scale-out.jpg#ZgotmplZ" alt="Scale Out" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1124 644'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Click <strong>Add</strong> when ready.</p>
+<p>Click <strong>+ Add a rule</strong> to add a second rule.</p>
+<p>Here, the rule is the converse of what I added for the Scale Out. This time, if the CPU threshold is <strong>below 60%</strong>, I want to <strong>decrease instance count by 1</strong>.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/11/scale-in.jpg" title="Scale In">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/11/scale-in.jpg#ZgotmplZ" alt="Scale In" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1136 648'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Click <strong>Add</strong> when ready.</p>
+<p>Finally, set the <strong>Minimum</strong>, <strong>Maximum</strong>, and <strong>Default</strong> limits for your instances. The minimum is the lowest your setup will scale in to, the maximum is the highest number of instances to scale out to, and default is what App Service will attempt to scale to if autoscaling doesn&rsquo;t work, for whatever reason.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/11/instance-limits.jpg" title="Instance limits">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/11/instance-limits.jpg#ZgotmplZ" alt="Instance limits" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1674 154'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Once you&rsquo;re happy, click <strong>Save</strong> to save and redeploy.</p>
+<blockquote>
+<p>Be careful with autoscaling! You can easily ramp up a huge bill if you set the thresholds too low or if you&rsquo;re too cavalier with the default instance limits. It&rsquo;s a good idea to configure your <strong>Subscription</strong> with some budgets and cost limits!</p>
+</blockquote>
+<p>If you see a <code>MissingSubscriptionRegistration</code> error when trying to save the settings, you need to browse to your <strong>Subscription</strong> in the Azure portal, click through to <strong>Resource providers</strong>, and <strong>Register</strong> <code>microsoft.insights</code>.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/11/register-microsoft-insights.jpg" title="Register microsoft insights">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/11/register-microsoft-insights.jpg#ZgotmplZ" alt="Register microsoft insights" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1920 648'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<h3 id="test-the-server">Test the server</h3>
+<p>Finally, go to the <strong>Overview</strong> leaf of the App Service.</p>
+<p>Here, click <strong>Refresh</strong> until you see as many <strong>Healthy</strong> instances as you configured the minimum for your autoscaling setup.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/11/healthy-tagging-server.jpg" title="Healthy tagging server">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/11/healthy-tagging-server.jpg#ZgotmplZ" alt="Healthy tagging server" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1826 498'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Next, click the <strong>URL</strong> in the Overview dashboard to open the Tagging server URL in a new tab. You should see the <code>Not found</code> message again.</p>
+<p>And, again, add the <code>/healthy</code> path to the end of the URL and you should see the <code>ok</code> message.</p>
+<p>If you want to take testing a step further, you can copy the URL to your Tagging server and add it to your <strong>Server container settings</strong> in the Google Tag Manager UI, like so:</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/11/container-settings.jpg" title="Container Settings">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/11/container-settings.jpg#ZgotmplZ" alt="Container Settings" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1142 628'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Click <strong>Save</strong> to save the settings.</p>
+<p>Now, you can click the <strong>Preview</strong> button in the GTM UI to open a Preview mode window to your server-side tagging environment.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/11/preview-container.jpg" title="Preview container">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/11/preview-container.jpg#ZgotmplZ" alt="Preview container" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1034 436'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Then, in a new tab, browse to your Tagging server URL again. If you want, you can add a custom path to the request, such as <code>/test</code>. When you browse to that URL, you should see an <strong>HTTP Error 400</strong> page.</p>
+<p>If you do, then <strong>everything is working fine!</strong>. A 400 error is returned by your Server container when there are no <a href="https://www.simoahava.com/analytics/server-side-tagging-google-tag-manager/#clients-and-tags">Clients to claim the request</a>.</p>
+<p>If you now open the Preview mode tab, you should see the request for the URL you visited.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/11/test-request.jpg" title="Test request">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/11/test-request.jpg#ZgotmplZ" alt="Test request" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1522 1132'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Well done! You now have a fully functioning server-side tagging setup running on Azure.</p>
+
+                
+                  <h2 id="optional-configure-a-custom-domain">(Optional) Configure a custom domain</h2>
+<p>This is where it gets tricky with Azure, unfortunately.</p>
+<p>With <a href="https://www.simoahava.com/analytics/deploy-server-side-google-tag-manager-aws/">Amazon AWS</a> and <a href="https://www.simoahava.com/analytics/provision-server-side-tagging-application-manually/">Google Cloud Platform</a>, mapping a custom domain <em>and</em> provisioning a (free) SSL certificate for it is super easy.</p>
+<p>With Azure, it&rsquo;s definitely easy to map a custom domain, and it&rsquo;s also quite easy to assign a free, managed SSL certificate to it. However, you can only add the <em>managed</em> SSL certificate to a <strong>subdomain</strong> if that subdomain is mapped with a <strong>CNAME DNS record</strong>. If the domain is mapped with an A record, you can only assign the managed certificate to an <strong>apex domain</strong> (i.e. naked domain name).</p>
+<p>This is a bummer, because you <em>want</em> to map your server-side GTM endpoint as a <strong>subdomain</strong> (so not an apex domain), and <em>specifically</em> with A records. Why? Because <a href="https://www.cookiestatus.com/safari/#cname-cloaking">Safari / WebKit browsers shorten the lifetime of first-party cookies</a> set with HTTP responses from domains mapped with CNAME records!</p>
+<p>This is a considerable limitation of first-party data collection, which is why you should <em>always</em> use A records to map the subdomains you&rsquo;ll use with server-side tagging.</p>
+<p>Because of this, I won&rsquo;t go into the details of how to actually secure the domain name behind HTTPS. There are many options for you:</p>
+<ul>
+<li>
+<p>You can delegate the subdomain name servers to something like <a href="https://www.cloudflare.com/">Cloudflare</a>, and use <a href="https://developers.cloudflare.com/ssl/origin-configuration/ssl-modes">Cloudflare&rsquo;s end-to-end SSL</a> to secure the traffic.</p>
+</li>
+<li>
+<p>You can <a href="https://docs.microsoft.com/en-us/azure/app-service/configure-ssl-certificate#import-an-app-service-certificate">purchase an SSL certificate</a> through Azure.</p>
+</li>
+<li>
+<p>You can use a free service like <a href="https://dev.to/ope/securing-your-azure-web-app-with-let-s-encrypt-4g99">Let&rsquo;s Encrypt</a>.</p>
+</li>
+</ul>
+<blockquote>
+<p>I recommend taking a look at <strong>Let&rsquo;s Encrypt</strong>! It&rsquo;s very easy to apply the LE certificate to your service. Just follow the guide behind the link above and you&rsquo;ll be set in Azure. The only downside is that the certificate <strong>won&rsquo;t auto-renew</strong>, so you&rsquo;ll need to manually renew it whenever it&rsquo;s about to expire.</p>
+</blockquote>
+<p>There are many ways to skin the cat, and I leave it up to you to figure out which works best in your environment.</p>
+<p>To map the custom domain itself, you need to open your <strong>Tagging server</strong> App Service again.</p>
+<blockquote>
+<p>Remember, the custom domain only needs to be mapped for the <em>Tagging server</em> – the Preview server can use the <code>*.azurewebsites.net</code> URL.</p>
+</blockquote>
+<p>Here, choose <strong>Custom domains</strong> in the navigation.</p>
+<p>Next, toggle <strong>HTTPS Only</strong> <em>on</em>.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/11/toggle-https-on.jpg" title="Toggle HTTPS on">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/11/toggle-https-on.jpg#ZgotmplZ" alt="Toggle HTTPS on" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1590 1110'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Now, copy the <strong>IP address</strong> string. In your <strong>DNS hosting service</strong>, add a new <strong>A record</strong> for the subdomain you want to map, and make that point to the IP address.</p>
+<p>This is what my subdomain mapping looks like in GoDaddy. I&rsquo;ve chosen <code>sgtm-demo.teamsimmer.com</code> as one of the custom domains I&rsquo;ll map to this service.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/11/ip-a-record.jpg" title="IP A record">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/11/ip-a-record.jpg#ZgotmplZ" alt="IP A record" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1744 376'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Next, copy the <strong>Custom Domain Verification ID</strong> from the Azure App Service page. Create a new <strong>TXT record</strong> with that value, and set the host to your subdomain name <strong>prefixed with <code>asuid.</code></strong>. For example, this is what my TXT record looks like:</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/11/txt-record.jpg" title="TXT record">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/11/txt-record.jpg#ZgotmplZ" alt="TXT record" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2142 462'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>When done, return to the Azure App Service page and click <strong>+ Add custom domain</strong>. Type the full name of your custom domain. In my case it was <code>sgtm-demo.teamsimmer.com</code>.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/11/add-custom-domain.jpg" title="Add custom domain">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/11/add-custom-domain.jpg#ZgotmplZ" alt="Add custom domain" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 588 382'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Click <strong>Validate</strong>, wait for the green checkmarks, and then click <strong>Add custom domain</strong>.</p>
+<blockquote>
+<p>You might have to wait a while for DNS to propagate, so don&rsquo;t lose hope if validation doesn&rsquo;t pass immediately.</p>
+</blockquote>
+<p>Now that you&rsquo;ve added the custom domain, you&rsquo;ll need to configure SSL for it. I&rsquo;ll let you figure out how to do this, following the tips I added at the beginning of this chapter.</p>
+<p>Here&rsquo;s what the setup looks like after configuring SSL properly. I used <a href="https://dev.to/ope/securing-your-azure-web-app-with-let-s-encrypt-4g99">Let&rsquo;s Encrypt</a> to assign a free certificate for the domain.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2021/11/ssl-domain.jpg" title="SSL domain">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2021/11/ssl-domain.jpg#ZgotmplZ" alt="SSL domain" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1542 364'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Once you&rsquo;ve configured the domain, you can add it to your Google Tag Manager Server <strong>container settings</strong> as the Server Container URL.</p>
+<p>After that, you can communicate with the server-side tagging endpoint using your custom domain!</p>
+<p>That&rsquo;s it – we&rsquo;re all set.</p>
+
+                
+                  <h2 id="summary">Summary</h2>
+<p>I hope the length of this guide didn&rsquo;t fool you – setting up the server-side tagging environment in Microsoft Azure is a <em>breeze</em>.</p>
+<p>I really like working in Azure. It gets far less love than AWS and GCP, for no good reason. The accessibility is almost on par with Google Cloud Platform, the documentation is <em>excellent</em>, and the costs are competitive.</p>
+<p>The only downside I could think of in this particular setup was the lack of a <strong>managed SSL certificate</strong> option for subdomains. However, I imagine it&rsquo;s on the roadmap, as provisioning the managed certificate for apex domains set with A records was introduced only a short while ago.</p>
+<p>With server-side tagging, it&rsquo;s important to <em>shop around</em>. Setting it up with the default, automatically provisioned Google App Engine service is very easy and very fast, but the lack of customization options and the fixed cost might be a turn-off for some.</p>
+<p>I wish someone out there would write an article comparing the realistic costs of different cloud infrastructure options for server-side tagging. It would be interesting to see how different cloud stacks balance between computation and cost in a way that still lets you collect data without too much compromise.</p>
+<p>I hope you found this guide useful! Please let me know in the comments if you have any questions.</p>
+
+                
+              
+              
+
+            </div>
+          </div>
+          <div id="post-footer" class="post-footer main-content-wrap">
+            
+              
+                
+                
+                  <div class="post-footer-tags">
+                    <span class="text-color-light text-small">TAGGED IN</span><br/>
+                    
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/google-tag-manager/">google tag manager</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/server-side-tagging/">server-side tagging</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/azure/">azure</a>
+
+                  </div>
+                
+              
+            
+            
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--disabled">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/gtm-tips/cross-domain-tracking-google-analytics-4/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/server-side-tagging-azure-app-service/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Server-side%20Tagging%20With%20Azure%20App%20Service%20https://www.simoahava.com/analytics/server-side-tagging-azure-app-service/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/server-side-tagging-azure-app-service/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#commento_thread">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+            
+              <span id="commento_thread"></span>
+<div id="commento"></div>
+<script defer src="https://cdn.commento.io/js/commento.js"></script>
+
+            
+          </div>
+        </article>
+        <footer id="footer" class="main-content-wrap">
+  <span class="copyrights">
+    &copy; 2021 Simo Ahava. All Rights Reserved
+  </span>
+</footer>
+
+      </div>
+      
+      <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+        
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--disabled">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/gtm-tips/cross-domain-tracking-google-analytics-4/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/server-side-tagging-azure-app-service/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Server-side%20Tagging%20With%20Azure%20App%20Service%20https://www.simoahava.com/analytics/server-side-tagging-azure-app-service/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/server-side-tagging-azure-app-service/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#commento_thread">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+      </div>
+      
+      <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+  <i id="btn-close-shareoptions" class="fa fa-close"></i>
+  <ul class="share-options">
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/server-side-tagging-azure-app-service/">
+          <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=Server-side%20Tagging%20With%20Azure%20App%20Service%20https://www.simoahava.com/analytics/server-side-tagging-azure-app-service/%20via%20@SimoAhava">
+          <i class="fa fa-twitter"></i><span>Share on Twitter</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/server-side-tagging-azure-app-service/">
+          <i class="fa fa-linkedin"></i><span>Share on LinkedIn</span>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+<div id="share-options-mask" class="share-options-mask"></div>
+
+    </div>
+    
+    <div id="about">
+  <div id="about-card">
+    <div id="about-btn-close">
+      <i class="fa fa-remove"></i>
+    </div>
+    
+      <img id="about-card-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+    
+    <h4 id="about-card-name">Simo Ahava</h4>
+    
+      <div id="about-card-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</div>
+    
+    
+      <div id="about-card-job">
+        <i class="fa fa-briefcase"></i>
+        <br/>
+        Senior Data Advocate at Reaktor
+      </div>
+    
+    
+      <div id="about-card-location">
+        <i class="fa fa-map-marker"></i>
+        <br/>
+        Finland
+      </div>
+    
+  </div>
+</div>
+
+    
+  
+    
+    <div id="cover" style="background-image:url('https://www.simoahava.com/images/maisema.jpg');"></div>
+  
+
+
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+
+
+
+
+<script src="https://www.simoahava.com/js/script.js"></script>
+
+
+
+
+<script src="https://cdn.commento.io/js/count.js"></script>
+
+    <script>
+      !function(){var e=document.querySelector(".simmer"),t=document.querySelector(".simmer .close"),o=window.sessionStorage&&window.sessionStorage.getItem("nosimmer");if(e){if(o){e.style.display="none"}t.addEventListener("click",function(){window.sessionStorage.setItem("nosimmer","true"),e.style.display="none"})}}();
+    </script>
+    <script>
+      var mylazyload = new LazyLoad({elements_selector: '.lazy'});
+      </script>
+    <style>
+      .ads {
+	  width: 1px;
+      }
+      </style>
+         
+
+    
+  </body>
+</html>
+
