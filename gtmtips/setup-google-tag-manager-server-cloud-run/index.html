@@ -1,0 +1,929 @@
+
+
+  
+    
+  
+
+
+  
+
+
+
+
+
+  
+
+
+  
+
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta name="google-site-verification" content="xQwWI2KUfP9LbFKhw2CVLFtrMY6Czrla7L3PD2aBolA" />
+
+
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org", 
+  "@type": "BlogPosting",
+  "headline": "#GTMTips: Setup A Google Tag Manager Server Using Cloud Run | Simo Ahava's blog",
+  "image": "https:\/\/www.simoahava.com\/images\/2022\/02\/setup-google-tag-manager-server-cloud-run.jpg",
+  "editor": "Simo Ahava",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Simo Ahava's blog",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https:\/\/www.simoahava.com\/images\/simo.png",
+      "height": "393",
+      "width": "407"
+    }
+  },
+  "url": "https:\/\/www.simoahava.com\/gtmtips\/setup-google-tag-manager-server-cloud-run\/",
+  "datePublished": "2022-02-25T07:00:00\u002b02:00",
+  "dateModified": "2022-02-25T07:00:00\u002b02:00",
+  "description": "How to setup a Google Tag Manager Server container using Cloud Run instead of Google App Engine.",
+  "author": {
+    "@type": "Person",
+    "name": "Simo Ahava"
+  }
+}
+</script>
+
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <title>#GTMTips: Setup A Google Tag Manager Server Using Cloud Run | Simo Ahava's blog</title>
+    
+    <script>
+      window.dataLayer=window.dataLayer||[];window.dataLayer.push({pageType: 'article', environment:  null });
+    </script>
+    
+
+    
+    
+    <script src="https://www.simoahava.com/x-js/lazyload.iife.min.js"></script>
+
+    
+
+    
+    <script>
+      (function(S,i,m,o){
+        window[m]=window[m]||[];
+        window[m].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
+        var f=S.getElementsByTagName(i)[0],j=S.createElement(i),dl=m!='dataLayer'?'&l='+m:'';
+        j.async=true;
+        j.src='https://sgtm.simoahava.com/gtm.js?id='+o+dl;
+        f.parentNode.insertBefore(j,f);
+      })(document,'script','dataLayer','GTM-PZ7GMV9');
+    </script>
+    
+    <meta name="author" content="Simo Ahava">
+    <meta name="keywords" content="">
+
+    <link rel="icon" href="https://www.simoahava.com/images/favicon.ico">
+    
+    <link rel="amphtml" href="https://www.simoahava.com/amp/gtmtips/setup-google-tag-manager-server-cloud-run/">
+    
+    <meta name="description" content="How to setup a Google Tag Manager Server container using Cloud Run instead of Google App Engine.">
+    <meta property="og:description" content="How to setup a Google Tag Manager Server container using Cloud Run instead of Google App Engine.">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="#GTMTips: Setup A Google Tag Manager Server Using Cloud Run">
+    <meta property="og:url" content="https://www.simoahava.com/gtmtips/setup-google-tag-manager-server-cloud-run/">
+    <meta property="og:site_name" content="Simo Ahava&#39;s blog">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="#GTMTips: Setup A Google Tag Manager Server Using Cloud Run">
+    <meta name="twitter:description" content="How to setup a Google Tag Manager Server container using Cloud Run instead of Google App Engine.">
+    
+      <meta name="twitter:creator" content="@SimoAhava">
+      
+    
+
+    
+    
+
+    
+	  <meta property="og:image" content="https://www.simoahava.com/images/2022/02/setup-google-tag-manager-server-cloud-run.jpg">
+      <meta name="twitter:image" content="https://www.simoahava.com/images/2022/02/setup-google-tag-manager-server-cloud-run.jpg">
+    
+
+
+    
+
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+    
+    
+    
+    <link rel="stylesheet" href="https://www.simoahava.com/css/style.css" />
+    
+    
+
+    
+      
+    
+    
+  </head>
+
+  <body>
+    
+    <div id="_progress"></div>
+    
+    <div id="blog">
+      <header id="header" data-behavior="4">
+  <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+  <div class="header-title">
+    <a class="header-title-link" href="https://www.simoahava.com/">Simo Ahava&#39;s blog</a>
+  </div>
+  
+</header>
+
+      <nav id="sidebar" data-behavior="4">
+  <div class="sidebar-container">
+    
+      <div class="sidebar-profile">
+        <a href="https://www.simoahava.com/">
+          <img class="sidebar-profile-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+        </a>
+        <h4 class="sidebar-profile-name">Simo Ahava</h4>
+        
+          <h5 class="sidebar-profile-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</h5>
+        
+      </div>
+    
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+      
+      <span class="sidebar-button-desc">Home</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+      
+      <span class="sidebar-button-desc">Categories</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tags/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Tags</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/gtm-tips/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-magic"></i>
+      
+      <span class="sidebar-button-desc">GTM Tips</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/about-simo-ahava/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+      
+      <span class="sidebar-button-desc">About</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tools/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-wrench"></i>
+      
+      <span class="sidebar-button-desc">Tools</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/blog-statistics/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bar-chart"></i>
+      
+      <span class="sidebar-button-desc">Blog statistics</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://github.com/sahava" target="_blank" rel="noopener">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+      
+      <span class="sidebar-button-desc">GitHub</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/upcoming-talks/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bullhorn"></i>
+      
+      <span class="sidebar-button-desc">Upcoming talks</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/custom-templates/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Templates</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/newsletter/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bell"></i>
+      
+      <span class="sidebar-button-desc">Newsletter</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+
+    </ul>
+  </div>
+</nav>
+
+      
+
+      <div id="main" data-behavior="4"
+        class="
+               hasCoverMetaIn
+               ">
+        <article class="post">
+	  <form id="search" action="https://www.simoahava.com/search/">
+  <input name="q" type="text" class="form-control input--xlarge" placeholder="Search blog..." autocomplete="off">
+  </form>
+
+          <div class="post-header main-content-wrap text-left">
+  
+    <div class="figure nocaption">
+      <img class="cover" src="https://www.simoahava.com/images/2022/02/setup-google-tag-manager-server-cloud-run.jpg">
+    </div>
+  
+  
+
+    <h1>
+      #GTMTips: Setup A Google Tag Manager Server Using Cloud Run
+    </h1>
+  
+  
+  <div class="postShorten-meta post-meta">
+    
+      <time datetime="2022-02-25T07:00:00&#43;02:00">
+        
+  February 25, 2022
+
+      </time>
+      
+      
+  
+  
+    <span>in</span>
+    
+      <a class="category-link" href="https://www.simoahava.com/categories/gtm-tips">GTM Tips</a>
+    
+  
+
+
+      | <a href="https://www.simoahava.com/gtmtips/setup-google-tag-manager-server-cloud-run/#commento">Comments</a>
+      
+  </div>
+
+
+</div>
+
+          <div class="post-content markdown">
+            <div class="main-content-wrap">
+	      
+                
+  	        <p>While <strong>Google App Engine</strong>, the default implementation pattern of <a href="https://www.simoahava.com/analytics/server-side-tagging-google-tag-manager/">server-side Google Tag Manager</a>, is straightforward to setup with the <a href="https://developers.google.com/tag-platform/tag-manager/server-side#set_up_a_gcp_tagging_server">automatic provisioning steps</a>, it&rsquo;s certainly not the only way to deploy the server.</p>
+<ul>
+<li><a href="https://www.simoahava.com/analytics/deploy-server-side-google-tag-manager-aws/">You can set it up in Amazon AWS</a> (this blog)</li>
+<li><a href="https://www.simoahava.com/analytics/server-side-tagging-azure-app-service/">You can set it up in Microsoft Azure</a> (this blog)</li>
+<li><a href="https://code.markedmondson.me/gtm-serverside-cloudrun/">You can set it up with Cloud Run</a> (<a href="https://twitter.com/holomarked">Mark Edmondson&rsquo;s</a> blog)</li>
+</ul>
+<p>In fact, the <a href="https://developers.google.com/tag-platform/tag-manager/server-side/manual-setup-guide">manual setup guide</a> gives you the details on how to deploy a Google Tag Manager Server in <em>any</em> environment that runs Docker.</p>
+<blockquote>
+<p>Docker is a way to wrap an entire application (such as the GTM server) in a <strong>container</strong>, which can then be deployed easily with tools offered by most server platforms. <a href="https://docs.docker.com/get-started/overview/">Read more here</a>.</p>
+</blockquote>
+<p>In this guide, I&rsquo;ll build on what Mark (brilliantly) wrote about by elaborating on a <strong>Cloud Run</strong> installation. To make matters easier, there&rsquo;s a simple <strong>install script</strong> you can use to automate most of the process.</p>
+
+                <span class="simmer">
+  <span class="close">X</span>
+  <p>
+    <span class="fa fa-md fa-bell"></span>
+    <strong>The Simmer Newsletter</strong>
+  </p>
+  <p>
+    Subscribe to the <a href="https://www.simoahava.com/newsletter/">Simmer newsletter</a> to get the latest news and content from Simo Ahava into your email inbox!
+  </p>
+  </span>
+
+                
+                  <h2 id="tip-130-how-to-deploy-a-gtm-server-using-cloud-run">Tip #130: How to deploy a GTM Server using Cloud Run</h2>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2022/02/setup-google-tag-manager-server-cloud-run.jpg" title="Setup Google Tag Manager Server Using Cloud Run">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2022/02/setup-google-tag-manager-server-cloud-run.jpg#ZgotmplZ" alt="Setup Google Tag Manager Server Using Cloud Run" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 960 540'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Cloud Run is still <em>fairly</em> recent tech, as it entered general availability in late 2019. If Cloud Run had the feature set it has today, it&rsquo;s likely that it would have been chosen as the native integration in Google Tag Manager instead of App Engine.</p>
+<p>Here&rsquo;s an <strong>App Engine</strong> vs. <strong>Cloud Run</strong> table I&rsquo;ve compiled:</p>
+<table>
+<thead>
+<tr>
+<th>App Engine</th>
+<th>Cloud Run</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Runs on <strong>Compute Engine</strong> instances.</td>
+<td>Runs on <strong>serverless containers</strong>.</td>
+</tr>
+<tr>
+<td>No scale-to-zero (App Engine Flexible).</td>
+<td>Can be configured to only run when servicing requests.</td>
+</tr>
+<tr>
+<td>Automatically compresses files.</td>
+<td>No automatic compression.</td>
+</tr>
+<tr>
+<td>Adds some additional metadata to HTTP requests.</td>
+<td>Doesn&rsquo;t modify the HTTP requests.</td>
+</tr>
+<tr>
+<td>(Probably) more efficient for a large number of requests (&gt;100 million / month).</td>
+<td>(Probably) more efficient for a smaller number of requests (&lt;100 million / month).</td>
+</tr>
+<tr>
+<td>Single-region, difficult to load balance.</td>
+<td>Can be setup with a multi-region network using a load balancer.</td>
+</tr>
+<tr>
+<td>Established technology.</td>
+<td>Up-and-coming technology.</td>
+</tr>
+</tbody>
+</table>
+<p>As you can see, the decision on which tech to choose is hardly an easy one. If you&rsquo;re running a <strong>very large number of requests</strong>, it seems like App Engine might still have the edge, especially when you&rsquo;re using <strong>auto-scaling</strong> and starting off with an appropriate minimum number of instances.</p>
+<p>But if you&rsquo;re processing a more modest request load and if you don&rsquo;t specifically need compression out-of-the-box, you might enjoy what Cloud Run brings to the mix.</p>
+
+                
+                  <h2 id="anecdotal-evidence">Anecdotal evidence</h2>
+<p>Anecdotes are rarely useful, but I&rsquo;ll share them anyway. After switching from App Engine (<strong>3 instances</strong>, catering to <strong>~5 million requests per month</strong>) to Cloud Run, this is what I found.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2022/02/app-engine-cost.jpg" title="App Engine Cost">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2022/02/app-engine-cost.jpg#ZgotmplZ" alt="App Engine Cost" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 3452 938'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>The daily cost of running three app engine instances (above) is just under <strong>4 euros per day</strong>. This is the <em>recommended setup</em> of server-side Google Tag Manager.</p>
+<p>Yes, I could have trivially scaled down to two or even just one instance to save in expenses, but traffic spikes can come without warning, and the <em>cold boot time</em> of an App Engine instance can be unbearably long.</p>
+<p>App Engine can also run into <strong>resource exhaustion</strong> issues depending on region, where even the minimum number of instances cannot be met.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2022/02/cloud-run-cost.jpg" title="Cloud Run Cost">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2022/02/cloud-run-cost.jpg#ZgotmplZ" alt="Cloud Run Cost" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 3442 962'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>With on-demand Cloud Run the cost varies from day-to-day, but on an average week I am paying <strong>under 1 euro per day</strong>, so even less than what I would pay for a <strong>single instance App Engine setup</strong> (which would be risky in case of traffic spikes and the long cold boot time of App Engine instances).</p>
+<p>As for latency, here&rsquo;s what Cloud Run shows:</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2022/02/cloud-run-latencies.jpg" title="Cloud Run Latencies">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2022/02/cloud-run-latencies.jpg#ZgotmplZ" alt="Cloud Run Latencies" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1676 414'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>The corresponding values for App Engine were (taken from an arbitrary 5-day sample):</p>
+<ul>
+<li>50th percentile: <strong>0.44s</strong></li>
+<li>95th percentile: <strong>0.87s</strong></li>
+<li>99th percentile: <strong>1.13s</strong></li>
+</ul>
+<p>I&rsquo;m not sure why Cloud Run has better latency, considering it <strong>doesn&rsquo;t compress files automatically</strong>, so <code>gtm.js</code> (Google Tag Manager) and <code>gtag.js</code> (Global Site Tag), for example, are sent fully uncompressed over the network.</p>
+<p>I am of course happy with these results, but I&rsquo;ll need more data before I can draw further conclusions.</p>
+<p>And, again, the site in question has very modest traffic (just around <strong>five million requests</strong> per month). It would be interesting to see comparison data from different cohorts: dozens of millions of monthly requests, hundreds of millions of monthly requests, billions of monthly requests&hellip;</p>
+
+                
+                  <h2 id="how-to-deploy-cloud-run">How to deploy Cloud Run</h2>
+<p>If you want to give Cloud Run a go, it&rsquo;s very easy to do so. You need a <strong>Google Cloud Project</strong> where billing has been enabled.</p>
+<p>In the project, fire up <strong>Cloud Shell</strong> by clicking the corresponding icon in the navigation bar.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2022/02/cloud-shell.jpg" title="Cloud Shell">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2022/02/cloud-shell.jpg#ZgotmplZ" alt="Cloud Shell" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 962 256'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Once the shell instance has started, run the following command:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">bash -c <span style="color:#a50">&#34;</span><span style="color:#00a">$(</span>curl -fsSL https://raw.githubusercontent.com/sahava/sgtm-cloud-run-shell/main/cr-script.sh<span style="color:#00a">)</span><span style="color:#a50">&#34;</span></code></pre></div>
+<p>This executes a <a href="https://github.com/sahava/sgtm-cloud-run-shell">shell script I&rsquo;ve written</a> that walks you through the deployment steps.</p>
+<ul>
+<li><strong>Service Name</strong> – this is what the Cloud Run service will be called, with suffixes <code>-debug</code> for the debug service and <code>-prod</code> for the tagging service automatically added by the script. Choose whatever you like or use the recommended <code>gtm-server</code> by pressing enter.</li>
+<li><strong>Fetch existing service configuration</strong> – if you&rsquo;ve already deployed a Cloud Run service, you can use this to fetch the existing configuration details from the region you&rsquo;ll select next. This is helpful as it prefills all the subsequent settings in the shell script. You can skip this step by pressing enter.</li>
+<li><strong>Container Config</strong> - copy-paste the <strong>container config string</strong> from the Google Tag Manager Server container user interface by clicking the container ID in the top bar.</li>
+</ul>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2022/02/gtm-container-config.jpg" title="GTM Container config">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2022/02/gtm-container-config.jpg#ZgotmplZ" alt="GTM Container config" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1596 1162'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<ul>
+<li><strong>Policy Script URL</strong> - if you want to use a <a href="https://developers.google.com/tag-platform/tag-manager/server-side/configure-a-policy">policy script</a> to control what a server container can do, you can add the URL to the script here.</li>
+<li><strong>Memory per instance</strong> - choose how much memory is reserved per Cloud Run instance. Use the recommended <strong>512Mi</strong> to mirror what an App Engine deployment would use.</li>
+<li><strong>CPU allocation per instance</strong> - choose how many CPUs are allocated per instance.</li>
+<li><strong>Minimum number of servers</strong> - choose how many instances to scale up to by default.</li>
+<li><strong>Maximum number of instances</strong> - choose the limit of how many instances the deployment can scale up to.</li>
+</ul>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2022/02/sample-config.jpg" title="Sample config">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2022/02/sample-config.jpg#ZgotmplZ" alt="Sample config" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1340 296'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>When you&rsquo;re done, this is what you should see. If you&rsquo;re happy with the setup, just type <code>y</code> and press enter to proceed.</p>
+<blockquote>
+<p>If you haven&rsquo;t enabled the Cloud Run API yet, at this point the script will do so for you.</p>
+</blockquote>
+<p>Each Server container runs on two services: a <strong>debug service</strong> and a <strong>tagging service</strong> (called <em>production service</em> in the script). The debug service is solely used for Preview mode, and runs on very limited capacity. The tagging service is the one you configured in the steps above.</p>
+<h3 id="deploy-the-debug-service">Deploy the debug service</h3>
+<p>The first thing you&rsquo;ll need to choose is the <strong>region for the debug service</strong>.</p>
+<p><strong>You should choose a region that&rsquo;s geographically closest to the people who will be doing the debugging</strong>. As I&rsquo;m from Finland, I&rsquo;ll choose the <code>europe-north1</code> region for the debug service.</p>
+<p>Once you&rsquo;ve chosen the region, it&rsquo;s going to take a moment for the service to deploy.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2022/02/debug-service-done.jpg" title="Debug service done">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2022/02/debug-service-done.jpg#ZgotmplZ" alt="Debug service done" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1938 418'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>After deployment is complete, you should see a message like the one above. Press any key to proceed to deploy the tagging service.</p>
+<h3 id="deploy-the-tagging-service">Deploy the tagging service</h3>
+<p>You&rsquo;ll need to choose a region for the tagging service, too. This time, select a region that&rsquo;s closest to where the bulk of your visitors visit from (see more about multi-region setups below).</p>
+<blockquote>
+<p><strong>NOTE!</strong> If you want to map a custom domain to the tagging service, as you should, do note that custom domain mappings are available in only a <a href="https://cloud.google.com/run/docs/mapping-custom-domains#run">limited set of regions</a>.</p>
+</blockquote>
+<p>By reducing the geographical distance between the machines that send the requests and your server that processes the requests, you&rsquo;ll also minimize the cost of <strong>network egress</strong> that your service will need to process.</p>
+<blockquote>
+<p>This does <em>not</em> need to be the same region as what you chose for the debug service!</p>
+</blockquote>
+<p>As the bulk of my visitors come from the US, I&rsquo;ve chosen <code>us-central1</code> as the region of my tagging service.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2022/02/click-link.jpg" title="Click link">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2022/02/click-link.jpg#ZgotmplZ" alt="Click link" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1900 436'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Once done, you should see a screen like the one above. Click the link that ends with <code>/healthy</code> to see if your new service works. You should see a new page that simply has the message <code>ok</code> written on it.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2022/02/ok-message.jpg" title="OK message">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2022/02/ok-message.jpg#ZgotmplZ" alt="OK message" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1126 186'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Congratulations! You&rsquo;ve setup a simple Cloud Run deployment that has one debug service and one production service.</p>
+<p><a href="https://cloud.google.com/run/docs/mapping-custom-domains">You can now map a <strong>custom domain to the service</strong></a>. Note that you map the custom domain only to the <strong>tagging service</strong>. You will never need to directly access the <strong>debug service</strong> URL, as the tagging service automatically redirects requests sent in Preview mode to the debug service.</p>
+
+                
+                  <h2 id="a-few-words-on-multi-region-setups">A few words on multi-region setups</h2>
+<p>The cool thing about Cloud Run is that you can create a number of <strong>tagging servers</strong>, each setup in a different region, and then add a <strong>load balancer</strong> in front of them that distributes the traffic automatically to the closest server region to where the request is coming from.</p>
+<blockquote>
+<p><strong>Note!</strong> You&rsquo;ll only need one single debug service, though. All the tagging services can be configured to point to this one debug service. This is not currently supported by the shell script, but it&rsquo;s a feature I&rsquo;m going to add to it in the near future.</p>
+</blockquote>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2022/02/load-balancer.jpg" title="Load Balancer">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2022/02/load-balancer.jpg#ZgotmplZ" alt="Load Balancer" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1716 1506'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Setting up the load balancer is beyond the scope of this article, but I will definitely write a guide on how to do this in the future.</p>
+<p>For the time being, you can check out the <a href="https://cloud.google.com/run/docs/multiple-regions">official documentation for a step-by-step</a>.</p>
+
+                
+                  <h2 id="summary">Summary</h2>
+<p>Jumping on Cloud Run isn&rsquo;t something I&rsquo;d unconditionally recommend to everyone using server-side Google Tag Manager.</p>
+<p>It still has unpolished edges, there are issues with general availability of some features, and measures to reduce latency (such as compression of files) require a lot of manual work.</p>
+<p>Having said that, the general <em>idea</em> of Cloud Run makes so much more sense than App Engine does. App Engine relies on <strong>virtual machines</strong> reserved for use in Google Cloud.</p>
+<p>These machines are in use whether or not they serve requests. This means that at any given time you are most likely running <strong>a lot of overhead</strong> in your setup and, in essence, paying for nothing.</p>
+<p>With Cloud Run, you can setup your deployment to only run when it actually serves requests. The per-request cost is slightly more than an &ldquo;always on&rdquo; deployment, but if you have wild fluctuation in your traffic your overall cost might still be smaller.</p>
+<p>Additionally, Cloud Run is the new, shiny thing in the Google Cloud Platform. It&rsquo;s plausible that Google will put a lot of effort into developing it to replace some of App Engine&rsquo;s use cases.</p>
+<p>For now, being able to smoothly run <strong>multi-region</strong> deployments and to <strong>having more control over how requests are serviced</strong> by your cloud infrastructure might be enough to persuade enterprise customers to look into Cloud Run as the next development step of their server-side Google Tag Manager deployments.</p>
+<p>Have you tried Cloud Run yet with server-side Google Tag Manager? What&rsquo;s your experience been like?</p>
+
+                
+              
+              
+
+            </div>
+          </div>
+          <div id="post-footer" class="post-footer main-content-wrap">
+            
+              
+                
+                
+                  <div class="post-footer-tags">
+                    <span class="text-color-light text-small">TAGGED IN</span><br/>
+                    
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/google-tag-manager/">google tag manager</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/gtmtips/">gtmtips</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/cloud-run/">cloud run</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/server-side-tagging/">server-side tagging</a>
+
+                  </div>
+                
+              
+            
+            
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--disabled">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/debug-guide-web-analytics-tag-management/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/gtmtips/setup-google-tag-manager-server-cloud-run/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=%23GTMTips:%20Setup%20A%20Google%20Tag%20Manager%20Server%20Using%20Cloud%20Run%20https://www.simoahava.com/gtmtips/setup-google-tag-manager-server-cloud-run/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/gtmtips/setup-google-tag-manager-server-cloud-run/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#commento_thread">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+            
+              <span id="commento_thread"></span>
+<div id="commento"></div>
+<script defer src="https://cdn.commento.io/js/commento.js"></script>
+
+            
+          </div>
+        </article>
+        <footer id="footer" class="main-content-wrap">
+  <span class="copyrights">
+    &copy; 2022 Simo Ahava. All Rights Reserved
+  </span>
+</footer>
+
+      </div>
+      
+      <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+        
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--disabled">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/debug-guide-web-analytics-tag-management/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/gtmtips/setup-google-tag-manager-server-cloud-run/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=%23GTMTips:%20Setup%20A%20Google%20Tag%20Manager%20Server%20Using%20Cloud%20Run%20https://www.simoahava.com/gtmtips/setup-google-tag-manager-server-cloud-run/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/gtmtips/setup-google-tag-manager-server-cloud-run/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#commento_thread">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+      </div>
+      
+      <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+  <i id="btn-close-shareoptions" class="fa fa-close"></i>
+  <ul class="share-options">
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/gtmtips/setup-google-tag-manager-server-cloud-run/">
+          <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=%23GTMTips:%20Setup%20A%20Google%20Tag%20Manager%20Server%20Using%20Cloud%20Run%20https://www.simoahava.com/gtmtips/setup-google-tag-manager-server-cloud-run/%20via%20@SimoAhava">
+          <i class="fa fa-twitter"></i><span>Share on Twitter</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/gtmtips/setup-google-tag-manager-server-cloud-run/">
+          <i class="fa fa-linkedin"></i><span>Share on LinkedIn</span>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+<div id="share-options-mask" class="share-options-mask"></div>
+
+    </div>
+    
+    <div id="about">
+  <div id="about-card">
+    <div id="about-btn-close">
+      <i class="fa fa-remove"></i>
+    </div>
+    
+      <img id="about-card-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+    
+    <h4 id="about-card-name">Simo Ahava</h4>
+    
+      <div id="about-card-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</div>
+    
+    
+      <div id="about-card-job">
+        <i class="fa fa-briefcase"></i>
+        <br/>
+        Senior Data Advocate at Reaktor
+      </div>
+    
+    
+      <div id="about-card-location">
+        <i class="fa fa-map-marker"></i>
+        <br/>
+        Finland
+      </div>
+    
+  </div>
+</div>
+
+    
+  
+    
+    <div id="cover" style="background-image:url('https://www.simoahava.com/images/maisema.jpg');"></div>
+  
+
+
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+
+
+
+
+<script src="https://www.simoahava.com/js/script.js"></script>
+
+
+
+
+<script src="https://cdn.commento.io/js/count.js"></script>
+
+    <script>
+      !function(){var e=document.querySelector(".simmer"),t=document.querySelector(".simmer .close"),o=window.sessionStorage&&window.sessionStorage.getItem("nosimmer");if(e){if(o){e.style.display="none"}t.addEventListener("click",function(){window.sessionStorage.setItem("nosimmer","true"),e.style.display="none"})}}();
+    </script>
+    <script>
+      var mylazyload = new LazyLoad({elements_selector: '.lazy'});
+      </script>
+    <style>
+      .ads {
+	  width: 1px;
+      }
+      </style>
+         
+
+    
+  </body>
+</html>
+
