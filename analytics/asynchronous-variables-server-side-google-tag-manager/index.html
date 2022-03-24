@@ -1,0 +1,754 @@
+
+
+  
+    
+  
+
+
+  
+
+
+
+
+
+  
+
+
+  
+
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta name="google-site-verification" content="xQwWI2KUfP9LbFKhw2CVLFtrMY6Czrla7L3PD2aBolA" />
+
+
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org", 
+  "@type": "BlogPosting",
+  "headline": "Asynchronous Variables In Server-side Google Tag Manager | Simo Ahava's blog",
+  "image": "https:\/\/www.simoahava.com\/images\/2022\/02\/asynchronous-variables-server-side-gtm.jpg",
+  "editor": "Simo Ahava",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Simo Ahava's blog",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https:\/\/www.simoahava.com\/images\/simo.png",
+      "height": "393",
+      "width": "407"
+    }
+  },
+  "url": "https:\/\/www.simoahava.com\/analytics\/asynchronous-variables-server-side-google-tag-manager\/",
+  "datePublished": "2022-03-24T07:00:44\u002b02:00",
+  "dateModified": "2022-03-24T07:00:44\u002b02:00",
+  "description": "How to use server-side Google Tag Manager\u0027s asynchronous variables to enrich the data streams from a server-side Google Tag Manager instance.",
+  "author": {
+    "@type": "Person",
+    "name": "Simo Ahava"
+  }
+}
+</script>
+
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <title>Asynchronous Variables In Server-side Google Tag Manager | Simo Ahava's blog</title>
+    
+    <script>
+      window.dataLayer=window.dataLayer||[];window.dataLayer.push({pageType: 'article', environment:  null });
+    </script>
+    
+
+    
+    
+    <script src="https://www.simoahava.com/x-js/lazyload.iife.min.js"></script>
+
+    
+
+    
+    <script>
+      (function(S,i,m,o){
+        window[m]=window[m]||[];
+        window[m].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
+        var f=S.getElementsByTagName(i)[0],j=S.createElement(i),dl=m!='dataLayer'?'&l='+m:'';
+        j.async=true;
+        j.src='https://sgtm.simoahava.com/gtm.js?id='+o+dl;
+        f.parentNode.insertBefore(j,f);
+      })(document,'script','dataLayer','GTM-PZ7GMV9');
+    </script>
+    
+    <meta name="author" content="Simo Ahava">
+    <meta name="keywords" content="">
+
+    <link rel="icon" href="https://www.simoahava.com/images/favicon.ico">
+    
+    <link rel="amphtml" href="https://www.simoahava.com/amp/analytics/asynchronous-variables-server-side-google-tag-manager/">
+    
+    <meta name="description" content="How to use server-side Google Tag Manager&#39;s asynchronous variables to enrich the data streams from a server-side Google Tag Manager instance.">
+    <meta property="og:description" content="How to use server-side Google Tag Manager&#39;s asynchronous variables to enrich the data streams from a server-side Google Tag Manager instance.">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="Asynchronous Variables In Server-side Google Tag Manager">
+    <meta property="og:url" content="https://www.simoahava.com/analytics/asynchronous-variables-server-side-google-tag-manager/">
+    <meta property="og:site_name" content="Simo Ahava&#39;s blog">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Asynchronous Variables In Server-side Google Tag Manager">
+    <meta name="twitter:description" content="How to use server-side Google Tag Manager&#39;s asynchronous variables to enrich the data streams from a server-side Google Tag Manager instance.">
+    
+      <meta name="twitter:creator" content="@SimoAhava">
+      
+    
+
+    
+    
+
+    
+	  <meta property="og:image" content="https://www.simoahava.com/images/2022/02/asynchronous-variables-in-server-side-google-tag-manager.jpg">
+      <meta name="twitter:image" content="https://www.simoahava.com/images/2022/02/asynchronous-variables-in-server-side-google-tag-manager.jpg">
+    
+
+
+    
+
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+    
+    
+    
+    <link rel="stylesheet" href="https://www.simoahava.com/css/style.css" />
+    
+    
+
+    
+      
+    
+    
+  </head>
+
+  <body>
+    
+    <div id="_progress"></div>
+    
+    <div id="blog">
+      <header id="header" data-behavior="4">
+  <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+  <div class="header-title">
+    <a class="header-title-link" href="https://www.simoahava.com/">Simo Ahava&#39;s blog</a>
+  </div>
+  
+</header>
+
+      <nav id="sidebar" data-behavior="4">
+  <div class="sidebar-container">
+    
+      <div class="sidebar-profile">
+        <a href="https://www.simoahava.com/">
+          <img class="sidebar-profile-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+        </a>
+        <h4 class="sidebar-profile-name">Simo Ahava</h4>
+        
+          <h5 class="sidebar-profile-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</h5>
+        
+      </div>
+    
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+      
+      <span class="sidebar-button-desc">Home</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+      
+      <span class="sidebar-button-desc">Categories</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tags/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Tags</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/gtm-tips/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-magic"></i>
+      
+      <span class="sidebar-button-desc">GTM Tips</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/about-simo-ahava/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+      
+      <span class="sidebar-button-desc">About</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tools/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-wrench"></i>
+      
+      <span class="sidebar-button-desc">Tools</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/blog-statistics/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bar-chart"></i>
+      
+      <span class="sidebar-button-desc">Blog statistics</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://github.com/sahava" target="_blank" rel="noopener">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+      
+      <span class="sidebar-button-desc">GitHub</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/upcoming-talks/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bullhorn"></i>
+      
+      <span class="sidebar-button-desc">Upcoming talks</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/custom-templates/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Templates</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/newsletter/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bell"></i>
+      
+      <span class="sidebar-button-desc">Newsletter</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+
+    </ul>
+  </div>
+</nav>
+
+      
+
+      <div id="main" data-behavior="4"
+        class="
+               hasCoverMetaIn
+               ">
+        <article class="post">
+	  <form id="search" action="https://www.simoahava.com/search/">
+  <input name="q" type="text" class="form-control input--xlarge" placeholder="Search blog..." autocomplete="off">
+  </form>
+
+          <div class="post-header main-content-wrap text-left">
+  
+    <div class="figure nocaption">
+      <img class="cover" src="https://www.simoahava.com/images/2022/02/asynchronous-variables-in-server-side-google-tag-manager.jpg">
+    </div>
+  
+  
+
+    <h1>
+      Asynchronous Variables In Server-side Google Tag Manager
+    </h1>
+  
+  
+  <div class="postShorten-meta post-meta">
+    
+      <time datetime="2022-03-24T07:00:44&#43;02:00">
+        
+  March 24, 2022
+
+      </time>
+      
+      
+  
+  
+    <span>in</span>
+    
+      <a class="category-link" href="https://www.simoahava.com/categories/analytics">Analytics</a>
+    
+  
+
+
+      | <a href="https://www.simoahava.com/analytics/asynchronous-variables-server-side-google-tag-manager/#commento">Comments</a>
+      
+  </div>
+
+
+</div>
+
+          <div class="post-content markdown">
+            <div class="main-content-wrap">
+	      
+                
+  	        <p>OK, that&rsquo;s one unappealing title for a blog post, but rest assured that the content more than makes up for this obscurity.</p>
+<p>Recently, my favorite toy in the world, <a href="https://developers.google.com/tag-platform/tag-manager/server-side">Google Tag Manager&rsquo;s server container</a>, introduced the capability to handle <strong>asynchronous operations</strong> in variables.</p>
+<p>This is done through a JavaScript interface known as <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>. A <strong>Promise</strong> is a way to run code in JavaScript without knowing what its eventual value will be. The &ldquo;promise&rdquo; part of this concept means that the code <em>promises</em> that it will reach a value eventually, so other code that relies on this value can execute accordingly.</p>
+<p>In this recent update, <a href="https://developers.google.com/tag-platform/tag-manager/server-side/api">server-side tagging APIs</a> have been updated to handle Promises.</p>
+<p>What this means <strong>in practice</strong>, is that you can attach a variable to a tag, have that variable return a Promise of <strong>completing an asynchronous operation</strong>, and the tag will <strong>automatically wait</strong> for the Promise to resolve before completing its work.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2022/02/asynchronous-variables-server-side-gtm.jpg" title="Asynchronous variables in server-side Google Tag Manager">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2022/02/asynchronous-variables-server-side-gtm.jpg#ZgotmplZ" alt="Asynchronous variables in server-side Google Tag Manager" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4790 2252'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>And so what, I hear you ask? You can finally <strong>enrich data streams that pass through a Server container</strong> without having to create custom Clients and Tags for it!</p>
+<blockquote>
+<p>Just note that everything we go through in this article implicitly requires you to utilize or build <a href="https://www.simoahava.com/analytics/custom-templates-guide-for-google-tag-manager/">custom templates</a>, as server-side Google Tag Manager doesn&rsquo;t have a &ldquo;Custom JavaScript variable&rdquo; option to run ad hoc code with.</p>
+</blockquote>
+<div id="toc-container"><h1 id="table-of-contents">Table of Contents</h1> <input type="checkbox" id="show"><label for="show" id="showbtn"><h1 id="table-of-contents-mobile">Table of Contents</h1><span class="show">&nbsp;[+show]</span><span class="hide">&nbsp;[–hide]</span></label><nav id="TableOfContents">
+  <ul>
+    <li><a href="#whats-changed">What&rsquo;s changed</a></li>
+    <li><a href="#how-to-work-with-promises">How to work with Promises</a></li>
+    <li><a href="#how-existing-apis-have-changed">How existing APIs have changed</a></li>
+    <li><a href="#caching">Caching</a></li>
+    <li><a href="#summary">Summary</a></li>
+  </ul>
+</nav></div>
+
+                <span class="simmer">
+  <span class="close">X</span>
+  <p>
+    <span class="fa fa-md fa-bell"></span>
+    <strong>The Simmer Newsletter</strong>
+  </p>
+  <p>
+    Subscribe to the <a href="https://www.simoahava.com/newsletter/">Simmer newsletter</a> to get the latest news and content from Simo Ahava into your email inbox!
+  </p>
+  </span>
+
+                
+                  <h2 id="whats-changed">What&rsquo;s changed</h2>
+<p>Previously, variables in Google Tag Manager were processed <strong>synchronously</strong>.</p>
+<p>This meant that when the GTM runtime started parsing a variable, it executed it row by row until it reached a <code>return</code> statement in the execution context. That value was then returned to whatever source invoked the variable in the first place.</p>
+<p>If the variable tried to run an <strong>asynchronous</strong> operation, meaning it did something that would <em>eventually</em> return a value but not when the variable was synchronously executed, the variable would just return an <code>undefined</code> value because GTM wouldn&rsquo;t wait around for the variable to complete.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2022/02/ga4-async-tag.jpg" title="Asynchronous tag">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2022/02/ga4-async-tag.jpg#ZgotmplZ" alt="Asynchronous tag" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1752 772'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>With this change, variables can now return a <strong>Promise</strong>, which the runtime code then waits to resolve before proceeding. In other words, the variable doesn&rsquo;t have to resolve to a value immediately – it can return a solemn promise that it will eventually reach a value (of course within a given <strong>timeout</strong>).</p>
+<p>And why is this a big deal? Because until now, if you wanted to have your <strong>tags</strong> and <strong>Clients</strong> wait for some asynchronous operation, you had to embed these asynchronous calls into the tag / Client code itself.</p>
+<p>Now all you have to do is make sure the variable returns a Promise, and whatever called the variable will dutifully wait for that Promise to be either resolved or rejected.</p>
+
+                
+                  <h2 id="how-to-work-with-promises">How to work with Promises</h2>
+<p>Luckily, you don&rsquo;t have to worry about the Promise interface itself.</p>
+<p>Although you <em>can</em> use the new <code>Promise</code> API to create custom Promises, and the more hard-core programmers out there can certainly make use of <code>Promise.all</code> to chain together multiple Promises, many built-in server-side tagging APIs have been automatically updated to utilize the Promise interface.</p>
+<p>Here&rsquo;s an example of using <code>Promise.all</code> in a variable template:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#aaa;font-style:italic">// Run multiple API calls and return a single Promise that&#39;s resolved when all the API calls have resolved
+</span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">const</span> <span style="color:#0aa">Promise</span> = require(<span style="color:#a50">&#39;Promise&#39;</span>);
+<span style="color:#00a">const</span> sendHttpRequest = require(<span style="color:#a50">&#39;sendHttpRequest&#39;</span>);
+
+<span style="color:#00a">return</span> <span style="color:#0aa">Promise</span>.all([
+  sendHttpRequest(FIRST_API_URL, FIRST_API_OPTIONS), 
+  sendHttpRequest(SECOND_API_URL, SECOND_API_OPTIONS)
+]).then(results =&gt; {
+  <span style="color:#aaa;font-style:italic">// results will equal [{statusCode: 200, headers: {}, body: ...}, {statusCode: 200, headers: {}, body: ...}];
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#00a">if</span> (results.filter(result =&gt; result.statusCode === <span style="color:#099">200</span>).length === <span style="color:#099">2</span>) {
+    <span style="color:#00a">return</span> <span style="color:#a50">&#34;Both API calls executed successfully!&#34;</span>;
+  } <span style="color:#00a">else</span> {
+    <span style="color:#00a">return</span> <span style="color:#a50">&#34;Oops, something went wrong!&#34;</span>;
+  }
+});
+</code></pre></div>
+
+                
+                  <h2 id="how-existing-apis-have-changed">How existing APIs have changed</h2>
+<p>The <code>BigQuery</code>, <code>sendHttpGet</code>, and <code>sendHttpRequest</code> APIs (<em>and the new <a href="https://www.simoahava.com/analytics/enrich-server-side-data-with-cloud-firestore/">Firestore API</a>!</em>) are likely to be the ones you&rsquo;ll be using most in this new context. They let you run asynchronous HTTP requests to endpoints (such as your enrichment API), and the response can be then used to enrich your tags&rsquo; and Clients&rsquo; data streams.</p>
+<p>To work with them, you just need to utilize the new Promise-friendly syntax. If you&rsquo;re running this in a variable, remember that the variable needs to <strong>return the Promise</strong>. The actual return value will be set to what the <strong>Promise instance methods ultimately return</strong>.</p>
+<p>Here&rsquo;s an example of how you would approach a simple GET request. This API polls the <a href="https://api.circle.so/#intro">Circle.so public API</a> and returns the number of members in the community the authentication token is created for.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">const</span> sendHttpRequest = require(<span style="color:#a50">&#39;sendHttpRequest&#39;</span>);
+<span style="color:#00a">const</span> JSON = require(<span style="color:#a50">&#39;JSON&#39;</span>);
+
+<span style="color:#00a">const</span> AUTH_TOKEN = <span style="color:#a50">&#39;XXXXXXXXXXXXX&#39;</span>;
+<span style="color:#00a">const</span> API_URL = <span style="color:#a50">&#39;https://app.circle.so/api/v1/community_members&#39;</span>;
+<span style="color:#00a">const</span> OPTIONS = {
+  headers: {Authorization: <span style="color:#a50">&#39;Token &#39;</span> + AUTH_TOKEN},
+  method: <span style="color:#a50">&#39;GET&#39;</span>,
+  timeout: <span style="color:#099">2000</span>
+};
+
+<span style="color:#aaa;font-style:italic">// Return the Promise
+</span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">return</span> sendHttpRequest(API_URL, OPTIONS).then(success_result =&gt; {
+  <span style="color:#00a">const</span> members = JSON.parse(success_result.body);
+  
+  <span style="color:#aaa;font-style:italic">// When the Promise resolves (successfully), the length of the array in the response body is returned
+</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#00a">return</span> members.length;
+});
+</code></pre></div>
+<p>Promises have <strong>three</strong> methods:</p>
+<ul>
+<li><code>.then()</code> takes two functions as parameters (above I only use the first one, though). The first is for what happens when the Promise is resolved successfully, and the second is for what happens when the Promise is rejected.</li>
+<li><code>.catch()</code> takes a single function as a parameter, and it&rsquo;s executed if the Promise is rejected. This is a handy way to isolate code only for error resolution.</li>
+<li><code>.finally()</code> takes a single function as a parameter, and it&rsquo;s <strong>always</strong> executed whether the Promise was resolved or rejected.</li>
+</ul>
+<p>So in the example above, I&rsquo;m only focused on <strong>successful resolution</strong>, but I could just as well add a <code>.catch()</code> step there to handle issues. However, as this is a simple GET request, I don&rsquo;t see any reason to specifically treat error cases, so I&rsquo;m OK with the variable returning <code>undefined</code> in case it runs into an error.</p>
+
+                
+                  <h2 id="caching">Caching</h2>
+<p>To prevent the same API call from being made over and over again, there&rsquo;s a <strong>caching</strong> mechanism in place. The cache is scoped to the incoming request, so once a new request comes in to the Server container, the cache is reset.</p>
+<p>The cache only works if the response is <strong>cacheable</strong>. In other words, the cache isn&rsquo;t <em>forced</em> on resources that should not be cached.</p>
+<p>If you want to add additional caching with more control, you can utilize the <a href="https://developers.google.com/tag-platform/tag-manager/server-side/api#templatedatastorage"><code>templateDataStorage</code> API</a> for this.</p>
+<p>Remember that all outgoing requests are considered <strong>network egress</strong> traffic by the cloud service, and you will need to pay for that network usage. Thus caching is a very important thing to have in place – one way or another.</p>
+<p>One thing that I&rsquo;d <em>love</em> to see is the option to override the Event Data object produced by the Client with these asynchronous variables. That way you could add the enrichment variables to the Event Data object itself, and they would be available to all the tags, triggers, and variables that utilize this object.</p>
+<blockquote>
+<p>This would sort out the caching problem completely, too, because the variable would run just once: when resolved in the Event Data object.</p>
+</blockquote>
+
+                
+                  <h2 id="summary">Summary</h2>
+<p>Although this has been a very technical overview, I hope you see the promise (pun intended) of this update to server-side Google Tag Manager.</p>
+<p><strong>Data stream enrichment</strong> has been one of the things I&rsquo;ve been harping about as a unique selling point of a server-side tag management solution, so I&rsquo;m really glad we <em>finally</em> have a handy way of doing so. It&rsquo;s been <strong>two years</strong> since server-side tagging in GTM was publicly announced, after all!</p>
+<p>Now, the ball is in the community&rsquo;s court.</p>
+<p><strong>Get creative with those variable templates!</strong></p>
+<p>I want to see the <a href="https://tagmanager.google.com/gallery/">Community Gallery</a> <em>stuffed</em> with utility variables for polling different APIs, handling HTTP communications, and running asynchronous operations to enrich those Clients and tags that might benefit from them.</p>
+<p>What do you think about this release? Can you think of use cases where these new Promises could be particularly helpful?</p>
+
+                
+              
+              
+
+            </div>
+          </div>
+          <div id="post-footer" class="post-footer main-content-wrap">
+            
+              
+                
+                
+                  <div class="post-footer-tags">
+                    <span class="text-color-light text-small">TAGGED IN</span><br/>
+                    
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/google-tag-manager/">google tag manager</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/server-side-tagging/">server-side tagging</a>
+
+                  </div>
+                
+              
+            
+            
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/enrich-server-side-data-with-cloud-firestore/">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/gtmtips/setup-google-tag-manager-server-cloud-run/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/asynchronous-variables-server-side-google-tag-manager/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Asynchronous%20Variables%20In%20Server-side%20Google%20Tag%20Manager%20https://www.simoahava.com/analytics/asynchronous-variables-server-side-google-tag-manager/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/asynchronous-variables-server-side-google-tag-manager/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#commento_thread">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+            
+              <span id="commento_thread"></span>
+<div id="commento"></div>
+<script defer src="https://cdn.commento.io/js/commento.js"></script>
+
+            
+          </div>
+        </article>
+        <footer id="footer" class="main-content-wrap">
+  <span class="copyrights">
+    &copy; 2022 Simo Ahava. All Rights Reserved
+  </span>
+</footer>
+
+      </div>
+      
+      <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+        
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/enrich-server-side-data-with-cloud-firestore/">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/gtmtips/setup-google-tag-manager-server-cloud-run/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/asynchronous-variables-server-side-google-tag-manager/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Asynchronous%20Variables%20In%20Server-side%20Google%20Tag%20Manager%20https://www.simoahava.com/analytics/asynchronous-variables-server-side-google-tag-manager/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/asynchronous-variables-server-side-google-tag-manager/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#commento_thread">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+      </div>
+      
+      <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+  <i id="btn-close-shareoptions" class="fa fa-close"></i>
+  <ul class="share-options">
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/asynchronous-variables-server-side-google-tag-manager/">
+          <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=Asynchronous%20Variables%20In%20Server-side%20Google%20Tag%20Manager%20https://www.simoahava.com/analytics/asynchronous-variables-server-side-google-tag-manager/%20via%20@SimoAhava">
+          <i class="fa fa-twitter"></i><span>Share on Twitter</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/asynchronous-variables-server-side-google-tag-manager/">
+          <i class="fa fa-linkedin"></i><span>Share on LinkedIn</span>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+<div id="share-options-mask" class="share-options-mask"></div>
+
+    </div>
+    
+    <div id="about">
+  <div id="about-card">
+    <div id="about-btn-close">
+      <i class="fa fa-remove"></i>
+    </div>
+    
+      <img id="about-card-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+    
+    <h4 id="about-card-name">Simo Ahava</h4>
+    
+      <div id="about-card-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</div>
+    
+    
+      <div id="about-card-job">
+        <i class="fa fa-briefcase"></i>
+        <br/>
+        Senior Data Advocate at Reaktor
+      </div>
+    
+    
+      <div id="about-card-location">
+        <i class="fa fa-map-marker"></i>
+        <br/>
+        Finland
+      </div>
+    
+  </div>
+</div>
+
+    
+  
+    
+    <div id="cover" style="background-image:url('https://www.simoahava.com/images/maisema.jpg');"></div>
+  
+
+
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+
+
+
+
+<script src="https://www.simoahava.com/js/script.js"></script>
+
+
+
+
+<script src="https://cdn.commento.io/js/count.js"></script>
+
+    <script>
+      !function(){var e=document.querySelector(".simmer"),t=document.querySelector(".simmer .close"),o=window.sessionStorage&&window.sessionStorage.getItem("nosimmer");if(e){if(o){e.style.display="none"}t.addEventListener("click",function(){window.sessionStorage.setItem("nosimmer","true"),e.style.display="none"})}}();
+    </script>
+    <script>
+      var mylazyload = new LazyLoad({elements_selector: '.lazy'});
+      </script>
+    <style>
+      .ads {
+	  width: 1px;
+      }
+      </style>
+         
+
+    
+  </body>
+</html>
+
