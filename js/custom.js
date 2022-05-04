@@ -12,7 +12,7 @@
   });
 })(jQuery)
 
-if (!!document.querySelector('#commento')) {
+if (!!document.querySelector('#commento') && !!document.getElementById('_progress')) {
   document.addEventListener(
     "scroll",
     function() {
