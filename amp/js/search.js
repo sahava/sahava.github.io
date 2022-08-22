@@ -1,6 +1,6 @@
 (function($) {
     
-    var endpoint = window.location.hostname === 'localhost' ? 'http://localhost:9080' : 'https://search-www-simoahava-com.appspot.com';
+    var endpoint = window.location.hostname === 'localhost' ? 'http://localhost:9080' : 'https://simoahava-com-search.ew.r.appspot.com';
     
     var header = document.querySelector('h1.searchResults');
     var spinner = document.querySelector('#spinner');
