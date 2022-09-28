@@ -1,0 +1,1026 @@
+
+
+  
+    
+  
+
+
+  
+
+
+
+
+
+  
+
+
+  
+
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta name="google-site-verification" content="xQwWI2KUfP9LbFKhw2CVLFtrMY6Czrla7L3PD2aBolA" />
+
+
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org", 
+  "@type": "BlogPosting",
+  "headline": "Content Analysis With GA4, BigQuery, R, Sheets, And Data Studio | Simo Ahava's blog",
+  "image": "https:\/\/www.simoahava.com\/images\/2022\/09\/pages-measure.jpg",
+  "editor": "Simo Ahava",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Simo Ahava's blog",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https:\/\/www.simoahava.com\/images\/simo.png",
+      "height": "393",
+      "width": "407"
+    }
+  },
+  "url": "https:\/\/www.simoahava.com\/analytics\/content-analysis-using-ga4-bigquery-r-google-sheets-data-studio\/",
+  "datePublished": "2022-09-28T07:00:00\u002b03:00",
+  "dateModified": "2022-09-28T07:00:00\u002b03:00",
+  "description": "How to measure a blog\u0027s effectiveness using a number of tools in the analyst\u0027s toolkit, such as GA4, BigQuery, R, Google Sheets, and Google Data Studio.",
+  "author": {
+    "@type": "Person",
+    "name": "Simo Ahava"
+  }
+}
+</script>
+
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <title>Content Analysis With GA4, BigQuery, R, Sheets, And Data Studio | Simo Ahava's blog</title>
+    
+    <script>
+      window.dataLayer=window.dataLayer||[];window.dataLayer.push({pageType: 'article', environment:  null });
+    </script>
+    
+
+    
+    
+    <script src="https://www.simoahava.com/x-js/lazyload.iife.min.js"></script>
+
+    
+
+    
+    <script>
+      (function(S,i,m,o){
+        window[m]=window[m]||[];
+        window[m].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
+        var f=S.getElementsByTagName(i)[0],j=S.createElement(i),dl=m!='dataLayer'?'&l='+m:'';
+        j.async=true;
+        j.src='https://sgtm.simoahava.com/gtm.js?id='+o+dl;
+        f.parentNode.insertBefore(j,f);
+      })(document,'script','dataLayer','GTM-PZ7GMV9');
+    </script>
+    
+    <meta name="author" content="Simo Ahava">
+    <meta name="keywords" content="">
+
+    <link rel="icon" href="https://www.simoahava.com/images/favicon.ico">
+    
+    <link rel="amphtml" href="https://www.simoahava.com/amp/analytics/content-analysis-using-ga4-bigquery-r-google-sheets-data-studio/">
+    
+    <meta name="description" content="How to measure a blog&#39;s effectiveness using a number of tools in the analyst&#39;s toolkit, such as GA4, BigQuery, R, Google Sheets, and Google Data Studio.">
+    <meta property="og:description" content="How to measure a blog&#39;s effectiveness using a number of tools in the analyst&#39;s toolkit, such as GA4, BigQuery, R, Google Sheets, and Google Data Studio.">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="Content Analysis With GA4, BigQuery, R, Sheets, And Data Studio">
+    <meta property="og:url" content="https://www.simoahava.com/analytics/content-analysis-using-ga4-bigquery-r-google-sheets-data-studio/">
+    <meta property="og:site_name" content="Simo Ahava&#39;s blog">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Content Analysis With GA4, BigQuery, R, Sheets, And Data Studio">
+    <meta name="twitter:description" content="How to measure a blog&#39;s effectiveness using a number of tools in the analyst&#39;s toolkit, such as GA4, BigQuery, R, Google Sheets, and Google Data Studio.">
+    
+      <meta name="twitter:creator" content="@SimoAhava">
+      
+    
+
+    
+    
+
+    
+	  <meta property="og:image" content="https://www.simoahava.com/images/2022/09/content-analysis-using-ga4-bigquery-r-sheets-data-studio.jpg">
+      <meta name="twitter:image" content="https://www.simoahava.com/images/2022/09/content-analysis-using-ga4-bigquery-r-sheets-data-studio.jpg">
+    
+
+
+    
+
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+    
+    
+    
+    <link rel="stylesheet" href="https://www.simoahava.com/css/style.css" />
+    
+    
+
+    
+      
+    
+    
+  </head>
+
+  <body>
+    
+    <div id="_progress"></div>
+    
+    <div id="blog">
+      <header id="header" data-behavior="4">
+  <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+  <div class="header-title">
+    <a class="header-title-link" href="https://www.simoahava.com/">Simo Ahava&#39;s blog</a>
+  </div>
+  
+</header>
+
+      <nav id="sidebar" data-behavior="4">
+  <div class="sidebar-container">
+    
+      <div class="sidebar-profile">
+        <a href="https://www.simoahava.com/">
+          <img class="sidebar-profile-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+        </a>
+        <h4 class="sidebar-profile-name">Simo Ahava</h4>
+        
+          <h5 class="sidebar-profile-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</h5>
+        
+      </div>
+    
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+      
+      <span class="sidebar-button-desc">Home</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+      
+      <span class="sidebar-button-desc">Categories</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tags/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Tags</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/gtm-tips/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-magic"></i>
+      
+      <span class="sidebar-button-desc">GTM Tips</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/about-simo-ahava/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+      
+      <span class="sidebar-button-desc">About</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tools/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-wrench"></i>
+      
+      <span class="sidebar-button-desc">Tools</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/blog-statistics/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bar-chart"></i>
+      
+      <span class="sidebar-button-desc">Blog statistics</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://github.com/sahava" target="_blank" rel="noopener">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+      
+      <span class="sidebar-button-desc">GitHub</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/upcoming-talks/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bullhorn"></i>
+      
+      <span class="sidebar-button-desc">Upcoming talks</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/custom-templates/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Templates</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/newsletter/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bell"></i>
+      
+      <span class="sidebar-button-desc">Newsletter</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+
+    </ul>
+  </div>
+</nav>
+
+      
+
+      <div id="main" data-behavior="4"
+        class="
+               hasCoverMetaIn
+               ">
+        <article class="post">
+	  <form id="search" action="https://www.simoahava.com/search/">
+  <input name="q" type="text" class="form-control input--xlarge" placeholder="Search blog..." autocomplete="off">
+  </form>
+
+          <div class="post-header main-content-wrap text-left">
+  
+    <div class="figure nocaption">
+      <img class="cover" src="https://www.simoahava.com/images/2022/09/content-analysis-using-ga4-bigquery-r-sheets-data-studio.jpg">
+    </div>
+  
+  
+
+    <h1>
+      Content Analysis With GA4, BigQuery, R, Sheets, And Data Studio
+    </h1>
+  
+  
+  <div class="postShorten-meta post-meta">
+    
+      <time datetime="2022-09-28T07:00:00&#43;03:00">
+        
+  September 28, 2022
+
+      </time>
+      
+      
+  
+  
+    <span>in</span>
+    
+      <a class="category-link" href="https://www.simoahava.com/categories/analytics">Analytics</a>
+    
+  
+
+
+      | <a href="https://www.simoahava.com/analytics/content-analysis-using-ga4-bigquery-r-google-sheets-data-studio/#commento">Comments</a>
+      
+  </div>
+
+
+</div>
+
+          <div class="post-content markdown">
+            <div class="main-content-wrap">
+	      
+                
+  	        <p>This is a <strong>guest post</strong> – the first one in a long time! The foreword and summary are written by me, Simo, and the rest is by my esteemed guest author.</p>
+<p>How fortunate was I to have been contacted by <a href="https://www.linkedin.com/in/arben-kqiku-301457117/">Arben Kqiku</a>, Digital Marketing &amp; Data Manager from <a href="https://comtogether.com/">comtogether</a>. Arben is one of our many <a href="https://www.teamsimmer.com/">Simmer</a> students, and he&rsquo;s walked through the <a href="https://www.teamsimmer.com/courses/query-ga4-data-in-google-bigquery/">Query GA4 Data In Google BigQuery</a> course, learning a lot along the way.</p>
+<p>He wanted to share with me this wonderful case study he wrote using the lessons learned during that course and his prior knowledge of tools and languages like <a href="https://www.r-project.org/">R</a>, Google Sheets, and Google Data Studio.</p>
+<p>In this article, Arben tackles the age-old question of how to measure a <strong>blog&rsquo;s effectiveness</strong>. The data is based on a BigQuery dataset generated from this blog, which is available to all who take <a href="https://www.teamsimmer.com/courses/query-ga4-data-in-google-bigquery/">the BigQuery course</a> at Simmer.</p>
+
+                <span class="simmer">
+  <span class="close">X</span>
+  <p>
+    <span class="fa fa-md fa-bell"></span>
+    <strong>The Simmer Newsletter</strong>
+  </p>
+  <p>
+    Subscribe to the <a href="https://www.simoahava.com/newsletter/">Simmer newsletter</a> to get the latest news and content from Simo Ahava into your email inbox!
+  </p>
+  </span>
+
+                
+                  <h2 id="a-web-analysis-of-simo-ahavas-blog">A web analysis of Simo Ahava&rsquo;s blog</h2>
+<p>Recently, I finished the <a href="https://www.teamsimmer.com/courses/query-ga4-data-in-google-bigquery/">Query GA4 Data in Google BigQuery</a> course, produced by Simo Ahava and taught by <a href="https://www.ga4bigquery.com/">Johan van de Werken</a>. As the name suggests, you learn how to query <a href="https://support.google.com/analytics/answer/12159447">Google Analytics 4</a> data by using <a href="https://cloud.google.com/bigquery/">Google BigQuery</a>, in this case specifically Simo Ahava&rsquo;s GA4 blog data.</p>
+<p>I wanted to test my newly acquired knowledge and this is why I wrote this article.</p>
+
+                
+                  <h2 id="how-to-measure-a-blogs-effectiveness">How to measure a blog&rsquo;s effectiveness?</h2>
+<p>A blog is composed of articles, so, logically we need to compare these articles to understand which performs the best. However, what KPIs should we use?</p>
+<p>We could use <strong>page views</strong> – the more page views an article generates the better. This certainly makes sense since page views can be interpreted as a proxy for interest. However, this metric has some limitations. For instance, people could visit an article and leave it right away without reading it. So, we need a metric that indicates whether someone has read an article or not.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2022/09/pages-measure.jpg" title="Measure the effectiveness of individual pages">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2022/09/pages-measure.jpg#ZgotmplZ" alt="Measure the effectiveness of individual pages" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1976 1038'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>We could use the Google Analytics 4 <strong>scroll</strong> event for this purpose. GA4 records a scroll event each time a user scrolls to <strong>90% of the total length</strong> of a page. You can <a href="https://support.google.com/analytics/answer/9216061">instruct GA4 to automatically collect this event</a> and others from the GA4 interface.</p>
+<p>However, this metric also has its limitations. Namely, the length between articles varies greatly. A page with only 300 words will generate more scroll events than a page with 8,000 words, simply because it&rsquo;s easier to reach the end of it. Therefore, we need to find a way to integrate an article&rsquo;s length into the equation.</p>
+
+                
+                  <h2 id="a-formula-to-measure-an-articles-attractiveness">A formula to measure an article&rsquo;s attractiveness</h2>
+<p>First of all, we could use <strong>scroll events</strong> and <strong>page views</strong> to calculate the scroll conversion rate by using the following formula:</p>
+<blockquote>
+<p><strong>scrolls</strong> / <strong>page views</strong></p>
+</blockquote>
+<p>However, we could have 2 pages with the same scroll conversion rate, one page with 10 views and the other with 1,000 views. Obviously, a page with 1,000 views is more valuable, so we need to refine our approach.</p>
+<p>As mentioned earlier, a scroll is more valuable on a page with 8,000 words than on a page with 300 words. So, we could use a formula that weighs the number of scrolls by the number of words present in an article:</p>
+<blockquote>
+<p><strong>scrolls</strong> * <strong>words_count</strong></p>
+</blockquote>
+<p>In this way, we give more weight to longer articles.</p>
+<p>Now that the abstract part of the article is done, let&rsquo;s move to the juicy part, the code.</p>
+
+                
+                  <h2 id="performance-score-of-each-article-with-scrolls-and-word-count">Performance score of each article with scrolls and word count</h2>
+<p>In BigQuery, it&rsquo;s fairly easy to extract scrolls per page.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#00a">select</span>
+  (<span style="color:#00a">select</span> value.string_value <span style="color:#00a">from</span> <span style="color:#00a">unnest</span>(event_params) <span style="color:#00a">where</span> <span style="color:#00a">key</span> = <span style="color:#a50">&#39;page_location&#39;</span>) <span style="color:#00a">as</span> page_location,
+  countif(event_name = <span style="color:#a50">&#39;scroll&#39;</span>) <span style="color:#00a">as</span> scrolls
+<span style="color:#00a">from</span>
+  `dataset.<span style="color:#00a">table</span>.events_*`
+<span style="color:#00a">where</span>
+  _table_suffix <span style="color:#00a">between</span> <span style="color:#a50">&#39;20220601&#39;</span> <span style="color:#00a">and</span> <span style="color:#a50">&#39;20220831&#39;</span>
+<span style="color:#00a">group</span> <span style="color:#00a">by</span>
+  page_location
+<span style="color:#00a">order</span> <span style="color:#00a">by</span>
+  page_views <span style="color:#00a">desc</span></code></pre></div>
+<p>Let&rsquo;s take a closer look.</p>
+<p>First, with the following code, we need to extract the <code>page_location</code> event parameter. To do so, we first need to <strong>unnest</strong> the event parameters and then select the <code>page_location</code> parameter.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql">(<span style="color:#00a">select</span> value.string_value <span style="color:#00a">from</span> <span style="color:#00a">unnest</span>(event_params) <span style="color:#00a">where</span> <span style="color:#00a">key</span> = <span style="color:#a50">&#39;page_location&#39;</span>) <span style="color:#00a">as</span> page_location</code></pre></div>
+<p>Scroll events are easier to extract – we simply need to tell BigQuery to count an event each time it encounters a scroll event while parsing the source table.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql">countif(event_name = <span style="color:#a50">&#39;scroll&#39;</span>) <span style="color:#00a">as</span> scrolls</code></pre></div>
+<p>Finally, we need to <strong>group by</strong> <code>page_location</code>, because we want to use the scrolls per page in our formula.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#00a">group</span> <span style="color:#00a">by</span>
+  page_location</code></pre></div>
+<h3 id="extracting-the-word-count">Extracting the word count</h3>
+<p>To extract the word count per page, additional tools are required. For this, I used R and Google Sheets.</p>
+<p>The first thing I did was to extract the pages that had at least <strong>100 page views</strong> between June 1st and August 31st, and I pasted the results into <a href="https://docs.google.com/spreadsheets/d/1tkOnw41zj7lQLonV-bEjJFszY5jSlMylmn9ntQO2qcA/edit#gid=0">this Google Sheet</a>.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2022/09/google-sheet-pages.jpg" title="Pages in Google Sheets">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2022/09/google-sheet-pages.jpg#ZgotmplZ" alt="Pages in Google Sheets" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1156 380'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Then, I used R to calculate the word count of each page.</p>
+<p>However, I encountered one obstacle when retrieving the HTML pages. Namely, there was a <em>lot</em> of information that did not correspond to real words, such as JavaScript code snippets and CSS styling. This is why I compared each word to an English dictionary and only counted <strong>real English words</strong>.</p>
+<p>Here are the concrete steps I took in R:</p>
+<ol>
+<li>Load packages</li>
+<li>Retrieve all page URLs from the Google Sheet linked to above</li>
+<li>Retrieve an English dictionary from GitHub</li>
+<li>For each page:<br>
+4.1. Retrieve all the words<br>
+4.2. Clean the words<br>
+4.3. Join with the English dictionary<br>
+4.4. See if there is a match in the dictionary. If there is, count it as 1 (<code>TRUE</code>)<br>
+4.5. Sum all the words that have a match in the dictionary</li>
+<li>Output the result in the same Google Sheet</li>
+</ol>
+<p>This is what the output looks like.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2022/09/word-count.jpg" title="Word Count after R and Sheets">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2022/09/word-count.jpg#ZgotmplZ" alt="Word Count after R and Sheets" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1146 460'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>And this is the R code I used.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-R" data-lang="R"><span style="color:#aaa;font-style:italic"># Packages</span>
+<span style="color:#0a0">library</span>(tidyverse)
+<span style="color:#0a0">library</span>(googlesheets4)
+<span style="color:#0a0">library</span>(rvest)
+ 
+<span style="color:#aaa;font-style:italic"># Retrieve data from Google sheet</span>
+sheet_URL = <span style="color:#a50">&#39;https://docs.google.com/spreadsheets/d/1tkOnw41zj7lQLonV-bEjJFszY5jSlMylmn9ntQO2qcA/edit#gid=0&#39;</span>
+sheet_id = <span style="color:#0a0">gs4_get</span>(sheet_URL)
+page_data = <span style="color:#0a0">range_read</span>(sheet_id)
+ 
+<span style="color:#aaa;font-style:italic"># Retrieve English dictionary</span>
+dict = <span style="color:#0a0">read.table</span>(file = <span style="color:#0a0">url</span>(<span style="color:#a50">&#34;https://github.com/dwyl/english-words/raw/master/words_alpha.txt&#34;</span>), col.names = <span style="color:#a50">&#34;words&#34;</span>) %&gt;%
+   <span style="color:#0a0">as_tibble</span>() %&gt;%
+   <span style="color:#0a0">mutate</span>(condition = <span style="color:#00a">TRUE</span>)
+ 
+<span style="color:#aaa;font-style:italic"># Read data from web pages and count words per page</span>
+words_per_page = page_data %&gt;%
+   <span style="color:#0a0">mutate</span>(words = <span style="color:#0a0">map</span>(Page, ~<span style="color:#0a0">return_words</span>(web_page = .x))) %&gt;%
+   <span style="color:#0a0">mutate</span>(words = words %&gt;% <span style="color:#0a0">unlist</span>())
+ 
+<span style="color:#aaa;font-style:italic"># Output data to Google sheets</span>
+<span style="color:#0a0">sheet_write</span>(words_per_page, sheet = <span style="color:#a50">&#39;output&#39;</span>, ss = sheet_id)
+ 
+<span style="color:#aaa;font-style:italic"># Functions</span>
+return_words = <span style="color:#0a0">function</span>(web_page){
+   words = web_page %&gt;%
+       <span style="color:#0a0">read_html</span>() %&gt;%
+       <span style="color:#0a0">html_text</span>() %&gt;%
+      
+       <span style="color:#aaa;font-style:italic"># clean words for table</span>
+       <span style="color:#0a0">tolower</span>() %&gt;%
+       <span style="color:#0a0">str_remove_all</span>(pattern = <span style="color:#a50">&#39;&#34;&#39;</span>) %&gt;%
+       <span style="color:#0a0">str_remove_all</span>(pattern = <span style="color:#a50">&#34;,|:|\\.|\\\n&#34;</span>) %&gt;%
+       <span style="color:#0a0">strsplit</span>(<span style="color:#a50">&#39; &#39;</span>) %&gt;%
+       <span style="color:#0a0">as_tibble</span>(<span style="color:#a50">&#39;words&#39;</span>) %&gt;%
+       <span style="color:#0a0">set_names</span>(<span style="color:#a50">&#34;words&#34;</span>) %&gt;%
+      
+       <span style="color:#aaa;font-style:italic"># join with English dictionary</span>
+       <span style="color:#0a0">left_join</span>(dict) %&gt;%
+      
+       <span style="color:#aaa;font-style:italic"># keep only words from the english dictionary</span>
+       <span style="color:#0a0">filter</span>(condition == <span style="color:#00a">TRUE</span>) %&gt;%
+       <span style="color:#0a0">pull</span>(condition) %&gt;%
+       <span style="color:#0a0">sum</span>()
+  
+   <span style="color:#0a0">return</span>(words)
+}</code></pre></div>
+<p>Next, in Google Sheets, I created a <code>case...when</code> statement for each page in order to create a column for word count in BigQuery.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2022/09/word-count-sheet.jpg" title="Word Count column in Sheets">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2022/09/word-count-sheet.jpg#ZgotmplZ" alt="Word Count column in Sheets" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1442 136'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Later, I copied all these <code>case...when</code> statements and pasted them back to BigQuery. To avoid showing a query with <strong>358</strong> <code>case...when</code> statements, I&rsquo;ll only display a handful of them here.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#00a">with</span> prep <span style="color:#00a">as</span> (
+<span style="color:#00a">select</span>
+  (<span style="color:#00a">select</span> value.string_value <span style="color:#00a">from</span> <span style="color:#00a">unnest</span>(event_params) <span style="color:#00a">where</span> <span style="color:#00a">key</span> = <span style="color:#a50">&#39;page_location&#39;</span>) <span style="color:#00a">as</span> page_location,
+  countif(event_name = <span style="color:#a50">&#39;scroll&#39;</span>) <span style="color:#00a">as</span> scrolls
+<span style="color:#00a">from</span>
+  `simoahava-com.analytics_206575074.events_*`
+<span style="color:#00a">where</span>
+  _table_suffix <span style="color:#00a">between</span> <span style="color:#a50">&#39;20220601&#39;</span> <span style="color:#00a">and</span> <span style="color:#a50">&#39;20220831&#39;</span>
+<span style="color:#00a">group</span> <span style="color:#00a">by</span>
+  page_location
+<span style="color:#00a">order</span> <span style="color:#00a">by</span>
+  page_views <span style="color:#00a">desc</span>),
+ 
+prep_words <span style="color:#00a">as</span> (
+<span style="color:#00a">select</span>
+  *,
+  <span style="color:#00a">case</span>
+    <span style="color:#00a">when</span> page_location = <span style="color:#a50">&#39;https://www.simoahava.com/analytics/google-analytics-4-ecommerce-guide-google-tag-manager/&#39;</span> <span style="color:#00a">then</span> <span style="color:#099">5865</span>
+    <span style="color:#00a">when</span> page_location = <span style="color:#a50">&#39;https://www.simoahava.com/&#39;</span> <span style="color:#00a">then</span> <span style="color:#099">521</span>
+    <span style="color:#00a">when</span> page_location = <span style="color:#a50">&#39;https://www.simoahava.com/analytics/one-tag-rule-them-all-introducing-google-tag/&#39;</span> <span style="color:#00a">then</span> <span style="color:#099">1365</span>
+    <span style="color:#00a">else</span> <span style="color:#00a">null</span> <span style="color:#00a">end</span> <span style="color:#00a">as</span> words_per_article
+<span style="color:#00a">from</span>
+  prep)
+ 
+<span style="color:#00a">select</span>
+  *,
+  scrolls * words_per_article <span style="color:#00a">as</span> performance_score
+<span style="color:#00a">from</span>
+  prep_words
+<span style="color:#00a">order</span> <span style="color:#00a">by</span>
+  performance_score <span style="color:#00a">desc</span></code></pre></div>
+<h3 id="load-it-all-in-google-data-studio">Load it all in Google Data Studio</h3>
+<p>With Google Data Studio, I created this horizontal bar chart which displays the performance score by page.</p>
+<p>We can clearly see that the article <a href="https://www.simoahava.com/analytics/google-analytics-4-ecommerce-guide-google-tag-manager/">Google Analytics 4: Ecommerce Guide For Google Tag Manager</a> dominates the results.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2022/09/load-in-data-studio.jpg" title="Load the data in Data Studio">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2022/09/load-in-data-studio.jpg#ZgotmplZ" alt="Load the data in Data Studio" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2270 1092'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+
+                
+                  <h2 id="performance-score-by-page-and-source--medium">Performance score by page and source / medium</h2>
+<p>In addition to knowing which articles have the best performance score, it would be interesting to see how they compare when segmented by <strong>source / medium</strong>. It may be that certain source / medium combinations could bring more interested users.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#00a">with</span> prep <span style="color:#00a">as</span> (
+<span style="color:#00a">select</span>
+  concat(traffic_source.<span style="color:#00a">source</span>, <span style="color:#a50">&#34; / &#34;</span>, traffic_source.medium) <span style="color:#00a">as</span> source_medium,
+  (<span style="color:#00a">select</span> value.string_value <span style="color:#00a">from</span> <span style="color:#00a">unnest</span>(event_params) <span style="color:#00a">where</span> <span style="color:#00a">key</span> = <span style="color:#a50">&#39;page_location&#39;</span>) <span style="color:#00a">as</span> page_location,
+  countif(event_name = <span style="color:#a50">&#39;scroll&#39;</span>) <span style="color:#00a">as</span> scrolls
+<span style="color:#00a">from</span>
+  `simoahava-com.analytics_206575074.events_*`
+<span style="color:#00a">where</span>
+  _table_suffix <span style="color:#00a">between</span> <span style="color:#a50">&#39;20220601&#39;</span> <span style="color:#00a">and</span> <span style="color:#a50">&#39;20220831&#39;</span>
+<span style="color:#00a">group</span> <span style="color:#00a">by</span>
+  source_medium,
+  page_location
+<span style="color:#00a">order</span> <span style="color:#00a">by</span>
+  scrolls <span style="color:#00a">desc</span>),
+ 
+prep_words <span style="color:#00a">as</span> (
+<span style="color:#00a">select</span>
+  *,
+  <span style="color:#00a">case</span>
+    <span style="color:#00a">when</span> page_location = <span style="color:#a50">&#39;https://www.simoahava.com/analytics/google-analytics-4-ecommerce-guide-google-tag-manager/&#39;</span> <span style="color:#00a">then</span> <span style="color:#099">5865</span>
+    <span style="color:#00a">when</span> page_location = <span style="color:#a50">&#39;https://www.simoahava.com/&#39;</span> <span style="color:#00a">then</span> <span style="color:#099">521</span>
+    <span style="color:#00a">when</span> page_location = <span style="color:#a50">&#39;https://www.simoahava.com/analytics/one-tag-rule-them-all-introducing-google-tag/&#39;</span> <span style="color:#00a">then</span> <span style="color:#099">1365</span>
+    <span style="color:#00a">else</span> <span style="color:#00a">null</span> <span style="color:#00a">end</span> <span style="color:#00a">as</span> words_per_article
+<span style="color:#00a">from</span>
+  prep)
+ 
+<span style="color:#00a">select</span>
+  source_medium,
+  page_location,
+  <span style="color:#00a">sum</span>(page_views) <span style="color:#00a">as</span> page_views,
+  <span style="color:#00a">sum</span>(scrolls) <span style="color:#00a">as</span> scrolls,
+  <span style="color:#00a">sum</span>(words_per_article) <span style="color:#00a">as</span> words_per_article,
+  <span style="color:#00a">sum</span>(scrolls * <span style="color:#00a">sum</span>(words_per_article) <span style="color:#00a">as</span> performance_score
+<span style="color:#00a">from</span>
+  prep_words
+<span style="color:#00a">group</span> <span style="color:#00a">by</span>
+  source_medium,
+  page_location
+<span style="color:#00a">having</span>
+  words_per_article <span style="color:#00a">is</span> <span style="color:#00a">not</span> <span style="color:#00a">null</span>
+  <span style="color:#00a">and</span> scrolls &gt; <span style="color:#099">100</span>
+<span style="color:#00a">order</span> <span style="color:#00a">by</span>
+  page_views <span style="color:#00a">desc</span></code></pre></div>
+<blockquote>
+<p><strong>Note from Simo</strong>: this query uses the <code>traffic_source.*</code> dimensions for source / medium. These are actually the <strong>first acquisition</strong> campaign details rather than the session-scoped campaign metadata that this query would benefit from to a greater degree. Unfortunately, at the time of writing this article, session-scoped data like this is unavailable in the BigQuery export, so using <code>traffic_source.*</code> is a decent enough proxy.</p>
+</blockquote>
+<p>When you split the data between two dimensions, it&rsquo;s sometimes useful to visualize it with a heatmap.</p>
+<p>In this case, we can see that the <strong>source / medium</strong> with the highest performance score is <code>google / organic</code>.</p>
+<p>I only selected combinations with at least 100 scrolls. That&rsquo;s why the right-hand side of the heatmap is mostly empty.</p>
+<p>However, it&rsquo;s interesting to note that the fourth article in the list, <a href="https://www.simoahava.com/analytics/one-tag-rule-them-all-introducing-google-tag/">One Tag To Rule Them All: Introducing The New Google Tag</a>, has a performance score for other sources as well.</p>
+<p>This tells us that the article in question has a more widespread penetration in terms of acquisition channels.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2022/09/performance-by-source-medium.jpg" title="Performance score by source/medium">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2022/09/performance-by-source-medium.jpg#ZgotmplZ" alt="Performance score by source/medium" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2222 1092'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+
+                
+                  <h2 id="attribute-a-performance-score-to-each-user">Attribute a performance score to each user</h2>
+<p>To associate a performance score to each user, we&rsquo;ll use the GA4 field <code>user_pseudo_id</code>, which stores the <strong>client identifier</strong> that GA4 attributes to each browser instance. Although it doesn&rsquo;t necessarily reflect the actual number of <strong>people</strong> that visit the site, it&rsquo;s again a decent enough proxy to get us some useful results.</p>
+<p>First thing to do is to create the query which aligns the <code>user_pseudo_id</code> together with <code>page_location</code>, the number of scroll events, and the word count for each page.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#00a">with</span> prep <span style="color:#00a">as</span> (
+<span style="color:#00a">select</span>
+  user_pseudo_id,
+  (<span style="color:#00a">select</span> value.int_value <span style="color:#00a">from</span> <span style="color:#00a">unnest</span>(event_params) <span style="color:#00a">where</span> <span style="color:#00a">key</span> = <span style="color:#a50">&#39;ga_session_id&#39;</span>) <span style="color:#00a">as</span> session_id,
+  (<span style="color:#00a">select</span> value.string_value <span style="color:#00a">from</span> <span style="color:#00a">unnest</span>(event_params) <span style="color:#00a">where</span> <span style="color:#00a">key</span> = <span style="color:#a50">&#39;page_location&#39;</span>) <span style="color:#00a">as</span> page_location,
+  countif(event_name = <span style="color:#a50">&#39;scroll&#39;</span>) <span style="color:#00a">as</span> scrolls,
+<span style="color:#00a">from</span>
+  `simoahava-com.analytics_206575074.events_*`
+<span style="color:#00a">where</span>
+  _table_suffix <span style="color:#00a">between</span> <span style="color:#a50">&#39;20220601&#39;</span> <span style="color:#00a">and</span> <span style="color:#a50">&#39;20220831&#39;</span>
+<span style="color:#00a">group</span> <span style="color:#00a">by</span>
+  user_pseudo_id,
+  session_id,
+  page_location
+<span style="color:#00a">order</span> <span style="color:#00a">by</span>
+  scrolls <span style="color:#00a">desc</span>)
+ 
+<span style="color:#00a">select</span>
+  user_pseudo_id,
+  session_id,
+  page_location,
+  <span style="color:#00a">case</span>
+    <span style="color:#00a">when</span> page_location = <span style="color:#a50">&#39;https://www.simoahava.com/analytics/google-analytics-4-ecommerce-guide-google-tag-manager/&#39;</span> <span style="color:#00a">then</span> <span style="color:#099">5865</span>
+    <span style="color:#00a">when</span> page_location = <span style="color:#a50">&#39;https://www.simoahava.com/&#39;</span> <span style="color:#00a">then</span> <span style="color:#099">521</span>
+    <span style="color:#00a">when</span> page_location = <span style="color:#a50">&#39;https://www.simoahava.com/analytics/one-tag-rule-them-all-introducing-google-tag/&#39;</span> <span style="color:#00a">then</span> <span style="color:#099">1365</span>
+    <span style="color:#00a">else</span> <span style="color:#00a">null</span> <span style="color:#00a">end</span> <span style="color:#00a">as</span> words_per_page,
+ scrolls
+<span style="color:#00a">from</span>
+  prep</code></pre></div>
+<p>This is what the query results look like.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2022/09/user-performance.jpg" title="User performance per page">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2022/09/user-performance.jpg#ZgotmplZ" alt="User performance per page" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1256 398'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Now I can create a query to parse the results table shown above and get the performance score per user.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#00a">with</span> prep <span style="color:#00a">as</span> (
+<span style="color:#00a">select</span>
+  user_pseudo_id,
+  <span style="color:#00a">sum</span>(words_per_page) <span style="color:#00a">as</span> words_per_page,
+  <span style="color:#00a">sum</span>(scrolls) <span style="color:#00a">as</span> scrolls
+<span style="color:#00a">from</span>
+  `dataset.result_table`
+<span style="color:#00a">group</span> <span style="color:#00a">by</span>
+  user_pseudo_id
+<span style="color:#00a">having</span>
+  words_per_page <span style="color:#00a">is</span> <span style="color:#00a">not</span> <span style="color:#00a">null</span>)
+ 
+<span style="color:#00a">select</span>
+  user_pseudo_id,
+  scrolls,
+  words_per_page,
+  scrolls * words_per_page <span style="color:#00a">as</span> performance_score
+<span style="color:#00a">from</span>
+  prep
+<span style="color:#00a">order</span> <span style="color:#00a">by</span>
+  performance_score <span style="color:#00a">desc</span></code></pre></div>
+<p>Here is the result.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2022/09/performance-by-user.jpg" title="Performance by user">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2022/09/performance-by-user.jpg#ZgotmplZ" alt="Performance by user" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1684 478'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>In total, we&rsquo;ve been able to attribute a performance score to <strong>164,306 users</strong>. We could use this information to create remarketing audiences by <a href="https://support.google.com/analytics/answer/10071301">importing the data</a> in GA4. Alternatively, we could add this information to our CRM and use it as a lead scoring system to power up our email campaigns.</p>
+
+                
+                  <h2 id="summary-by-simo">Summary (by Simo)</h2>
+<p>Thank you, Arben!</p>
+<p>Content effectiveness is <em>brutally</em> difficult to measure. I&rsquo;ve <a href="https://www.simoahava.com/analytics/track-content-engagement-via-gtm/">tried</a>, and <a href="https://www.simoahava.com/analytics/track-content-engagement-part-2/">tried</a>, and <a href="https://www.simoahava.com/analytics/fire-tag-upon-scroll-depth-and-time-spent/">tried</a> to visit this topic over and over again in the history of this blog, and I&rsquo;ve never quite figured out what formula would work best.</p>
+<p>I&rsquo;m not saying Arben has cracked the puzzle, but he does raise an important point about drilling down deeper than what the default metrics offer us.</p>
+<p>Engagement is ultimately something ephemeral enough to resist being pigeonholed into a universal formula. I&rsquo;ve always disliked it when analytics platforms try to insert meaning into clinical metrics by naming them something like &ldquo;Engagement Rate&rdquo; or &ldquo;Bounce Rate&rdquo;. They&rsquo;re just metrics. Whether they describe engagement is a different discussion altogether.</p>
+<p>I hope you were inspired by Arben&rsquo;s exploration of the different tools available in the analyst&rsquo;s arsenal. You can get far with just Google BigQuery, but using R and Google Sheets for creating the base dataset can prove extremely valuable in the long run.</p>
+<p>Please check out <a href="https://www.linkedin.com/in/arben-kqiku-301457117/">Arben&rsquo;s profile on LinkedIn</a>, connect with him, and share your thoughts about his work with him!</p>
+
+                
+              
+              
+
+            </div>
+          </div>
+          <div id="post-footer" class="post-footer main-content-wrap">
+            
+              
+                
+                
+                  <div class="post-footer-tags">
+                    <span class="text-color-light text-small">TAGGED IN</span><br/>
+                    
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/google-analytics-4/">google analytics 4</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/google-bigquery/">google bigquery</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/google-sheets/">google sheets</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/content-analysis/">content analysis</a>
+
+                  </div>
+                
+              
+            
+            
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--disabled">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/gtm-tips/use-ga4-schema-in-universal-analytics-ecommerce/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/content-analysis-using-ga4-bigquery-r-google-sheets-data-studio/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Content%20Analysis%20With%20GA4,%20BigQuery,%20R,%20Sheets,%20And%20Data%20Studio%20https://www.simoahava.com/analytics/content-analysis-using-ga4-bigquery-r-google-sheets-data-studio/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/content-analysis-using-ga4-bigquery-r-google-sheets-data-studio/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#commento_thread">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+            
+              <span id="commento_thread"></span>
+<div id="commento"></div>
+<script defer src="https://commento.simoahava.com/js/commento.js" data-no-livereload="true"></script>
+
+            
+          </div>
+        </article>
+        <footer id="footer" class="main-content-wrap">
+  <span class="copyrights">
+    &copy; 2022 Simo Ahava. All Rights Reserved
+  </span>
+</footer>
+
+      </div>
+      
+      <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+        
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--disabled">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/gtm-tips/use-ga4-schema-in-universal-analytics-ecommerce/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/content-analysis-using-ga4-bigquery-r-google-sheets-data-studio/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Content%20Analysis%20With%20GA4,%20BigQuery,%20R,%20Sheets,%20And%20Data%20Studio%20https://www.simoahava.com/analytics/content-analysis-using-ga4-bigquery-r-google-sheets-data-studio/%20via%20@SimoAhava">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/content-analysis-using-ga4-bigquery-r-google-sheets-data-studio/">
+              <i class="fa fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#commento_thread">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+      </div>
+      
+      <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+  <i id="btn-close-shareoptions" class="fa fa-close"></i>
+  <ul class="share-options">
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/content-analysis-using-ga4-bigquery-r-google-sheets-data-studio/">
+          <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=Content%20Analysis%20With%20GA4,%20BigQuery,%20R,%20Sheets,%20And%20Data%20Studio%20https://www.simoahava.com/analytics/content-analysis-using-ga4-bigquery-r-google-sheets-data-studio/%20via%20@SimoAhava">
+          <i class="fa fa-twitter"></i><span>Share on Twitter</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/content-analysis-using-ga4-bigquery-r-google-sheets-data-studio/">
+          <i class="fa fa-linkedin"></i><span>Share on LinkedIn</span>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+<div id="share-options-mask" class="share-options-mask"></div>
+
+    </div>
+    
+    <div id="about">
+  <div id="about-card">
+    <div id="about-btn-close">
+      <i class="fa fa-remove"></i>
+    </div>
+    
+      <img id="about-card-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+    
+    <h4 id="about-card-name">Simo Ahava</h4>
+    
+      <div id="about-card-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</div>
+    
+    
+      <div id="about-card-job">
+        <i class="fa fa-briefcase"></i>
+        <br/>
+        Senior Data Advocate at Reaktor
+      </div>
+    
+    
+      <div id="about-card-location">
+        <i class="fa fa-map-marker"></i>
+        <br/>
+        Finland
+      </div>
+    
+  </div>
+</div>
+
+    
+  
+    
+    <div id="cover" style="background-image:url('https://www.simoahava.com/images/maisema.jpg');"></div>
+  
+
+
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+
+
+
+
+<script src="https://www.simoahava.com/js/script.js"></script>
+
+
+
+
+<script src="https://commento.simoahava.com/js/count.js"></script>
+
+    <script>
+      !function(){var e=document.querySelector(".simmer"),t=document.querySelector(".simmer .close"),o=window.sessionStorage&&window.sessionStorage.getItem("nosimmer");if(e){if(o){e.style.display="none"}t.addEventListener("click",function(){window.sessionStorage.setItem("nosimmer","true"),e.style.display="none"})}}();
+    </script>
+    <script>
+      var mylazyload = new LazyLoad({elements_selector: '.lazy'});
+      </script>
+    <style>
+      .ads {
+	  width: 1px;
+      }
+      </style>
+         
+
+    
+  </body>
+</html>
+
