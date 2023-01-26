@@ -1,0 +1,830 @@
+
+
+  
+    
+  
+
+
+  
+
+
+
+
+
+  
+
+
+  
+
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta name="google-site-verification" content="xQwWI2KUfP9LbFKhw2CVLFtrMY6Czrla7L3PD2aBolA" />
+
+
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org", 
+  "@type": "BlogPosting",
+  "headline": "Session Attribution With GA4 Measurement Protocol | Simo Ahava's blog",
+  "image": "https:\/\/www.simoahava.com\/images\/2023\/01\/mp-ga4.jpg",
+  "editor": "Simo Ahava",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Simo Ahava's blog",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https:\/\/www.simoahava.com\/images\/simo.png",
+      "height": "393",
+      "width": "407"
+    }
+  },
+  "url": "https:\/\/www.simoahava.com\/analytics\/session-attribution-with-ga4-measurement-protocol\/",
+  "datePublished": "2023-01-26T12:28:27\u002b02:00",
+  "dateModified": "2023-01-26T12:28:27\u002b02:00",
+  "description": "A quick overview of how session attribution works with events generated using Google Analytics 4 Measurement Protocol.",
+  "author": {
+    "@type": "Person",
+    "name": "Simo Ahava"
+  }
+}
+</script>
+
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <title>Session Attribution With GA4 Measurement Protocol | Simo Ahava's blog</title>
+    
+    <script>
+      window.dataLayer=window.dataLayer||[];window.dataLayer.push({pageType: 'article', environment:  null });
+    </script>
+    
+
+    
+    
+    <script src="https://www.simoahava.com/x-js/lazyload.iife.min.js"></script>
+
+    
+
+    
+    <script>
+      (function(S,i,m,o){
+        window[m]=window[m]||[];
+        window[m].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
+        var f=S.getElementsByTagName(i)[0],j=S.createElement(i),dl=m!='dataLayer'?'&l='+m:'';
+        j.async=true;
+        j.src='https://sgtm.simoahava.com/gtm.js?id='+o+dl;
+        f.parentNode.insertBefore(j,f);
+      })(document,'script','dataLayer','GTM-PZ7GMV9');
+    </script>
+    
+    <meta name="author" content="Simo Ahava">
+    <meta name="keywords" content="">
+
+    <link rel="icon" href="https://www.simoahava.com/images/favicon.ico">
+    
+    <link rel="amphtml" href="https://www.simoahava.com/amp/analytics/session-attribution-with-ga4-measurement-protocol/">
+    
+    <meta name="description" content="A quick overview of how session attribution works with events generated using Google Analytics 4 Measurement Protocol.">
+    <meta property="og:description" content="A quick overview of how session attribution works with events generated using Google Analytics 4 Measurement Protocol.">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="Session Attribution With GA4 Measurement Protocol">
+    <meta property="og:url" content="https://www.simoahava.com/analytics/session-attribution-with-ga4-measurement-protocol/">
+    <meta property="og:site_name" content="Simo Ahava&#39;s blog">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Session Attribution With GA4 Measurement Protocol">
+    <meta name="twitter:description" content="A quick overview of how session attribution works with events generated using Google Analytics 4 Measurement Protocol.">
+    
+      <meta name="twitter:creator" content="@SimoAhava">
+      
+    
+
+    
+    
+
+    
+      <meta name="twitter:image" content="https://www.simoahava.com/images/2023/01/mp-ga4.jpg">  
+      <meta property="og:image" content="https://www.simoahava.com/images/2023/01/mp-ga4.jpg">
+    
+
+
+    
+
+      
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+      
+    
+    <link rel="stylesheet" href="https://www.simoahava.com/css/style.css" />
+    
+    
+
+    
+      
+    
+    
+  </head>
+
+  <body>
+    
+    <div id="_progress"></div>
+    
+    <div id="blog">
+      <header id="header" data-behavior="4">
+  <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+  <div class="header-title">
+    <a class="header-title-link" href="https://www.simoahava.com/">Simo Ahava&#39;s blog</a>
+  </div>
+  
+</header>
+
+      <nav id="sidebar" data-behavior="4">
+  <div class="sidebar-container">
+    
+      <div class="sidebar-profile">
+        <a href="https://www.simoahava.com/">
+          <img class="sidebar-profile-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+        </a>
+        <h4 class="sidebar-profile-name">Simo Ahava</h4>
+        
+          <h5 class="sidebar-profile-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</h5>
+        
+      </div>
+    
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+      
+      <span class="sidebar-button-desc">Home</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+      
+      <span class="sidebar-button-desc">Categories</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tags/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Tags</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/gtm-tips/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-magic"></i>
+      
+      <span class="sidebar-button-desc">GTM Tips</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/about-simo-ahava/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+      
+      <span class="sidebar-button-desc">About</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tools/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-wrench"></i>
+      
+      <span class="sidebar-button-desc">Tools</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/blog-statistics/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bar-chart"></i>
+      
+      <span class="sidebar-button-desc">Blog statistics</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://github.com/sahava" target="_blank" rel="noopener ">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-brands fa-github"></i>
+      
+      <span class="sidebar-button-desc">GitHub</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/upcoming-talks/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bullhorn"></i>
+      
+      <span class="sidebar-button-desc">Upcoming talks</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/custom-templates/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Templates</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/newsletter/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bell"></i>
+      
+      <span class="sidebar-button-desc">Newsletter</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://masto.measure.chat/@SimoAhava" target="_blank" rel="noopener me">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-brands fa-mastodon"></i>
+      
+      <span class="sidebar-button-desc">Mastodon</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+
+    </ul>
+  </div>
+</nav>
+
+      
+
+      <div id="main" data-behavior="4"
+        class="
+               hasCoverMetaIn
+               ">
+        <article class="post">
+	  <form id="search" action="https://www.simoahava.com/search/">
+  <input name="q" type="text" class="form-control input--xlarge" placeholder="Search blog..." autocomplete="off">
+  </form>
+
+          <div class="post-header main-content-wrap text-left">
+  
+  
+
+    <h1>
+      Session Attribution With GA4 Measurement Protocol
+    </h1>
+  
+  
+  <div class="postShorten-meta post-meta">
+    
+      <time datetime="2023-01-26T12:28:27&#43;02:00">
+        
+  January 26, 2023
+
+      </time>
+      
+      
+  
+  
+    <span>in</span>
+    
+      <a class="category-link" href="https://www.simoahava.com/categories/analytics">Analytics</a>
+    
+  
+
+
+      | <a href="https://www.simoahava.com/analytics/session-attribution-with-ga4-measurement-protocol/#commento">Comments</a>
+      
+  </div>
+
+
+</div>
+
+          <div class="post-content markdown">
+            <div class="main-content-wrap">
+	      
+                
+  	        <p>In this article, I&rsquo;ll try to clarify the understandably murky <a href="https://developers.google.com/analytics/devguides/collection/protocol/ga4">Measurement Protocol</a> functionality in <a href="https://support.google.com/analytics/answer/10089681?hl=en">Google Analytics 4</a>.</p>
+<p>Measurement Protocol is a way to send events to Google Analytics 4 directly from a machine capable of sending HTTP requests (such as a web server). It&rsquo;s an alternative collection method to the client-side libraries of <a href="https://support.google.com/analytics/answer/11994839">Google Tag</a> and the <a href="https://firebase.google.com/docs/analytics">Firebase SDK</a>.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2023/01/mp-ga4.jpg" title="Measurement Protocol In Google Analytics 4">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2023/01/mp-ga4.jpg#ZgotmplZ" alt="Measurement Protocol In Google Analytics 4" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1806 1198'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Measurement Protocol in GA4 is very different from its <a href="https://developers.google.com/analytics/devguides/collection/protocol/v1">predecessor in Universal Analytics</a>. In Universal Analytics, Measurement Protocol was <em>the</em> collection mechanism, with the same protocol being used for both client-side library hits and server-to-server hits.</p>
+<p>In GA4, MP is really its own thing. It&rsquo;s completely decoupled from the client-side libraries, and it works with a different schema, a different set of rules, and a different data profile in the reports.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2023/01/example-from-reports.jpg" title="Example from exploration report">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2023/01/example-from-reports.jpg#ZgotmplZ" alt="Example from exploration report" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1074 436'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>One of the pressing questions with Measurement Protocol has been whether it&rsquo;s possible to insert events <strong>into the past</strong> so that they would be associated with the correct session.</p>
+<p>In this article, I&rsquo;ll show you that <strong>yes</strong>, it&rsquo;s possible. Read on.</p>
+
+                <span class="simmer">
+  <span class="close">X</span>
+  <p>
+    <span class="fa fa-md fa-bell"></span>
+    <strong>The Simmer Newsletter</strong>
+  </p>
+  <p>
+    Subscribe to the <a href="https://www.simoahava.com/newsletter/">Simmer newsletter</a> to get the latest news and content from Simo Ahava into your email inbox!
+  </p>
+  </span>
+
+                
+                  <h2 id="quick-summary">Quick summary</h2>
+<p>To send a Measurement Protocol hit successfully and have it be associated with the correct session, you need three things in place:</p>
+<ul>
+<li>The <strong>Client ID</strong>, which you can get from BigQuery (<code>user_pseudo_id</code>), the <code>_ga</code> cookie, or using the <a href="https://www.simoahava.com/custom-templates/gtag-get-api/">GTAG GET API</a> Custom Template.</li>
+<li>The <strong>Session ID</strong>, which you can get from BigQuery (event parameter named <code>ga_session_id</code>), the <code>_ga_&lt;measurement ID&gt;</code> cookie, or using the GTAG GET API.</li>
+<li>The <strong>timestamp</strong> (in microseconds) of the event, set to a maximum 72 hours into the past, measured from the moment you dispatch the Measurement Protocol request.</li>
+</ul>
+<p>The timestamp should be chosen so that it occurs while the session (represented by the Session ID) is still active.</p>
+<p>If you have all three of these in place, the event that you send will be associated with the <strong>session source/medium</strong> of the active session.</p>
+
+                
+                  <h2 id="use-google-bigquery-to-find-the-parameters">Use Google BigQuery to find the parameters</h2>
+<p>I&rsquo;ve hopefully established myself by now as the ultimate Google BigQuery fanboy. I&rsquo;ve never kept it a secret that I think it&rsquo;s the <em>only</em> actually useful way to access Google Analytics 4 data. We even built <a href="https://www.teamsimmer.com/checkout/ga4-google-bigquery/bq-course-page/">an online course on Simmer</a> around this thought process.</p>
+<p>For accessing the three parameters listed in the previous chapter, BigQuery is <em>invaluable</em>. As long as you can pinpoint the session you want to augment, there&rsquo;s not much else to it.</p>
+<p>For example, here&rsquo;s the query I used to find the exact session I want to insert my hit into.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#00a">SELECT</span>
+    user_pseudo_id,
+    event_timestamp,
+    event_name,
+    event_params
+<span style="color:#00a">FROM</span>
+    `project.dataset.<span style="color:#00a">table</span>`
+<span style="color:#00a">WHERE</span>
+    user_pseudo_id = <span style="color:#a50">&#39;1871825471.1628513380&#39;</span> <span style="color:#00a">AND</span>
+    (<span style="color:#00a">SELECT</span>
+        value.int_value
+    <span style="color:#00a">FROM</span>
+        <span style="color:#00a">UNNEST</span>(event_params)
+    <span style="color:#00a">WHERE</span>
+        <span style="color:#00a">key</span> = <span style="color:#a50">&#39;ga_session_id&#39;</span>
+    ) = <span style="color:#099">1674465678</span></code></pre></div>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2023/01/bigquery-result.jpg" title="BigQuery result for the data">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2023/01/bigquery-result.jpg#ZgotmplZ" alt="BigQuery result for the data" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2406 1518'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>The <code>WHERE</code> clause specifies the Client ID (<code>user_pseudo_id</code>) and Session ID (nested <code>event_params[].ga_session_id</code>), and I can then use the list of events to find the correct &ldquo;slot&rdquo; for my timestamp.</p>
+<p>The <code>event_timestamp</code> field is already in microseconds, so if I want my Measurement Protocol event to be added <em>after</em> a specific event, I&rsquo;ll just need to make sure the timestamp I set in the Measurement Protocol hit is greater than that.</p>
+<p>Another reason I chose this particular session as an example is that if you look at the <code>page_view</code> event, you can see that its event parameters indicate the session is marked with the <code>linkedin.com / referral</code> source/medium values.</p>
+
+                
+                  <h2 id="send-the-hit">Send the hit</h2>
+<p>To test this, I used the amazing <a href="https://ga-dev-tools.web.app/ga4/event-builder/">Event Builder tool</a>. It lets you give Measurement Protocol a spin by generating the hit for you. You will, of course, need to provide all the required parameters by following <a href="https://developers.google.com/analytics/devguides/collection/protocol/ga4">the documentation</a>.</p>
+<p>In Event Builder, I added the <strong>API Secret</strong>, the <strong>Measurement ID</strong>, the <strong>Client ID</strong>, the <strong>Event Name</strong>, and the <strong>timestamp</strong> in their required fields.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2023/01/event-builder.jpg" title="Event Builder">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2023/01/event-builder.jpg#ZgotmplZ" alt="Event Builder" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1344 1358'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Importantly, the <strong>timestamp</strong> was set a few microseconds <em>after</em> the <code>page_view</code> event I saw in BigQuery. This is to make sure that the session &ldquo;starts&rdquo; correctly from BigQuery&rsquo;s point of view. You&rsquo;ll of course want to position this event so that it&rsquo;s logically placed within whatever funnel it belongs in. For example, if you&rsquo;re sending <strong>purchase</strong> events, you&rsquo;ll want to place the event after the checkout events have been collected.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2023/01/event-details.jpg" title="Event Details">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2023/01/event-details.jpg#ZgotmplZ" alt="Event Details" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1820 684'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Finally, in <strong>Event Details</strong> I added a <code>page_location</code> (this is not necessary – it was part of another test I was running) as well as the <strong>Session ID</strong> I got from BigQuery (or the user&rsquo;s cookies).</p>
+<p>When ready, I clicked the <strong>Validate event</strong> button, followed by <strong>Send to GA</strong>.</p>
+
+                
+                  <h2 id="realtime-reports">Realtime reports</h2>
+<p>First, the event shows up in the <strong>Realtime</strong> reports in GA4.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2023/01/ga4-real-time.jpg" title="Real Time report">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2023/01/ga4-real-time.jpg#ZgotmplZ" alt="Real Time report" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1222 876'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>This is interesting for two reasons.</p>
+<p>First, the event was <em>dispatched</em> in realtime, but its actual timestamp was a couple of days in the past.</p>
+<p>Second, the <a href="https://developers.google.com/analytics/devguides/collection/protocol/ga4/sending-events?client_type=gtag#recommended_parameters_for_reports">Measurement Protocol documentation states</a> that if you want to see the hit appear in Realtime reports, it needs the <code>engagement_time_msec</code> parameter – this didn&rsquo;t appear to be true.</p>
+
+                
+                  <h2 id="standard-reports">Standard reports</h2>
+<p>After waiting some 24 hours for good measure, I built a simple <strong>Free form</strong> Exploration report, where I filtered for the event name together with its <strong>Session source / medium</strong> value. This is what it looked like:</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2023/01/example-from-reports.jpg" title="Example from reports">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2023/01/example-from-reports.jpg#ZgotmplZ" alt="Example from reports" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1074 436'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>This confirmed that the event was associated with the <strong>session</strong> source and medium to which it was sent using the timestamp parameter.</p>
+
+                
+                  <h2 id="bigquery">BigQuery</h2>
+<p>Finally, my ultimate source of truth, I ran the <a href="#use-google-bigquery-to-find-the-parameters">same query as above</a> again, and this is what I saw:</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2023/01/final-test-result.jpg" title="Final test result">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2023/01/final-test-result.jpg#ZgotmplZ" alt="Final test result" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2642 1294'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>The event is placed exactly where I wanted to place it.</p>
+<p>Looking at this, you can see one major caveat when it comes to Measurement Protocol:</p>
+<p><strong>Events do not inherit properties from &ldquo;the session&rdquo;</strong>.</p>
+<p>There is no &ldquo;session scope&rdquo; when it comes to the BigQuery output. Instead, events are shown with the parameters their actual requests had.</p>
+<p>Thus, just looking at the BigQuery report, it would be impossible to determine whether the session source/medium attribution actually worked, as BigQuery <strong>doesn&rsquo;t have</strong> the capability to tell you what the source/medium of any given session was.</p>
+<p>That&rsquo;s why I was forced to suffer through the Google Analytics 4 user interface to see if the alignment actually worked (and it did!).</p>
+
+                
+                  <h2 id="summary">Summary</h2>
+<p>This article was a proof-of-concept to show you that Measurement Protocol for sessions <em>does</em> work – just like the documentation says.</p>
+<p>You need three parameters for this: the Client ID, the Session ID, and the timestamp (in microseconds) of the hit.</p>
+<p>BigQuery is a great tool for testing things out, but if you want to integrate this method with your sales engine or something more sophisticated, you&rsquo;ll need to harvest the required parameters from the user&rsquo;s cookies or wherever you store these values.</p>
+<p>Finally, I want to emphasize an extremely important point about Google Analytics and Measurement Protocol:</p>
+<p><strong>Google Analytics isn&rsquo;t supposed to be an exact representation of ALL THE DATA</strong>. You can use the tool as you like, of course, but it&rsquo;s a <em>marketing analytics</em> service. It&rsquo;s supposed to tell you <em>how well your marketing campaigns are doing based on traffic on your website</em> (or your app).</p>
+<p>In other words, using Measurement Protocol to send offline (or server-side) hits to Google Analytics when those hits can&rsquo;t be associated with an actual user or session is just a bad idea. It adds a <em>lot</em> of noise to the dataset, and those hits will be isolated from the rest of the behavioral data that GA collects.</p>
+<p>I hope you enjoyed this article. Let me know in the comments if you have any questions. I didn&rsquo;t test all the permutations (such as what happens if you send the event to a time when the session ID was no longer an active session), so if you do some testing of your own, I&rsquo;d love to hear about it.</p>
+
+                
+              
+              
+
+            </div>
+          </div>
+          <div id="post-footer" class="post-footer main-content-wrap">
+            
+              
+                
+                
+                  <div class="post-footer-tags">
+                    <span class="text-color-light text-small">TAGGED IN</span><br/>
+                    
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/google-analytics-4/">google analytics 4</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/measurement-protocol/">measurement protocol</a>
+
+                  </div>
+                
+              
+            
+            
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--disabled">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/track-and-categorize-all-link-clicks-on-the-site/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/session-attribution-with-ga4-measurement-protocol/">
+              <i class="fa fa-brands fa-facebook"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Session%20Attribution%20With%20GA4%20Measurement%20Protocol%20https://www.simoahava.com/analytics/session-attribution-with-ga4-measurement-protocol/%20via%20@SimoAhava">
+              <i class="fa fa-brands fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/session-attribution-with-ga4-measurement-protocol/">
+              <i class="fa fa-brands fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#commento_thread">
+            <i class="fa-regular fa-comments"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+            
+              <span id="commento_thread"></span>
+<div id="commento"></div>
+<script defer src="https://commento.simoahava.com/js/commento.js" data-no-livereload="true"></script>
+
+            
+          </div>
+        </article>
+        <footer id="footer" class="main-content-wrap">
+  <span class="copyrights">
+    &copy; 2023 Simo Ahava. All Rights Reserved
+  </span>
+</footer>
+
+      </div>
+      
+      <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+        
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--disabled">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/track-and-categorize-all-link-clicks-on-the-site/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/session-attribution-with-ga4-measurement-protocol/">
+              <i class="fa fa-brands fa-facebook"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Session%20Attribution%20With%20GA4%20Measurement%20Protocol%20https://www.simoahava.com/analytics/session-attribution-with-ga4-measurement-protocol/%20via%20@SimoAhava">
+              <i class="fa fa-brands fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/session-attribution-with-ga4-measurement-protocol/">
+              <i class="fa fa-brands fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#commento_thread">
+            <i class="fa-regular fa-comments"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+      </div>
+      
+      <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+  <i id="btn-close-shareoptions" class="fa fa-close"></i>
+  <ul class="share-options">
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/session-attribution-with-ga4-measurement-protocol/">
+          <i class="fa fa-brands fa-facebook"></i><span>Share on Facebook</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=Session%20Attribution%20With%20GA4%20Measurement%20Protocol%20https://www.simoahava.com/analytics/session-attribution-with-ga4-measurement-protocol/%20via%20@SimoAhava">
+          <i class="fa fa-brands fa-twitter"></i><span>Share on Twitter</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/session-attribution-with-ga4-measurement-protocol/">
+          <i class="fa fa-brands fa-linkedin"></i><span>Share on LinkedIn</span>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+<div id="share-options-mask" class="share-options-mask"></div>
+
+    </div>
+    
+    <div id="about">
+  <div id="about-card">
+    <div id="about-btn-close">
+      <i class="fa fa-remove"></i>
+    </div>
+    
+      <img id="about-card-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+    
+    <h4 id="about-card-name">Simo Ahava</h4>
+    
+      <div id="about-card-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</div>
+    
+    
+      <div id="about-card-job">
+        <i class="fa fa-briefcase"></i>
+        <br/>
+        Senior Data Advocate at Reaktor
+      </div>
+    
+    
+      <div id="about-card-location">
+        <i class="fa fa-map-marker"></i>
+        <br/>
+        Finland
+      </div>
+    
+  </div>
+</div>
+
+    
+  
+    
+    <div id="cover" style="background-image:url('https://www.simoahava.com/images/maisema.jpg');"></div>
+  
+
+
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+
+
+
+
+<script src="https://www.simoahava.com/js/script.js"></script>
+
+
+
+
+<script src="https://commento.simoahava.com/js/count.js"></script>
+
+    <script>
+      !function(){var e=document.querySelector(".simmer"),t=document.querySelector(".simmer .close"),o=window.sessionStorage&&window.sessionStorage.getItem("nosimmer");if(e){if(o){e.style.display="none"}t.addEventListener("click",function(){window.sessionStorage.setItem("nosimmer","true"),e.style.display="none"})}}();
+    </script>
+    <script>
+      var mylazyload = new LazyLoad({elements_selector: '.lazy'});
+      </script>
+    <style>
+      .ads {
+	  width: 1px;
+      }
+      </style>
+         
+
+    
+  </body>
+</html>
+
