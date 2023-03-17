@@ -136,7 +136,7 @@
 <meta itemprop="description" content="Guide to implementing Google Analytics 4 Ecommerce measurement using Google Tag Manager.">
 <meta itemprop="datePublished" content="2020-10-22T07:00:00&#43;03:00" />
 <meta itemprop="dateModified" content="2020-10-22T07:00:00&#43;03:00" />
-<meta itemprop="wordCount" content="7950">
+<meta itemprop="wordCount" content="7906">
 
 
 
@@ -1011,7 +1011,7 @@ on
         
         
           <blockquote>
-<p><strong>Last updated 24 August 2022</strong>: The GA4 Event tags in Google Tag Manager have been updated to allow you to load the Ecommerce data directly from the <code>dataLayer</code> (if following the <a href="https://developers.google.com/analytics/devguides/collection/ga4/ecommerce?client_type=gtm">GA4 schema</a>) or from a Custom JavaScript variable (or a custom template), as long as it returns an object in the <a href="https://developers.google.com/analytics/devguides/collection/ga4/ecommerce?client_type=gtm">GA4 ecommerce schema</a>.</p>
+<p><strong>Last updated 17 March 2023</strong>: <a href="https://support.google.com/analytics/answer/9164320?hl=en#031623">Item-scoped Custom Dimensions</a> are now available in Google Analytics 4.</p>
 </blockquote>
 <p>This is an <strong>implementation guide</strong> for <a href="https://developers.google.com/analytics/devguides/collection/app-web/tag-guide">Google Analytics 4</a>. The guide is aimed at <a href="https://tagmanager.google.com/">Google Tag Manager</a> users and has been designed to complement the <a href="https://developers.google.com/tag-manager/ecommerce-appweb">official documentation</a>.</p>
 
@@ -1403,18 +1403,6 @@ on
   
 
 <p>Note that the GA4 data model allows you to send things like <code>item_list_name</code> and <code>promotion_id</code> in <strong>any</strong> Ecommerce object to GA4. You can add them into an <code>items</code> array to indicate that specific items are in this current action due to an interaction with a list or promotion earlier in the session. Or you can add them as regular parameters to the event tag itself, in case the current Ecommerce action took place in a specific item list or within some promotion context.</p>
-<h4 id="product-scoped-custom-dimensions-and-metrics">Product-scoped Custom Dimensions and Metrics</h4>
-<p>Universal Analytics lets us add <strong>additional metadata</strong> to each product using <a href="https://www.simoahava.com/amp/gtm-tips/product-scoped-custom-dimensions-and-metrics/">product-scoped custom dimensions and metrics</a>. This is a <strong>vital</strong> part of dimension widening that any modern online store desperately needs.</p>
-
-
-    <a href="https://www.simoahava.com/amp/images/2020/10/custom-item-parameters.jpg" title="Custom item parameters, where k0 is the parameter name prefix, and v0 is the value prefix.">
-  
-    <amp-img src="https://www.simoahava.com/amp/images/2020/10/custom-item-parameters.jpg" layout="responsive" alt="Custom item parameters, where k0 is the parameter name prefix, and v0 is the value prefix." height="136" width="1236"></amp-img>
-  
-    </a>
-  
-
-<p>In GA4, you can add any parameters you wish into the <code>items</code> array, and they will be transported to GA4, but even if you <a href="https://support.google.com/analytics/answer/10075209?hl=en&amp;ref_topic=9756175">register these as custom definitions</a> it doesn&rsquo;t seem like they&rsquo;re available in the Ecommerce reports themselves.</p>
 <h4 id="checkout-measurement">Checkout measurement</h4>
 <p>As mentioned <a href="#available-actions">above</a>, checkout tracking has certainly changed between Enhanced Ecommerce and GA4.</p>
 <p>Where Enhanced Ecommerce introduces a combination of <strong>funnel steps</strong> (e.g. view cart, shipping, payment) and <strong>checkout options</strong> (e.g. shipping method, payment method), GA4 only has the <code>begin_checkout</code> event for establishing entrance into the checkout flow.</p>
@@ -1442,6 +1430,28 @@ on
 <p>An additional hiccup is the <a href="https://www.simoahava.com/amp/analytics/enhanced-ecommerce-guide-for-google-tag-manager/#send-the-data-to-google-analytics-using-a-custom-javascript-variable">Custom JavaScript variable</a> (or custom template) option, which we&rsquo;ve been spoiled with when using Enhanced Ecommerce.</p>
 <p>Even though you can use a Custom JavaScript variable (or a <a href="https://www.simoahava.com/amp/analytics/custom-templates-guide-for-google-tag-manager/">custom template</a>) to map the <code>items</code> array however you wish, you&rsquo;re still forced to add all the other parameters as individual fields into the tag.</p>
 <p>I hope we get an option similar to Enhanced Ecommerce, where the <strong>entire</strong> event payload could be fetched from a variable. That way we could have a really dynamic setup and minimize the number of tags we&rsquo;re using. Not just for Ecommerce but for <strong>all</strong> GA4 data collection!</p>
+<h3 id="item-scoped-custom-dimensions">Item-scoped Custom Dimensions</h3>
+<p>Google Analytics 4 lets you send up to <strong>27</strong> custom parameters in the <code>items</code> array. Out of these, you can register <strong>10</strong> (free version of GA4) or <strong>25</strong> (enterprise version) as <strong>Item-scoped Custom Dimensions</strong> in the Google Analytics 4 user interface.</p>
+
+
+    <a href="https://www.simoahava.com/amp/images/2020/10/custom-item-parameters.jpg" title="Custom item parameters, where k0 is the parameter name prefix, and v0 is the value prefix.">
+  
+    <amp-img src="https://www.simoahava.com/amp/images/2020/10/custom-item-parameters.jpg" layout="responsive" alt="Custom item parameters, where k0 is the parameter name prefix, and v0 is the value prefix." height="136" width="1236"></amp-img>
+  
+    </a>
+  
+
+<p>You can create the Custom Dimension following the regular process in the <strong>Admin</strong> section of Google Analytics 4.</p>
+
+
+    <a href="https://www.simoahava.com/amp/images/2023/03/item-scoped-custom-dim.jpg" title="item-scoped-custom-dim.jpg">
+  
+    <amp-img src="https://www.simoahava.com/amp/images/2023/03/item-scoped-custom-dim.jpg" layout="responsive" alt="item-scoped-custom-dim.jpg" height="514" width="1230"></amp-img>
+  
+    </a>
+  
+
+<p>Currently, item-scoped parameters are <strong>not</strong> part of the Google Analytics 4 export to BigQuery.</p>
 <h3 id="migrating-from-enhanced-ecommerce">Migrating from Enhanced Ecommerce</h3>
 <p>Before you start rewriting your <code>dataLayer</code> objects, do note that Google Analytics 4 Ecommerce <strong>does support the Enhanced Ecommerce data model</strong> - at least to some extent.</p>
 <p>The main path of migration is that you <strong>do not have to provide an <code>items</code> object</strong> in GA4 syntax. Instead, you can set the value of the <code>items</code> parameter in the tag to an <code>impressions</code> or <code>promotions</code> or <code>products</code> variable in your Enhanced Ecommerce object. GA4 will be able to map the parameter names in the Enhanced Ecommerce <code>products</code> object to their corresponding parameters in the Google Analytics 4 schema.</p>
@@ -2431,7 +2441,7 @@ on
 <p>The new, <strong>gtag.js</strong>-based format is where all the cool new stuff will be introduced. If you choose complacency over the effort of properly moving to the new setup, you might end up with a suboptimal Ecommerce setup for future iterations of GA4&rsquo;s Ecommerce reports.</p>
 <p>Having said that, it makes sense to <strong>implement</strong> GA4 Ecommerce as soon as possible. You don&rsquo;t have to abandon your Universal Analytics setup, but do proceed with either a migration or a completely new <code>dataLayer</code> setup for GA4 as well.</p>
 <p>You&rsquo;ll want to start collecting that GA4 data as soon as possible to prepare for the eventual shift from Universal Analytics to Google Analytics 4. At that point, the more historical data you have, the better you&rsquo;ll know how the new paradigm works for your organization.</p>
-<p>I know absolute use case parity with Enhanced Ecommerce isn&rsquo;t something GA4 Ecommerce should even pursue, but we&rsquo;re still missing things like <strong>item-scoped custom dimensions</strong> and <strong>easily managed item list and promotion attribution</strong> from the mix.</p>
+<p>I know absolute use case parity with Enhanced Ecommerce isn&rsquo;t something GA4 Ecommerce should even pursue, but we&rsquo;re still missing things like <strong>easily managed item list and promotion attribution</strong> from the mix.</p>
 <p>The Google Tag Manager tags are also missing a few key pieces, such as an option to pull in all Ecommerce data directly from the <code>dataLayer</code> or even from a Custom JavaScript variable (or custom template).</p>
 <p>Until we have these things, it&rsquo;s best to treat GA4 Ecommerce as being in <strong>rough beta</strong>, even if that label has officially been dropped.</p>
 <p>What are you most looking forward to about the GA4&rsquo;s Ecommerce reports? What do you expect the Google Tag Manager integration to look like?</p>
