@@ -710,10 +710,7 @@ el.setAttribute(<span style="color:#a50">&#39;style&#39;</span>, <span style="co
 <p>Alternatively, you could have <code>tracker.html</code> running in the service, and you&rsquo;d load <code>tracker.mydomain.com/tracker.html</code> in an iframe, and use that as the <code>localStorage</code> store.</p>
 <p>Naturally, this incurs some extra costs, because you would have to route a lot of calls to this cloud endpoint to make sure all the relevant cookies get their expiration extended. This is why, I guess, Adobe offers it as a service.</p>
 <p>I&rsquo;d be curious to see if this is something Google is looking at, too. Seems like it would be a somewhat elegant way to handle the problem with the <code>_ga</code> cookie. They could, for example, have <code>analytics.js</code> fetched from this CNAME redirected domain, but in addition to serving the library, it would also write the <code>_ga</code> cookie in a <code>Set-Cookie</code> response.</p>
-<p>I verified with <a href="https://twitter.com/johnwilander">John Wilander</a> (a WebKit engineer working on ITP) that this should be OK:</p>
-<blockquote class="twitter-tweet"><p lang="en" dir="ltr">You’re asking two questions. Let me respond to them separately:<br>1) Same eTLD+1 is same-site, i.e. same “party.” ITP doesn’t look at subdomains.</p>&mdash; John Wilander 🇺🇦 (@johnwilander) <a href="https://twitter.com/johnwilander/status/1101726191457689600?ref_src=twsrc%5Etfw">March 2, 2019</a></blockquote>
-<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-
+<p>I verified with <a href="https://twitter.com/johnwilander">John Wilander</a> (a WebKit engineer working on ITP) that this should be OK.</p>
 <p>The <strong>problem</strong> here is that it adds quite a bit of overhead to the web service providing the response. For one, it would need to do the calculations for the <code>_ga</code> ID, but also it would need to process the request and customize the response. It&rsquo;s possible that even if Google did do this, they wouldn&rsquo;t offer it as part of the <strong>free Google Analytics</strong> service.</p>
 <h3 id="reverse-proxy-to-third-party-service">Reverse proxy to third party service</h3>
 <blockquote>
@@ -769,16 +766,10 @@ app.get(<span style="color:#a50">&#39;/analytics.js&#39;</span>, proxy({
 <p>For sites with authentication, this makes it even more prudent to incentivize a login. If a user logs in to the service, no cookies are even needed, since a persistent User ID could be used as the user&rsquo;s identifier sent to analytics platforms (as long as the user&rsquo;s consent for this is requested and as long as the tracking only happens when they&rsquo;re logged in).</p>
 <h3 id="but-perhaps-the-baby-was-thrown-out-with-the-bathwater">&hellip;but perhaps the baby was thrown out with the bathwater</h3>
 <p>I can&rsquo;t help thinking that <em>benevolent</em> first-party analytics gets hit with collateral damage here.</p>
-<p>I had some exchanges in Twitter with the WebKit engineer working on ITP (<a href="https://twitter.com/johnwilander">John Wilander</a>), and this is one of the things he responded to me with:</p>
-<blockquote class="twitter-tweet"><p lang="en" dir="ltr">Only document.cookie cookies are affected by the 7-day cap in ITP 2.1. Cross-site tracking is bad for people and for the web. Therefore, ITP will evolve to protect users from being tracked.</p>&mdash; John Wilander 🇺🇦 (@johnwilander) <a href="https://twitter.com/johnwilander/status/1100872846727733249?ref_src=twsrc%5Etfw">February 27, 2019</a></blockquote>
-<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-
+<p>I had some exchanges in Twitter with the WebKit engineer working on ITP (<a href="https://twitter.com/johnwilander">John Wilander</a>), and this is one of the things he responded to me with.</p>
 <p>I totally agree with cross-site tracking being <em>generally</em> bad. But there are ways to do web analytics without malicious intent. It would have made more sense to prevent cookies from being accessed outside the domain they were set on, thus forcing sites to append linker parameters to internal links, but expiring all <code>document.cookie</code> setters with a 7-day cap is pretty drastic.</p>
 <p>Having Google Analytics running on your site does not make you a bad person - you are using it to optimize the performance and usability of your site, and for creating better landing pages and marketing campaigns. But now that the cookie is capped at 7 days, you basically lose all ability to build cohorts of users who only visit your site once a month, for example, unless you invest in setting HTTP cookies instead.</p>
-<p>John&rsquo;s later tweet clarified this:</p>
-<blockquote class="twitter-tweet"><p lang="en" dir="ltr">Things would be easier if third-parties stayed third-parties. But since site owners bring in third-parties into their first-party context, ITP has to deal with it. Hopefully, we can get to a place where devs help prevent cross-site tracking.</p>&mdash; John Wilander 🇺🇦 (@johnwilander) <a href="https://twitter.com/johnwilander/status/1100993814456483841?ref_src=twsrc%5Etfw">February 28, 2019</a></blockquote>
-<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-
+<p>John&rsquo;s later tweet clarified this.</p>
 <p>So it does seem that ITP is taking blanket measures to best target the bad actors in the industry.</p>
 <h3 id="and-this-is-definitely-not-the-last-of-it">And this is definitely not the last of it</h3>
 <p>It&rsquo;s not just ITP. Firefox will <a href="https://www.fastcompany.com/90299092/mozilla-most-innovative-companies-2019">also start blocking cross-site third-party trackers</a>, no doubt taking a leaf out of ITP&rsquo;s book. They&rsquo;ve already had a very <a href="https://support.mozilla.org/en-US/kb/content-blocking">strong-armed approach</a> to blocking trackers (though in private browsing mode only, for now), so this doesn&rsquo;t come as a big surprise.</p>
