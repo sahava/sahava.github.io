@@ -1,0 +1,1316 @@
+
+
+  
+    
+  
+
+
+  
+
+
+
+
+
+  
+
+
+  
+
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta name="google-site-verification" content="xQwWI2KUfP9LbFKhw2CVLFtrMY6Czrla7L3PD2aBolA" />
+
+
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org", 
+  "@type": "BlogPosting",
+  "headline": "Transformations In Server-side Google Tag Manager | Simo Ahava's blog",
+  "image": "https:\/\/www.simoahava.com\/images\/2023\/04\/simo-twitter.jpg",
+  "editor": "Simo Ahava",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Simo Ahava's blog",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https:\/\/www.simoahava.com\/images\/simo.png",
+      "height": "393",
+      "width": "407"
+    }
+  },
+  "url": "https:\/\/www.simoahava.com\/analytics\/transformations-server-side-google-tag-manager\/",
+  "datePublished": "2023-06-07T07:10:00\u002b03:00",
+  "dateModified": "2023-06-07T07:10:00\u002b03:00",
+  "description": "Transformations in server-side Google Tag Manager allow you to modify the event data object before it becomes available to tag. It\u0027s a governance and data enrichment tool, and this article explains how it works.",
+  "author": {
+    "@type": "Person",
+    "name": "Simo Ahava"
+  }
+}
+</script>
+
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <title>Transformations In Server-side Google Tag Manager | Simo Ahava's blog</title>
+    
+    <script>
+      window.dataLayer=window.dataLayer||[];window.dataLayer.push({pageType: 'article', environment:  null });
+    </script>
+    
+
+    
+    
+    <script src="https://www.simoahava.com/x-js/lazyload.iife.min.js"></script>
+
+    
+
+    
+    <script>
+      (function(S,i,m,o){
+        window[m]=window[m]||[];
+        window[m].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
+        var f=S.getElementsByTagName(i)[0],j=S.createElement(i),dl=m!='dataLayer'?'&l='+m:'';
+        j.async=true;
+        j.src='https://sgtm.simoahava.com/gtm.js?id='+o+dl;
+        f.parentNode.insertBefore(j,f);
+      })(document,'script','dataLayer','GTM-PZ7GMV9');
+    </script>
+    
+    <meta name="author" content="Simo Ahava">
+    <meta name="keywords" content="">
+
+    <link rel="icon" href="https://www.simoahava.com/images/favicon.ico">
+    
+    <link rel="amphtml" href="https://www.simoahava.com/amp/analytics/transformations-server-side-google-tag-manager/">
+    
+    <meta name="description" content="Transformations in server-side Google Tag Manager allow you to modify the event data object before it becomes available to tag. It&#39;s a governance and data enrichment tool, and this article explains how it works.">
+    <meta property="og:description" content="Transformations in server-side Google Tag Manager allow you to modify the event data object before it becomes available to tag. It&#39;s a governance and data enrichment tool, and this article explains how it works.">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="Transformations In Server-side Google Tag Manager">
+    <meta property="og:url" content="https://www.simoahava.com/analytics/transformations-server-side-google-tag-manager/">
+    <meta property="og:site_name" content="Simo Ahava&#39;s blog">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Transformations In Server-side Google Tag Manager">
+    <meta name="twitter:description" content="Transformations in server-side Google Tag Manager allow you to modify the event data object before it becomes available to tag. It&#39;s a governance and data enrichment tool, and this article explains how it works.">
+    
+      <meta name="twitter:creator" content="@SimoAhava">
+      
+    
+
+    
+    
+
+    
+	  <meta property="og:image" content="https://www.simoahava.com/images/2023/04/transformations-in-server-side-google-tag-manager.jpg">
+      <meta name="twitter:image" content="https://www.simoahava.com/images/2023/04/transformations-in-server-side-google-tag-manager.jpg">
+    
+
+
+    
+
+      
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+      
+    
+    <link rel="stylesheet" href="https://www.simoahava.com/css/style.css" />
+    
+    
+
+    
+      
+    
+    
+  </head>
+
+  <body>
+    
+    <div id="_progress"></div>
+    
+    <div id="blog">
+      <header id="header" data-behavior="4">
+  <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+  <div class="header-title">
+    <a class="header-title-link" href="https://www.simoahava.com/">Simo Ahava&#39;s blog</a>
+  </div>
+  
+</header>
+
+      <nav id="sidebar" data-behavior="4">
+  <div class="sidebar-container">
+    
+      <div class="sidebar-profile">
+        <a href="https://www.simoahava.com/">
+          <img class="sidebar-profile-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+        </a>
+        <h4 class="sidebar-profile-name">Simo Ahava</h4>
+        
+          <h5 class="sidebar-profile-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</h5>
+        
+      </div>
+    
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+      
+      <span class="sidebar-button-desc">Home</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+      
+      <span class="sidebar-button-desc">Categories</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tags/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Tags</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/gtm-tips/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-magic"></i>
+      
+      <span class="sidebar-button-desc">GTM Tips</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/about-simo-ahava/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+      
+      <span class="sidebar-button-desc">About</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tools/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-wrench"></i>
+      
+      <span class="sidebar-button-desc">Tools</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/blog-statistics/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bar-chart"></i>
+      
+      <span class="sidebar-button-desc">Blog statistics</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://github.com/sahava" target="_blank" rel="noopener ">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-brands fa-github"></i>
+      
+      <span class="sidebar-button-desc">GitHub</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/upcoming-talks/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bullhorn"></i>
+      
+      <span class="sidebar-button-desc">Upcoming talks</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/custom-templates/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Templates</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/newsletter/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bell"></i>
+      
+      <span class="sidebar-button-desc">Newsletter</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://masto.measure.chat/@SimoAhava" target="_blank" rel="noopener me">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-brands fa-mastodon"></i>
+      
+      <span class="sidebar-button-desc">Mastodon</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+
+    </ul>
+  </div>
+</nav>
+
+      
+
+      <div id="main" data-behavior="4"
+        class="
+               hasCoverMetaIn
+               ">
+        <article class="post">
+	  <form id="search" action="https://www.simoahava.com/search/">
+  <input name="q" type="text" class="form-control input--xlarge" placeholder="Search blog..." autocomplete="off">
+  </form>
+
+          <div class="post-header main-content-wrap text-left">
+  
+    <div class="figure nocaption">
+      <img class="cover" src="https://www.simoahava.com/images/2023/04/transformations-in-server-side-google-tag-manager.jpg">
+    </div>
+  
+  
+
+    <h1>
+      Transformations In Server-side Google Tag Manager
+    </h1>
+  
+  
+  <div class="postShorten-meta post-meta">
+    
+      <time datetime="2023-06-07T07:10:00&#43;03:00">
+        
+  June 7, 2023
+
+      </time>
+      
+      
+  
+  
+    <span>in</span>
+    
+      <a class="category-link" href="https://www.simoahava.com/categories/analytics">Analytics</a>
+    
+  
+
+
+      | <a href="https://www.simoahava.com/analytics/transformations-server-side-google-tag-manager/#commento">Comments</a>
+      
+  </div>
+
+
+</div>
+
+          <div class="post-content markdown">
+            <div class="main-content-wrap">
+	      
+                
+  	        <p>In January 2020, when <a href="https://developers.google.com/tag-platform/tag-manager/server-side">Google Tag Manager&rsquo;s server-side tagging</a> was first introduced to the general public at <a href="https://www.superweek.hu">SuperWeek</a>, I wrote a <a href="https://twitter.com/SimoAhava/status/1222459714614841346">flurry of tweets</a>, sharing my vision of a server-side tagging future.</p>
+<p>In one of the tweets, I discussed how you could do these:</p>
+<ul>
+<li>Hit validation and fixing before the hit is sent to the endpoint</li>
+<li>PII and privacy controls for the requests before dispatch</li>
+</ul>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2023/04/simo-twitter.jpg" title="Tweet about server-side tagging">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2023/04/simo-twitter.jpg#ZgotmplZ" alt="Tweet about server-side tagging" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1084 538'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Fast forward to today, over three years later, and we are <em>finally</em> treated to a feature that grants us scalable controls to properly interrupt data flows within server-side GTM.</p>
+<p>I&rsquo;m talking about <strong>TRANSFORMATIONS</strong>.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2023/04/transformations.jpg" title="Transformations">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2023/04/transformations.jpg#ZgotmplZ" alt="Transformations" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2356 724'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>It&rsquo;s a new feature and <strong>resource</strong> type in server-side tagging, which you can access through the new entry in the container resource navigator.</p>
+<p>Transformations sit firmly between the <strong>client</strong> and <strong>tags</strong>, allowing you to <strong>include</strong> and <strong>exclude</strong> parameters from the <a href="https://www.simoahava.com/analytics/server-side-tagging-google-tag-manager/#event-model">event data object</a> before tags can access it.</p>
+<p>You can also use it to <strong>augment</strong> existing parameters. This is useful if you want to enrich the event data object with an appropriately designed <a href="https://www.simoahava.com/analytics/enrich-server-side-data-with-cloud-firestore/">Firestore pipeline</a>, or something similar.</p>
+<div id="toc-container"><h1 id="table-of-contents">Table of Contents</h1> <input type="checkbox" id="show"><label for="show" id="showbtn"><h1 id="table-of-contents-mobile">Table of Contents</h1><span class="show">&nbsp;[+show]</span><span class="hide">&nbsp;[–hide]</span></label><nav id="TableOfContents">
+  <ul>
+    <li><a href="#transformations-in-a-nutshell">Transformations in a nutshell</a></li>
+    <li><a href="#create-a-new-transformation">Create a new transformation</a></li>
+    <li><a href="#transformation-types">Transformation types</a>
+      <ul>
+        <li><a href="#allow-parameters">Allow parameters</a></li>
+        <li><a href="#exclude-parameters">Exclude parameters</a></li>
+        <li><a href="#augment-event">Augment event</a></li>
+      </ul>
+    </li>
+    <li><a href="#transformation-priority">Transformation priority</a></li>
+    <li><a href="#matching-conditions">Matching conditions</a></li>
+    <li><a href="#affected-tags">Affected tags</a></li>
+    <li><a href="#debug-transformations">Debug transformations</a></li>
+    <li><a href="#use-cases">Use cases</a>
+      <ul>
+        <li><a href="#use-case-1-flag-custom-events-as-conversions-for-ga4">Use case #1: Flag custom events as conversions for GA4</a></li>
+        <li><a href="#use-case-2-enrich-ecommerce-data">Use case #2: Enrich ecommerce data</a></li>
+        <li><a href="#use-case-3-hash-sensitive-urls">Use case #3: Hash sensitive URLs</a></li>
+        <li><a href="#use-case-4-populate-identifiers-from-firestore-storage">Use case #4: Populate identifiers from Firestore storage</a></li>
+        <li><a href="#use-case-5-clear-unwanted-parameters-from-ga4s-event-data-object">Use case #5: Clear unwanted parameters from GA4&rsquo;s event data object</a></li>
+        <li><a href="#use-case-6-force-ga4-hits-to-show-up-in-debugview">Use case #6: Force GA4 hits to show up in DebugView</a></li>
+        <li><a href="#use-case-7-augment-event-with-first-party-user-data">Use case #7: Augment event with first-party user data</a></li>
+      </ul>
+    </li>
+    <li><a href="#summary">Summary</a></li>
+  </ul>
+</nav></div>
+<p>Read on for more information about how transformations work and how to use them.</p>
+
+                <span class="simmer">
+  <span class="close">X</span>
+  <p>
+    <span class="fa fa-md fa-bell"></span>
+    <strong>The Simmer Newsletter</strong>
+  </p>
+  <p>
+    Subscribe to the <a href="https://www.simoahava.com/newsletter/">Simmer newsletter</a> to get the latest news and content from Simo Ahava into your email inbox!
+  </p>
+  </span>
+
+                
+                  <h2 id="transformations-in-a-nutshell">Transformations in a nutshell</h2>
+<p>To understand transformations, you first need to recall how <strong>clients</strong> and <strong>tags</strong> interact in a server-side tagging container.</p>
+<p>A <strong>client</strong> is a server-side tagging resource whose purpose is to digest an <strong>incoming HTTP request</strong> and ideally turn it into an <a href="https://www.simoahava.com/analytics/server-side-tagging-google-tag-manager/#event-model">event data object</a>.</p>
+<p>This event data object is then consumed by <strong>tags</strong> in order to perform their tasks, such as dispatching requests to third-party vendors. The event data object semantics are not standardized or enforced, but it is recommended that clients follow the <a href="https://developers.google.com/tag-platform/tag-manager/server-side/common-event-data">schema outlined by Google</a>.</p>
+<p>For example, a client could take a URL parameter like <code>&amp;cid=12345.12345</code> and turn it into an event data object key named <code>client_id</code> with the value <code>12345.12345</code>. Tags could then be coded or configured to take this <code>client_id</code> key from the event data object and populate their own outgoing requests with the value.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2023/05/sgtm-client.jpg" title="Server-side GTM client example">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2023/05/sgtm-client.jpg#ZgotmplZ" alt="Server-side GTM client example" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1920 1080'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>The best way to check what type of event data objects are generated by clients is to use <a href="https://developers.google.com/tag-platform/tag-manager/server-side/debug">Preview mode</a>. When you select an <em>event</em> in the left-hand navigation, the <strong>Event Data</strong> tab will show what the client produced.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2023/05/sgtm-preview.jpg" title="SGTM preview mode">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2023/05/sgtm-preview.jpg#ZgotmplZ" alt="SGTM preview mode" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4142 1670'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<blockquote>
+<p>Why don&rsquo;t you see events under all the requests? That&rsquo;s because there either wasn&rsquo;t a client to <strong>claim</strong> the request in question, or the client didn&rsquo;t produce an event object using a <a href="https://developers.google.com/tag-platform/tag-manager/server-side/api#runcontainer">specific template API</a>.</p>
+</blockquote>
+<p>The main problem with event data is that the client&rsquo;s operations are <strong>fixed</strong>. The event data object it produces is the same for <strong>all tags</strong> that are configured to make use of it. If you want a tag to ignore certain fields in the event data object, or if you want a set of tags to mutate some of the values into another format, the tag template itself needs to support this, <em>and not all tag templates do</em>.</p>
+<p>Furthermore, Google&rsquo;s own clients, which the majority of users will default to as the main controllers of the incoming data streams, are black boxes and there&rsquo;s not much you can do to control how they work.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2023/04/ga4-client.jpg" title="GA4 Client">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2023/04/ga4-client.jpg#ZgotmplZ" alt="GA4 Client" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1786 698'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>For long, we&rsquo;ve been waiting for a feature that would allow us to edit the event data object itself before tags get to consume it.</p>
+<p>This is where <strong>transformations</strong> enter the stage.</p>
+<p>With <strong>transformations</strong>, you can now create a rule that removes or modifies the values in the event data object before tags can access it.</p>
+<p>Instead of having to make tag-specific exceptions, you can now <strong>modify the event data object itself</strong>. After doing so, any tag that is set to consume this transformation will be privy only to the modified event data object rather than the original one.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2023/04/transformation-type.jpg" title="Transformationt ype">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2023/04/transformation-type.jpg#ZgotmplZ" alt="Transformationt ype" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1268 472'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<blockquote>
+<p>Importantly, transformations <strong>don&rsquo;t permanently edit</strong> the event data object. They create a transformed <em>clone</em> of the object to be digested by whatever tags and whatever conditions you specify in the transformation (more about these below). Tags that are not affected by a transformation will have access to the original, unmodified event data object.</p>
+</blockquote>
+
+                
+                  <h2 id="create-a-new-transformation">Create a new transformation</h2>
+<p>To create a new transformation, click the <strong>Transformations</strong> entry in the left-hand navigation of your server-side tagging container. You&rsquo;ll see a list of your existing transformations. If you click the button labeled <strong>NEW</strong>, you can create a new transformation.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2023/05/new-transformation.jpg" title="New transformation">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2023/05/new-transformation.jpg#ZgotmplZ" alt="New transformation" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2074 536'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>When you create a transformation, you&rsquo;ll first need to choose its type.</p>
+
+                
+                  <h2 id="transformation-types">Transformation types</h2>
+<p>Transformations come in <strong>three types</strong>:</p>
+<ul>
+<li><strong>Allow parameters</strong>, which lets you <em>allowlist</em> the parameters that should end up in the event data object. This is very powerful, as parameters that are not allowed will be excluded from the event data.</li>
+<li><strong>Exclude parameters</strong>, which lets you <em>denylist</em> the parameters that should <strong>not</strong> end up in the event data object. Parameters that are not excluded will be included in the event data.</li>
+<li><strong>Augment event</strong>, which lets you <strong>add</strong> or <strong>modify</strong> event data parameters. This is where you would do <strong>data enrichment</strong>, <strong>sensitive data purges</strong>, and similar.</li>
+</ul>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2023/05/transformation-type.jpg" title="Transformation types">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2023/05/transformation-type.jpg#ZgotmplZ" alt="Transformation types" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 832 488'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<h3 id="allow-parameters">Allow parameters</h3>
+<p>When you choose <strong>Allow parameters</strong> as the transformation type, you&rsquo;ll need to populate a table of rows, with each row corresponding to a parameter name in the event data object.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2023/05/allow-parameters.jpg" title="Allow parameters">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2023/05/allow-parameters.jpg#ZgotmplZ" alt="Allow parameters" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1776 884'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>When this transformation is evaluated, the keys in the event data object are compared against the parameters listed in this transformation. If there&rsquo;s a match, that key is kept in the event data object.</p>
+<p>If there&rsquo;s no match, then the key is dropped from the event data object for this transformation.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2023/05/allowed-parameters.jpg" title="Allowed parameters">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2023/05/allowed-parameters.jpg#ZgotmplZ" alt="Allowed parameters" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1518 1362'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>In the example above, the only allowed parameters are <code>client_id</code>, <code>event_name</code>, <code>ga_session_id</code>, and <code>custom_timestamp</code>. Other parameters are not included in this transformation.</p>
+<p>This is a very powerful transformation type, as it lets you proactively exclude all parameters that you are not aware of or that you haven&rsquo;t exclusively allowlisted for the tags that consume this transformation.</p>
+<blockquote>
+<p>It&rsquo;s also a risky transformation type because of this. Especially when working with third-party vendors, you might not know exactly which parameters the vendor needs due to poor documentation or lazy template design. The <strong>Allow parameters</strong> transformation is most potent when you&rsquo;re working with a service for which you know exactly which parameters are required and which are optional.</p>
+</blockquote>
+<h3 id="exclude-parameters">Exclude parameters</h3>
+<p>Like <em>Allow parameters</em> above, parameter exclusion requires you to populate a table of rows, with each row corresponding to a parameter in the event data object.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2023/05/exclude-parameters.jpg" title="Exclude parameters">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2023/05/exclude-parameters.jpg#ZgotmplZ" alt="Exclude parameters" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1772 702'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>However, this time when comparing keys in the event data object against this list, any key that matches between the two is <strong>dropped</strong> from the event data object. Keys that are <em>not</em> matched are kept.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2023/05/excluded-parameters.jpg" title="Excluded parameters">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2023/05/excluded-parameters.jpg#ZgotmplZ" alt="Excluded parameters" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1820 1410'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>In this case, <code>client_hints</code> and <code>ip_override</code> have been excluded from the final event data object in this transformation. That&rsquo;s why they have empty values above whereas all the other parameter values are preserved.</p>
+<p>While the allowlist is more <strong>proactive</strong> and pre-emptive as a measure, the <strong>Exclude parameters</strong> transformation lets you remove parameters that you <em>know</em> to be problematic.</p>
+<h3 id="augment-event">Augment event</h3>
+<p>Event augmentation is what you&rsquo;d use for data enrichment and for cleaning up the contents of the event data object. Instead of removing or keeping parameters, the <strong>augment event</strong> transformation type lets you <strong>add</strong> new keys to the event data object <em>and/or</em> <strong>modify</strong> existing values.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2023/05/augment-event.jpg" title="Augment event with ecom data">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2023/05/augment-event.jpg#ZgotmplZ" alt="Augment event with ecom data" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1772 934'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>When you add parameter names and values into this transformation, any parameters that share the same name in the event data object get overwritten by the transformation&rsquo;s value for the given parameter. If there is no pre-existing parameter with that name, a new one is added to the event data object.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2023/05/parameters-from-firestore.jpg" title="Parameters from Firestore">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2023/05/parameters-from-firestore.jpg#ZgotmplZ" alt="Parameters from Firestore" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1824 1252'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<blockquote>
+<p>In the example above, with the exception of <code>currency</code>, all the ecommerce parameters are <a href="https://www.simoahava.com/analytics/enrich-server-side-data-with-cloud-firestore/#example-walkthrough">retrieved from Firestore</a>.</p>
+</blockquote>
+<p>The cool thing is that the <strong>values</strong> you set support the full range of server-side Google Tag Manager&rsquo;s variable capabilities, including things like <strong>asynchronous API calls</strong> and <strong>Firestore lookups</strong>.</p>
+<p>While event augmentation is very useful for <strong>removing sensitive information</strong> from the <code>page_location</code> field, for example, its biggest potential lies in <strong>enriching</strong> the information in the event data object so that a multitude of tags can make use of the modification.</p>
+
+                
+                  <h2 id="transformation-priority">Transformation priority</h2>
+<p>It&rsquo;s possible for multiple transformations to apply to a given event data key. For example, you might have a transformation in place that <strong>augments</strong> an event data key and also another transformation in place that <strong>excludes</strong> this key under certain conditions.</p>
+<p>In this case it might be sensible to set the exclusion at a higher priority, so that the key isn&rsquo;t unnecessarily augmented in cases where it&rsquo;s already been excluded.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2023/05/transformation-priority.jpg" title="Transformation priority">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2023/05/transformation-priority.jpg#ZgotmplZ" alt="Transformation priority" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1388 264'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>You can find the priority setting under the <strong>Advanced Settings</strong> of any transformation.</p>
+<p>If you don&rsquo;t specify a priority, then transformations are evaluated in this default priority order:</p>
+<p><strong>Allow parameters</strong> &gt; <strong>Augment event</strong> &gt; <strong>Exclude parameters</strong></p>
+
+                
+                  <h2 id="matching-conditions">Matching conditions</h2>
+<p><strong>Matching conditions</strong> allow you to enable the given transformation only when certain variable conditions are matched.</p>
+<p>For example, given the Ecommerce augmentation example from above, it makes sense to only enable this transformation when the <code>event_name</code> value is <code>purchase</code>, as that&rsquo;s the only event that would include the transaction ID required for fetching the data from Firestore (read more about this use case below).</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2023/05/matching-conditions.jpg" title="Matching conditions">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2023/05/matching-conditions.jpg#ZgotmplZ" alt="Matching conditions" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1856 1324'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>If GA4 is your main incoming data stream, you could even add a <strong>Client Name</strong> condition to the transformation to make sure that other types of incoming streams don&rsquo;t trigger the Firestore lookups.</p>
+
+
+
+<div class="figure " >
+  
+    <a href="https://www.simoahava.com/images/2023/05/matching-in-preview.jpg" title="Matching conditions in preview mode">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2023/05/matching-in-preview.jpg#ZgotmplZ" alt="Matching conditions in preview mode" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1378 460'%3E%3C/svg%3E">
+  
+    </a>
+  
+   
+    <span class="caption">Matching conditions in preview mode</span>
+  
+</div>
+
+
+<p>If any of these matching conditions does <em>not</em> match, then the transformation is not evaluated and event data is not modified.</p>
+
+                
+                  <h2 id="affected-tags">Affected tags</h2>
+<p>In addition to restricting transformations to work only under certain conditions, you can also apply them only to specific tags that you allowlist in the <strong>Affected tags</strong> settings.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2023/05/affected-tags.jpg" title="Affected tags">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2023/05/affected-tags.jpg#ZgotmplZ" alt="Affected tags" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1858 1432'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>In the example above, my <strong>Allow parameters</strong> transformation allowlists only a very restricted range of event data parameters for my custom analytics collector system.</p>
+<p>Other tags can make use of the entire event data object, but this particular Custom Analytics Collector tag is only privy to the limited set allowlisted in this transformation.</p>
+
+                
+                  <h2 id="debug-transformations">Debug transformations</h2>
+<p>In Preview mode, the main way to see transformations at work is to select an <strong>event</strong> in Preview mode, and then open a <strong>tag</strong> that should be affected by a transformation.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2023/05/preview-mode.jpg" title="Preview Mode">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2023/05/preview-mode.jpg#ZgotmplZ" alt="Preview Mode" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1328 758'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Here, under <strong>Modified event data</strong> you&rsquo;ll see what was available to the tag when it fired. If you check <strong>Show Original</strong>, you&rsquo;ll see a <em>diff</em> of what the original event data object looked like.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2023/05/show-original.jpg" title="Show original">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2023/05/show-original.jpg#ZgotmplZ" alt="Show original" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1800 1666'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>The transformations that affect this tag are also listed. By clicking them open, you can see what the transformation is supposed to do, and you can also see another diff of &ldquo;before&rdquo; and &ldquo;after&rdquo; states of the event data object after the transformation does its job.</p>
+<p>If there are multiple transformations affecting the current tag, then the &ldquo;before&rdquo; state might be impacted by prior (higher priority) transformations modifying it.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2023/05/transformation-details.jpg" title="Transformation details">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2023/05/transformation-details.jpg#ZgotmplZ" alt="Transformation details" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1774 1382'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>In the image above, this transformation only shows a few keys in the event data object, because there was a higher priority <strong>Allow parameters</strong> transformation before this one, stripping out all the keys that were not explicitly allowlisted.</p>
+
+                
+                  <h2 id="use-cases">Use cases</h2>
+<p>Here are some use cases for transformations.</p>
+<p>#1 <a href="#use-case-1-flag-custom-events-as-conversions-for-ga4">Flag custom events as conversions for GA4</a><br>
+#2 <a href="#use-case-2-enrich-ecommerce-data">Enrich ecommerce data</a><br>
+#3 <a href="#use-case-3-hash-ssensitive-urls">Hash sensitive URLs</a><br>
+#4 <a href="#use-case-4-populate-identifiers-from-firestore-storage">Populate identifiers from Firestore storage</a><br>
+#5 <a href="#use-case-5-clear-unwanted-parameters-from-ga4s-event-data-object">Clear unwanted parameters from GA4&rsquo;s event data object</a><br>
+#6 <a href="#use-case-6-force-ga4-hits-to-show-up-in-debugview">Force GA4 hits to show up in DebugView</a><br>
+#7 <a href="#use-case-7-augment-event-with-first-party-user-data">Augment event with first-party user data</a></p>
+<p>Naturally, all of these use cases have been doable before with server-side Google Tag Manager in one way or another. However, not all tags allow you to modify the information consumed from the event data object.</p>
+<p>Furthermore, the problem with modifying individual tags is that you might slip and miss a tag, which then becomes a liability in your tracking schema. By nipping the problem in the bud using a transformation, the event data object itself is modified making it impossible for a tag to access something that doesn&rsquo;t exist anymore.</p>
+<h3 id="use-case-1-flag-custom-events-as-conversions-for-ga4">Use case #1: Flag custom events as conversions for GA4</h3>
+<p>One of the &ldquo;quirks&rdquo; of Google Analytics 4 is that it determines <strong>conversions</strong> in two places: in the <a href="https://support.google.com/analytics/answer/12966437?sjid=7054793677152552224-EU">Google Analytics 4 Admin interface</a> <em>and</em> in the client-side implementation, where conversion events are flagged with a specific URL parameter (<code>_c=1</code>) that tells GA4 the incoming event is, indeed, a conversion.</p>
+<p>This second context can result in a bit of a headache if you&rsquo;re using a server-side container to duplicate events across different Measurement IDs.</p>
+<p>For example, let&rsquo;s say you have a Google Analytics 4 event stream collecting to Measurement ID <code>G-1234567</code>. In this stream, the event <code>click_to_call</code> has <strong>not</strong> been flagged as a conversion, so the event requests do not have the <code>_c=1</code> parameter.</p>
+<p>However, in server-side GTM you forward this event to <code>G-2345678</code> where <code>click_to_call</code> <em>has</em> been flagged as a conversion. But because the original request didn&rsquo;t have the <code>_c=1</code> parameter, this conversion is not registered correctly.</p>
+<p><strong>Augment event</strong> transformation to the rescue!</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2023/05/augment-conversion.jpg" title="Augment conversions">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2023/05/augment-conversion.jpg#ZgotmplZ" alt="Augment conversions" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1856 1284'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Above, I&rsquo;m setting the parameter <code>x-ga-system_properties.c</code> to the value <code>1</code>. By comparing the Event Data object with the incoming request parameters, I know that this corresponds with the URL parameter <code>_c=1</code>.</p>
+<p>Additionally, I use a Lookup Table that returns <code>true</code> for all the events that should have this parameter added to them:</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2023/05/lookup-events.jpg" title="Lookup table for conversion events">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2023/05/lookup-events.jpg#ZgotmplZ" alt="Lookup table for conversion events" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1798 826'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Finally, I&rsquo;ve defined the transformation to only apply to the <code>G-2345678</code> GA4 tag in the Server container.</p>
+<p>Now the outgoing request to <code>G-2345678</code> for any event flagged as a conversion with the Lookup Table will always include the <code>_c=1</code> parameter.</p>
+<h3 id="use-case-2-enrich-ecommerce-data">Use case #2: Enrich ecommerce data</h3>
+<p>One of my favorite data enrichment use cases is for <strong>ecommerce data</strong>.</p>
+<p>Just imagine a scenario where all you need to do client-side is collect a <code>purchase</code> event with a <code>transaction_id</code>. Then, in server-side GTM, you can use the <code>transaction_id</code> to pull in the rest of the ecommerce data from your sales engine (using HTTP API calls) or from Firestore, if it&rsquo;s something you&rsquo;ve already set up.</p>
+<p>You can now move this logic to an <strong>Augment event</strong> transformation so that all your conversion tags can make use of this enriched data automatically.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2023/05/parameters-from-firestore.jpg" title="Parameters from Firestore">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2023/05/parameters-from-firestore.jpg#ZgotmplZ" alt="Parameters from Firestore" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1824 1252'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<blockquote>
+<p>You could even replace the <code>value</code> collected from the client-side hit with the actual <strong>profit</strong>, and send that to your vendors. You&rsquo;d never want to expose your profit margins in the client, but in a server-side environment it&rsquo;s very doable indeed.</p>
+</blockquote>
+<p>The benefit of using this <strong>Augment event</strong> transformation is that the augmentation applies to the <strong>event data object</strong>, which means that tags that make use of it (for example the GA4 tag) won&rsquo;t require any modifications in the tags themselves. They&rsquo;ll just see the transformed event data object and work with the augmented values out of the box.</p>
+<h3 id="use-case-3-hash-sensitive-urls">Use case #3: Hash sensitive URLs</h3>
+<p>Sometimes the URL itself can contain information that you don&rsquo;t want to forward to a third-party vendor. However, the vendor might still need URL data for cohort building or something similar.</p>
+<p>With a properly setup <strong>Augment event</strong> transformation, you can now <strong>hash</strong> the <code>page_location</code> value whenever the URL has the potential of containing sensitive information.</p>
+<p>For example, in this case we want to use the <a href="https://tagmanager.google.com/gallery/#/owners/gtm-templates-simo-ahava/templates/sha256-hasher">sha256 Hasher</a> variable template to hash the <code>page_location</code> value, but <em>only</em> when the <code>page_category</code> event data key has the value <code>logged-in</code> and <em>only</em> for Facebook tags.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2023/05/augment-hash-for-facebook.jpg" title="Augment hash for facebook">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2023/05/augment-hash-for-facebook.jpg#ZgotmplZ" alt="Augment hash for facebook" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1862 1290'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>By doing this in a transformation, we can ensure that Facebook never gets the actual page URL for sensitive pages.</p>
+<h3 id="use-case-4-populate-identifiers-from-firestore-storage">Use case #4: Populate identifiers from Firestore storage</h3>
+<p>If you have the legal basis to do so, one thing you might have been using server-side tagging for is to collect and collate a user&rsquo;s <strong>identity graph</strong>.</p>
+<p>This can be as simple as a table stored in Firestore, where all the identifiers associated with a user are stored in a neat document entry.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2023/05/augment-cid-sid.jpg" title="Augment identity from Firestore">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2023/05/augment-cid-sid.jpg#ZgotmplZ" alt="Augment identity from Firestore" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1856 1118'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>For example, you could store the user&rsquo;s <strong>login ID</strong> as the primary key, and then under that you could add all their known client/device identifiers, session IDs, and whatever other identifiers the different marketing platforms like to collect.</p>
+<p>With an <strong>Augment event</strong> transformation, you can see what parameters are included in the event data object and then populate the rest after performing the lookup in Firestore. You&rsquo;ll be able to &ldquo;fill in the gaps&rdquo; of your tracking schema by overwriting new or ephemeral identifiers with something more sticky.</p>
+<p>But – please. Make sure you have a legal basis for processing all that personal data first!</p>
+<h3 id="use-case-5-clear-unwanted-parameters-from-ga4s-event-data-object">Use case #5: Clear unwanted parameters from GA4&rsquo;s event data object</h3>
+<p>The GA4 request seems to collect a <em>lot</em> of information that the GA4 client transpiles into the event data object. Not all of this information is documented!</p>
+<p>It might be useful to look at a handful of GA4 events in server-side tagging Preview Mode to see just what event data is generated. You can then create an <strong>Exclude parameters</strong> transformation to clear all the parameters that you&rsquo;re not comfortable with from the event data object.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2023/05/exclude-parameters.jpg" title="Exclude parameters">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2023/05/exclude-parameters.jpg#ZgotmplZ" alt="Exclude parameters" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1772 702'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Similarly, you might want to remove Facebook-specific parameters from GA4 tags and vice versa, if you&rsquo;re using a GA4 client to produce an event data object for both GA4 and Facebook. And this applies to other marketing vendors to whom you are collecting data by piggybacking on the GA4 stream.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2023/05/parameters-excluded.jpg" title="Exclude Facebook params">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2023/05/parameters-excluded.jpg#ZgotmplZ" alt="Exclude Facebook params" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1858 1266'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Use the &ldquo;Some tags&rdquo; setting here, as you can use it to specify the subset of tags that should consume any given transformation.</p>
+<h3 id="use-case-6-force-ga4-hits-to-show-up-in-debugview">Use case #6: Force GA4 hits to show up in DebugView</h3>
+<p>Augmenting event data can help you debug your Google Analytics 4 hits, too.</p>
+<p>For an event to surface in GA4&rsquo;s <a href="https://support.google.com/analytics/answer/7201382?hl=en">DebugView</a>, it needs to be sent with the special URL parameter <code>_dbg=1</code> to GA4&rsquo;s collection servers.</p>
+<p>The GA4 Client parses this parameter into an event data key accessible through <code>x-ga-system_properties.dbg</code>. With an <strong>Augment Event</strong> transformation, it&rsquo;s now easy to add it to any events that you want to explore through DebugView.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2023/05/augment-debug-mode.jpg" title="Augment debug mode">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2023/05/augment-debug-mode.jpg#ZgotmplZ" alt="Augment debug mode" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1856 1428'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>In this transformation, I&rsquo;m setting <code>x-ga-system_properties.dbg</code> to <code>1</code> but only when the server-side tagging container is in Preview mode. I&rsquo;m also limiting this to GA4 tags, because no other tags need to make use of this GA-specific feature.</p>
+<h3 id="use-case-7-augment-event-with-first-party-user-data">Use case #7: Augment event with first-party user data</h3>
+<p>While I think you should be <strong>very</strong> careful with using <a href="https://support.google.com/google-ads/answer/9888656">enhanced conversions</a>  due to obvious privacy issues with handing first-party data to Google on a silver platter, it doesn&rsquo;t stop me from exploring the technical fundamentals of how it works in server-side tagging.</p>
+<p>Instead of sourcing the first-party data client-side, you can <strong>augment it</strong> into your server-side hits by using a transformation that fetches it from a suitable data source.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2023/05/user-data.jpg" title="User data">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2023/05/user-data.jpg#ZgotmplZ" alt="User data" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1768 746'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>To populate the first-party data variables, you need to use the prefix <code>user_data</code>. Under that, you can set:</p>
+<ul>
+<li><code>user_data.email</code>: the user&rsquo;s email address.</li>
+<li><code>user_data.phone_number</code>: the user&rsquo;s phone number.</li>
+<li><code>user_data.address.0.first_name</code>: the user&rsquo;s first name.</li>
+</ul>
+<p>And you can keep adding to the <code>address</code> object in addition to the first name with stuff like <code>city</code>, <code>country</code>, <code>last_name</code>, <code>region</code>, and <code>postal_code</code>.</p>
+<p>You don&rsquo;t have to hash them yourself, as they will be hashed by the Google tags before the outgoing request is compiled.</p>
+<p>With a transformation like this, it&rsquo;s <strong>absolutely vital</strong> you only enable it for vendors that you trust using the <strong>Affected tags</strong> setting. Otherwise you might be looking at a severe data breach possibility.</p>
+
+                
+                  <h2 id="summary">Summary</h2>
+<p>I&rsquo;m very happy with this feature release. I think server-side Google Tag Manager is close to having a very satisfactory feature set to cater to an unbelievable number of marketing use cases.</p>
+<p>The benefit of <strong>transformations</strong> for data governance should be obvious:</p>
+<ol>
+<li>Google strongly recommends and incentivizes vendors to utilize the <strong>event data object</strong> when sourcing values for their tag templates.</li>
+<li>With transformations, you have <strong>full control</strong> over what the event data object ends up looking like, regardless of what the client originally produces.</li>
+<li>This control can be used for <strong>adding</strong>, <strong>removing</strong>, and <strong>updating</strong> values in the event data object.</li>
+</ol>
+<p>Naturally, tags don&rsquo;t <em>have</em> to use the event data object. As transformations obviously pose a risk to malicious tags that want to collect as much as they can without users having a proper say, these tags could now proceed to scrape the information from the request URL itself or from cookies or other HTTP headers.</p>
+<p>Hopefully there will be additional UI signals in server-side Google Tag Manager that help us clearly see what data each tag template is using.</p>
+<p>One of the problems with transformations is that you need to know both what the event data object can look like at different times <em>and</em> which parameters each tag makes use of.</p>
+<p>A solid way of figuring out what a tag template is actually trying to do is to observe its <a href="https://developers.google.com/tag-platform/tag-manager/server-side/permissions">permissions</a>. Good template design involves adding as few permissions as possible, so if a template clearly lists which event data keys it wants to access, you can build your transformations more efficiently.</p>
+
+
+
+<div class="figure nocaption" >
+  
+    <a href="https://www.simoahava.com/images/2023/05/tag-permission.jpg" title="tag permissions">
+  
+    <img class="fig-img lazy" data-src="https://www.simoahava.com/images/2023/05/tag-permission.jpg#ZgotmplZ" alt="tag permissions" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1528 410'%3E%3C/svg%3E">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Obviously templates can also be built with wildcard permissions access, in which case this sleuth work won&rsquo;t be as effective. I hope that Google figures out a way to incentivize limited permission sets over broader wildcard selections.</p>
+<p>A few features that I&rsquo;d still like to see in transformations include:</p>
+<ul>
+<li>Ability to select a tag <em>type</em> over individual tags when choosing <strong>Affected tags</strong>.</li>
+<li>Ability to populate the table of parameters with a single <em>variable</em>, so that you could iterate over all the keys in the event data object, for example, and return an array (for Allow / Exclude) or object (for Augment) of parameter names (and values) to which you want the transformation to apply.</li>
+</ul>
+<p>What do you think about transformations? Do you have additional use cases in mind for them?</p>
+
+                
+              
+              
+
+            </div>
+          </div>
+          <div id="post-footer" class="post-footer main-content-wrap">
+            
+              
+                
+                
+                  <div class="post-footer-tags">
+                    <span class="text-color-light text-small">TAGGED IN</span><br/>
+                    
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/google-tag-manager/">google tag manager</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/server-side-tagging/">server-side tagging</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/transformations/">transformations</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/enrichment/">enrichment</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/governance/">governance</a>
+
+                  </div>
+                
+              
+            
+            
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--disabled">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/dear-google-analytics-4/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/transformations-server-side-google-tag-manager/">
+              <i class="fa fa-brands fa-facebook"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Transformations%20In%20Server-side%20Google%20Tag%20Manager%20https://www.simoahava.com/analytics/transformations-server-side-google-tag-manager/%20via%20@SimoAhava">
+              <i class="fa fa-brands fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/transformations-server-side-google-tag-manager/">
+              <i class="fa fa-brands fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#commento_thread">
+            <i class="fa-regular fa-comments"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+            
+              <span id="commento_thread"></span>
+<div id="commento"></div>
+<script defer src="https://commento.simoahava.com/js/commento.js" data-no-livereload="true"></script>
+
+            
+          </div>
+        </article>
+        <footer id="footer" class="main-content-wrap">
+  <span class="copyrights">
+    &copy; 2023 Simo Ahava. All Rights Reserved
+  </span>
+</footer>
+
+      </div>
+      
+      <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+        
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--disabled">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/dear-google-analytics-4/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/transformations-server-side-google-tag-manager/">
+              <i class="fa fa-brands fa-facebook"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Transformations%20In%20Server-side%20Google%20Tag%20Manager%20https://www.simoahava.com/analytics/transformations-server-side-google-tag-manager/%20via%20@SimoAhava">
+              <i class="fa fa-brands fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/transformations-server-side-google-tag-manager/">
+              <i class="fa fa-brands fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#commento_thread">
+            <i class="fa-regular fa-comments"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+      </div>
+      
+      <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+  <i id="btn-close-shareoptions" class="fa fa-close"></i>
+  <ul class="share-options">
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/transformations-server-side-google-tag-manager/">
+          <i class="fa fa-brands fa-facebook"></i><span>Share on Facebook</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=Transformations%20In%20Server-side%20Google%20Tag%20Manager%20https://www.simoahava.com/analytics/transformations-server-side-google-tag-manager/%20via%20@SimoAhava">
+          <i class="fa fa-brands fa-twitter"></i><span>Share on Twitter</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/transformations-server-side-google-tag-manager/">
+          <i class="fa fa-brands fa-linkedin"></i><span>Share on LinkedIn</span>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+<div id="share-options-mask" class="share-options-mask"></div>
+
+    </div>
+    
+    <div id="about">
+  <div id="about-card">
+    <div id="about-btn-close">
+      <i class="fa fa-remove"></i>
+    </div>
+    
+      <img id="about-card-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+    
+    <h4 id="about-card-name">Simo Ahava</h4>
+    
+      <div id="about-card-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</div>
+    
+    
+      <div id="about-card-job">
+        <i class="fa fa-briefcase"></i>
+        <br/>
+        Senior Data Advocate at Reaktor
+      </div>
+    
+    
+      <div id="about-card-location">
+        <i class="fa fa-map-marker"></i>
+        <br/>
+        Finland
+      </div>
+    
+  </div>
+</div>
+
+    
+  
+    
+    <div id="cover" style="background-image:url('https://www.simoahava.com/images/maisema.jpg');"></div>
+  
+
+
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+
+
+
+
+<script src="https://www.simoahava.com/js/script.js"></script>
+
+
+
+
+<script src="https://commento.simoahava.com/js/count.js"></script>
+
+    <script>
+      !function(){var e=document.querySelector(".simmer"),t=document.querySelector(".simmer .close"),o=window.sessionStorage&&window.sessionStorage.getItem("nosimmer");if(e){if(o){e.style.display="none"}t.addEventListener("click",function(){window.sessionStorage.setItem("nosimmer","true"),e.style.display="none"})}}();
+    </script>
+    <script>
+      var mylazyload = new LazyLoad({elements_selector: '.lazy'});
+      </script>
+    <style>
+      .ads {
+	  width: 1px;
+      }
+      </style>
+         
+
+    
+  </body>
+</html>
+
