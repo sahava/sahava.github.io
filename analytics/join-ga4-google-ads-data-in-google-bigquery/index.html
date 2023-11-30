@@ -1,0 +1,2809 @@
+
+
+  
+    
+  
+
+
+  
+
+
+
+
+
+  
+
+
+  
+
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta name="google-site-verification" content="xQwWI2KUfP9LbFKhw2CVLFtrMY6Czrla7L3PD2aBolA" />
+
+
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org", 
+  "@type": "BlogPosting",
+  "headline": "Join Google Ads And GA4 Data In Google BigQuery | Simo Ahava's blog",
+  "image": "https:\/\/www.simoahava.com\/images\/2023\/11\/Article-mage-digital-analytics.jpg",
+  "editor": "Simo Ahava",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Simo Ahava's blog",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https:\/\/www.simoahava.com\/images\/simo.png",
+      "height": "393",
+      "width": "407"
+    }
+  },
+  "url": "https:\/\/www.simoahava.com\/analytics\/join-ga4-google-ads-data-in-google-bigquery\/",
+  "datePublished": "2023-11-30T07:00:00\u002b02:00",
+  "dateModified": "2023-11-30T07:00:00\u002b02:00",
+  "description": "In this article, you\u0027ll learn how to combine data from Google Analytics 4 and Google Ads using an automated data pipeline that feeds the results into a Google BigQuery data warehouse.",
+  "author": {
+    "@type": "Person",
+    "name": "Simo Ahava"
+  }
+}
+</script>
+
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <title>Join Google Ads And GA4 Data In Google BigQuery | Simo Ahava's blog</title>
+    
+    <script>
+      window.dataLayer=window.dataLayer||[];window.dataLayer.push({pageType: 'article', environment:  null });
+    </script>
+    
+
+    
+    
+    
+    <script>
+      (function(S,i,m,o){
+        window[m]=window[m]||[];
+        window[m].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
+        var f=S.getElementsByTagName(i)[0],j=S.createElement(i),dl=m!='dataLayer'?'&l='+m:'';
+        j.async=true;
+        j.src='https://sgtm.simoahava.com/gtm.js?id='+o+dl;
+        f.parentNode.insertBefore(j,f);
+      })(document,'script','dataLayer','GTM-PZ7GMV9');
+    </script>
+    
+    <meta name="author" content="Simo Ahava">
+    <meta name="keywords" content="">
+
+    <link rel="icon" href="https://www.simoahava.com/images/favicon.ico">
+    
+    <link rel="amphtml" href="https://www.simoahava.com/amp/analytics/join-ga4-google-ads-data-in-google-bigquery/">
+    
+    <meta name="description" content="In this article, you&#39;ll learn how to combine data from Google Analytics 4 and Google Ads using an automated data pipeline that feeds the results into a Google BigQuery data warehouse.">
+    <meta property="og:description" content="In this article, you&#39;ll learn how to combine data from Google Analytics 4 and Google Ads using an automated data pipeline that feeds the results into a Google BigQuery data warehouse.">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="Join Google Ads And GA4 Data In Google BigQuery">
+    <meta property="og:url" content="https://www.simoahava.com/analytics/join-ga4-google-ads-data-in-google-bigquery/">
+    <meta property="og:site_name" content="Simo Ahava&#39;s blog">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Join Google Ads And GA4 Data In Google BigQuery">
+    <meta name="twitter:description" content="In this article, you&#39;ll learn how to combine data from Google Analytics 4 and Google Ads using an automated data pipeline that feeds the results into a Google BigQuery data warehouse.">
+    
+      <meta name="twitter:creator" content="@SimoAhava">
+      
+    
+
+    
+    
+
+    
+	  <meta property="og:image" content="https://www.simoahava.com/images/2023/11/join-ga4-google-ads-data-in-google-bigquery.jpg">
+      <meta name="twitter:image" content="https://www.simoahava.com/images/2023/11/join-ga4-google-ads-data-in-google-bigquery.jpg">
+    
+
+
+    
+
+      
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+      
+    
+    <link rel="stylesheet" href="https://www.simoahava.com/css/style.css" />
+    
+    
+
+    
+      
+    
+    
+  </head>
+
+  <body>
+    
+    <div id="_progress"></div>
+    
+    <div id="blog">
+      <header id="header" data-behavior="4">
+  <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+  <div class="header-title">
+    <a class="header-title-link" href="https://www.simoahava.com/">Simo Ahava&#39;s blog</a>
+  </div>
+  
+</header>
+
+      <nav id="sidebar" data-behavior="4">
+  <div class="sidebar-container">
+    
+      <div class="sidebar-profile">
+        <a href="https://www.simoahava.com/">
+          <img class="sidebar-profile-picture" loading="lazy" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+        </a>
+        <h4 class="sidebar-profile-name">Simo Ahava</h4>
+        
+          <h5 class="sidebar-profile-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</h5>
+        
+      </div>
+    
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+      
+      <span class="sidebar-button-desc">Home</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+      
+      <span class="sidebar-button-desc">Categories</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tags/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Tags</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/gtm-tips/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-magic"></i>
+      
+      <span class="sidebar-button-desc">GTM Tips</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/about-simo-ahava/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+      
+      <span class="sidebar-button-desc">About</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/tools/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-wrench"></i>
+      
+      <span class="sidebar-button-desc">Tools</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/blog-statistics/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bar-chart"></i>
+      
+      <span class="sidebar-button-desc">Blog statistics</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://github.com/sahava" target="_blank" rel="noopener ">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-brands fa-github"></i>
+      
+      <span class="sidebar-button-desc">GitHub</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/upcoming-talks/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bullhorn"></i>
+      
+      <span class="sidebar-button-desc">Upcoming talks</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/custom-templates/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Templates</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://www.simoahava.com/newsletter/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bell"></i>
+      
+      <span class="sidebar-button-desc">Newsletter</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://masto.measure.chat/@SimoAhava" target="_blank" rel="noopener me">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-brands fa-mastodon"></i>
+      
+      <span class="sidebar-button-desc">Mastodon</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+
+    </ul>
+  </div>
+</nav>
+
+      
+
+      <div id="main" data-behavior="4"
+        class="
+               hasCoverMetaIn
+               ">
+        <article class="post">
+	  <form id="search" action="https://www.simoahava.com/search/">
+  <input name="q" type="text" class="form-control input--xlarge" placeholder="Search blog..." autocomplete="off">
+  </form>
+
+          <div class="post-header main-content-wrap text-left">
+  
+    <div class="figure nocaption">
+      <img class="cover" src="https://www.simoahava.com/images/2023/11/join-ga4-google-ads-data-in-google-bigquery.jpg" width="750" height="422" alt="Join Google Ads And GA4 Data In Google BigQuery">
+    </div>
+  
+  
+
+    <h1>
+      Join Google Ads And GA4 Data In Google BigQuery
+    </h1>
+  
+  
+  <div class="postShorten-meta post-meta">
+    
+      <time datetime="2023-11-30T07:00:00&#43;02:00">
+        
+  November 30, 2023
+
+      </time>
+      
+      
+  
+  
+    <span>in</span>
+    
+      <a class="category-link" href="https://www.simoahava.com/categories/analytics">Analytics</a>
+    
+  
+
+
+      | <a href="https://www.simoahava.com/analytics/join-ga4-google-ads-data-in-google-bigquery/#commento">Comments</a>
+      
+  </div>
+
+
+</div>
+
+          <div class="post-content markdown">
+            <div class="main-content-wrap">
+	      
+                
+  	        <p>I am fortunate to share another <strong>guest post</strong> by <a href="https://www.linkedin.com/in/arben-kqiku-301457117/">Arben Kqiku</a>, Digital Analyts at <a href="https://www.linkedin.com/company/assura-ch/">Assura</a>.</p>
+<p>Last time, Arben graced this blog with a <a href="https://www.simoahava.com/analytics/content-analysis-using-ga4-bigquery-r-google-sheets-data-studio/">comprehensive love letter to R</a> as an example of the power of this programming language.</p>
+<p>This time, he&rsquo;ll add even more fancy tools to the toolkit to help you build a <strong>data pipeline</strong> in the Google Cloud Platform to join your Google Ads and Google Analytics 4 data together.</p>
+<div id="toc-container"><h1 id="table-of-contents">Table of Contents</h1> <input type="checkbox" id="show"><label for="show" id="showbtn"><h1 id="table-of-contents-mobile">Table of Contents</h1><span class="show">&nbsp;[+show]</span><span class="hide">&nbsp;[–hide]</span></label><nav id="TableOfContents">
+  <ul>
+    <li><a href="#goal-of-this-article">Goal of this article</a></li>
+    <li><a href="#what-am-i-trying-to-solve">What am I trying to solve?</a></li>
+    <li><a href="#what-are-the-requirements-of-the-solution-well-build">What are the requirements of the solution we&rsquo;ll build?</a></li>
+    <li><a href="#the-awesome-things-youll-learn">The awesome things you&rsquo;ll learn</a></li>
+    <li><a href="#tools">Tools</a>
+      <ul>
+        <li><a href="#mageai-and-r">Mage.ai and R</a></li>
+        <li><a href="#google-cloud-platform-gcp-and-visual-studio-code">Google Cloud Platform (GCP) and Visual Studio Code</a></li>
+      </ul>
+    </li>
+    <li><a href="#walkthrough">Walkthrough</a>
+      <ul>
+        <li><a href="#configure-the-google-cloud-platform">Configure the Google Cloud Platform</a>
+          <ul>
+            <li><a href="#billing-and-costs">Billing and costs</a></li>
+            <li><a href="#create-a-google-cloud-project">Create a Google Cloud Project</a></li>
+          </ul>
+        </li>
+        <li><a href="#create-ssh-and-public-keys">Create SSH and public keys</a></li>
+        <li><a href="#create-a-vm-instance-and-connect-to-it-by-using-our-ssh-keys">Create a VM instance and connect to it by using our SSH keys</a></li>
+        <li><a href="#install-visual-studio-code-and-access-the-vm">Install Visual Studio Code and access the VM</a></li>
+        <li><a href="#install-mage">Install Mage</a></li>
+        <li><a href="#create-the-data-pipeline">Create the data pipeline</a>
+          <ul>
+            <li><a href="#load-data-from-the-ga4-api">Load data from the GA4 API</a></li>
+            <li><a href="#load-data-from-the-google-ads-api">Load data from the Google Ads API</a></li>
+            <li><a href="#join-ga4-and-google-ads-data">Join GA4 and Google Ads data</a></li>
+            <li><a href="#export-data-to-bigquery">Export data to BigQuery</a></li>
+          </ul>
+        </li>
+        <li><a href="#test-the-entire-pipeline">Test the entire pipeline</a></li>
+        <li><a href="#create-a-schedule">Create a schedule</a></li>
+      </ul>
+    </li>
+    <li><a href="#summary-by-simo">Summary (by Simo)</a></li>
+  </ul>
+</nav></div>
+
+                <span class="simmer">
+  <span class="close">X</span>
+  <p>
+    <span class="fa fa-md fa-bell"></span>
+    <strong>The Simmer Newsletter</strong>
+  </p>
+  <p>
+    Subscribe to the <a href="https://www.simoahava.com/newsletter/">Simmer newsletter</a> to get the latest news and content from Simo Ahava into your email inbox!
+  </p>
+  </span>
+
+                
+                  <h2 id="goal-of-this-article">Goal of this article</h2>
+<p>My goal for this article is twofold; first, I want to show my fellow R users that it is possible and fun to use R in a production environment! R is sometimes seen as a second-class citizen compared to Python, but in my experience, R has consistently proven effective in addressing all my data challenges at work.</p>
+<p>Second, I want to show my fellow digital analysts the power of complementing GTM and GA4 with additional tools.</p>
+
+
+
+<div style="aspect-ratio: 1288 / 775;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/Article-mage-digital-analytics.jpg" title="Architecture diagram of what we&#39;ll build">
+  
+    <img class="fig-img" height="775" width="1288" loading="lazy" src="https://www.simoahava.com/images/2023/11/Article-mage-digital-analytics.jpg#ZgotmplZ" alt="Architecture diagram of what we&#39;ll build">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Above you can see an architectural overview of what we&rsquo;ll build today.</p>
+
+                
+                  <h2 id="what-am-i-trying-to-solve">What am I trying to solve?</h2>
+<p>As a digital analyst, I often need to combine data from different sources and display it in a dashboard.</p>
+<p>For instance, clients run campaigns on platforms like <strong>Google Ads</strong> and <strong>Meta Ads</strong>, and they want to understand the impact of each channel or even individual campaigns.</p>
+<p>The challenge is that each channel tends to attribute conversions mostly to itself. This isn&rsquo;t intentional; it&rsquo;s just that each channel operates independently and can&rsquo;t see the contributions of others.</p>
+<p>To address this, we usually use conversion data from a third-party source, like <strong>Google Analytics</strong>, and combine it with other data such as impressions, clicks, and cost from the advertising channels. This helps us calculate the cost per conversion for each channel more accurately.</p>
+<p>I know <em>multi-touch attribution</em> isn&rsquo;t perfect because it often doesn&rsquo;t consider view-through conversions. However, it&rsquo;s the best method we have for day-to-day operations. While <strong>Marketing Mix Modeling</strong> is an option, it requires a lot of data over a long period. So, for practical purposes, multi-touch attribution remains our best tool. As the saying goes, <code>all models are wrong, but some models are useful</code>.</p>
+
+                
+                  <h2 id="what-are-the-requirements-of-the-solution-well-build">What are the requirements of the solution we&rsquo;ll build?</h2>
+<p>The pipeline we&rsquo;ll build today needs to address the following things:</p>
+<p><strong>Accessibility</strong>: Make sure we can easily get data from different sources, such as Google Ads, Meta Ads, and GA4.</p>
+<p><strong>Data integration</strong>: Combine data from different sources accurately.</p>
+<p><strong>Storage</strong>: Create a data warehouse in <strong>Google BigQuery</strong> for the joined data and make it accessible to data visualization tools.</p>
+<p><strong>Maintenance</strong>: Find a way to automate these steps without needing manual intervention. That way stakeholders will have access to almost real-time data.</p>
+
+                
+                  <h2 id="the-awesome-things-youll-learn">The awesome things you&rsquo;ll learn</h2>
+<ol>
+<li>How to create a Google Cloud project.</li>
+<li>How to set up a virtual machine.</li>
+<li>How to access your virtual machine remotely.</li>
+<li>How to install <a href="https://mage.ai">Mage.ai</a> on the virtual machine to handle the automation.</li>
+<li>How to retrieve data from the GA4 API in a production environment.</li>
+<li>How to retrieve data from the Google Ads API in a production environment.</li>
+<li>How to export data to Google BigQuery in a production environment.</li>
+<li>How to schedule a data pipeline that automatically updates every 5 minutes.</li>
+</ol>
+
+                
+                  <h2 id="tools">Tools</h2>
+<h3 id="mageai-and-r">Mage.ai and R</h3>
+<p>In my previous company, <a href="https://www.comtogether.com">comtogether</a>, <a href="https://www.linkedin.com/in/casper-crause/">Casper Crause</a> took care of our data engineering needs, and he often did so with Python.</p>
+<p>Recently, I needed to automate multiple data pipelines and I had no idea how to do that in R. I thought, well, might as well learn Python. But then, before giving up, I googled one last time <code>Data Engineering in R</code>, and that&rsquo;s when I stumbled on <a href="https://mage.ai">Mage.ai</a>!</p>
+<p>The screenshot below comes from Mage. Mage is a data engineering tool that allows you to build your <em>ETL</em> (extract, transform, and load) pipelines. What I love about Mage is that it is easy to use, you can visualize your data pipelines and it supports multiple programming languages: SQL, Python.. and R!</p>
+
+
+
+<div style="aspect-ratio: 1804 / 1156;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/mage-ai-example.jpg" title="mage-ai-example.jpg">
+  
+    <img class="fig-img" height="1156" width="1804" loading="lazy" src="https://www.simoahava.com/images/2023/11/mage-ai-example.jpg#ZgotmplZ" alt="mage-ai-example.jpg">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>I love R and I am so thankful that <a href="https://www.linkedin.com/in/dangtommy/">Tommy Dang</a> and his team included it in Mage.</p>
+<p>Many tools prefer Python since it is more widely adopted for data engineering tasks. Moreover, in a recent workshop on <a href="https://www.youtube.com/watch?v=C0fNc8ZOpSI&amp;t=1324s&amp;ab_channel=DataSlinger">Andreas Kretz&rsquo;s YouTube channel</a>, Tommy mentioned that they are going to include even more programming languages!</p>
+<p>In addition to building our pipeline, we&rsquo;ll use Mage to schedule it, as you can see in the example below.</p>
+
+
+
+<div style="aspect-ratio: 1151 / 233;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/mage-schedule.jpg" title="Mage scheduler">
+  
+    <img class="fig-img" height="233" width="1151" loading="lazy" src="https://www.simoahava.com/images/2023/11/mage-schedule.jpg#ZgotmplZ" alt="Mage scheduler">
+  
+    </a>
+  
+  
+</div>
+
+
+<h3 id="google-cloud-platform-gcp-and-visual-studio-code">Google Cloud Platform (GCP) and Visual Studio Code</h3>
+<p>You can run Mage on your local machine or in the cloud.</p>
+<p>Obviously, if you run it locally, your computer needs to be on all the time, which is not ideal. Therefore, we&rsquo;ll create a virtual machine (VM) on the <a href="https://cloud.google.com/">Google Cloud Platform</a> and run Mage from there.</p>
+<p>A virtual machine (VM) on GCP is like a computer in the cloud. It&rsquo;s not a physical machine you can touch; instead, it&rsquo;s a powerful, remote computer that you can use to run your software and store your data.</p>
+<p>To access the virtual machine from our computer, we&rsquo;ll use <a href="https://code.visualstudio.com/download">Visual Studio Code</a>, which is a lovely, <strong>free</strong> code editor that supports many programming languages.</p>
+
+                
+                  <h2 id="walkthrough">Walkthrough</h2>
+<h3 id="configure-the-google-cloud-platform">Configure the Google Cloud Platform</h3>
+<h4 id="billing-and-costs">Billing and costs</h4>
+<p>To use GCP, you need a payment method. But worry not, as of today, If you have never used GCP, you get a credit of $300. So, go to the Google Cloud Console and create an account: <a href="https://console.cloud.google.com/welcome">https://console.cloud.google.com/welcome</a>.</p>
+
+
+
+<div style="aspect-ratio: 908 / 530;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/google-cloud-credits.jpg" title="Google Cloud Credits">
+  
+    <img class="fig-img" height="530" width="908" loading="lazy" src="https://www.simoahava.com/images/2023/11/google-cloud-credits.jpg#ZgotmplZ" alt="Google Cloud Credits">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Once you have used your free credits, you need to add a credit card to your account, by going under &ldquo;BILLING&rdquo;:</p>
+
+
+
+<div style="aspect-ratio: 1396 / 1004;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/google-cloud-billing.jpg" title="Google Cloud billing">
+  
+    <img class="fig-img" height="1004" width="1396" loading="lazy" src="https://www.simoahava.com/images/2023/11/google-cloud-billing.jpg#ZgotmplZ" alt="Google Cloud billing">
+  
+    </a>
+  
+  
+</div>
+
+
+<h4 id="create-a-google-cloud-project">Create a Google Cloud Project</h4>
+<p>In order to use GCP, we need a project. Later, everything that we&rsquo;ll do will be within this project. So, go back to <a href="https://console.cloud.google.com/welcome">https://console.cloud.google.com/welcome</a> and create a new project by first clicking on the project selector in the top left.</p>
+
+
+
+<div style="aspect-ratio: 1070 / 238;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/project-selector.jpg" title="Project selector">
+  
+    <img class="fig-img" height="238" width="1070" loading="lazy" src="https://www.simoahava.com/images/2023/11/project-selector.jpg#ZgotmplZ" alt="Project selector">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Then, click on &ldquo;NEW PROJECT&rdquo;.</p>
+
+
+
+<div style="aspect-ratio: 748 / 152;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/new-project.jpg" title="New project">
+  
+    <img class="fig-img" height="152" width="748" loading="lazy" src="https://www.simoahava.com/images/2023/11/new-project.jpg#ZgotmplZ" alt="New project">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Next, name your project. I called my project <code>mage-ai-test</code>.</p>
+
+
+
+<div style="aspect-ratio: 1118 / 840;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/new-cloud-project.jpg" title="New cloud project">
+  
+    <img class="fig-img" height="840" width="1118" loading="lazy" src="https://www.simoahava.com/images/2023/11/new-cloud-project.jpg#ZgotmplZ" alt="New cloud project">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Then simply wait until your project is created. Once you have selected your project, type &ldquo;vm instances&rdquo; in the search bar, and select &ldquo;VM instances&rdquo;.</p>
+
+
+
+<div style="aspect-ratio: 721 / 196;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/vm-instances.jpg" title="VM instances">
+  
+    <img class="fig-img" height="196" width="721" loading="lazy" src="https://www.simoahava.com/images/2023/11/vm-instances.jpg#ZgotmplZ" alt="VM instances">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>This will lead to the following screen:</p>
+
+
+
+<div style="aspect-ratio: 1208 / 826;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/compute-engine-api.jpg" title="Compute engine API">
+  
+    <img class="fig-img" height="826" width="1208" loading="lazy" src="https://www.simoahava.com/images/2023/11/compute-engine-api.jpg#ZgotmplZ" alt="Compute engine API">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>On GCP, to use specific features, you must activate the corresponding APIs. For example, we&rsquo;ll enable the Google Analytics API later to get data from GA4. To make a virtual machine, we need to enable the Compute Engine API. Afterward, you&rsquo;ll see this screen, but we won&rsquo;t create a VM instance just yet…</p>
+
+
+
+<div style="aspect-ratio: 1310 / 664;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/create-vm-instance.jpg" title="Create VM instances">
+  
+    <img class="fig-img" height="664" width="1310" loading="lazy" src="https://www.simoahava.com/images/2023/11/create-vm-instance.jpg#ZgotmplZ" alt="Create VM instances">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>First, we need to create <strong>SSH keys</strong> that will allow us to access our virtual machine from our computer.</p>
+<p>SSH keys are like special keys that help your computer talk securely to another computer, such as a virtual machine.</p>
+<p>It&rsquo;s a way for your computer to prove it&rsquo;s really you when connecting to the virtual machine. It&rsquo;s like having a secret handshake between your computer and the virtual machine, making sure they can trust each other without needing to type in a password every time.</p>
+<h3 id="create-ssh-and-public-keys">Create SSH and public keys</h3>
+<p>We need to create two SSH keys, a private and a public key. Think of SSH keys like a pair of magic keys for your online accounts. You have one key that you keep secret (the private key) and another key that you share with others (the public key).</p>
+<ol>
+<li><strong>Private Key (Secret Key):</strong> This is like the key to your front door that only you have. You keep it safe on your computer, and it&rsquo;s a secret. It&rsquo;s used to unlock and access your accounts securely.</li>
+<li><strong>Public Key (Shared Key):</strong> This is like a lock that matches your private key.</li>
+</ol>
+<p>When you connect to a server or service, you use your private key to prove you are who you say you are. The server then checks this with your public key to make sure it&rsquo;s really you. This way, even if someone gets your public key, they can&rsquo;t do anything without the private key, which stays safe on your computer. It&rsquo;s a bit like having a special lock and key where only your key can open it.</p>
+<p>To create your keys, hop to the terminal in your local machine and type the following code:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">ssh-keygen -t rsa -f ~/.ssh/mage-ai-test -C arbenkqiku</code></pre></div>
+<p>The end of the code should be your username, in my case <code>arbenkqiku</code>. If you don&rsquo;t know your user name, type <code>whoami</code> in the terminal and press enter. This will output your username.</p>
+<p>Once you enter the code mentioned above, you&rsquo;ll be prompted to insert your computer&rsquo;s password, if you have any. Once you add your password, your SSH keys will be created.</p>
+
+
+
+<div style="aspect-ratio: 1036 / 536;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/create-ssh-key.jpg" title="Create SSH key">
+  
+    <img class="fig-img" height="536" width="1036" loading="lazy" src="https://www.simoahava.com/images/2023/11/create-ssh-key.jpg#ZgotmplZ" alt="Create SSH key">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Now, go to the directory where your SSH keys can be found. <code>cd</code> stands for &ldquo;change directory&rdquo;:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#0aa">cd</span> ~/.ssh/</code></pre></div>
+<p>This is where your public private and public SSH keys are located.</p>
+<p>Now, type the following code to display the content of your public SSH key in the terminal.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">cat mage-ai-test.pub</code></pre></div>
+<p>This will show the content of your public SSH key that we will later paste into our VM.</p>
+
+
+
+<div style="aspect-ratio: 1132 / 260;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/public-key.jpg" title="Public key">
+  
+    <img class="fig-img" height="260" width="1132" loading="lazy" src="https://www.simoahava.com/images/2023/11/public-key.jpg#ZgotmplZ" alt="Public key">
+  
+    </a>
+  
+  
+</div>
+
+
+<h3 id="create-a-vm-instance-and-connect-to-it-by-using-our-ssh-keys">Create a VM instance and connect to it by using our SSH keys</h3>
+<p>Now, let&rsquo;s go back to Google Cloud Platform and click on &ldquo;CREATE INSTANCE&rdquo; in the VM instances overview.</p>
+
+
+
+<div style="aspect-ratio: 1310 / 664;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/create-new-vm-instance.jpg" title="Create new VM instance">
+  
+    <img class="fig-img" height="664" width="1310" loading="lazy" src="https://www.simoahava.com/images/2023/11/create-new-vm-instance.jpg#ZgotmplZ" alt="Create new VM instance">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Give a name to the VM instance and select the region closest to you:</p>
+
+
+
+<div style="aspect-ratio: 1414 / 392;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/name-and-region-of-vm-instance.jpg" title="Name and region for VM instance">
+  
+    <img class="fig-img" height="392" width="1414" loading="lazy" src="https://www.simoahava.com/images/2023/11/name-and-region-of-vm-instance.jpg#ZgotmplZ" alt="Name and region for VM instance">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Go to the &ldquo;Boot disk&rdquo; section and click on &ldquo;CHANGE&rdquo;:</p>
+
+
+
+<div style="aspect-ratio: 1398 / 478;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/change-boot-disk.jpg" title="Change boot disk">
+  
+    <img class="fig-img" height="478" width="1398" loading="lazy" src="https://www.simoahava.com/images/2023/11/change-boot-disk.jpg#ZgotmplZ" alt="Change boot disk">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Select the following options.</p>
+
+
+
+<div style="aspect-ratio: 1120 / 1088;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/advanced-boot-disk-options.jpg" title="Advanced boot disk options">
+  
+    <img class="fig-img" height="1088" width="1120" loading="lazy" src="https://www.simoahava.com/images/2023/11/advanced-boot-disk-options.jpg#ZgotmplZ" alt="Advanced boot disk options">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Under Firewall, select the following options:</p>
+
+
+
+<div style="aspect-ratio: 934 / 306;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/firewall-options.jpg" title="Firewall options">
+  
+    <img class="fig-img" height="306" width="934" loading="lazy" src="https://www.simoahava.com/images/2023/11/firewall-options.jpg#ZgotmplZ" alt="Firewall options">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>This is important, as otherwise we won&rsquo;t be able to access Mage by using the IP address of our VM, you&rsquo;ll understand later what I mean by this.</p>
+<p>Under Advanced Options &gt; Security, click on &ldquo;ADD ITEM&rdquo;. Here is where we&rsquo;ll add our <strong>public SSH key</strong>.</p>
+
+
+
+<div style="aspect-ratio: 1098 / 1032;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/add-public-key-to-vm.jpg" title="Add public key to VM">
+  
+    <img class="fig-img" height="1032" width="1098" loading="lazy" src="https://www.simoahava.com/images/2023/11/add-public-key-to-vm.jpg#ZgotmplZ" alt="Add public key to VM">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Copy the entire SSH public key and paste it.</p>
+
+
+
+<div style="aspect-ratio: 1052 / 418;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/paste-ssh-key.jpg" title="Paste SSH key">
+  
+    <img class="fig-img" height="418" width="1052" loading="lazy" src="https://www.simoahava.com/images/2023/11/paste-ssh-key.jpg#ZgotmplZ" alt="Paste SSH key">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Finally, click on &ldquo;CREATE&rdquo;. It may take some time to create the VM.</p>
+<p>Once done, your new VM will appear here. Also, you&rsquo;ll see that your VM will have an &ldquo;External IP&rdquo;.</p>
+
+
+
+<div style="aspect-ratio: 1089 / 257;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/vm-external-ip.jpg" title="VM with external IP">
+  
+    <img class="fig-img" height="257" width="1089" loading="lazy" src="https://www.simoahava.com/images/2023/11/vm-external-ip.jpg#ZgotmplZ" alt="VM with external IP">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>You can use this &ldquo;External IP&rdquo; and your SSH private key to connect to this VM. Let&rsquo;s do this!</p>
+<p>Go back to the terminal in your local machine and go to the directory where the SSH keys are located:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#0aa">cd</span> ~/.ssh/</code></pre></div>
+<p>Next, type this command:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">ssh -i mage-ai-test arbenkqiku@34.65.231.180</code></pre></div>
+<p>I&rsquo;ll break it down to you so you know what to replace:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">ssh -i name_of_private_key user_name@gcp_vm_instance_external_ip</code></pre></div>
+<p>You&rsquo;ll likely will be prompted to enter your password again, and also to add the &ldquo;External IP&rdquo; as a host. Just follow the instructions and you should be able to connect to your VM.</p>
+<p>As you can see from the image below, we connected to the VM named <code>mage-demo-test</code>. And if you recall, in &ldquo;Boot disk&rdquo; options, we selected Ubuntu as our operating system!</p>
+
+
+
+<div style="aspect-ratio: 944 / 764;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/ubuntu-vm-remote.jpg" title="Remote connection to VM">
+  
+    <img class="fig-img" height="764" width="944" loading="lazy" src="https://www.simoahava.com/images/2023/11/ubuntu-vm-remote.jpg#ZgotmplZ" alt="Remote connection to VM">
+  
+    </a>
+  
+  
+</div>
+
+
+<h3 id="install-visual-studio-code-and-access-the-vm">Install Visual Studio Code and access the VM</h3>
+<p>We could do this whole process through the terminal, but it is much more user-friendly to do it through Visual Studio Code. Visual Studio Code is a very powerful code editor. Go to this link: <a href="https://code.visualstudio.com/download,">https://code.visualstudio.com/download,</a> and download Visual Studio Code.</p>
+<p>Once you have installed it, go to &ldquo;Extensions&rdquo; and install &ldquo;Remote - SSH&rdquo;.</p>
+
+
+
+<div style="aspect-ratio: 1025 / 303;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/remote-ssh-code-extension.jpg" title="Remote SSH code extension">
+  
+    <img class="fig-img" height="303" width="1025" loading="lazy" src="https://www.simoahava.com/images/2023/11/remote-ssh-code-extension.jpg#ZgotmplZ" alt="Remote SSH code extension">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>In Visual Studio Code, go the the search bar and type <code>&gt;</code>, and then select the following option:</p>
+
+
+
+<div style="aspect-ratio: 1228 / 200;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/open-ssh-config.jpg" title="Open SSH configuration file">
+  
+    <img class="fig-img" height="200" width="1228" loading="lazy" src="https://www.simoahava.com/images/2023/11/open-ssh-config.jpg#ZgotmplZ" alt="Open SSH configuration file">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>In the configuration file that will open, you need to enter your details. Essentially, we&rsquo;re providing the details to connect to our VM.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">Host mage-demo-test <span style="color:#aaa;font-style:italic"># Give a name to your host</span>
+  HostName 34.65.231.180 <span style="color:#aaa;font-style:italic"># Replace with the External IP address in GCP</span>
+  User arbenkqiku <span style="color:#aaa;font-style:italic"># Replace this with your user name</span>
+  IdentityFile /Users/arbenkqiku/.ssh/mage-ai-test <span style="color:#aaa;font-style:italic"># Path to private SSH key</span></code></pre></div>
+<p>Now, we still have to go back to the terminal one last time and type this:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#0aa">eval</span> <span style="color:#00a">$(</span>ssh-agent<span style="color:#00a">)</span>
+ssh-add /Users/arbenkqiku/.ssh/mage-ai-test <span style="color:#aaa;font-style:italic"># Path to private SSH key</span></code></pre></div>
+<p>Then, type your password when prompted. This basically means that you can use your password when you try to access the VM through Visual Studio Code.</p>
+
+
+
+<div style="aspect-ratio: 1108 / 156;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/ssh-add-command.jpg" title="The ssh-add command">
+  
+    <img class="fig-img" height="156" width="1108" loading="lazy" src="https://www.simoahava.com/images/2023/11/ssh-add-command.jpg#ZgotmplZ" alt="The ssh-add command">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Now, go back to the search bar of Visual Studio Code, type <code>&gt;</code> and select the following option:</p>
+
+
+
+<div style="aspect-ratio: 1210 / 182;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/code-connect-to-ssh-host.jpg" title="Connect to SSH host">
+  
+    <img class="fig-img" height="182" width="1210" loading="lazy" src="https://www.simoahava.com/images/2023/11/code-connect-to-ssh-host.jpg#ZgotmplZ" alt="Connect to SSH host">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Among others, it should suggest the host that you just created, click on that host:</p>
+
+
+
+<div style="aspect-ratio: 1208 / 174;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/choose-ssh-host.jpg" title="Choose SSH host">
+  
+    <img class="fig-img" height="174" width="1208" loading="lazy" src="https://www.simoahava.com/images/2023/11/choose-ssh-host.jpg#ZgotmplZ" alt="Choose SSH host">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>A new window will open. In the search bar, type your password:</p>
+
+
+
+<div style="aspect-ratio: 1226 / 148;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/ssh-passphrase.jpg" title="Enter passphrase for SSH">
+  
+    <img class="fig-img" height="148" width="1226" loading="lazy" src="https://www.simoahava.com/images/2023/11/ssh-passphrase.jpg#ZgotmplZ" alt="Enter passphrase for SSH">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Now, click on the &ldquo;Remote Explorer&rdquo; icon, and it should show that you connected to your VM:</p>
+
+
+
+<div style="aspect-ratio: 894 / 966;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/remote-explorer-vm.jpg" title="Remote explorer with the VM">
+  
+    <img class="fig-img" height="966" width="894" loading="lazy" src="https://www.simoahava.com/images/2023/11/remote-explorer-vm.jpg#ZgotmplZ" alt="Remote explorer with the VM">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>On the top right, click this icon to display the terminal below:</p>
+
+
+
+<div style="aspect-ratio: 820 / 344;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/display-terminal-icon.jpg" title="Display terminal icon">
+  
+    <img class="fig-img" height="344" width="820" loading="lazy" src="https://www.simoahava.com/images/2023/11/display-terminal-icon.jpg#ZgotmplZ" alt="Display terminal icon">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Now click on &ldquo;TERMINAL&rdquo;. Congratulations, you have accessed your VM through Visual Studio Code!</p>
+
+
+
+<div style="aspect-ratio: 1010 / 508;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/access-terminal-success.jpg" title="access VM through code terminal">
+  
+    <img class="fig-img" height="508" width="1010" loading="lazy" src="https://www.simoahava.com/images/2023/11/access-terminal-success.jpg#ZgotmplZ" alt="access VM through code terminal">
+  
+    </a>
+  
+  
+</div>
+
+
+<h3 id="install-mage">Install Mage</h3>
+<p>To install mage on GCP, I largely followed <a href="https://www.youtube.com/watch?v=C0fNc8ZOpSI&amp;t=696s&amp;ab_channel=DataSlinger">this tutorial</a>, but I will also explain every step here. First of all, let&rsquo;s create a directory <strong>in our VM</strong> for mage:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">mkdir mage-demo</code></pre></div>
+<p>Now, if you type the following code, you should be able to see the newly created folder:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">ls</code></pre></div>
+<p>Then, let&rsquo;s access the folder:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#0aa">cd</span> mage-demo</code></pre></div>
+<p>Now, to install mage, we need to first install <strong>Docker</strong>.</p>
+<p>Docker is a platform for developing, shipping, and running applications. It uses containerization technology to package an application and its dependencies together into a single unit called a &ldquo;container&rdquo;.</p>
+<p>In the <code>mage-demo</code> folder, let&rsquo;s download a GitHub repo that contains the installation for Docker:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">git clone https://github.com/MichaelShoemaker/DockerComposeInstall.git</code></pre></div>
+<p>Let&rsquo;s access the folder that contains the Docker installation:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#0aa">cd</span> DockerComposeInstall</code></pre></div>
+<p>Let&rsquo;s modify the file to make it executable:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">chmod +x InstallDocker</code></pre></div>
+<p>Then, let&rsquo;s run it:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">./InstallDocker</code></pre></div>
+<p>Type this to verify that Docker has been installed correctly:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">docker run hello-world</code></pre></div>
+<p>This should show the following message:</p>
+
+
+
+<div style="aspect-ratio: 1184 / 278;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/hello-docker.jpg" title="Hello from Docker">
+  
+    <img class="fig-img" height="278" width="1184" loading="lazy" src="https://www.simoahava.com/images/2023/11/hello-docker.jpg#ZgotmplZ" alt="Hello from Docker">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Now, let&rsquo;s go back to the initial directory:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#0aa">cd</span> mage-demo</code></pre></div>
+<p>Now, we can finally install mage with this command:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">docker run -it -p 6789:6789 -v <span style="color:#00a">$(</span><span style="color:#0aa">pwd</span><span style="color:#00a">)</span>:/home/src --restart always mageai/mageai /app/run_app.sh mage start mage-ai-test</code></pre></div>
+<p>with the command <code>--restart always</code>, we&rsquo;re asking the VM to always restart mage whenever the VM is shut down and later restarted.</p>
+<p>At the end, <code>mage-ai-test</code> represents the name of our project.</p>
+<p>Now, to access mage through our External IP from GCP, we need to hop back on GCP first, as we need to create a <strong>firewall rule</strong>.</p>
+<p>This is necessary to control and regulate incoming and outgoing traffic to and from your VM on Google Cloud Platform. When you want to access mage through your External IP from GCP, a firewall rule is needed to explicitly allow the traffic to reach your VM.</p>
+<p>Browse to <a href="https://console.cloud.google.com/net-security/firewall-manager/firewall-policies/list">Firewall</a> in the Google Cloud Platform.</p>
+<p>Click on &ldquo;CREATE FIREWALL RULE&rdquo;:</p>
+
+
+
+<div style="aspect-ratio: 1066 / 316;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/create-firewall-rule.jpg" title="Create firewall rule">
+  
+    <img class="fig-img" height="316" width="1066" loading="lazy" src="https://www.simoahava.com/images/2023/11/create-firewall-rule.jpg#ZgotmplZ" alt="Create firewall rule">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Select the following options and click on &ldquo;CREATE&rdquo;:</p>
+
+
+
+<div style="aspect-ratio: 1112 / 962;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/firewall-options.jpg" title="Firewall options">
+  
+    <img class="fig-img" height="962" width="1112" loading="lazy" src="https://www.simoahava.com/images/2023/11/firewall-options.jpg#ZgotmplZ" alt="Firewall options">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Basically, with this firewall rule in place, it means we can access mage via the external IP address by using port number 6789.</p>
+<p>Now, if you type <strong>your VM external IP</strong> followed by <code>:6789</code> in your web browser you should be able to access mage.</p>
+<p>For example, this is the URL I would use with my configuration: <code>http://34.65.231.180:6789</code>.</p>
+
+
+
+<div style="aspect-ratio: 1084 / 666;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/mage-test.jpg" title="Test mage">
+  
+    <img class="fig-img" height="666" width="1084" loading="lazy" src="https://www.simoahava.com/images/2023/11/mage-test.jpg#ZgotmplZ" alt="Test mage">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>As you can see, <code>mage-ai-test</code> was the name of our project in a previous command.</p>
+<p>Congrats, now you can create data pipelines that will run in the cloud!</p>
+<h3 id="create-the-data-pipeline">Create the data pipeline</h3>
+<p>Now, we can finally create the pipeline. Here are the four parts that will compose our data pipeline:</p>
+<ul>
+<li>Retrieve data from GA4</li>
+<li>Retrieve data from Google Ads</li>
+<li>Join the data</li>
+<li>Export the data to BigQuery</li>
+</ul>
+<h4 id="load-data-from-the-ga4-api">Load data from the GA4 API</h4>
+<p>To start, click on <strong>New pipeline</strong> &gt; <strong>Standard (batch)</strong>:</p>
+
+
+
+<div style="aspect-ratio: 1614 / 718;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/new-batch-pipeline.jpg" title="New batch pipeline">
+  
+    <img class="fig-img" height="718" width="1614" loading="lazy" src="https://www.simoahava.com/images/2023/11/new-batch-pipeline.jpg#ZgotmplZ" alt="New batch pipeline">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>On the left side, you can see all your files, even the pipeline that we have just created.</p>
+
+
+
+<div style="aspect-ratio: 1303 / 756;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/files-in-pipeline.jpg" title="Files in pipeline">
+  
+    <img class="fig-img" height="756" width="1303" loading="lazy" src="https://www.simoahava.com/images/2023/11/files-in-pipeline.jpg#ZgotmplZ" alt="Files in pipeline">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>In the middle, you can see the blocks that you can use to build your pipelines. In this guide, we&rsquo;ll use <strong>Data loader</strong>, <strong>Transformer</strong>, and <strong>Data exporter</strong> blocks:</p>
+
+
+
+<div style="aspect-ratio: 1106 / 334;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/mage-blocks.jpg" title="Mage blocks">
+  
+    <img class="fig-img" height="334" width="1106" loading="lazy" src="https://www.simoahava.com/images/2023/11/mage-blocks.jpg#ZgotmplZ" alt="Mage blocks">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>As mentioned previously, you can use Python, SQL, and R in each block. In our case, we&rsquo;ll use <strong>R</strong>. So, click on <strong>Data Loader</strong> and select R:</p>
+
+
+
+<div style="aspect-ratio: 1094 / 428;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/use-r.jpg" title="Use R">
+  
+    <img class="fig-img" height="428" width="1094" loading="lazy" src="https://www.simoahava.com/images/2023/11/use-r.jpg#ZgotmplZ" alt="Use R">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Name the block <code>ga4</code>, then click <strong>Save and add block</strong>.</p>
+<p>You should now see the block on the right, together with a sample R code.</p>
+
+
+
+<div style="aspect-ratio: 1074 / 455;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/sample-r-code.jpg" title="Block with sample R">
+  
+    <img class="fig-img" height="455" width="1074" loading="lazy" src="https://www.simoahava.com/images/2023/11/sample-r-code.jpg#ZgotmplZ" alt="Block with sample R">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>To install and load packages, mage uses the <code>pacman</code> package. Once you load <code>pacman</code>, you can install packages by using:</p>
+<p><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">pacman::<span style="color:#0a0">p_load</span>(package1, package2, package3)</code></pre></div>
+​
+The first time you run the <code>p_load()</code> function, it will install a package, and then it will simply load it. For this block, we&rsquo;ll install three packages:</p>
+<p><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#0a0">library</span>(<span style="color:#a50">&#34;pacman&#34;</span>)
+pacman::<span style="color:#0a0">p_load</span>(dplyr, purrr, googleAnalyticsR)
+
+load_data &lt;- <span style="color:#0a0">function</span>() {
+
+}</code></pre></div>
+​
+In order to access GA4 data by using the <code>googleAnalyticsR</code> package, developed by <a href="https://code.markedmondson.me/">Mark Edmondson</a>, you need an access token.</p>
+<p>An access token is like your digital ID card; it confirms your identity and verifies that you truly have permission to access the GA4 properties you&rsquo;re attempting to retrieve data from.</p>
+<p>To get an access token, you can run the following function in the <strong>RStudio console</strong> in your local machine: <code>ga_auth()</code>.</p>
+<p>Once you run this function, you&rsquo;ll be redirected to a browser window where you&rsquo;ll select your account:</p>
+
+
+
+<div style="aspect-ratio: 938 / 606;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/select-google-account.jpg" title="select google account">
+  
+    <img class="fig-img" height="606" width="938" loading="lazy" src="https://www.simoahava.com/images/2023/11/select-google-account.jpg#ZgotmplZ" alt="select google account">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>With this, you are basically giving permission to the <code>googleAnalyticsR</code> package to access your GA4 properties.</p>
+<p>However, the problem is that we&rsquo;ll run our data pipeline in a production environment where you cannot interact with the browser.</p>
+<p>So, we need to find another way to solve this problem.</p>
+<p>In fact, if I try to run the function <code>ga_auth()</code> on Mage, it throws an error:</p>
+
+
+
+<div style="aspect-ratio: 1130 / 1096;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/ga-auth-error.jpg" title="GA auth error">
+  
+    <img class="fig-img" height="1096" width="1130" loading="lazy" src="https://www.simoahava.com/images/2023/11/ga-auth-error.jpg#ZgotmplZ" alt="GA auth error">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>So, we need to generate a Google Analytics token that we can use in a production environment.</p>
+<p>First, let&rsquo;s go back to GCP and browse to <a href="https://console.cloud.google.com/apis/dashboard">Enabled APIs &amp; services</a>.</p>
+<p>Click on &ldquo;ENABLE APIS AND SERVICES&rdquo;.</p>
+
+
+
+<div style="aspect-ratio: 1018 / 634;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/enable-apis-services.jpg" title="Enable APIs services">
+  
+    <img class="fig-img" height="634" width="1018" loading="lazy" src="https://www.simoahava.com/images/2023/11/enable-apis-services.jpg#ZgotmplZ" alt="Enable APIs services">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Search for <code>Google Analytics</code>, click the <strong>Google Analytics Reporting API</strong> result, and then choose <strong>ENABLE</strong>.</p>
+
+
+
+<div style="aspect-ratio: 1014 / 484;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/enable-ga-api.jpg" title="Enable GA API">
+  
+    <img class="fig-img" height="484" width="1014" loading="lazy" src="https://www.simoahava.com/images/2023/11/enable-ga-api.jpg#ZgotmplZ" alt="Enable GA API">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>This means that our project is now eligible to use the <strong>Google Analytics Reporting API</strong>.</p>
+<p>Next, repeat these API-enabling steps for the <strong>Google Analytics Data API</strong>.</p>
+<p>Once done, we have the APIs enabled but we still haven&rsquo;t created the required <strong>token</strong>.</p>
+<p>Browse to <a href="https://console.cloud.google.com/apis/credentials">Credentials</a> in the Google Cloud console.</p>
+<p>Hover over &ldquo;CREATE CREDENTIALS&rdquo; and click on <strong>Service account</strong>.</p>
+
+
+
+<div style="aspect-ratio: 1138 / 604;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/create-service-account.jpg" title="Create service account">
+  
+    <img class="fig-img" height="604" width="1138" loading="lazy" src="https://www.simoahava.com/images/2023/11/create-service-account.jpg#ZgotmplZ" alt="Create service account">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Give the service account a name and then click <strong>CREATE AND CONTINUE</strong>.</p>
+
+
+
+<div style="aspect-ratio: 1106 / 706;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/create-and-continue-service-account.jpg" title="Continue with service account">
+  
+    <img class="fig-img" height="706" width="1106" loading="lazy" src="https://www.simoahava.com/images/2023/11/create-and-continue-service-account.jpg#ZgotmplZ" alt="Continue with service account">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Give the service account the <strong>Editor</strong> role and then click on <strong>Continue</strong>.</p>
+
+
+
+<div style="aspect-ratio: 922 / 1018;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/set-editor-role.jpg" title="Set editor role">
+  
+    <img class="fig-img" height="1018" width="922" loading="lazy" src="https://www.simoahava.com/images/2023/11/set-editor-role.jpg#ZgotmplZ" alt="Set editor role">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Finally, click on <strong>DONE</strong>.</p>
+<p>Now that the service account has been created, go back to the Credentials view and you&rsquo;ll see the account that you just created. Click on it.</p>
+
+
+
+<div style="aspect-ratio: 1428 / 1152;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/click-service-account-edit.jpg" title="Click to edit service account">
+  
+    <img class="fig-img" height="1152" width="1428" loading="lazy" src="https://www.simoahava.com/images/2023/11/click-service-account-edit.jpg#ZgotmplZ" alt="Click to edit service account">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Then, click the <strong>KEYS</strong> tab and choose to <strong>Create new key</strong>.</p>
+
+
+
+<div style="aspect-ratio: 994 / 870;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/create-new-key.jpg" title="Create new key">
+  
+    <img class="fig-img" height="870" width="994" loading="lazy" src="https://www.simoahava.com/images/2023/11/create-new-key.jpg#ZgotmplZ" alt="Create new key">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Select <strong>JSON</strong> as the key type and click <strong>Create</strong>.</p>
+<p>This should download your key as a JSON file.</p>
+<p>Store it in a safe place. Basically, the service account is like an account that has permission to act on your behalf. When you want your application or service to communicate with the GA4 API, it needs to prove its identity. Instead of using a user&rsquo;s personal Google account, which may not be appropriate for server-to-server communication, you can use a service account.</p>
+<p>Now, as if it were a real user, we need to go to the GA4 property and add our service account email. So, go back to <a href="https://console.cloud.google.com/apis/credentials">Credentials</a> and copy your service account&rsquo;s <strong>email address</strong>:</p>
+
+
+
+<div style="aspect-ratio: 1016 / 312;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/copy-service-account-email.jpg" title="Copy service account email">
+  
+    <img class="fig-img" height="312" width="1016" loading="lazy" src="https://www.simoahava.com/images/2023/11/copy-service-account-email.jpg#ZgotmplZ" alt="Copy service account email">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Next, open Google Analytics 4, go to your property, and click on <strong>Property access management</strong> in Admin:</p>
+
+
+
+<div style="aspect-ratio: 892 / 702;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/property-access-management.jpg" title="Property access management">
+  
+    <img class="fig-img" height="702" width="892" loading="lazy" src="https://www.simoahava.com/images/2023/11/property-access-management.jpg#ZgotmplZ" alt="Property access management">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Add your service account email address to the list of users, give it <strong>Viewer</strong> permissions, and click on <strong>Add</strong> to add the service account as a user to the GA4 property.</p>
+<p>Now, before adding code to Mage, I like to test it on my local machine to make sure that everything works properly.</p>
+<p>So, on your local machine, open a new <strong>R script</strong> and try the following code:</p>
+<p><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#aaa;font-style:italic"># Packages ----</span>
+<span style="color:#0a0">library</span>(purrr)
+<span style="color:#0a0">library</span>(dplyr)
+<span style="color:#0a0">library</span>(googleAnalyticsR)
+
+<span style="color:#aaa;font-style:italic"># Authenticate ----  </span>
+
+<span style="color:#aaa;font-style:italic"># path to your JSON service account that we saved earlier</span>
+<span style="color:#0a0">ga_auth</span>(json_file = <span style="color:#a50">&#34;/Users/arbenkqiku/Desktop/mage-ai/mage-ai-test-405614-2e1e1c865c18.json&#34;</span>)  </code></pre></div>
+​
+If everything works correctly, you should see the following message:</p>
+
+
+
+<div style="aspect-ratio: 880 / 44;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/ga-auth-test-worked.jpg" title="GA auth test worked">
+  
+    <img class="fig-img" height="44" width="880" loading="lazy" src="https://www.simoahava.com/images/2023/11/ga-auth-test-worked.jpg#ZgotmplZ" alt="GA auth test worked">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>That means that your pipeline can now communicate with the GA4 Reporting API without any extra authentication flows.</p>
+<p>Now, what I want to retrieve from GA4 are the sessions where a lead generation conversion event happened.</p>
+<p>In the case of this client of mine, either someone submitted a form, clicked on the WhatsApp icon to talk to them privately, or clicked on the phone icon to call them.</p>
+<p>So, in the the next piece of code I want to create a filter with all the event names I am interested in, namely the event names equal to <code>form_submit_lead</code> or <code>whatsapp_click</code> or <code>phone_click</code>.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#aaa;font-style:italic"># GA4 property ID</span>
+property_id = <span style="color:#a50">&#34;1234567&#34;</span>
+
+<span style="color:#aaa;font-style:italic"># Create filter</span>
+goals_filter = <span style="color:#0a0">ga_data_filter</span>(<span style="color:#a50">&#34;eventName&#34;</span> == <span style="color:#a50">&#34;form_submit_lead&#34;</span> | <span style="color:#a50">&#34;eventName&#34;</span> == <span style="color:#a50">&#34;whatsapp_click&#34;</span> | <span style="color:#a50">&#34;eventName&#34;</span> == <span style="color:#a50">&#34;phone_click&#34;</span>)</code></pre></div>
+<p>In the next piece of code, we have the actual query to GA4:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#aaa;font-style:italic"># Get conversions from GA4</span>
+goals_data = <span style="color:#0a0">ga_data</span>(propertyId = property_id,         
+                     date_range = <span style="color:#0a0">c</span>(<span style="color:#a50">&#34;2023-10-01&#34;</span>, <span style="color:#a50">&#34;2023-11-08&#34;</span>),        
+                     dimensions = <span style="color:#0a0">c</span>(<span style="color:#a50">&#34;date&#34;</span>),        
+                     metrics = <span style="color:#0a0">c</span>(<span style="color:#a50">&#34;sessions&#34;</span>),        
+                     dim_filter = goals_filter) %&gt;%     
+
+<span style="color:#aaa;font-style:italic"># rename sessions to goals</span>
+<span style="color:#0a0">set_names</span>(<span style="color:#0a0">c</span>(<span style="color:#a50">&#34;date&#34;</span>, <span style="color:#a50">&#34;goals&#34;</span>))</code></pre></div>
+<p>Basically, we&rsquo;re getting the sessions from 1st October 2023 until 8th November 2023, segmented by date, and only when one of the events mentioned earlier occurred. This is what the final table looks like in my case:</p>
+
+
+
+<div style="aspect-ratio: 732 / 800;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/ga-table-results.jpg" title="GA table results">
+  
+    <img class="fig-img" height="800" width="732" loading="lazy" src="https://www.simoahava.com/images/2023/11/ga-table-results.jpg#ZgotmplZ" alt="GA table results">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>It is not always easy to know what certain fields are called in the GA4 API. You can go to <a href="https://ga-dev-tools.google/ga4/dimensions-metrics-explorer/">this website</a> and look for a specific field. For example, if we look for &ldquo;channel&rdquo;, you can see all the different fields that contain &ldquo;channel&rdquo; and what they are called in the GA4 API.</p>
+
+
+
+<div style="aspect-ratio: 883 / 765;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/ga-explorer-dims.jpg" title="GA explorer">
+  
+    <img class="fig-img" height="765" width="883" loading="lazy" src="https://www.simoahava.com/images/2023/11/ga-explorer-dims.jpg#ZgotmplZ" alt="GA explorer">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Now, in addition to retrieving the sessions where a conversion event occurred, I also want to retrieve the sessions segmented by day, so I&rsquo;ll use this query:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#aaa;font-style:italic"># Get sessions from GA4</span>
+sessions_data = <span style="color:#0a0">ga_data</span>(propertyId = property_id,                      
+                        date_range = <span style="color:#0a0">c</span>(<span style="color:#a50">&#34;2023-10-01&#34;</span>, <span style="color:#a50">&#34;2023-11-08&#34;</span>),        
+                        dimensions = <span style="color:#0a0">c</span>(<span style="color:#a50">&#34;date&#34;</span>),                     
+                        metrics = <span style="color:#0a0">c</span>(<span style="color:#a50">&#34;sessions&#34;</span>))</code></pre></div>
+<p>This returns a table of sessions segmented by date.</p>
+<p>Now, to join the sessions with the conversions:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#aaa;font-style:italic"># Merge GA4 goals and sessions</span>
+sessions_goals_ga4 = sessions_data %&gt;%   
+	<span style="color:#aaa;font-style:italic"># join sessions with goals  </span>
+<span style="color:#0a0">full_join</span>(goals_data) %&gt;%   
+	<span style="color:#aaa;font-style:italic"># replace all NAs with 0  </span>
+<span style="color:#0a0">replace</span>(<span style="color:#0a0">is.na</span>(.), <span style="color:#099">0</span>)</code></pre></div>
+<p>This is the final result:</p>
+
+
+
+<div style="aspect-ratio: 855 / 813;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/sessions-by-goals.jpg" title="Sessions by goals">
+  
+    <img class="fig-img" height="813" width="855" loading="lazy" src="https://www.simoahava.com/images/2023/11/sessions-by-goals.jpg#ZgotmplZ" alt="Sessions by goals">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Here is the <strong>complete code</strong>.</p>
+<p>At the end of the script, I added the <code>sessions_goals_ga4</code> dataframe. This is because in Mage, we&rsquo;re using this code within a <strong>Data Loader</strong> block. We need to return a dataframe for the next block, otherwise the next block doesn&rsquo;t have any data to play with.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#aaa;font-style:italic"># Packages ----</span>
+<span style="color:#0a0">library</span>(purrr)
+<span style="color:#0a0">library</span>(dplyr)
+<span style="color:#0a0">library</span>(googleAnalyticsR)
+
+<span style="color:#aaa;font-style:italic"># Authenticate ----  </span>
+	<span style="color:#aaa;font-style:italic"># path to your JSON service account that we save earlier</span>
+<span style="color:#0a0">ga_auth</span>(json_file = <span style="color:#a50">&#34;/Users/arbenkqiku/Desktop/mage-ai/mage-ai-test-405614-2e1e1c865c18.json&#34;</span>)  
+
+<span style="color:#aaa;font-style:italic"># GA4 property ID</span>
+property_id = <span style="color:#a50">&#34;1234567&#34;</span>
+
+<span style="color:#aaa;font-style:italic"># Create filter</span>
+goals_filter = <span style="color:#0a0">ga_data_filter</span>(<span style="color:#a50">&#34;eventName&#34;</span> == <span style="color:#a50">&#34;form_submit_lead&#34;</span> | <span style="color:#a50">&#34;eventName&#34;</span> == <span style="color:#a50">&#34;whatsapp_click&#34;</span> | <span style="color:#a50">&#34;eventName&#34;</span> == <span style="color:#a50">&#34;phone_click&#34;</span>)
+
+<span style="color:#aaa;font-style:italic"># Get conversions from GA4</span>
+goals_data = <span style="color:#0a0">ga_data</span>(propertyId = property_id,         
+                     date_range = <span style="color:#0a0">c</span>(<span style="color:#a50">&#34;2023-10-01&#34;</span>, <span style="color:#a50">&#34;2023-11-08&#34;</span>),        
+                     dimensions = <span style="color:#0a0">c</span>(<span style="color:#a50">&#34;date&#34;</span>),        
+                     metrics = <span style="color:#0a0">c</span>(<span style="color:#a50">&#34;sessions&#34;</span>),        
+                     dim_filter = goals_filter) %&gt;%     
+
+	<span style="color:#aaa;font-style:italic"># rename sessions to goals</span>
+<span style="color:#0a0">set_names</span>(<span style="color:#0a0">c</span>(<span style="color:#a50">&#34;date&#34;</span>, <span style="color:#a50">&#34;goals&#34;</span>))
+
+<span style="color:#aaa;font-style:italic"># Get sessions from GA4</span>
+sessions_data = <span style="color:#0a0">ga_data</span>(propertyId = property_id,                      
+                        date_range = <span style="color:#0a0">c</span>(<span style="color:#a50">&#34;2023-10-01&#34;</span>, <span style="color:#a50">&#34;2023-11-08&#34;</span>),        
+                        dimensions = <span style="color:#0a0">c</span>(<span style="color:#a50">&#34;date&#34;</span>),                     
+                        metrics = <span style="color:#0a0">c</span>(<span style="color:#a50">&#34;sessions&#34;</span>))
+
+<span style="color:#aaa;font-style:italic"># Merge GA4 goals and sessions</span>
+sessions_goals_ga4 = sessions_data %&gt;%   
+	<span style="color:#aaa;font-style:italic"># join sessions with goals  </span>
+<span style="color:#0a0">full_join</span>(goals_data) %&gt;%   
+	<span style="color:#aaa;font-style:italic"># replace all NAs with 0  </span>
+<span style="color:#0a0">replace</span>(<span style="color:#0a0">is.na</span>(.), <span style="color:#099">0</span>)
+
+<span style="color:#aaa;font-style:italic"># Final data frame for next block in mage.ai</span>
+sessions_goals_ga4</code></pre></div>
+<p>Now, before we copy this code to Mage, we need to make our <strong>JSON service account</strong> key accessible to Mage, as for now it is only available on our local machine.</p>
+<p>Remember, Mage is installed on our <strong>virtual machine</strong>. We need to paste the JSON service account key there.</p>
+<p>Open <strong>Visual Studio Code</strong> and click on &ldquo;Open&rdquo;.</p>
+
+
+
+<div style="aspect-ratio: 830 / 954;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/visual-studio-code-open.jpg" title="Visual studio code open">
+  
+    <img class="fig-img" height="954" width="830" loading="lazy" src="https://www.simoahava.com/images/2023/11/visual-studio-code-open.jpg#ZgotmplZ" alt="Visual studio code open">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Go to the path where your JSON service account key is located in your local machine. You should be able to see your service account key in the left panel.</p>
+
+
+
+<div style="aspect-ratio: 722 / 790;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/vs-code-json-path.jpg" title="VS code JSON path">
+  
+    <img class="fig-img" height="790" width="722" loading="lazy" src="https://www.simoahava.com/images/2023/11/vs-code-json-path.jpg#ZgotmplZ" alt="VS code JSON path">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Right-click and <strong>copy</strong> it.</p>
+<p>Next, go to the search bar, type <code>&gt;</code> and connect to your virtual machine.</p>
+
+
+
+<div style="aspect-ratio: 1300 / 310;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/connect-to-vm.jpg" title="Connect to VM">
+  
+    <img class="fig-img" height="310" width="1300" loading="lazy" src="https://www.simoahava.com/images/2023/11/connect-to-vm.jpg#ZgotmplZ" alt="Connect to VM">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Once you are in the VM, click on &ldquo;Open&hellip;&rdquo; and access the folder where Mage is installed. Click on &ldquo;OK&rdquo;.</p>
+
+
+
+<div style="aspect-ratio: 1686 / 736;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/open-file-folder.jpg" title="Open file or folder">
+  
+    <img class="fig-img" height="736" width="1686" loading="lazy" src="https://www.simoahava.com/images/2023/11/open-file-folder.jpg#ZgotmplZ" alt="Open file or folder">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>On the left side you should now see the files contained in that folder.</p>
+<p>Right-click in that area and choose <strong>Paste</strong> to paste your service account JSON file into the project.</p>
+<p>You should see your service account file now successfully added to the files in your VM.</p>
+
+
+
+<div style="aspect-ratio: 780 / 615;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/service-account-in-vm.jpg" title="service account in VM">
+  
+    <img class="fig-img" height="615" width="780" loading="lazy" src="https://www.simoahava.com/images/2023/11/service-account-in-vm.jpg#ZgotmplZ" alt="service account in VM">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>In Mage, you can use the function <code>list.files()</code> to see that the service account key is available.</p>
+
+
+
+<div style="aspect-ratio: 1158 / 1232;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/service-account-key-available.jpg" title="Service account key available">
+  
+    <img class="fig-img" height="1232" width="1158" loading="lazy" src="https://www.simoahava.com/images/2023/11/service-account-key-available.jpg#ZgotmplZ" alt="Service account key available">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Now, take the code that we previously played with in RStudio and paste it into Mage. You need to make some adjustments, though.</p>
+<p>The main change is that the bulk of the code is now within the <code>load_data()</code> function. The only code that&rsquo;s run outside that function are the library loads.</p>
+<p>Another thing that changes is the path to the service account key. This now needs to reference the path to the file in your VM. As it should be in the root of your project, you just need to add the filename.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#0a0">library</span>(<span style="color:#a50">&#34;pacman&#34;</span>)
+pacman::<span style="color:#0a0">p_load</span>(dplyr, purrr, googleAnalyticsR)
+
+load_data &lt;- <span style="color:#0a0">function</span>() {
+    <span style="color:#aaa;font-style:italic"># Specify your data loading logic here</span>
+    <span style="color:#aaa;font-style:italic"># Return value: loaded dataframe</span>
+
+    <span style="color:#aaa;font-style:italic"># Retrieve data ----</span>
+    <span style="color:#aaa;font-style:italic"># path to your JSON service account</span>
+    <span style="color:#0a0">ga_auth</span>(json_file = <span style="color:#a50">&#34;mage-ai-test-405614-2e1e1c865c18.json&#34;</span>)
+
+    <span style="color:#aaa;font-style:italic"># GA4 property ID</span>
+    property_id = <span style="color:#a50">&#34;1234567&#34;</span>
+
+    <span style="color:#aaa;font-style:italic"># Create filter</span>
+    goals_filter = <span style="color:#0a0">ga_data_filter</span>(<span style="color:#a50">&#34;eventName&#34;</span> == <span style="color:#a50">&#34;form_submit_lead&#34;</span> | <span style="color:#a50">&#34;eventName&#34;</span> == <span style="color:#a50">&#34;whatsapp_click&#34;</span> | <span style="color:#a50">&#34;eventName&#34;</span> == <span style="color:#a50">&#34;phone_click&#34;</span>)
+
+    <span style="color:#aaa;font-style:italic"># Get conversions from GA4</span>
+    goals_data = <span style="color:#0a0">ga_data</span>(propertyId = property_id, 
+                         date_range = <span style="color:#0a0">c</span>(<span style="color:#a50">&#34;2023-10-01&#34;</span>, <span style="color:#a50">&#34;2023-11-08&#34;</span>),
+                         dimensions = <span style="color:#0a0">c</span>(<span style="color:#a50">&#34;date&#34;</span>),
+                         metrics = <span style="color:#0a0">c</span>(<span style="color:#a50">&#34;sessions&#34;</span>),
+                         dim_filter = goals_filter,
+    ) %&gt;% 
+    
+    <span style="color:#0a0">set_names</span>(<span style="color:#0a0">c</span>(<span style="color:#a50">&#34;date&#34;</span>, <span style="color:#a50">&#34;goals&#34;</span>))
+
+    <span style="color:#aaa;font-style:italic"># Get sessions from GA4</span>
+    sessions_data = <span style="color:#0a0">ga_data</span>(propertyId = property_id, 
+                            date_range = <span style="color:#0a0">c</span>(<span style="color:#a50">&#34;2023-10-01&#34;</span>, <span style="color:#a50">&#34;2023-11-08&#34;</span>),
+                            dimensions = <span style="color:#0a0">c</span>(<span style="color:#a50">&#34;date&#34;</span>),
+                            metrics = <span style="color:#0a0">c</span>(<span style="color:#a50">&#34;sessions&#34;</span>))
+
+    <span style="color:#aaa;font-style:italic"># Merge GA4 goals and sessions</span>
+    sessions_goals_ga4 = sessions_data %&gt;% 
+    <span style="color:#aaa;font-style:italic"># join sessions with goals</span>
+    <span style="color:#0a0">full_join</span>(goals_data) %&gt;% 
+    <span style="color:#aaa;font-style:italic"># replace all NAs with 0</span>
+    <span style="color:#0a0">replace</span>(<span style="color:#0a0">is.na</span>(.), <span style="color:#099">0</span>)
+
+    <span style="color:#aaa;font-style:italic"># Final data frame</span>
+    sessions_goals_ga4
+}</code></pre></div>
+<p>If everything worked properly, Mage will provide a preview of the data retrieved:</p>
+
+
+
+<div style="aspect-ratio: 779 / 571;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/mage-preview.jpg" title="Mage preview">
+  
+    <img class="fig-img" height="571" width="779" loading="lazy" src="https://www.simoahava.com/images/2023/11/mage-preview.jpg#ZgotmplZ" alt="Mage preview">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>As you can see, our Data loader block has a green tick next to it, which means that it was able to run successfully.</p>
+
+
+
+<div style="aspect-ratio: 941 / 369;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/data-loader-worked.jpg" title="Data loader worked">
+  
+    <img class="fig-img" height="369" width="941" loading="lazy" src="https://www.simoahava.com/images/2023/11/data-loader-worked.jpg#ZgotmplZ" alt="Data loader worked">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Later, we can use this data that we retrieved from GA4 for whatever purpose we want. However, before playing around with it, let&rsquo;s download some data from Google Ads!</p>
+<h4 id="load-data-from-the-google-ads-api">Load data from the Google Ads API</h4>
+<p>To retrieve data from the Google Ads API, we&rsquo;ll use the R package <a href="https://selesnow.github.io/rgoogleads/"><code>rgoogleads</code></a>, developed by <a href="https://github.com/selesnow/rgoogleads#author">Alexey Seleznev</a>. Unfortunately, with this package it is not possible to use a service account key. Instead, we&rsquo;ll have to generate an access token by using the <a href="https://gargle.r-lib.org/"><code>gargle</code></a> package. The goal of <code>gargle</code>, as explained on their website, is to &ldquo;take some of the agonizing pain out of working with Google APIs&rdquo;.</p>
+<p>First of all, you need to browse to the <a href="https://console.cloud.google.com/marketplace/product/google/googleads.googleapis.com">Google Ads API</a> in Google Cloud Platform and click to <strong>Enable</strong> it.</p>
+<p>To access Google Ads data, we need to create the credentials for an application, because when we use the <code>rgoogleads</code> package to get data, Google sees it as an external app trying to access our ads info.</p>
+<p>So, when we attempt to fetch our Google Ads data, Google asks for our permission to let this app access our ads data. If we say yes, Google gives us an access token. This token then lets our computer talk to the Google Ads API without having to interact each time.</p>
+<p>Before doing anything, GCP will ask you to set up a &ldquo;consent screen&rdquo;. This screen is like a friendly message to users, letting them know that our app wants to look at their Google Ads data.</p>
+<p>It&rsquo;s a way to make sure users are aware and agree to let our app access their information. To get started, browse to the <a href="https://console.cloud.google.com/apis/credentials/consent">OAuth consent screen</a> section of your GCP project.</p>
+<p>Here, click on &ldquo;CONFIGURE CONSENT SCREEN&rdquo;.</p>
+
+
+
+<div style="aspect-ratio: 1366 / 209;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/configure-consent-screen.jpg" title="Configure consent screen">
+  
+    <img class="fig-img" height="209" width="1366" loading="lazy" src="https://www.simoahava.com/images/2023/11/configure-consent-screen.jpg#ZgotmplZ" alt="Configure consent screen">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Select <strong>External</strong> as the User Type and then click &ldquo;CREATE&rdquo;.</p>
+<p>Give your app a name and add your email address.</p>
+
+
+
+<div style="aspect-ratio: 1100 / 546;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/name-and-email-consent.jpg" title="Name and email for consent">
+  
+    <img class="fig-img" height="546" width="1100" loading="lazy" src="https://www.simoahava.com/images/2023/11/name-and-email-consent.jpg#ZgotmplZ" alt="Name and email for consent">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Add your email to the <strong>Developer email address</strong>, too, and then click &ldquo;SAVE AND CONTINUE&rdquo;.</p>
+<p>In the next screen, click on &ldquo;ADD OR REMOVE SCOPES&rdquo;. Scopes govern what your app is allowed to do with the APIs.</p>
+<p>Search for <code>google ads</code> and select the <strong>Google Ads API</strong>. Click UPDATE when done.</p>
+
+
+
+<div style="aspect-ratio: 1470 / 1190;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/add-google-ads-scope.jpg" title="Add google ads scope">
+  
+    <img class="fig-img" height="1190" width="1470" loading="lazy" src="https://www.simoahava.com/images/2023/11/add-google-ads-scope.jpg#ZgotmplZ" alt="Add google ads scope">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Then, click &ldquo;SAVE AND CONTINUE&rdquo; to proceed to the &ldquo;Test users&rdquo; step.</p>
+<p>Here, click &ldquo;ADD USERS&rdquo;. Add <strong>your email address</strong> and click &ldquo;ADD&rdquo;.</p>
+
+
+
+<div style="aspect-ratio: 1108 / 280;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/add-test-user.jpg" title="Add test user">
+  
+    <img class="fig-img" height="280" width="1108" loading="lazy" src="https://www.simoahava.com/images/2023/11/add-test-user.jpg#ZgotmplZ" alt="Add test user">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Make sure to include your email because our app is currently in the &ldquo;Testing&rdquo; phase. During this phase, only the emails that are added can be used by the app. So, adding your email is crucial to get your Google Ads data.</p>
+<p>Click on &ldquo;SAVE AND CONTINUE&rdquo; to proceed to the Summary step, and then &ldquo;BACK TO DASHBOARD&rdquo; when done with configuring the consent screen.</p>
+<p>Now that the consent screen has been configured, you can browse to <a href="https://console.cloud.google.com/apis/credentials">Credentials</a> again.</p>
+<p>Here, click on &ldquo;CREATE CREDENTIALS&rdquo; and this time choose <strong>OAuth client ID</strong>.</p>
+
+
+
+<div style="aspect-ratio: 1218 / 702;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/oauth-client-id.jpg" title="oauth client id">
+  
+    <img class="fig-img" height="702" width="1218" loading="lazy" src="https://www.simoahava.com/images/2023/11/oauth-client-id.jpg#ZgotmplZ" alt="oauth client id">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Under <strong>Application type</strong>, select <strong>Desktop app</strong>, give a name to your OAuth client ID, and click on &ldquo;CREATE&rdquo;:</p>
+
+
+
+<div style="aspect-ratio: 1090 / 818;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/create-oauth-id.jpg" title="Create the oauth id">
+  
+    <img class="fig-img" height="818" width="1090" loading="lazy" src="https://www.simoahava.com/images/2023/11/create-oauth-id.jpg#ZgotmplZ" alt="Create the oauth id">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Download your client ID as a JSON file and click on OK.</p>
+
+
+
+<div style="aspect-ratio: 1050 / 1132;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/download-oauth-json.jpg" title="Download JSON">
+  
+    <img class="fig-img" height="1132" width="1050" loading="lazy" src="https://www.simoahava.com/images/2023/11/download-oauth-json.jpg#ZgotmplZ" alt="Download JSON">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Save it in a secure location. Now, let&rsquo;s go back to <strong>RStudio</strong> on our local machine. Open a new script and load these packages:</p>
+<p><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#aaa;font-style:italic"># Packages</span>
+<span style="color:#0a0">library</span>(gargle)
+<span style="color:#0a0">library</span>(rgoogleads)</code></pre></div>​</p>
+<p>Then, we&rsquo;ll import the OAuth Client ID credentials that we just created by using the function <code>gargle_oauth_client_from_json()</code>. The name of your client can be whatever you prefer:</p>
+<p><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#aaa;font-style:italic"># Create gargle client</span>
+my_client = <span style="color:#0a0">gargle_oauth_client_from_json</span>(path = <span style="color:#a50">&#34;/Users/arbenkqiku/Desktop/mage-ai/mage-demo-client-id.json&#34;</span>,
+                                          name = <span style="color:#a50">&#34;Google Ads App&#34;</span>)</code></pre></div>​</p>
+<p>Then, we can add the following scope and email to our token request:</p>
+<p><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">scopes = <span style="color:#a50">&#34;https://www.googleapis.com/auth/adwords&#34;</span>
+email = <span style="color:#a50">&#34;arben.kqiku@gmail.com&#34;</span></code></pre></div>
+​
+Finally, we can go through the process of acquiring a token by running this function:</p>
+<p><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#aaa;font-style:italic"># Create a token by using Gargle</span>
+my_token = <span style="color:#0a0">gargle2.0_token</span>(email = email,  
+                           package = <span style="color:#a50">&#34;rgoogleads&#34;</span>,  
+                           scope = scopes,  
+                           client = my_client)</code></pre></div>​</p>
+<p>This will open a browser window.</p>
+<p>Do you recognize the name of the App? That&rsquo;s the name of our application! We&rsquo;re now going through the process of authorizing our app to access our Google Ads data. Now, select your email.</p>
+
+
+
+<div style="aspect-ratio: 926 / 638;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/authorize-app.jpg" title="Authorize app">
+  
+    <img class="fig-img" height="638" width="926" loading="lazy" src="https://www.simoahava.com/images/2023/11/authorize-app.jpg#ZgotmplZ" alt="Authorize app">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Google will tell you that this app isn&rsquo;t verified, as its status is still &ldquo;testing&rdquo;.</p>
+<p>However, it is our own app, so we can safely click on &ldquo;Continue&rdquo;.</p>
+<p>Authorize the app to &ldquo;See, edit, create and delete your Google Ads accounts and data&hellip;&rdquo; and click on &ldquo;Continue&rdquo;.</p>
+
+
+
+<div style="aspect-ratio: 838 / 1492;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/authorize-google-ads-access.jpg" title="Authorize google ads access">
+  
+    <img class="fig-img" height="1492" width="838" loading="lazy" src="https://www.simoahava.com/images/2023/11/authorize-google-ads-access.jpg#ZgotmplZ" alt="Authorize google ads access">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>If everything worked correctly, you should see a message saying that <code>Authentication complete. Please close this page and return to R</code>.</p>
+<p>Now, if we review the content of the variable <code>my_token</code>, which contains our access token, we can review the information again, for example the email associated with the token, the scopes, and so forth.</p>
+
+
+
+<div style="aspect-ratio: 1560 / 366;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/review-token.jpg" title="Review token">
+  
+    <img class="fig-img" height="366" width="1560" loading="lazy" src="https://www.simoahava.com/images/2023/11/review-token.jpg#ZgotmplZ" alt="Review token">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>We can now test if the token works properly by running the <code>gads_auth()</code> function. Nothing should really happen here, as with the token we can authenticate non-interactively.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#aaa;font-style:italic"># Authenticate by using the previously created token</span>
+<span style="color:#0a0">gads_auth</span>(token = my_token)</code></pre></div>
+<p>Let&rsquo;s run a simple function of the <code>rgoogleads</code> package to see if we can access our data:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#aaa;font-style:italic"># get list of accessible accounts</span>
+<span style="color:#0a0">gads_get_accessible_customers</span>()</code></pre></div>
+<p>Yes, I am able to retrieve the accounts that I have access to!</p>
+
+
+
+<div style="aspect-ratio: 861 / 597;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/ads-accounts-listed.jpg" title="Ads accounts listed">
+  
+    <img class="fig-img" height="597" width="861" loading="lazy" src="https://www.simoahava.com/images/2023/11/ads-accounts-listed.jpg#ZgotmplZ" alt="Ads accounts listed">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>However, we are not ready for production yet. In fact, if we type this code:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#aaa;font-style:italic"># where is the cache of the token located</span>
+my_token$cache_path</code></pre></div>
+<p>We&rsquo;ll get the result that the token is cached in a local directory, such as <code>~/Library/Caches/gargle</code>.</p>
+<p>This means that when we try to load <code>my_token</code> in production, it will look for the local path instead of a path on the VM.</p>
+<p>So, we need to change the cache path to our Mage directory on the VM. This is how you&rsquo;d do it:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#aaa;font-style:italic"># change path of cache to mage main directory</span>
+my_token$cache_path = <span style="color:#a50">&#34;/home/src&#34;</span>
+
+<span style="color:#aaa;font-style:italic"># save token again with changed directory</span>
+<span style="color:#0a0">saveRDS</span>(my_token, file = <span style="color:#a50">&#34;google_ads_token_mage_demo.RDS&#34;</span>)</code></pre></div>
+<p>Here is the full code to generate, test, and save the token:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#aaa;font-style:italic"># Packages</span>
+<span style="color:#0a0">library</span>(gargle)
+<span style="color:#0a0">library</span>(rgoogleads)
+
+<span style="color:#aaa;font-style:italic"># Create gargle client</span>
+my_client = <span style="color:#0a0">gargle_oauth_client_from_json</span>(path = <span style="color:#a50">&#34;/Users/arbenkqiku/Desktop/mage-ai/mage-demo-client-id.json&#34;</span>,
+                                          name = <span style="color:#a50">&#34;Google Ads App&#34;</span>)
+
+<span style="color:#aaa;font-style:italic"># Define scope and email</span>
+scopes = <span style="color:#a50">&#34;https://www.googleapis.com/auth/adwords&#34;</span>
+email = <span style="color:#a50">&#34;arben.kqiku@gmail.com&#34;</span>
+
+<span style="color:#aaa;font-style:italic"># Create a token by using Gargle</span>
+my_token = <span style="color:#0a0">gargle2.0_token</span>(email = email,  
+                           package = <span style="color:#a50">&#34;rgoogleads&#34;</span>,  
+                           scope = scopes,  
+                           client = my_client)
+
+<span style="color:#aaa;font-style:italic"># Authenticate by using the previously created token</span>
+<span style="color:#0a0">gads_auth</span>(token = my_token)
+
+<span style="color:#aaa;font-style:italic"># Test token by getting the list of accessible accounts</span>
+<span style="color:#0a0">gads_get_accessible_customers</span>()
+
+<span style="color:#aaa;font-style:italic"># Change path of cache to mage main directory, so you can use the token in production</span>
+my_token$cache_path = <span style="color:#a50">&#34;/home/src&#34;</span>
+
+<span style="color:#aaa;font-style:italic"># Save token with changed directory</span>
+<span style="color:#0a0">saveRDS</span>(my_token, file = <span style="color:#a50">&#34;google_ads_token_mage_demo.RDS&#34;</span>)</code></pre></div>
+<p>Now that we have generated the access token, you can copy-paste the JSON file from your local machine to the VM directory by using Visual Studio Code. Follow the exact steps you took to copy-paste the service account JSON file before.</p>
+<p>Next, we can go back to Mage, add a Data loader block, and select R as the programming language.</p>
+
+
+
+<div style="aspect-ratio: 967 / 227;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/new-data-loader-with-r.jpg" title="New data loader with R">
+  
+    <img class="fig-img" height="227" width="967" loading="lazy" src="https://www.simoahava.com/images/2023/11/new-data-loader-with-r.jpg#ZgotmplZ" alt="New data loader with R">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Name the block <code>google_ads</code> and click on &ldquo;Save and add block&rdquo;.</p>
+<p>In the block code, we need to first load the necessary packages.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#0a0">library</span>(<span style="color:#a50">&#34;pacman&#34;</span>)
+<span style="color:#0a0">p_load</span>(rgoogleads)
+<span style="color:#0a0">p_load</span>(dplyr)
+<span style="color:#0a0">p_load</span>(purrr)
+
+load_data &lt;- <span style="color:#0a0">function</span>() {
+
+}</code></pre></div>
+<p>Then, we need to load our access token, authenticate with it, and set the Google Ads account ID we want to get the data from.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#aaa;font-style:italic"># load Google Ads access token</span>
+my_token = <span style="color:#0a0">readRDS</span>(file = <span style="color:#a50">&#34;google_ads_token_mage_demo.RDS&#34;</span>)
+    
+<span style="color:#aaa;font-style:italic"># Authenticate with the token</span>
+<span style="color:#0a0">gads_auth</span>(token = my_token)
+
+<span style="color:#aaa;font-style:italic"># Set the Google Ads account id you want to get data from</span>
+<span style="color:#0a0">gads_set_customer_id</span>(<span style="color:#a50">&#39;123-123-1234&#39;</span>)</code></pre></div>
+<p>Here is the query that we&rsquo;re using to retrieve our data. We&rsquo;ll retrieve impressions, clicks, and cost segmented by date, from &ldquo;2023-10-19&rdquo; until &ldquo;2023-11-01&rdquo;.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#aaa;font-style:italic"># run query</span>
+google_ads_account_data = <span style="color:#0a0">gads_get_report</span>(
+  resource    = <span style="color:#a50">&#34;customer&#34;</span>,
+  fields      = <span style="color:#0a0">c</span>(<span style="color:#a50">&#34;segments.date&#34;</span>,
+                  <span style="color:#a50">&#34;metrics.impressions&#34;</span>,
+                  <span style="color:#a50">&#34;metrics.clicks&#34;</span>,
+                  <span style="color:#a50">&#34;metrics.cost_micros&#34;</span>),
+  date_from   = <span style="color:#a50">&#34;2023-10-19&#34;</span>,
+  date_to     = <span style="color:#a50">&#34;2023-11-01&#34;</span>
+)</code></pre></div>
+<p>The first argument you need to define is the <strong>resource</strong> you are getting the data from, in our case <code>customer</code>.</p>
+<p>You can find <a href="https://developers.google.com/google-ads/api/fields/v13/overview#list-of-all-resources">here</a> the list of all available resources.</p>
+<p>For example, if you would like to retrieve data at the ad group level, you should define the resource as <a href="https://developers.google.com/google-ads/api/fields/v13/ad_group"><code>ad_group</code></a>.</p>
+<p>To build our query, we can use the <a href="https://developers.google.com/google-ads/api/fields/v13/customer_query_builder">Google Ads query builder</a>, which can be used for any resource, in our case <code>customer</code>.</p>
+
+
+
+<div style="aspect-ratio: 890 / 390;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/build-customer-query.jpg" title="Build customer query">
+  
+    <img class="fig-img" height="390" width="890" loading="lazy" src="https://www.simoahava.com/images/2023/11/build-customer-query.jpg#ZgotmplZ" alt="Build customer query">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Below you can select attributes, segments, or metrics:</p>
+
+
+
+<div style="aspect-ratio: 885 / 409;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/select-attributes-segments-metrics.jpg" title="Select attributes, segments, metrics">
+  
+    <img class="fig-img" height="409" width="885" loading="lazy" src="https://www.simoahava.com/images/2023/11/select-attributes-segments-metrics.jpg#ZgotmplZ" alt="Select attributes, segments, metrics">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>When you select fields, it will start populating the query in the user interface of the builder.</p>
+<p>This is very useful to know what the metrics and dimensions are called in the Google Ads API.</p>
+<p>Here is the final part of our Data loader block, which should always be a variable containing data, as we have to pass something to the next block.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#aaa;font-style:italic"># return data</span>
+google_ads_account_data</code></pre></div>
+<p>Here is the complete code block we&rsquo;re working with:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#0a0">library</span>(<span style="color:#a50">&#34;pacman&#34;</span>)
+<span style="color:#0a0">p_load</span>(rgoogleads)
+<span style="color:#0a0">p_load</span>(dplyr)
+<span style="color:#0a0">p_load</span>(purrr)
+
+load_data &lt;- <span style="color:#0a0">function</span>() {
+    <span style="color:#aaa;font-style:italic"># Specify your data loading logic here</span>
+    <span style="color:#aaa;font-style:italic"># Return value: loaded dataframe</span>
+    
+    <span style="color:#aaa;font-style:italic"># load Google Ads access token</span>
+    my_token = <span style="color:#0a0">readRDS</span>(file = <span style="color:#a50">&#34;google_ads_token_mage_demo.RDS&#34;</span>)
+    
+    <span style="color:#aaa;font-style:italic"># Authenticate with the token</span>
+    <span style="color:#0a0">gads_auth</span>(token = my_token)
+    
+    <span style="color:#aaa;font-style:italic"># Set the Google Ads account id you want to get data from</span>
+    <span style="color:#0a0">gads_set_customer_id</span>(<span style="color:#a50">&#39;123-123-1234&#39;</span>)
+
+    <span style="color:#aaa;font-style:italic"># run query</span>
+    google_ads_account_data = <span style="color:#0a0">gads_get_report</span>(
+      resource    = <span style="color:#a50">&#34;customer&#34;</span>,
+      fields      = <span style="color:#0a0">c</span>(<span style="color:#a50">&#34;segments.date&#34;</span>,
+                      <span style="color:#a50">&#34;metrics.impressions&#34;</span>,
+                      <span style="color:#a50">&#34;metrics.clicks&#34;</span>,
+                      <span style="color:#a50">&#34;metrics.cost_micros&#34;</span>),
+      date_from   = <span style="color:#a50">&#34;2023-10-19&#34;</span>,
+      date_to     = <span style="color:#a50">&#34;2023-11-01&#34;</span>
+    )
+
+<span style="color:#aaa;font-style:italic"># return data for next block</span>
+google_ads_account_data
+}</code></pre></div>
+<p>If you run this code, you should be able to see clicks, cost, and impressions segmented by date.</p>
+
+
+
+<div style="aspect-ratio: 1410 / 828;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/ads-data-table.jpg" title="Ads data in a table">
+  
+    <img class="fig-img" height="828" width="1410" loading="lazy" src="https://www.simoahava.com/images/2023/11/ads-data-table.jpg#ZgotmplZ" alt="Ads data in a table">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>We&rsquo;re now done with this Data Loader block. Next, let&rsquo;s move on to <strong>transformers</strong>.</p>
+<h4 id="join-ga4-and-google-ads-data">Join GA4 and Google Ads data</h4>
+<p>In Mage, add a new <strong>Transformer</strong> block and select <strong>R</strong> as the programming language.</p>
+<p>Give the block a name like <code>join_ga4_google_ads</code> and click on &ldquo;Save and add block&rdquo;.</p>
+<p>In the Tree, we can now see that the Transformer block named <code>join_ga4_google_ads</code> only receives data from the Data Loader block <code>google_ads</code>. We need to also link the Data Loader <code>ga4</code> with the Transformer.</p>
+<p>To do this, you simply need to drag and drop the arrow from the <code>ga4</code> block to the <code>join_ga4_google_ads</code> Transformer.</p>
+
+
+
+<div style="aspect-ratio: 1148 / 782;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/join-ga4-transformer.jpg" title="Join ga4 with transformer">
+  
+    <img class="fig-img" height="782" width="1148" loading="lazy" src="https://www.simoahava.com/images/2023/11/join-ga4-transformer.jpg#ZgotmplZ" alt="Join ga4 with transformer">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>The first thing that we&rsquo;ll do in the Transformer block is to add the final variables from the previous Data loader blocks to the <code>transform()</code> function.</p>
+
+
+
+<div style="aspect-ratio: 1460 / 774;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/transform-data-loader-functions.jpg" title="Transform data loader functions">
+  
+    <img class="fig-img" height="774" width="1460" loading="lazy" src="https://www.simoahava.com/images/2023/11/transform-data-loader-functions.jpg#ZgotmplZ" alt="Transform data loader functions">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Next, we can add the following packages on top of the <code>transform()</code> function:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#0a0">library</span>(<span style="color:#a50">&#34;pacman&#34;</span>)
+<span style="color:#0a0">p_load</span>(tibble, dplyr, purrr, stringr, lubridate)</code></pre></div>
+<p>The first piece of code that we&rsquo;re adding is this:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#aaa;font-style:italic"># Build a row with the exact time</span>
+check_time = <span style="color:#0a0">tibble</span>(Date = <span style="color:#0a0">Sys.time</span>(),
+                    Impressions = <span style="color:#099">0</span>,
+                    Sessions = <span style="color:#099">0</span>,
+                    Clicks = <span style="color:#099">0</span>,
+                    Cost = <span style="color:#099">0</span>,
+                    Goals = <span style="color:#099">0</span>)</code></pre></div>
+<p>I am creating this tibble called <code>check_time</code> only so that later in BigQuery we can verify whether our schedule from Mage is working correctly.</p>
+<p>Then, we can finally join the Google Ads data with the GA4 data, and also return the <code>merged_data</code> variable for the next block:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#aaa;font-style:italic"># Merge Google Ads with GA4 Data</span>
+merged_data = google_ads_account_data %&gt;%
+  
+  <span style="color:#0a0">left_join</span>(sessions_goals_ga4, by = <span style="color:#0a0">c</span>(<span style="color:#a50">&#34;date&#34;</span> = <span style="color:#a50">&#34;date&#34;</span>)) %&gt;%
+  
+  <span style="color:#aaa;font-style:italic"># reorder and capitalise columns</span>
+  <span style="color:#0a0">select</span>(date, impressions, sessions, clicks, cost, goals) %&gt;% 
+  <span style="color:#0a0">set_names</span>(<span style="color:#0a0">names</span>(.) %&gt;% <span style="color:#0a0">str_to_title</span>()) %&gt;%
+  
+  <span style="color:#aaa;font-style:italic"># add check_time variable to verify schedule</span>
+  <span style="color:#0a0">mutate</span>(Date = Date %&gt;% <span style="color:#0a0">as_datetime</span>()) %&gt;%
+  <span style="color:#0a0">bind_rows</span>(check_time) %&gt;%
+
+  <span style="color:#aaa;font-style:italic"># replace NAs with 0</span>
+  <span style="color:#0a0">replace</span>(<span style="color:#0a0">is.na</span>(.), <span style="color:#099">0</span>) %&gt;%
+  
+  <span style="color:#0a0">arrange</span>(<span style="color:#0a0">desc</span>(Date))
+
+<span style="color:#aaa;font-style:italic"># Return merged_data variable for next block</span>
+merged_data</code></pre></div>
+<p>If everything worked properly, you should get something similar to this:</p>
+
+
+
+<div style="aspect-ratio: 987 / 398;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/joined-data-after-transformation.jpg" title="Joined data after transformation">
+  
+    <img class="fig-img" height="398" width="987" loading="lazy" src="https://www.simoahava.com/images/2023/11/joined-data-after-transformation.jpg#ZgotmplZ" alt="Joined data after transformation">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>I am aware that we&rsquo;re joining Google Ads data with GA4 data from all sources, and we should actually only join GA4 data coming from Google Ads. However, the goal of this guide is simply to show how to perform data engineering tasks with digital data.</p>
+<h4 id="export-data-to-bigquery">Export data to BigQuery</h4>
+<p>Now that we joined data successfully from Google Ads and GA4, we&rsquo;re ready to export the data to BigQuery.</p>
+<p>Browse to the <a href="https://console.cloud.google.com/bigquery/">BigQuery console</a> in your Google Cloud Platform project.</p>
+<p>BigQuery has the following data hierarchy: <strong>project</strong> -&gt; <strong>dataset</strong> -&gt; <strong>table</strong>.</p>
+<p>We already have a project, so now we need to create a dataset where our tables will reside. Click on the three dots on the right of your project, and then on &ldquo;Create data set&rdquo;:</p>
+
+
+
+<div style="aspect-ratio: 1024 / 450;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/create-bq-dataset.jpg" title="Create BQ dataset">
+  
+    <img class="fig-img" height="450" width="1024" loading="lazy" src="https://www.simoahava.com/images/2023/11/create-bq-dataset.jpg#ZgotmplZ" alt="Create BQ dataset">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Give a name to your data set, select a region, and click on &ldquo;CREATE DATA SET&rdquo;:</p>
+
+
+
+<div style="aspect-ratio: 1120 / 1294;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/configure-bq-dataset.jpg" title="Configure BQ dataset">
+  
+    <img class="fig-img" height="1294" width="1120" loading="lazy" src="https://www.simoahava.com/images/2023/11/configure-bq-dataset.jpg#ZgotmplZ" alt="Configure BQ dataset">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Back in Mage, add a <strong>Data Explorer</strong> block and choose <strong>R</strong> as the programming language again.</p>
+<p>Name the block <code>biq_query_export</code> and click on &ldquo;Save and add block&rdquo;.</p>
+<p>This is what your data tree should look like.</p>
+
+
+
+<div style="aspect-ratio: 1082 / 1000;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/mage-data-tree.jpg" title="Mage data tree">
+  
+    <img class="fig-img" height="1000" width="1082" loading="lazy" src="https://www.simoahava.com/images/2023/11/mage-data-tree.jpg#ZgotmplZ" alt="Mage data tree">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Go the the <code>big_query_export</code> block, and add <code>merged_data</code> as the argument of the function <code>export_data()</code>. Also, let&rsquo;s load the <code>bigrquery</code> package.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#0a0">library</span>(<span style="color:#a50">&#34;pacman&#34;</span>)
+<span style="color:#0a0">p_load</span>(bigrquery)
+
+export_data &lt;- <span style="color:#0a0">function</span>(merged_data) {
+    <span style="color:#aaa;font-style:italic"># Specify your data exporting logic here</span>
+    <span style="color:#aaa;font-style:italic"># Return value: exported dataframe</span>
+    
+}</code></pre></div>
+<p>To authenticate with BigQuery, we can actually use the service account key that we previously created for GA4.</p>
+<p>The only thing that changes is the function <code>bq_auth()</code> instead of <code>ga_auth()</code>.</p>
+<p>This is great news as it means we don&rsquo;t have to go through yet another cumbersome authentication process:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#aaa;font-style:italic"># Authenticate</span>
+<span style="color:#0a0">bq_auth</span>(path = <span style="color:#a50">&#34;mage-ai-test-405614-2e1e1c865c18.json&#34;</span>)</code></pre></div>
+<p>In fact, you can use the same service account key to authenticate with multiple Google services such as Google Drive or Google Sheets.</p>
+<p>There are different R packages for these services, such as <a href="https://googledrive.tidyverse.org/reference/drive_auth.html"><code>googledrive</code></a> and <a href="https://www.rdocumentation.org/packages/googlesheets4/versions/0.1.0/topics/sheets_auth"><code>googlesheets4</code></a>.</p>
+<p>Granted, you need to authorize the respective APIs in the Google Cloud Platform as shown previously, but this is a great time saver!</p>
+<p>The next thing to do is to create a table reference for BigQuery.</p>
+<p>As you may remember, we previously created only a data set, so we now need to create a placeholder for our table.</p>
+<p>To do so, we need to define our project name, data set, and table. The project name and data set are already defined and we can retrieve these from BigQuery. The table name is up to you.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#aaa;font-style:italic"># Define Big Query Project data</span>
+project = <span style="color:#a50">&#34;mage-ai-test-405614&#34;</span>
+data_set = <span style="color:#a50">&#34;mage_demo&#34;</span>
+table = <span style="color:#a50">&#34;merged_data&#34;</span>
+
+<span style="color:#aaa;font-style:italic"># Define table</span>
+table = <span style="color:#0a0">bq_table</span>(project = project, dataset = data_set, table = table)</code></pre></div>
+<p>To find the right project and data set name, go to BigQuery and click on the data set you created.</p>
+<p>To the right, you should see the <strong>Data set ID</strong>, which comprises <code>project_name.data_set_name</code>. You can separate and copy those values to insert them into the code above.</p>
+
+
+
+<div style="aspect-ratio: 1390 / 536;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/dataset-info.jpg" title="data set info">
+  
+    <img class="fig-img" height="536" width="1390" loading="lazy" src="https://www.simoahava.com/images/2023/11/dataset-info.jpg#ZgotmplZ" alt="data set info">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>In the following code, if the table exists, we delete and recreate it before uploading data.</p>
+<p>I&rsquo;m doing this every 5 minutes for demonstration, but in real production, I&rsquo;d likely run it less frequently, adding only the new data instead of recreating the whole table.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#0a0">if</span>(<span style="color:#0a0">bq_table_exists</span>(table)){
+  <span style="color:#aaa;font-style:italic"># if table already exists, delete it</span>
+  <span style="color:#0a0">bq_table_delete</span>(table)
+	
+	<span style="color:#aaa;font-style:italic"># recreate table so that we can fill it out</span>
+  <span style="color:#0a0">bq_table_create</span>(table, merged_data)
+	
+	<span style="color:#aaa;font-style:italic"># fill out table</span>
+  <span style="color:#0a0">bq_table_upload</span>(table, merged_data)
+}else{
+  <span style="color:#0a0">bq_table_create</span>(table, merged_data)
+  <span style="color:#0a0">bq_table_upload</span>(table, merged_data)
+}</code></pre></div>
+<p>Here is the final code:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#0a0">library</span>(<span style="color:#a50">&#34;pacman&#34;</span>)
+<span style="color:#0a0">p_load</span>(bigrquery)
+
+export_data &lt;- <span style="color:#0a0">function</span>(merged_data) {
+    <span style="color:#aaa;font-style:italic"># Specify your data exporting logic here</span>
+    <span style="color:#aaa;font-style:italic"># Return value: exported dataframe</span>
+
+    <span style="color:#aaa;font-style:italic"># Authenticate</span>
+    <span style="color:#0a0">bq_auth</span>(path = <span style="color:#a50">&#34;mage-ai-test-405614-2e1e1c865c18.json&#34;</span>)
+
+    <span style="color:#aaa;font-style:italic"># Define Big Query Project data</span>
+    project = <span style="color:#a50">&#34;mage-ai-test-405614&#34;</span>
+    data_set = <span style="color:#a50">&#34;mage_demo&#34;</span>
+    table = <span style="color:#a50">&#34;merged_data&#34;</span>
+
+    <span style="color:#aaa;font-style:italic"># Create table reference</span>
+    table = <span style="color:#0a0">bq_table</span>(project = project, dataset = data_set, table = table)
+
+    <span style="color:#0a0">if</span>(<span style="color:#0a0">bq_table_exists</span>(table)){
+      <span style="color:#aaa;font-style:italic"># if table already exists, delete it</span>
+      <span style="color:#0a0">bq_table_delete</span>(table)
+	
+	    <span style="color:#aaa;font-style:italic"># recreate table so that we can fill it out</span>
+      <span style="color:#0a0">bq_table_create</span>(table, merged_data)
+	
+	    <span style="color:#aaa;font-style:italic"># fill out table</span>
+      <span style="color:#0a0">bq_table_upload</span>(table, merged_data)
+    }else{
+      <span style="color:#0a0">bq_table_create</span>(table, merged_data)
+      <span style="color:#0a0">bq_table_upload</span>(table, merged_data)
+    }
+}</code></pre></div>
+<p>If you run the code, you should have a new table called <code>merged_data</code> in BigQuery. If you click PREVIEW, you should be able to see data within.</p>
+
+
+
+<div style="aspect-ratio: 1113 / 231;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/bigquery-preview.jpg" title="BQ preview">
+  
+    <img class="fig-img" height="231" width="1113" loading="lazy" src="https://www.simoahava.com/images/2023/11/bigquery-preview.jpg#ZgotmplZ" alt="BQ preview">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Our pipeline is complete, as you can see all the blocks have a green tick:</p>
+
+
+
+<div style="aspect-ratio: 1134 / 1036;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/mage-pipeline-complete.jpg" title="Mage pipeline complete">
+  
+    <img class="fig-img" height="1036" width="1134" loading="lazy" src="https://www.simoahava.com/images/2023/11/mage-pipeline-complete.jpg#ZgotmplZ" alt="Mage pipeline complete">
+  
+    </a>
+  
+  
+</div>
+
+
+<h3 id="test-the-entire-pipeline">Test the entire pipeline</h3>
+<p>Only because each block ran successfully, there is no guarantee that the entire pipeline will run smoothly. So, we have to run the entire pipeline before creating a schedule.</p>
+<p>In Mage, click on &ldquo;Triggers&rdquo;:</p>
+
+
+
+<div style="aspect-ratio: 1208 / 280;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/mage-triggers.jpg" title="Mage triggers">
+  
+    <img class="fig-img" height="280" width="1208" loading="lazy" src="https://www.simoahava.com/images/2023/11/mage-triggers.jpg#ZgotmplZ" alt="Mage triggers">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>At the top, click on <strong>Run @once</strong>.</p>
+<p>This will produce a trigger, and you&rsquo;ll see that its status will change to <code>running</code>:</p>
+
+
+
+<div style="aspect-ratio: 908 / 94;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/trigger-running.jpg" title="Trigger running">
+  
+    <img class="fig-img" height="94" width="908" loading="lazy" src="https://www.simoahava.com/images/2023/11/trigger-running.jpg#ZgotmplZ" alt="Trigger running">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>When done, it should say <code>completed</code> and switch to inactive state.</p>
+<p>If we now refresh the BigQuery table, we can see that it has an updated date/time for the rows. This means that our pipeline ran successfully!</p>
+
+
+
+<div style="aspect-ratio: 1090 / 237;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/date-time-bigquery-updated.jpg" title="Date time updated in BQ">
+  
+    <img class="fig-img" height="237" width="1090" loading="lazy" src="https://www.simoahava.com/images/2023/11/date-time-bigquery-updated.jpg#ZgotmplZ" alt="Date time updated in BQ">
+  
+    </a>
+  
+  
+</div>
+
+
+<h3 id="create-a-schedule">Create a schedule</h3>
+<p>Now that we know that our pipeline works properly, let&rsquo;s create a trigger that runs every 5 minutes.</p>
+<p>In Mage&rsquo;s Triggers view, click on <strong>New trigger</strong>.</p>
+<p>Select <strong>Schedule</strong> as the trigger type.</p>
+
+
+
+<div style="aspect-ratio: 978 / 218;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/mage-new-schedule-trigger.jpg" title="New schedule trigger">
+  
+    <img class="fig-img" height="218" width="978" loading="lazy" src="https://www.simoahava.com/images/2023/11/mage-new-schedule-trigger.jpg#ZgotmplZ" alt="New schedule trigger">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Given that the trigger will run every 5 minutes, let&rsquo;s name it <code>every_5_minutes</code>.</p>
+<p>Select <strong>custom</strong> as frequency and give the following <em>cron</em> expression: <code>*/5 * * * *</code></p>
+
+
+
+<div style="aspect-ratio: 950 / 581;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/every-five-minutes.jpg" title="Every five minutes">
+  
+    <img class="fig-img" height="581" width="950" loading="lazy" src="https://www.simoahava.com/images/2023/11/every-five-minutes.jpg#ZgotmplZ" alt="Every five minutes">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>A <em>cron</em> expression is like a schedule for your computer tasks.</p>
+<p>It&rsquo;s a simple set of instructions that tells your system when to run a specific job.</p>
+<p>The expression consists of five parts, representing minutes, hours, days, months, and days of the week. For example, <code>*/15 * * * *</code> means &ldquo;every 15 minutes, every hour, every day, every month, every day of the week&rdquo;.</p>
+<p>When ready with the trigger, click on <strong>Save changes</strong>.</p>
+
+
+
+<div style="aspect-ratio: 965 / 556;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/save-schedule-trigger.jpg" title="Save schedule trigger">
+  
+    <img class="fig-img" height="556" width="965" loading="lazy" src="https://www.simoahava.com/images/2023/11/save-schedule-trigger.jpg#ZgotmplZ" alt="Save schedule trigger">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Now you have created your trigger, but as you can see its status is <code>inactive</code>. To start it, click on <strong>Start trigger</strong>.</p>
+
+
+
+<div style="aspect-ratio: 1398 / 826;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/start-schedule-trigger.jpg" title="Start schedule trigger">
+  
+    <img class="fig-img" height="826" width="1398" loading="lazy" src="https://www.simoahava.com/images/2023/11/start-schedule-trigger.jpg#ZgotmplZ" alt="Start schedule trigger">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>The status switches to <code>active</code>. If you browse back to the Triggers view, it will show you when it&rsquo;s set to trigger next.</p>
+
+
+
+<div style="aspect-ratio: 934 / 211;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/trigger-next-run-date.jpg" title="Next run date">
+  
+    <img class="fig-img" height="211" width="934" loading="lazy" src="https://www.simoahava.com/images/2023/11/trigger-next-run-date.jpg#ZgotmplZ" alt="Next run date">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Be mindful of the fact that the time zone in Mage is in UTC.</p>
+<p>Once the timer is set to go off, its status should change to <code>running</code>.</p>
+<p>After it&rsquo;s run, you can now refresh the BigQuery table and see that the data has now been updated again.</p>
+
+
+
+<div style="aspect-ratio: 1102 / 281;" class="figure nocaption">
+  
+    <a href="https://www.simoahava.com/images/2023/11/bigquery-schedule-updated.jpg" title="BigQuery schedule updated">
+  
+    <img class="fig-img" height="281" width="1102" loading="lazy" src="https://www.simoahava.com/images/2023/11/bigquery-schedule-updated.jpg#ZgotmplZ" alt="BigQuery schedule updated">
+  
+    </a>
+  
+  
+</div>
+
+
+<p>Congratulations! Our journey is complete. I hope you had fun and learned something useful.</p>
+<p>If you have any comments, please post them below. If you want to connect with me, Arben, here is my <a href="https://www.linkedin.com/in/arben-kqiku-301457117/">LinkedIn</a>!</p>
+
+                
+                  <h2 id="summary-by-simo">Summary (by Simo)</h2>
+<p>Thank you so much, Arben!</p>
+<p>There&rsquo;s something just <em>magical</em> about automation platforms like Mage.ai.</p>
+<p>Being able to plug different components and services into a directed graph is such a powerful asset in today&rsquo;s data engineering world.</p>
+<p>Even though this guide was long and comprehensive, hopefully you got the idea that data engineering on this level is not beyond the reach of anyone.</p>
+<p>Arben was using some very basic building blocks: API connectors, service accounts, and queries, all wrapped up with the R programming language.</p>
+<p>Even if you didn&rsquo;t understand all the individual parts of this machine, hopefully you can appreciate how they all work together to generate the joined data export in your data warehouse (BigQuery in this case) as a result.</p>
+<p>As always, please share your thoughts in the comments below. Don&rsquo;t hesitate to contact <a href="https://www.linkedin.com/in/arben-kqiku-301457117/">Arben</a> if you want to shower him with praise for this excellent guide!</p>
+
+                
+              
+              
+
+            </div>
+          </div>
+          <div id="post-footer" class="post-footer main-content-wrap">
+            
+              
+                
+                
+                  <div class="post-footer-tags">
+                    <span class="text-color-light text-small">TAGGED IN</span><br/>
+                    
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/google-cloud-platform/">google cloud platform</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/r/">r</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/data-engineering/">data engineering</a>
+
+  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/google-analytics-4/">google analytics 4</a>
+
+                  </div>
+                
+              
+            
+            
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--disabled">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/cloud-run-server-side-tagging-google-tag-manager/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/join-ga4-google-ads-data-in-google-bigquery/">
+              <i class="fa fa-brands fa-facebook"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Join%20Google%20Ads%20And%20GA4%20Data%20In%20Google%20BigQuery%20https://www.simoahava.com/analytics/join-ga4-google-ads-data-in-google-bigquery/%20via%20@SimoAhava">
+              <i class="fa fa-brands fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/join-ga4-google-ads-data-in-google-bigquery/">
+              <i class="fa fa-brands fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#commento_thread">
+            <i class="fa-regular fa-comments"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+            
+              <span id="commento_thread"></span>
+<div id="commento"></div>
+<script defer src="https://commento.simoahava.com/js/commento.js" data-no-livereload="true"></script>
+
+            
+          </div>
+        </article>
+        <footer id="footer" class="main-content-wrap">
+  <span class="copyrights">
+    &copy; 2023 Simo Ahava. All Rights Reserved
+  </span>
+</footer>
+
+      </div>
+      
+      <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+        
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--disabled">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/cloud-run-server-side-tagging-google-tag-manager/">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/join-ga4-google-ads-data-in-google-bigquery/">
+              <i class="fa fa-brands fa-facebook"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Join%20Google%20Ads%20And%20GA4%20Data%20In%20Google%20BigQuery%20https://www.simoahava.com/analytics/join-ga4-google-ads-data-in-google-bigquery/%20via%20@SimoAhava">
+              <i class="fa fa-brands fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/join-ga4-google-ads-data-in-google-bigquery/">
+              <i class="fa fa-brands fa-linkedin"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#commento_thread">
+            <i class="fa-regular fa-comments"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#">
+          <i class="fa fa-search"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+      </div>
+      
+      <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+  <i id="btn-close-shareoptions" class="fa fa-close"></i>
+  <ul class="share-options">
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/join-ga4-google-ads-data-in-google-bigquery/">
+          <i class="fa fa-brands fa-facebook"></i><span>Share on Facebook</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=Join%20Google%20Ads%20And%20GA4%20Data%20In%20Google%20BigQuery%20https://www.simoahava.com/analytics/join-ga4-google-ads-data-in-google-bigquery/%20via%20@SimoAhava">
+          <i class="fa fa-brands fa-twitter"></i><span>Share on Twitter</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/join-ga4-google-ads-data-in-google-bigquery/">
+          <i class="fa fa-brands fa-linkedin"></i><span>Share on LinkedIn</span>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+<div id="share-options-mask" class="share-options-mask"></div>
+
+    </div>
+    
+    <div id="about">
+  <div id="about-card">
+    <div id="about-btn-close">
+      <i class="fa fa-remove"></i>
+    </div>
+    
+      <img id="about-card-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
+    
+    <h4 id="about-card-name">Simo Ahava</h4>
+    
+      <div id="about-card-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</div>
+    
+    
+      <div id="about-card-job">
+        <i class="fa fa-briefcase"></i>
+        <br/>
+        Senior Data Advocate at Reaktor
+      </div>
+    
+    
+      <div id="about-card-location">
+        <i class="fa fa-map-marker"></i>
+        <br/>
+        Finland
+      </div>
+    
+  </div>
+</div>
+
+    
+  
+    
+    <div id="cover" style="background-image:url('https://www.simoahava.com/images/maisema.jpg');"></div>
+  
+
+
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+
+
+
+
+<script src="https://www.simoahava.com/js/script.js"></script>
+
+
+
+
+<script src="https://commento.simoahava.com/js/count.js"></script>
+
+    <script>
+      !function(){var e=document.querySelector(".simmer"),t=document.querySelector(".simmer .close"),o=window.sessionStorage&&window.sessionStorage.getItem("nosimmer");if(e){if(o){e.style.display="none"}t.addEventListener("click",function(){window.sessionStorage.setItem("nosimmer","true"),e.style.display="none"})}}();
+    </script>
+    <style>
+      .ads {
+	  width: 1px;
+      }
+      </style>
+         
+
+    
+  </body>
+</html>
+
