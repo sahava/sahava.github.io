@@ -345,7 +345,8 @@
             <div class="main-content-wrap">
 	      
                 
-  	        <p>Ever since <a href="https://analytics.google.com">Google Analytics</a> released the first features of <a href="https://www.simoahava.com/analytics/consent-mode-google-tags/">consent mode</a>, I&rsquo;ve been anxiously waiting for news about a more tightly-knit integration with Google&rsquo;s preferred implementation solution: Google Tag Manager.</p>
+  	        <p><strong>Last updated 1 December 2023: New consent signals added</strong></p>
+<p>Ever since <a href="https://analytics.google.com">Google Analytics</a> released the first features of <a href="https://www.simoahava.com/analytics/consent-mode-google-tags/">consent mode</a>, I&rsquo;ve been anxiously waiting for news about a more tightly-knit integration with Google&rsquo;s preferred implementation solution: Google Tag Manager.</p>
 <p>In a <a href="https://blog.google/products/marketingplatform/360/respect-user-consent-choices-google-tag-manager/">recent release</a>, Google released a veritable cornucopia of new features that <em>should</em> assist in determining and implementing consent not just across Google tags, but <em>any</em> tags running in the container.</p>
 
 
@@ -417,43 +418,59 @@
 
                 
                   <h2 id="new-consent-types">New consent types</h2>
-<p>First of all, in addition to <code>ad_storage</code> and <code>analytics_storage</code>, which were introduced with <a href="(/analytics/consent-mode-google-tags/)">consent mode</a>, there are <strong>three</strong> additional consent types Google recommends to use with these APIs. Here&rsquo;s the full list (<a href="https://support.google.com/tagmanager/answer/10718549#consent-types">source</a>):</p>
+<p>First of all, in addition to <code>ad_storage</code> and <code>analytics_storage</code>, which were introduced with <a href="(/analytics/consent-mode-google-tags/)">consent mode</a>, there are <strong>five</strong> additional consent types Google recommends to use with these APIs. Here&rsquo;s the full list (<a href="https://support.google.com/tagmanager/answer/10718549#consent-types">source</a>):</p>
 <table>
 <thead>
 <tr>
 <th>Consent type</th>
+<th>Required for Google&rsquo;s services</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>ad_storage</code></td>
+<td>Yes</td>
 <td>Enables storage (such as cookies) related to advertising</td>
 </tr>
 <tr>
 <td><code>analytics_storage</code></td>
+<td>Yes</td>
 <td>Enables storage (such as cookies) related to analytics e.g. visit duration</td>
 </tr>
 <tr>
+<td><code>ad_user_data</code></td>
+<td>Yes</td>
+<td>Whether Google&rsquo;s services can use user data for building advertising audiences</td>
+</tr>
+<tr>
+<td><code>ad_personalization</code></td>
+<td>Yes</td>
+<td>Whether Google&rsquo;s services can use the data for remarketing</td>
+</tr>
+<tr>
 <td><code>functionality_storage</code></td>
+<td>No</td>
 <td>Enables storage that supports the functionality of the website or app e.g. language settings</td>
 </tr>
 <tr>
 <td><code>personalization_storage</code></td>
+<td>No</td>
 <td>Enables storage related to personalization e.g. video recommendations</td>
 </tr>
 <tr>
 <td><code>security_storage</code></td>
+<td>No</td>
 <td>Enables storage related to security such as authentication functionality, fraud prevention, and other user protection</td>
 </tr>
 </tbody>
 </table>
 <blockquote>
-<p>Note! The three new consent types are <em>only</em> for non-Google tags. Google tags (e.g. Analytics, Ads, and Floodlight) are only sensitive to <code>ad_storage</code> and <code>analytics_storage</code>.</p>
+<p>Note! The last three consent types are <em>only</em> for non-Google tags. Google tags (e.g. Analytics, Ads, and Floodlight) are only sensitive to <code>ad_storage</code>, <code>analytics_storage</code>. <code>ad_user_data</code>, and <code>ad_personalization</code>.</p>
 </blockquote>
 <p>It&rsquo;s somewhat odd seeing <code>functionality_storage</code> and <code>security_storage</code> here, as at least in the European Union they are typically deemed to be <strong>strictly necessary</strong> storage and thus wouldn&rsquo;t require consent at all. On the other hand, having more configuration options is rarely a bad thing.</p>
 <blockquote>
-<p>You can actually add <strong>any consent types you like</strong> into the respective API calls and tag settings. The three new consent types are Google&rsquo;s recommendations, but they&rsquo;re not an exhaustive list.</p>
+<p>You can actually add <strong>any consent types you like</strong> into the respective API calls and tag settings. The three additional consent types are Google&rsquo;s recommendations, but they&rsquo;re not an exhaustive list.</p>
 </blockquote>
 
                 
@@ -479,7 +496,7 @@
 <p><strong>Built-in Consent Checks</strong> means that the tag (or, more precisely, the template running the tag) is <em>consent-aware</em>. This means that the tag is doing <em>something</em> with consent state, although it isn&rsquo;t really explained <em>what</em> it is.</p>
 <p>In the screenshot above, for example, you can see <code>ad_storage</code> and <code>functionality_storage</code> listed in the Built-in Consent Checks section. This means that this particular tag template has defined in its <a href="#new-permission-accesses-consent-state">permissions</a> that it needs read and/or write access to these particular consent types.</p>
 <p>It&rsquo;s a good thing to be aware of, in case you are wondering why the tag isn&rsquo;t behaving as you&rsquo;d expect it to behave.</p>
-<p>Google tags (Analytics, Ads, and Floodlight) have built-in checks for <code>analytics_storage</code> and <code>ad_storage</code>, and their behavior <a href="https://support.google.com/analytics/answer/9976101?hl=en">is documented</a>. Other tags might show <a href="#new-consent-types">other consent types</a> here, and it&rsquo;s up to these tags&rsquo; documentation to explain how they are accessing consent state.</p>
+<p>Google tags (Analytics, Ads, and Floodlight) have built-in checks for <code>analytics_storage</code>, <code>ad_storage</code>, <code>ad_user_data</code>, and <code>ad_personalization</code>, and their behavior <a href="https://support.google.com/analytics/answer/9976101?hl=en">is documented</a>. Other tags might show <a href="#new-consent-types">other consent types</a> here, and it&rsquo;s up to these tags&rsquo; documentation to explain how they are accessing consent state.</p>
 <blockquote>
 <p>Note! Built-in Consent Checks is only visible if the template is accessing consent state in its code. If it has nothing to do with consent APIs, you won&rsquo;t see Built-in Consent Checks under these settings.</p>
 </blockquote>
@@ -491,7 +508,7 @@
 <ul>
 <li><strong>Not set</strong> – the default option. Use this to indicate this tag hasn&rsquo;t been properly reviewed for whether its triggering should be conditioned on consent or not.</li>
 <li><strong>No additional consent required</strong> – Set this if the tag&rsquo;s triggering should <em>not</em> be limited based on consent.</li>
-<li><strong>Require additional consent for this tag</strong> – Set this if the tag should only fire if consent has been granted to one or more consent types. When you check this option, a small table appears, and you can add any of the <a href="#new-consent-types">five consent types</a> into the table. The tag will <em>only</em> fire if all the listed consent types have the <code>granted</code> state.</li>
+<li><strong>Require additional consent for this tag</strong> – Set this if the tag should only fire if consent has been granted to one or more consent types. When you check this option, a small table appears, and you can add any of the <a href="#new-consent-types">available consent types</a> into the table. The tag will <em>only</em> fire if all the listed consent types have the <code>granted</code> state.</li>
 </ul>
 
 
@@ -605,7 +622,7 @@
 <h3 id="consent-initialization">Consent Initialization</h3>
 <p><strong>Consent Initialization</strong> is a trigger that <strong>fires before any other trigger in the container</strong>. It is programmatically generated to be the very first trigger that can fire on any given page.</p>
 <p>This means that it&rsquo;s good for, as the name implies, establishing the <strong>default consent state</strong> of the new consent types, for example (see <a href="#new-template-apis">below</a>).</p>
-<p>In other words, if you are using a consent management platform and you want to run some code (perhaps their own custom template) that establishes the default consent state for the five different consent types, <strong>this</strong> is the correct trigger type to use.</p>
+<p>In other words, if you are using a consent management platform and you want to run some code (perhaps their own custom template) that establishes the default consent state for the seven different consent types, <strong>this</strong> is the correct trigger type to use.</p>
 <p>The built-in trigger that&rsquo;s automatically available in all containers is called <strong>Consent Initialization - All Pages</strong>.</p>
 
 
@@ -671,12 +688,14 @@
 <p><strong>Default consent state</strong> is something that&rsquo;s applied as soon as the tag fires (preferably on the <strong>Consent Initialization</strong> trigger). This establishes a baseline for consent settings. Its values can be derived from CMP-specific cookies or something in the <code>dataLayer</code>, for example.</p>
 <p>The API is called <a href="https://developers.google.com/tag-manager/templates/api#setdefaultconsentstate"><code>setDefaultConsentState</code></a>, and it takes an object with five properties, each corresponding to a consent type listed in the <a href="#new-consent-types">table above</a>. You can also provide an optional <code>region</code> parameter to have the settings established in the API call apply to visitors from specific regions. The regions (and sub-regions) are provided in <a href="https://en.wikipedia.org/wiki/ISO_3166-2">ISO 3166-2 format</a>.</p>
 <p>The default settings are applied until <a href="#update-consent-state">consent state is updated</a>.</p>
-<p>In the example below, the CMP template establishes a default state of <code>denied</code> across the board, except for USA, where all but <code>ad_storage</code> is set to <code>granted</code> state.</p>
+<p>In the example below, the CMP template establishes a default state of <code>denied</code> across the board, except for USA, where all but <code>ad_storage</code>, <code>ad_user_data</code>, and <code>ad_personalization</code> are set to <code>granted</code> state.</p>
 <div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">const</span> setDefaultConsentState = require(<span style="color:#a50">&#39;setDefaultConsentState&#39;</span>);
 
 setDefaultConsentState({
   ad_storage: <span style="color:#a50">&#39;denied&#39;</span>,
   analytics_storage: <span style="color:#a50">&#39;denied&#39;</span>,
+  ad_user_data: <span style="color:#a50">&#39;denied&#39;</span>,
+  ad_personalizatio: <span style="color:#a50">&#39;denied&#39;</span>,
   functionality_storage: <span style="color:#a50">&#39;denied&#39;</span>,
   personalization_storage: <span style="color:#a50">&#39;denied&#39;</span>,
   security_storage: <span style="color:#a50">&#39;denied&#39;</span>
@@ -701,6 +720,8 @@ setDefaultConsentState({
 updateConsentState({
   ad_storage: data.ad_storage,
   analytics_storage: data.analytics_storage,
+  ad_user_data: data.ad_user_data,
+  ad_personalization: data.ad_personalization,
   functionality_storage: <span style="color:#a50">&#39;granted&#39;</span>,
   personalization_storage: data.personalization_storage,
   security_storage: <span style="color:#a50">&#39;granted&#39;</span>
@@ -809,9 +830,8 @@ addConsentListener(<span style="color:#a50">&#39;analytics_storage&#39;</span>, 
 <p>Other things that I feel like should be improved include:</p>
 <ul>
 <li>Incentivize using the new Consent Initialization and Initialization trigger types. Make them work with asynchronous requests as well (i.e. don&rsquo;t proceed to the next trigger event until a success signal has been sent).</li>
-<li>Add consent support for server-side Google Tag Manager, too. The <code>gcs</code> parameter in the request URL (of Google tags) could be used to pass all five consent types, and the server-side tagging environment could then decipher user consent from this parameter, using purpose-built APIs in templates.</li>
 <li>Make it possible to grant / deny consent on a vendor-by-vendor basis as well.</li>
-<li>Make it possible to add custom purpose types instead of just the five consent types that are now available (although that is a whole lot better than the two (<code>ad_storage</code> and <code>analytics_storage</code>) we used to have!).</li>
+<li>Make it possible to add custom purpose types instead of just the seven consent types that are now available (although that is a whole lot better than the two (<code>ad_storage</code> and <code>analytics_storage</code>) we used to have!).</li>
 <li>Expose consent state to outside Google Tag Manager as well, as it&rsquo;s possible that not all tags are running through Google Tag Manager.</li>
 </ul>
 <p>In general, consent is predicated on <strong>transparency</strong>. The more GTM can improve transparency to what the state of consent is, the better for all parties involved.</p>
