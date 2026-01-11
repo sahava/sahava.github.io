@@ -1,1013 +1,236 @@
-
-
-  
-    
-  
-
-
-  
-
-
-
-
-
-  
-
-
-  
-
-<!DOCTYPE html>
-<html lang="en-us">
-  <head>
-    <meta name="google-site-verification" content="xQwWI2KUfP9LbFKhw2CVLFtrMY6Czrla7L3PD2aBolA" />
-
-
-<script type="application/ld+json">
-{
-  "@context": "http://schema.org", 
-  "@type": "BlogPosting",
-  "headline": "DIY Google Ads Account Monitor With R, AdWords API, And Slack API | Simo Ahava's blog",
-  "image": "https:\/\/www.simoahava.com\/images\/2019\/04\/article-header.jpg",
-  "editor": "Simo Ahava",
-  "publisher": {
-    "@type": "Organization",
-    "name": "Simo Ahava's blog",
-    "logo": {
-      "@type": "ImageObject",
-      "url": "https:\/\/www.simoahava.com\/images\/simo.png",
-      "height": "393",
-      "width": "407"
-    }
-  },
-  "url": "https:\/\/www.simoahava.com\/web-development\/monitor-google-ads-accounts-r-adwords-api-slack-api\/",
-  "datePublished": "2019-04-17T09:00:00\u002b03:00",
-  "dateModified": "2019-04-17T09:00:00\u002b03:00",
-  "description": "Use the AdWords API and Slack API together with R to build a poweful monitoring system for your Google Ads accounts.",
-  "author": {
-    "@type": "Person",
-    "name": "Simo Ahava"
-  }
-}
-</script>
-
-
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    
-    <title>DIY Google Ads Account Monitor With R, AdWords API, And Slack API | Simo Ahava's blog</title>
-    
-    <script>
-      window.dataLayer=window.dataLayer||[];window.dataLayer.push({pageType: 'article', environment:  null });
-    </script>
-    
-
-    
-    
-    
-    <script>
-      (function(S,i,m,o){
-        window[m]=window[m]||[];
-        window[m].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
-        var f=S.getElementsByTagName(i)[0],j=S.createElement(i),dl=m!='dataLayer'?'&l='+m:'';
-        j.async=true;
-        j.src='https://sgtm.simoahava.com/gtm.js?id='+o+dl;
-        f.parentNode.insertBefore(j,f);
-      })(document,'script','dataLayer','GTM-PZ7GMV9');
-    </script>
-    
-    <meta name="author" content="Simo Ahava">
-    <meta name="keywords" content="">
-
-    <link rel="icon" href="https://www.simoahava.com/images/favicon.ico">
-    
-    <link rel="amphtml" href="https://www.simoahava.com/amp/web-development/monitor-google-ads-accounts-r-adwords-api-slack-api/">
-    
-    <meta name="description" content="Use the AdWords API and Slack API together with R to build a poweful monitoring system for your Google Ads accounts.">
-    <meta property="og:description" content="Use the AdWords API and Slack API together with R to build a poweful monitoring system for your Google Ads accounts.">
-    <meta property="og:type" content="blog">
-    <meta property="og:title" content="DIY Google Ads Account Monitor With R, AdWords API, And Slack API">
-    <meta property="og:url" content="https://www.simoahava.com/web-development/monitor-google-ads-accounts-r-adwords-api-slack-api/">
-    <meta property="og:site_name" content="Simo Ahava&#39;s blog">
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="DIY Google Ads Account Monitor With R, AdWords API, And Slack API">
-    <meta name="twitter:description" content="Use the AdWords API and Slack API together with R to build a poweful monitoring system for your Google Ads accounts.">
-    
-      <meta name="twitter:creator" content="@SimoAhava">
-      
-    
-
-    
-    
-
-    
-      <meta name="twitter:image" content="https://www.simoahava.com/images/2019/04/article-header.jpg">  
-      <meta property="og:image" content="https://www.simoahava.com/images/2019/04/article-header.jpg">
-    
-
-
-    
-
-      
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-      
-    
-    <link rel="stylesheet" href="https://www.simoahava.com/css/style.css" />
-    
-    
-
-    
-      
-    
-    
-  </head>
-
-  <body>
-    
-    <div id="_progress"></div>
-    
-    <div id="blog">
-      <header id="header" data-behavior="4">
-  <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
-  <div class="header-title">
-    <a class="header-title-link" href="https://www.simoahava.com/">Simo Ahava&#39;s blog</a>
-  </div>
-  
-</header>
-
-      <nav id="sidebar" data-behavior="4">
-  <div class="sidebar-container">
-    
-      <div class="sidebar-profile">
-        <a href="https://www.simoahava.com/">
-          <img class="sidebar-profile-picture" loading="lazy" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
-        </a>
-        <h4 class="sidebar-profile-name">Simo Ahava</h4>
-        
-          <h5 class="sidebar-profile-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</h5>
-        
-      </div>
-    
-    <ul class="sidebar-buttons">
-      
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-home"></i>
-      
-      <span class="sidebar-button-desc">Home</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
-      
-      <span class="sidebar-button-desc">Categories</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/tags/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
-      
-      <span class="sidebar-button-desc">Tags</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/gtm-tips/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-magic"></i>
-      
-      <span class="sidebar-button-desc">GTM Tips</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/about-simo-ahava/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-question"></i>
-      
-      <span class="sidebar-button-desc">About</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
-      
-      <span class="sidebar-button-desc">RSS</span>
-    </a>
-  </li>
-
-
-    </ul>
-    <ul class="sidebar-buttons">
-      
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/tools/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-wrench"></i>
-      
-      <span class="sidebar-button-desc">Tools</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/blog-statistics/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-bar-chart"></i>
-      
-      <span class="sidebar-button-desc">Blog statistics</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://github.com/sahava" target="_blank" rel="noopener ">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-brands fa-github"></i>
-      
-      <span class="sidebar-button-desc">GitHub</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/upcoming-talks/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-bullhorn"></i>
-      
-      <span class="sidebar-button-desc">Upcoming talks</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/custom-templates/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
-      
-      <span class="sidebar-button-desc">Templates</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/newsletter/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-bell"></i>
-      
-      <span class="sidebar-button-desc">Newsletter</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://masto.measure.chat/@SimoAhava" target="_blank" rel="noopener me">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-brands fa-mastodon"></i>
-      
-      <span class="sidebar-button-desc">Mastodon</span>
-    </a>
-  </li>
-
-
-    </ul>
-    <ul class="sidebar-buttons">
-      
-
-    </ul>
-  </div>
-</nav>
-
-      
-
-      <div id="main" data-behavior="4"
-        class="
-               hasCoverMetaIn
-               ">
-        <article class="post">
-	  <form id="search" action="https://www.simoahava.com/search/">
-  <input name="q" type="text" class="form-control input--xlarge" placeholder="Search blog..." autocomplete="off">
-  </form>
-
-          <div class="post-header main-content-wrap text-left">
-  
-  
-
-    <h1>
-      DIY Google Ads Account Monitor With R, AdWords API, And Slack API
-    </h1>
-  
-  
-  <div class="postShorten-meta post-meta">
-    
-      <time datetime="2019-04-17T09:00:00&#43;03:00">
-        
-  April 17, 2019
-
-      </time>
-      
-      
-  
-  
-    <span>in</span>
-    
-      <a class="category-link" href="https://www.simoahava.com/categories/web-development">Web development</a>
-    
-  
-
-
-      | <a href="https://www.simoahava.com/web-development/monitor-google-ads-accounts-r-adwords-api-slack-api/#commento"><comentario-count path="/web-development/monitor-google-ads-accounts-r-adwords-api-slack-api/" 
-                  placeholder="..."
-                  error-text="N/A "
-                  zero-text="0 "
-                  prefix=""
-                  suffix=" "></comentario-count>Comments</a>
-      
-  </div>
-
-
-</div>
-
-          <div class="post-content markdown">
-            <div class="main-content-wrap">
-	      
-                
-  	        <p>Every now and then I&rsquo;m fortunate enough to be able to publish <a href="https://www.simoahava.com/tags/guest-post/">guest posts</a> by illustrious people in the analytics and digital marketing industries. This time, I get to work with an old colleague of mine who&rsquo;s a veritable wizard when it comes to building solutions that make our daily work in the digital industry so much smoother.</p>
-<p><strong>Erik Grönroos</strong> works as an analyst in <a href="https://markkinointiakatemia.fi/">MarkkinointiAkatemia</a>, a Finnish digital customer acquisition agency. Erik&rsquo;s job is to utilize data and analytics to help grow the agency as well as the companies of the clients he works with.</p>
-<p>In this guide, Erik will share with you how to build an application which helps you automate the monitoring of your <a href="https://ads.google.com/">Google Ads</a> accounts using the <a href="https://www.r-project.org/">R programming language</a>, the <a href="https://developers.google.com/adwords/api/docs/guides/start">AdWords API</a> and the <a href="https://api.slack.com/">Slack API</a>.</p>
-
-
-
-<div style="aspect-ratio: 3032 / 1514;" class="figure nocaption">
-  
-    <a href="https://www.simoahava.com/images/2019/04/article-header.jpg" title="Google Ads account monitor">
-  
-    <img class="fig-img" height="1514" width="3032" loading="lazy" src="https://www.simoahava.com/images/2019/04/article-header.jpg#ZgotmplZ" alt="Google Ads account monitor">
-  
-    </a>
-  
-  
-</div>
-
-
-<p>I&rsquo;m particularly excited to publish this article, as it&rsquo;s the first time (if I recall correctly) that Google Ads and R are covered in the blog.</p>
-<p>Anyway, as the editor, all the mistake and errors that you can find in the article are 100% <em>mea culpa</em>, so let me know in the comments if errors persisted to the final draft. Thank you!</p>
-<div id="toc-container"><h1 id="table-of-contents">Table of Contents</h1> <input type="checkbox" id="show"><label for="show" id="showbtn"><h1 id="table-of-contents-mobile">Table of Contents</h1><span class="show">&nbsp;[+show]</span><span class="hide">&nbsp;[–hide]</span></label><nav id="TableOfContents">
-  <ul>
-    <li><a href="#introduction">Introduction</a></li>
-    <li><a href="#how-the-solution-works">How the solution works</a></li>
-    <li><a href="#requirements">Requirements</a></li>
-    <li><a href="#about-r">About R</a></li>
-    <li><a href="#episode-i-an-r-script">Episode I: An R script</a>
-      <ul>
-        <li><a href="#now-lets-script-for-real">Now, let&rsquo;s script for real!</a></li>
-      </ul>
-    </li>
-    <li><a href="#episode-ii-the-slack-bot-strikes-back">Episode II: The Slack bot strikes back</a></li>
-    <li><a href="#episode-iii-return-of-the-cron-job">Episode III: Return of the cron job</a></li>
-    <li><a href="#summary">Summary</a></li>
-  </ul>
-</nav></div>
-
-                <span class="simmer">
-  <span class="close">X</span>
-  <p>
-    <span class="fa fa-md fa-bell"></span>
-    <strong>The Simmer Newsletter</strong>
-  </p>
-  <p>
-    Subscribe to the <a href="https://www.simoahava.com/newsletter/">Simmer newsletter</a> to get the latest news and content from Simo Ahava into your email inbox!
-  </p>
-  </span>
-
-                
-                  <h2 id="introduction">Introduction</h2>
-<p>In this article I&rsquo;ll show you how to implement an <strong>automated monitoring application</strong> for keeping an eye on your Google Ads accounts. Since the nature of the implementation is a Proof of Concept (PoC), I&rsquo;ll try to keep it simple by using just one practical use case for demonstrating the end-to-end pipeline:</p>
-<p><strong>Zero-cost detection in Ads accounts, for monitoring credit card expirations or other issues that prevent your ads from rolling.</strong></p>
-<p>This implementation utilizes <strong>R</strong> and the <strong>Google AdWords API</strong> for checking the data, <strong>Slack API</strong> for realtime alerting via your Slack bot if something critical is detected, and good ol&rsquo; <code>cron</code> for scheduling the script.</p>
-<p>If you&rsquo;re a marketing agency, a typical situation is that you have plenty of Google Ads accounts to take care of. When the number of accounts breaches the hundreds or the thousands, manually managing, monitoring, and maintaining them isn&rsquo;t really an option anymore.</p>
-<p>What you can do, of course, is set up Google Ads&rsquo; <a href="https://support.google.com/google-ads/answer/1704338?hl=en">built-in alerts</a> one by one for each of your accounts. You could even manage these alerts via the <a href="https://developers.google.com/google-ads/api/reference/rpc/">Google Ads API</a> or utilize <a href="https://developers.google.com/google-ads/scripts/">Google Ads scripts</a>. But the problem with these is that they involve email alerts by default. Hey, it&rsquo;s 2019. Email is probably not the only channel you should use for building automation on.</p>
-<p>So, we decided to harness the force of APIs and, as a result, saved the galaxy!</p>
-
-                
-                  <h2 id="how-the-solution-works">How the solution works</h2>
-<p>The script is populated with the list of <strong>Google Ads account IDs</strong> we want to monitor. The monitoring system itself queries the <strong>cost data</strong> of each ID using the <strong>Google AdWords API</strong>, and parses the results for those accounts that have accumulated no cost at all, signalling potential issues with your budgets or your configurations.</p>
-<p>When this information has been parsed, the account IDs that were flagged are written to a <strong>database</strong> for further analysis, and a notification is dispatched to the <strong>Slack bot</strong> so that the team responsible can be immediately notified when problems arise.</p>
-
-                
-                  <h2 id="requirements">Requirements</h2>
-<ul>
-<li><a href="https://cran.r-project.org/mirrors.html">R CLI</a> on a Linux server (for <code>cron</code> to run your R script)</li>
-<li><a href="https://www.rstudio.com/">RStudio</a> for developing
-&ndash; Required R packages: <a href="https://cran.r-project.org/web/packages/RAdwords/index.html">RAdwords</a>, <a href="https://cran.r-project.org/web/packages/httr/index.html">httr</a>, <a href="https://cran.r-project.org/web/packages/jsonlite/index.html">jsonlite</a>
-&ndash; Optional R packages: <a href="https://cran.r-project.org/web/packages/DBI/index.html">DBI</a>, <a href="https://cran.r-project.org/web/packages/RMariaDB/index.html">RMariaDB</a></li>
-<li>Google API Client ID and Client Secret</li>
-<li><a href="https://developers.google.com/google-ads/api/docs/first-call/dev-token">Google AdWords Developer Token</a></li>
-<li>Slack webhook URL</li>
-<li>Crontab access (on the same Linux server)</li>
-</ul>
-
-                
-                  <h2 id="about-r">About R</h2>
-<p>R is a statistical programming language that today supports pretty much the same Machine Learning (ML) tricks that Python does. R vs. Python is a long-standing debate, so it really boils down to language preference: which one do you want to use for cool data stuff! Okay, I&rsquo;ll put my pants back on, hold on.</p>
-<p>We don&rsquo;t need ML in this simple monitoring example, but we do use it for more advanced solutions. That&rsquo;s why R is the tool of choice for us.</p>
-<p>RStudio is an IDE for R, it makes R easier to use. Quote from RStudio&rsquo;s website:</p>
-<blockquote>
-<p>RStudio is an integrated development environment (IDE) for R. It includes a console, syntax-highlighting editor that supports direct code execution, as well as tools for plotting, history, debugging and workspace management.<br>
- </p>
-</blockquote>
-<blockquote>
-<p>RStudio is available in open source and commercial editions and runs on the desktop (Windows, Mac, and Linux) or in a browser connected to RStudio Server or RStudio Server Pro (Debian/Ubuntu, RedHat/CentOS, and SUSE Linux).</p>
-</blockquote>
-<p>If you don&rsquo;t have RStudio installed yet, grab yours from <a href="https://www.rstudio.com/products/rstudio/download/">RStudio downloads</a>.</p>
-
-
-
-<div style="aspect-ratio: 1910 / 933;" class="figure nocaption">
-  
-    <a href="https://www.simoahava.com/images/2019/04/r-studio.jpg" title="R Studio">
-  
-    <img class="fig-img" height="933" width="1910" loading="lazy" src="https://www.simoahava.com/images/2019/04/r-studio.jpg#ZgotmplZ" alt="R Studio">
-  
-    </a>
-  
-  
-</div>
-
-
-<p>We won&rsquo;t get into the RStudio installation details in this article. RStudio&rsquo;s website provides comprehensive documentation and step-by-step how-to&rsquo;s for that.</p>
-<p>Once you have your RStudio setup up and running, let&rsquo;s script!</p>
-
-                
-                  <h2 id="episode-i-an-r-script">Episode I: An R script</h2>
-<p>We are using <strong>MariaDB</strong> to store the Google Ads Customer IDs of our clients, where they can be retrieved from for several other integration and automation purposes we need.</p>
-<p>If you&rsquo;re using some other database server, you need to modify the DB part of the code to suit your needs. R has comprehensive support for a wide variety of databases, perhaps even all of them. Basically, if it&rsquo;s something to do with data, R can read from it.</p>
-<p>If you&rsquo;re not using a database, you can skip the DB part. Optionally, R can also read the IDs from e.g. Google Sheets or a CSV file. How to do this in R is your homework!</p>
-<p>You&rsquo;re probably thinking &ldquo;But why aren&rsquo;t you reading the IDs directly from AdWords API&rdquo;?</p>
-<p>Well, the unfortunate thing is that <strong>RAdwords</strong>, the R AdWords package, implements the Adwords API Reporting Service only, and the Reporting Service does not support querying Google Ads Customer IDs on the Manager Account level (formerly known as <em>My Client Center</em> or <em>Google MCC</em>). Instead, you&rsquo;d need access to AdWords API Managed Customer Service to do that.</p>
-<p>In our case, this isn&rsquo;t a problem though, because we want to persist the IDs in our own custom environment and have different classifications and levels for different sort of contracts and clients. This way we are able to do the desired actions to those clients that need them, and we can also add monitoring capabilities to the setup.</p>
-<p>If you need to read the IDs directly from the AdWords API, you can access the Managed Customer Service via a newer R package called <a href="https://cran.r-project.org/web/packages/adwordsR/index.html">adwordsR</a>.</p>
-<h3 id="now-lets-script-for-real">Now, let&rsquo;s script for real!</h3>
-<p>Create a new R file in your RStudio with the following content, set up your DB user and pass, and save the file as <code>db_credentials.R</code> in <code>/YOUR_R_USER_ROOT_DIR/auth/</code>. This is your DB auth file.</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">db_username = <span style="color:#a50">&#34;YOUR_USERNAME&#34;</span>
-db_password = <span style="color:#a50">&#34;YOUR_PASSWORD&#34;</span></code></pre></div>
-<p>Create another file including the following code and save the file as <code>connect_db.R</code> in <code>/YOUR_R_USER_ROOT_DIR/</code>. This is your DB connector.</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-R" data-lang="R"><span style="color:#aaa;font-style:italic"># Include DB credentials from your /auth/ dir</span>
-<span style="color:#0a0">source</span>(<span style="color:#a50">&#34;~/auth/db_credentials.R&#34;</span>)
-
-<span style="color:#aaa;font-style:italic"># Check if the required packages are installed, install if not</span>
-<span style="color:#0a0">if</span>(!<span style="color:#0a0">require</span>(DBI)) <span style="color:#0a0">install.packages</span>(<span style="color:#a50">&#34;DBI&#34;</span>) 
-<span style="color:#0a0">if</span>(!<span style="color:#0a0">require</span>(RMariaDB)) <span style="color:#0a0">install.packages</span>(<span style="color:#a50">&#34;RMariaDB&#34;</span>)
-
-<span style="color:#aaa;font-style:italic"># Load packages</span>
-<span style="color:#0a0">library</span>(DBI)
-<span style="color:#0a0">library</span>(RMariaDB)
-
-<span style="color:#aaa;font-style:italic"># Create a DB connection handle</span>
-con &lt;- <span style="color:#0a0">dbConnect</span>(
-  drv = RMariaDB::<span style="color:#0a0">MariaDB</span>(),
-  username = db_username,
-  password = db_password,
-  host = <span style="color:#a50">&#34;YOUR_DB_HOST&#34;</span>,
-  port = <span style="color:#099">3306</span>,
-  <span style="color:#a50">&#34;YOUR_DB_NAME&#34;</span>
-)</code></pre></div>
-<p>And finally the actual Ads R script, include the following code and save it as <code>google-ads-zero-cost-monitor.R</code> in <code>/YOUR_R_USER_ROOT_DIR/</code>.</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#aaa;font-style:italic"># Init the DB connection</span>
-<span style="color:#0a0">source</span>(<span style="color:#a50">&#34;~/connect_db.R&#34;</span>)
-
-<span style="color:#aaa;font-style:italic"># Check if the required packages are installed, install if not</span>
-<span style="color:#0a0">if</span>(!<span style="color:#0a0">require</span>(RAdwords)) <span style="color:#0a0">install.packages</span>(<span style="color:#a50">&#34;RAdwords&#34;</span>)
-
-<span style="color:#aaa;font-style:italic"># Load packages</span>
-<span style="color:#0a0">library</span>(RAdwords)
-
-<span style="color:#aaa;font-style:italic"># Define the file path where your AdWords API OAuth RData file should be stored to, we&#39;ll need this next</span>
-google_ads_auth_file &lt;- <span style="color:#a50">&#34;~/auth/google_ads_auth.RData&#34;</span>
-
-<span style="color:#aaa;font-style:italic"># Check if the google_auth RData file already exists, create if not</span>
-<span style="color:#0a0">if</span>(!<span style="color:#0a0">file.exists</span>(google_ads_auth_file)) {
-  <span style="color:#aaa;font-style:italic"># Auth steps:</span>
-  <span style="color:#aaa;font-style:italic"># 1) You&#39;ll need Google API Client ID, Client Secret and AdWords Developer Token here for authenticating, see https://github.com/jburkhardt/RAdwords for details</span>
-  <span style="color:#aaa;font-style:italic"># 2) Once you&#39;ve provided those in your R console when R requests them, you&#39;ll get redirected to OAuth screen in your browser</span>
-  <span style="color:#aaa;font-style:italic"># 3) Authenticate with your Google Account (the same that has access to your AdWords account)</span>
-  <span style="color:#aaa;font-style:italic"># 4) You&#39;ll be redirected to a OAuth success screen that provides a final token code and asks you to copy/paste it to your application (to your R console in this case)</span>
-  google_auth &lt;- <span style="color:#0a0">doAuth</span>(save = <span style="color:#00a">FALSE</span>)
-  
-  <span style="color:#aaa;font-style:italic"># Save the auth credentials, to be used the auth from a file from now on</span>
-  <span style="color:#0a0">save</span>(google_auth, file = google_ads_auth_file)
-}
-
-<span style="color:#aaa;font-style:italic"># Load Google auth credentials</span>
-<span style="color:#0a0">load</span>(file = google_ads_auth_file)
-
-<span style="color:#aaa;font-style:italic"># Init date vars</span>
-dayBeforeYesterday &lt;- <span style="color:#0a0">Sys.Date</span>() - <span style="color:#099">2</span>
-yesterday &lt;- <span style="color:#0a0">Sys.Date</span>() - <span style="color:#099">1</span>
-
-<span style="color:#aaa;font-style:italic"># Fetch Google Ads Customer IDs from your DB</span>
-ads_accounts &lt;- <span style="color:#0a0">dbGetQuery</span>(con, <span style="color:#a50">&#34;SELECT ads_customer_id FROM ads_accounts&#34;</span>)
-
-<span style="color:#aaa;font-style:italic"># Create a list of the IDs for later looping</span>
-account_list &lt;- ads_accounts$ads_customer_id
-
-<span style="color:#aaa;font-style:italic"># Alternatively, if you want to skip the DB stuff, you can define your Google Ads Customer IDs manually by uncommenting the following line and listing the IDs here:</span>
-<span style="color:#aaa;font-style:italic"># account_list &lt;- c(&#34;123-123-1234&#34;, &#34;234-234-2345&#34;)</span>
-
-<span style="color:#aaa;font-style:italic"># Init AdWords API request</span>
-<span style="color:#aaa;font-style:italic"># We&#39;re checking the cost data from two previous days</span>
-body &lt;- <span style="color:#0a0">statement</span>(select = <span style="color:#0a0">c</span>(<span style="color:#a50">&#39;Cost&#39;</span>),
-                  report = <span style="color:#a50">&#34;ACCOUNT_PERFORMANCE_REPORT&#34;</span>,
-                  start  = dayBeforeYesterday,
-                  end    = yesterday)
-
-<span style="color:#aaa;font-style:italic"># Init a data frame for collecting the data and and an index variable for keeping track of progressing during the for loop</span>
-adsdata &lt;- <span style="color:#0a0">data.frame</span>()
-progressIndex &lt;- <span style="color:#099">0</span>
-
-<span style="color:#aaa;font-style:italic"># Get the Ads cost data</span>
-<span style="color:#0a0">for </span>(account in account_list) {
-
-  <span style="color:#aaa;font-style:italic"># Get cost data</span>
-  ads_api_response &lt;- <span style="color:#0a0">getData</span>(clientCustomerId = account,
-                              google_auth      = google_auth,
-                              statement        = body)
-
-  <span style="color:#aaa;font-style:italic"># Proceed only if the API doesn&#39;t return an error (happens when there&#39;s no data to return or when the API fails), this is for dropping off false zero cost alerts</span>
-  <span style="color:#0a0">if</span>(!<span style="color:#0a0">is.null</span>(<span style="color:#0a0">dim</span>(ads_api_response))) {
-   
-    <span style="color:#aaa;font-style:italic"># Init empty data frame</span>
-    adsdata_temp &lt;- <span style="color:#0a0">setNames</span>(<span style="color:#0a0">data.frame</span>(<span style="color:#0a0">matrix</span>(ncol = <span style="color:#099">2</span>, nrow = <span style="color:#099">1</span>)), <span style="color:#0a0">c</span>(<span style="color:#a50">&#34;Cost&#34;</span>, <span style="color:#a50">&#34;Account&#34;</span>))
-    
-    <span style="color:#aaa;font-style:italic"># Include account id</span>
-    adsdata_temp$Account &lt;- account
-    
-    <span style="color:#aaa;font-style:italic"># Include cost data</span>
-    <span style="color:#aaa;font-style:italic"># If there&#39;s no data, the result is doubled for some reason</span>
-    <span style="color:#aaa;font-style:italic"># Fix this by always reading the 1st value only with [1]</span>
-    adsdata_temp$Cost &lt;- ads_api_response$Cost[1]
-    
-    <span style="color:#aaa;font-style:italic"># If cost is zero, NA is returned, replace it with zero</span>
-    <span style="color:#0a0">if</span>(<span style="color:#0a0">is.na</span>(adsdata_temp$Cost)) adsdata_temp$Cost &lt;- <span style="color:#099">0</span>
-    
-    <span style="color:#aaa;font-style:italic"># Collect during each iteration</span>
-    adsdata &lt;- <span style="color:#0a0">rbind</span>(adsdata, adsdata_temp, stringsAsFactors = <span style="color:#00a">FALSE</span>)
-  
-  }
-  
-  <span style="color:#aaa;font-style:italic"># Print progress to R console</span>
-  progressIndex &lt;- progressIndex + <span style="color:#099">1</span>
-  <span style="color:#0a0">cat</span>(<span style="color:#0a0">paste</span>(<span style="color:#a50">&#34;Query &#34;</span>, progressIndex, <span style="color:#a50">&#34; of &#34;</span>, <span style="color:#0a0">NROW</span>(account_list), <span style="color:#a50">&#34; done\r\n&#34;</span>, sep = <span style="color:#a50">&#34;&#34;</span>))
-
-}
-
-<span style="color:#aaa;font-style:italic"># Keep accounts with zero cost only</span>
-ads_accounts_with_zero_cost &lt;- <span style="color:#0a0">subset</span>(adsdata, Cost == <span style="color:#099">0</span>)
-
-<span style="color:#aaa;font-style:italic"># Count nbr of alerted accounts</span>
-nbr_of_accounts_with_alerts &lt;- <span style="color:#0a0">nrow</span>(ads_accounts_with_zero_cost)
-
-<span style="color:#aaa;font-style:italic"># Save all alerts to DB, if there was any</span>
-<span style="color:#aaa;font-style:italic"># This assumes you have DB table named &#34;alerts&#34; existing with fields: </span>
-<span style="color:#aaa;font-style:italic"># ads_customer_id VARCHAR</span>
-<span style="color:#aaa;font-style:italic"># category VARCHAR</span>
-<span style="color:#aaa;font-style:italic"># status_id INT</span>
-<span style="color:#aaa;font-style:italic"># created_at DATETIME</span>
-<span style="color:#aaa;font-style:italic"># updated_at DATETIME</span>
-
-<span style="color:#0a0">if</span>(nbr_of_accounts_with_alerts &gt; <span style="color:#099">0</span>) {
-  
-  <span style="color:#0a0">for </span>(i in <span style="color:#099">1</span>:<span style="color:#0a0">nrow</span>(ads_accounts_with_zero_cost)) {
-    row &lt;- ads_accounts_with_zero_cost[i, ]
-    
-    ads_customer_id &lt;- row$ads_customer_id
-    category &lt;- <span style="color:#a50">&#34;ALERT_ZERO_COST&#34;</span> <span style="color:#aaa;font-style:italic"># For categorizing different types of alerts</span>
-    status_id &lt;- <span style="color:#099">0</span> <span style="color:#aaa;font-style:italic"># To be set to eg. 1 when the alert is handled via a custom UI</span>
-    
-    <span style="color:#aaa;font-style:italic"># Save each item to db</span>
-    query &lt;- <span style="color:#0a0">paste</span>(<span style="color:#a50">&#34;INSERT INTO alerts (
-</span><span style="color:#a50">                    ads_customer_id,
-</span><span style="color:#a50">                    category,
-</span><span style="color:#a50">                    status_id,
-</span><span style="color:#a50">                    created_at,
-</span><span style="color:#a50">                    updated_at)
-</span><span style="color:#a50">                   VALUES (&#34;</span>,
-                    <span style="color:#a50">&#34;&#39;&#34;</span>, ads_customer_id, <span style="color:#a50">&#34;&#39;, &#34;</span>,
-                    <span style="color:#a50">&#34;&#39;&#34;</span>, category, <span style="color:#a50">&#34;&#39;, &#34;</span>,
-                    status_id, <span style="color:#a50">&#34;, &#34;</span>,
-                    <span style="color:#a50">&#34;now(), &#34;</span>,
-                    <span style="color:#a50">&#34;now())&#34;</span>,
-                   sep = <span style="color:#a50">&#34;&#34;</span>
-    )
-    <span style="color:#0a0">dbExecute</span>(con, query)
-  }
-  
-<span style="color:#aaa;font-style:italic"># If you want to check/debug what was stored, uncomment and run these lines</span>
-<span style="color:#aaa;font-style:italic"># db_alerts &lt;- dbGetQuery(con, &#34;SELECT * FROM alerts&#34;)</span>
-<span style="color:#aaa;font-style:italic"># View(db_alerts)</span>
-  
-}</code></pre></div>
-<p>Now you have your Ads zero cost monitor script ready and you can move on to setting up your Slack bot.</p>
-
-                
-                  <h2 id="episode-ii-the-slack-bot-strikes-back">Episode II: The Slack bot strikes back</h2>
-<p>Because the guys at Slack are awesome, they have written an excellent guide on how to set up your bot. They even serve you virtual cookies! Slack&rsquo;s guides are a textbook example about how documentation should be written - they&rsquo;re always a pleasure to read and follow! Thanks guys!</p>
-<p>So, follow the <a href="https://api.slack.com/bot-users">Slack bot users guide</a>. The required steps for our alert notifications are:</p>
-<ol>
-<li>
-<p>Create your Slack app</p>
-</li>
-<li>
-<p>Create your bot user</p>
-</li>
-<li>
-<p>Install your bot to your Slack workspace</p>
-</li>
-</ol>
-<p>Once you manage to get your bot installed into your Slack workspace, you will get a <strong>webhook URL</strong> that you&rsquo;ll need in the following script.</p>
-
-
-
-<div style="aspect-ratio: 1751 / 941;" class="figure nocaption">
-  
-    <a href="https://www.simoahava.com/images/2019/04/slack-bot-token.jpg" title="Webhook URL">
-  
-    <img class="fig-img" height="941" width="1751" loading="lazy" src="https://www.simoahava.com/images/2019/04/slack-bot-token.jpg#ZgotmplZ" alt="Webhook URL">
-  
-    </a>
-  
-  
-</div>
-
-
-<p>The bot script part is here:</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-R" data-lang="R"><span style="color:#aaa;font-style:italic">### SLACK NOTIFICATIONS ###</span>
-
-<span style="color:#aaa;font-style:italic"># Replace the default value with the webhook URL you got from Slack</span>
-webhook_url &lt;- <span style="color:#a50">&#34;https://hooks.slack.com/services/12345&#34;</span>
-
-<span style="color:#aaa;font-style:italic"># Check if the required packages are installed, install if not</span>
-<span style="color:#0a0">if</span>(!<span style="color:#0a0">require</span>(jsonlite)) <span style="color:#0a0">install.packages</span>(<span style="color:#a50">&#34;jsonlite&#34;</span>) 
-<span style="color:#0a0">if</span>(!<span style="color:#0a0">require</span>(httr)) <span style="color:#0a0">install.packages</span>(<span style="color:#a50">&#34;httr&#34;</span>)
-
-<span style="color:#aaa;font-style:italic"># Load packages</span>
-<span style="color:#0a0">library</span>(jsonlite)
-<span style="color:#0a0">library</span>(httr)
-
-<span style="color:#aaa;font-style:italic"># Nbr of accounts for the Slack notification</span>
-nbr_of_accounts &lt;- <span style="color:#0a0">NROW</span>(account_list)
-
-<span style="color:#aaa;font-style:italic"># Setup the message you want to send to Slack</span>
-msg_desc &lt;- <span style="color:#0a0">paste</span>(<span style="color:#a50">&#34;Number of Google Ads accounts checked: &#34;</span>,
-                  nbr_of_accounts,
-                  sep = <span style="color:#a50">&#34;&#34;</span>)
-
-msg_title &lt;- <span style="color:#0a0">paste</span>(<span style="color:#a50">&#34;ALERT - Number of zero cost accounts detected: &#34;</span>,
-                   nbr_of_accounts_with_alerts,
-                   sep = <span style="color:#a50">&#34;&#34;</span>)
-
-<span style="color:#aaa;font-style:italic"># This places a channel ping if there were occurrences with zero cost, and if not, defaults to empty message</span>
-<span style="color:#0a0">if</span>(nbr_of_accounts_with_alerts &gt; <span style="color:#099">0</span>) {
-  msg_body &lt;- <span style="color:#a50">&#34;Alerts saved to database! &lt;!channel&gt;&#34;</span>
-} else {
-  msg_body &lt;- <span style="color:#a50">&#34;&#34;</span>
-}
-
-<span style="color:#aaa;font-style:italic"># Alert to Slack - POST the msg</span>
-request &lt;- <span style="color:#0a0">POST</span>(webhook_url,
-                body = <span style="color:#0a0">paste</span>(
-                  <span style="color:#a50">&#39;{&#34;attachments&#34;: [{&#39;</span>,
-                  
-                  <span style="color:#a50">&#39;&#34;title&#34;: &#34;&#39;</span>,
-                  msg_title,
-                  <span style="color:#a50">&#39;&#34;,&#39;</span>,
-                  
-                  <span style="color:#a50">&#39;&#34;pretext&#34;: &#34;&#39;</span>,
-                  msg_desc,
-                  <span style="color:#a50">&#39;&#34;,&#39;</span>,
-                  
-                  <span style="color:#a50">&#39;&#34;text&#34;: &#34;&#39;</span>,
-                  msg_body,
-                  <span style="color:#a50">&#39;&#34;, &#34;color&#34;: &#34;#ee0000&#34;&#39;</span>,
-                  
-                  <span style="color:#a50">&#39;}]}&#39;</span>,
-                  
-                  sep = <span style="color:#a50">&#39;&#39;</span>
-                )
-)</code></pre></div>
-<p>Once you&rsquo;ve set this up, include the above Slack part into your google-ads-zero-cost-monitor.R script. Your monitoring script is now done!</p>
-<p>This is what a sample notification would look like in Slack:</p>
-
-
-
-<div style="aspect-ratio: 1109 / 137;" class="figure nocaption">
-  
-    <a href="https://www.simoahava.com/images/2019/04/slack-alert.jpg" title="Slack alert sample">
-  
-    <img class="fig-img" height="137" width="1109" loading="lazy" src="https://www.simoahava.com/images/2019/04/slack-alert.jpg#ZgotmplZ" alt="Slack alert sample">
-  
-    </a>
-  
-  
-</div>
-
-
-<p>Test it carefully in your RStudio and make sure everything is working correctly. After that, you&rsquo;re ready to move your script to production by scheduling it via <code>cron</code>.</p>
-
-                
-                  <h2 id="episode-iii-return-of-the-cron-job">Episode III: Return of the cron job</h2>
-<p>Open <code>crontab</code> in your Linux shell for editing:</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">crontab -e</code></pre></div>
-<p>Add a cron job that suits your needs. Here&rsquo;s an example syntax with a scheduler that runs the R monitoring script daily at 10 AM.</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#aaa;font-style:italic"># Daily at 10 AM</span>
-<span style="color:#099">0</span> <span style="color:#099">10</span> * * * Rscript /home/YOUR_USERNAME/google-ads-zero-cost-monitor.R</code></pre></div>
-
-                
-                  <h2 id="summary">Summary</h2>
-<p>You have now created a potentially powerful Google Ads monitoring pipeline that has endless opportunities for extending. Other useful use cases for utilizing the pipeline are for example anomaly detection, high spend tracking, campaign-level stuff, automation of ads placement optimizing, and so forth.</p>
-<p>It goes without saying that automation is absolutely necessary in this day and age when it can save you and your team from countless hours of manual labor. By automating trivial processes such as monitoring and anomaly detection, you are freeing up your most valuable resources (people) to work on more ambitious tasks.</p>
-<p>As always, we&rsquo;re looking forward to your comments and questions. Let us know what you think of the solution, if it could be improved, and if you already have extensions in mind!</p>
-
-                
-              
-              
-
-            </div>
-          </div>
-          <div id="post-footer" class="post-footer main-content-wrap">
-            
-              
-                
-                
-                  <div class="post-footer-tags">
-                    <span class="text-color-light text-small">TAGGED IN</span><br/>
-                    
-  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/adwords/">adwords</a>
-
-  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/api/">api</a>
-
-  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/r/">r</a>
-
-  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/slack/">slack</a>
-
-  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/guest-post/">guest post</a>
-
-                  </div>
-                
-              
-            
-            
-  <div class="post-actions-wrap">
-      <nav >
-        <ul class="post-actions post-action-nav">
-          
-            <li class="post-action">
-              
-                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/fetch-latest-value-data-layer-variable/">
-              
-                  <i class="fa fa-angle-left"></i>
-                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
-                </a>
-            </li>
-            <li class="post-action">
-              
-                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/css-selector-guide-google-tag-manager/">
-              
-                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
-                  <i class="fa fa-angle-right"></i>
-                </a>
-            </li>
-          
-        </ul>
-      </nav>
-    <ul class="post-actions post-action-share" >
-      
-        <li class="post-action hide-lg hide-md hide-sm">
-          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
-            <i class="fa fa-share-alt"></i>
-          </a>
-        </li>
-        
-          <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/web-development/monitor-google-ads-accounts-r-adwords-api-slack-api/">
-              <i class="fa fa-brands fa-facebook"></i>
-            </a>
-          </li>
-        
-          <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=DIY%20Google%20Ads%20Account%20Monitor%20With%20R,%20AdWords%20API,%20And%20Slack%20API%20https://www.simoahava.com/web-development/monitor-google-ads-accounts-r-adwords-api-slack-api/%20via%20@SimoAhava">
-              <i class="fa fa-brands fa-twitter"></i>
-            </a>
-          </li>
-        
-          <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/web-development/monitor-google-ads-accounts-r-adwords-api-slack-api/">
-              <i class="fa fa-brands fa-linkedin"></i>
-            </a>
-          </li>
-        
-      
-      
-        <li class="post-action">
-          <a class="post-action-btn btn btn--default" href="#commento">
-            <i class="fa-regular fa-comments"></i>
-          </a>
-        </li>
-      
-      <li class="post-action">
-          <a class="post-action-btn btn btn--default" href="#">
-          <i class="fa fa-search"></i>
-        </a>
-      </li>
-    </ul>
-  </div>
-
-
-            
-              <a name="commento"></a>
-<comentario-comments></comentario-comments>
-
-            
-          </div>
-        </article>
-        <footer id="footer" class="main-content-wrap">
-  <span class="copyrights">
-    &copy; 2026 Simo Ahava. All Rights Reserved
-  </span>
-</footer>
-
-      </div>
-      
-      <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
-        
-  <div class="post-actions-wrap">
-      <nav >
-        <ul class="post-actions post-action-nav">
-          
-            <li class="post-action">
-              
-                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/fetch-latest-value-data-layer-variable/">
-              
-                  <i class="fa fa-angle-left"></i>
-                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
-                </a>
-            </li>
-            <li class="post-action">
-              
-                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/css-selector-guide-google-tag-manager/">
-              
-                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
-                  <i class="fa fa-angle-right"></i>
-                </a>
-            </li>
-          
-        </ul>
-      </nav>
-    <ul class="post-actions post-action-share" >
-      
-        <li class="post-action hide-lg hide-md hide-sm">
-          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
-            <i class="fa fa-share-alt"></i>
-          </a>
-        </li>
-        
-          <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/web-development/monitor-google-ads-accounts-r-adwords-api-slack-api/">
-              <i class="fa fa-brands fa-facebook"></i>
-            </a>
-          </li>
-        
-          <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=DIY%20Google%20Ads%20Account%20Monitor%20With%20R,%20AdWords%20API,%20And%20Slack%20API%20https://www.simoahava.com/web-development/monitor-google-ads-accounts-r-adwords-api-slack-api/%20via%20@SimoAhava">
-              <i class="fa fa-brands fa-twitter"></i>
-            </a>
-          </li>
-        
-          <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/web-development/monitor-google-ads-accounts-r-adwords-api-slack-api/">
-              <i class="fa fa-brands fa-linkedin"></i>
-            </a>
-          </li>
-        
-      
-      
-        <li class="post-action">
-          <a class="post-action-btn btn btn--default" href="#commento">
-            <i class="fa-regular fa-comments"></i>
-          </a>
-        </li>
-      
-      <li class="post-action">
-          <a class="post-action-btn btn btn--default" href="#">
-          <i class="fa fa-search"></i>
-        </a>
-      </li>
-    </ul>
-  </div>
-
-
-      </div>
-      
-      <div id="share-options-bar" class="share-options-bar" data-behavior="4">
-  <i id="btn-close-shareoptions" class="fa fa-close"></i>
-  <ul class="share-options">
-    
-      <li class="share-option">
-        <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/web-development/monitor-google-ads-accounts-r-adwords-api-slack-api/">
-          <i class="fa fa-brands fa-facebook"></i><span>Share on Facebook</span>
-        </a>
-      </li>
-    
-      <li class="share-option">
-        <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=DIY%20Google%20Ads%20Account%20Monitor%20With%20R,%20AdWords%20API,%20And%20Slack%20API%20https://www.simoahava.com/web-development/monitor-google-ads-accounts-r-adwords-api-slack-api/%20via%20@SimoAhava">
-          <i class="fa fa-brands fa-twitter"></i><span>Share on Twitter</span>
-        </a>
-      </li>
-    
-      <li class="share-option">
-        <a class="share-option-btn" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/web-development/monitor-google-ads-accounts-r-adwords-api-slack-api/">
-          <i class="fa fa-brands fa-linkedin"></i><span>Share on LinkedIn</span>
-        </a>
-      </li>
-    
-  </ul>
-</div>
-<div id="share-options-mask" class="share-options-mask"></div>
-
-    </div>
-    
-    <div id="about">
-  <div id="about-card">
-    <div id="about-btn-close">
-      <i class="fa fa-remove"></i>
-    </div>
-    
-      <img id="about-card-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
-    
-    <h4 id="about-card-name">Simo Ahava</h4>
-    
-      <div id="about-card-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</div>
-    
-    
-      <div id="about-card-job">
-        <i class="fa fa-briefcase"></i>
-        <br/>
-        Senior Data Advocate at Reaktor
-      </div>
-    
-    
-      <div id="about-card-location">
-        <i class="fa fa-map-marker"></i>
-        <br/>
-        Finland
-      </div>
-    
-  </div>
-</div>
-
-    
-  
-    
-    <div id="cover" style="background-image:url('https://www.simoahava.com/images/maisema.jpg');"></div>
-  
-
-
-    
-<script defer src="https://comentario.simoahava.com/comentario.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
-
-
-
-
-<script src="https://www.simoahava.com/js/script.js"></script>
-
-
-
-    <script>
-      !function(){var e=document.querySelector(".simmer"),t=document.querySelector(".simmer .close"),o=window.sessionStorage&&window.sessionStorage.getItem("nosimmer");if(e){if(o){e.style.display="none"}t.addEventListener("click",function(){window.sessionStorage.setItem("nosimmer","true"),e.style.display="none"})}}();
-    </script>
-    <style>
-      .ads {
-	  width: 1px;
-      }
-      </style>
-         
-
-    
-  </body>
-</html>
-
+<!doctype html><html lang=en-us><head><meta name=google-site-verification content="xQwWI2KUfP9LbFKhw2CVLFtrMY6Czrla7L3PD2aBolA"><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"DIY Google Ads Account Monitor With R, AdWords API, And Slack API | Simo Ahava's blog","image":"https:\/\/www.simoahava.com\/images\/2019\/04\/article-header.jpg","editor":"Simo Ahava","publisher":{"@type":"Organization","name":"Simo Ahava's blog","logo":{"@type":"ImageObject","url":"https:\/\/www.simoahava.com\/images\/simo.png","height":"393","width":"407"}},"url":"https:\/\/www.simoahava.com\/web-development\/monitor-google-ads-accounts-r-adwords-api-slack-api\/","datePublished":"2019-04-17T09:00:00\u002b03:00","dateModified":"2019-04-17T09:00:00\u002b03:00","description":"Use the AdWords API and Slack API together with R to build a poweful monitoring system for your Google Ads accounts.","author":{"@type":"Person","name":"Simo Ahava"}}</script><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>DIY Google Ads Account Monitor With R, AdWords API, And Slack API | Simo Ahava's blog</title>
+<script>window.dataLayer=window.dataLayer||[],window.dataLayer.push({pageType:"article",environment:null})</script><script>(function(e,t,n,s){window[n]=window[n]||[],window[n].push({"gtm.start":(new Date).getTime(),event:"gtm.js"});var i=e.getElementsByTagName(t)[0],o=e.createElement(t),a=n!="dataLayer"?"&l="+n:"";o.async=!0,o.src="https://sgtm.simoahava.com/gtm.js?id="+s+a,i.parentNode.insertBefore(o,i)})(document,"script","dataLayer","GTM-PZ7GMV9")</script><meta name=author content="Simo Ahava"><meta name=keywords content><link rel=icon href=https://www.simoahava.com/images/favicon.ico><link rel=amphtml href=https://www.simoahava.com/amp/web-development/monitor-google-ads-accounts-r-adwords-api-slack-api/><meta name=description content="Use the AdWords API and Slack API together with R to build a poweful monitoring system for your Google Ads accounts."><meta property="og:description" content="Use the AdWords API and Slack API together with R to build a poweful monitoring system for your Google Ads accounts."><meta property="og:type" content="blog"><meta property="og:title" content="DIY Google Ads Account Monitor With R, AdWords API, And Slack API"><meta property="og:url" content="https://www.simoahava.com/web-development/monitor-google-ads-accounts-r-adwords-api-slack-api/"><meta property="og:site_name" content="Simo Ahava's blog"><meta name=twitter:card content="summary"><meta name=twitter:title content="DIY Google Ads Account Monitor With R, AdWords API, And Slack API"><meta name=twitter:description content="Use the AdWords API and Slack API together with R to build a poweful monitoring system for your Google Ads accounts."><meta name=twitter:creator content="@SimoAhava"><meta name=twitter:image content="https://www.simoahava.com/images/2019/04/article-header.jpg"><meta property="og:image" content="https://www.simoahava.com/images/2019/04/article-header.jpg"><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=/css/style.css></head><body><div id=_progress></div><div id=blog><header id=header data-behavior=4><i id=btn-open-sidebar class="fa fa-lg fa-bars"></i><div class=header-title><a class=header-title-link href=/>Simo Ahava's blog</a></div></header><nav id=sidebar data-behavior=4><div class=sidebar-container><div class=sidebar-profile><a href=/><img class=sidebar-profile-picture loading=lazy src=https://www.simoahava.com/images/simo.png alt="Author's picture"></a><h4 class=sidebar-profile-name>Simo Ahava</h4><h5 class=sidebar-profile-bio>Husband | Father | Analytics developer<br>simo (at) simoahava.com</h5></div><ul class=sidebar-buttons><li class=sidebar-button><a class=sidebar-button-link href=/><i class="sidebar-button-icon fa fa-lg fa-home"></i>
+<span class=sidebar-button-desc>Home</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/categories/><i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+<span class=sidebar-button-desc>Categories</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/tags/><i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+<span class=sidebar-button-desc>Tags</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/categories/gtm-tips/><i class="sidebar-button-icon fa fa-lg fa-magic"></i>
+<span class=sidebar-button-desc>GTM Tips</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/about-simo-ahava/><i class="sidebar-button-icon fa fa-lg fa-question"></i>
+<span class=sidebar-button-desc>About</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/index.xml><i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+<span class=sidebar-button-desc>RSS</span></a></li></ul><ul class=sidebar-buttons><li class=sidebar-button><a class=sidebar-button-link href=/tools/><i class="sidebar-button-icon fa fa-lg fa-wrench"></i>
+<span class=sidebar-button-desc>Tools</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/blog-statistics/><i class="sidebar-button-icon fa fa-lg fa-bar-chart"></i>
+<span class=sidebar-button-desc>Blog statistics</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=https://github.com/sahava target=_blank rel=noopener><i class="sidebar-button-icon fa fa-lg fa-brands fa-github"></i>
+<span class=sidebar-button-desc>GitHub</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/upcoming-talks/><i class="sidebar-button-icon fa fa-lg fa-bullhorn"></i>
+<span class=sidebar-button-desc>Upcoming talks</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/custom-templates/><i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+<span class=sidebar-button-desc>Templates</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/newsletter/><i class="sidebar-button-icon fa fa-lg fa-bell"></i>
+<span class=sidebar-button-desc>Newsletter</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=https://masto.measure.chat/@SimoAhava target=_blank rel="noopener me"><i class="sidebar-button-icon fa fa-lg fa-brands fa-mastodon"></i>
+<span class=sidebar-button-desc>Mastodon</span></a></li></ul><ul class=sidebar-buttons></ul></div></nav><div id=main data-behavior=4 class=hasCoverMetaIn><article class=post><form id=search action=/search/><input name=q type=text class="form-control input--xlarge" placeholder="Search blog..." autocomplete=off></form><div class="post-header main-content-wrap text-left"><h1>DIY Google Ads Account Monitor With R, AdWords API, And Slack API</h1><div class="postShorten-meta post-meta"><time datetime=2019-04-17T09:00:00+03:00>April 17, 2019
+</time><span>in</span>
+<a class=category-link href=/categories/web-development>Web development</a>
+| <a href=https://www.simoahava.com/web-development/monitor-google-ads-accounts-r-adwords-api-slack-api/#commento><comentario-count path=/web-development/monitor-google-ads-accounts-r-adwords-api-slack-api/ placeholder=... error-text="N/A " zero-text="0 " prefix suffix=" "></comentario-count>Comments</a></div></div><div class="post-content markdown"><div class=main-content-wrap><p>Every now and then I&rsquo;m fortunate enough to be able to publish <a href=/tags/guest-post/>guest posts</a> by illustrious people in the analytics and digital marketing industries. This time, I get to work with an old colleague of mine who&rsquo;s a veritable wizard when it comes to building solutions that make our daily work in the digital industry so much smoother.</p><p><strong>Erik Grönroos</strong> works as an analyst in <a href=https://markkinointiakatemia.fi/>MarkkinointiAkatemia</a>, a Finnish digital customer acquisition agency. Erik&rsquo;s job is to utilize data and analytics to help grow the agency as well as the companies of the clients he works with.</p><p>In this guide, Erik will share with you how to build an application which helps you automate the monitoring of your <a href=https://ads.google.com/>Google Ads</a> accounts using the <a href=https://www.r-project.org/>R programming language</a>, the <a href=https://developers.google.com/adwords/api/docs/guides/start>AdWords API</a> and the <a href=https://api.slack.com/>Slack API</a>.</p><div style=aspect-ratio:3032/1514 class="figure nocaption"><a href=/images/2019/04/article-header.jpg title="Google Ads account monitor"><img class=fig-img height=1514 width=3032 loading=lazy src=/images/2019/04/article-header.jpg#ZgotmplZ alt="Google Ads account monitor"></a></div><p>I&rsquo;m particularly excited to publish this article, as it&rsquo;s the first time (if I recall correctly) that Google Ads and R are covered in the blog.</p><p>Anyway, as the editor, all the mistake and errors that you can find in the article are 100% <em>mea culpa</em>, so let me know in the comments if errors persisted to the final draft. Thank you!</p><div id=toc-container><h1 id=table-of-contents>Table of Contents</h1><input type=checkbox id=show><label for=show id=showbtn><h1 id=table-of-contents-mobile>Table of Contents</h1><span class=show>&nbsp;[+show]</span><span class=hide>&nbsp;[–hide]</span></label><nav id=TableOfContents><ul><li><a href=#introduction>Introduction</a></li><li><a href=#how-the-solution-works>How the solution works</a></li><li><a href=#requirements>Requirements</a></li><li><a href=#about-r>About R</a></li><li><a href=#episode-i-an-r-script>Episode I: An R script</a><ul><li><a href=#now-lets-script-for-real>Now, let&rsquo;s script for real!</a></li></ul></li><li><a href=#episode-ii-the-slack-bot-strikes-back>Episode II: The Slack bot strikes back</a></li><li><a href=#episode-iii-return-of-the-cron-job>Episode III: Return of the cron job</a></li><li><a href=#summary>Summary</a></li></ul></nav></div><span class=simmer><span class=close>X</span><p><span class="fa fa-md fa-bell"></span>
+<strong>The Simmer Newsletter</strong></p><p>Subscribe to the <a href=/newsletter/>Simmer newsletter</a> to get the latest news and content from Simo Ahava into your email inbox!</p></span><h2 id=introduction>Introduction</h2><p>In this article I&rsquo;ll show you how to implement an <strong>automated monitoring application</strong> for keeping an eye on your Google Ads accounts. Since the nature of the implementation is a Proof of Concept (PoC), I&rsquo;ll try to keep it simple by using just one practical use case for demonstrating the end-to-end pipeline:</p><p><strong>Zero-cost detection in Ads accounts, for monitoring credit card expirations or other issues that prevent your ads from rolling.</strong></p><p>This implementation utilizes <strong>R</strong> and the <strong>Google AdWords API</strong> for checking the data, <strong>Slack API</strong> for realtime alerting via your Slack bot if something critical is detected, and good ol&rsquo; <code>cron</code> for scheduling the script.</p><p>If you&rsquo;re a marketing agency, a typical situation is that you have plenty of Google Ads accounts to take care of. When the number of accounts breaches the hundreds or the thousands, manually managing, monitoring, and maintaining them isn&rsquo;t really an option anymore.</p><p>What you can do, of course, is set up Google Ads&rsquo; <a href="https://support.google.com/google-ads/answer/1704338?hl=en">built-in alerts</a> one by one for each of your accounts. You could even manage these alerts via the <a href=https://developers.google.com/google-ads/api/reference/rpc/>Google Ads API</a> or utilize <a href=https://developers.google.com/google-ads/scripts/>Google Ads scripts</a>. But the problem with these is that they involve email alerts by default. Hey, it&rsquo;s 2019. Email is probably not the only channel you should use for building automation on.</p><p>So, we decided to harness the force of APIs and, as a result, saved the galaxy!</p><h2 id=how-the-solution-works>How the solution works</h2><p>The script is populated with the list of <strong>Google Ads account IDs</strong> we want to monitor. The monitoring system itself queries the <strong>cost data</strong> of each ID using the <strong>Google AdWords API</strong>, and parses the results for those accounts that have accumulated no cost at all, signalling potential issues with your budgets or your configurations.</p><p>When this information has been parsed, the account IDs that were flagged are written to a <strong>database</strong> for further analysis, and a notification is dispatched to the <strong>Slack bot</strong> so that the team responsible can be immediately notified when problems arise.</p><h2 id=requirements>Requirements</h2><ul><li><a href=https://cran.r-project.org/mirrors.html>R CLI</a> on a Linux server (for <code>cron</code> to run your R script)</li><li><a href=https://www.rstudio.com/>RStudio</a> for developing
+&ndash; Required R packages: <a href=https://cran.r-project.org/web/packages/RAdwords/index.html>RAdwords</a>, <a href=https://cran.r-project.org/web/packages/httr/index.html>httr</a>, <a href=https://cran.r-project.org/web/packages/jsonlite/index.html>jsonlite</a>
+&ndash; Optional R packages: <a href=https://cran.r-project.org/web/packages/DBI/index.html>DBI</a>, <a href=https://cran.r-project.org/web/packages/RMariaDB/index.html>RMariaDB</a></li><li>Google API Client ID and Client Secret</li><li><a href=https://developers.google.com/google-ads/api/docs/first-call/dev-token>Google AdWords Developer Token</a></li><li>Slack webhook URL</li><li>Crontab access (on the same Linux server)</li></ul><h2 id=about-r>About R</h2><p>R is a statistical programming language that today supports pretty much the same Machine Learning (ML) tricks that Python does. R vs. Python is a long-standing debate, so it really boils down to language preference: which one do you want to use for cool data stuff! Okay, I&rsquo;ll put my pants back on, hold on.</p><p>We don&rsquo;t need ML in this simple monitoring example, but we do use it for more advanced solutions. That&rsquo;s why R is the tool of choice for us.</p><p>RStudio is an IDE for R, it makes R easier to use. Quote from RStudio&rsquo;s website:</p><blockquote><p>RStudio is an integrated development environment (IDE) for R. It includes a console, syntax-highlighting editor that supports direct code execution, as well as tools for plotting, history, debugging and workspace management.<br> </p></blockquote><blockquote><p>RStudio is available in open source and commercial editions and runs on the desktop (Windows, Mac, and Linux) or in a browser connected to RStudio Server or RStudio Server Pro (Debian/Ubuntu, RedHat/CentOS, and SUSE Linux).</p></blockquote><p>If you don&rsquo;t have RStudio installed yet, grab yours from <a href=https://www.rstudio.com/products/rstudio/download/>RStudio downloads</a>.</p><div style=aspect-ratio:1910/933 class="figure nocaption"><a href=/images/2019/04/r-studio.jpg title="R Studio"><img class=fig-img height=933 width=1910 loading=lazy src=/images/2019/04/r-studio.jpg#ZgotmplZ alt="R Studio"></a></div><p>We won&rsquo;t get into the RStudio installation details in this article. RStudio&rsquo;s website provides comprehensive documentation and step-by-step how-to&rsquo;s for that.</p><p>Once you have your RStudio setup up and running, let&rsquo;s script!</p><h2 id=episode-i-an-r-script>Episode I: An R script</h2><p>We are using <strong>MariaDB</strong> to store the Google Ads Customer IDs of our clients, where they can be retrieved from for several other integration and automation purposes we need.</p><p>If you&rsquo;re using some other database server, you need to modify the DB part of the code to suit your needs. R has comprehensive support for a wide variety of databases, perhaps even all of them. Basically, if it&rsquo;s something to do with data, R can read from it.</p><p>If you&rsquo;re not using a database, you can skip the DB part. Optionally, R can also read the IDs from e.g. Google Sheets or a CSV file. How to do this in R is your homework!</p><p>You&rsquo;re probably thinking &ldquo;But why aren&rsquo;t you reading the IDs directly from AdWords API&rdquo;?</p><p>Well, the unfortunate thing is that <strong>RAdwords</strong>, the R AdWords package, implements the Adwords API Reporting Service only, and the Reporting Service does not support querying Google Ads Customer IDs on the Manager Account level (formerly known as <em>My Client Center</em> or <em>Google MCC</em>). Instead, you&rsquo;d need access to AdWords API Managed Customer Service to do that.</p><p>In our case, this isn&rsquo;t a problem though, because we want to persist the IDs in our own custom environment and have different classifications and levels for different sort of contracts and clients. This way we are able to do the desired actions to those clients that need them, and we can also add monitoring capabilities to the setup.</p><p>If you need to read the IDs directly from the AdWords API, you can access the Managed Customer Service via a newer R package called <a href=https://cran.r-project.org/web/packages/adwordsR/index.html>adwordsR</a>.</p><h3 id=now-lets-script-for-real>Now, let&rsquo;s script for real!</h3><p>Create a new R file in your RStudio with the following content, set up your DB user and pass, and save the file as <code>db_credentials.R</code> in <code>/YOUR_R_USER_ROOT_DIR/auth/</code>. This is your DB auth file.</p><div class=highlight><pre tabindex=0 style=background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>db_username = <span style=color:#a50>&#34;YOUR_USERNAME&#34;</span>
+</span></span><span style=display:flex><span>db_password = <span style=color:#a50>&#34;YOUR_PASSWORD&#34;</span></span></span></code></pre></div><p>Create another file including the following code and save the file as <code>connect_db.R</code> in <code>/YOUR_R_USER_ROOT_DIR/</code>. This is your DB connector.</p><div class=highlight><pre tabindex=0 style=background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-R data-lang=R><span style=display:flex><span><span style=color:#aaa;font-style:italic># Include DB credentials from your /auth/ dir</span>
+</span></span><span style=display:flex><span><span style=color:#0a0>source</span>(<span style=color:#a50>&#34;~/auth/db_credentials.R&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic># Check if the required packages are installed, install if not</span>
+</span></span><span style=display:flex><span><span style=color:#00a>if</span>(!<span style=color:#0a0>require</span>(DBI)) <span style=color:#0a0>install.packages</span>(<span style=color:#a50>&#34;DBI&#34;</span>) 
+</span></span><span style=display:flex><span><span style=color:#00a>if</span>(!<span style=color:#0a0>require</span>(RMariaDB)) <span style=color:#0a0>install.packages</span>(<span style=color:#a50>&#34;RMariaDB&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic># Load packages</span>
+</span></span><span style=display:flex><span><span style=color:#0a0>library</span>(DBI)
+</span></span><span style=display:flex><span><span style=color:#0a0>library</span>(RMariaDB)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic># Create a DB connection handle</span>
+</span></span><span style=display:flex><span>con &lt;- <span style=color:#0a0>dbConnect</span>(
+</span></span><span style=display:flex><span>  drv = RMariaDB::<span style=color:#0a0>MariaDB</span>(),
+</span></span><span style=display:flex><span>  username = db_username,
+</span></span><span style=display:flex><span>  password = db_password,
+</span></span><span style=display:flex><span>  host = <span style=color:#a50>&#34;YOUR_DB_HOST&#34;</span>,
+</span></span><span style=display:flex><span>  port = <span style=color:#099>3306</span>,
+</span></span><span style=display:flex><span>  <span style=color:#a50>&#34;YOUR_DB_NAME&#34;</span>
+</span></span><span style=display:flex><span>)</span></span></code></pre></div><p>And finally the actual Ads R script, include the following code and save it as <code>google-ads-zero-cost-monitor.R</code> in <code>/YOUR_R_USER_ROOT_DIR/</code>.</p><div class=highlight><pre tabindex=0 style=background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#aaa;font-style:italic># Init the DB connection</span>
+</span></span><span style=display:flex><span><span style=color:#0a0>source</span>(<span style=color:#a50>&#34;~/connect_db.R&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic># Check if the required packages are installed, install if not</span>
+</span></span><span style=display:flex><span><span style=color:#00a>if</span>(!<span style=color:#0a0>require</span>(RAdwords)) <span style=color:#0a0>install.packages</span>(<span style=color:#a50>&#34;RAdwords&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic># Load packages</span>
+</span></span><span style=display:flex><span><span style=color:#0a0>library</span>(RAdwords)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic># Define the file path where your AdWords API OAuth RData file should be stored to, we&#39;ll need this next</span>
+</span></span><span style=display:flex><span>google_ads_auth_file &lt;- <span style=color:#a50>&#34;~/auth/google_ads_auth.RData&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic># Check if the google_auth RData file already exists, create if not</span>
+</span></span><span style=display:flex><span><span style=color:#00a>if</span>(!<span style=color:#0a0>file.exists</span>(google_ads_auth_file)) {
+</span></span><span style=display:flex><span>  <span style=color:#aaa;font-style:italic># Auth steps:</span>
+</span></span><span style=display:flex><span>  <span style=color:#aaa;font-style:italic># 1) You&#39;ll need Google API Client ID, Client Secret and AdWords Developer Token here for authenticating, see https://github.com/jburkhardt/RAdwords for details</span>
+</span></span><span style=display:flex><span>  <span style=color:#aaa;font-style:italic># 2) Once you&#39;ve provided those in your R console when R requests them, you&#39;ll get redirected to OAuth screen in your browser</span>
+</span></span><span style=display:flex><span>  <span style=color:#aaa;font-style:italic># 3) Authenticate with your Google Account (the same that has access to your AdWords account)</span>
+</span></span><span style=display:flex><span>  <span style=color:#aaa;font-style:italic># 4) You&#39;ll be redirected to a OAuth success screen that provides a final token code and asks you to copy/paste it to your application (to your R console in this case)</span>
+</span></span><span style=display:flex><span>  google_auth &lt;- <span style=color:#0a0>doAuth</span>(save = <span style=color:#00a>FALSE</span>)
+</span></span><span style=display:flex><span>  
+</span></span><span style=display:flex><span>  <span style=color:#aaa;font-style:italic># Save the auth credentials, to be used the auth from a file from now on</span>
+</span></span><span style=display:flex><span>  <span style=color:#0a0>save</span>(google_auth, file = google_ads_auth_file)
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic># Load Google auth credentials</span>
+</span></span><span style=display:flex><span><span style=color:#0a0>load</span>(file = google_ads_auth_file)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic># Init date vars</span>
+</span></span><span style=display:flex><span>dayBeforeYesterday &lt;- <span style=color:#0a0>Sys.Date</span>() - <span style=color:#099>2</span>
+</span></span><span style=display:flex><span>yesterday &lt;- <span style=color:#0a0>Sys.Date</span>() - <span style=color:#099>1</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic># Fetch Google Ads Customer IDs from your DB</span>
+</span></span><span style=display:flex><span>ads_accounts &lt;- <span style=color:#0a0>dbGetQuery</span>(con, <span style=color:#a50>&#34;SELECT ads_customer_id FROM ads_accounts&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic># Create a list of the IDs for later looping</span>
+</span></span><span style=display:flex><span>account_list &lt;- ads_accounts$ads_customer_id
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic># Alternatively, if you want to skip the DB stuff, you can define your Google Ads Customer IDs manually by uncommenting the following line and listing the IDs here:</span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic># account_list &lt;- c(&#34;123-123-1234&#34;, &#34;234-234-2345&#34;)</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic># Init AdWords API request</span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic># We&#39;re checking the cost data from two previous days</span>
+</span></span><span style=display:flex><span>body &lt;- <span style=color:#0a0>statement</span>(select = <span style=color:#0a0>c</span>(<span style=color:#a50>&#39;Cost&#39;</span>),
+</span></span><span style=display:flex><span>                  report = <span style=color:#a50>&#34;ACCOUNT_PERFORMANCE_REPORT&#34;</span>,
+</span></span><span style=display:flex><span>                  start  = dayBeforeYesterday,
+</span></span><span style=display:flex><span>                  end    = yesterday)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic># Init a data frame for collecting the data and and an index variable for keeping track of progressing during the for loop</span>
+</span></span><span style=display:flex><span>adsdata &lt;- <span style=color:#0a0>data.frame</span>()
+</span></span><span style=display:flex><span>progressIndex &lt;- <span style=color:#099>0</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic># Get the Ads cost data</span>
+</span></span><span style=display:flex><span><span style=color:#00a>for</span> (account <span style=color:#00a>in</span> account_list) {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#aaa;font-style:italic># Get cost data</span>
+</span></span><span style=display:flex><span>  ads_api_response &lt;- <span style=color:#0a0>getData</span>(clientCustomerId = account,
+</span></span><span style=display:flex><span>                              google_auth      = google_auth,
+</span></span><span style=display:flex><span>                              statement        = body)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#aaa;font-style:italic># Proceed only if the API doesn&#39;t return an error (happens when there&#39;s no data to return or when the API fails), this is for dropping off false zero cost alerts</span>
+</span></span><span style=display:flex><span>  <span style=color:#00a>if</span>(!<span style=color:#0a0>is.null</span>(<span style=color:#0a0>dim</span>(ads_api_response))) {
+</span></span><span style=display:flex><span>   
+</span></span><span style=display:flex><span>    <span style=color:#aaa;font-style:italic># Init empty data frame</span>
+</span></span><span style=display:flex><span>    adsdata_temp &lt;- <span style=color:#0a0>setNames</span>(<span style=color:#0a0>data.frame</span>(<span style=color:#0a0>matrix</span>(ncol = <span style=color:#099>2</span>, nrow = <span style=color:#099>1</span>)), <span style=color:#0a0>c</span>(<span style=color:#a50>&#34;Cost&#34;</span>, <span style=color:#a50>&#34;Account&#34;</span>))
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#aaa;font-style:italic># Include account id</span>
+</span></span><span style=display:flex><span>    adsdata_temp$Account &lt;- account
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#aaa;font-style:italic># Include cost data</span>
+</span></span><span style=display:flex><span>    <span style=color:#aaa;font-style:italic># If there&#39;s no data, the result is doubled for some reason</span>
+</span></span><span style=display:flex><span>    <span style=color:#aaa;font-style:italic># Fix this by always reading the 1st value only with [1]</span>
+</span></span><span style=display:flex><span>    adsdata_temp$Cost &lt;- ads_api_response$Cost[1]
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#aaa;font-style:italic># If cost is zero, NA is returned, replace it with zero</span>
+</span></span><span style=display:flex><span>    <span style=color:#00a>if</span>(<span style=color:#0a0>is.na</span>(adsdata_temp$Cost)) adsdata_temp$Cost &lt;- <span style=color:#099>0</span>
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#aaa;font-style:italic># Collect during each iteration</span>
+</span></span><span style=display:flex><span>    adsdata &lt;- <span style=color:#0a0>rbind</span>(adsdata, adsdata_temp, stringsAsFactors = <span style=color:#00a>FALSE</span>)
+</span></span><span style=display:flex><span>  
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>  
+</span></span><span style=display:flex><span>  <span style=color:#aaa;font-style:italic># Print progress to R console</span>
+</span></span><span style=display:flex><span>  progressIndex &lt;- progressIndex + <span style=color:#099>1</span>
+</span></span><span style=display:flex><span>  <span style=color:#0a0>cat</span>(<span style=color:#0a0>paste</span>(<span style=color:#a50>&#34;Query &#34;</span>, progressIndex, <span style=color:#a50>&#34; of &#34;</span>, <span style=color:#0a0>NROW</span>(account_list), <span style=color:#a50>&#34; done\r\n&#34;</span>, sep = <span style=color:#a50>&#34;&#34;</span>))
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic># Keep accounts with zero cost only</span>
+</span></span><span style=display:flex><span>ads_accounts_with_zero_cost &lt;- <span style=color:#0a0>subset</span>(adsdata, Cost == <span style=color:#099>0</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic># Count nbr of alerted accounts</span>
+</span></span><span style=display:flex><span>nbr_of_accounts_with_alerts &lt;- <span style=color:#0a0>nrow</span>(ads_accounts_with_zero_cost)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic># Save all alerts to DB, if there was any</span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic># This assumes you have DB table named &#34;alerts&#34; existing with fields: </span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic># ads_customer_id VARCHAR</span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic># category VARCHAR</span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic># status_id INT</span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic># created_at DATETIME</span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic># updated_at DATETIME</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#00a>if</span>(nbr_of_accounts_with_alerts &gt; <span style=color:#099>0</span>) {
+</span></span><span style=display:flex><span>  
+</span></span><span style=display:flex><span>  <span style=color:#00a>for</span> (i <span style=color:#00a>in</span> <span style=color:#099>1</span>:<span style=color:#0a0>nrow</span>(ads_accounts_with_zero_cost)) {
+</span></span><span style=display:flex><span>    row &lt;- ads_accounts_with_zero_cost[i, ]
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    ads_customer_id &lt;- row$ads_customer_id
+</span></span><span style=display:flex><span>    category &lt;- <span style=color:#a50>&#34;ALERT_ZERO_COST&#34;</span> <span style=color:#aaa;font-style:italic># For categorizing different types of alerts</span>
+</span></span><span style=display:flex><span>    status_id &lt;- <span style=color:#099>0</span> <span style=color:#aaa;font-style:italic># To be set to eg. 1 when the alert is handled via a custom UI</span>
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#aaa;font-style:italic># Save each item to db</span>
+</span></span><span style=display:flex><span>    query &lt;- <span style=color:#0a0>paste</span>(<span style=color:#a50>&#34;INSERT INTO alerts (
+</span></span></span><span style=display:flex><span><span style=color:#a50>                    ads_customer_id,
+</span></span></span><span style=display:flex><span><span style=color:#a50>                    category,
+</span></span></span><span style=display:flex><span><span style=color:#a50>                    status_id,
+</span></span></span><span style=display:flex><span><span style=color:#a50>                    created_at,
+</span></span></span><span style=display:flex><span><span style=color:#a50>                    updated_at)
+</span></span></span><span style=display:flex><span><span style=color:#a50>                   VALUES (&#34;</span>,
+</span></span><span style=display:flex><span>                    <span style=color:#a50>&#34;&#39;&#34;</span>, ads_customer_id, <span style=color:#a50>&#34;&#39;, &#34;</span>,
+</span></span><span style=display:flex><span>                    <span style=color:#a50>&#34;&#39;&#34;</span>, category, <span style=color:#a50>&#34;&#39;, &#34;</span>,
+</span></span><span style=display:flex><span>                    status_id, <span style=color:#a50>&#34;, &#34;</span>,
+</span></span><span style=display:flex><span>                    <span style=color:#a50>&#34;now(), &#34;</span>,
+</span></span><span style=display:flex><span>                    <span style=color:#a50>&#34;now())&#34;</span>,
+</span></span><span style=display:flex><span>                   sep = <span style=color:#a50>&#34;&#34;</span>
+</span></span><span style=display:flex><span>    )
+</span></span><span style=display:flex><span>    <span style=color:#0a0>dbExecute</span>(con, query)
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>  
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic># If you want to check/debug what was stored, uncomment and run these lines</span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic># db_alerts &lt;- dbGetQuery(con, &#34;SELECT * FROM alerts&#34;)</span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic># View(db_alerts)</span>
+</span></span><span style=display:flex><span>  
+</span></span><span style=display:flex><span>}</span></span></code></pre></div><p>Now you have your Ads zero cost monitor script ready and you can move on to setting up your Slack bot.</p><h2 id=episode-ii-the-slack-bot-strikes-back>Episode II: The Slack bot strikes back</h2><p>Because the guys at Slack are awesome, they have written an excellent guide on how to set up your bot. They even serve you virtual cookies! Slack&rsquo;s guides are a textbook example about how documentation should be written - they&rsquo;re always a pleasure to read and follow! Thanks guys!</p><p>So, follow the <a href=https://api.slack.com/bot-users>Slack bot users guide</a>. The required steps for our alert notifications are:</p><ol><li><p>Create your Slack app</p></li><li><p>Create your bot user</p></li><li><p>Install your bot to your Slack workspace</p></li></ol><p>Once you manage to get your bot installed into your Slack workspace, you will get a <strong>webhook URL</strong> that you&rsquo;ll need in the following script.</p><div style=aspect-ratio:1751/941 class="figure nocaption"><a href=/images/2019/04/slack-bot-token.jpg title="Webhook URL"><img class=fig-img height=941 width=1751 loading=lazy src=/images/2019/04/slack-bot-token.jpg#ZgotmplZ alt="Webhook URL"></a></div><p>The bot script part is here:</p><div class=highlight><pre tabindex=0 style=background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-R data-lang=R><span style=display:flex><span><span style=color:#aaa;font-style:italic>### SLACK NOTIFICATIONS ###</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic># Replace the default value with the webhook URL you got from Slack</span>
+</span></span><span style=display:flex><span>webhook_url &lt;- <span style=color:#a50>&#34;https://hooks.slack.com/services/12345&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic># Check if the required packages are installed, install if not</span>
+</span></span><span style=display:flex><span><span style=color:#00a>if</span>(!<span style=color:#0a0>require</span>(jsonlite)) <span style=color:#0a0>install.packages</span>(<span style=color:#a50>&#34;jsonlite&#34;</span>) 
+</span></span><span style=display:flex><span><span style=color:#00a>if</span>(!<span style=color:#0a0>require</span>(httr)) <span style=color:#0a0>install.packages</span>(<span style=color:#a50>&#34;httr&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic># Load packages</span>
+</span></span><span style=display:flex><span><span style=color:#0a0>library</span>(jsonlite)
+</span></span><span style=display:flex><span><span style=color:#0a0>library</span>(httr)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic># Nbr of accounts for the Slack notification</span>
+</span></span><span style=display:flex><span>nbr_of_accounts &lt;- <span style=color:#0a0>NROW</span>(account_list)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic># Setup the message you want to send to Slack</span>
+</span></span><span style=display:flex><span>msg_desc &lt;- <span style=color:#0a0>paste</span>(<span style=color:#a50>&#34;Number of Google Ads accounts checked: &#34;</span>,
+</span></span><span style=display:flex><span>                  nbr_of_accounts,
+</span></span><span style=display:flex><span>                  sep = <span style=color:#a50>&#34;&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>msg_title &lt;- <span style=color:#0a0>paste</span>(<span style=color:#a50>&#34;ALERT - Number of zero cost accounts detected: &#34;</span>,
+</span></span><span style=display:flex><span>                   nbr_of_accounts_with_alerts,
+</span></span><span style=display:flex><span>                   sep = <span style=color:#a50>&#34;&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic># This places a channel ping if there were occurrences with zero cost, and if not, defaults to empty message</span>
+</span></span><span style=display:flex><span><span style=color:#00a>if</span>(nbr_of_accounts_with_alerts &gt; <span style=color:#099>0</span>) {
+</span></span><span style=display:flex><span>  msg_body &lt;- <span style=color:#a50>&#34;Alerts saved to database! &lt;!channel&gt;&#34;</span>
+</span></span><span style=display:flex><span>} <span style=color:#00a>else</span> {
+</span></span><span style=display:flex><span>  msg_body &lt;- <span style=color:#a50>&#34;&#34;</span>
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic># Alert to Slack - POST the msg</span>
+</span></span><span style=display:flex><span>request &lt;- <span style=color:#0a0>POST</span>(webhook_url,
+</span></span><span style=display:flex><span>                body = <span style=color:#0a0>paste</span>(
+</span></span><span style=display:flex><span>                  <span style=color:#a50>&#39;{&#34;attachments&#34;: [{&#39;</span>,
+</span></span><span style=display:flex><span>                  
+</span></span><span style=display:flex><span>                  <span style=color:#a50>&#39;&#34;title&#34;: &#34;&#39;</span>,
+</span></span><span style=display:flex><span>                  msg_title,
+</span></span><span style=display:flex><span>                  <span style=color:#a50>&#39;&#34;,&#39;</span>,
+</span></span><span style=display:flex><span>                  
+</span></span><span style=display:flex><span>                  <span style=color:#a50>&#39;&#34;pretext&#34;: &#34;&#39;</span>,
+</span></span><span style=display:flex><span>                  msg_desc,
+</span></span><span style=display:flex><span>                  <span style=color:#a50>&#39;&#34;,&#39;</span>,
+</span></span><span style=display:flex><span>                  
+</span></span><span style=display:flex><span>                  <span style=color:#a50>&#39;&#34;text&#34;: &#34;&#39;</span>,
+</span></span><span style=display:flex><span>                  msg_body,
+</span></span><span style=display:flex><span>                  <span style=color:#a50>&#39;&#34;, &#34;color&#34;: &#34;#ee0000&#34;&#39;</span>,
+</span></span><span style=display:flex><span>                  
+</span></span><span style=display:flex><span>                  <span style=color:#a50>&#39;}]}&#39;</span>,
+</span></span><span style=display:flex><span>                  
+</span></span><span style=display:flex><span>                  sep = <span style=color:#a50>&#39;&#39;</span>
+</span></span><span style=display:flex><span>                )
+</span></span><span style=display:flex><span>)</span></span></code></pre></div><p>Once you&rsquo;ve set this up, include the above Slack part into your google-ads-zero-cost-monitor.R script. Your monitoring script is now done!</p><p>This is what a sample notification would look like in Slack:</p><div style=aspect-ratio:1109/137 class="figure nocaption"><a href=/images/2019/04/slack-alert.jpg title="Slack alert sample"><img class=fig-img height=137 width=1109 loading=lazy src=/images/2019/04/slack-alert.jpg#ZgotmplZ alt="Slack alert sample"></a></div><p>Test it carefully in your RStudio and make sure everything is working correctly. After that, you&rsquo;re ready to move your script to production by scheduling it via <code>cron</code>.</p><h2 id=episode-iii-return-of-the-cron-job>Episode III: Return of the cron job</h2><p>Open <code>crontab</code> in your Linux shell for editing:</p><div class=highlight><pre tabindex=0 style=background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>crontab -e</span></span></code></pre></div><p>Add a cron job that suits your needs. Here&rsquo;s an example syntax with a scheduler that runs the R monitoring script daily at 10 AM.</p><div class=highlight><pre tabindex=0 style=background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#aaa;font-style:italic># Daily at 10 AM</span>
+</span></span><span style=display:flex><span><span style=color:#099>0</span> <span style=color:#099>10</span> * * * Rscript /home/YOUR_USERNAME/google-ads-zero-cost-monitor.R</span></span></code></pre></div><h2 id=summary>Summary</h2><p>You have now created a potentially powerful Google Ads monitoring pipeline that has endless opportunities for extending. Other useful use cases for utilizing the pipeline are for example anomaly detection, high spend tracking, campaign-level stuff, automation of ads placement optimizing, and so forth.</p><p>It goes without saying that automation is absolutely necessary in this day and age when it can save you and your team from countless hours of manual labor. By automating trivial processes such as monitoring and anomaly detection, you are freeing up your most valuable resources (people) to work on more ambitious tasks.</p><p>As always, we&rsquo;re looking forward to your comments and questions. Let us know what you think of the solution, if it could be improved, and if you already have extensions in mind!</p></div></div><div id=post-footer class="post-footer main-content-wrap"><div class=post-footer-tags><span class="text-color-light text-small">TAGGED IN</span><br><a class="tag tag--primary tag--small" href=/tags/adwords/>adwords</a>
+<a class="tag tag--primary tag--small" href=/tags/api/>api</a>
+<a class="tag tag--primary tag--small" href=/tags/r/>r</a>
+<a class="tag tag--primary tag--small" href=/tags/slack/>slack</a>
+<a class="tag tag--primary tag--small" href=/tags/guest-post/>guest post</a></div><div class=post-actions-wrap><nav><ul class="post-actions post-action-nav"><li class=post-action><a class="post-action-btn btn btn--default" href=/analytics/fetch-latest-value-data-layer-variable/><i class="fa fa-angle-left"></i>
+<span class="hide-xs hide-sm text-small icon-ml">NEXT</span></a></li><li class=post-action><a class="post-action-btn btn btn--default" href=/analytics/css-selector-guide-google-tag-manager/><span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+<i class="fa fa-angle-right"></i></a></li></ul></nav><ul class="post-actions post-action-share"><li class="post-action hide-lg hide-md hide-sm"><a class="post-action-btn btn btn--default btn-open-shareoptions" href=#btn-open-shareoptions><i class="fa fa-share-alt"></i></a></li><li class="post-action hide-xs"><a class="post-action-btn btn btn--default" target=new href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/web-development/monitor-google-ads-accounts-r-adwords-api-slack-api/"><i class="fa fa-brands fa-facebook"></i></a></li><li class="post-action hide-xs"><a class="post-action-btn btn btn--default" target=new href="https://twitter.com/intent/tweet?text=DIY%20Google%20Ads%20Account%20Monitor%20With%20R,%20AdWords%20API,%20And%20Slack%20API%20https://www.simoahava.com/web-development/monitor-google-ads-accounts-r-adwords-api-slack-api/%20via%20@SimoAhava"><i class="fa fa-brands fa-twitter"></i></a></li><li class="post-action hide-xs"><a class="post-action-btn btn btn--default" target=new href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/web-development/monitor-google-ads-accounts-r-adwords-api-slack-api/"><i class="fa fa-brands fa-linkedin"></i></a></li><li class=post-action><a class="post-action-btn btn btn--default" href=#commento><i class="fa-regular fa-comments"></i></a></li><li class=post-action><a class="post-action-btn btn btn--default" href=#><i class="fa fa-search"></i></a></li></ul></div><a name=commento></a><comentario-comments></comentario-comments></div></article><footer id=footer class=main-content-wrap><span class=copyrights>&copy; 2026 Simo Ahava. All Rights Reserved</span></footer></div><div id=bottom-bar class=post-bottom-bar data-behavior=4><div class=post-actions-wrap><nav><ul class="post-actions post-action-nav"><li class=post-action><a class="post-action-btn btn btn--default" href=/analytics/fetch-latest-value-data-layer-variable/><i class="fa fa-angle-left"></i>
+<span class="hide-xs hide-sm text-small icon-ml">NEXT</span></a></li><li class=post-action><a class="post-action-btn btn btn--default" href=/analytics/css-selector-guide-google-tag-manager/><span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+<i class="fa fa-angle-right"></i></a></li></ul></nav><ul class="post-actions post-action-share"><li class="post-action hide-lg hide-md hide-sm"><a class="post-action-btn btn btn--default btn-open-shareoptions" href=#btn-open-shareoptions><i class="fa fa-share-alt"></i></a></li><li class="post-action hide-xs"><a class="post-action-btn btn btn--default" target=new href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/web-development/monitor-google-ads-accounts-r-adwords-api-slack-api/"><i class="fa fa-brands fa-facebook"></i></a></li><li class="post-action hide-xs"><a class="post-action-btn btn btn--default" target=new href="https://twitter.com/intent/tweet?text=DIY%20Google%20Ads%20Account%20Monitor%20With%20R,%20AdWords%20API,%20And%20Slack%20API%20https://www.simoahava.com/web-development/monitor-google-ads-accounts-r-adwords-api-slack-api/%20via%20@SimoAhava"><i class="fa fa-brands fa-twitter"></i></a></li><li class="post-action hide-xs"><a class="post-action-btn btn btn--default" target=new href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/web-development/monitor-google-ads-accounts-r-adwords-api-slack-api/"><i class="fa fa-brands fa-linkedin"></i></a></li><li class=post-action><a class="post-action-btn btn btn--default" href=#commento><i class="fa-regular fa-comments"></i></a></li><li class=post-action><a class="post-action-btn btn btn--default" href=#><i class="fa fa-search"></i></a></li></ul></div></div><div id=share-options-bar class=share-options-bar data-behavior=4><i id=btn-close-shareoptions class="fa fa-close"></i><ul class=share-options><li class=share-option><a class=share-option-btn target=new href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/web-development/monitor-google-ads-accounts-r-adwords-api-slack-api/"><i class="fa fa-brands fa-facebook"></i><span>Share on Facebook</span></a></li><li class=share-option><a class=share-option-btn target=new href="https://twitter.com/intent/tweet?text=DIY%20Google%20Ads%20Account%20Monitor%20With%20R,%20AdWords%20API,%20And%20Slack%20API%20https://www.simoahava.com/web-development/monitor-google-ads-accounts-r-adwords-api-slack-api/%20via%20@SimoAhava"><i class="fa fa-brands fa-twitter"></i><span>Share on Twitter</span></a></li><li class=share-option><a class=share-option-btn target=new href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/web-development/monitor-google-ads-accounts-r-adwords-api-slack-api/"><i class="fa fa-brands fa-linkedin"></i><span>Share on LinkedIn</span></a></li></ul></div><div id=share-options-mask class=share-options-mask></div></div><div id=about><div id=about-card><div id=about-btn-close><i class="fa fa-remove"></i></div><img id=about-card-picture src=https://www.simoahava.com/images/simo.png alt="Author's picture"><h4 id=about-card-name>Simo Ahava</h4><div id=about-card-bio>Husband | Father | Analytics developer<br>simo (at) simoahava.com</div><div id=about-card-job><i class="fa fa-briefcase"></i><br>Senior Data Advocate at Reaktor</div><div id=about-card-location><i class="fa fa-map-marker"></i><br>Finland</div></div></div><div id=cover style=background-image:url(https://www.simoahava.com/images/maisema.jpg)></div><script defer src=https://comentario.simoahava.com/comentario.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin=anonymous referrerpolicy=no-referrer></script><script defer src=/js/script.js></script><script>!function(){var e=document.querySelector(".simmer"),t=document.querySelector(".simmer .close"),n=window.sessionStorage&&window.sessionStorage.getItem("nosimmer");e&&(n&&(e.style.display="none"),t&&t.addEventListener("click",function(){window.sessionStorage.setItem("nosimmer","true"),e.style.display="none"}))}()</script></body></html>

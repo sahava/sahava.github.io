@@ -1,918 +1,185 @@
-
-
-  
-    
-  
-
-
-  
-
-
-
-
-
-  
-
-
-  
-
-<!DOCTYPE html>
-<html lang="en-us">
-  <head>
-    <meta name="google-site-verification" content="xQwWI2KUfP9LbFKhw2CVLFtrMY6Czrla7L3PD2aBolA" />
-
-
-<script type="application/ld+json">
-{
-  "@context": "http://schema.org", 
-  "@type": "BlogPosting",
-  "headline": "Static Site Search With Hugo \u002b App Engine \u002b Search API \u002b Python | Simo Ahava's blog",
-  "image": "https:\/\/www.simoahava.com\/images\/2018\/01\/hugo.jpg",
-  "editor": "Simo Ahava",
-  "publisher": {
-    "@type": "Organization",
-    "name": "Simo Ahava's blog",
-    "logo": {
-      "@type": "ImageObject",
-      "url": "https:\/\/www.simoahava.com\/images\/simo.png",
-      "height": "393",
-      "width": "407"
-    }
-  },
-  "url": "https:\/\/www.simoahava.com\/web-development\/static-site-search-google-app-engine-search-api\/",
-  "datePublished": "2018-01-15T09:39:41\u002b02:00",
-  "dateModified": "2018-01-15T09:39:41\u002b02:00",
-  "description": "How to make static site search work using Google App Engine\u0027s Search API and a static site generated with Hugo.",
-  "author": {
-    "@type": "Person",
-    "name": "Simo Ahava"
-  }
-}
-</script>
-
-
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    
-    <title>Static Site Search With Hugo &#43; App Engine &#43; Search API &#43; Python | Simo Ahava's blog</title>
-    
-    <script>
-      window.dataLayer=window.dataLayer||[];window.dataLayer.push({pageType: 'article', environment:  null });
-    </script>
-    
-
-    
-    
-    
-    <script>
-      (function(S,i,m,o){
-        window[m]=window[m]||[];
-        window[m].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
-        var f=S.getElementsByTagName(i)[0],j=S.createElement(i),dl=m!='dataLayer'?'&l='+m:'';
-        j.async=true;
-        j.src='https://sgtm.simoahava.com/gtm.js?id='+o+dl;
-        f.parentNode.insertBefore(j,f);
-      })(document,'script','dataLayer','GTM-PZ7GMV9');
-    </script>
-    
-    <meta name="author" content="Simo Ahava">
-    <meta name="keywords" content="">
-
-    <link rel="icon" href="https://www.simoahava.com/images/favicon.ico">
-    
-    <link rel="amphtml" href="https://www.simoahava.com/amp/web-development/static-site-search-google-app-engine-search-api/">
-    
-    <meta name="description" content="How to make static site search work using Google App Engine&#39;s Search API and a static site generated with Hugo.">
-    <meta property="og:description" content="How to make static site search work using Google App Engine&#39;s Search API and a static site generated with Hugo.">
-    <meta property="og:type" content="blog">
-    <meta property="og:title" content="Static Site Search With Hugo &#43; App Engine &#43; Search API &#43; Python">
-    <meta property="og:url" content="https://www.simoahava.com/web-development/static-site-search-google-app-engine-search-api/">
-    <meta property="og:site_name" content="Simo Ahava&#39;s blog">
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Static Site Search With Hugo &#43; App Engine &#43; Search API &#43; Python">
-    <meta name="twitter:description" content="How to make static site search work using Google App Engine&#39;s Search API and a static site generated with Hugo.">
-    
-      <meta name="twitter:creator" content="@SimoAhava">
-      
-    
-
-    
-    
-
-    
-      <meta name="twitter:image" content="https://www.simoahava.com/images/2018/01/hugo.jpg">  
-      <meta property="og:image" content="https://www.simoahava.com/images/2018/01/hugo.jpg">
-    
-
-
-    
-
-      
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-      
-    
-    <link rel="stylesheet" href="https://www.simoahava.com/css/style.css" />
-    
-    
-
-    
-      
-    
-    
-  </head>
-
-  <body>
-    
-    <div id="_progress"></div>
-    
-    <div id="blog">
-      <header id="header" data-behavior="4">
-  <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
-  <div class="header-title">
-    <a class="header-title-link" href="https://www.simoahava.com/">Simo Ahava&#39;s blog</a>
-  </div>
-  
-</header>
-
-      <nav id="sidebar" data-behavior="4">
-  <div class="sidebar-container">
-    
-      <div class="sidebar-profile">
-        <a href="https://www.simoahava.com/">
-          <img class="sidebar-profile-picture" loading="lazy" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
-        </a>
-        <h4 class="sidebar-profile-name">Simo Ahava</h4>
-        
-          <h5 class="sidebar-profile-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</h5>
-        
-      </div>
-    
-    <ul class="sidebar-buttons">
-      
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-home"></i>
-      
-      <span class="sidebar-button-desc">Home</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
-      
-      <span class="sidebar-button-desc">Categories</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/tags/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
-      
-      <span class="sidebar-button-desc">Tags</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/gtm-tips/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-magic"></i>
-      
-      <span class="sidebar-button-desc">GTM Tips</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/about-simo-ahava/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-question"></i>
-      
-      <span class="sidebar-button-desc">About</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
-      
-      <span class="sidebar-button-desc">RSS</span>
-    </a>
-  </li>
-
-
-    </ul>
-    <ul class="sidebar-buttons">
-      
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/tools/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-wrench"></i>
-      
-      <span class="sidebar-button-desc">Tools</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/blog-statistics/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-bar-chart"></i>
-      
-      <span class="sidebar-button-desc">Blog statistics</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://github.com/sahava" target="_blank" rel="noopener ">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-brands fa-github"></i>
-      
-      <span class="sidebar-button-desc">GitHub</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/upcoming-talks/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-bullhorn"></i>
-      
-      <span class="sidebar-button-desc">Upcoming talks</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/custom-templates/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
-      
-      <span class="sidebar-button-desc">Templates</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/newsletter/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-bell"></i>
-      
-      <span class="sidebar-button-desc">Newsletter</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://masto.measure.chat/@SimoAhava" target="_blank" rel="noopener me">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-brands fa-mastodon"></i>
-      
-      <span class="sidebar-button-desc">Mastodon</span>
-    </a>
-  </li>
-
-
-    </ul>
-    <ul class="sidebar-buttons">
-      
-
-    </ul>
-  </div>
-</nav>
-
-      
-
-      <div id="main" data-behavior="4"
-        class="
-               hasCoverMetaIn
-               ">
-        <article class="post">
-	  <form id="search" action="https://www.simoahava.com/search/">
-  <input name="q" type="text" class="form-control input--xlarge" placeholder="Search blog..." autocomplete="off">
-  </form>
-
-          <div class="post-header main-content-wrap text-left">
-  
-  
-
-    <h1>
-      Static Site Search With Hugo &#43; App Engine &#43; Search API &#43; Python
-    </h1>
-  
-  
-  <div class="postShorten-meta post-meta">
-    
-      <time datetime="2018-01-15T09:39:41&#43;02:00">
-        
-  January 15, 2018
-
-      </time>
-      
-      
-  
-  
-    <span>in</span>
-    
-      <a class="category-link" href="https://www.simoahava.com/categories/web-development">Web development</a>
-    
-  
-
-
-      | <a href="https://www.simoahava.com/web-development/static-site-search-google-app-engine-search-api/#commento"><comentario-count path="/web-development/static-site-search-google-app-engine-search-api/" 
-                  placeholder="..."
-                  error-text="N/A "
-                  zero-text="0 "
-                  prefix=""
-                  suffix=" "></comentario-count>Comments</a>
-      
-  </div>
-
-
-</div>
-
-          <div class="post-content markdown">
-            <div class="main-content-wrap">
-	      
-                
-  	        <p>As the year changed to 2018, I decided to abandon <a href="https://www.wordpress.org">WordPress</a>, which I had been using for over 12 years as my content management system of choice. I had many reasons to do so, but the biggest motivators were the opportunity to try something new and to abandon the bloat and clutter of WordPress for a more simple, more elegant order of things. Spurred on by another adopter, <a href="http://markedmondson.me/">Mark Edmondson</a>, I decided to give <a href="https://gohugo.io/">Hugo</a> a go (pun intended).</p>
-
-
-
-<div style="aspect-ratio: 2120 / 670;" class="figure nocaption">
-  
-    <a href="https://www.simoahava.com/images/2018/01/hugo.jpg" title="Hugo static site generator">
-  
-    <img class="fig-img" height="670" width="2120" loading="lazy" src="https://www.simoahava.com/images/2018/01/hugo.jpg#ZgotmplZ" alt="Hugo static site generator">
-  
-    </a>
-  
-  
-</div>
-
-
-<p>The migration wasn&rsquo;t easy, as I had to convert WordPress&rsquo; relational database into a static list of markdown files. Along the way, I had to configure two themes (<a href="https://themes.gohugo.io/hugo-tranquilpeak-theme/">regular</a> and <a href="https://github.com/DanielMuller/hugo-theme-campser">AMP</a>), optimize all my images, JavaScript, and stylesheets, and go through every single one of my 200+ articles, looking for stylistic issues and broken links (oh boy, were there many of those!).</p>
-<p>Hugo is written in the <a href="https://golang.org/">Go</a> language, and it&rsquo;s fairly easy to use if you&rsquo;re familiar with <a href="https://daringfireball.net/projects/markdown/syntax">markdown</a> and the command line of your operating system. The trick about a static site is that all the content is stored in static files in your file server. There is no relational database to fall back on, which means that a static site can be both blazing fast and a chore to maintain.</p>
-<p>One of the biggest headaches for me was how to set up site search. Without a database or a web server generating dynamic HTML documents, finding a suitable way to index the content in the browser and respond quickly and efficiently to search queries seemed like an insurmountable task.</p>
-<p>I tried a number of things at first, including:</p>
-<ul>
-<li>
-<p><a href="https://www.algolia.com/">Algolia</a>, which I had to give up beacuse I had too much content for their free tier.</p>
-</li>
-<li>
-<p><a href="https://lunrjs.com/">lunr.js</a> running on a NodeJS virtual machine in Google&rsquo;s cloud, which I had to give up because I got a bill of 400$ for instance upkeep for the month of December alone.</p>
-</li>
-<li>
-<p>Custom-built solution that digested JSON generated by Hugo and parsed it for searching with jQuery directly in the browser, which I had to give up since downloading an indexed JSON file of around 5 megabytes on every page is not conducive to a good user experience.</p>
-</li>
-</ul>
-<p>After the failed experiment with lunr.js, I still wanted to give Google&rsquo;s App Engine another chance. I&rsquo;ve been in love with App Engine ever since publishing the first version of my <a href="https://www.gtmtools.com/">GTM Tools</a> on it. Well, as it turns out, App Engine has a really useful and flexible <a href="https://cloud.google.com/appengine/docs/standard/python/search/">Search API</a> for Python, which seems to be tailormade to work with the JSON generated by Hugo in a static site!</p>
-
-
-
-<div style="aspect-ratio: 2878 / 1102;" class="figure nocaption">
-  
-    <a href="https://www.simoahava.com/images/2018/01/static-site-search-with-google-appengine-search-api.jpg" title="Search API quotas in App Engine">
-  
-    <img class="fig-img" height="1102" width="2878" loading="lazy" src="https://www.simoahava.com/images/2018/01/static-site-search-with-google-appengine-search-api.jpg#ZgotmplZ" alt="Search API quotas in App Engine">
-  
-    </a>
-  
-  
-</div>
-
-
-
-                <span class="simmer">
-  <span class="close">X</span>
-  <p>
-    <span class="fa fa-md fa-bell"></span>
-    <strong>The Simmer Newsletter</strong>
-  </p>
-  <p>
-    Subscribe to the <a href="https://www.simoahava.com/newsletter/">Simmer newsletter</a> to get the latest news and content from Simo Ahava into your email inbox!
-  </p>
-  </span>
-
-                
-                  <h2 id="the-setup">The setup</h2>
-<p>My setup looks like this:</p>
-<ol>
-<li>
-<p>The <a href="https://gohugo.io/templates/output-formats/#output-formats">Hugo config file</a> is configured to output an <code>index.json</code> into the public directory, with all the content of my site ready for indexing.</p>
-</li>
-<li>
-<p>A script which deploys this JSON file into the App Engine project.</p>
-</li>
-<li>
-<p>An App Engine project which uses the <a href="https://cloud.google.com/appengine/docs/standard/python/search/">Python Search API</a> client to build an index of this JSON.</p>
-</li>
-<li>
-<p>The App Engine project also provides an HTTP endpoint to which my site makes all the search queries. Each request is processed as a search query, and the result is returned in the HTTP response.</p>
-</li>
-<li>
-<p>Finally, I have a bunch of JavaScript running the search form and the search results page on my site, sending the request to the App Engine endpoint as well as formatting the search results page with the response.</p>
-</li>
-</ol>
-<p>The beauty of using the Search API is that I&rsquo;m well below the <a href="https://cloud.google.com/appengine/docs/standard/python/search/#Python_Search_API_quotas">quota limits</a> for the free version, and thus I don&rsquo;t have to pay a dime to make it all work!</p>
-
-
-
-<div style="aspect-ratio: 1402 / 282;" class="figure nocaption">
-  
-    <a href="https://www.simoahava.com/images/2018/01/search-quota.jpg" title="My quotas for the search API">
-  
-    <img class="fig-img" height="282" width="1402" loading="lazy" src="https://www.simoahava.com/images/2018/01/search-quota.jpg#ZgotmplZ" alt="My quotas for the search API">
-  
-    </a>
-  
-  
-</div>
-
-
-
-                
-                  <h2 id="1-the-config-file-modification">1. The config file modification</h2>
-<p>The change to Hugo&rsquo;s config file is easy to make, because Hugo has built in support for generating the JSON in a format that most search libraries digest. In the configuration file, you need to find the <code>output</code> configuration, and add <code>&quot;JSON&quot;</code> as one of the outputs for the <code>home</code> content type. So it looks something like this:</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-toml" data-lang="toml">[output]
-  home = [ <span style="color:#a50">&#34;HTML&#34;</span>, <span style="color:#a50">&#34;RSS&#34;</span>, <span style="color:#a50">&#34;JSON&#34;</span> ]</code></pre></div>
-<p>This configuration change generates an <code>index.json</code> file into the root of your public folder whenever the Hugo project is built.</p>
-<p>Here&rsquo;s an example of a what a blog post might look like in this file:</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">[
-    {
-        <span style="color:#1e90ff;font-weight:bold">&#34;uri&#34;</span>: <span style="color:#a50">&#34;https://www.simoahava.com/upcoming-talks/&#34;</span>,
-        <span style="color:#1e90ff;font-weight:bold">&#34;title&#34;</span>: <span style="color:#a50">&#34;Upcoming Talks&#34;</span>,
-        <span style="color:#1e90ff;font-weight:bold">&#34;tags&#34;</span>: [],
-        <span style="color:#1e90ff;font-weight:bold">&#34;description&#34;</span>: <span style="color:#a50">&#34;My upcoming conference talks and events&#34;</span>,
-        <span style="color:#1e90ff;font-weight:bold">&#34;content&#34;</span>: <span style="color:#a50">&#34;17 March 2018: MeasureCamp London 20 March 2018: SMX München 19 April 2018: Advanced GTM Workshop (Hamburg) 24 May 2018: NXT Nordic (Oslo) 20 September 2018: Advanced GTM Workshop (Hamburg) 14-16 November 2018: SMXL Milan    I enjoy presenting at conferences and meetups, and I have a track record of hundreds of talks since 2013, comprising keynotes, conference presentations, workshops, seminars, and public trainings. Audience sizes have varied between 3 and 2,000.\nMy favorite topics revolve around web analytics development and analytics customization, but I\u0026rsquo;m more than happy to talk about integrating analytics into organizations, knowledge transfer, improving technical skills, digital marketing, and content creation.\nSome of my conference slides can be found at SlideShare.\nFor a sample, here\u0026rsquo;s a talk I gave at Reaktor Breakpoint in 2015.\n   You can contact me at simo (at) simoahava.com for enquiring about my availability for your event.\n&#34;</span>
-    }
-]</code></pre></div>
-
-                
-                  <h2 id="2-the-deploy-script">2. The deploy script</h2>
-<p>The deploy script is a piece of Bash code which builds the Hugo site, copies the <code>index.json</code> into my search project folder, and then deploys the entire search project into App Engine. Here&rsquo;s what it looks like:</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#0aa">cd</span> ~/Documents/Projects/www-simoahava-com/
-rm -rf public
-hugo
-cp public/index.json ../www-simoahava-com-search/
-rm -rf public
-<span style="color:#0aa">cd</span> ~/Documents/Projects/www-simoahava-com-search/
-gcloud app deploy
-curl https://search-www-simoahava-com.appspot.com/update</code></pre></div>
-<p>The <code>hugo</code> command builds the site and generates the public folder. From the public folder, the <code>index.json</code> is then copied to my search project folder, which is subsequently deployed into App Engine using the command <code>gcloud app deploy</code>. Finally, a <code>curl</code> command to my custom endpoint makes certain that my Python script updates the search index with the latest version of <code>index.json</code>.</p>
-
-                
-                  <h2 id="3-the-python-code-running-in-app-engine">3. The Python code running in App Engine</h2>
-<p>In <a href="https://cloud.google.com/appengine/">App Engine</a>, I&rsquo;ve simply created a new project with a name that&rsquo;s easy enough to remember as the endpoint. I haven&rsquo;t added any billing to the account, because I&rsquo;ve set a challenge for myself to build a free search API for my site.</p>
-<p>See <a href="https://cloud.google.com/appengine/docs/flexible/python/quickstart">this documentation</a> for a quick start guide on how to get started with Python and App Engine. Focus especially on how to setup the App Engine project (you don&rsquo;t need to enable billing), and how to install and configure the <code>gcloud</code> command line tools for your project.</p>
-<p>The Python code looks like this.</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#aaa;font-style:italic">#!/usr/bin/python</span>
-
-<span style="color:#00a">from</span> <span style="color:#0aa;text-decoration:underline">urlparse</span> <span style="color:#00a">import</span> urlparse
-<span style="color:#00a">from</span> <span style="color:#0aa;text-decoration:underline">urlparse</span> <span style="color:#00a">import</span> parse_qs
-
-<span style="color:#00a">import</span> <span style="color:#0aa;text-decoration:underline">json</span>
-<span style="color:#00a">import</span> <span style="color:#0aa;text-decoration:underline">re</span>
-
-<span style="color:#00a">import</span> <span style="color:#0aa;text-decoration:underline">webapp2</span>
-<span style="color:#00a">from</span> <span style="color:#0aa;text-decoration:underline">webapp2_extras</span> <span style="color:#00a">import</span> jinja2
-
-<span style="color:#00a">from</span> <span style="color:#0aa;text-decoration:underline">google.appengine.api</span> <span style="color:#00a">import</span> search
-
-<span style="color:#aaa;font-style:italic"># Index name for your search documents</span>
-_INDEX_NAME = <span style="color:#a50">&#39;search-www-simoahava-com&#39;</span>
-
-
-<span style="color:#00a">def</span> <span style="color:#0a0">create_document</span>(title, uri, description, tags, content):
-    <span style="color:#a50">&#34;&#34;&#34;Create a search document with ID generated from the post title&#34;&#34;&#34;</span>
-    doc_id = re.sub(<span style="color:#a50">&#39;[\s+]&#39;</span>, <span style="color:#a50">&#39;&#39;</span>, title)
-    document = search.Document(
-        doc_id=doc_id,
-        fields=[
-            search.TextField(name=<span style="color:#a50">&#39;title&#39;</span>, value=title),
-            search.TextField(name=<span style="color:#a50">&#39;uri&#39;</span>, value=uri),
-            search.TextField(name=<span style="color:#a50">&#39;description&#39;</span>, value=description),
-            search.TextField(name=<span style="color:#a50">&#39;tags&#39;</span>, value=json.dumps(tags)),
-            search.TextField(name=<span style="color:#a50">&#39;content&#39;</span>, value=content)
-        ]
-    )
-    <span style="color:#00a">return</span> document
-
-
-<span style="color:#00a">def</span> <span style="color:#0a0">add_document_to_index</span>(document):
-    index = search.Index(_INDEX_NAME)
-    index.put(document)
-	
-
-<span style="color:#00a">class</span> <span style="color:#0a0;text-decoration:underline">BaseHandler</span>(webapp2.RequestHandler):
-    <span style="color:#a50">&#34;&#34;&#34;The other handlers inherit from this class. Provides some helper methods
-</span><span style="color:#a50">    for rendering a template.&#34;&#34;&#34;</span>
-
-    <span style="color:#888">@webapp2.cached_property</span>
-    <span style="color:#00a">def</span> <span style="color:#0a0">jinja2</span>(self):
-        <span style="color:#00a">return</span> jinja2.get_jinja2(app=self.app)
-
-
-<span style="color:#00a">class</span> <span style="color:#0a0;text-decoration:underline">ProcessQuery</span>(BaseHandler):
-    <span style="color:#a50">&#34;&#34;&#34;Handles search requests for comments.&#34;&#34;&#34;</span>
-
-    <span style="color:#00a">def</span> <span style="color:#0a0">get</span>(self):
-        <span style="color:#a50">&#34;&#34;&#34;Handles a get request with a query.&#34;&#34;&#34;</span>
-        uri = urlparse(self.request.uri)
-        query = <span style="color:#a50">&#39;&#39;</span>
-        <span style="color:#00a">if</span> uri.query:
-            query = parse_qs(uri.query)
-            query = query[<span style="color:#a50">&#39;q&#39;</span>][<span style="color:#099">0</span>]
-
-        index = search.Index(_INDEX_NAME)
-
-        compiled_query = search.Query(
-            query_string=json.dumps(query),
-            options=search.QueryOptions(
-                sort_options=search.SortOptions(match_scorer=search.MatchScorer()),
-                limit=<span style="color:#099">1000</span>,
-                returned_fields=[<span style="color:#a50">&#39;title&#39;</span>, <span style="color:#a50">&#39;uri&#39;</span>, <span style="color:#a50">&#39;description&#39;</span>]
-            )
-        )
-		
-		results = index.search(compiled_query)
-
-        json_results = {
-            <span style="color:#a50">&#39;results&#39;</span>: [],
-            <span style="color:#a50">&#39;query&#39;</span>: json.dumps(query)
-        }
-
-        <span style="color:#00a">for</span> document <span style="color:#00a">in</span> results.results:
-            search_result = {}
-            <span style="color:#00a">for</span> field <span style="color:#00a">in</span> document.fields:
-                search_result[field.name] = field.value
-            json_results[<span style="color:#a50">&#39;results&#39;</span>].append(search_result)
-        self.response.headers.add(<span style="color:#a50">&#39;Access-Control-Allow-Origin&#39;</span>, <span style="color:#a50">&#39;https://www.simoahava.com&#39;</span>)
-        self.response.write(json.dumps(json_results))
-		
-
-<span style="color:#00a">class</span> <span style="color:#0a0;text-decoration:underline">UpdateIndex</span>(BaseHandler):
-    <span style="color:#a50">&#34;&#34;&#34;Updates the index using index.json&#34;&#34;&#34;</span>
-
-    <span style="color:#00a">def</span> <span style="color:#0a0">get</span>(self):
-        <span style="color:#00a">with</span> <span style="color:#0aa">open</span>(<span style="color:#a50">&#39;index.json&#39;</span>) <span style="color:#00a">as</span> json_file:
-            data = json.load(json_file)
-
-        <span style="color:#00a">for</span> post <span style="color:#00a">in</span> data:
-            title = post.get(<span style="color:#a50">&#39;title&#39;</span>, <span style="color:#a50">&#39;&#39;</span>)
-            uri = post.get(<span style="color:#a50">&#39;uri&#39;</span>, <span style="color:#a50">&#39;&#39;</span>)
-            description = post.get(<span style="color:#a50">&#39;description&#39;</span>, <span style="color:#a50">&#39;&#39;</span>)
-            tags = post.get(<span style="color:#a50">&#39;tags&#39;</span>, [])
-            content = post.get(<span style="color:#a50">&#39;content&#39;</span>, <span style="color:#a50">&#39;&#39;</span>)
-
-            doc = create_document(title, uri, description, tags, content)
-            add_document_to_index(doc)
-			
-
-application = webapp2.WSGIApplication(
-    [(<span style="color:#a50">&#39;/&#39;</span>, ProcessQuery),
-     (<span style="color:#a50">&#39;/update&#39;</span>, UpdateIndex)],
-    debug=True)</code></pre></div>
-<p>At the very end, I&rsquo;m binding requests to the <code>/</code> endpoint to <code>ProcessQuery</code>, and requests to <code>/update</code> to <code>UpdateIndex</code>. In other words, these are the two endpoints I am serving.</p>
-<p><code>UpdateIndex</code> loads the <code>index.json</code> file, and for every single content piece within (blog posts, pages, etc.), it grabs the <code>title</code>, <code>uri</code>, <code>description</code>, <code>tags</code>, and <code>content</code> parameters from the content JSON, and creates documents for each instance. Then, each document is added to the index.</p>
-<p>This is how the Search API can be used to translate any JSON file into a valid search index, that you can then build queries against.</p>
-<p>Queries are made by polling the <code>/?q=&lt;keyword&gt;</code> endpoint, where <code>keyword</code> matches a valid query against the Search API <a href="https://cloud.google.com/appengine/docs/standard/python/search/query_strings">query engine</a>. Each query is processed by <code>ProcessQuery</code>, which takes the query term, polls the search index with that term, and then compiles a result of all the documents that the search index returns for that query (in ranked order). This result is then pushed into a JSON response back to the client.</p>
-<p>The search API gives you plenty of room to optimize the index and for compiling complex queries. I&rsquo;ve opted for a fairly mundane approach, which might lead to some odd ranking outliers, such as documents that should clearly be at the top of a list of relevant results ending up in the end, but I&rsquo;m still quite happy with how the robustness of the API.</p>
-
-                
-                  <h2 id="4-the-javascript">4. The JavaScript</h2>
-<p>Finally, I need some client-side code to produce the search results page. Since Hugo doesn&rsquo;t have a web server, I can&rsquo;t do the search server-side - it must be done in the client. This is one of the cases where a static site loses some of its shine when compared to its counterparts that come equipped with a web server and server-side processing capabilities. A Hugo site is built and deployed all at once, so there&rsquo;s no dynamic generation of HTML pages after building - everything has to happen in the client.</p>
-<p>Anyway, the search form on my site is very simple. It just looks like this:</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">form</span> <span style="color:#1e90ff">id</span>=<span style="color:#a50">&#34;search&#34;</span> <span style="color:#1e90ff">action</span>=<span style="color:#a50">&#34;/search/&#34;</span>&gt;
-  &lt;<span style="color:#1e90ff;font-weight:bold">input</span> <span style="color:#1e90ff">name</span>=<span style="color:#a50">&#34;q&#34;</span> <span style="color:#1e90ff">type</span>=<span style="color:#a50">&#34;text&#34;</span> <span style="color:#1e90ff">class</span>=<span style="color:#a50">&#34;form-control input--xlarge&#34;</span> <span style="color:#1e90ff">placeholder</span>=<span style="color:#a50">&#34;Search blog...&#34;</span> <span style="color:#1e90ff">autocomplete</span>=<span style="color:#a50">&#34;off&#34;</span>&gt;
-&lt;/<span style="color:#1e90ff;font-weight:bold">form</span>&gt;</code></pre></div>
-<p>When the form is submitted, it does a GET request to the <code>/search/</code> page on my site, adding whatever was typed into the field as the <code>q</code> query parameter, so the URL becomes something like</p>
-<p><code>https://www.simoahava.com/search/?q=google+tag+manager</code></p>
-<p>On the <code>/search/</code> page, I have a loading spinner which waits until the request to the search endpoint is completed. The search call is done with JavaScript, and it looks like this:</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">(<span style="color:#00a">function</span>($) {
-
-    <span style="color:#00a">var</span> printSearchResults = <span style="color:#00a">function</span>(results) {
-	  <span style="color:#aaa;font-style:italic">// Update the page DOM with the search results...
-</span><span style="color:#aaa;font-style:italic"></span>	};
-
-    <span style="color:#00a">var</span> endpoint = <span style="color:#a50">&#39;https://search-www-simoahava-com.appspot.com&#39;</span>;
-
-    <span style="color:#00a">var</span> getQuery = <span style="color:#00a">function</span>() {
-        <span style="color:#00a">if</span> (<span style="color:#0aa">window</span>.location.search.length === <span style="color:#099">0</span> || !<span style="color:#099">/(\?|&amp;)q=/</span>.test(<span style="color:#0aa">window</span>.location.search)) {
-            <span style="color:#00a">return</span> <span style="color:#00a">undefined</span>;
-        }
-
-        <span style="color:#00a">var</span> parts = <span style="color:#0aa">window</span>.location.search.substring(<span style="color:#099">1</span>).split(<span style="color:#a50">&#39;&amp;&#39;</span>);
-        <span style="color:#00a">var</span> query = parts.map(<span style="color:#00a">function</span>(part) {
-            <span style="color:#00a">var</span> temp = part.split(<span style="color:#a50">&#39;=&#39;</span>);
-            <span style="color:#00a">return</span> temp[<span style="color:#099">0</span>] === <span style="color:#a50">&#39;q&#39;</span> ? temp[<span style="color:#099">1</span>] : <span style="color:#00a">false</span>;
-        });
-        <span style="color:#00a">return</span> query[<span style="color:#099">0</span>] || <span style="color:#00a">undefined</span>;
-    };
-
-    $(<span style="color:#0aa">document</span>).ready(<span style="color:#00a">function</span>() {
-        <span style="color:#00a">var</span> query = getQuery();
-
-        <span style="color:#00a">if</span> (<span style="color:#00a">typeof</span> query === <span style="color:#a50">&#39;undefined&#39;</span>) {
-            printSearchResults();
-            <span style="color:#00a">return</span>;
-        } <span style="color:#00a">else</span> {
-            $.get(endpoint + <span style="color:#a50">&#39;?q=&#39;</span> + query, <span style="color:#00a">function</span>(data) {
-                printSearchResults(JSON.parse(data));
-            });
-        }
-    });
-	
-})(<span style="color:#0aa">window</span>.jQuery)
-</code></pre></div>
-<p>To keep things simple, I&rsquo;ve only included the relevant pieces of code that can be used elsewhere, too. In short, when the <code>/search/</code> page is loaded, whatever is included as the value of the <code>q</code> query parameter is immediately sent to the search API endpoint. The response is then processed and built into a search results page.</p>
-<p>So, if the page URL is <code>https://www.simoahava.com/search/?q=google+tag.manager</code>, this piece of JavaScript turns that into a GET request to <code>https://search-www-simoahava-com.appspot.com/?q=google+tag+manager</code>. You can visit that URL to see what the response looks like.</p>
-<p>This response is the processed, and the search results page is built.</p>
-
-                
-                  <h2 id="summary">Summary</h2>
-<p>This is how I&rsquo;ve chosen to build site search using the flexibility of Hugo together with the powerful Search API offered by Google&rsquo;s App Engine.</p>
-<p>Based on my limited amount of research, it&rsquo;s as good a solution as any, and it seems quite fast without compromising the power of the search query engine. However, as more content builds up, it&rsquo;s conceivable that the query engine either gets slower or I start hitting my free tier quotas, at which point I&rsquo;ll need to rethink my approach.</p>
-<p>The weak link at the moment is that everything is done client-side. That means that contrary to the philosphy of static sites, a lot of processing takes place in the browser. But I&rsquo;m not sure how this could be avoided, since a static site doesn&rsquo;t offer you the capabilities of a server-side processor.</p>
-<p>At this time, it&rsquo;s a trade-off I&rsquo;m willing to make, but I am anxious to hear feedback if the search is clumsy or not working properly for you.</p>
-
-                
-              
-              
-
-            </div>
-          </div>
-          <div id="post-footer" class="post-footer main-content-wrap">
-            
-              
-                
-                
-                  <div class="post-footer-tags">
-                    <span class="text-color-light text-small">TAGGED IN</span><br/>
-                    
-  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/app-engine/">app engine</a>
-
-  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/search-api/">search api</a>
-
-  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/hugo/">hugo</a>
-
-  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/static-site/">static site</a>
-
-  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/google-cloud/">google cloud</a>
-
-                  </div>
-                
-              
-            
-            
-  <div class="post-actions-wrap">
-      <nav >
-        <ul class="post-actions post-action-nav">
-          
-            <li class="post-action">
-              
-                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/simple-custom-event-listeners-gtm/">
-              
-                  <i class="fa fa-angle-left"></i>
-                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
-                </a>
-            </li>
-            <li class="post-action">
-              
-                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/new-tools-released/">
-              
-                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
-                  <i class="fa fa-angle-right"></i>
-                </a>
-            </li>
-          
-        </ul>
-      </nav>
-    <ul class="post-actions post-action-share" >
-      
-        <li class="post-action hide-lg hide-md hide-sm">
-          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
-            <i class="fa fa-share-alt"></i>
-          </a>
-        </li>
-        
-          <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/web-development/static-site-search-google-app-engine-search-api/">
-              <i class="fa fa-brands fa-facebook"></i>
-            </a>
-          </li>
-        
-          <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Static%20Site%20Search%20With%20Hugo%20&#43;%20App%20Engine%20&#43;%20Search%20API%20&#43;%20Python%20https://www.simoahava.com/web-development/static-site-search-google-app-engine-search-api/%20via%20@SimoAhava">
-              <i class="fa fa-brands fa-twitter"></i>
-            </a>
-          </li>
-        
-          <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/web-development/static-site-search-google-app-engine-search-api/">
-              <i class="fa fa-brands fa-linkedin"></i>
-            </a>
-          </li>
-        
-      
-      
-        <li class="post-action">
-          <a class="post-action-btn btn btn--default" href="#commento">
-            <i class="fa-regular fa-comments"></i>
-          </a>
-        </li>
-      
-      <li class="post-action">
-          <a class="post-action-btn btn btn--default" href="#">
-          <i class="fa fa-search"></i>
-        </a>
-      </li>
-    </ul>
-  </div>
-
-
-            
-              <a name="commento"></a>
-<comentario-comments></comentario-comments>
-
-            
-          </div>
-        </article>
-        <footer id="footer" class="main-content-wrap">
-  <span class="copyrights">
-    &copy; 2026 Simo Ahava. All Rights Reserved
-  </span>
-</footer>
-
-      </div>
-      
-      <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
-        
-  <div class="post-actions-wrap">
-      <nav >
-        <ul class="post-actions post-action-nav">
-          
-            <li class="post-action">
-              
-                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/simple-custom-event-listeners-gtm/">
-              
-                  <i class="fa fa-angle-left"></i>
-                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
-                </a>
-            </li>
-            <li class="post-action">
-              
-                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/new-tools-released/">
-              
-                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
-                  <i class="fa fa-angle-right"></i>
-                </a>
-            </li>
-          
-        </ul>
-      </nav>
-    <ul class="post-actions post-action-share" >
-      
-        <li class="post-action hide-lg hide-md hide-sm">
-          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
-            <i class="fa fa-share-alt"></i>
-          </a>
-        </li>
-        
-          <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/web-development/static-site-search-google-app-engine-search-api/">
-              <i class="fa fa-brands fa-facebook"></i>
-            </a>
-          </li>
-        
-          <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Static%20Site%20Search%20With%20Hugo%20&#43;%20App%20Engine%20&#43;%20Search%20API%20&#43;%20Python%20https://www.simoahava.com/web-development/static-site-search-google-app-engine-search-api/%20via%20@SimoAhava">
-              <i class="fa fa-brands fa-twitter"></i>
-            </a>
-          </li>
-        
-          <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/web-development/static-site-search-google-app-engine-search-api/">
-              <i class="fa fa-brands fa-linkedin"></i>
-            </a>
-          </li>
-        
-      
-      
-        <li class="post-action">
-          <a class="post-action-btn btn btn--default" href="#commento">
-            <i class="fa-regular fa-comments"></i>
-          </a>
-        </li>
-      
-      <li class="post-action">
-          <a class="post-action-btn btn btn--default" href="#">
-          <i class="fa fa-search"></i>
-        </a>
-      </li>
-    </ul>
-  </div>
-
-
-      </div>
-      
-      <div id="share-options-bar" class="share-options-bar" data-behavior="4">
-  <i id="btn-close-shareoptions" class="fa fa-close"></i>
-  <ul class="share-options">
-    
-      <li class="share-option">
-        <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/web-development/static-site-search-google-app-engine-search-api/">
-          <i class="fa fa-brands fa-facebook"></i><span>Share on Facebook</span>
-        </a>
-      </li>
-    
-      <li class="share-option">
-        <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=Static%20Site%20Search%20With%20Hugo%20&#43;%20App%20Engine%20&#43;%20Search%20API%20&#43;%20Python%20https://www.simoahava.com/web-development/static-site-search-google-app-engine-search-api/%20via%20@SimoAhava">
-          <i class="fa fa-brands fa-twitter"></i><span>Share on Twitter</span>
-        </a>
-      </li>
-    
-      <li class="share-option">
-        <a class="share-option-btn" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/web-development/static-site-search-google-app-engine-search-api/">
-          <i class="fa fa-brands fa-linkedin"></i><span>Share on LinkedIn</span>
-        </a>
-      </li>
-    
-  </ul>
-</div>
-<div id="share-options-mask" class="share-options-mask"></div>
-
-    </div>
-    
-    <div id="about">
-  <div id="about-card">
-    <div id="about-btn-close">
-      <i class="fa fa-remove"></i>
-    </div>
-    
-      <img id="about-card-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
-    
-    <h4 id="about-card-name">Simo Ahava</h4>
-    
-      <div id="about-card-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</div>
-    
-    
-      <div id="about-card-job">
-        <i class="fa fa-briefcase"></i>
-        <br/>
-        Senior Data Advocate at Reaktor
-      </div>
-    
-    
-      <div id="about-card-location">
-        <i class="fa fa-map-marker"></i>
-        <br/>
-        Finland
-      </div>
-    
-  </div>
-</div>
-
-    
-  
-    
-    <div id="cover" style="background-image:url('https://www.simoahava.com/images/maisema.jpg');"></div>
-  
-
-
-    
-<script defer src="https://comentario.simoahava.com/comentario.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
-
-
-
-
-<script src="https://www.simoahava.com/js/script.js"></script>
-
-
-
-    <script>
-      !function(){var e=document.querySelector(".simmer"),t=document.querySelector(".simmer .close"),o=window.sessionStorage&&window.sessionStorage.getItem("nosimmer");if(e){if(o){e.style.display="none"}t.addEventListener("click",function(){window.sessionStorage.setItem("nosimmer","true"),e.style.display="none"})}}();
-    </script>
-    <style>
-      .ads {
-	  width: 1px;
-      }
-      </style>
-         
-
-    
-  </body>
-</html>
-
+<!doctype html><html lang=en-us><head><meta name=google-site-verification content="xQwWI2KUfP9LbFKhw2CVLFtrMY6Czrla7L3PD2aBolA"><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"Static Site Search With Hugo \u002b App Engine \u002b Search API \u002b Python | Simo Ahava's blog","image":"https:\/\/www.simoahava.com\/images\/2018\/01\/hugo.jpg","editor":"Simo Ahava","publisher":{"@type":"Organization","name":"Simo Ahava's blog","logo":{"@type":"ImageObject","url":"https:\/\/www.simoahava.com\/images\/simo.png","height":"393","width":"407"}},"url":"https:\/\/www.simoahava.com\/web-development\/static-site-search-google-app-engine-search-api\/","datePublished":"2018-01-15T09:39:41\u002b02:00","dateModified":"2018-01-15T09:39:41\u002b02:00","description":"How to make static site search work using Google App Engine\u0027s Search API and a static site generated with Hugo.","author":{"@type":"Person","name":"Simo Ahava"}}</script><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Static Site Search With Hugo + App Engine + Search API + Python | Simo Ahava's blog</title>
+<script>window.dataLayer=window.dataLayer||[],window.dataLayer.push({pageType:"article",environment:null})</script><script>(function(e,t,n,s){window[n]=window[n]||[],window[n].push({"gtm.start":(new Date).getTime(),event:"gtm.js"});var i=e.getElementsByTagName(t)[0],o=e.createElement(t),a=n!="dataLayer"?"&l="+n:"";o.async=!0,o.src="https://sgtm.simoahava.com/gtm.js?id="+s+a,i.parentNode.insertBefore(o,i)})(document,"script","dataLayer","GTM-PZ7GMV9")</script><meta name=author content="Simo Ahava"><meta name=keywords content><link rel=icon href=https://www.simoahava.com/images/favicon.ico><link rel=amphtml href=https://www.simoahava.com/amp/web-development/static-site-search-google-app-engine-search-api/><meta name=description content="How to make static site search work using Google App Engine's Search API and a static site generated with Hugo."><meta property="og:description" content="How to make static site search work using Google App Engine's Search API and a static site generated with Hugo."><meta property="og:type" content="blog"><meta property="og:title" content="Static Site Search With Hugo + App Engine + Search API + Python"><meta property="og:url" content="https://www.simoahava.com/web-development/static-site-search-google-app-engine-search-api/"><meta property="og:site_name" content="Simo Ahava's blog"><meta name=twitter:card content="summary"><meta name=twitter:title content="Static Site Search With Hugo + App Engine + Search API + Python"><meta name=twitter:description content="How to make static site search work using Google App Engine's Search API and a static site generated with Hugo."><meta name=twitter:creator content="@SimoAhava"><meta name=twitter:image content="https://www.simoahava.com/images/2018/01/hugo.jpg"><meta property="og:image" content="https://www.simoahava.com/images/2018/01/hugo.jpg"><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=/css/style.css></head><body><div id=_progress></div><div id=blog><header id=header data-behavior=4><i id=btn-open-sidebar class="fa fa-lg fa-bars"></i><div class=header-title><a class=header-title-link href=/>Simo Ahava's blog</a></div></header><nav id=sidebar data-behavior=4><div class=sidebar-container><div class=sidebar-profile><a href=/><img class=sidebar-profile-picture loading=lazy src=https://www.simoahava.com/images/simo.png alt="Author's picture"></a><h4 class=sidebar-profile-name>Simo Ahava</h4><h5 class=sidebar-profile-bio>Husband | Father | Analytics developer<br>simo (at) simoahava.com</h5></div><ul class=sidebar-buttons><li class=sidebar-button><a class=sidebar-button-link href=/><i class="sidebar-button-icon fa fa-lg fa-home"></i>
+<span class=sidebar-button-desc>Home</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/categories/><i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+<span class=sidebar-button-desc>Categories</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/tags/><i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+<span class=sidebar-button-desc>Tags</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/categories/gtm-tips/><i class="sidebar-button-icon fa fa-lg fa-magic"></i>
+<span class=sidebar-button-desc>GTM Tips</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/about-simo-ahava/><i class="sidebar-button-icon fa fa-lg fa-question"></i>
+<span class=sidebar-button-desc>About</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/index.xml><i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+<span class=sidebar-button-desc>RSS</span></a></li></ul><ul class=sidebar-buttons><li class=sidebar-button><a class=sidebar-button-link href=/tools/><i class="sidebar-button-icon fa fa-lg fa-wrench"></i>
+<span class=sidebar-button-desc>Tools</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/blog-statistics/><i class="sidebar-button-icon fa fa-lg fa-bar-chart"></i>
+<span class=sidebar-button-desc>Blog statistics</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=https://github.com/sahava target=_blank rel=noopener><i class="sidebar-button-icon fa fa-lg fa-brands fa-github"></i>
+<span class=sidebar-button-desc>GitHub</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/upcoming-talks/><i class="sidebar-button-icon fa fa-lg fa-bullhorn"></i>
+<span class=sidebar-button-desc>Upcoming talks</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/custom-templates/><i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+<span class=sidebar-button-desc>Templates</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/newsletter/><i class="sidebar-button-icon fa fa-lg fa-bell"></i>
+<span class=sidebar-button-desc>Newsletter</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=https://masto.measure.chat/@SimoAhava target=_blank rel="noopener me"><i class="sidebar-button-icon fa fa-lg fa-brands fa-mastodon"></i>
+<span class=sidebar-button-desc>Mastodon</span></a></li></ul><ul class=sidebar-buttons></ul></div></nav><div id=main data-behavior=4 class=hasCoverMetaIn><article class=post><form id=search action=/search/><input name=q type=text class="form-control input--xlarge" placeholder="Search blog..." autocomplete=off></form><div class="post-header main-content-wrap text-left"><h1>Static Site Search With Hugo + App Engine + Search API + Python</h1><div class="postShorten-meta post-meta"><time datetime=2018-01-15T09:39:41+02:00>January 15, 2018
+</time><span>in</span>
+<a class=category-link href=/categories/web-development>Web development</a>
+| <a href=https://www.simoahava.com/web-development/static-site-search-google-app-engine-search-api/#commento><comentario-count path=/web-development/static-site-search-google-app-engine-search-api/ placeholder=... error-text="N/A " zero-text="0 " prefix suffix=" "></comentario-count>Comments</a></div></div><div class="post-content markdown"><div class=main-content-wrap><p>As the year changed to 2018, I decided to abandon <a href=https://www.wordpress.org>WordPress</a>, which I had been using for over 12 years as my content management system of choice. I had many reasons to do so, but the biggest motivators were the opportunity to try something new and to abandon the bloat and clutter of WordPress for a more simple, more elegant order of things. Spurred on by another adopter, <a href=http://markedmondson.me/>Mark Edmondson</a>, I decided to give <a href=https://gohugo.io/>Hugo</a> a go (pun intended).</p><div style=aspect-ratio:2120/670 class="figure nocaption"><a href=/images/2018/01/hugo.jpg title="Hugo static site generator"><img class=fig-img height=670 width=2120 loading=lazy src=/images/2018/01/hugo.jpg#ZgotmplZ alt="Hugo static site generator"></a></div><p>The migration wasn&rsquo;t easy, as I had to convert WordPress&rsquo; relational database into a static list of markdown files. Along the way, I had to configure two themes (<a href=https://themes.gohugo.io/hugo-tranquilpeak-theme/>regular</a> and <a href=https://github.com/DanielMuller/hugo-theme-campser>AMP</a>), optimize all my images, JavaScript, and stylesheets, and go through every single one of my 200+ articles, looking for stylistic issues and broken links (oh boy, were there many of those!).</p><p>Hugo is written in the <a href=https://golang.org/>Go</a> language, and it&rsquo;s fairly easy to use if you&rsquo;re familiar with <a href=https://daringfireball.net/projects/markdown/syntax>markdown</a> and the command line of your operating system. The trick about a static site is that all the content is stored in static files in your file server. There is no relational database to fall back on, which means that a static site can be both blazing fast and a chore to maintain.</p><p>One of the biggest headaches for me was how to set up site search. Without a database or a web server generating dynamic HTML documents, finding a suitable way to index the content in the browser and respond quickly and efficiently to search queries seemed like an insurmountable task.</p><p>I tried a number of things at first, including:</p><ul><li><p><a href=https://www.algolia.com/>Algolia</a>, which I had to give up beacuse I had too much content for their free tier.</p></li><li><p><a href=https://lunrjs.com/>lunr.js</a> running on a NodeJS virtual machine in Google&rsquo;s cloud, which I had to give up because I got a bill of 400$ for instance upkeep for the month of December alone.</p></li><li><p>Custom-built solution that digested JSON generated by Hugo and parsed it for searching with jQuery directly in the browser, which I had to give up since downloading an indexed JSON file of around 5 megabytes on every page is not conducive to a good user experience.</p></li></ul><p>After the failed experiment with lunr.js, I still wanted to give Google&rsquo;s App Engine another chance. I&rsquo;ve been in love with App Engine ever since publishing the first version of my <a href=https://www.gtmtools.com/>GTM Tools</a> on it. Well, as it turns out, App Engine has a really useful and flexible <a href=https://cloud.google.com/appengine/docs/standard/python/search/>Search API</a> for Python, which seems to be tailormade to work with the JSON generated by Hugo in a static site!</p><div style=aspect-ratio:2878/1102 class="figure nocaption"><a href=/images/2018/01/static-site-search-with-google-appengine-search-api.jpg title="Search API quotas in App Engine"><img class=fig-img height=1102 width=2878 loading=lazy src=/images/2018/01/static-site-search-with-google-appengine-search-api.jpg#ZgotmplZ alt="Search API quotas in App Engine"></a></div><span class=simmer><span class=close>X</span><p><span class="fa fa-md fa-bell"></span>
+<strong>The Simmer Newsletter</strong></p><p>Subscribe to the <a href=/newsletter/>Simmer newsletter</a> to get the latest news and content from Simo Ahava into your email inbox!</p></span><h2 id=the-setup>The setup</h2><p>My setup looks like this:</p><ol><li><p>The <a href=https://gohugo.io/templates/output-formats/#output-formats>Hugo config file</a> is configured to output an <code>index.json</code> into the public directory, with all the content of my site ready for indexing.</p></li><li><p>A script which deploys this JSON file into the App Engine project.</p></li><li><p>An App Engine project which uses the <a href=https://cloud.google.com/appengine/docs/standard/python/search/>Python Search API</a> client to build an index of this JSON.</p></li><li><p>The App Engine project also provides an HTTP endpoint to which my site makes all the search queries. Each request is processed as a search query, and the result is returned in the HTTP response.</p></li><li><p>Finally, I have a bunch of JavaScript running the search form and the search results page on my site, sending the request to the App Engine endpoint as well as formatting the search results page with the response.</p></li></ol><p>The beauty of using the Search API is that I&rsquo;m well below the <a href=https://cloud.google.com/appengine/docs/standard/python/search/#Python_Search_API_quotas>quota limits</a> for the free version, and thus I don&rsquo;t have to pay a dime to make it all work!</p><div style=aspect-ratio:1402/282 class="figure nocaption"><a href=/images/2018/01/search-quota.jpg title="My quotas for the search API"><img class=fig-img height=282 width=1402 loading=lazy src=/images/2018/01/search-quota.jpg#ZgotmplZ alt="My quotas for the search API"></a></div><h2 id=1-the-config-file-modification>1. The config file modification</h2><p>The change to Hugo&rsquo;s config file is easy to make, because Hugo has built in support for generating the JSON in a format that most search libraries digest. In the configuration file, you need to find the <code>output</code> configuration, and add <code>"JSON"</code> as one of the outputs for the <code>home</code> content type. So it looks something like this:</p><div class=highlight><pre tabindex=0 style=background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-toml data-lang=toml><span style=display:flex><span>[output]
+</span></span><span style=display:flex><span>  home = [ <span style=color:#a50>&#34;HTML&#34;</span>, <span style=color:#a50>&#34;RSS&#34;</span>, <span style=color:#a50>&#34;JSON&#34;</span> ]</span></span></code></pre></div><p>This configuration change generates an <code>index.json</code> file into the root of your public folder whenever the Hugo project is built.</p><p>Here&rsquo;s an example of a what a blog post might look like in this file:</p><div class=highlight><pre tabindex=0 style=background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-json data-lang=json><span style=display:flex><span>[
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#1e90ff;font-weight:700>&#34;uri&#34;</span>: <span style=color:#a50>&#34;https://www.simoahava.com/upcoming-talks/&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#1e90ff;font-weight:700>&#34;title&#34;</span>: <span style=color:#a50>&#34;Upcoming Talks&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#1e90ff;font-weight:700>&#34;tags&#34;</span>: [],
+</span></span><span style=display:flex><span>        <span style=color:#1e90ff;font-weight:700>&#34;description&#34;</span>: <span style=color:#a50>&#34;My upcoming conference talks and events&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#1e90ff;font-weight:700>&#34;content&#34;</span>: <span style=color:#a50>&#34;17 March 2018: MeasureCamp London 20 March 2018: SMX München 19 April 2018: Advanced GTM Workshop (Hamburg) 24 May 2018: NXT Nordic (Oslo) 20 September 2018: Advanced GTM Workshop (Hamburg) 14-16 November 2018: SMXL Milan    I enjoy presenting at conferences and meetups, and I have a track record of hundreds of talks since 2013, comprising keynotes, conference presentations, workshops, seminars, and public trainings. Audience sizes have varied between 3 and 2,000.\nMy favorite topics revolve around web analytics development and analytics customization, but I\u0026rsquo;m more than happy to talk about integrating analytics into organizations, knowledge transfer, improving technical skills, digital marketing, and content creation.\nSome of my conference slides can be found at SlideShare.\nFor a sample, here\u0026rsquo;s a talk I gave at Reaktor Breakpoint in 2015.\n   You can contact me at simo (at) simoahava.com for enquiring about my availability for your event.\n&#34;</span>
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>]</span></span></code></pre></div><h2 id=2-the-deploy-script>2. The deploy script</h2><p>The deploy script is a piece of Bash code which builds the Hugo site, copies the <code>index.json</code> into my search project folder, and then deploys the entire search project into App Engine. Here&rsquo;s what it looks like:</p><div class=highlight><pre tabindex=0 style=background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#0aa>cd</span> ~/Documents/Projects/www-simoahava-com/
+</span></span><span style=display:flex><span>rm -rf public
+</span></span><span style=display:flex><span>hugo
+</span></span><span style=display:flex><span>cp public/index.json ../www-simoahava-com-search/
+</span></span><span style=display:flex><span>rm -rf public
+</span></span><span style=display:flex><span><span style=color:#0aa>cd</span> ~/Documents/Projects/www-simoahava-com-search/
+</span></span><span style=display:flex><span>gcloud app deploy
+</span></span><span style=display:flex><span>curl https://search-www-simoahava-com.appspot.com/update</span></span></code></pre></div><p>The <code>hugo</code> command builds the site and generates the public folder. From the public folder, the <code>index.json</code> is then copied to my search project folder, which is subsequently deployed into App Engine using the command <code>gcloud app deploy</code>. Finally, a <code>curl</code> command to my custom endpoint makes certain that my Python script updates the search index with the latest version of <code>index.json</code>.</p><h2 id=3-the-python-code-running-in-app-engine>3. The Python code running in App Engine</h2><p>In <a href=https://cloud.google.com/appengine/>App Engine</a>, I&rsquo;ve simply created a new project with a name that&rsquo;s easy enough to remember as the endpoint. I haven&rsquo;t added any billing to the account, because I&rsquo;ve set a challenge for myself to build a free search API for my site.</p><p>See <a href=https://cloud.google.com/appengine/docs/flexible/python/quickstart>this documentation</a> for a quick start guide on how to get started with Python and App Engine. Focus especially on how to setup the App Engine project (you don&rsquo;t need to enable billing), and how to install and configure the <code>gcloud</code> command line tools for your project.</p><p>The Python code looks like this.</p><div class=highlight><pre tabindex=0 style=background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#aaa;font-style:italic>#!/usr/bin/python</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#00a>from</span> <span style=color:#0aa;text-decoration:underline>urlparse</span> <span style=color:#00a>import</span> urlparse
+</span></span><span style=display:flex><span><span style=color:#00a>from</span> <span style=color:#0aa;text-decoration:underline>urlparse</span> <span style=color:#00a>import</span> parse_qs
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#00a>import</span> <span style=color:#0aa;text-decoration:underline>json</span>
+</span></span><span style=display:flex><span><span style=color:#00a>import</span> <span style=color:#0aa;text-decoration:underline>re</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#00a>import</span> <span style=color:#0aa;text-decoration:underline>webapp2</span>
+</span></span><span style=display:flex><span><span style=color:#00a>from</span> <span style=color:#0aa;text-decoration:underline>webapp2_extras</span> <span style=color:#00a>import</span> jinja2
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#00a>from</span> <span style=color:#0aa;text-decoration:underline>google.appengine.api</span> <span style=color:#00a>import</span> search
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic># Index name for your search documents</span>
+</span></span><span style=display:flex><span>_INDEX_NAME = <span style=color:#a50>&#39;search-www-simoahava-com&#39;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#00a>def</span> <span style=color:#0a0>create_document</span>(title, uri, description, tags, content):
+</span></span><span style=display:flex><span>    <span style=color:#a50>&#34;&#34;&#34;Create a search document with ID generated from the post title&#34;&#34;&#34;</span>
+</span></span><span style=display:flex><span>    doc_id = re.sub(<span style=color:#a50>&#39;[\s+]&#39;</span>, <span style=color:#a50>&#39;&#39;</span>, title)
+</span></span><span style=display:flex><span>    document = search.Document(
+</span></span><span style=display:flex><span>        doc_id=doc_id,
+</span></span><span style=display:flex><span>        fields=[
+</span></span><span style=display:flex><span>            search.TextField(name=<span style=color:#a50>&#39;title&#39;</span>, value=title),
+</span></span><span style=display:flex><span>            search.TextField(name=<span style=color:#a50>&#39;uri&#39;</span>, value=uri),
+</span></span><span style=display:flex><span>            search.TextField(name=<span style=color:#a50>&#39;description&#39;</span>, value=description),
+</span></span><span style=display:flex><span>            search.TextField(name=<span style=color:#a50>&#39;tags&#39;</span>, value=json.dumps(tags)),
+</span></span><span style=display:flex><span>            search.TextField(name=<span style=color:#a50>&#39;content&#39;</span>, value=content)
+</span></span><span style=display:flex><span>        ]
+</span></span><span style=display:flex><span>    )
+</span></span><span style=display:flex><span>    <span style=color:#00a>return</span> document
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#00a>def</span> <span style=color:#0a0>add_document_to_index</span>(document):
+</span></span><span style=display:flex><span>    index = search.Index(_INDEX_NAME)
+</span></span><span style=display:flex><span>    index.put(document)
+</span></span><span style=display:flex><span>	
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#00a>class</span> <span style=color:#0a0;text-decoration:underline>BaseHandler</span>(webapp2.RequestHandler):
+</span></span><span style=display:flex><span>    <span style=color:#a50>&#34;&#34;&#34;The other handlers inherit from this class. Provides some helper methods
+</span></span></span><span style=display:flex><span><span style=color:#a50>    for rendering a template.&#34;&#34;&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#888>@webapp2.cached_property</span>
+</span></span><span style=display:flex><span>    <span style=color:#00a>def</span> <span style=color:#0a0>jinja2</span>(self):
+</span></span><span style=display:flex><span>        <span style=color:#00a>return</span> jinja2.get_jinja2(app=self.app)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#00a>class</span> <span style=color:#0a0;text-decoration:underline>ProcessQuery</span>(BaseHandler):
+</span></span><span style=display:flex><span>    <span style=color:#a50>&#34;&#34;&#34;Handles search requests for comments.&#34;&#34;&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#00a>def</span> <span style=color:#0a0>get</span>(self):
+</span></span><span style=display:flex><span>        <span style=color:#a50>&#34;&#34;&#34;Handles a get request with a query.&#34;&#34;&#34;</span>
+</span></span><span style=display:flex><span>        uri = urlparse(self.request.uri)
+</span></span><span style=display:flex><span>        query = <span style=color:#a50>&#39;&#39;</span>
+</span></span><span style=display:flex><span>        <span style=color:#00a>if</span> uri.query:
+</span></span><span style=display:flex><span>            query = parse_qs(uri.query)
+</span></span><span style=display:flex><span>            query = query[<span style=color:#a50>&#39;q&#39;</span>][<span style=color:#099>0</span>]
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        index = search.Index(_INDEX_NAME)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        compiled_query = search.Query(
+</span></span><span style=display:flex><span>            query_string=json.dumps(query),
+</span></span><span style=display:flex><span>            options=search.QueryOptions(
+</span></span><span style=display:flex><span>                sort_options=search.SortOptions(match_scorer=search.MatchScorer()),
+</span></span><span style=display:flex><span>                limit=<span style=color:#099>1000</span>,
+</span></span><span style=display:flex><span>                returned_fields=[<span style=color:#a50>&#39;title&#39;</span>, <span style=color:#a50>&#39;uri&#39;</span>, <span style=color:#a50>&#39;description&#39;</span>]
+</span></span><span style=display:flex><span>            )
+</span></span><span style=display:flex><span>        )
+</span></span><span style=display:flex><span>		
+</span></span><span style=display:flex><span>		results = index.search(compiled_query)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        json_results = {
+</span></span><span style=display:flex><span>            <span style=color:#a50>&#39;results&#39;</span>: [],
+</span></span><span style=display:flex><span>            <span style=color:#a50>&#39;query&#39;</span>: json.dumps(query)
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#00a>for</span> document <span style=color:#00a>in</span> results.results:
+</span></span><span style=display:flex><span>            search_result = {}
+</span></span><span style=display:flex><span>            <span style=color:#00a>for</span> field <span style=color:#00a>in</span> document.fields:
+</span></span><span style=display:flex><span>                search_result[field.name] = field.value
+</span></span><span style=display:flex><span>            json_results[<span style=color:#a50>&#39;results&#39;</span>].append(search_result)
+</span></span><span style=display:flex><span>        self.response.headers.add(<span style=color:#a50>&#39;Access-Control-Allow-Origin&#39;</span>, <span style=color:#a50>&#39;https://www.simoahava.com&#39;</span>)
+</span></span><span style=display:flex><span>        self.response.write(json.dumps(json_results))
+</span></span><span style=display:flex><span>		
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#00a>class</span> <span style=color:#0a0;text-decoration:underline>UpdateIndex</span>(BaseHandler):
+</span></span><span style=display:flex><span>    <span style=color:#a50>&#34;&#34;&#34;Updates the index using index.json&#34;&#34;&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#00a>def</span> <span style=color:#0a0>get</span>(self):
+</span></span><span style=display:flex><span>        <span style=color:#00a>with</span> <span style=color:#0aa>open</span>(<span style=color:#a50>&#39;index.json&#39;</span>) <span style=color:#00a>as</span> json_file:
+</span></span><span style=display:flex><span>            data = json.load(json_file)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#00a>for</span> post <span style=color:#00a>in</span> data:
+</span></span><span style=display:flex><span>            title = post.get(<span style=color:#a50>&#39;title&#39;</span>, <span style=color:#a50>&#39;&#39;</span>)
+</span></span><span style=display:flex><span>            uri = post.get(<span style=color:#a50>&#39;uri&#39;</span>, <span style=color:#a50>&#39;&#39;</span>)
+</span></span><span style=display:flex><span>            description = post.get(<span style=color:#a50>&#39;description&#39;</span>, <span style=color:#a50>&#39;&#39;</span>)
+</span></span><span style=display:flex><span>            tags = post.get(<span style=color:#a50>&#39;tags&#39;</span>, [])
+</span></span><span style=display:flex><span>            content = post.get(<span style=color:#a50>&#39;content&#39;</span>, <span style=color:#a50>&#39;&#39;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>            doc = create_document(title, uri, description, tags, content)
+</span></span><span style=display:flex><span>            add_document_to_index(doc)
+</span></span><span style=display:flex><span>			
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>application = webapp2.WSGIApplication(
+</span></span><span style=display:flex><span>    [(<span style=color:#a50>&#39;/&#39;</span>, ProcessQuery),
+</span></span><span style=display:flex><span>     (<span style=color:#a50>&#39;/update&#39;</span>, UpdateIndex)],
+</span></span><span style=display:flex><span>    debug=<span style=color:#00a>True</span>)</span></span></code></pre></div><p>At the very end, I&rsquo;m binding requests to the <code>/</code> endpoint to <code>ProcessQuery</code>, and requests to <code>/update</code> to <code>UpdateIndex</code>. In other words, these are the two endpoints I am serving.</p><p><code>UpdateIndex</code> loads the <code>index.json</code> file, and for every single content piece within (blog posts, pages, etc.), it grabs the <code>title</code>, <code>uri</code>, <code>description</code>, <code>tags</code>, and <code>content</code> parameters from the content JSON, and creates documents for each instance. Then, each document is added to the index.</p><p>This is how the Search API can be used to translate any JSON file into a valid search index, that you can then build queries against.</p><p>Queries are made by polling the <code>/?q=&lt;keyword></code> endpoint, where <code>keyword</code> matches a valid query against the Search API <a href=https://cloud.google.com/appengine/docs/standard/python/search/query_strings>query engine</a>. Each query is processed by <code>ProcessQuery</code>, which takes the query term, polls the search index with that term, and then compiles a result of all the documents that the search index returns for that query (in ranked order). This result is then pushed into a JSON response back to the client.</p><p>The search API gives you plenty of room to optimize the index and for compiling complex queries. I&rsquo;ve opted for a fairly mundane approach, which might lead to some odd ranking outliers, such as documents that should clearly be at the top of a list of relevant results ending up in the end, but I&rsquo;m still quite happy with how the robustness of the API.</p><h2 id=4-the-javascript>4. The JavaScript</h2><p>Finally, I need some client-side code to produce the search results page. Since Hugo doesn&rsquo;t have a web server, I can&rsquo;t do the search server-side - it must be done in the client. This is one of the cases where a static site loses some of its shine when compared to its counterparts that come equipped with a web server and server-side processing capabilities. A Hugo site is built and deployed all at once, so there&rsquo;s no dynamic generation of HTML pages after building - everything has to happen in the client.</p><p>Anyway, the search form on my site is very simple. It just looks like this:</p><div class=highlight><pre tabindex=0 style=background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-html data-lang=html><span style=display:flex><span>&lt;<span style=color:#1e90ff;font-weight:700>form</span> <span style=color:#1e90ff>id</span>=<span style=color:#a50>&#34;search&#34;</span> <span style=color:#1e90ff>action</span>=<span style=color:#a50>&#34;/search/&#34;</span>&gt;
+</span></span><span style=display:flex><span>  &lt;<span style=color:#1e90ff;font-weight:700>input</span> <span style=color:#1e90ff>name</span>=<span style=color:#a50>&#34;q&#34;</span> <span style=color:#1e90ff>type</span>=<span style=color:#a50>&#34;text&#34;</span> <span style=color:#1e90ff>class</span>=<span style=color:#a50>&#34;form-control input--xlarge&#34;</span> <span style=color:#1e90ff>placeholder</span>=<span style=color:#a50>&#34;Search blog...&#34;</span> <span style=color:#1e90ff>autocomplete</span>=<span style=color:#a50>&#34;off&#34;</span>&gt;
+</span></span><span style=display:flex><span>&lt;/<span style=color:#1e90ff;font-weight:700>form</span>&gt;</span></span></code></pre></div><p>When the form is submitted, it does a GET request to the <code>/search/</code> page on my site, adding whatever was typed into the field as the <code>q</code> query parameter, so the URL becomes something like</p><p><code>https://www.simoahava.com/search/?q=google+tag+manager</code></p><p>On the <code>/search/</code> page, I have a loading spinner which waits until the request to the search endpoint is completed. The search call is done with JavaScript, and it looks like this:</p><div class=highlight><pre tabindex=0 style=background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-javascript data-lang=javascript><span style=display:flex><span>(<span style=color:#00a>function</span>($) {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#00a>var</span> printSearchResults = <span style=color:#00a>function</span>(results) {
+</span></span><span style=display:flex><span>	  <span style=color:#aaa;font-style:italic>// Update the page DOM with the search results...
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>	};
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#00a>var</span> endpoint = <span style=color:#a50>&#39;https://search-www-simoahava-com.appspot.com&#39;</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#00a>var</span> getQuery = <span style=color:#00a>function</span>() {
+</span></span><span style=display:flex><span>        <span style=color:#00a>if</span> (<span style=color:#0aa>window</span>.location.search.length === <span style=color:#099>0</span> || !<span style=color:#099>/(\?|&amp;)q=/</span>.test(<span style=color:#0aa>window</span>.location.search)) {
+</span></span><span style=display:flex><span>            <span style=color:#00a>return</span> <span style=color:#00a>undefined</span>;
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#00a>var</span> parts = <span style=color:#0aa>window</span>.location.search.substring(<span style=color:#099>1</span>).split(<span style=color:#a50>&#39;&amp;&#39;</span>);
+</span></span><span style=display:flex><span>        <span style=color:#00a>var</span> query = parts.map(<span style=color:#00a>function</span>(part) {
+</span></span><span style=display:flex><span>            <span style=color:#00a>var</span> temp = part.split(<span style=color:#a50>&#39;=&#39;</span>);
+</span></span><span style=display:flex><span>            <span style=color:#00a>return</span> temp[<span style=color:#099>0</span>] === <span style=color:#a50>&#39;q&#39;</span> ? temp[<span style=color:#099>1</span>] : <span style=color:#00a>false</span>;
+</span></span><span style=display:flex><span>        });
+</span></span><span style=display:flex><span>        <span style=color:#00a>return</span> query[<span style=color:#099>0</span>] || <span style=color:#00a>undefined</span>;
+</span></span><span style=display:flex><span>    };
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    $(<span style=color:#0aa>document</span>).ready(<span style=color:#00a>function</span>() {
+</span></span><span style=display:flex><span>        <span style=color:#00a>var</span> query = getQuery();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#00a>if</span> (<span style=color:#00a>typeof</span> query === <span style=color:#a50>&#39;undefined&#39;</span>) {
+</span></span><span style=display:flex><span>            printSearchResults();
+</span></span><span style=display:flex><span>            <span style=color:#00a>return</span>;
+</span></span><span style=display:flex><span>        } <span style=color:#00a>else</span> {
+</span></span><span style=display:flex><span>            $.get(endpoint + <span style=color:#a50>&#39;?q=&#39;</span> + query, <span style=color:#00a>function</span>(data) {
+</span></span><span style=display:flex><span>                printSearchResults(JSON.parse(data));
+</span></span><span style=display:flex><span>            });
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>    });
+</span></span><span style=display:flex><span>	
+</span></span><span style=display:flex><span>})(<span style=color:#0aa>window</span>.jQuery)</span></span></code></pre></div><p>To keep things simple, I&rsquo;ve only included the relevant pieces of code that can be used elsewhere, too. In short, when the <code>/search/</code> page is loaded, whatever is included as the value of the <code>q</code> query parameter is immediately sent to the search API endpoint. The response is then processed and built into a search results page.</p><p>So, if the page URL is <code>https://www.simoahava.com/search/?q=google+tag.manager</code>, this piece of JavaScript turns that into a GET request to <code>https://search-www-simoahava-com.appspot.com/?q=google+tag+manager</code>. You can visit that URL to see what the response looks like.</p><p>This response is the processed, and the search results page is built.</p><h2 id=summary>Summary</h2><p>This is how I&rsquo;ve chosen to build site search using the flexibility of Hugo together with the powerful Search API offered by Google&rsquo;s App Engine.</p><p>Based on my limited amount of research, it&rsquo;s as good a solution as any, and it seems quite fast without compromising the power of the search query engine. However, as more content builds up, it&rsquo;s conceivable that the query engine either gets slower or I start hitting my free tier quotas, at which point I&rsquo;ll need to rethink my approach.</p><p>The weak link at the moment is that everything is done client-side. That means that contrary to the philosphy of static sites, a lot of processing takes place in the browser. But I&rsquo;m not sure how this could be avoided, since a static site doesn&rsquo;t offer you the capabilities of a server-side processor.</p><p>At this time, it&rsquo;s a trade-off I&rsquo;m willing to make, but I am anxious to hear feedback if the search is clumsy or not working properly for you.</p></div></div><div id=post-footer class="post-footer main-content-wrap"><div class=post-footer-tags><span class="text-color-light text-small">TAGGED IN</span><br><a class="tag tag--primary tag--small" href=/tags/app-engine/>app engine</a>
+<a class="tag tag--primary tag--small" href=/tags/search-api/>search api</a>
+<a class="tag tag--primary tag--small" href=/tags/hugo/>hugo</a>
+<a class="tag tag--primary tag--small" href=/tags/static-site/>static site</a>
+<a class="tag tag--primary tag--small" href=/tags/google-cloud/>google cloud</a></div><div class=post-actions-wrap><nav><ul class="post-actions post-action-nav"><li class=post-action><a class="post-action-btn btn btn--default" href=/analytics/simple-custom-event-listeners-gtm/><i class="fa fa-angle-left"></i>
+<span class="hide-xs hide-sm text-small icon-ml">NEXT</span></a></li><li class=post-action><a class="post-action-btn btn btn--default" href=/analytics/new-tools-released/><span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+<i class="fa fa-angle-right"></i></a></li></ul></nav><ul class="post-actions post-action-share"><li class="post-action hide-lg hide-md hide-sm"><a class="post-action-btn btn btn--default btn-open-shareoptions" href=#btn-open-shareoptions><i class="fa fa-share-alt"></i></a></li><li class="post-action hide-xs"><a class="post-action-btn btn btn--default" target=new href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/web-development/static-site-search-google-app-engine-search-api/"><i class="fa fa-brands fa-facebook"></i></a></li><li class="post-action hide-xs"><a class="post-action-btn btn btn--default" target=new href="https://twitter.com/intent/tweet?text=Static%20Site%20Search%20With%20Hugo%20+%20App%20Engine%20+%20Search%20API%20+%20Python%20https://www.simoahava.com/web-development/static-site-search-google-app-engine-search-api/%20via%20@SimoAhava"><i class="fa fa-brands fa-twitter"></i></a></li><li class="post-action hide-xs"><a class="post-action-btn btn btn--default" target=new href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/web-development/static-site-search-google-app-engine-search-api/"><i class="fa fa-brands fa-linkedin"></i></a></li><li class=post-action><a class="post-action-btn btn btn--default" href=#commento><i class="fa-regular fa-comments"></i></a></li><li class=post-action><a class="post-action-btn btn btn--default" href=#><i class="fa fa-search"></i></a></li></ul></div><a name=commento></a><comentario-comments></comentario-comments></div></article><footer id=footer class=main-content-wrap><span class=copyrights>&copy; 2026 Simo Ahava. All Rights Reserved</span></footer></div><div id=bottom-bar class=post-bottom-bar data-behavior=4><div class=post-actions-wrap><nav><ul class="post-actions post-action-nav"><li class=post-action><a class="post-action-btn btn btn--default" href=/analytics/simple-custom-event-listeners-gtm/><i class="fa fa-angle-left"></i>
+<span class="hide-xs hide-sm text-small icon-ml">NEXT</span></a></li><li class=post-action><a class="post-action-btn btn btn--default" href=/analytics/new-tools-released/><span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+<i class="fa fa-angle-right"></i></a></li></ul></nav><ul class="post-actions post-action-share"><li class="post-action hide-lg hide-md hide-sm"><a class="post-action-btn btn btn--default btn-open-shareoptions" href=#btn-open-shareoptions><i class="fa fa-share-alt"></i></a></li><li class="post-action hide-xs"><a class="post-action-btn btn btn--default" target=new href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/web-development/static-site-search-google-app-engine-search-api/"><i class="fa fa-brands fa-facebook"></i></a></li><li class="post-action hide-xs"><a class="post-action-btn btn btn--default" target=new href="https://twitter.com/intent/tweet?text=Static%20Site%20Search%20With%20Hugo%20+%20App%20Engine%20+%20Search%20API%20+%20Python%20https://www.simoahava.com/web-development/static-site-search-google-app-engine-search-api/%20via%20@SimoAhava"><i class="fa fa-brands fa-twitter"></i></a></li><li class="post-action hide-xs"><a class="post-action-btn btn btn--default" target=new href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/web-development/static-site-search-google-app-engine-search-api/"><i class="fa fa-brands fa-linkedin"></i></a></li><li class=post-action><a class="post-action-btn btn btn--default" href=#commento><i class="fa-regular fa-comments"></i></a></li><li class=post-action><a class="post-action-btn btn btn--default" href=#><i class="fa fa-search"></i></a></li></ul></div></div><div id=share-options-bar class=share-options-bar data-behavior=4><i id=btn-close-shareoptions class="fa fa-close"></i><ul class=share-options><li class=share-option><a class=share-option-btn target=new href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/web-development/static-site-search-google-app-engine-search-api/"><i class="fa fa-brands fa-facebook"></i><span>Share on Facebook</span></a></li><li class=share-option><a class=share-option-btn target=new href="https://twitter.com/intent/tweet?text=Static%20Site%20Search%20With%20Hugo%20+%20App%20Engine%20+%20Search%20API%20+%20Python%20https://www.simoahava.com/web-development/static-site-search-google-app-engine-search-api/%20via%20@SimoAhava"><i class="fa fa-brands fa-twitter"></i><span>Share on Twitter</span></a></li><li class=share-option><a class=share-option-btn target=new href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/web-development/static-site-search-google-app-engine-search-api/"><i class="fa fa-brands fa-linkedin"></i><span>Share on LinkedIn</span></a></li></ul></div><div id=share-options-mask class=share-options-mask></div></div><div id=about><div id=about-card><div id=about-btn-close><i class="fa fa-remove"></i></div><img id=about-card-picture src=https://www.simoahava.com/images/simo.png alt="Author's picture"><h4 id=about-card-name>Simo Ahava</h4><div id=about-card-bio>Husband | Father | Analytics developer<br>simo (at) simoahava.com</div><div id=about-card-job><i class="fa fa-briefcase"></i><br>Senior Data Advocate at Reaktor</div><div id=about-card-location><i class="fa fa-map-marker"></i><br>Finland</div></div></div><div id=cover style=background-image:url(https://www.simoahava.com/images/maisema.jpg)></div><script defer src=https://comentario.simoahava.com/comentario.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin=anonymous referrerpolicy=no-referrer></script><script defer src=/js/script.js></script><script>!function(){var e=document.querySelector(".simmer"),t=document.querySelector(".simmer .close"),n=window.sessionStorage&&window.sessionStorage.getItem("nosimmer");e&&(n&&(e.style.display="none"),t&&t.addEventListener("click",function(){window.sessionStorage.setItem("nosimmer","true"),e.style.display="none"}))}()</script></body></html>

@@ -1,1101 +1,152 @@
-
-
-  
-    
-  
-
-
-  
-
-
-
-
-
-  
-
-
-  
-
-<!DOCTYPE html>
-<html lang="en-us">
-  <head>
-    <meta name="google-site-verification" content="xQwWI2KUfP9LbFKhw2CVLFtrMY6Czrla7L3PD2aBolA" />
-
-
-<script type="application/ld+json">
-{
-  "@context": "http://schema.org", 
-  "@type": "BlogPosting",
-  "headline": "Improve Google Analytics Bot Detection With reCAPTCHA | Simo Ahava's blog",
-  "image": "https:\/\/www.simoahava.com\/images\/2019\/09\/bot-traffic-in-ga.jpg",
-  "editor": "Simo Ahava",
-  "publisher": {
-    "@type": "Organization",
-    "name": "Simo Ahava's blog",
-    "logo": {
-      "@type": "ImageObject",
-      "url": "https:\/\/www.simoahava.com\/images\/simo.png",
-      "height": "393",
-      "width": "407"
-    }
-  },
-  "url": "https:\/\/www.simoahava.com\/analytics\/improve-google-analytics-bot-detection-with-recaptcha\/",
-  "datePublished": "2019-10-23T09:00:00\u002b03:00",
-  "dateModified": "2019-10-23T09:00:00\u002b03:00",
-  "description": "Build your own reCAPTCHA v3 verification mechanism and send the results to Google Analytics for improved bot detection.",
-  "author": {
-    "@type": "Person",
-    "name": "Simo Ahava"
-  }
-}
-</script>
-
-
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    
-    <title>Improve Google Analytics Bot Detection With reCAPTCHA | Simo Ahava's blog</title>
-    
-    <script>
-      window.dataLayer=window.dataLayer||[];window.dataLayer.push({pageType: 'article', environment:  null });
-    </script>
-    
-
-    
-    
-    
-    <script>
-      (function(S,i,m,o){
-        window[m]=window[m]||[];
-        window[m].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
-        var f=S.getElementsByTagName(i)[0],j=S.createElement(i),dl=m!='dataLayer'?'&l='+m:'';
-        j.async=true;
-        j.src='https://sgtm.simoahava.com/gtm.js?id='+o+dl;
-        f.parentNode.insertBefore(j,f);
-      })(document,'script','dataLayer','GTM-PZ7GMV9');
-    </script>
-    
-    <meta name="author" content="Simo Ahava">
-    <meta name="keywords" content="">
-
-    <link rel="icon" href="https://www.simoahava.com/images/favicon.ico">
-    
-    <link rel="amphtml" href="https://www.simoahava.com/amp/analytics/improve-google-analytics-bot-detection-with-recaptcha/">
-    
-    <meta name="description" content="Build your own reCAPTCHA v3 verification mechanism and send the results to Google Analytics for improved bot detection.">
-    <meta property="og:description" content="Build your own reCAPTCHA v3 verification mechanism and send the results to Google Analytics for improved bot detection.">
-    <meta property="og:type" content="blog">
-    <meta property="og:title" content="Improve Google Analytics Bot Detection With reCAPTCHA">
-    <meta property="og:url" content="https://www.simoahava.com/analytics/improve-google-analytics-bot-detection-with-recaptcha/">
-    <meta property="og:site_name" content="Simo Ahava&#39;s blog">
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Improve Google Analytics Bot Detection With reCAPTCHA">
-    <meta name="twitter:description" content="Build your own reCAPTCHA v3 verification mechanism and send the results to Google Analytics for improved bot detection.">
-    
-      <meta name="twitter:creator" content="@SimoAhava">
-      
-    
-
-    
-    
-
-    
-      <meta name="twitter:image" content="https://www.simoahava.com/images/2019/09/bot-traffic-in-ga.jpg">  
-      <meta property="og:image" content="https://www.simoahava.com/images/2019/09/bot-traffic-in-ga.jpg">
-    
-
-
-    
-
-      
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-      
-    
-    <link rel="stylesheet" href="https://www.simoahava.com/css/style.css" />
-    
-    
-
-    
-      
-    
-    
-  </head>
-
-  <body>
-    
-    <div id="_progress"></div>
-    
-    <div id="blog">
-      <header id="header" data-behavior="4">
-  <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
-  <div class="header-title">
-    <a class="header-title-link" href="https://www.simoahava.com/">Simo Ahava&#39;s blog</a>
-  </div>
-  
-</header>
-
-      <nav id="sidebar" data-behavior="4">
-  <div class="sidebar-container">
-    
-      <div class="sidebar-profile">
-        <a href="https://www.simoahava.com/">
-          <img class="sidebar-profile-picture" loading="lazy" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
-        </a>
-        <h4 class="sidebar-profile-name">Simo Ahava</h4>
-        
-          <h5 class="sidebar-profile-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</h5>
-        
-      </div>
-    
-    <ul class="sidebar-buttons">
-      
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-home"></i>
-      
-      <span class="sidebar-button-desc">Home</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
-      
-      <span class="sidebar-button-desc">Categories</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/tags/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
-      
-      <span class="sidebar-button-desc">Tags</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/gtm-tips/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-magic"></i>
-      
-      <span class="sidebar-button-desc">GTM Tips</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/about-simo-ahava/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-question"></i>
-      
-      <span class="sidebar-button-desc">About</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
-      
-      <span class="sidebar-button-desc">RSS</span>
-    </a>
-  </li>
-
-
-    </ul>
-    <ul class="sidebar-buttons">
-      
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/tools/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-wrench"></i>
-      
-      <span class="sidebar-button-desc">Tools</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/blog-statistics/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-bar-chart"></i>
-      
-      <span class="sidebar-button-desc">Blog statistics</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://github.com/sahava" target="_blank" rel="noopener ">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-brands fa-github"></i>
-      
-      <span class="sidebar-button-desc">GitHub</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/upcoming-talks/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-bullhorn"></i>
-      
-      <span class="sidebar-button-desc">Upcoming talks</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/custom-templates/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
-      
-      <span class="sidebar-button-desc">Templates</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/newsletter/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-bell"></i>
-      
-      <span class="sidebar-button-desc">Newsletter</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://masto.measure.chat/@SimoAhava" target="_blank" rel="noopener me">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-brands fa-mastodon"></i>
-      
-      <span class="sidebar-button-desc">Mastodon</span>
-    </a>
-  </li>
-
-
-    </ul>
-    <ul class="sidebar-buttons">
-      
-
-    </ul>
-  </div>
-</nav>
-
-      
-
-      <div id="main" data-behavior="4"
-        class="
-               hasCoverMetaIn
-               ">
-        <article class="post">
-	  <form id="search" action="https://www.simoahava.com/search/">
-  <input name="q" type="text" class="form-control input--xlarge" placeholder="Search blog..." autocomplete="off">
-  </form>
-
-          <div class="post-header main-content-wrap text-left">
-  
-  
-
-    <h1>
-      Improve Google Analytics Bot Detection With reCAPTCHA
-    </h1>
-  
-  
-  <div class="postShorten-meta post-meta">
-    
-      <time datetime="2019-10-23T09:00:00&#43;03:00">
-        
-  October 23, 2019
-
-      </time>
-      
-      
-  
-  
-    <span>in</span>
-    
-      <a class="category-link" href="https://www.simoahava.com/categories/analytics">Analytics</a>
-    
-  
-
-
-      | <a href="https://www.simoahava.com/analytics/improve-google-analytics-bot-detection-with-recaptcha/#commento"><comentario-count path="/analytics/improve-google-analytics-bot-detection-with-recaptcha/" 
-                  placeholder="..."
-                  error-text="N/A "
-                  zero-text="0 "
-                  prefix=""
-                  suffix=" "></comentario-count>Comments</a>
-      
-  </div>
-
-
-</div>
-
-          <div class="post-content markdown">
-            <div class="main-content-wrap">
-	      
-                
-  	        <p>There are thousands upon thousands of bots, crawlers, spiders, and other creepy-crawlies out there doing nothing but crawling through websites and harvesting the content within for whatever purposes they have been fine-tuned to. While <a href="https://analytics.google.com/">Google Analytics</a> provides <a href="https://support.google.com/analytics/answer/1010249?hl=en">a bot filtering feature</a> to filter out &ldquo;spam&rdquo; and &ldquo;bot traffic&rdquo; from views, this is far from comprehensive enough to tackle all instances of bot traffic that might enter the site.</p>
-
-
-
-<div style="aspect-ratio: 1634 / 502;" class="figure nocaption">
-  
-    <a href="https://www.simoahava.com/images/2019/09/bot-traffic-in-ga.jpg" title="Bot traffic in GA">
-  
-    <img class="fig-img" height="502" width="1634" loading="lazy" src="https://www.simoahava.com/images/2019/09/bot-traffic-in-ga.jpg#ZgotmplZ" alt="Bot traffic in GA">
-  
-    </a>
-  
-  
-</div>
-
-
-<p>You might have noticed bot traffic in your data even if you have bot filtering toggled on. For instance, such traffic could be characterized as follows:</p>
-<ul>
-<li>Traffic without a discernible source/medium</li>
-<li>Average Session Duration under &lt;00:00:01</li>
-<li>Same / outdated user agent</li>
-<li>Non-converting traffic / high bounce rate</li>
-<li>Network location a known cloud host (e.g. AWS)</li>
-</ul>
-<p>Luckily, there are better ways to identify this traffic than looking at noisy Google Analytics data. Google has introduced <a href="https://developers.google.com/recaptcha/docs/v3">reCAPTCHA v3</a> which lets you verify traffic without any user interaction required. This is done with a simple JavaScript API combined with a server-side verification endpoint.</p>
-
-
-
-<div style="aspect-ratio: 980 / 752;" class="figure nocaption">
-  
-    <a href="https://www.simoahava.com/images/2019/10/recaptcha-bot-traffic.jpg" title="reCAPTCHA bot traffic">
-  
-    <img class="fig-img" height="752" width="980" loading="lazy" src="https://www.simoahava.com/images/2019/10/recaptcha-bot-traffic.jpg#ZgotmplZ" alt="reCAPTCHA bot traffic">
-  
-    </a>
-  
-  
-</div>
-
-
-<p>In this article, <strong>Sebastian Pospischil</strong> and <strong>Philipp Schneider</strong> from <a href="https://www.resolutionmedia.com/">Resolution Media</a> will share the solution with you. They&rsquo;ll show you how to build a simple PHP API on your Apache web server to handle the requests from reCAPTCHA.</p>
-
-
-
-<div style="aspect-ratio: 1249 / 629;" class="figure nocaption">
-  
-    <a href="https://www.simoahava.com/images/2019/10/phil-sebastian.jpg" title="Philipp Schneider and Sebastian Pospischil">
-  
-    <img class="fig-img" height="629" width="1249" loading="lazy" src="https://www.simoahava.com/images/2019/10/phil-sebastian.jpg#ZgotmplZ" alt="Philipp Schneider and Sebastian Pospischil">
-  
-    </a>
-  
-  
-</div>
-
-
-<p>I&rsquo;ll contribute by building the same thing with <strong>Node.js</strong>. Remember that you can have both (Apache and Node.js) running in <a href="https://cloud.google.com/">Google Cloud</a> using e.g. the <a href="https://cloud.google.com/appengine/docs/standard/runtimes">App Engine</a> standard environment. This is helpful if you do not have the resources or capabilities to run something like this on your own web servers.</p>
-<p>Huge thanks to Philipp and Sebastian for sharing this nugget of wisdom with this blog!</p>
-
-                <span class="simmer">
-  <span class="close">X</span>
-  <p>
-    <span class="fa fa-md fa-bell"></span>
-    <strong>The Simmer Newsletter</strong>
-  </p>
-  <p>
-    Subscribe to the <a href="https://www.simoahava.com/newsletter/">Simmer newsletter</a> to get the latest news and content from Simo Ahava into your email inbox!
-  </p>
-  </span>
-
-                
-                  <h2 id="getting-started">Getting started</h2>
-<p>To start with, you&rsquo;ll need to generate a (free) <strong>site key</strong> and a (free) <strong>secret key</strong> for your reCAPTCHA API use. Head on over to <a href="https://www.google.com/recaptcha/admin/create">https://www.google.com/recaptcha/admin/create</a>, and register a new site to use with reCAPTCHA v3. Make sure you enter all the domains from which these verification requests will be sent.</p>
-
-
-
-<div style="aspect-ratio: 765 / 707;" class="figure nocaption">
-  
-    <a href="https://www.simoahava.com/images/2019/09/enable-recaptcha.jpg" title="Enable reCAPTCHA">
-  
-    <img class="fig-img" height="707" width="765" loading="lazy" src="https://www.simoahava.com/images/2019/09/enable-recaptcha.jpg#ZgotmplZ" alt="Enable reCAPTCHA">
-  
-    </a>
-  
-  
-</div>
-
-
-<p>Once you&rsquo;ve added everything and checked all the necessary boxes, click <strong>SUBMIT</strong> to get your keys.</p>
-
-
-
-<div style="aspect-ratio: 791 / 535;" class="figure nocaption">
-  
-    <a href="https://www.simoahava.com/images/2019/09/register-keys.jpg" title="register keys">
-  
-    <img class="fig-img" height="535" width="791" loading="lazy" src="https://www.simoahava.com/images/2019/09/register-keys.jpg#ZgotmplZ" alt="register keys">
-  
-    </a>
-  
-  
-</div>
-
-
-<p>Copy the keys, as you&rsquo;ll need them soon when configuring the Custom HTML tag in <a href="https://tagmanager.google.com/">Google Tag Manager</a> as well as the server-side endpoint.</p>
-
-                
-                  <h2 id="php-endpoint">PHP endpoint</h2>
-<p>In this chapter, Philipp and Sebastian will walk you through the steps of creating a PHP endpoint for verifying the reCAPTCHA requests. They&rsquo;ll also show you how to create the Custom HTML tag in Google Tag Manager for loading the reCAPTCHA JavaScript API and ascertaining the &ldquo;bot-ness&rdquo; of the user.</p>
-<h3 id="custom-html-tag">Custom HTML tag</h3>
-<p>First things first - let&rsquo;s setup Google Tag Manager. In GTM, create a new <strong>Custom HTML Tag</strong>.</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">style</span>&gt;
-  <span style="color:#aaa;font-style:italic">/* hides the recaptcha badge */</span>
-  .<span style="color:#0a0;text-decoration:underline">grecaptcha-badge</span> {
-    <span style="color:#00a">visibility</span>: <span style="color:#00a">hidden</span> <span style="color:#4c8317">!important</span>;
-  }
-&lt;/<span style="color:#1e90ff;font-weight:bold">style</span>&gt;
-&lt;<span style="color:#1e90ff;font-weight:bold">script</span> <span style="color:#1e90ff">src</span>=<span style="color:#a50">&#34;https://www.google.com/recaptcha/api.js?render=_reCAPTCHA_site_key_&#34;</span>&gt;&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
-&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
-  grecaptcha.ready(<span style="color:#00a">function</span>() {
-    grecaptcha.execute(<span style="color:#a50">&#39;_reCAPTCHA_site_key_&#39;</span>, {
-      action: <span style="color:#a50">&#39;homepage&#39;</span>
-    }).then(<span style="color:#00a">function</span>(token) {
-      <span style="color:#00a">var</span> xhr = <span style="color:#00a">new</span> XMLHttpRequest();
-      xhr.onload = <span style="color:#00a">function</span>() {
-        <span style="color:#00a">if</span> (xhr.response !== <span style="color:#a50">&#39;noChange&#39;</span>) {
-          <span style="color:#00a">var</span> greResult = JSON.parse(xhr.response);
-          <span style="color:#0aa">window</span>.dataLayer.push({
-            event: <span style="color:#a50">&#39;recaptcha&#39;</span>, 
-            recaptchaAnswer: greResult.success,
-            recaptchaScore: greResult.score
-          });
-        }
-      };
-      xhr.open(<span style="color:#a50">&#39;POST&#39;</span>, <span style="color:#a50">&#39;/gtm/recaptcha.php&#39;</span>, <span style="color:#00a">true</span>); <span style="color:#aaa;font-style:italic">//replace this with URL to your PHP fil
-</span><span style="color:#aaa;font-style:italic"></span>      xhr.setRequestHeader(<span style="color:#a50">&#39;Content-type&#39;</span>, <span style="color:#a50">&#39;application/x-www-form-urlencoded&#39;</span>);
-      xhr.send(<span style="color:#a50">&#39;token=&#39;</span> + token + <span style="color:#a50">&#39;&amp;action=homepage&#39;</span>);
-    });
-  });
-&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
-<p>You can set this tag to fire on whatever trigger you wish, though a trigger that fires when the page loads (e.g. All Pages, DOM Ready, or Window Loaded) is recommended.</p>
-<p>Make sure you edit the following:</p>
-<ul>
-<li>The <code>_reCAPTCHA_site_key</code> string on lines 7 and 10 with the actual <strong>site key</strong> you copied from the reCAPTCHA admin console in the previous chapter.</li>
-<li>The URL of your PHP endpoint on line 24.</li>
-</ul>
-<p>This block of code runs the reCAPTCHA JavaScript API in the user&rsquo;s browser, and sends the tokenized result to the PHP endpoint you&rsquo;ll configure in the next chapter. When it gets a response, the score and success state are pushed into <code>dataLayer</code>.</p>
-
-
-
-<div style="aspect-ratio: 280 / 96;" class="figure nocaption">
-  
-    <a href="https://www.simoahava.com/images/2019/09/recaptcha-badge.jpg" title="reCAPTCHA badge">
-  
-    <img class="fig-img" height="96" width="280" loading="lazy" src="https://www.simoahava.com/images/2019/09/recaptcha-badge.jpg#ZgotmplZ" alt="reCAPTCHA badge">
-  
-    </a>
-  
-  
-</div>
-
-
-<p>The very first code block in the tag hides the reCAPTCHA badge from showing up on the site. <a href="https://developers.google.com/recaptcha/docs/faq#id-like-to-hide-the-recaptcha-badge.-what-is-allowed">Remember to read this part of the FAQ</a> to learn how to modify your site to allow the hiding of the badge.</p>
-<h3 id="php-file-for-your-server">PHP file for your server</h3>
-<p>Create a file <code>recaptcha.php</code> with the following code, and upload it to all the domains you wish to validate reCAPTCHA requests on. Place it in a subdirectory named <code>/gtm/</code>.</p>
-<blockquote>
-<p><strong>NOTE!</strong> You can use whatever path and filename you want for the PHP file - just remember to update the Custom HTML tag&rsquo;s HTTP request endpoint URL accordingly.</p>
-</blockquote>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-php" data-lang="php"><span style="color:#4c8317">&lt;?php</span>
-	<span style="color:#aaa;font-style:italic">// reCaptcha info
-</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#a00">$url</span> = <span style="color:#a50">&#39;https://www.google.com/recaptcha/api/siteverify&#39;</span>;        
-    <span style="color:#a00">$secret</span> = <span style="color:#a50">&#34;_reCAPTCHA_secret_key_&#34;</span>;
-	<span style="color:#a00">$remoteip</span> = <span style="color:#a00">$_SERVER</span>[<span style="color:#a50">&#39;REMOTE_ADDR&#39;</span>];
-	<span style="color:#aaa;font-style:italic">// Form info
-</span><span style="color:#aaa;font-style:italic"></span>	<span style="color:#a00">$action</span> = <span style="color:#a00">$_POST</span>[<span style="color:#a50">&#39;action&#39;</span>];
-	<span style="color:#a00">$response</span> = <span style="color:#a00">$_POST</span>[<span style="color:#a50">&#39;token&#39;</span>];
-	<span style="color:#aaa;font-style:italic">// Botscore
-</span><span style="color:#aaa;font-style:italic"></span>	<span style="color:#a00">$botscore</span> = <span style="color:#a00">$_COOKIE</span>[<span style="color:#a50">&#39;_rbs&#39;</span>];
-
-	<span style="color:#aaa;font-style:italic">// Curl Request
-</span><span style="color:#aaa;font-style:italic"></span>	<span style="color:#a00">$curl</span> = curl_init();
-	curl_setopt(<span style="color:#a00">$curl</span>, CURLOPT_URL, <span style="color:#a00">$url</span>);
-	curl_setopt(<span style="color:#a00">$curl</span>, CURLOPT_POST, <span style="color:#00a">true</span>);
-	curl_setopt(<span style="color:#a00">$curl</span>, CURLOPT_RETURNTRANSFER, <span style="color:#099">1</span>);
-	curl_setopt(<span style="color:#a00">$curl</span>, CURLOPT_POSTFIELDS, <span style="color:#00a">array</span>(
-		<span style="color:#a50">&#39;secret&#39;</span> =&gt; <span style="color:#a00">$secret</span>,
-		<span style="color:#a50">&#39;remoteip&#39;</span> =&gt; <span style="color:#a00">$remoteip</span>,
-		<span style="color:#a50">&#39;action&#39;</span> =&gt; <span style="color:#a00">$action</span>,		
-		<span style="color:#a50">&#39;response&#39;</span> =&gt; <span style="color:#a00">$response</span>
-	));
-	<span style="color:#a00">$curlData</span> = curl_exec(<span style="color:#a00">$curl</span>);
-	curl_close(<span style="color:#a00">$curl</span>);
-	<span style="color:#a00">$curlJson</span> = json_decode(<span style="color:#a00">$curlData</span>, <span style="color:#00a">true</span>);
-	
-	<span style="color:#aaa;font-style:italic">//defining the answer
-</span><span style="color:#aaa;font-style:italic"></span>	<span style="color:#a00">$answer</span> = <span style="color:#a00">$curlData</span>;
-	
-	<span style="color:#aaa;font-style:italic">//refresh the cookie
-</span><span style="color:#aaa;font-style:italic"></span>	setcookie(<span style="color:#a50">&#39;_rbs&#39;</span>, <span style="color:#a00">$curlJson</span>[<span style="color:#a50">&#39;score&#39;</span>], time()+<span style="color:#099">1800</span>, <span style="color:#a50">&#39;/&#39;</span>,<span style="color:#a50">&#39;&#39;</span>, <span style="color:#099">0</span>); 
-	
-	<span style="color:#aaa;font-style:italic">// only fire $answer if botscore cookie is not set or different from acutal score
-</span><span style="color:#aaa;font-style:italic"></span>	<span style="color:#00a">if</span> (<span style="color:#a00">$botscore</span> != <span style="color:#a00">$curlJson</span>[<span style="color:#a50">&#39;score&#39;</span>]) {
-		<span style="color:#00a">echo</span> <span style="color:#a00">$answer</span>;
-	} <span style="color:#00a">else</span> {
-		<span style="color:#00a">echo</span> <span style="color:#a50">&#34;noChange&#34;</span>;
-	}
-<span style="color:#4c8317">?&gt;</span>
-</code></pre></div>
-<p>Again, make sure you replace the <code>_reCAPTCHA_secret_key</code> on line 4 with the <strong>secret key</strong> you got from the admin console.</p>
-<p>This PHP code takes the response sent by Google Tag Manager, validates it against the reCAPTCHA verification API, and then sends the result object in the response, which will, in turn, be pushed into <code>dataLayer</code> for your tags to use.</p>
-<p>The code also writes a cookie in the HTTP response. This cookie is named <code>_rbs</code> and contains the score of the reCAPTCHA action. The results are only returned if the reCAPTCHA score has changed in the last 30 minutes. If the results have not changed, the response will be <code>&quot;noChange&quot;</code>, which blocks the <code>dataLayer.push()</code> from taking place.</p>
-
-                
-                  <h2 id="nodejs-endpoint">Node.js endpoint</h2>
-<p>In this chapter, Simo will show you how to do the same as above by using a <a href="https://www.nodejs.org/">Node.js</a> application instead.</p>
-<h3 id="custom-html-tag-1">Custom HTML tag</h3>
-<p>The main difference (apart from the tech stack) to the PHP solution is that we&rsquo;ll log errors as well. They are sent as the value of the <code>recaptchaScore</code> key in <code>dataLayer</code>, so in your report you&rsquo;ll end up with a mix of valid scores and error texts, but this should be easy to filter in your tables.</p>
-<p>This is what the Custom HTML tag looks like:</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">style</span>&gt;
-  <span style="color:#aaa;font-style:italic">/* hides the recaptcha badge */</span>
-  .<span style="color:#0a0;text-decoration:underline">grecaptcha-badge</span> {
-    <span style="color:#00a">visibility</span>: <span style="color:#00a">hidden</span> <span style="color:#4c8317">!important</span>;
-  }
-&lt;/<span style="color:#1e90ff;font-weight:bold">style</span>&gt;
-&lt;<span style="color:#1e90ff;font-weight:bold">script</span> <span style="color:#1e90ff">src</span>=<span style="color:#a50">&#34;https://www.google.com/recaptcha/api.js?render=_reCAPTCHA_site_key&amp;onload=__recaptchaCallback&#34;</span> <span style="color:#1e90ff">async</span> <span style="color:#1e90ff">defer</span>&gt;&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
-&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
-  <span style="color:#0aa">window</span>.__recaptchaCallback = <span style="color:#00a">function</span>() {
-    <span style="color:#00a">if</span> (<span style="color:#0aa">window</span>.grecaptcha) {
-      <span style="color:#0aa">window</span>.grecaptcha.execute(<span style="color:#a50">&#39;_reCAPTCHA_site_key&#39;</span>, {action: <span style="color:#a50">&#39;homepage&#39;</span>}).then(<span style="color:#00a">function</span>(token) {
-        <span style="color:#00a">var</span> url = <span style="color:#a50">&#39;https://mydomain.com:3000/recaptcha/&#39;</span>;
-        <span style="color:#00a">var</span> xhr = <span style="color:#00a">new</span> XMLHttpRequest();
-        xhr.open(<span style="color:#a50">&#39;GET&#39;</span>, url + <span style="color:#a50">&#39;?g-recaptcha-response=&#39;</span> + token, <span style="color:#00a">true</span>);
-        xhr.onreadystatechange = <span style="color:#00a">function</span>(data) {
-          <span style="color:#00a">if</span> (<span style="color:#00a">this</span>.readyState === XMLHttpRequest.DONE &amp;&amp; <span style="color:#00a">this</span>.status === <span style="color:#099">200</span>) {
-            <span style="color:#00a">var</span> responseJson = JSON.parse(xhr.response);
-            <span style="color:#0aa">window</span>.dataLayer.push({
-              event: <span style="color:#a50">&#39;recaptcha&#39;</span>,
-              recaptchaAnswer: responseJson.status,
-              recaptchaScore: responseJson.recaptcha.score
-            });
-          }
-        }
-        xhr.send();
-      });
-    }
-  };
-&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
-<p>Remember to change the <code>_reCAPTCHA_site_key</code> on lines 7 and 11.</p>
-<p>The <code>url</code> variable on line 12 needs to point to your Node.js application.</p>
-<p>This setup is different from the PHP request. Here, we use a GET request, and we parse the response, pushing both the success and error into <code>dataLayer</code> using a success callback for the HTTP request.</p>
-<p>Also, since we load the JavaScript API asynchronously, we create a global callback method <code>__recaptchaCallback</code>, whose name we pass in the script loader as a parameter (<code>&amp;onload</code>).</p>
-<p>The end result is the same as with the PHP endpoint - a <code>dataLayer.push()</code> event with the reCAPTCHA status and score.</p>
-<h3 id="nodejs-application">Node.js application</h3>
-<p>The <strong>Node.js</strong> application example here is the simplest possible thing you can build. For it to work, you need to have <a href="https://nodejs.org/en/download/">Node.js installed</a> on in the environment where you want to run the endpoint (for example, a web server running on your site or in the cloud).</p>
-<p>Create an empty directory, and initialize a new <code>npm</code> project with <code>npm init</code>. After following through the setup steps, run:</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">$ npm install express express-recaptcha cookie-parser --save</code></pre></div>
-<p>This installs the required dependencies to run a simple <strong>express.js</strong> web server as well as the files required to run the reCAPTCHA middleware and some cookie parsing logic.</p>
-<p>Then, create a file named <strong>server.js</strong>, open it for editing, and add the following code within:</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">const</span> express = require(<span style="color:#a50">&#39;express&#39;</span>);
-<span style="color:#00a">const</span> cookieParser = require(<span style="color:#a50">&#39;cookie-parser&#39;</span>);
-<span style="color:#00a">const</span> Recaptcha = require(<span style="color:#a50">&#39;express-recaptcha&#39;</span>).RecaptchaV3;
-
-<span style="color:#00a">const</span> app = express();
-app.use(cookieParser());
-
-<span style="color:#00a">const</span> siteKey = <span style="color:#a50">&#39;_reCAPTCHA_site_key&#39;</span>;
-<span style="color:#00a">const</span> secretKey = <span style="color:#a50">&#39;_reCAPTCHA_secret_key&#39;</span>;
-
-<span style="color:#00a">const</span> recaptcha = <span style="color:#00a">new</span> Recaptcha(siteKey, secretKey, {action: <span style="color:#a50">&#39;homepage&#39;</span>});
-
-app.get(<span style="color:#a50">&#39;/recaptcha/&#39;</span>, recaptcha.middleware.verify, (req, res) =&gt; {
-  <span style="color:#00a">const</span> botCookie = req.cookies._rbs;
-  res.header(<span style="color:#a50">&#39;Access-Control-Allow-Origin&#39;</span>, <span style="color:#a50">&#39;*&#39;</span>); <span style="color:#aaa;font-style:italic">// Set this to the actual domain that will be sending the requests
-</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#00a">if</span> (!req.recaptcha.error) {
-    <span style="color:#00a">const</span> recaptcha = req.recaptcha.data;
-    <span style="color:#00a">const</span> score = recaptcha.score;
-    res.cookie(<span style="color:#a50">&#39;_rbs&#39;</span>, score, {path: <span style="color:#a50">&#39;/&#39;</span>, maxAge: <span style="color:#099">30</span> * <span style="color:#099">60</span> * <span style="color:#099">1000</span>});
-    <span style="color:#aaa;font-style:italic">// Only send response if cookie does not exist or does not match the latest score
-</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">if</span> (botCookie !== score) {
-      res.send({status: <span style="color:#a50">&#39;1&#39;</span>, recaptcha: req.recaptcha.data});
-    }
-  } <span style="color:#00a">else</span> {
-    <span style="color:#00a">const</span> score = req.recaptcha.error;
-    res.cookie(<span style="color:#a50">&#39;_rbs&#39;</span>, score, {path: <span style="color:#a50">&#39;/&#39;</span>, maxAge: <span style="color:#099">30</span> * <span style="color:#099">60</span> * <span style="color:#099">1000</span>});
-    res.send({status: <span style="color:#a50">&#39;0&#39;</span>, recaptcha: {score: score}});
-  }
-});
-
-app.listen(<span style="color:#099">3000</span>, () =&gt; console.log(<span style="color:#a50">&#39;App listening on port 3000!&#39;</span>));
-</code></pre></div>
-<p>Edit lines 8 and 9 with the actual <strong>site key</strong> and <strong>secret key</strong>, respectively.</p>
-<p>Edit line 15 to allow requests only from your site (so if your site is running on <code>https://mydomain.com</code>, that&rsquo;s what you would add as a valid origin instead of <code>*</code>).</p>
-<p>This application runs on port <code>3000</code> of whatever hostname is configured for your web server. It creates a simple GET request endpoint to <code>/recaptcha/</code>, where a piece of <strong>middleware</strong> will inspect the incoming request for a reCAPTCHA token.</p>
-<p>If the token is encountered, it is validated and the <code>recaptcha</code> results are written to <code>dataLayer</code> as well as a cookie named <code>_rbs</code>.</p>
-<p>If the validation fails, the &ldquo;score&rdquo; will be the error message instead of the actual score.</p>
-
-                
-                  <h2 id="rest-of-the-setup">Rest of the setup</h2>
-<h3 id="google-analytics-custom-dimensions">Google Analytics Custom Dimensions</h3>
-<p>In Google Analytics, create <strong>two</strong> new Custom Dimensions:</p>
-<ul>
-<li><strong>reCAPTCHA score</strong> (session scope)</li>
-<li><strong>reCAPTCHA answer</strong> (session scope)</li>
-</ul>
-
-
-
-<div style="aspect-ratio: 806 / 672;" class="figure nocaption">
-  
-    <a href="https://www.simoahava.com/images/2019/09/create-custom-dimension.jpg" title="Create custom dimension">
-  
-    <img class="fig-img" height="672" width="806" loading="lazy" src="https://www.simoahava.com/images/2019/09/create-custom-dimension.jpg#ZgotmplZ" alt="Create custom dimension">
-  
-    </a>
-  
-  
-</div>
-
-
-<p>These two Custom Dimensions allow us to permanently filter out bot traffic from our Google Analytics production views.</p>
-
-
-
-<div style="aspect-ratio: 1652 / 472;" class="figure nocaption">
-  
-    <a href="https://www.simoahava.com/images/2019/09/new-custom-dimensions.jpg" title="New custom dimensions">
-  
-    <img class="fig-img" height="472" width="1652" loading="lazy" src="https://www.simoahava.com/images/2019/09/new-custom-dimensions.jpg#ZgotmplZ" alt="New custom dimensions">
-  
-    </a>
-  
-  
-</div>
-
-
-<p>Note that the Google Analytics tags are only fired if the score changes (or if the score was previously an error). That way you won&rsquo;t constantly send the same reCAPTCHA score to Google Analytics while the session is active.</p>
-<p>The Custom Dimensions are sent with an <strong>event tag</strong>.</p>
-<h3 id="google-tag-manager-setup">Google Tag Manager setup</h3>
-<p>First, let&rsquo;s create two new Data Layer variables.</p>
-<h4 id="data-layer-variables">Data Layer Variables</h4>
-<p>The first variable is named <strong>dl_recaptchaAnswer</strong>, and should have its Data Layer Variable Name field pointing to <code>recaptchaAnswer</code>.</p>
-<p>The second variable is named <strong>dl_recaptchaScore</strong>, and should have its Data Layer Variable Name field pointing to <code>recaptchaScore</code>.</p>
-<p>Here&rsquo;s what the latter would look like:</p>
-
-
-
-<div style="aspect-ratio: 537 / 582;" class="figure nocaption">
-  
-    <a href="https://www.simoahava.com/images/2019/09/data-layer-variable.jpg" title="Data Layer variable">
-  
-    <img class="fig-img" height="582" width="537" loading="lazy" src="https://www.simoahava.com/images/2019/09/data-layer-variable.jpg#ZgotmplZ" alt="Data Layer variable">
-  
-    </a>
-  
-  
-</div>
-
-
-<h4 id="trigger">Trigger</h4>
-<p>The trigger is a simple Custom Event trigger that looks like this:</p>
-
-
-
-<div style="aspect-ratio: 730 / 468;" class="figure nocaption">
-  
-    <a href="https://www.simoahava.com/images/2019/09/custom-event-trigger.jpg" title="Custom event trigger">
-  
-    <img class="fig-img" height="468" width="730" loading="lazy" src="https://www.simoahava.com/images/2019/09/custom-event-trigger.jpg#ZgotmplZ" alt="Custom event trigger">
-  
-    </a>
-  
-  
-</div>
-
-
-<h4 id="event-tag">Event tag</h4>
-<p>The main function of the event tag is to send the Custom Dimensions. You can arrange the other fields however you like. This is what a sample Universal Analytics event tag might look like:</p>
-
-
-
-<div style="aspect-ratio: 918 / 686;" class="figure nocaption">
-  
-    <a href="https://www.simoahava.com/images/2019/09/ga-event-tag-1.jpg" title="GA Event tag 1">
-  
-    <img class="fig-img" height="686" width="918" loading="lazy" src="https://www.simoahava.com/images/2019/09/ga-event-tag-1.jpg#ZgotmplZ" alt="GA Event tag 1">
-  
-    </a>
-  
-  
-</div>
-
-
-
-
-
-<div style="aspect-ratio: 897 / 538;" class="figure nocaption">
-  
-    <a href="https://www.simoahava.com/images/2019/09/ga-event-tag-2.jpg" title="GA Event tag 2">
-  
-    <img class="fig-img" height="538" width="897" loading="lazy" src="https://www.simoahava.com/images/2019/09/ga-event-tag-2.jpg#ZgotmplZ" alt="GA Event tag 2">
-  
-    </a>
-  
-  
-</div>
-
-
-<p>Just make sure you have the Custom Dimension index and value settings correct per what you configured in Google Analytics admin earlier.</p>
-<blockquote>
-<p><strong>NOTE</strong>! One enhancement would be to set the Custom Dimensions <em>only</em> if <code>recaptchaAnswer</code> is <code>1</code> (success), so that you don&rsquo;t end up overwriting a valid score for the session with an errant error message.</p>
-</blockquote>
-
-                
-                  <h2 id="analyze-the-results">Analyze the results</h2>
-<p>When you set the whole thing up, all users on your page will be vetted in the background for their probability to be a bot. The script fires if the user hasn&rsquo;t been validated with a proper score within 30 minutes since the last validation. This ensures that you don&rsquo;t flood Google Analytics unnecessarily with events that just have the same score sent with each one.</p>
-
-
-
-<div style="aspect-ratio: 980 / 752;" class="figure nocaption">
-  
-    <a href="https://www.simoahava.com/images/2019/10/recaptcha-bot-traffic.jpg" title="reCAPTCHA bot traffic">
-  
-    <img class="fig-img" height="752" width="980" loading="lazy" src="https://www.simoahava.com/images/2019/10/recaptcha-bot-traffic.jpg#ZgotmplZ" alt="reCAPTCHA bot traffic">
-  
-    </a>
-  
-  
-</div>
-
-
-<p>Here&rsquo;s what the custom dimensions will end up populated with:</p>
-<table>
-<thead>
-<tr>
-<th>Key</th>
-<th>Google Analytics fields</th>
-<th>Explanation</th>
-<th>Sample value</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>recaptchaAnswer</code></td>
-<td>Event Action, Custom Dimension</td>
-<td>Whether or not the validation worked. <code>1</code> for success, <code>0</code> for failure.</td>
-<td><code>1</code></td>
-</tr>
-<tr>
-<td><code>recaptchaScore</code></td>
-<td>Event Label, Custom Dimension</td>
-<td>Score between <code>0.0</code> and <code>1.0</code> (where <code>1.0</code> is most likely to be human and <code>0.0</code> most likely to be bot). If the validation fails, the error message is sent instead.</td>
-<td><code>0.9</code>, or <code>invalid-input-response</code></td>
-</tr>
-</tbody>
-</table>
-<p>You can drill down to the <code>0.1</code> score to identify idiosyncrasies in this low-score traffic.</p>
-
-
-
-<div style="aspect-ratio: 980 / 987;" class="figure nocaption">
-  
-    <a href="https://www.simoahava.com/images/2019/10/recaptcha-providers.jpg" title="reCAPTCHA providers">
-  
-    <img class="fig-img" height="987" width="980" loading="lazy" src="https://www.simoahava.com/images/2019/10/recaptcha-providers.jpg#ZgotmplZ" alt="reCAPTCHA providers">
-  
-    </a>
-  
-  
-</div>
-
-
-<p>To get a better understanding of the amount of bot traffic, create segments based on <strong>reCAPTCHA score</strong>. After a few weeks, you’ll have enough data in order to:</p>
-<ul>
-<li>Determine the ratio of bot traffic on your site.</li>
-<li>Decide whether you should permanently filter out flagged bot traffic from you Google Analytics production views.</li>
-</ul>
-
-                
-                  <h2 id="summary">Summary</h2>
-<p>Thank you so much to Philipp and Sebastian for sharing their amazing idea here. Since reCAPTCHA v3 calculates the score based on user interactions on the site, it&rsquo;s a perfect candidate for measuring with Google Analytics, since we can surreptitiously collect the &ldquo;bot-ness&rdquo; of the visitor and leverage GA&rsquo;s custom dimensions to collect the data.</p>
-<p>It&rsquo;s not trivial to implement, as it requires a web service to poll for the reCAPTCHA score. Perhaps someone could do the world a service and create a free, public API for polling this information? Until then, you&rsquo;re stuck with an on-premise solution or, better yet, leveraging the cloud for setting up the API endpoint.</p>
-<p>This solution should serve well to uncover the complexity of bot traffic on any given website. Bots and crawlers come in different shapes and sizes - there are malicious agents as well as services that aim to do good. Regardless, bot traffic is most likely <em>not</em> your target traffic when building your website, so being able to segment it out in Google Analytics is a major win for data quality indeed.</p>
-<p>Let us know in the comments what you think of this solution, and whether you have ideas for improving it!</p>
-
-                
-              
-              
-
-            </div>
-          </div>
-          <div id="post-footer" class="post-footer main-content-wrap">
-            
-              
-                
-                
-                  <div class="post-footer-tags">
-                    <span class="text-color-light text-small">TAGGED IN</span><br/>
-                    
-  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/google-tag-manager/">google tag manager</a>
-
-  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/google-analytics/">google analytics</a>
-
-  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/php/">php</a>
-
-  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/node.js/">node.js</a>
-
-  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/recaptcha/">recaptcha</a>
-
-                  </div>
-                
-              
-            
-            
-  <div class="post-actions-wrap">
-      <nav >
-        <ul class="post-actions post-action-nav">
-          
-            <li class="post-action">
-              
-                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/gtm-tips/mysterious-macro-call-custom-html-tags/">
-              
-                  <i class="fa fa-angle-left"></i>
-                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
-                </a>
-            </li>
-            <li class="post-action">
-              
-                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/bigquery-query-guide-google-analytics-app-web/">
-              
-                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
-                  <i class="fa fa-angle-right"></i>
-                </a>
-            </li>
-          
-        </ul>
-      </nav>
-    <ul class="post-actions post-action-share" >
-      
-        <li class="post-action hide-lg hide-md hide-sm">
-          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
-            <i class="fa fa-share-alt"></i>
-          </a>
-        </li>
-        
-          <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/improve-google-analytics-bot-detection-with-recaptcha/">
-              <i class="fa fa-brands fa-facebook"></i>
-            </a>
-          </li>
-        
-          <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Improve%20Google%20Analytics%20Bot%20Detection%20With%20reCAPTCHA%20https://www.simoahava.com/analytics/improve-google-analytics-bot-detection-with-recaptcha/%20via%20@SimoAhava">
-              <i class="fa fa-brands fa-twitter"></i>
-            </a>
-          </li>
-        
-          <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/improve-google-analytics-bot-detection-with-recaptcha/">
-              <i class="fa fa-brands fa-linkedin"></i>
-            </a>
-          </li>
-        
-      
-      
-        <li class="post-action">
-          <a class="post-action-btn btn btn--default" href="#commento">
-            <i class="fa-regular fa-comments"></i>
-          </a>
-        </li>
-      
-      <li class="post-action">
-          <a class="post-action-btn btn btn--default" href="#">
-          <i class="fa fa-search"></i>
-        </a>
-      </li>
-    </ul>
-  </div>
-
-
-            
-              <a name="commento"></a>
-<comentario-comments></comentario-comments>
-
-            
-          </div>
-        </article>
-        <footer id="footer" class="main-content-wrap">
-  <span class="copyrights">
-    &copy; 2026 Simo Ahava. All Rights Reserved
-  </span>
-</footer>
-
-      </div>
-      
-      <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
-        
-  <div class="post-actions-wrap">
-      <nav >
-        <ul class="post-actions post-action-nav">
-          
-            <li class="post-action">
-              
-                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/gtm-tips/mysterious-macro-call-custom-html-tags/">
-              
-                  <i class="fa fa-angle-left"></i>
-                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
-                </a>
-            </li>
-            <li class="post-action">
-              
-                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/bigquery-query-guide-google-analytics-app-web/">
-              
-                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
-                  <i class="fa fa-angle-right"></i>
-                </a>
-            </li>
-          
-        </ul>
-      </nav>
-    <ul class="post-actions post-action-share" >
-      
-        <li class="post-action hide-lg hide-md hide-sm">
-          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
-            <i class="fa fa-share-alt"></i>
-          </a>
-        </li>
-        
-          <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/improve-google-analytics-bot-detection-with-recaptcha/">
-              <i class="fa fa-brands fa-facebook"></i>
-            </a>
-          </li>
-        
-          <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Improve%20Google%20Analytics%20Bot%20Detection%20With%20reCAPTCHA%20https://www.simoahava.com/analytics/improve-google-analytics-bot-detection-with-recaptcha/%20via%20@SimoAhava">
-              <i class="fa fa-brands fa-twitter"></i>
-            </a>
-          </li>
-        
-          <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/improve-google-analytics-bot-detection-with-recaptcha/">
-              <i class="fa fa-brands fa-linkedin"></i>
-            </a>
-          </li>
-        
-      
-      
-        <li class="post-action">
-          <a class="post-action-btn btn btn--default" href="#commento">
-            <i class="fa-regular fa-comments"></i>
-          </a>
-        </li>
-      
-      <li class="post-action">
-          <a class="post-action-btn btn btn--default" href="#">
-          <i class="fa fa-search"></i>
-        </a>
-      </li>
-    </ul>
-  </div>
-
-
-      </div>
-      
-      <div id="share-options-bar" class="share-options-bar" data-behavior="4">
-  <i id="btn-close-shareoptions" class="fa fa-close"></i>
-  <ul class="share-options">
-    
-      <li class="share-option">
-        <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/improve-google-analytics-bot-detection-with-recaptcha/">
-          <i class="fa fa-brands fa-facebook"></i><span>Share on Facebook</span>
-        </a>
-      </li>
-    
-      <li class="share-option">
-        <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=Improve%20Google%20Analytics%20Bot%20Detection%20With%20reCAPTCHA%20https://www.simoahava.com/analytics/improve-google-analytics-bot-detection-with-recaptcha/%20via%20@SimoAhava">
-          <i class="fa fa-brands fa-twitter"></i><span>Share on Twitter</span>
-        </a>
-      </li>
-    
-      <li class="share-option">
-        <a class="share-option-btn" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/improve-google-analytics-bot-detection-with-recaptcha/">
-          <i class="fa fa-brands fa-linkedin"></i><span>Share on LinkedIn</span>
-        </a>
-      </li>
-    
-  </ul>
-</div>
-<div id="share-options-mask" class="share-options-mask"></div>
-
-    </div>
-    
-    <div id="about">
-  <div id="about-card">
-    <div id="about-btn-close">
-      <i class="fa fa-remove"></i>
-    </div>
-    
-      <img id="about-card-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
-    
-    <h4 id="about-card-name">Simo Ahava</h4>
-    
-      <div id="about-card-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</div>
-    
-    
-      <div id="about-card-job">
-        <i class="fa fa-briefcase"></i>
-        <br/>
-        Senior Data Advocate at Reaktor
-      </div>
-    
-    
-      <div id="about-card-location">
-        <i class="fa fa-map-marker"></i>
-        <br/>
-        Finland
-      </div>
-    
-  </div>
-</div>
-
-    
-  
-    
-    <div id="cover" style="background-image:url('https://www.simoahava.com/images/maisema.jpg');"></div>
-  
-
-
-    
-<script defer src="https://comentario.simoahava.com/comentario.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
-
-
-
-
-<script src="https://www.simoahava.com/js/script.js"></script>
-
-
-
-    <script>
-      !function(){var e=document.querySelector(".simmer"),t=document.querySelector(".simmer .close"),o=window.sessionStorage&&window.sessionStorage.getItem("nosimmer");if(e){if(o){e.style.display="none"}t.addEventListener("click",function(){window.sessionStorage.setItem("nosimmer","true"),e.style.display="none"})}}();
-    </script>
-    <style>
-      .ads {
-	  width: 1px;
-      }
-      </style>
-         
-
-    
-  </body>
-</html>
-
+<!doctype html><html lang=en-us><head><meta name=google-site-verification content="xQwWI2KUfP9LbFKhw2CVLFtrMY6Czrla7L3PD2aBolA"><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"Improve Google Analytics Bot Detection With reCAPTCHA | Simo Ahava's blog","image":"https:\/\/www.simoahava.com\/images\/2019\/09\/bot-traffic-in-ga.jpg","editor":"Simo Ahava","publisher":{"@type":"Organization","name":"Simo Ahava's blog","logo":{"@type":"ImageObject","url":"https:\/\/www.simoahava.com\/images\/simo.png","height":"393","width":"407"}},"url":"https:\/\/www.simoahava.com\/analytics\/improve-google-analytics-bot-detection-with-recaptcha\/","datePublished":"2019-10-23T09:00:00\u002b03:00","dateModified":"2019-10-23T09:00:00\u002b03:00","description":"Build your own reCAPTCHA v3 verification mechanism and send the results to Google Analytics for improved bot detection.","author":{"@type":"Person","name":"Simo Ahava"}}</script><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Improve Google Analytics Bot Detection With reCAPTCHA | Simo Ahava's blog</title>
+<script>window.dataLayer=window.dataLayer||[],window.dataLayer.push({pageType:"article",environment:null})</script><script>(function(e,t,n,s){window[n]=window[n]||[],window[n].push({"gtm.start":(new Date).getTime(),event:"gtm.js"});var i=e.getElementsByTagName(t)[0],o=e.createElement(t),a=n!="dataLayer"?"&l="+n:"";o.async=!0,o.src="https://sgtm.simoahava.com/gtm.js?id="+s+a,i.parentNode.insertBefore(o,i)})(document,"script","dataLayer","GTM-PZ7GMV9")</script><meta name=author content="Simo Ahava"><meta name=keywords content><link rel=icon href=https://www.simoahava.com/images/favicon.ico><link rel=amphtml href=https://www.simoahava.com/amp/analytics/improve-google-analytics-bot-detection-with-recaptcha/><meta name=description content="Build your own reCAPTCHA v3 verification mechanism and send the results to Google Analytics for improved bot detection."><meta property="og:description" content="Build your own reCAPTCHA v3 verification mechanism and send the results to Google Analytics for improved bot detection."><meta property="og:type" content="blog"><meta property="og:title" content="Improve Google Analytics Bot Detection With reCAPTCHA"><meta property="og:url" content="https://www.simoahava.com/analytics/improve-google-analytics-bot-detection-with-recaptcha/"><meta property="og:site_name" content="Simo Ahava's blog"><meta name=twitter:card content="summary"><meta name=twitter:title content="Improve Google Analytics Bot Detection With reCAPTCHA"><meta name=twitter:description content="Build your own reCAPTCHA v3 verification mechanism and send the results to Google Analytics for improved bot detection."><meta name=twitter:creator content="@SimoAhava"><meta name=twitter:image content="https://www.simoahava.com/images/2019/09/bot-traffic-in-ga.jpg"><meta property="og:image" content="https://www.simoahava.com/images/2019/09/bot-traffic-in-ga.jpg"><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=/css/style.css></head><body><div id=_progress></div><div id=blog><header id=header data-behavior=4><i id=btn-open-sidebar class="fa fa-lg fa-bars"></i><div class=header-title><a class=header-title-link href=/>Simo Ahava's blog</a></div></header><nav id=sidebar data-behavior=4><div class=sidebar-container><div class=sidebar-profile><a href=/><img class=sidebar-profile-picture loading=lazy src=https://www.simoahava.com/images/simo.png alt="Author's picture"></a><h4 class=sidebar-profile-name>Simo Ahava</h4><h5 class=sidebar-profile-bio>Husband | Father | Analytics developer<br>simo (at) simoahava.com</h5></div><ul class=sidebar-buttons><li class=sidebar-button><a class=sidebar-button-link href=/><i class="sidebar-button-icon fa fa-lg fa-home"></i>
+<span class=sidebar-button-desc>Home</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/categories/><i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+<span class=sidebar-button-desc>Categories</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/tags/><i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+<span class=sidebar-button-desc>Tags</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/categories/gtm-tips/><i class="sidebar-button-icon fa fa-lg fa-magic"></i>
+<span class=sidebar-button-desc>GTM Tips</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/about-simo-ahava/><i class="sidebar-button-icon fa fa-lg fa-question"></i>
+<span class=sidebar-button-desc>About</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/index.xml><i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+<span class=sidebar-button-desc>RSS</span></a></li></ul><ul class=sidebar-buttons><li class=sidebar-button><a class=sidebar-button-link href=/tools/><i class="sidebar-button-icon fa fa-lg fa-wrench"></i>
+<span class=sidebar-button-desc>Tools</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/blog-statistics/><i class="sidebar-button-icon fa fa-lg fa-bar-chart"></i>
+<span class=sidebar-button-desc>Blog statistics</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=https://github.com/sahava target=_blank rel=noopener><i class="sidebar-button-icon fa fa-lg fa-brands fa-github"></i>
+<span class=sidebar-button-desc>GitHub</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/upcoming-talks/><i class="sidebar-button-icon fa fa-lg fa-bullhorn"></i>
+<span class=sidebar-button-desc>Upcoming talks</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/custom-templates/><i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+<span class=sidebar-button-desc>Templates</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/newsletter/><i class="sidebar-button-icon fa fa-lg fa-bell"></i>
+<span class=sidebar-button-desc>Newsletter</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=https://masto.measure.chat/@SimoAhava target=_blank rel="noopener me"><i class="sidebar-button-icon fa fa-lg fa-brands fa-mastodon"></i>
+<span class=sidebar-button-desc>Mastodon</span></a></li></ul><ul class=sidebar-buttons></ul></div></nav><div id=main data-behavior=4 class=hasCoverMetaIn><article class=post><form id=search action=/search/><input name=q type=text class="form-control input--xlarge" placeholder="Search blog..." autocomplete=off></form><div class="post-header main-content-wrap text-left"><h1>Improve Google Analytics Bot Detection With reCAPTCHA</h1><div class="postShorten-meta post-meta"><time datetime=2019-10-23T09:00:00+03:00>October 23, 2019
+</time><span>in</span>
+<a class=category-link href=/categories/analytics>Analytics</a>
+| <a href=https://www.simoahava.com/analytics/improve-google-analytics-bot-detection-with-recaptcha/#commento><comentario-count path=/analytics/improve-google-analytics-bot-detection-with-recaptcha/ placeholder=... error-text="N/A " zero-text="0 " prefix suffix=" "></comentario-count>Comments</a></div></div><div class="post-content markdown"><div class=main-content-wrap><p>There are thousands upon thousands of bots, crawlers, spiders, and other creepy-crawlies out there doing nothing but crawling through websites and harvesting the content within for whatever purposes they have been fine-tuned to. While <a href=https://analytics.google.com/>Google Analytics</a> provides <a href="https://support.google.com/analytics/answer/1010249?hl=en">a bot filtering feature</a> to filter out &ldquo;spam&rdquo; and &ldquo;bot traffic&rdquo; from views, this is far from comprehensive enough to tackle all instances of bot traffic that might enter the site.</p><div style=aspect-ratio:1634/502 class="figure nocaption"><a href=/images/2019/09/bot-traffic-in-ga.jpg title="Bot traffic in GA"><img class=fig-img height=502 width=1634 loading=lazy src=/images/2019/09/bot-traffic-in-ga.jpg#ZgotmplZ alt="Bot traffic in GA"></a></div><p>You might have noticed bot traffic in your data even if you have bot filtering toggled on. For instance, such traffic could be characterized as follows:</p><ul><li>Traffic without a discernible source/medium</li><li>Average Session Duration under &lt;00:00:01</li><li>Same / outdated user agent</li><li>Non-converting traffic / high bounce rate</li><li>Network location a known cloud host (e.g. AWS)</li></ul><p>Luckily, there are better ways to identify this traffic than looking at noisy Google Analytics data. Google has introduced <a href=https://developers.google.com/recaptcha/docs/v3>reCAPTCHA v3</a> which lets you verify traffic without any user interaction required. This is done with a simple JavaScript API combined with a server-side verification endpoint.</p><div style=aspect-ratio:980/752 class="figure nocaption"><a href=/images/2019/10/recaptcha-bot-traffic.jpg title="reCAPTCHA bot traffic"><img class=fig-img height=752 width=980 loading=lazy src=/images/2019/10/recaptcha-bot-traffic.jpg#ZgotmplZ alt="reCAPTCHA bot traffic"></a></div><p>In this article, <strong>Sebastian Pospischil</strong> and <strong>Philipp Schneider</strong> from <a href=https://www.resolutionmedia.com/>Resolution Media</a> will share the solution with you. They&rsquo;ll show you how to build a simple PHP API on your Apache web server to handle the requests from reCAPTCHA.</p><div style=aspect-ratio:1249/629 class="figure nocaption"><a href=/images/2019/10/phil-sebastian.jpg title="Philipp Schneider and Sebastian Pospischil"><img class=fig-img height=629 width=1249 loading=lazy src=/images/2019/10/phil-sebastian.jpg#ZgotmplZ alt="Philipp Schneider and Sebastian Pospischil"></a></div><p>I&rsquo;ll contribute by building the same thing with <strong>Node.js</strong>. Remember that you can have both (Apache and Node.js) running in <a href=https://cloud.google.com/>Google Cloud</a> using e.g. the <a href=https://cloud.google.com/appengine/docs/standard/runtimes>App Engine</a> standard environment. This is helpful if you do not have the resources or capabilities to run something like this on your own web servers.</p><p>Huge thanks to Philipp and Sebastian for sharing this nugget of wisdom with this blog!</p><span class=simmer><span class=close>X</span><p><span class="fa fa-md fa-bell"></span>
+<strong>The Simmer Newsletter</strong></p><p>Subscribe to the <a href=/newsletter/>Simmer newsletter</a> to get the latest news and content from Simo Ahava into your email inbox!</p></span><h2 id=getting-started>Getting started</h2><p>To start with, you&rsquo;ll need to generate a (free) <strong>site key</strong> and a (free) <strong>secret key</strong> for your reCAPTCHA API use. Head on over to <a href=https://www.google.com/recaptcha/admin/create>https://www.google.com/recaptcha/admin/create</a>, and register a new site to use with reCAPTCHA v3. Make sure you enter all the domains from which these verification requests will be sent.</p><div style=aspect-ratio:765/707 class="figure nocaption"><a href=/images/2019/09/enable-recaptcha.jpg title="Enable reCAPTCHA"><img class=fig-img height=707 width=765 loading=lazy src=/images/2019/09/enable-recaptcha.jpg#ZgotmplZ alt="Enable reCAPTCHA"></a></div><p>Once you&rsquo;ve added everything and checked all the necessary boxes, click <strong>SUBMIT</strong> to get your keys.</p><div style=aspect-ratio:791/535 class="figure nocaption"><a href=/images/2019/09/register-keys.jpg title="register keys"><img class=fig-img height=535 width=791 loading=lazy src=/images/2019/09/register-keys.jpg#ZgotmplZ alt="register keys"></a></div><p>Copy the keys, as you&rsquo;ll need them soon when configuring the Custom HTML tag in <a href=https://tagmanager.google.com/>Google Tag Manager</a> as well as the server-side endpoint.</p><h2 id=php-endpoint>PHP endpoint</h2><p>In this chapter, Philipp and Sebastian will walk you through the steps of creating a PHP endpoint for verifying the reCAPTCHA requests. They&rsquo;ll also show you how to create the Custom HTML tag in Google Tag Manager for loading the reCAPTCHA JavaScript API and ascertaining the &ldquo;bot-ness&rdquo; of the user.</p><h3 id=custom-html-tag>Custom HTML tag</h3><p>First things first - let&rsquo;s setup Google Tag Manager. In GTM, create a new <strong>Custom HTML Tag</strong>.</p><div class=highlight><pre tabindex=0 style=background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-html data-lang=html><span style=display:flex><span>&lt;<span style=color:#1e90ff;font-weight:700>style</span>&gt;
+</span></span><span style=display:flex><span>  <span style=color:#aaa;font-style:italic>/* hides the recaptcha badge */</span>
+</span></span><span style=display:flex><span>  .<span style=color:#0a0;text-decoration:underline>grecaptcha-badge</span> {
+</span></span><span style=display:flex><span>    <span style=color:#00a>visibility</span>: <span style=color:#00a>hidden</span> <span style=color:#4c8317>!important</span>;
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>&lt;/<span style=color:#1e90ff;font-weight:700>style</span>&gt;
+</span></span><span style=display:flex><span>&lt;<span style=color:#1e90ff;font-weight:700>script</span> <span style=color:#1e90ff>src</span>=<span style=color:#a50>&#34;https://www.google.com/recaptcha/api.js?render=_reCAPTCHA_site_key_&#34;</span>&gt;&lt;/<span style=color:#1e90ff;font-weight:700>script</span>&gt;
+</span></span><span style=display:flex><span>&lt;<span style=color:#1e90ff;font-weight:700>script</span>&gt;
+</span></span><span style=display:flex><span>  grecaptcha.ready(<span style=color:#00a>function</span>() {
+</span></span><span style=display:flex><span>    grecaptcha.execute(<span style=color:#a50>&#39;_reCAPTCHA_site_key_&#39;</span>, {
+</span></span><span style=display:flex><span>      action: <span style=color:#a50>&#39;homepage&#39;</span>
+</span></span><span style=display:flex><span>    }).then(<span style=color:#00a>function</span>(token) {
+</span></span><span style=display:flex><span>      <span style=color:#00a>var</span> xhr = <span style=color:#00a>new</span> XMLHttpRequest();
+</span></span><span style=display:flex><span>      xhr.onload = <span style=color:#00a>function</span>() {
+</span></span><span style=display:flex><span>        <span style=color:#00a>if</span> (xhr.response !== <span style=color:#a50>&#39;noChange&#39;</span>) {
+</span></span><span style=display:flex><span>          <span style=color:#00a>var</span> greResult = JSON.parse(xhr.response);
+</span></span><span style=display:flex><span>          <span style=color:#0aa>window</span>.dataLayer.push({
+</span></span><span style=display:flex><span>            event: <span style=color:#a50>&#39;recaptcha&#39;</span>, 
+</span></span><span style=display:flex><span>            recaptchaAnswer: greResult.success,
+</span></span><span style=display:flex><span>            recaptchaScore: greResult.score
+</span></span><span style=display:flex><span>          });
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>      };
+</span></span><span style=display:flex><span>      xhr.open(<span style=color:#a50>&#39;POST&#39;</span>, <span style=color:#a50>&#39;/gtm/recaptcha.php&#39;</span>, <span style=color:#00a>true</span>); <span style=color:#aaa;font-style:italic>//replace this with URL to your PHP fil
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>      xhr.setRequestHeader(<span style=color:#a50>&#39;Content-type&#39;</span>, <span style=color:#a50>&#39;application/x-www-form-urlencoded&#39;</span>);
+</span></span><span style=display:flex><span>      xhr.send(<span style=color:#a50>&#39;token=&#39;</span> + token + <span style=color:#a50>&#39;&amp;action=homepage&#39;</span>);
+</span></span><span style=display:flex><span>    });
+</span></span><span style=display:flex><span>  });
+</span></span><span style=display:flex><span>&lt;/<span style=color:#1e90ff;font-weight:700>script</span>&gt;</span></span></code></pre></div><p>You can set this tag to fire on whatever trigger you wish, though a trigger that fires when the page loads (e.g. All Pages, DOM Ready, or Window Loaded) is recommended.</p><p>Make sure you edit the following:</p><ul><li>The <code>_reCAPTCHA_site_key</code> string on lines 7 and 10 with the actual <strong>site key</strong> you copied from the reCAPTCHA admin console in the previous chapter.</li><li>The URL of your PHP endpoint on line 24.</li></ul><p>This block of code runs the reCAPTCHA JavaScript API in the user&rsquo;s browser, and sends the tokenized result to the PHP endpoint you&rsquo;ll configure in the next chapter. When it gets a response, the score and success state are pushed into <code>dataLayer</code>.</p><div style=aspect-ratio:280/96 class="figure nocaption"><a href=/images/2019/09/recaptcha-badge.jpg title="reCAPTCHA badge"><img class=fig-img height=96 width=280 loading=lazy src=/images/2019/09/recaptcha-badge.jpg#ZgotmplZ alt="reCAPTCHA badge"></a></div><p>The very first code block in the tag hides the reCAPTCHA badge from showing up on the site. <a href=https://developers.google.com/recaptcha/docs/faq#id-like-to-hide-the-recaptcha-badge.-what-is-allowed>Remember to read this part of the FAQ</a> to learn how to modify your site to allow the hiding of the badge.</p><h3 id=php-file-for-your-server>PHP file for your server</h3><p>Create a file <code>recaptcha.php</code> with the following code, and upload it to all the domains you wish to validate reCAPTCHA requests on. Place it in a subdirectory named <code>/gtm/</code>.</p><blockquote><p><strong>NOTE!</strong> You can use whatever path and filename you want for the PHP file - just remember to update the Custom HTML tag&rsquo;s HTTP request endpoint URL accordingly.</p></blockquote><div class=highlight><pre tabindex=0 style=background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span>&lt;?php
+</span></span><span style=display:flex><span>	<span style=color:#aaa;font-style:italic>// reCaptcha info
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>    <span style=color:#a00>$url</span> = <span style=color:#a50>&#39;https://www.google.com/recaptcha/api/siteverify&#39;</span>;        
+</span></span><span style=display:flex><span>    <span style=color:#a00>$secret</span> = <span style=color:#a50>&#34;_reCAPTCHA_secret_key_&#34;</span>;
+</span></span><span style=display:flex><span>	<span style=color:#a00>$remoteip</span> = <span style=color:#a00>$_SERVER</span>[<span style=color:#a50>&#39;REMOTE_ADDR&#39;</span>];
+</span></span><span style=display:flex><span>	<span style=color:#aaa;font-style:italic>// Form info
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>	<span style=color:#a00>$action</span> = <span style=color:#a00>$_POST</span>[<span style=color:#a50>&#39;action&#39;</span>];
+</span></span><span style=display:flex><span>	<span style=color:#a00>$response</span> = <span style=color:#a00>$_POST</span>[<span style=color:#a50>&#39;token&#39;</span>];
+</span></span><span style=display:flex><span>	<span style=color:#aaa;font-style:italic>// Botscore
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>	<span style=color:#a00>$botscore</span> = <span style=color:#a00>$_COOKIE</span>[<span style=color:#a50>&#39;_rbs&#39;</span>];
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#aaa;font-style:italic>// Curl Request
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>	<span style=color:#a00>$curl</span> = curl_init();
+</span></span><span style=display:flex><span>	curl_setopt(<span style=color:#a00>$curl</span>, CURLOPT_URL, <span style=color:#a00>$url</span>);
+</span></span><span style=display:flex><span>	curl_setopt(<span style=color:#a00>$curl</span>, CURLOPT_POST, <span style=color:#00a>true</span>);
+</span></span><span style=display:flex><span>	curl_setopt(<span style=color:#a00>$curl</span>, CURLOPT_RETURNTRANSFER, <span style=color:#099>1</span>);
+</span></span><span style=display:flex><span>	curl_setopt(<span style=color:#a00>$curl</span>, CURLOPT_POSTFIELDS, <span style=color:#00a>array</span>(
+</span></span><span style=display:flex><span>		<span style=color:#a50>&#39;secret&#39;</span> =&gt; <span style=color:#a00>$secret</span>,
+</span></span><span style=display:flex><span>		<span style=color:#a50>&#39;remoteip&#39;</span> =&gt; <span style=color:#a00>$remoteip</span>,
+</span></span><span style=display:flex><span>		<span style=color:#a50>&#39;action&#39;</span> =&gt; <span style=color:#a00>$action</span>,		
+</span></span><span style=display:flex><span>		<span style=color:#a50>&#39;response&#39;</span> =&gt; <span style=color:#a00>$response</span>
+</span></span><span style=display:flex><span>	));
+</span></span><span style=display:flex><span>	<span style=color:#a00>$curlData</span> = curl_exec(<span style=color:#a00>$curl</span>);
+</span></span><span style=display:flex><span>	curl_close(<span style=color:#a00>$curl</span>);
+</span></span><span style=display:flex><span>	<span style=color:#a00>$curlJson</span> = json_decode(<span style=color:#a00>$curlData</span>, <span style=color:#00a>true</span>);
+</span></span><span style=display:flex><span>	
+</span></span><span style=display:flex><span>	<span style=color:#aaa;font-style:italic>//defining the answer
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>	<span style=color:#a00>$answer</span> = <span style=color:#a00>$curlData</span>;
+</span></span><span style=display:flex><span>	
+</span></span><span style=display:flex><span>	<span style=color:#aaa;font-style:italic>//refresh the cookie
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>	setcookie(<span style=color:#a50>&#39;_rbs&#39;</span>, <span style=color:#a00>$curlJson</span>[<span style=color:#a50>&#39;score&#39;</span>], time()+<span style=color:#099>1800</span>, <span style=color:#a50>&#39;/&#39;</span>,<span style=color:#a50>&#39;&#39;</span>, <span style=color:#099>0</span>); 
+</span></span><span style=display:flex><span>	
+</span></span><span style=display:flex><span>	<span style=color:#aaa;font-style:italic>// only fire $answer if botscore cookie is not set or different from acutal score
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>	<span style=color:#00a>if</span> (<span style=color:#a00>$botscore</span> != <span style=color:#a00>$curlJson</span>[<span style=color:#a50>&#39;score&#39;</span>]) {
+</span></span><span style=display:flex><span>		<span style=color:#00a>echo</span> <span style=color:#a00>$answer</span>;
+</span></span><span style=display:flex><span>	} <span style=color:#00a>else</span> {
+</span></span><span style=display:flex><span>		<span style=color:#00a>echo</span> <span style=color:#a50>&#34;noChange&#34;</span>;
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span><span style=color:#4c8317>?&gt;</span><span style=color:red;background-color:#faa>
+</span></span></span></code></pre></div><p>Again, make sure you replace the <code>_reCAPTCHA_secret_key</code> on line 4 with the <strong>secret key</strong> you got from the admin console.</p><p>This PHP code takes the response sent by Google Tag Manager, validates it against the reCAPTCHA verification API, and then sends the result object in the response, which will, in turn, be pushed into <code>dataLayer</code> for your tags to use.</p><p>The code also writes a cookie in the HTTP response. This cookie is named <code>_rbs</code> and contains the score of the reCAPTCHA action. The results are only returned if the reCAPTCHA score has changed in the last 30 minutes. If the results have not changed, the response will be <code>"noChange"</code>, which blocks the <code>dataLayer.push()</code> from taking place.</p><h2 id=nodejs-endpoint>Node.js endpoint</h2><p>In this chapter, Simo will show you how to do the same as above by using a <a href=https://www.nodejs.org/>Node.js</a> application instead.</p><h3 id=custom-html-tag-1>Custom HTML tag</h3><p>The main difference (apart from the tech stack) to the PHP solution is that we&rsquo;ll log errors as well. They are sent as the value of the <code>recaptchaScore</code> key in <code>dataLayer</code>, so in your report you&rsquo;ll end up with a mix of valid scores and error texts, but this should be easy to filter in your tables.</p><p>This is what the Custom HTML tag looks like:</p><div class=highlight><pre tabindex=0 style=background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-html data-lang=html><span style=display:flex><span>&lt;<span style=color:#1e90ff;font-weight:700>style</span>&gt;
+</span></span><span style=display:flex><span>  <span style=color:#aaa;font-style:italic>/* hides the recaptcha badge */</span>
+</span></span><span style=display:flex><span>  .<span style=color:#0a0;text-decoration:underline>grecaptcha-badge</span> {
+</span></span><span style=display:flex><span>    <span style=color:#00a>visibility</span>: <span style=color:#00a>hidden</span> <span style=color:#4c8317>!important</span>;
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>&lt;/<span style=color:#1e90ff;font-weight:700>style</span>&gt;
+</span></span><span style=display:flex><span>&lt;<span style=color:#1e90ff;font-weight:700>script</span> <span style=color:#1e90ff>src</span>=<span style=color:#a50>&#34;https://www.google.com/recaptcha/api.js?render=_reCAPTCHA_site_key&amp;onload=__recaptchaCallback&#34;</span> <span style=color:#1e90ff>async</span> <span style=color:#1e90ff>defer</span>&gt;&lt;/<span style=color:#1e90ff;font-weight:700>script</span>&gt;
+</span></span><span style=display:flex><span>&lt;<span style=color:#1e90ff;font-weight:700>script</span>&gt;
+</span></span><span style=display:flex><span>  <span style=color:#0aa>window</span>.__recaptchaCallback = <span style=color:#00a>function</span>() {
+</span></span><span style=display:flex><span>    <span style=color:#00a>if</span> (<span style=color:#0aa>window</span>.grecaptcha) {
+</span></span><span style=display:flex><span>      <span style=color:#0aa>window</span>.grecaptcha.execute(<span style=color:#a50>&#39;_reCAPTCHA_site_key&#39;</span>, {action: <span style=color:#a50>&#39;homepage&#39;</span>}).then(<span style=color:#00a>function</span>(token) {
+</span></span><span style=display:flex><span>        <span style=color:#00a>var</span> url = <span style=color:#a50>&#39;https://mydomain.com:3000/recaptcha/&#39;</span>;
+</span></span><span style=display:flex><span>        <span style=color:#00a>var</span> xhr = <span style=color:#00a>new</span> XMLHttpRequest();
+</span></span><span style=display:flex><span>        xhr.open(<span style=color:#a50>&#39;GET&#39;</span>, url + <span style=color:#a50>&#39;?g-recaptcha-response=&#39;</span> + token, <span style=color:#00a>true</span>);
+</span></span><span style=display:flex><span>        xhr.onreadystatechange = <span style=color:#00a>function</span>(data) {
+</span></span><span style=display:flex><span>          <span style=color:#00a>if</span> (<span style=color:#00a>this</span>.readyState === XMLHttpRequest.DONE &amp;&amp; <span style=color:#00a>this</span>.status === <span style=color:#099>200</span>) {
+</span></span><span style=display:flex><span>            <span style=color:#00a>var</span> responseJson = JSON.parse(xhr.response);
+</span></span><span style=display:flex><span>            <span style=color:#0aa>window</span>.dataLayer.push({
+</span></span><span style=display:flex><span>              event: <span style=color:#a50>&#39;recaptcha&#39;</span>,
+</span></span><span style=display:flex><span>              recaptchaAnswer: responseJson.status,
+</span></span><span style=display:flex><span>              recaptchaScore: responseJson.recaptcha.score
+</span></span><span style=display:flex><span>            });
+</span></span><span style=display:flex><span>          }
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>        xhr.send();
+</span></span><span style=display:flex><span>      });
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>  };
+</span></span><span style=display:flex><span>&lt;/<span style=color:#1e90ff;font-weight:700>script</span>&gt;</span></span></code></pre></div><p>Remember to change the <code>_reCAPTCHA_site_key</code> on lines 7 and 11.</p><p>The <code>url</code> variable on line 12 needs to point to your Node.js application.</p><p>This setup is different from the PHP request. Here, we use a GET request, and we parse the response, pushing both the success and error into <code>dataLayer</code> using a success callback for the HTTP request.</p><p>Also, since we load the JavaScript API asynchronously, we create a global callback method <code>__recaptchaCallback</code>, whose name we pass in the script loader as a parameter (<code>&amp;onload</code>).</p><p>The end result is the same as with the PHP endpoint - a <code>dataLayer.push()</code> event with the reCAPTCHA status and score.</p><h3 id=nodejs-application>Node.js application</h3><p>The <strong>Node.js</strong> application example here is the simplest possible thing you can build. For it to work, you need to have <a href=https://nodejs.org/en/download/>Node.js installed</a> on in the environment where you want to run the endpoint (for example, a web server running on your site or in the cloud).</p><p>Create an empty directory, and initialize a new <code>npm</code> project with <code>npm init</code>. After following through the setup steps, run:</p><div class=highlight><pre tabindex=0 style=background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=display:flex><span>$ npm install express express-recaptcha cookie-parser --save</span></span></code></pre></div><p>This installs the required dependencies to run a simple <strong>express.js</strong> web server as well as the files required to run the reCAPTCHA middleware and some cookie parsing logic.</p><p>Then, create a file named <strong>server.js</strong>, open it for editing, and add the following code within:</p><div class=highlight><pre tabindex=0 style=background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-javascript data-lang=javascript><span style=display:flex><span><span style=color:#00a>const</span> express = require(<span style=color:#a50>&#39;express&#39;</span>);
+</span></span><span style=display:flex><span><span style=color:#00a>const</span> cookieParser = require(<span style=color:#a50>&#39;cookie-parser&#39;</span>);
+</span></span><span style=display:flex><span><span style=color:#00a>const</span> Recaptcha = require(<span style=color:#a50>&#39;express-recaptcha&#39;</span>).RecaptchaV3;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#00a>const</span> app = express();
+</span></span><span style=display:flex><span>app.use(cookieParser());
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#00a>const</span> siteKey = <span style=color:#a50>&#39;_reCAPTCHA_site_key&#39;</span>;
+</span></span><span style=display:flex><span><span style=color:#00a>const</span> secretKey = <span style=color:#a50>&#39;_reCAPTCHA_secret_key&#39;</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#00a>const</span> recaptcha = <span style=color:#00a>new</span> Recaptcha(siteKey, secretKey, {action: <span style=color:#a50>&#39;homepage&#39;</span>});
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>app.get(<span style=color:#a50>&#39;/recaptcha/&#39;</span>, recaptcha.middleware.verify, (req, res) =&gt; {
+</span></span><span style=display:flex><span>  <span style=color:#00a>const</span> botCookie = req.cookies._rbs;
+</span></span><span style=display:flex><span>  res.header(<span style=color:#a50>&#39;Access-Control-Allow-Origin&#39;</span>, <span style=color:#a50>&#39;*&#39;</span>); <span style=color:#aaa;font-style:italic>// Set this to the actual domain that will be sending the requests
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>  <span style=color:#00a>if</span> (!req.recaptcha.error) {
+</span></span><span style=display:flex><span>    <span style=color:#00a>const</span> recaptcha = req.recaptcha.data;
+</span></span><span style=display:flex><span>    <span style=color:#00a>const</span> score = recaptcha.score;
+</span></span><span style=display:flex><span>    res.cookie(<span style=color:#a50>&#39;_rbs&#39;</span>, score, {path: <span style=color:#a50>&#39;/&#39;</span>, maxAge: <span style=color:#099>30</span> * <span style=color:#099>60</span> * <span style=color:#099>1000</span>});
+</span></span><span style=display:flex><span>    <span style=color:#aaa;font-style:italic>// Only send response if cookie does not exist or does not match the latest score
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>    <span style=color:#00a>if</span> (botCookie !== score) {
+</span></span><span style=display:flex><span>      res.send({status: <span style=color:#a50>&#39;1&#39;</span>, recaptcha: req.recaptcha.data});
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>  } <span style=color:#00a>else</span> {
+</span></span><span style=display:flex><span>    <span style=color:#00a>const</span> score = req.recaptcha.error;
+</span></span><span style=display:flex><span>    res.cookie(<span style=color:#a50>&#39;_rbs&#39;</span>, score, {path: <span style=color:#a50>&#39;/&#39;</span>, maxAge: <span style=color:#099>30</span> * <span style=color:#099>60</span> * <span style=color:#099>1000</span>});
+</span></span><span style=display:flex><span>    res.send({status: <span style=color:#a50>&#39;0&#39;</span>, recaptcha: {score: score}});
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>});
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>app.listen(<span style=color:#099>3000</span>, () =&gt; console.log(<span style=color:#a50>&#39;App listening on port 3000!&#39;</span>));</span></span></code></pre></div><p>Edit lines 8 and 9 with the actual <strong>site key</strong> and <strong>secret key</strong>, respectively.</p><p>Edit line 15 to allow requests only from your site (so if your site is running on <code>https://mydomain.com</code>, that&rsquo;s what you would add as a valid origin instead of <code>*</code>).</p><p>This application runs on port <code>3000</code> of whatever hostname is configured for your web server. It creates a simple GET request endpoint to <code>/recaptcha/</code>, where a piece of <strong>middleware</strong> will inspect the incoming request for a reCAPTCHA token.</p><p>If the token is encountered, it is validated and the <code>recaptcha</code> results are written to <code>dataLayer</code> as well as a cookie named <code>_rbs</code>.</p><p>If the validation fails, the &ldquo;score&rdquo; will be the error message instead of the actual score.</p><h2 id=rest-of-the-setup>Rest of the setup</h2><h3 id=google-analytics-custom-dimensions>Google Analytics Custom Dimensions</h3><p>In Google Analytics, create <strong>two</strong> new Custom Dimensions:</p><ul><li><strong>reCAPTCHA score</strong> (session scope)</li><li><strong>reCAPTCHA answer</strong> (session scope)</li></ul><div style=aspect-ratio:806/672 class="figure nocaption"><a href=/images/2019/09/create-custom-dimension.jpg title="Create custom dimension"><img class=fig-img height=672 width=806 loading=lazy src=/images/2019/09/create-custom-dimension.jpg#ZgotmplZ alt="Create custom dimension"></a></div><p>These two Custom Dimensions allow us to permanently filter out bot traffic from our Google Analytics production views.</p><div style=aspect-ratio:1652/472 class="figure nocaption"><a href=/images/2019/09/new-custom-dimensions.jpg title="New custom dimensions"><img class=fig-img height=472 width=1652 loading=lazy src=/images/2019/09/new-custom-dimensions.jpg#ZgotmplZ alt="New custom dimensions"></a></div><p>Note that the Google Analytics tags are only fired if the score changes (or if the score was previously an error). That way you won&rsquo;t constantly send the same reCAPTCHA score to Google Analytics while the session is active.</p><p>The Custom Dimensions are sent with an <strong>event tag</strong>.</p><h3 id=google-tag-manager-setup>Google Tag Manager setup</h3><p>First, let&rsquo;s create two new Data Layer variables.</p><h4 id=data-layer-variables>Data Layer Variables</h4><p>The first variable is named <strong>dl_recaptchaAnswer</strong>, and should have its Data Layer Variable Name field pointing to <code>recaptchaAnswer</code>.</p><p>The second variable is named <strong>dl_recaptchaScore</strong>, and should have its Data Layer Variable Name field pointing to <code>recaptchaScore</code>.</p><p>Here&rsquo;s what the latter would look like:</p><div style=aspect-ratio:537/582 class="figure nocaption"><a href=/images/2019/09/data-layer-variable.jpg title="Data Layer variable"><img class=fig-img height=582 width=537 loading=lazy src=/images/2019/09/data-layer-variable.jpg#ZgotmplZ alt="Data Layer variable"></a></div><h4 id=trigger>Trigger</h4><p>The trigger is a simple Custom Event trigger that looks like this:</p><div style=aspect-ratio:730/468 class="figure nocaption"><a href=/images/2019/09/custom-event-trigger.jpg title="Custom event trigger"><img class=fig-img height=468 width=730 loading=lazy src=/images/2019/09/custom-event-trigger.jpg#ZgotmplZ alt="Custom event trigger"></a></div><h4 id=event-tag>Event tag</h4><p>The main function of the event tag is to send the Custom Dimensions. You can arrange the other fields however you like. This is what a sample Universal Analytics event tag might look like:</p><div style=aspect-ratio:918/686 class="figure nocaption"><a href=/images/2019/09/ga-event-tag-1.jpg title="GA Event tag 1"><img class=fig-img height=686 width=918 loading=lazy src=/images/2019/09/ga-event-tag-1.jpg#ZgotmplZ alt="GA Event tag 1"></a></div><div style=aspect-ratio:897/538 class="figure nocaption"><a href=/images/2019/09/ga-event-tag-2.jpg title="GA Event tag 2"><img class=fig-img height=538 width=897 loading=lazy src=/images/2019/09/ga-event-tag-2.jpg#ZgotmplZ alt="GA Event tag 2"></a></div><p>Just make sure you have the Custom Dimension index and value settings correct per what you configured in Google Analytics admin earlier.</p><blockquote><p><strong>NOTE</strong>! One enhancement would be to set the Custom Dimensions <em>only</em> if <code>recaptchaAnswer</code> is <code>1</code> (success), so that you don&rsquo;t end up overwriting a valid score for the session with an errant error message.</p></blockquote><h2 id=analyze-the-results>Analyze the results</h2><p>When you set the whole thing up, all users on your page will be vetted in the background for their probability to be a bot. The script fires if the user hasn&rsquo;t been validated with a proper score within 30 minutes since the last validation. This ensures that you don&rsquo;t flood Google Analytics unnecessarily with events that just have the same score sent with each one.</p><div style=aspect-ratio:980/752 class="figure nocaption"><a href=/images/2019/10/recaptcha-bot-traffic.jpg title="reCAPTCHA bot traffic"><img class=fig-img height=752 width=980 loading=lazy src=/images/2019/10/recaptcha-bot-traffic.jpg#ZgotmplZ alt="reCAPTCHA bot traffic"></a></div><p>Here&rsquo;s what the custom dimensions will end up populated with:</p><table><thead><tr><th>Key</th><th>Google Analytics fields</th><th>Explanation</th><th>Sample value</th></tr></thead><tbody><tr><td><code>recaptchaAnswer</code></td><td>Event Action, Custom Dimension</td><td>Whether or not the validation worked. <code>1</code> for success, <code>0</code> for failure.</td><td><code>1</code></td></tr><tr><td><code>recaptchaScore</code></td><td>Event Label, Custom Dimension</td><td>Score between <code>0.0</code> and <code>1.0</code> (where <code>1.0</code> is most likely to be human and <code>0.0</code> most likely to be bot). If the validation fails, the error message is sent instead.</td><td><code>0.9</code>, or <code>invalid-input-response</code></td></tr></tbody></table><p>You can drill down to the <code>0.1</code> score to identify idiosyncrasies in this low-score traffic.</p><div style=aspect-ratio:980/987 class="figure nocaption"><a href=/images/2019/10/recaptcha-providers.jpg title="reCAPTCHA providers"><img class=fig-img height=987 width=980 loading=lazy src=/images/2019/10/recaptcha-providers.jpg#ZgotmplZ alt="reCAPTCHA providers"></a></div><p>To get a better understanding of the amount of bot traffic, create segments based on <strong>reCAPTCHA score</strong>. After a few weeks, you’ll have enough data in order to:</p><ul><li>Determine the ratio of bot traffic on your site.</li><li>Decide whether you should permanently filter out flagged bot traffic from you Google Analytics production views.</li></ul><h2 id=summary>Summary</h2><p>Thank you so much to Philipp and Sebastian for sharing their amazing idea here. Since reCAPTCHA v3 calculates the score based on user interactions on the site, it&rsquo;s a perfect candidate for measuring with Google Analytics, since we can surreptitiously collect the &ldquo;bot-ness&rdquo; of the visitor and leverage GA&rsquo;s custom dimensions to collect the data.</p><p>It&rsquo;s not trivial to implement, as it requires a web service to poll for the reCAPTCHA score. Perhaps someone could do the world a service and create a free, public API for polling this information? Until then, you&rsquo;re stuck with an on-premise solution or, better yet, leveraging the cloud for setting up the API endpoint.</p><p>This solution should serve well to uncover the complexity of bot traffic on any given website. Bots and crawlers come in different shapes and sizes - there are malicious agents as well as services that aim to do good. Regardless, bot traffic is most likely <em>not</em> your target traffic when building your website, so being able to segment it out in Google Analytics is a major win for data quality indeed.</p><p>Let us know in the comments what you think of this solution, and whether you have ideas for improving it!</p></div></div><div id=post-footer class="post-footer main-content-wrap"><div class=post-footer-tags><span class="text-color-light text-small">TAGGED IN</span><br><a class="tag tag--primary tag--small" href=/tags/google-tag-manager/>google tag manager</a>
+<a class="tag tag--primary tag--small" href=/tags/google-analytics/>google analytics</a>
+<a class="tag tag--primary tag--small" href=/tags/php/>php</a>
+<a class="tag tag--primary tag--small" href=/tags/node.js/>node.js</a>
+<a class="tag tag--primary tag--small" href=/tags/recaptcha/>recaptcha</a></div><div class=post-actions-wrap><nav><ul class="post-actions post-action-nav"><li class=post-action><a class="post-action-btn btn btn--default" href=/gtm-tips/mysterious-macro-call-custom-html-tags/><i class="fa fa-angle-left"></i>
+<span class="hide-xs hide-sm text-small icon-ml">NEXT</span></a></li><li class=post-action><a class="post-action-btn btn btn--default" href=/analytics/bigquery-query-guide-google-analytics-app-web/><span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+<i class="fa fa-angle-right"></i></a></li></ul></nav><ul class="post-actions post-action-share"><li class="post-action hide-lg hide-md hide-sm"><a class="post-action-btn btn btn--default btn-open-shareoptions" href=#btn-open-shareoptions><i class="fa fa-share-alt"></i></a></li><li class="post-action hide-xs"><a class="post-action-btn btn btn--default" target=new href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/improve-google-analytics-bot-detection-with-recaptcha/"><i class="fa fa-brands fa-facebook"></i></a></li><li class="post-action hide-xs"><a class="post-action-btn btn btn--default" target=new href="https://twitter.com/intent/tweet?text=Improve%20Google%20Analytics%20Bot%20Detection%20With%20reCAPTCHA%20https://www.simoahava.com/analytics/improve-google-analytics-bot-detection-with-recaptcha/%20via%20@SimoAhava"><i class="fa fa-brands fa-twitter"></i></a></li><li class="post-action hide-xs"><a class="post-action-btn btn btn--default" target=new href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/improve-google-analytics-bot-detection-with-recaptcha/"><i class="fa fa-brands fa-linkedin"></i></a></li><li class=post-action><a class="post-action-btn btn btn--default" href=#commento><i class="fa-regular fa-comments"></i></a></li><li class=post-action><a class="post-action-btn btn btn--default" href=#><i class="fa fa-search"></i></a></li></ul></div><a name=commento></a><comentario-comments></comentario-comments></div></article><footer id=footer class=main-content-wrap><span class=copyrights>&copy; 2026 Simo Ahava. All Rights Reserved</span></footer></div><div id=bottom-bar class=post-bottom-bar data-behavior=4><div class=post-actions-wrap><nav><ul class="post-actions post-action-nav"><li class=post-action><a class="post-action-btn btn btn--default" href=/gtm-tips/mysterious-macro-call-custom-html-tags/><i class="fa fa-angle-left"></i>
+<span class="hide-xs hide-sm text-small icon-ml">NEXT</span></a></li><li class=post-action><a class="post-action-btn btn btn--default" href=/analytics/bigquery-query-guide-google-analytics-app-web/><span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+<i class="fa fa-angle-right"></i></a></li></ul></nav><ul class="post-actions post-action-share"><li class="post-action hide-lg hide-md hide-sm"><a class="post-action-btn btn btn--default btn-open-shareoptions" href=#btn-open-shareoptions><i class="fa fa-share-alt"></i></a></li><li class="post-action hide-xs"><a class="post-action-btn btn btn--default" target=new href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/improve-google-analytics-bot-detection-with-recaptcha/"><i class="fa fa-brands fa-facebook"></i></a></li><li class="post-action hide-xs"><a class="post-action-btn btn btn--default" target=new href="https://twitter.com/intent/tweet?text=Improve%20Google%20Analytics%20Bot%20Detection%20With%20reCAPTCHA%20https://www.simoahava.com/analytics/improve-google-analytics-bot-detection-with-recaptcha/%20via%20@SimoAhava"><i class="fa fa-brands fa-twitter"></i></a></li><li class="post-action hide-xs"><a class="post-action-btn btn btn--default" target=new href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/improve-google-analytics-bot-detection-with-recaptcha/"><i class="fa fa-brands fa-linkedin"></i></a></li><li class=post-action><a class="post-action-btn btn btn--default" href=#commento><i class="fa-regular fa-comments"></i></a></li><li class=post-action><a class="post-action-btn btn btn--default" href=#><i class="fa fa-search"></i></a></li></ul></div></div><div id=share-options-bar class=share-options-bar data-behavior=4><i id=btn-close-shareoptions class="fa fa-close"></i><ul class=share-options><li class=share-option><a class=share-option-btn target=new href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/improve-google-analytics-bot-detection-with-recaptcha/"><i class="fa fa-brands fa-facebook"></i><span>Share on Facebook</span></a></li><li class=share-option><a class=share-option-btn target=new href="https://twitter.com/intent/tweet?text=Improve%20Google%20Analytics%20Bot%20Detection%20With%20reCAPTCHA%20https://www.simoahava.com/analytics/improve-google-analytics-bot-detection-with-recaptcha/%20via%20@SimoAhava"><i class="fa fa-brands fa-twitter"></i><span>Share on Twitter</span></a></li><li class=share-option><a class=share-option-btn target=new href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/improve-google-analytics-bot-detection-with-recaptcha/"><i class="fa fa-brands fa-linkedin"></i><span>Share on LinkedIn</span></a></li></ul></div><div id=share-options-mask class=share-options-mask></div></div><div id=about><div id=about-card><div id=about-btn-close><i class="fa fa-remove"></i></div><img id=about-card-picture src=https://www.simoahava.com/images/simo.png alt="Author's picture"><h4 id=about-card-name>Simo Ahava</h4><div id=about-card-bio>Husband | Father | Analytics developer<br>simo (at) simoahava.com</div><div id=about-card-job><i class="fa fa-briefcase"></i><br>Senior Data Advocate at Reaktor</div><div id=about-card-location><i class="fa fa-map-marker"></i><br>Finland</div></div></div><div id=cover style=background-image:url(https://www.simoahava.com/images/maisema.jpg)></div><script defer src=https://comentario.simoahava.com/comentario.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin=anonymous referrerpolicy=no-referrer></script><script defer src=/js/script.js></script><script>!function(){var e=document.querySelector(".simmer"),t=document.querySelector(".simmer .close"),n=window.sessionStorage&&window.sessionStorage.getItem("nosimmer");e&&(n&&(e.style.display="none"),t&&t.addEventListener("click",function(){window.sessionStorage.setItem("nosimmer","true"),e.style.display="none"}))}()</script></body></html>

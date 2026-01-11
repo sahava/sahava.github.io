@@ -1,1316 +1,315 @@
-
-
-  
-    
-  
-
-
-  
-
-
-
-
-
-  
-
-
-  
-
-<!DOCTYPE html>
-<html lang="en-us">
-  <head>
-    <meta name="google-site-verification" content="xQwWI2KUfP9LbFKhw2CVLFtrMY6Czrla7L3PD2aBolA" />
-
-
-<script type="application/ld+json">
-{
-  "@context": "http://schema.org", 
-  "@type": "BlogPosting",
-  "headline": "Cookieless Tracking For Cross-site Iframes | Simo Ahava's blog",
-  "image": "https:\/\/www.simoahava.com\/images\/2020\/02\/iframe-postmessage.jpg",
-  "editor": "Simo Ahava",
-  "publisher": {
-    "@type": "Organization",
-    "name": "Simo Ahava's blog",
-    "logo": {
-      "@type": "ImageObject",
-      "url": "https:\/\/www.simoahava.com\/images\/simo.png",
-      "height": "393",
-      "width": "407"
-    }
-  },
-  "url": "https:\/\/www.simoahava.com\/analytics\/cookieless-tracking-cross-site-iframes\/",
-  "datePublished": "2020-02-19T09:00:38\u002b02:00",
-  "dateModified": "2020-02-19T09:00:38\u002b02:00",
-  "description": "How to track Google Analytics traffic within a cross-site iframe without using cookies. This is useful due to how browser tracking protections prevent access to cookies in third-party (cross-site) context.",
-  "author": {
-    "@type": "Person",
-    "name": "Simo Ahava"
-  }
-}
-</script>
-
-
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    
-    <title>Cookieless Tracking For Cross-site Iframes | Simo Ahava's blog</title>
-    
-    <script>
-      window.dataLayer=window.dataLayer||[];window.dataLayer.push({pageType: 'article', environment:  null });
-    </script>
-    
-
-    
-    
-    
-    <script>
-      (function(S,i,m,o){
-        window[m]=window[m]||[];
-        window[m].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
-        var f=S.getElementsByTagName(i)[0],j=S.createElement(i),dl=m!='dataLayer'?'&l='+m:'';
-        j.async=true;
-        j.src='https://sgtm.simoahava.com/gtm.js?id='+o+dl;
-        f.parentNode.insertBefore(j,f);
-      })(document,'script','dataLayer','GTM-PZ7GMV9');
-    </script>
-    
-    <meta name="author" content="Simo Ahava">
-    <meta name="keywords" content="">
-
-    <link rel="icon" href="https://www.simoahava.com/images/favicon.ico">
-    
-    <link rel="amphtml" href="https://www.simoahava.com/amp/analytics/cookieless-tracking-cross-site-iframes/">
-    
-    <meta name="description" content="How to track Google Analytics traffic within a cross-site iframe without using cookies. This is useful due to how browser tracking protections prevent access to cookies in third-party (cross-site) context.">
-    <meta property="og:description" content="How to track Google Analytics traffic within a cross-site iframe without using cookies. This is useful due to how browser tracking protections prevent access to cookies in third-party (cross-site) context.">
-    <meta property="og:type" content="blog">
-    <meta property="og:title" content="Cookieless Tracking For Cross-site Iframes">
-    <meta property="og:url" content="https://www.simoahava.com/analytics/cookieless-tracking-cross-site-iframes/">
-    <meta property="og:site_name" content="Simo Ahava&#39;s blog">
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Cookieless Tracking For Cross-site Iframes">
-    <meta name="twitter:description" content="How to track Google Analytics traffic within a cross-site iframe without using cookies. This is useful due to how browser tracking protections prevent access to cookies in third-party (cross-site) context.">
-    
-      <meta name="twitter:creator" content="@SimoAhava">
-      
-    
-
-    
-    
-
-    
-      <meta name="twitter:image" content="https://www.simoahava.com/images/2020/02/iframe-postmessage.jpg">  
-      <meta property="og:image" content="https://www.simoahava.com/images/2020/02/iframe-postmessage.jpg">
-    
-
-
-    
-
-      
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-      
-    
-    <link rel="stylesheet" href="https://www.simoahava.com/css/style.css" />
-    
-    
-
-    
-      
-    
-    
-  </head>
-
-  <body>
-    
-    <div id="_progress"></div>
-    
-    <div id="blog">
-      <header id="header" data-behavior="4">
-  <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
-  <div class="header-title">
-    <a class="header-title-link" href="https://www.simoahava.com/">Simo Ahava&#39;s blog</a>
-  </div>
-  
-</header>
-
-      <nav id="sidebar" data-behavior="4">
-  <div class="sidebar-container">
-    
-      <div class="sidebar-profile">
-        <a href="https://www.simoahava.com/">
-          <img class="sidebar-profile-picture" loading="lazy" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
-        </a>
-        <h4 class="sidebar-profile-name">Simo Ahava</h4>
-        
-          <h5 class="sidebar-profile-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</h5>
-        
-      </div>
-    
-    <ul class="sidebar-buttons">
-      
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-home"></i>
-      
-      <span class="sidebar-button-desc">Home</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
-      
-      <span class="sidebar-button-desc">Categories</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/tags/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
-      
-      <span class="sidebar-button-desc">Tags</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/gtm-tips/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-magic"></i>
-      
-      <span class="sidebar-button-desc">GTM Tips</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/about-simo-ahava/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-question"></i>
-      
-      <span class="sidebar-button-desc">About</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
-      
-      <span class="sidebar-button-desc">RSS</span>
-    </a>
-  </li>
-
-
-    </ul>
-    <ul class="sidebar-buttons">
-      
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/tools/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-wrench"></i>
-      
-      <span class="sidebar-button-desc">Tools</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/blog-statistics/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-bar-chart"></i>
-      
-      <span class="sidebar-button-desc">Blog statistics</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://github.com/sahava" target="_blank" rel="noopener ">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-brands fa-github"></i>
-      
-      <span class="sidebar-button-desc">GitHub</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/upcoming-talks/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-bullhorn"></i>
-      
-      <span class="sidebar-button-desc">Upcoming talks</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/custom-templates/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
-      
-      <span class="sidebar-button-desc">Templates</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/newsletter/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-bell"></i>
-      
-      <span class="sidebar-button-desc">Newsletter</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://masto.measure.chat/@SimoAhava" target="_blank" rel="noopener me">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-brands fa-mastodon"></i>
-      
-      <span class="sidebar-button-desc">Mastodon</span>
-    </a>
-  </li>
-
-
-    </ul>
-    <ul class="sidebar-buttons">
-      
-
-    </ul>
-  </div>
-</nav>
-
-      
-
-      <div id="main" data-behavior="4"
-        class="
-               hasCoverMetaIn
-               ">
-        <article class="post">
-	  <form id="search" action="https://www.simoahava.com/search/">
-  <input name="q" type="text" class="form-control input--xlarge" placeholder="Search blog..." autocomplete="off">
-  </form>
-
-          <div class="post-header main-content-wrap text-left">
-  
-  
-
-    <h1>
-      Cookieless Tracking For Cross-site Iframes
-    </h1>
-  
-  
-  <div class="postShorten-meta post-meta">
-    
-      <time datetime="2020-02-19T09:00:38&#43;02:00">
-        
-  February 19, 2020
-
-      </time>
-      
-      
-  
-  
-    <span>in</span>
-    
-      <a class="category-link" href="https://www.simoahava.com/categories/analytics">Analytics</a>
-    
-  
-
-
-      | <a href="https://www.simoahava.com/analytics/cookieless-tracking-cross-site-iframes/#commento"><comentario-count path="/analytics/cookieless-tracking-cross-site-iframes/" 
-                  placeholder="..."
-                  error-text="N/A "
-                  zero-text="0 "
-                  prefix=""
-                  suffix=" "></comentario-count>Comments</a>
-      
-  </div>
-
-
-</div>
-
-          <div class="post-content markdown">
-            <div class="main-content-wrap">
-	      
-                
-  	        <blockquote>
-<p><strong>Updated 25 May 2021</strong>: Added information about using this with GA4. As Google Analytics 4 does not have a mechanism to disable cookie storage, only the second solution (send <code>dataLayer</code> events from iframe to the parent) described in this article will work for GA4.</p>
-</blockquote>
-<p>Here I am, back with <code>&lt;iframe&gt;</code> and <strong>cross-domain tracking</strong>. I&rsquo;ve published a couple of articles before on the topic, with <a href="https://www.simoahava.com/analytics/tracking-cross-domain-iframes-upgraded-solution/">my upgraded solution</a> being the most recent one. These articles tackle the general problem of <strong>passing the Client ID from the parent to the <code>&lt;iframe&gt;</code></strong>.</p>
-<p>By doing so, the <code>&lt;iframe&gt;</code> can take the Client ID from the frame URL and create the <code>_ga</code> cookie in the <code>&lt;iframe&gt;</code>, allowing hits from the parent <em>and</em> the <code>&lt;iframe&gt;</code> to use the same Client ID. Great.</p>
-<p>However, there&rsquo;s a catch that&rsquo;s become more and more troubling with the increase of <a href="https://www.cookiestatus.com">browsers&rsquo; tracking protection mechanisms</a>: if the <code>&lt;iframe&gt;</code> loads content <strong>cross-site</strong>, the browser must <strong>allow cookie access in third-party context</strong>. In other words, if the browser blocks <em>third-party cookies</em>, the <code>&lt;iframe&gt;</code> will not be able to write the cookie, and Google Analytics tracking <strong>will fail</strong>.</p>
-
-
-
-<div style="aspect-ratio: 1396 / 472;" class="figure nocaption">
-  
-    <a href="https://www.simoahava.com/images/2020/02/iframe-postmessage.jpg" title="Iframe post message">
-  
-    <img class="fig-img" height="472" width="1396" loading="lazy" src="https://www.simoahava.com/images/2020/02/iframe-postmessage.jpg#ZgotmplZ" alt="Iframe post message">
-  
-    </a>
-  
-  
-</div>
-
-
-<p>This article offers <strong>two</strong> solutions to this problem.</p>
-<p>The <strong>first</strong> is that it sends the Google Analytics Client ID from the parent to the <code>&lt;iframe&gt;</code> using <code>window.postMessage</code>, and the child frame can poll for this information on every page, meaning cookies are not needed to store the Client ID.</p>
-<p>The <strong>second</strong> solution is that the child frame actually sends every single <code>dataLayer</code> message to the parent, so that the child frame doesn&rsquo;t have to track anything by itself. The parent handles the tracking for the child frame instead.</p>
-<p>Using <code>window.postMessage</code> is more robust than the link decoration of my earlier proposals, because it doesn&rsquo;t force a reload of the frame, nor does it require the child frame to support cookies. It&rsquo;s a bit more elaborate to set up, however.</p>
-<blockquote>
-<p>Warning! I&rsquo;m not kidding about that last statement. Setting this up requires quite a bit of custom code, and you&rsquo;re working with bilateral communication between two windows. Please read this article carefully so that you understand what&rsquo;s going on before copy-pasting any code to your Google Tag Manager container(s).</p>
-</blockquote>
-<div id="toc-container"><h1 id="table-of-contents">Table of Contents</h1> <input type="checkbox" id="show"><label for="show" id="showbtn"><h1 id="table-of-contents-mobile">Table of Contents</h1><span class="show">&nbsp;[+show]</span><span class="hide">&nbsp;[–hide]</span></label><nav id="TableOfContents">
-  <ul>
-    <li><a href="#what-exactly-is-the-problem">What exactly is the problem?</a></li>
-    <li><a href="#solution-1-pass-the-client-id-from-the-parent-to-the-child">Solution 1: Pass the Client ID from the parent to the child</a></li>
-    <li><a href="#solution-2-forward-all-data-layer-messages-from-child-to-parent">Solution 2: Forward all Data Layer messages from child to parent</a></li>
-    <li><a href="#the-parent-page-setup">The parent page setup</a>
-      <ul>
-        <li><a href="#the-custom-html-tag">The Custom HTML tag</a>
-          <ul>
-            <li><a href="#configuration">Configuration</a></li>
-            <li><a href="#the-listener">The listener</a></li>
-          </ul>
-        </li>
-        <li><a href="#configuring-the-message-forwarding-system">Configuring the message forwarding system</a></li>
-      </ul>
-    </li>
-    <li><a href="#the-embedded-child-page-setup">The embedded (child) page setup</a>
-      <ul>
-        <li><a href="#the-custom-html-tag-1">The Custom HTML tag</a>
-          <ul>
-            <li><a href="#configuration-1">Configuration</a></li>
-            <li><a href="#the-poller">The poller</a></li>
-            <li><a href="#the-listener-1">The listener</a></li>
-            <li><a href="#the-message-forwarder">The message forwarder</a></li>
-          </ul>
-        </li>
-        <li><a href="#google-analytics-tags">Google Analytics tags</a>
-          <ul>
-            <li><a href="#multi-purpose-container">Multi-purpose container</a></li>
-          </ul>
-        </li>
-      </ul>
-    </li>
-    <li><a href="#summary">Summary</a></li>
-  </ul>
-</nav></div>
-
-                <span class="simmer">
-  <span class="close">X</span>
-  <p>
-    <span class="fa fa-md fa-bell"></span>
-    <strong>The Simmer Newsletter</strong>
-  </p>
-  <p>
-    Subscribe to the <a href="https://www.simoahava.com/newsletter/">Simmer newsletter</a> to get the latest news and content from Simo Ahava into your email inbox!
-  </p>
-  </span>
-
-                
-                  <h2 id="what-exactly-is-the-problem">What exactly is the problem?</h2>
-<p>Glad you asked!</p>
-<p>When a page loads an <code>&lt;iframe&gt;</code> from a <strong>cross-site</strong> origin, that frame is loaded in a third-party context, and any access to browser storage from within that <code>&lt;iframe&gt;</code> will require the browser to allow third-party cookies for the <code>&lt;iframe</code> site.</p>
-<p>A key term here is <strong>cross-site</strong>. This means that the <strong>top privately-controlled domain name</strong> of the <code>&lt;iframe&gt;</code> is different from that of the parent page.</p>
-<p>In the examples below, the top privately-controlled domain name is in italics.</p>
-<ul>
-<li>www.<em>simoahava.com</em></li>
-<li>www.<em>gtmtools.com</em></li>
-<li>www.<em>ebay.co.uk</em></li>
-<li><em>sahava.github.io</em></li>
-<li>analytics.<em>google.com</em></li>
-</ul>
-<p>If any one of the sites above loaded any other site from the list in an <code>&lt;iframe&gt;</code>, that content would be loaded cross-site, and any cookie operations within the embedded page would require third-party cookie access.</p>
-<p>The following examples are all <strong>same-site</strong>, even if they are cross-origin:</p>
-<ul>
-<li>www.<em>simoahava.com</em></li>
-<li><em>simoahava.com</em></li>
-<li>blog.<em>simoahava.com</em></li>
-<li>tracking.endpoint.<em>simoahava.com</em></li>
-</ul>
-<p>Any communication between pages from the list above would happen in a <strong>same-site</strong> (or first-party) context, and cookie access would not be restricted.</p>
-<p>As I mention in the introduction, this is only going to spell doom for tracking within embedded content due to how browsers implement tracking protections.</p>
-
-
-
-<div style="aspect-ratio: 2878 / 1212;" class="figure ">
-  
-    <a href="https://www.simoahava.com/images/2020/02/tracking-protections.jpg" title="From www.cookiestatus.com">
-  
-    <img class="fig-img" height="1212" width="2878" loading="lazy" src="https://www.simoahava.com/images/2020/02/tracking-protections.jpg#ZgotmplZ" alt="From www.cookiestatus.com">
-  
-    </a>
-  
-   
-    <span class="caption">From www.cookiestatus.com</span>
-  
-</div>
-
-
-<p>Even though Google recently made a veritable non-announcement by saying they&rsquo;ll <a href="https://blog.chromium.org/2020/01/building-more-private-web-path-towards.html">phase out third-party cookies by 2022</a>, Google Chrome will actually make things harder for cross-site cookie access much, much sooner.</p>
-<p>Chrome v80 (released on February 4, 2020), enforces <a href="https://web.dev/samesite-cookies-explained/">SameSite cookie restrictions</a>, which means that if a cookie should be accessible in third-party context, it requires the <code>SameSite=None</code> and <code>Secure</code> flags set. By default, these are <em>not</em> set.</p>
-<blockquote>
-<p>You <strong>can</strong> set those flags with the <a href="https://www.simoahava.com/analytics/cookieflags-field-google-analytics/"><code>cookieFlags</code></a> setting, but do note that this only fixes the &ldquo;problem&rdquo; for Google Chrome. It doesn&rsquo;t make those cookies work in browsers that block third-party cookies.</p>
-</blockquote>
-<p>Luckily, there&rsquo;s a way around this.</p>
-<p>We can ignore cookies altogether.</p>
-
-                
-                  <h2 id="solution-1-pass-the-client-id-from-the-parent-to-the-child">Solution 1: Pass the Client ID from the parent to the child</h2>
-<blockquote>
-<p><strong>NOTE!</strong> As there is currently no mechanism to disable cookie storage from Google Analytics 4 deployments, this solution will only work for Universal Analytics. For GA4, you need to use <a href="#solution-2-forward-all-data-layer-messages-from-child-to-parent">Solution 2</a> below.</p>
-</blockquote>
-<p>Let&rsquo;s take a look at another celebrated illustration from yours truly:</p>
-
-
-
-<div style="aspect-ratio: 2614 / 1612;" class="figure nocaption">
-  
-    <a href="https://www.simoahava.com/images/2020/02/postmessage-process.jpg" title="postMessage process">
-  
-    <img class="fig-img" height="1612" width="2614" loading="lazy" src="https://www.simoahava.com/images/2020/02/postmessage-process.jpg#ZgotmplZ" alt="postMessage process">
-  
-    </a>
-  
-  
-</div>
-
-
-<p>There are many potential <strong>race conditions</strong> in the mix, so some precautions need to be taken. Here&rsquo;s how the parent page works:</p>
-<ol>
-<li>The parent page starts listening for messages from the <code>&lt;iframe&gt;</code> as soon as Google Tag Manager loads.</li>
-<li>Once the parent page receives the <code>childReady</code> message, it starts polling for the Google Analytics tracker until a maximum timeout is reached.</li>
-<li>As soon as the Google Analytics tracker is available, the parent page sends the Client ID back to the <code>&lt;iframe&gt;</code>.</li>
-</ol>
-<p>And here&rsquo;s how the <code>&lt;iframe&gt;</code> page reacts:</p>
-<ol>
-<li>The <code>&lt;iframe&gt;</code> page starts sending the <code>childReady</code> message as soon as Google Tag Manager loads.</li>
-<li>Once the parent page responds with the Client ID (or a timeout is reached), the child page stops sending the message.</li>
-<li>The child page writes the Client ID into <code>dataLayer</code>.</li>
-</ol>
-<p>So now we know how the Client ID will be passed to the <code>&lt;iframe&gt;</code>, but that&rsquo;s not enough, yet.</p>
-<p><strong>Every single Google Analytics tag in the <code>&lt;iframe&gt;</code> must be configured to work with this setup!</strong></p>
-<p>More specifically, they all need two <strong>fields</strong> set, preferably in a <a href="https://www.simoahava.com/analytics/google-analytics-settings-variable-in-gtm/">Google Analytics Settings variable</a>:</p>
-<ul>
-<li><code>storage</code> set to <code>none</code> to avoid the tracker failing if it can&rsquo;t write the Client ID cookie.</li>
-<li><code>clientId</code> set to the value from the <code>dataLayer</code>.</li>
-</ul>
-<p>We&rsquo;ll get to these <a href="#google-analytics-tags">shortly</a>, don&rsquo;t worry.</p>
-
-                
-                  <h2 id="solution-2-forward-all-data-layer-messages-from-child-to-parent">Solution 2: Forward all Data Layer messages from child to parent</h2>
-<p>If you don&rsquo;t want to do any tracking within the <code>&lt;iframe&gt;</code> (I don&rsquo;t blame you), you can actually delegate tracking to the parent by sending all <code>dataLayer</code> messages to the parent for processing.</p>
-<blockquote>
-<p>This is the only viable solution for tracking cross-site iframe traffic with GA4.</p>
-</blockquote>
-<p>This means the parent page would manage tags for both the parent page&rsquo;s native interactions <em>as well as</em> those that happen within the <code>&lt;iframe&gt;</code>.</p>
-
-
-
-<div style="aspect-ratio: 3054 / 1932;" class="figure nocaption">
-  
-    <a href="https://www.simoahava.com/images/2020/02/datalayer-listener.jpg" title="dataLayer message forwarder">
-  
-    <img class="fig-img" height="1932" width="3054" loading="lazy" src="https://www.simoahava.com/images/2020/02/datalayer-listener.jpg#ZgotmplZ" alt="dataLayer message forwarder">
-  
-    </a>
-  
-  
-</div>
-
-
-<p>The process is almost the same as with the first solution. Here&rsquo;s how the parent page works:</p>
-<ol>
-<li>The parent page starts listening for messages from the <code>&lt;iframe&gt;</code> as soon as Google Tag Manager loads.</li>
-<li>Once the parent page receives the <code>childReady</code> message, it responds with a <code>parentReady</code> message.</li>
-<li>If the child frame sends a message in <code>dataLayer</code>-compatible format, the parent page pushes this message into its own <code>dataLayer</code>.</li>
-</ol>
-<p>On the <code>&lt;iframe&gt;</code>, this is what happens:</p>
-<ol>
-<li>The <code>&lt;iframe&gt;</code> page starts sending the <code>childReady</code> message as soon as Google Tag Manager loads.</li>
-<li>Once the parent page responds with <code>parentReady</code>, the child frame &ldquo;hijacks&rdquo; the <code>dataLayer.push()</code> method, and sends all the messages passed to it over to the parent page.</li>
-</ol>
-<p>The messages from the child frame are namespaced to keep them separate from the parent&rsquo;s &ldquo;native&rdquo; <code>dataLayer</code> messages, and they include some metadata about the <code>&lt;iframe&gt;</code> (mainly the URL and title).</p>
-
-
-
-<div style="aspect-ratio: 1278 / 894;" class="figure nocaption">
-  
-    <a href="https://www.simoahava.com/images/2020/02/parent-datalayer.jpg" title="Parent dataLayer">
-  
-    <img class="fig-img" height="894" width="1278" loading="lazy" src="https://www.simoahava.com/images/2020/02/parent-datalayer.jpg#ZgotmplZ" alt="Parent dataLayer">
-  
-    </a>
-  
-  
-</div>
-
-
-
-                
-                  <h2 id="the-parent-page-setup">The parent page setup</h2>
-<p>This article combines <strong>both</strong> solutions into a single set of Custom HTML tags, one for the parent page and one for the child <code>&lt;iframe&gt;</code>.</p>
-<p>On the parent page, i.e. the page sending the Client ID to the <code>&lt;iframe&gt;</code> and waiting for the messages sent from the child, you need to create a <strong>Custom HTML tag</strong> that fires on a <strong>Page View</strong> trigger. You can use the <em>All Pages</em> trigger if you wish, but you might as well create a <strong>Page View</strong> trigger that only fires on pages where you know the <code>&lt;iframe&gt;</code> to exist.</p>
-<h3 id="the-custom-html-tag">The Custom HTML tag</h3>
-<p>The Custom HTML tag itself should contain the following code:</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
-  (<span style="color:#00a">function</span>() {
-    <span style="color:#aaa;font-style:italic">// Universal Analytics tracking ID whose _ga cookie to use.
-</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#aaa;font-style:italic">// If using GA4, you can leave this setting untouched.
-</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">var</span> trackingId = <span style="color:#a50">&#39;UA-XXXXX-Y&#39;</span>;
-    
-    <span style="color:#aaa;font-style:italic">// Maximum time in milliseconds to wait for GA tracker to load.
-</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#aaa;font-style:italic">// Again, irrelevant for GA4.
-</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">var</span> maxGATime = <span style="color:#099">2000</span>;
-    
-    <span style="color:#aaa;font-style:italic">// Set to the origin (&#34;https://www.domain.com&#34;) of the iframe you want to communicate with
-</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">var</span> childOrigin = <span style="color:#a50">&#39;https://www.iframe-domain.com&#39;</span>;
-    
-    <span style="color:#aaa;font-style:italic">// Don&#39;t touch anything that follows
-</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">var</span> pollInterval = <span style="color:#099">200</span>;
-    
-    <span style="color:#00a">var</span> postCallback = <span style="color:#00a">function</span>(event) {
-      <span style="color:#00a">if</span> (event.origin !== childOrigin) <span style="color:#00a">return</span>;
-      <span style="color:#00a">if</span> (event.data !== <span style="color:#a50">&#39;childReady&#39;</span> &amp;&amp; !event.data.event) <span style="color:#00a">return</span>;
-      
-      <span style="color:#00a">if</span> (event.data === <span style="color:#a50">&#39;childReady&#39;</span>) {
-        <span style="color:#aaa;font-style:italic">// Send event that parent is ready
-</span><span style="color:#aaa;font-style:italic"></span>        event.source.postMessage(<span style="color:#a50">&#39;parentReady&#39;</span>, event.origin);
-
-        <span style="color:#00a">var</span> pollCallback = <span style="color:#00a">function</span>() {
-          <span style="color:#aaa;font-style:italic">// Stop polling if maxTime reached
-</span><span style="color:#aaa;font-style:italic"></span>          maxGATime -= pollInterval;
-          <span style="color:#00a">if</span> (maxGATime &lt;= <span style="color:#099">0</span>) <span style="color:#0aa">window</span>.clearInterval(poll);
-          
-          <span style="color:#aaa;font-style:italic">// Only proceed if GA loaded and tracker accessible
-</span><span style="color:#aaa;font-style:italic"></span>          <span style="color:#00a">var</span> ga = <span style="color:#0aa">window</span>[<span style="color:#0aa">window</span>[<span style="color:#a50">&#39;GoogleAnalyticsObject&#39;</span>]];
-          <span style="color:#00a">if</span> (ga &amp;&amp; ga.getAll) {
-            <span style="color:#aaa;font-style:italic">// Get tracker that matches the Tracking ID you provided
-</span><span style="color:#aaa;font-style:italic"></span>            <span style="color:#00a">var</span> tracker = ga.getAll().filter(<span style="color:#00a">function</span>(t) { 
-              <span style="color:#00a">return</span> t.get(<span style="color:#a50">&#39;trackingId&#39;</span>) === trackingId; 
-            }).shift();
-            
-            <span style="color:#aaa;font-style:italic">// Send message back to frame with Client ID
-</span><span style="color:#aaa;font-style:italic"></span>            <span style="color:#00a">if</span> (tracker) {
-              event.source.postMessage({
-                event: <span style="color:#a50">&#39;clientId&#39;</span>,
-                clientId: tracker.get(<span style="color:#a50">&#39;clientId&#39;</span>)
-              }, event.origin);
-            }
-            <span style="color:#aaa;font-style:italic">// Stop polling if not already done so
-</span><span style="color:#aaa;font-style:italic"></span>            <span style="color:#0aa">window</span>.clearInterval(poll);
-          }
-        };
-        
-        <span style="color:#aaa;font-style:italic">// Start polling for Google Analytics tracker
-</span><span style="color:#aaa;font-style:italic"></span>        <span style="color:#00a">var</span> poll = <span style="color:#0aa">window</span>.setInterval(pollCallback, pollInterval)
-      }
-      
-      <span style="color:#aaa;font-style:italic">// Push dataLayer message from iframe to dataLayer of parent
-</span><span style="color:#aaa;font-style:italic"></span>      <span style="color:#00a">if</span> (event.data.event) {
-        <span style="color:#0aa">window</span>.dataLayer.push(event.data);
-      }
-    };
-    
-    <span style="color:#aaa;font-style:italic">// Start listening for messages from child frame
-</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#0aa">window</span>.addEventListener(<span style="color:#a50">&#39;message&#39;</span>, postCallback);
-  })();
-&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
-<p>There&rsquo;s quite a lot happening here, so let&rsquo;s walk through the code! If you don&rsquo;t care about this deep-dive, you can <a href="#configuring-the-message-forwarding-system">skip right to</a> how you might need to configure the parent page container to support the message forwarding setup.</p>
-<h4 id="configuration">Configuration</h4>
-<p>First, there&rsquo;s the configuration stuff:</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#aaa;font-style:italic">// Tracking ID whose _ga cookie to use
-</span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">var</span> trackingId = <span style="color:#a50">&#39;UA-XXXXX-Y&#39;</span>;
-
-<span style="color:#aaa;font-style:italic">// Maximum time in milliseconds to wait for GA tracker to load
-</span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">var</span> maxGATime = <span style="color:#099">2000</span>;
-
-<span style="color:#aaa;font-style:italic">// Set to the origin (&#34;https://www.domain.com&#34;) of the iframe you want to communicate with
-</span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">var</span> childOrigin = <span style="color:#a50">&#39;https://www.iframe-domain.com&#39;</span>;
-</code></pre></div>
-<p>The <code>trackingId</code> should be set to the Google Analytics tracking ID of the tracker whose <code>_ga</code> cookie you want to use. This is because there might be multiple GA cookies each storing the Client ID for a different Tracking ID. If you&rsquo;re unsure, just type your regular tracking ID as the value of the <code>trackingId</code> variable.</p>
-<p>Set <code>maxGATime</code> to the maximum amount of time that the page waits for Google Analytics to load. You can certainly set this a lot higher than <em>2000</em> (2 seconds) if you want, but I would recommend against indefinite polling.</p>
-<blockquote>
-<p>The <code>trackingId</code> and <code>maxGATime</code> settings are only relevant for Universal Analytics. If tracking to GA4, you do not need to change these from their default values.</p>
-</blockquote>
-<p>Set the <code>childOrigin</code> to the <strong>origin</strong> of the <code>&lt;iframe&gt;</code> you want to send the data to. The <strong>origin</strong> is everything in the URL up to the first <em>path</em> slash. So, if the URL is <code>https://www.simoahava.com/my-home-page/</code>, the <strong>origin</strong> would be <code>https://www.simoahava.com</code>.</p>
-<blockquote>
-<p>It&rsquo;s important to <strong>not</strong> have the trailing slash, as that&rsquo;s part of the <em>path</em> component and not the <em>origin</em>.</p>
-</blockquote>
-<h4 id="the-listener">The listener</h4>
-<p>On the last line of the main code block, we add the <code>message</code> listener:</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#0aa">window</span>.addEventListener(<span style="color:#a50">&#39;message&#39;</span>, postCallback);
-</code></pre></div>
-<p>This means that when an <code>&lt;iframe&gt;</code> sends a <code>postMessage</code> to the parent page, the listener fires and executes the <code>postCallback</code> function.</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">var</span> postCallback = <span style="color:#00a">function</span>(event) {
-  <span style="color:#00a">if</span> (event.origin !== childOrigin) <span style="color:#00a">return</span>;
-  <span style="color:#00a">if</span> (event.data !== <span style="color:#a50">&#39;childReady&#39;</span> &amp;&amp; !event.data.event) <span style="color:#00a">return</span>;
-
-  <span style="color:#00a">if</span> (event.data === <span style="color:#a50">&#39;childReady&#39;</span>) {
-    <span style="color:#aaa;font-style:italic">// Send event that parent is ready
-</span><span style="color:#aaa;font-style:italic"></span>    event.source.postMessage(<span style="color:#a50">&#39;parentReady&#39;</span>, event.origin);
-
-    <span style="color:#00a">var</span> pollCallback = <span style="color:#00a">function</span>() {
-      <span style="color:#aaa;font-style:italic">// Stop polling if maxTime reached
-</span><span style="color:#aaa;font-style:italic"></span>      maxGATime -= pollInterval;
-      <span style="color:#00a">if</span> (maxGATime &lt;= <span style="color:#099">0</span>) <span style="color:#0aa">window</span>.clearInterval(poll);
-
-      <span style="color:#aaa;font-style:italic">// Only proceed if GA loaded and tracker accessible
-</span><span style="color:#aaa;font-style:italic"></span>      <span style="color:#00a">var</span> ga = <span style="color:#0aa">window</span>[<span style="color:#0aa">window</span>[<span style="color:#a50">&#39;GoogleAnalyticsObject&#39;</span>]];
-      <span style="color:#00a">if</span> (ga &amp;&amp; ga.getAll) {
-        <span style="color:#aaa;font-style:italic">// Get tracker that matches the Tracking ID you provided
-</span><span style="color:#aaa;font-style:italic"></span>        <span style="color:#00a">var</span> tracker = ga.getAll().filter(<span style="color:#00a">function</span>(t) { 
-          <span style="color:#00a">return</span> t.get(<span style="color:#a50">&#39;trackingId&#39;</span>) === trackingId; 
-        }).shift();
-
-        <span style="color:#aaa;font-style:italic">// Send message back to frame with Client ID
-</span><span style="color:#aaa;font-style:italic"></span>        <span style="color:#00a">if</span> (tracker) {
-          event.source.postMessage({
-            event: <span style="color:#a50">&#39;clientId&#39;</span>,
-            clientId: tracker.get(<span style="color:#a50">&#39;clientId&#39;</span>)
-          }, event.origin);
-        }
-        <span style="color:#aaa;font-style:italic">// Stop polling if not already done so
-</span><span style="color:#aaa;font-style:italic"></span>        <span style="color:#0aa">window</span>.clearInterval(poll);
-      }
-    };
-
-    <span style="color:#aaa;font-style:italic">// Start polling for Google Analytics tracker
-</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">var</span> poll = <span style="color:#0aa">window</span>.setInterval(pollCallback, pollInterval)
-  }
-  
-  <span style="color:#aaa;font-style:italic">// Push dataLayer message from iframe to dataLayer of parent
-</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#00a">if</span> (event.data.event) {
-    <span style="color:#0aa">window</span>.dataLayer.push(event.data);
-  }
-};
-</code></pre></div>
-<p>First, if the message retrieved was not expected (e.g. coming from a different <code>&lt;iframe&gt;</code> or has the wrong content), the callback stops execution.</p>
-<p>If the message <em>was</em> from the <code>&lt;iframe&gt;</code>, the first thing that&rsquo;s done is notify the child frame that the parent has received the message and is ready to start bilateral communication.</p>
-<p>Next, a <code>window.setInterval</code> starts polling the parent page every 200 milliseconds up to the default of 2 full seconds. With each poll, the script checks if the Google Analytics tracker has been created. If it has, the script takes the <code>clientId</code> from the tracker, and sends it back to the <code>&lt;iframe&gt;</code> using <code>event.source.postMessage()</code>. After this is done, the polling is manually stopped to avoid having the Client ID being sent multiple times to the <code>&lt;iframe&gt;</code>.</p>
-<p>In essence, the parent page needs to wait for two things:</p>
-<ol>
-<li>For the child page to signal it is ready to receive messages.</li>
-<li>For the Google Analytics tracker to be available, so that the Client ID can be grabbed from it.</li>
-</ol>
-<p>The last code block checks if the message from the child frame contains an object with the <code>event</code> property, in which case it pushes this entire object into the parent page <code>dataLayer</code>.</p>
-<h3 id="configuring-the-message-forwarding-system">Configuring the message forwarding system</h3>
-<p>The parent page listens for <code>dataLayer</code> messages forwarded from the embedded <code>&lt;iframe&gt;</code>. You can create tags, triggers, and variables that react to these messages.</p>
-<p>All triggers will be of type <strong>Custom Event trigger</strong>. That&rsquo;s because all the events sent from the frame will be appended with the <code>iframe.</code> prefix - even those without an <code>event</code> value (they&rsquo;ll be sent as <code>iframe.Message</code>). So, if you want to fire a tag when a link is clicked in the <code>&lt;iframe&gt;</code>, the trigger could look like this:</p>
-
-
-
-<div style="aspect-ratio: 2254 / 1092;" class="figure nocaption">
-  
-    <a href="https://www.simoahava.com/images/2020/02/iframe-link-click.jpg" title="Iframe link click">
-  
-    <img class="fig-img" height="1092" width="2254" loading="lazy" src="https://www.simoahava.com/images/2020/02/iframe-link-click.jpg#ZgotmplZ" alt="Iframe link click">
-  
-    </a>
-  
-  
-</div>
-
-
-<p>It requires quite a bit of manual configuration to get the whole thing up and running. But it can make your whole setup run much smoother, as you won&rsquo;t need to embed any extra code within the <code>&lt;iframe&gt;</code>.</p>
-<p>Each message sent from the <code>&lt;iframe&gt;</code> is automatically enhanced with some page-level information:</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">{
-  iframe: {
-    pageData: {
-      url: <span style="color:#a50">&#39;https://www.iframe-domain.com/iframe-page?iframequery=iframevalue#iframeHash&#39;</span>,
-      title: <span style="color:#a50">&#39;The Iframe Page Title | Iframe Company&#39;</span>
-    }
-  }
-}
-</code></pre></div>
-<p>If you want to update your parent page tags to use the <code>&lt;iframe&gt;</code> page-level data, you need to create Data Layer variables for <strong>iframe.pageData.url</strong> (the URL of the <code>&lt;iframe&gt;</code> page) and <strong>iframe.pageData.title</strong> (the page title).</p>
-<p>Once you have all these configured, you&rsquo;re ready to configure the <code>&lt;iframe&gt;</code> page!</p>
-
-                
-                  <h2 id="the-embedded-child-page-setup">The embedded (child) page setup</h2>
-<p>This is where things get tricky. In this guide, we&rsquo;re covering a fairly typical use case where the <code>&lt;iframe&gt;</code> content is only ever interacted with as an embed. So there&rsquo;s no scenario where the user would visit the page loaded in the <code>&lt;iframe&gt;</code> in a first-party or top-frame context. I&rsquo;ll <a href="#multi-purpose-container">briefly discuss that scenario later</a> as well, but for now let&rsquo;s assume that the page in the <code>&lt;iframe&gt;</code> is only accessed as an embedded element.</p>
-<p>You&rsquo;ll need to do <strong>three</strong> things in the Google Tag Manager container of the <code>&lt;iframe&gt;</code> page.</p>
-<ol>
-<li>Create a Custom HTML tag that communicates with the parent page.</li>
-<li>Update the settings for <strong>all</strong> of your Universal Analytics (and App+Web while you&rsquo;re at it) tags.</li>
-<li>Update the triggers for your Universal Analytics tags so they don&rsquo;t fire until they&rsquo;ve received the Client ID from the parent.</li>
-</ol>
-<h3 id="the-custom-html-tag-1">The Custom HTML tag</h3>
-<p>Create a new Custom HTML tag, and set it to fire on the <strong>All Pages</strong> trigger. If the <code>&lt;iframe&gt;</code> is a single-page app, you should still only fire the Custom HTML tag on the All Pages trigger, and not with every SPA page change, for example.</p>
-<p>Here&rsquo;s what you should copy-paste into the tag:</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
-  (<span style="color:#00a">function</span>() {
-    <span style="color:#aaa;font-style:italic">// If not in iframe, do nothing
-</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">try</span> {
-      <span style="color:#00a">if</span> (<span style="color:#0aa">window</span>.top === <span style="color:#0aa">window</span>.self) <span style="color:#00a">return</span>;
-    } <span style="color:#00a">catch</span>(e) {}
-    
-    <span style="color:#aaa;font-style:italic">// Set to false to prevent dataLayer messages from being sent to parent
-</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">var</span> sendDataLayerMessages = <span style="color:#00a">true</span>;
-    
-    <span style="color:#aaa;font-style:italic">// Set the prefix that will be used in the event name, and under which all
-</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#aaa;font-style:italic">// the dataLayer properties will be embedded
-</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">var</span> dataLayerMessagePrefix = <span style="color:#a50">&#39;iframe&#39;</span>;
-    
-    <span style="color:#aaa;font-style:italic">// Set to parent origin (&#34;https://www.domain.com&#34;)
-</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">var</span> parentOrigin = <span style="color:#a50">&#39;https://www.parent-domain.com&#39;</span>;
-
-    <span style="color:#aaa;font-style:italic">// Maximum time in milliseconds to poll the parent frame for ready signal
-</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">var</span> maxTime = <span style="color:#099">2000</span>;
-    
-    <span style="color:#aaa;font-style:italic">// Don&#39;t touch anything that follows
-</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">var</span> pollInterval = <span style="color:#099">200</span>;
-    <span style="color:#00a">var</span> parentReady = <span style="color:#00a">false</span>;
-    
-    <span style="color:#00a">var</span> postCallback = <span style="color:#00a">function</span>(event) {
-      <span style="color:#00a">if</span> (event.origin !== parentOrigin) <span style="color:#00a">return</span>;
-      <span style="color:#00a">if</span> (event.data.event !== <span style="color:#a50">&#39;clientId&#39;</span> &amp;&amp; event.data !== <span style="color:#a50">&#39;parentReady&#39;</span>) <span style="color:#00a">return</span>;
-      
-      <span style="color:#00a">if</span> (event.data.event === <span style="color:#a50">&#39;clientId&#39;</span>) {
-        <span style="color:#0aa">window</span>.dataLayer.push({
-          event: <span style="color:#a50">&#39;clientId&#39;</span>,
-          clientId: event.data.clientId
-        });
-      }
-      
-      <span style="color:#00a">if</span> (event.data === <span style="color:#a50">&#39;parentReady&#39;</span> &amp;&amp; !parentReady) {
-        <span style="color:#0aa">window</span>.clearInterval(poll);
-        <span style="color:#00a">if</span> (sendDataLayerMessages) startDataLayerMessageCollection();
-        parentReady = <span style="color:#00a">true</span>;
-      }
-    };
-    
-    <span style="color:#00a">var</span> pollCallback = <span style="color:#00a">function</span>() {
-      <span style="color:#aaa;font-style:italic">// If maximum time is reached, stop polling
-</span><span style="color:#aaa;font-style:italic"></span>      maxTime -= pollInterval;
-      <span style="color:#00a">if</span> (maxTime &lt;= <span style="color:#099">0</span>) <span style="color:#0aa">window</span>.clearInterval(poll);
-      <span style="color:#aaa;font-style:italic">// Send message to parent that iframe is ready to retrieve Client ID
-</span><span style="color:#aaa;font-style:italic"></span>      <span style="color:#0aa">window</span>.top.postMessage(<span style="color:#a50">&#39;childReady&#39;</span>, parentOrigin);
-    };
-    
-    <span style="color:#00a">var</span> createMessage = <span style="color:#00a">function</span>(obj) {
-      <span style="color:#00a">if</span> (!<span style="color:#0aa">Array</span>.isArray(obj) &amp;&amp; <span style="color:#00a">typeof</span> obj === <span style="color:#a50">&#39;object&#39;</span>) {
-        <span style="color:#00a">var</span> flattenObj = JSON.parse(JSON.stringify(obj));
-		<span style="color:#00a">var</span> message = {};
-        <span style="color:#aaa;font-style:italic">// Add metadata about the page into the message
-</span><span style="color:#aaa;font-style:italic"></span>        message[dataLayerMessagePrefix] = {
-          pageData: {
-            url: <span style="color:#0aa">document</span>.location.href,
-            title: <span style="color:#0aa">document</span>.title
-          }
-        };
-        <span style="color:#00a">for</span> (<span style="color:#00a">var</span> prop <span style="color:#00a">in</span> flattenObj) {
-          <span style="color:#00a">if</span> (flattenObj.hasOwnProperty(prop) &amp;&amp; prop !== <span style="color:#a50">&#39;gtm.uniqueEventId&#39;</span>) {
-            <span style="color:#00a">if</span> (prop === <span style="color:#a50">&#39;event&#39;</span>) {
-              message.event = dataLayerMessagePrefix + <span style="color:#a50">&#39;.&#39;</span> + flattenObj[prop];
-            } <span style="color:#00a">else</span> {
-              message[dataLayerMessagePrefix][prop] = flattenObj[prop];
-            }
-          }
-        }
-        <span style="color:#00a">if</span> (!message.event) message.event = dataLayerMessagePrefix + <span style="color:#a50">&#39;.Message&#39;</span>;
-        <span style="color:#00a">return</span> message;
-      }
-      <span style="color:#00a">return</span> <span style="color:#00a">false</span>;
-    };
-    
-    <span style="color:#00a">var</span> startDataLayerMessageCollection = <span style="color:#00a">function</span>() {
-      <span style="color:#aaa;font-style:italic">// Send the current dataLayer content to top frame, flatten the object
-</span><span style="color:#aaa;font-style:italic"></span>      <span style="color:#0aa">window</span>.dataLayer.forEach(<span style="color:#00a">function</span>(obj) {
-        <span style="color:#00a">var</span> message = createMessage(obj);
-        <span style="color:#00a">if</span> (message) <span style="color:#0aa">window</span>.top.postMessage(message, parentOrigin);
-      });
-      <span style="color:#aaa;font-style:italic">// Create the push listener for future messages
-</span><span style="color:#aaa;font-style:italic"></span>      <span style="color:#00a">var</span> oldPush = <span style="color:#0aa">window</span>.dataLayer.push;
-      <span style="color:#0aa">window</span>.dataLayer.push = <span style="color:#00a">function</span>() {
-        <span style="color:#00a">var</span> states = [].slice.call(arguments, <span style="color:#099">0</span>);
-        states.forEach(<span style="color:#00a">function</span>(arg) {
-          <span style="color:#00a">var</span> message = createMessage(arg);
-          <span style="color:#00a">if</span> (message) <span style="color:#0aa">window</span>.top.postMessage(message, parentOrigin);
-        });
-        <span style="color:#00a">return</span> oldPush.apply(<span style="color:#0aa">window</span>.dataLayer, states);
-      };
-    };
-    
-    <span style="color:#aaa;font-style:italic">// Start polling the parent page with &#34;childReady&#34; message
-</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">var</span> poll = <span style="color:#0aa">window</span>.setInterval(pollCallback, pollInterval);
-    
-    <span style="color:#aaa;font-style:italic">// Start listening for messages from the parent page
-</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#0aa">window</span>.addEventListener(<span style="color:#a50">&#39;message&#39;</span>, postCallback);
-  })();
-&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
-<p>The following chapters will walk through this code. You can skip right to <a href="#google-analytics-tags">configuring the Google Analytics tags</a> if you don&rsquo;t care about the walkthrough.</p>
-<h4 id="configuration-1">Configuration</h4>
-<p>This is the first code block:</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#aaa;font-style:italic">// If not in iframe, do nothing
-</span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">try</span> {
-  <span style="color:#00a">if</span> (<span style="color:#0aa">window</span>.top === <span style="color:#0aa">window</span>.self) <span style="color:#00a">return</span>;
-} <span style="color:#00a">catch</span>(e) {}
-
-<span style="color:#aaa;font-style:italic">// Set to false to prevent dataLayer messages from being sent to parent
-</span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">var</span> sendDataLayerMessages = <span style="color:#00a">true</span>;
-
-<span style="color:#aaa;font-style:italic">// Set the prefix that will be used in the event name, and under which all
-</span><span style="color:#aaa;font-style:italic">// the dataLayer properties will be embedded
-</span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">var</span> dataLayerMessagePrefix = <span style="color:#a50">&#39;iframe&#39;</span>;
-
-<span style="color:#aaa;font-style:italic">// Set to parent origin (&#34;https://www.domain.com&#34;)
-</span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">var</span> parentOrigin = <span style="color:#a50">&#39;https://www.parent-domain.com&#39;</span>;
-
-<span style="color:#aaa;font-style:italic">// Maximum time in milliseconds to poll the parent frame for ready signal
-</span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">var</span> maxTime = <span style="color:#099">2000</span>;
-</code></pre></div>
-<p>First of all, if the page is <strong>not</strong> loaded in an <code>&lt;iframe&gt;</code>, the code does not and should not execute at all. There&rsquo;s no parent page to communicate with, so executing any of the following code would be unnecessary.</p>
-<p>You can set <code>sendDataLayerMessages</code> to <code>false</code> if you <strong>don&rsquo;t</strong> want to forward the <code>dataLayer</code> messages from the child to the parent. This is useful if you&rsquo;re comfortable with tracking everything within the <code>&lt;iframe&gt;</code> itself, and don&rsquo;t want to bother with setting up the corresponding tags in the parent page.</p>
-<p>The <code>dataLayerMessagePrefix</code> value is what will be used to namespace the <code>dataLayer</code> messages that are forwarded from the child to the parent (if you haven&rsquo;t disabled forwarding per the previous paragraph).</p>
-<p>The <code>parentOrigin</code> should be set to the <strong>origin</strong> of the parent page, i.e. the page to which the messages are sent. Remember, <strong>origin</strong> is everything from the protocol to the first slash of the path component. In other words, the <strong>origin</strong> of <code>https://www.simoahava.com/some-page</code> is <code>https://www.simoahava.com</code>.</p>
-<p>Finally, the <code>maxTime</code> is how long the <code>&lt;iframe&gt;</code> tries to send the <code>childReady</code> message to the parent before it stops.</p>
-<h4 id="the-poller">The poller</h4>
-<p>The child frame polls the parent page with the <code>childReady</code> message to signal it&rsquo;s ready for the bilateral communication to start.</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">var</span> pollCallback = <span style="color:#00a">function</span>() {
-  <span style="color:#aaa;font-style:italic">// If maximum time is reached, stop polling
-</span><span style="color:#aaa;font-style:italic"></span>  maxTime -= pollInterval;
-  <span style="color:#00a">if</span> (maxTime &lt;= <span style="color:#099">0</span>) <span style="color:#0aa">window</span>.clearInterval(poll);
-  <span style="color:#aaa;font-style:italic">// Send message to parent that iframe is ready to retrieve Client ID
-</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#0aa">window</span>.top.postMessage(<span style="color:#a50">&#39;childReady&#39;</span>, parentOrigin);
-};
-
-<span style="color:#aaa;font-style:italic">// Start polling the parent page with &#34;childReady&#34; message
-</span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">var</span> poll = <span style="color:#0aa">window</span>.setInterval(pollCallback, pollInterval);
-</code></pre></div>
-<p>It runs every 200 milliseconds until the maximum poll time (2000 milliseconds by default) is reached.</p>
-<h4 id="the-listener-1">The listener</h4>
-<p>At the same time as it starts polling, a <code>postMessage</code> listener is also initiated. This listener waits for two things:</p>
-<ol>
-<li>The parent to signal <code>parentReady</code>, so that the <code>&lt;iframe&gt;</code> can start forwarding its <code>dataLayer messages to the parent</code>.</li>
-<li>The parent to return a Client ID string, so that the <code>&lt;iframe&gt;</code> can use this in Google Analytics tags.</li>
-</ol>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">var</span> postCallback = <span style="color:#00a">function</span>(event) {
-  <span style="color:#00a">if</span> (event.origin !== parentOrigin) <span style="color:#00a">return</span>;
-  <span style="color:#00a">if</span> (event.data.event !== <span style="color:#a50">&#39;clientId&#39;</span> &amp;&amp; event.data !== <span style="color:#a50">&#39;parentReady&#39;</span>) <span style="color:#00a">return</span>;
-
-  <span style="color:#00a">if</span> (event.data.event === <span style="color:#a50">&#39;clientId&#39;</span>) {
-    <span style="color:#0aa">window</span>.dataLayer.push({
-      event: <span style="color:#a50">&#39;clientId&#39;</span>,
-      clientId: event.data.clientId
-    });
-  }
-
-  <span style="color:#00a">if</span> (event.data === <span style="color:#a50">&#39;parentReady&#39;</span> &amp;&amp; !parentReady) {
-    <span style="color:#0aa">window</span>.clearInterval(poll);
-    <span style="color:#00a">if</span> (sendDataLayerMessages) startDataLayerMessageCollection();
-    parentReady = <span style="color:#00a">true</span>;
-  }
-};
-
-<span style="color:#aaa;font-style:italic">// Start listening for messages from the parent page
-</span><span style="color:#aaa;font-style:italic"></span><span style="color:#0aa">window</span>.addEventListener(<span style="color:#a50">&#39;message&#39;</span>, postCallback);
-</code></pre></div>
-<p>If the parent sends a <code>clientId</code> message, then the page pushes this data into <code>dataLayer</code>, and Google Analytics tags firing in the <code>&lt;iframe&gt;</code> can utilize this information in their settings.</p>
-<p>If the parent sends a <code>parentReady</code> message, the <code>&lt;iframe&gt;</code> stops sending the <code>childReady</code> message. Then, it fires up the <code>dataLayer</code> message forwarder (unless the user has chosen to prevent this).</p>
-<h4 id="the-message-forwarder">The message forwarder</h4>
-<p>The forwarder comprises two methods: <code>createMessage(obj)</code> and <code>startDataLayerMessageCollection()</code>.</p>
-<p>Without going into too much detail, the basic setup is this:</p>
-<ol>
-<li>The <code>createMessage()</code> method is a utility that wraps the <code>dataLayer</code> message from the <code>&lt;iframe&gt;</code> page with the prefix configured in the beginning of the Custom HTML tag (<code>&quot;iframe&quot;</code>) by default. This prefix is used with the event name (so <code>gtm.js</code> becomes <code>iframe.gtm.js</code>) as well as with the object itself (so <code>{key: 'value'}</code> becomes <code>{iframe: {key: value}}</code>).</li>
-<li>The <code>createMessage()</code> method also automatically adds a <code>pageData</code> object which contains the <code>url</code> and <code>title</code> of the page in the <code>&lt;iframe&gt;</code>.</li>
-<li>The <code>startDataLayerMessageCollection()</code> method first sends everything in the <code>dataLayer</code> array collected thus far to the parent.</li>
-<li>Then the method rewrites the <code>dataLayer.push</code> function to send everything pushed into <code>dataLayer</code> to the parent page as well.</li>
-</ol>
-<p>In other words, everything added to the <code>dataLayer</code> array within the <code>&lt;iframe&gt;</code> is forwarded to the parent page, so that the parent page can handle tracking of interactions and events within the <code>&lt;iframe&gt;</code> as well.</p>
-<p>For example, here&rsquo;s how the forwarded transpiles and sends a <code>dataLayer</code> message to the parent page.</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#aaa;font-style:italic">// This is what&#39;s pushed into dataLayer:
-</span><span style="color:#aaa;font-style:italic"></span>{
-  event: <span style="color:#a50">&#39;userLogin&#39;</span>,
-  user: {
-    id: <span style="color:#a50">&#39;abcd-1234&#39;</span>,
-    status: <span style="color:#a50">&#39;gold&#39;</span>
-  }
-}
-
-<span style="color:#aaa;font-style:italic">// This is what&#39;s sent to the parent page
-</span><span style="color:#aaa;font-style:italic"></span>{
-  event: <span style="color:#a50">&#39;iframe.userLogin&#39;</span>,
-  iframe: {
-    pageData: {
-      url: <span style="color:#a50">&#39;https://www.iframe-domain.com/iframe-page/&#39;</span>,
-      title: <span style="color:#a50">&#39;Iframe Page Title&#39;</span>
-    },
-    user: {
-      id: <span style="color:#a50">&#39;abcd-1234&#39;</span>,
-      status: <span style="color:#a50">&#39;gold&#39;</span>
-    }
-  }
-}
-</code></pre></div>
-<h3 id="google-analytics-tags">Google Analytics tags</h3>
-<p>If you <strong>do</strong> want to collect data to Google Analytics from within the <code>&lt;iframe&gt;</code> page, you need to configure <strong>all</strong> your Google Analytics tags with the following settings:</p>
-
-
-
-<div style="aspect-ratio: 1786 / 1138;" class="figure nocaption">
-  
-    <a href="https://www.simoahava.com/images/2020/02/iframe-google-analytics-settings.jpg" title="Iframe google analytics settings">
-  
-    <img class="fig-img" height="1138" width="1786" loading="lazy" src="https://www.simoahava.com/images/2020/02/iframe-google-analytics-settings.jpg#ZgotmplZ" alt="Iframe google analytics settings">
-  
-    </a>
-  
-  
-</div>
-
-
-<p>As the <code>&lt;iframe&gt;</code> will no longer use cookies to persist the Client ID, you need to set the <code>storage</code> field value to <code>none</code>.</p>
-<p>Then, because the child frame uses the Client ID pushed into <code>dataLayer</code> by the message listener, you&rsquo;ll need to update the <code>clientId</code> field to use a Data Layer variable for <code>clientId</code>. It should look like this:</p>
-
-
-
-<div style="aspect-ratio: 2354 / 1208;" class="figure nocaption">
-  
-    <a href="https://www.simoahava.com/images/2020/02/dlv-clientid.jpg" title="Client ID in Data Layer">
-  
-    <img class="fig-img" height="1208" width="2354" loading="lazy" src="https://www.simoahava.com/images/2020/02/dlv-clientid.jpg#ZgotmplZ" alt="Client ID in Data Layer">
-  
-    </a>
-  
-  
-</div>
-
-
-<p>None of your tags should fire if the Client ID is not yet available. You can use the <code>clientId</code> in a Custom Event trigger to fire your tags when Client ID has been pushed to <code>dataLayer</code>.</p>
-
-
-
-<div style="aspect-ratio: 2258 / 1080;" class="figure nocaption">
-  
-    <a href="https://www.simoahava.com/images/2020/02/custom-event-trigger.jpg" title="Custom Event trigger">
-  
-    <img class="fig-img" height="1080" width="2258" loading="lazy" src="https://www.simoahava.com/images/2020/02/custom-event-trigger.jpg#ZgotmplZ" alt="Custom Event trigger">
-  
-    </a>
-  
-  
-</div>
-
-
-<p>You can also update your existing triggers to not fire until <code>clientId</code> has a valid value.</p>
-
-
-
-<div style="aspect-ratio: 1862 / 1126;" class="figure nocaption">
-  
-    <a href="https://www.simoahava.com/images/2020/02/clientid-not-undefined.jpg" title="Client ID not undefined">
-  
-    <img class="fig-img" height="1126" width="1862" loading="lazy" src="https://www.simoahava.com/images/2020/02/clientid-not-undefined.jpg#ZgotmplZ" alt="Client ID not undefined">
-  
-    </a>
-  
-  
-</div>
-
-
-<h4 id="multi-purpose-container">Multi-purpose container</h4>
-<p>One important caveat to note is that if you set up all your tags per the instructions in the previous chapter, then the container running in the <code>&lt;iframe&gt;</code> will not function properly if the page is visited directly as a top-level page, i.e. not as an embed.</p>
-<p>I would generally recommend to avoid mixing too many use cases in a single container. It might be wiser to create a <em>different</em>  container for scenarios where the page is visited directly, and have the developers update the site code to load the correct container, depending on whether the page is embedded in an <code>&lt;iframe&gt;</code> or not.</p>
-<p>However, if you do want the container to cater to different use cases, then a good idea is to create a separate set of tags for when the page is accessed in the top frame vs. when the page is accessed as an embed.</p>
-<p>You can use a simple utility variable to check if the page is accessed as an <code>&lt;iframe&gt;</code> or not. This Custom JavaScript variable returns <code>true</code> if the page <strong>is NOT in an <code>&lt;iframe&gt;</code></strong> and <code>false</code> otherwise.</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() {
-  <span style="color:#00a">try</span> {
-    <span style="color:#00a">return</span> <span style="color:#0aa">window</span>.top === <span style="color:#0aa">window</span>.self;
-  } <span style="color:#00a">catch</span>(e) { <span style="color:#00a">return</span> <span style="color:#00a">false</span>; }
-}
-</code></pre></div>
-<p>You can then check for this variable value in your tags, triggers, and variables, to make sure that tracking is configured correctly depending on how the page is accessed.</p>
-
-                
-                  <h2 id="summary">Summary</h2>
-<p>This has been a difficult article to write, and I feel a bit embarrassed to leave so much work to you, my noble reader.</p>
-<p>The thing is - working with this type of a bilateral messaging setup requires both the parent page and the <code>&lt;iframe&gt;</code> page to be in sync. The Custom HTML tags I&rsquo;ve designed have been built to naturally reject race conditions, but it&rsquo;s possible you&rsquo;ll need to modify one or the other (or both) to make things work on your site.</p>
-<p>Over the course of my career, and especially over the time I&rsquo;ve been blogging about Google Tag Manager, trying to perfect tracking of <code>&lt;iframe&gt;</code> elements has been my personal Mount Everest. Cross-site tracking of embedded content has take over my life to such an extent that I&rsquo;m losing sleep and seriously considering hunting down Ibrahim or Isabella Frame, or whoever the person is who thought the <code>&lt;iframe&gt;</code> is a great addition to the HTML spec.</p>
-<p>Regardless, it&rsquo;s still <em>such a common use case</em> on the SaaS- and micro service -rich web to embed cross-site content. Naturally, there&rsquo;s an incentive to know what happens in these <code>&lt;iframe&gt;</code> blocks that I consider the time I&rsquo;ve spent trying to solve this particular riddle to be almost worthwhile.</p>
-<p>Anyway, I expect <em>and hope</em> that you have comments and/or questions about this setup. Let&rsquo;s continue the discussion in the comments of this article, thank you!</p>
-
-                
-              
-              
-
-            </div>
-          </div>
-          <div id="post-footer" class="post-footer main-content-wrap">
-            
-              
-                
-                
-                  <div class="post-footer-tags">
-                    <span class="text-color-light text-small">TAGGED IN</span><br/>
-                    
-  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/google-tag-manager/">google tag manager</a>
-
-  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/cross-domain-tracking/">cross-domain tracking</a>
-
-  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/iframe/">iframe</a>
-
-  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/postmessage/">postmessage</a>
-
-  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/cookie/">cookie</a>
-
-                  </div>
-                
-              
-            
-            
-  <div class="post-actions-wrap">
-      <nav >
-        <ul class="post-actions post-action-nav">
-          
-            <li class="post-action">
-              
-                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/create-slack-notification-system-google-tag-manager-changes/">
-              
-                  <i class="fa fa-angle-left"></i>
-                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
-                </a>
-            </li>
-            <li class="post-action">
-              
-                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/gtm-tips/collect-isp-custom-dimension-google-analytics/">
-              
-                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
-                  <i class="fa fa-angle-right"></i>
-                </a>
-            </li>
-          
-        </ul>
-      </nav>
-    <ul class="post-actions post-action-share" >
-      
-        <li class="post-action hide-lg hide-md hide-sm">
-          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
-            <i class="fa fa-share-alt"></i>
-          </a>
-        </li>
-        
-          <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/cookieless-tracking-cross-site-iframes/">
-              <i class="fa fa-brands fa-facebook"></i>
-            </a>
-          </li>
-        
-          <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Cookieless%20Tracking%20For%20Cross-site%20Iframes%20https://www.simoahava.com/analytics/cookieless-tracking-cross-site-iframes/%20via%20@SimoAhava">
-              <i class="fa fa-brands fa-twitter"></i>
-            </a>
-          </li>
-        
-          <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/cookieless-tracking-cross-site-iframes/">
-              <i class="fa fa-brands fa-linkedin"></i>
-            </a>
-          </li>
-        
-      
-      
-        <li class="post-action">
-          <a class="post-action-btn btn btn--default" href="#commento">
-            <i class="fa-regular fa-comments"></i>
-          </a>
-        </li>
-      
-      <li class="post-action">
-          <a class="post-action-btn btn btn--default" href="#">
-          <i class="fa fa-search"></i>
-        </a>
-      </li>
-    </ul>
-  </div>
-
-
-            
-              <a name="commento"></a>
-<comentario-comments></comentario-comments>
-
-            
-          </div>
-        </article>
-        <footer id="footer" class="main-content-wrap">
-  <span class="copyrights">
-    &copy; 2026 Simo Ahava. All Rights Reserved
-  </span>
-</footer>
-
-      </div>
-      
-      <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
-        
-  <div class="post-actions-wrap">
-      <nav >
-        <ul class="post-actions post-action-nav">
-          
-            <li class="post-action">
-              
-                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/create-slack-notification-system-google-tag-manager-changes/">
-              
-                  <i class="fa fa-angle-left"></i>
-                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
-                </a>
-            </li>
-            <li class="post-action">
-              
-                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/gtm-tips/collect-isp-custom-dimension-google-analytics/">
-              
-                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
-                  <i class="fa fa-angle-right"></i>
-                </a>
-            </li>
-          
-        </ul>
-      </nav>
-    <ul class="post-actions post-action-share" >
-      
-        <li class="post-action hide-lg hide-md hide-sm">
-          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
-            <i class="fa fa-share-alt"></i>
-          </a>
-        </li>
-        
-          <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/cookieless-tracking-cross-site-iframes/">
-              <i class="fa fa-brands fa-facebook"></i>
-            </a>
-          </li>
-        
-          <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Cookieless%20Tracking%20For%20Cross-site%20Iframes%20https://www.simoahava.com/analytics/cookieless-tracking-cross-site-iframes/%20via%20@SimoAhava">
-              <i class="fa fa-brands fa-twitter"></i>
-            </a>
-          </li>
-        
-          <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/cookieless-tracking-cross-site-iframes/">
-              <i class="fa fa-brands fa-linkedin"></i>
-            </a>
-          </li>
-        
-      
-      
-        <li class="post-action">
-          <a class="post-action-btn btn btn--default" href="#commento">
-            <i class="fa-regular fa-comments"></i>
-          </a>
-        </li>
-      
-      <li class="post-action">
-          <a class="post-action-btn btn btn--default" href="#">
-          <i class="fa fa-search"></i>
-        </a>
-      </li>
-    </ul>
-  </div>
-
-
-      </div>
-      
-      <div id="share-options-bar" class="share-options-bar" data-behavior="4">
-  <i id="btn-close-shareoptions" class="fa fa-close"></i>
-  <ul class="share-options">
-    
-      <li class="share-option">
-        <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/cookieless-tracking-cross-site-iframes/">
-          <i class="fa fa-brands fa-facebook"></i><span>Share on Facebook</span>
-        </a>
-      </li>
-    
-      <li class="share-option">
-        <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=Cookieless%20Tracking%20For%20Cross-site%20Iframes%20https://www.simoahava.com/analytics/cookieless-tracking-cross-site-iframes/%20via%20@SimoAhava">
-          <i class="fa fa-brands fa-twitter"></i><span>Share on Twitter</span>
-        </a>
-      </li>
-    
-      <li class="share-option">
-        <a class="share-option-btn" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/cookieless-tracking-cross-site-iframes/">
-          <i class="fa fa-brands fa-linkedin"></i><span>Share on LinkedIn</span>
-        </a>
-      </li>
-    
-  </ul>
-</div>
-<div id="share-options-mask" class="share-options-mask"></div>
-
-    </div>
-    
-    <div id="about">
-  <div id="about-card">
-    <div id="about-btn-close">
-      <i class="fa fa-remove"></i>
-    </div>
-    
-      <img id="about-card-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
-    
-    <h4 id="about-card-name">Simo Ahava</h4>
-    
-      <div id="about-card-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</div>
-    
-    
-      <div id="about-card-job">
-        <i class="fa fa-briefcase"></i>
-        <br/>
-        Senior Data Advocate at Reaktor
-      </div>
-    
-    
-      <div id="about-card-location">
-        <i class="fa fa-map-marker"></i>
-        <br/>
-        Finland
-      </div>
-    
-  </div>
-</div>
-
-    
-  
-    
-    <div id="cover" style="background-image:url('https://www.simoahava.com/images/maisema.jpg');"></div>
-  
-
-
-    
-<script defer src="https://comentario.simoahava.com/comentario.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
-
-
-
-
-<script src="https://www.simoahava.com/js/script.js"></script>
-
-
-
-    <script>
-      !function(){var e=document.querySelector(".simmer"),t=document.querySelector(".simmer .close"),o=window.sessionStorage&&window.sessionStorage.getItem("nosimmer");if(e){if(o){e.style.display="none"}t.addEventListener("click",function(){window.sessionStorage.setItem("nosimmer","true"),e.style.display="none"})}}();
-    </script>
-    <style>
-      .ads {
-	  width: 1px;
-      }
-      </style>
-         
-
-    
-  </body>
-</html>
-
+<!doctype html><html lang=en-us><head><meta name=google-site-verification content="xQwWI2KUfP9LbFKhw2CVLFtrMY6Czrla7L3PD2aBolA"><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"Cookieless Tracking For Cross-site Iframes | Simo Ahava's blog","image":"https:\/\/www.simoahava.com\/images\/2020\/02\/iframe-postmessage.jpg","editor":"Simo Ahava","publisher":{"@type":"Organization","name":"Simo Ahava's blog","logo":{"@type":"ImageObject","url":"https:\/\/www.simoahava.com\/images\/simo.png","height":"393","width":"407"}},"url":"https:\/\/www.simoahava.com\/analytics\/cookieless-tracking-cross-site-iframes\/","datePublished":"2020-02-19T09:00:38\u002b02:00","dateModified":"2020-02-19T09:00:38\u002b02:00","description":"How to track Google Analytics traffic within a cross-site iframe without using cookies. This is useful due to how browser tracking protections prevent access to cookies in third-party (cross-site) context.","author":{"@type":"Person","name":"Simo Ahava"}}</script><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Cookieless Tracking For Cross-site Iframes | Simo Ahava's blog</title>
+<script>window.dataLayer=window.dataLayer||[],window.dataLayer.push({pageType:"article",environment:null})</script><script>(function(e,t,n,s){window[n]=window[n]||[],window[n].push({"gtm.start":(new Date).getTime(),event:"gtm.js"});var i=e.getElementsByTagName(t)[0],o=e.createElement(t),a=n!="dataLayer"?"&l="+n:"";o.async=!0,o.src="https://sgtm.simoahava.com/gtm.js?id="+s+a,i.parentNode.insertBefore(o,i)})(document,"script","dataLayer","GTM-PZ7GMV9")</script><meta name=author content="Simo Ahava"><meta name=keywords content><link rel=icon href=https://www.simoahava.com/images/favicon.ico><link rel=amphtml href=https://www.simoahava.com/amp/analytics/cookieless-tracking-cross-site-iframes/><meta name=description content="How to track Google Analytics traffic within a cross-site iframe without using cookies. This is useful due to how browser tracking protections prevent access to cookies in third-party (cross-site) context."><meta property="og:description" content="How to track Google Analytics traffic within a cross-site iframe without using cookies. This is useful due to how browser tracking protections prevent access to cookies in third-party (cross-site) context."><meta property="og:type" content="blog"><meta property="og:title" content="Cookieless Tracking For Cross-site Iframes"><meta property="og:url" content="https://www.simoahava.com/analytics/cookieless-tracking-cross-site-iframes/"><meta property="og:site_name" content="Simo Ahava's blog"><meta name=twitter:card content="summary"><meta name=twitter:title content="Cookieless Tracking For Cross-site Iframes"><meta name=twitter:description content="How to track Google Analytics traffic within a cross-site iframe without using cookies. This is useful due to how browser tracking protections prevent access to cookies in third-party (cross-site) context."><meta name=twitter:creator content="@SimoAhava"><meta name=twitter:image content="https://www.simoahava.com/images/2020/02/iframe-postmessage.jpg"><meta property="og:image" content="https://www.simoahava.com/images/2020/02/iframe-postmessage.jpg"><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=/css/style.css></head><body><div id=_progress></div><div id=blog><header id=header data-behavior=4><i id=btn-open-sidebar class="fa fa-lg fa-bars"></i><div class=header-title><a class=header-title-link href=/>Simo Ahava's blog</a></div></header><nav id=sidebar data-behavior=4><div class=sidebar-container><div class=sidebar-profile><a href=/><img class=sidebar-profile-picture loading=lazy src=https://www.simoahava.com/images/simo.png alt="Author's picture"></a><h4 class=sidebar-profile-name>Simo Ahava</h4><h5 class=sidebar-profile-bio>Husband | Father | Analytics developer<br>simo (at) simoahava.com</h5></div><ul class=sidebar-buttons><li class=sidebar-button><a class=sidebar-button-link href=/><i class="sidebar-button-icon fa fa-lg fa-home"></i>
+<span class=sidebar-button-desc>Home</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/categories/><i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+<span class=sidebar-button-desc>Categories</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/tags/><i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+<span class=sidebar-button-desc>Tags</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/categories/gtm-tips/><i class="sidebar-button-icon fa fa-lg fa-magic"></i>
+<span class=sidebar-button-desc>GTM Tips</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/about-simo-ahava/><i class="sidebar-button-icon fa fa-lg fa-question"></i>
+<span class=sidebar-button-desc>About</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/index.xml><i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+<span class=sidebar-button-desc>RSS</span></a></li></ul><ul class=sidebar-buttons><li class=sidebar-button><a class=sidebar-button-link href=/tools/><i class="sidebar-button-icon fa fa-lg fa-wrench"></i>
+<span class=sidebar-button-desc>Tools</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/blog-statistics/><i class="sidebar-button-icon fa fa-lg fa-bar-chart"></i>
+<span class=sidebar-button-desc>Blog statistics</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=https://github.com/sahava target=_blank rel=noopener><i class="sidebar-button-icon fa fa-lg fa-brands fa-github"></i>
+<span class=sidebar-button-desc>GitHub</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/upcoming-talks/><i class="sidebar-button-icon fa fa-lg fa-bullhorn"></i>
+<span class=sidebar-button-desc>Upcoming talks</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/custom-templates/><i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+<span class=sidebar-button-desc>Templates</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/newsletter/><i class="sidebar-button-icon fa fa-lg fa-bell"></i>
+<span class=sidebar-button-desc>Newsletter</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=https://masto.measure.chat/@SimoAhava target=_blank rel="noopener me"><i class="sidebar-button-icon fa fa-lg fa-brands fa-mastodon"></i>
+<span class=sidebar-button-desc>Mastodon</span></a></li></ul><ul class=sidebar-buttons></ul></div></nav><div id=main data-behavior=4 class=hasCoverMetaIn><article class=post><form id=search action=/search/><input name=q type=text class="form-control input--xlarge" placeholder="Search blog..." autocomplete=off></form><div class="post-header main-content-wrap text-left"><h1>Cookieless Tracking For Cross-site Iframes</h1><div class="postShorten-meta post-meta"><time datetime=2020-02-19T09:00:38+02:00>February 19, 2020
+</time><span>in</span>
+<a class=category-link href=/categories/analytics>Analytics</a>
+| <a href=https://www.simoahava.com/analytics/cookieless-tracking-cross-site-iframes/#commento><comentario-count path=/analytics/cookieless-tracking-cross-site-iframes/ placeholder=... error-text="N/A " zero-text="0 " prefix suffix=" "></comentario-count>Comments</a></div></div><div class="post-content markdown"><div class=main-content-wrap><blockquote><p><strong>Updated 25 May 2021</strong>: Added information about using this with GA4. As Google Analytics 4 does not have a mechanism to disable cookie storage, only the second solution (send <code>dataLayer</code> events from iframe to the parent) described in this article will work for GA4.</p></blockquote><p>Here I am, back with <code>&lt;iframe></code> and <strong>cross-domain tracking</strong>. I&rsquo;ve published a couple of articles before on the topic, with <a href=/analytics/tracking-cross-domain-iframes-upgraded-solution/>my upgraded solution</a> being the most recent one. These articles tackle the general problem of <strong>passing the Client ID from the parent to the <code>&lt;iframe></code></strong>.</p><p>By doing so, the <code>&lt;iframe></code> can take the Client ID from the frame URL and create the <code>_ga</code> cookie in the <code>&lt;iframe></code>, allowing hits from the parent <em>and</em> the <code>&lt;iframe></code> to use the same Client ID. Great.</p><p>However, there&rsquo;s a catch that&rsquo;s become more and more troubling with the increase of <a href=https://www.cookiestatus.com>browsers&rsquo; tracking protection mechanisms</a>: if the <code>&lt;iframe></code> loads content <strong>cross-site</strong>, the browser must <strong>allow cookie access in third-party context</strong>. In other words, if the browser blocks <em>third-party cookies</em>, the <code>&lt;iframe></code> will not be able to write the cookie, and Google Analytics tracking <strong>will fail</strong>.</p><div style=aspect-ratio:1396/472 class="figure nocaption"><a href=/images/2020/02/iframe-postmessage.jpg title="Iframe post message"><img class=fig-img height=472 width=1396 loading=lazy src=/images/2020/02/iframe-postmessage.jpg#ZgotmplZ alt="Iframe post message"></a></div><p>This article offers <strong>two</strong> solutions to this problem.</p><p>The <strong>first</strong> is that it sends the Google Analytics Client ID from the parent to the <code>&lt;iframe></code> using <code>window.postMessage</code>, and the child frame can poll for this information on every page, meaning cookies are not needed to store the Client ID.</p><p>The <strong>second</strong> solution is that the child frame actually sends every single <code>dataLayer</code> message to the parent, so that the child frame doesn&rsquo;t have to track anything by itself. The parent handles the tracking for the child frame instead.</p><p>Using <code>window.postMessage</code> is more robust than the link decoration of my earlier proposals, because it doesn&rsquo;t force a reload of the frame, nor does it require the child frame to support cookies. It&rsquo;s a bit more elaborate to set up, however.</p><blockquote><p>Warning! I&rsquo;m not kidding about that last statement. Setting this up requires quite a bit of custom code, and you&rsquo;re working with bilateral communication between two windows. Please read this article carefully so that you understand what&rsquo;s going on before copy-pasting any code to your Google Tag Manager container(s).</p></blockquote><div id=toc-container><h1 id=table-of-contents>Table of Contents</h1><input type=checkbox id=show><label for=show id=showbtn><h1 id=table-of-contents-mobile>Table of Contents</h1><span class=show>&nbsp;[+show]</span><span class=hide>&nbsp;[–hide]</span></label><nav id=TableOfContents><ul><li><a href=#what-exactly-is-the-problem>What exactly is the problem?</a></li><li><a href=#solution-1-pass-the-client-id-from-the-parent-to-the-child>Solution 1: Pass the Client ID from the parent to the child</a></li><li><a href=#solution-2-forward-all-data-layer-messages-from-child-to-parent>Solution 2: Forward all Data Layer messages from child to parent</a></li><li><a href=#the-parent-page-setup>The parent page setup</a><ul><li><a href=#the-custom-html-tag>The Custom HTML tag</a><ul><li><a href=#configuration>Configuration</a></li><li><a href=#the-listener>The listener</a></li></ul></li><li><a href=#configuring-the-message-forwarding-system>Configuring the message forwarding system</a></li></ul></li><li><a href=#the-embedded-child-page-setup>The embedded (child) page setup</a><ul><li><a href=#the-custom-html-tag-1>The Custom HTML tag</a><ul><li><a href=#configuration-1>Configuration</a></li><li><a href=#the-poller>The poller</a></li><li><a href=#the-listener-1>The listener</a></li><li><a href=#the-message-forwarder>The message forwarder</a></li></ul></li><li><a href=#google-analytics-tags>Google Analytics tags</a><ul><li><a href=#multi-purpose-container>Multi-purpose container</a></li></ul></li></ul></li><li><a href=#summary>Summary</a></li></ul></nav></div><span class=simmer><span class=close>X</span><p><span class="fa fa-md fa-bell"></span>
+<strong>The Simmer Newsletter</strong></p><p>Subscribe to the <a href=/newsletter/>Simmer newsletter</a> to get the latest news and content from Simo Ahava into your email inbox!</p></span><h2 id=what-exactly-is-the-problem>What exactly is the problem?</h2><p>Glad you asked!</p><p>When a page loads an <code>&lt;iframe></code> from a <strong>cross-site</strong> origin, that frame is loaded in a third-party context, and any access to browser storage from within that <code>&lt;iframe></code> will require the browser to allow third-party cookies for the <code>&lt;iframe</code> site.</p><p>A key term here is <strong>cross-site</strong>. This means that the <strong>top privately-controlled domain name</strong> of the <code>&lt;iframe></code> is different from that of the parent page.</p><p>In the examples below, the top privately-controlled domain name is in italics.</p><ul><li>www.<em>simoahava.com</em></li><li>www.<em>gtmtools.com</em></li><li>www.<em>ebay.co.uk</em></li><li><em>sahava.github.io</em></li><li>analytics.<em>google.com</em></li></ul><p>If any one of the sites above loaded any other site from the list in an <code>&lt;iframe></code>, that content would be loaded cross-site, and any cookie operations within the embedded page would require third-party cookie access.</p><p>The following examples are all <strong>same-site</strong>, even if they are cross-origin:</p><ul><li>www.<em>simoahava.com</em></li><li><em>simoahava.com</em></li><li>blog.<em>simoahava.com</em></li><li>tracking.endpoint.<em>simoahava.com</em></li></ul><p>Any communication between pages from the list above would happen in a <strong>same-site</strong> (or first-party) context, and cookie access would not be restricted.</p><p>As I mention in the introduction, this is only going to spell doom for tracking within embedded content due to how browsers implement tracking protections.</p><div style=aspect-ratio:2878/1212 class=figure><a href=/images/2020/02/tracking-protections.jpg title="From www.cookiestatus.com"><img class=fig-img height=1212 width=2878 loading=lazy src=/images/2020/02/tracking-protections.jpg#ZgotmplZ alt="From www.cookiestatus.com">
+</a><span class=caption>From www.cookiestatus.com</span></div><p>Even though Google recently made a veritable non-announcement by saying they&rsquo;ll <a href=https://blog.chromium.org/2020/01/building-more-private-web-path-towards.html>phase out third-party cookies by 2022</a>, Google Chrome will actually make things harder for cross-site cookie access much, much sooner.</p><p>Chrome v80 (released on February 4, 2020), enforces <a href=https://web.dev/samesite-cookies-explained/>SameSite cookie restrictions</a>, which means that if a cookie should be accessible in third-party context, it requires the <code>SameSite=None</code> and <code>Secure</code> flags set. By default, these are <em>not</em> set.</p><blockquote><p>You <strong>can</strong> set those flags with the <a href=/analytics/cookieflags-field-google-analytics/><code>cookieFlags</code></a> setting, but do note that this only fixes the &ldquo;problem&rdquo; for Google Chrome. It doesn&rsquo;t make those cookies work in browsers that block third-party cookies.</p></blockquote><p>Luckily, there&rsquo;s a way around this.</p><p>We can ignore cookies altogether.</p><h2 id=solution-1-pass-the-client-id-from-the-parent-to-the-child>Solution 1: Pass the Client ID from the parent to the child</h2><blockquote><p><strong>NOTE!</strong> As there is currently no mechanism to disable cookie storage from Google Analytics 4 deployments, this solution will only work for Universal Analytics. For GA4, you need to use <a href=#solution-2-forward-all-data-layer-messages-from-child-to-parent>Solution 2</a> below.</p></blockquote><p>Let&rsquo;s take a look at another celebrated illustration from yours truly:</p><div style=aspect-ratio:2614/1612 class="figure nocaption"><a href=/images/2020/02/postmessage-process.jpg title="postMessage process"><img class=fig-img height=1612 width=2614 loading=lazy src=/images/2020/02/postmessage-process.jpg#ZgotmplZ alt="postMessage process"></a></div><p>There are many potential <strong>race conditions</strong> in the mix, so some precautions need to be taken. Here&rsquo;s how the parent page works:</p><ol><li>The parent page starts listening for messages from the <code>&lt;iframe></code> as soon as Google Tag Manager loads.</li><li>Once the parent page receives the <code>childReady</code> message, it starts polling for the Google Analytics tracker until a maximum timeout is reached.</li><li>As soon as the Google Analytics tracker is available, the parent page sends the Client ID back to the <code>&lt;iframe></code>.</li></ol><p>And here&rsquo;s how the <code>&lt;iframe></code> page reacts:</p><ol><li>The <code>&lt;iframe></code> page starts sending the <code>childReady</code> message as soon as Google Tag Manager loads.</li><li>Once the parent page responds with the Client ID (or a timeout is reached), the child page stops sending the message.</li><li>The child page writes the Client ID into <code>dataLayer</code>.</li></ol><p>So now we know how the Client ID will be passed to the <code>&lt;iframe></code>, but that&rsquo;s not enough, yet.</p><p><strong>Every single Google Analytics tag in the <code>&lt;iframe></code> must be configured to work with this setup!</strong></p><p>More specifically, they all need two <strong>fields</strong> set, preferably in a <a href=/analytics/google-analytics-settings-variable-in-gtm/>Google Analytics Settings variable</a>:</p><ul><li><code>storage</code> set to <code>none</code> to avoid the tracker failing if it can&rsquo;t write the Client ID cookie.</li><li><code>clientId</code> set to the value from the <code>dataLayer</code>.</li></ul><p>We&rsquo;ll get to these <a href=#google-analytics-tags>shortly</a>, don&rsquo;t worry.</p><h2 id=solution-2-forward-all-data-layer-messages-from-child-to-parent>Solution 2: Forward all Data Layer messages from child to parent</h2><p>If you don&rsquo;t want to do any tracking within the <code>&lt;iframe></code> (I don&rsquo;t blame you), you can actually delegate tracking to the parent by sending all <code>dataLayer</code> messages to the parent for processing.</p><blockquote><p>This is the only viable solution for tracking cross-site iframe traffic with GA4.</p></blockquote><p>This means the parent page would manage tags for both the parent page&rsquo;s native interactions <em>as well as</em> those that happen within the <code>&lt;iframe></code>.</p><div style=aspect-ratio:3054/1932 class="figure nocaption"><a href=/images/2020/02/datalayer-listener.jpg title="dataLayer message forwarder"><img class=fig-img height=1932 width=3054 loading=lazy src=/images/2020/02/datalayer-listener.jpg#ZgotmplZ alt="dataLayer message forwarder"></a></div><p>The process is almost the same as with the first solution. Here&rsquo;s how the parent page works:</p><ol><li>The parent page starts listening for messages from the <code>&lt;iframe></code> as soon as Google Tag Manager loads.</li><li>Once the parent page receives the <code>childReady</code> message, it responds with a <code>parentReady</code> message.</li><li>If the child frame sends a message in <code>dataLayer</code>-compatible format, the parent page pushes this message into its own <code>dataLayer</code>.</li></ol><p>On the <code>&lt;iframe></code>, this is what happens:</p><ol><li>The <code>&lt;iframe></code> page starts sending the <code>childReady</code> message as soon as Google Tag Manager loads.</li><li>Once the parent page responds with <code>parentReady</code>, the child frame &ldquo;hijacks&rdquo; the <code>dataLayer.push()</code> method, and sends all the messages passed to it over to the parent page.</li></ol><p>The messages from the child frame are namespaced to keep them separate from the parent&rsquo;s &ldquo;native&rdquo; <code>dataLayer</code> messages, and they include some metadata about the <code>&lt;iframe></code> (mainly the URL and title).</p><div style=aspect-ratio:1278/894 class="figure nocaption"><a href=/images/2020/02/parent-datalayer.jpg title="Parent dataLayer"><img class=fig-img height=894 width=1278 loading=lazy src=/images/2020/02/parent-datalayer.jpg#ZgotmplZ alt="Parent dataLayer"></a></div><h2 id=the-parent-page-setup>The parent page setup</h2><p>This article combines <strong>both</strong> solutions into a single set of Custom HTML tags, one for the parent page and one for the child <code>&lt;iframe></code>.</p><p>On the parent page, i.e. the page sending the Client ID to the <code>&lt;iframe></code> and waiting for the messages sent from the child, you need to create a <strong>Custom HTML tag</strong> that fires on a <strong>Page View</strong> trigger. You can use the <em>All Pages</em> trigger if you wish, but you might as well create a <strong>Page View</strong> trigger that only fires on pages where you know the <code>&lt;iframe></code> to exist.</p><h3 id=the-custom-html-tag>The Custom HTML tag</h3><p>The Custom HTML tag itself should contain the following code:</p><div class=highlight><pre tabindex=0 style=background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-html data-lang=html><span style=display:flex><span>&lt;<span style=color:#1e90ff;font-weight:700>script</span>&gt;
+</span></span><span style=display:flex><span>  (<span style=color:#00a>function</span>() {
+</span></span><span style=display:flex><span>    <span style=color:#aaa;font-style:italic>// Universal Analytics tracking ID whose _ga cookie to use.
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>    <span style=color:#aaa;font-style:italic>// If using GA4, you can leave this setting untouched.
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>    <span style=color:#00a>var</span> trackingId = <span style=color:#a50>&#39;UA-XXXXX-Y&#39;</span>;
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#aaa;font-style:italic>// Maximum time in milliseconds to wait for GA tracker to load.
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>    <span style=color:#aaa;font-style:italic>// Again, irrelevant for GA4.
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>    <span style=color:#00a>var</span> maxGATime = <span style=color:#099>2000</span>;
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#aaa;font-style:italic>// Set to the origin (&#34;https://www.domain.com&#34;) of the iframe you want to communicate with
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>    <span style=color:#00a>var</span> childOrigin = <span style=color:#a50>&#39;https://www.iframe-domain.com&#39;</span>;
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#aaa;font-style:italic>// Don&#39;t touch anything that follows
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>    <span style=color:#00a>var</span> pollInterval = <span style=color:#099>200</span>;
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#00a>var</span> postCallback = <span style=color:#00a>function</span>(event) {
+</span></span><span style=display:flex><span>      <span style=color:#00a>if</span> (event.origin !== childOrigin) <span style=color:#00a>return</span>;
+</span></span><span style=display:flex><span>      <span style=color:#00a>if</span> (event.data !== <span style=color:#a50>&#39;childReady&#39;</span> &amp;&amp; !event.data.event) <span style=color:#00a>return</span>;
+</span></span><span style=display:flex><span>      
+</span></span><span style=display:flex><span>      <span style=color:#00a>if</span> (event.data === <span style=color:#a50>&#39;childReady&#39;</span>) {
+</span></span><span style=display:flex><span>        <span style=color:#aaa;font-style:italic>// Send event that parent is ready
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>        event.source.postMessage(<span style=color:#a50>&#39;parentReady&#39;</span>, event.origin);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#00a>var</span> pollCallback = <span style=color:#00a>function</span>() {
+</span></span><span style=display:flex><span>          <span style=color:#aaa;font-style:italic>// Stop polling if maxTime reached
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>          maxGATime -= pollInterval;
+</span></span><span style=display:flex><span>          <span style=color:#00a>if</span> (maxGATime &lt;= <span style=color:#099>0</span>) <span style=color:#0aa>window</span>.clearInterval(poll);
+</span></span><span style=display:flex><span>          
+</span></span><span style=display:flex><span>          <span style=color:#aaa;font-style:italic>// Only proceed if GA loaded and tracker accessible
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>          <span style=color:#00a>var</span> ga = <span style=color:#0aa>window</span>[<span style=color:#0aa>window</span>[<span style=color:#a50>&#39;GoogleAnalyticsObject&#39;</span>]];
+</span></span><span style=display:flex><span>          <span style=color:#00a>if</span> (ga &amp;&amp; ga.getAll) {
+</span></span><span style=display:flex><span>            <span style=color:#aaa;font-style:italic>// Get tracker that matches the Tracking ID you provided
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>            <span style=color:#00a>var</span> tracker = ga.getAll().filter(<span style=color:#00a>function</span>(t) { 
+</span></span><span style=display:flex><span>              <span style=color:#00a>return</span> t.get(<span style=color:#a50>&#39;trackingId&#39;</span>) === trackingId; 
+</span></span><span style=display:flex><span>            }).shift();
+</span></span><span style=display:flex><span>            
+</span></span><span style=display:flex><span>            <span style=color:#aaa;font-style:italic>// Send message back to frame with Client ID
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>            <span style=color:#00a>if</span> (tracker) {
+</span></span><span style=display:flex><span>              event.source.postMessage({
+</span></span><span style=display:flex><span>                event: <span style=color:#a50>&#39;clientId&#39;</span>,
+</span></span><span style=display:flex><span>                clientId: tracker.get(<span style=color:#a50>&#39;clientId&#39;</span>)
+</span></span><span style=display:flex><span>              }, event.origin);
+</span></span><span style=display:flex><span>            }
+</span></span><span style=display:flex><span>            <span style=color:#aaa;font-style:italic>// Stop polling if not already done so
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>            <span style=color:#0aa>window</span>.clearInterval(poll);
+</span></span><span style=display:flex><span>          }
+</span></span><span style=display:flex><span>        };
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#aaa;font-style:italic>// Start polling for Google Analytics tracker
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>        <span style=color:#00a>var</span> poll = <span style=color:#0aa>window</span>.setInterval(pollCallback, pollInterval)
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>      
+</span></span><span style=display:flex><span>      <span style=color:#aaa;font-style:italic>// Push dataLayer message from iframe to dataLayer of parent
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>      <span style=color:#00a>if</span> (event.data.event) {
+</span></span><span style=display:flex><span>        <span style=color:#0aa>window</span>.dataLayer.push(event.data);
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>    };
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#aaa;font-style:italic>// Start listening for messages from child frame
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>    <span style=color:#0aa>window</span>.addEventListener(<span style=color:#a50>&#39;message&#39;</span>, postCallback);
+</span></span><span style=display:flex><span>  })();
+</span></span><span style=display:flex><span>&lt;/<span style=color:#1e90ff;font-weight:700>script</span>&gt;</span></span></code></pre></div><p>There&rsquo;s quite a lot happening here, so let&rsquo;s walk through the code! If you don&rsquo;t care about this deep-dive, you can <a href=#configuring-the-message-forwarding-system>skip right to</a> how you might need to configure the parent page container to support the message forwarding setup.</p><h4 id=configuration>Configuration</h4><p>First, there&rsquo;s the configuration stuff:</p><div class=highlight><pre tabindex=0 style=background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-javascript data-lang=javascript><span style=display:flex><span><span style=color:#aaa;font-style:italic>// Tracking ID whose _ga cookie to use
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span><span style=color:#00a>var</span> trackingId = <span style=color:#a50>&#39;UA-XXXXX-Y&#39;</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic>// Maximum time in milliseconds to wait for GA tracker to load
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span><span style=color:#00a>var</span> maxGATime = <span style=color:#099>2000</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic>// Set to the origin (&#34;https://www.domain.com&#34;) of the iframe you want to communicate with
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span><span style=color:#00a>var</span> childOrigin = <span style=color:#a50>&#39;https://www.iframe-domain.com&#39;</span>;</span></span></code></pre></div><p>The <code>trackingId</code> should be set to the Google Analytics tracking ID of the tracker whose <code>_ga</code> cookie you want to use. This is because there might be multiple GA cookies each storing the Client ID for a different Tracking ID. If you&rsquo;re unsure, just type your regular tracking ID as the value of the <code>trackingId</code> variable.</p><p>Set <code>maxGATime</code> to the maximum amount of time that the page waits for Google Analytics to load. You can certainly set this a lot higher than <em>2000</em> (2 seconds) if you want, but I would recommend against indefinite polling.</p><blockquote><p>The <code>trackingId</code> and <code>maxGATime</code> settings are only relevant for Universal Analytics. If tracking to GA4, you do not need to change these from their default values.</p></blockquote><p>Set the <code>childOrigin</code> to the <strong>origin</strong> of the <code>&lt;iframe></code> you want to send the data to. The <strong>origin</strong> is everything in the URL up to the first <em>path</em> slash. So, if the URL is <code>https://www.simoahava.com/my-home-page/</code>, the <strong>origin</strong> would be <code>https://www.simoahava.com</code>.</p><blockquote><p>It&rsquo;s important to <strong>not</strong> have the trailing slash, as that&rsquo;s part of the <em>path</em> component and not the <em>origin</em>.</p></blockquote><h4 id=the-listener>The listener</h4><p>On the last line of the main code block, we add the <code>message</code> listener:</p><div class=highlight><pre tabindex=0 style=background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-javascript data-lang=javascript><span style=display:flex><span><span style=color:#0aa>window</span>.addEventListener(<span style=color:#a50>&#39;message&#39;</span>, postCallback);</span></span></code></pre></div><p>This means that when an <code>&lt;iframe></code> sends a <code>postMessage</code> to the parent page, the listener fires and executes the <code>postCallback</code> function.</p><div class=highlight><pre tabindex=0 style=background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-javascript data-lang=javascript><span style=display:flex><span><span style=color:#00a>var</span> postCallback = <span style=color:#00a>function</span>(event) {
+</span></span><span style=display:flex><span>  <span style=color:#00a>if</span> (event.origin !== childOrigin) <span style=color:#00a>return</span>;
+</span></span><span style=display:flex><span>  <span style=color:#00a>if</span> (event.data !== <span style=color:#a50>&#39;childReady&#39;</span> &amp;&amp; !event.data.event) <span style=color:#00a>return</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#00a>if</span> (event.data === <span style=color:#a50>&#39;childReady&#39;</span>) {
+</span></span><span style=display:flex><span>    <span style=color:#aaa;font-style:italic>// Send event that parent is ready
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>    event.source.postMessage(<span style=color:#a50>&#39;parentReady&#39;</span>, event.origin);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#00a>var</span> pollCallback = <span style=color:#00a>function</span>() {
+</span></span><span style=display:flex><span>      <span style=color:#aaa;font-style:italic>// Stop polling if maxTime reached
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>      maxGATime -= pollInterval;
+</span></span><span style=display:flex><span>      <span style=color:#00a>if</span> (maxGATime &lt;= <span style=color:#099>0</span>) <span style=color:#0aa>window</span>.clearInterval(poll);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      <span style=color:#aaa;font-style:italic>// Only proceed if GA loaded and tracker accessible
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>      <span style=color:#00a>var</span> ga = <span style=color:#0aa>window</span>[<span style=color:#0aa>window</span>[<span style=color:#a50>&#39;GoogleAnalyticsObject&#39;</span>]];
+</span></span><span style=display:flex><span>      <span style=color:#00a>if</span> (ga &amp;&amp; ga.getAll) {
+</span></span><span style=display:flex><span>        <span style=color:#aaa;font-style:italic>// Get tracker that matches the Tracking ID you provided
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>        <span style=color:#00a>var</span> tracker = ga.getAll().filter(<span style=color:#00a>function</span>(t) { 
+</span></span><span style=display:flex><span>          <span style=color:#00a>return</span> t.get(<span style=color:#a50>&#39;trackingId&#39;</span>) === trackingId; 
+</span></span><span style=display:flex><span>        }).shift();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#aaa;font-style:italic>// Send message back to frame with Client ID
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>        <span style=color:#00a>if</span> (tracker) {
+</span></span><span style=display:flex><span>          event.source.postMessage({
+</span></span><span style=display:flex><span>            event: <span style=color:#a50>&#39;clientId&#39;</span>,
+</span></span><span style=display:flex><span>            clientId: tracker.get(<span style=color:#a50>&#39;clientId&#39;</span>)
+</span></span><span style=display:flex><span>          }, event.origin);
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>        <span style=color:#aaa;font-style:italic>// Stop polling if not already done so
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>        <span style=color:#0aa>window</span>.clearInterval(poll);
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>    };
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#aaa;font-style:italic>// Start polling for Google Analytics tracker
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>    <span style=color:#00a>var</span> poll = <span style=color:#0aa>window</span>.setInterval(pollCallback, pollInterval)
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>  
+</span></span><span style=display:flex><span>  <span style=color:#aaa;font-style:italic>// Push dataLayer message from iframe to dataLayer of parent
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>  <span style=color:#00a>if</span> (event.data.event) {
+</span></span><span style=display:flex><span>    <span style=color:#0aa>window</span>.dataLayer.push(event.data);
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>};</span></span></code></pre></div><p>First, if the message retrieved was not expected (e.g. coming from a different <code>&lt;iframe></code> or has the wrong content), the callback stops execution.</p><p>If the message <em>was</em> from the <code>&lt;iframe></code>, the first thing that&rsquo;s done is notify the child frame that the parent has received the message and is ready to start bilateral communication.</p><p>Next, a <code>window.setInterval</code> starts polling the parent page every 200 milliseconds up to the default of 2 full seconds. With each poll, the script checks if the Google Analytics tracker has been created. If it has, the script takes the <code>clientId</code> from the tracker, and sends it back to the <code>&lt;iframe></code> using <code>event.source.postMessage()</code>. After this is done, the polling is manually stopped to avoid having the Client ID being sent multiple times to the <code>&lt;iframe></code>.</p><p>In essence, the parent page needs to wait for two things:</p><ol><li>For the child page to signal it is ready to receive messages.</li><li>For the Google Analytics tracker to be available, so that the Client ID can be grabbed from it.</li></ol><p>The last code block checks if the message from the child frame contains an object with the <code>event</code> property, in which case it pushes this entire object into the parent page <code>dataLayer</code>.</p><h3 id=configuring-the-message-forwarding-system>Configuring the message forwarding system</h3><p>The parent page listens for <code>dataLayer</code> messages forwarded from the embedded <code>&lt;iframe></code>. You can create tags, triggers, and variables that react to these messages.</p><p>All triggers will be of type <strong>Custom Event trigger</strong>. That&rsquo;s because all the events sent from the frame will be appended with the <code>iframe.</code> prefix - even those without an <code>event</code> value (they&rsquo;ll be sent as <code>iframe.Message</code>). So, if you want to fire a tag when a link is clicked in the <code>&lt;iframe></code>, the trigger could look like this:</p><div style=aspect-ratio:2254/1092 class="figure nocaption"><a href=/images/2020/02/iframe-link-click.jpg title="Iframe link click"><img class=fig-img height=1092 width=2254 loading=lazy src=/images/2020/02/iframe-link-click.jpg#ZgotmplZ alt="Iframe link click"></a></div><p>It requires quite a bit of manual configuration to get the whole thing up and running. But it can make your whole setup run much smoother, as you won&rsquo;t need to embed any extra code within the <code>&lt;iframe></code>.</p><p>Each message sent from the <code>&lt;iframe></code> is automatically enhanced with some page-level information:</p><div class=highlight><pre tabindex=0 style=background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-javascript data-lang=javascript><span style=display:flex><span>{
+</span></span><span style=display:flex><span>  iframe: {
+</span></span><span style=display:flex><span>    pageData: {
+</span></span><span style=display:flex><span>      url: <span style=color:#a50>&#39;https://www.iframe-domain.com/iframe-page?iframequery=iframevalue#iframeHash&#39;</span>,
+</span></span><span style=display:flex><span>      title: <span style=color:#a50>&#39;The Iframe Page Title | Iframe Company&#39;</span>
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>}</span></span></code></pre></div><p>If you want to update your parent page tags to use the <code>&lt;iframe></code> page-level data, you need to create Data Layer variables for <strong>iframe.pageData.url</strong> (the URL of the <code>&lt;iframe></code> page) and <strong>iframe.pageData.title</strong> (the page title).</p><p>Once you have all these configured, you&rsquo;re ready to configure the <code>&lt;iframe></code> page!</p><h2 id=the-embedded-child-page-setup>The embedded (child) page setup</h2><p>This is where things get tricky. In this guide, we&rsquo;re covering a fairly typical use case where the <code>&lt;iframe></code> content is only ever interacted with as an embed. So there&rsquo;s no scenario where the user would visit the page loaded in the <code>&lt;iframe></code> in a first-party or top-frame context. I&rsquo;ll <a href=#multi-purpose-container>briefly discuss that scenario later</a> as well, but for now let&rsquo;s assume that the page in the <code>&lt;iframe></code> is only accessed as an embedded element.</p><p>You&rsquo;ll need to do <strong>three</strong> things in the Google Tag Manager container of the <code>&lt;iframe></code> page.</p><ol><li>Create a Custom HTML tag that communicates with the parent page.</li><li>Update the settings for <strong>all</strong> of your Universal Analytics (and App+Web while you&rsquo;re at it) tags.</li><li>Update the triggers for your Universal Analytics tags so they don&rsquo;t fire until they&rsquo;ve received the Client ID from the parent.</li></ol><h3 id=the-custom-html-tag-1>The Custom HTML tag</h3><p>Create a new Custom HTML tag, and set it to fire on the <strong>All Pages</strong> trigger. If the <code>&lt;iframe></code> is a single-page app, you should still only fire the Custom HTML tag on the All Pages trigger, and not with every SPA page change, for example.</p><p>Here&rsquo;s what you should copy-paste into the tag:</p><div class=highlight><pre tabindex=0 style=background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-html data-lang=html><span style=display:flex><span>&lt;<span style=color:#1e90ff;font-weight:700>script</span>&gt;
+</span></span><span style=display:flex><span>  (<span style=color:#00a>function</span>() {
+</span></span><span style=display:flex><span>    <span style=color:#aaa;font-style:italic>// If not in iframe, do nothing
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>    <span style=color:#00a>try</span> {
+</span></span><span style=display:flex><span>      <span style=color:#00a>if</span> (<span style=color:#0aa>window</span>.top === <span style=color:#0aa>window</span>.self) <span style=color:#00a>return</span>;
+</span></span><span style=display:flex><span>    } <span style=color:#00a>catch</span>(e) {}
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#aaa;font-style:italic>// Set to false to prevent dataLayer messages from being sent to parent
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>    <span style=color:#00a>var</span> sendDataLayerMessages = <span style=color:#00a>true</span>;
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#aaa;font-style:italic>// Set the prefix that will be used in the event name, and under which all
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>    <span style=color:#aaa;font-style:italic>// the dataLayer properties will be embedded
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>    <span style=color:#00a>var</span> dataLayerMessagePrefix = <span style=color:#a50>&#39;iframe&#39;</span>;
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#aaa;font-style:italic>// Set to parent origin (&#34;https://www.domain.com&#34;)
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>    <span style=color:#00a>var</span> parentOrigin = <span style=color:#a50>&#39;https://www.parent-domain.com&#39;</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#aaa;font-style:italic>// Maximum time in milliseconds to poll the parent frame for ready signal
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>    <span style=color:#00a>var</span> maxTime = <span style=color:#099>2000</span>;
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#aaa;font-style:italic>// Don&#39;t touch anything that follows
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>    <span style=color:#00a>var</span> pollInterval = <span style=color:#099>200</span>;
+</span></span><span style=display:flex><span>    <span style=color:#00a>var</span> parentReady = <span style=color:#00a>false</span>;
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#00a>var</span> postCallback = <span style=color:#00a>function</span>(event) {
+</span></span><span style=display:flex><span>      <span style=color:#00a>if</span> (event.origin !== parentOrigin) <span style=color:#00a>return</span>;
+</span></span><span style=display:flex><span>      <span style=color:#00a>if</span> (event.data.event !== <span style=color:#a50>&#39;clientId&#39;</span> &amp;&amp; event.data !== <span style=color:#a50>&#39;parentReady&#39;</span>) <span style=color:#00a>return</span>;
+</span></span><span style=display:flex><span>      
+</span></span><span style=display:flex><span>      <span style=color:#00a>if</span> (event.data.event === <span style=color:#a50>&#39;clientId&#39;</span>) {
+</span></span><span style=display:flex><span>        <span style=color:#0aa>window</span>.dataLayer.push({
+</span></span><span style=display:flex><span>          event: <span style=color:#a50>&#39;clientId&#39;</span>,
+</span></span><span style=display:flex><span>          clientId: event.data.clientId
+</span></span><span style=display:flex><span>        });
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>      
+</span></span><span style=display:flex><span>      <span style=color:#00a>if</span> (event.data === <span style=color:#a50>&#39;parentReady&#39;</span> &amp;&amp; !parentReady) {
+</span></span><span style=display:flex><span>        <span style=color:#0aa>window</span>.clearInterval(poll);
+</span></span><span style=display:flex><span>        <span style=color:#00a>if</span> (sendDataLayerMessages) startDataLayerMessageCollection();
+</span></span><span style=display:flex><span>        parentReady = <span style=color:#00a>true</span>;
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>    };
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#00a>var</span> pollCallback = <span style=color:#00a>function</span>() {
+</span></span><span style=display:flex><span>      <span style=color:#aaa;font-style:italic>// If maximum time is reached, stop polling
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>      maxTime -= pollInterval;
+</span></span><span style=display:flex><span>      <span style=color:#00a>if</span> (maxTime &lt;= <span style=color:#099>0</span>) <span style=color:#0aa>window</span>.clearInterval(poll);
+</span></span><span style=display:flex><span>      <span style=color:#aaa;font-style:italic>// Send message to parent that iframe is ready to retrieve Client ID
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>      <span style=color:#0aa>window</span>.top.postMessage(<span style=color:#a50>&#39;childReady&#39;</span>, parentOrigin);
+</span></span><span style=display:flex><span>    };
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#00a>var</span> createMessage = <span style=color:#00a>function</span>(obj) {
+</span></span><span style=display:flex><span>      <span style=color:#00a>if</span> (!<span style=color:#0aa>Array</span>.isArray(obj) &amp;&amp; <span style=color:#00a>typeof</span> obj === <span style=color:#a50>&#39;object&#39;</span>) {
+</span></span><span style=display:flex><span>        <span style=color:#00a>var</span> flattenObj = JSON.parse(JSON.stringify(obj));
+</span></span><span style=display:flex><span>		<span style=color:#00a>var</span> message = {};
+</span></span><span style=display:flex><span>        <span style=color:#aaa;font-style:italic>// Add metadata about the page into the message
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>        message[dataLayerMessagePrefix] = {
+</span></span><span style=display:flex><span>          pageData: {
+</span></span><span style=display:flex><span>            url: <span style=color:#0aa>document</span>.location.href,
+</span></span><span style=display:flex><span>            title: <span style=color:#0aa>document</span>.title
+</span></span><span style=display:flex><span>          }
+</span></span><span style=display:flex><span>        };
+</span></span><span style=display:flex><span>        <span style=color:#00a>for</span> (<span style=color:#00a>var</span> prop <span style=color:#00a>in</span> flattenObj) {
+</span></span><span style=display:flex><span>          <span style=color:#00a>if</span> (flattenObj.hasOwnProperty(prop) &amp;&amp; prop !== <span style=color:#a50>&#39;gtm.uniqueEventId&#39;</span>) {
+</span></span><span style=display:flex><span>            <span style=color:#00a>if</span> (prop === <span style=color:#a50>&#39;event&#39;</span>) {
+</span></span><span style=display:flex><span>              message.event = dataLayerMessagePrefix + <span style=color:#a50>&#39;.&#39;</span> + flattenObj[prop];
+</span></span><span style=display:flex><span>            } <span style=color:#00a>else</span> {
+</span></span><span style=display:flex><span>              message[dataLayerMessagePrefix][prop] = flattenObj[prop];
+</span></span><span style=display:flex><span>            }
+</span></span><span style=display:flex><span>          }
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>        <span style=color:#00a>if</span> (!message.event) message.event = dataLayerMessagePrefix + <span style=color:#a50>&#39;.Message&#39;</span>;
+</span></span><span style=display:flex><span>        <span style=color:#00a>return</span> message;
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>      <span style=color:#00a>return</span> <span style=color:#00a>false</span>;
+</span></span><span style=display:flex><span>    };
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#00a>var</span> startDataLayerMessageCollection = <span style=color:#00a>function</span>() {
+</span></span><span style=display:flex><span>      <span style=color:#aaa;font-style:italic>// Send the current dataLayer content to top frame, flatten the object
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>      <span style=color:#0aa>window</span>.dataLayer.forEach(<span style=color:#00a>function</span>(obj) {
+</span></span><span style=display:flex><span>        <span style=color:#00a>var</span> message = createMessage(obj);
+</span></span><span style=display:flex><span>        <span style=color:#00a>if</span> (message) <span style=color:#0aa>window</span>.top.postMessage(message, parentOrigin);
+</span></span><span style=display:flex><span>      });
+</span></span><span style=display:flex><span>      <span style=color:#aaa;font-style:italic>// Create the push listener for future messages
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>      <span style=color:#00a>var</span> oldPush = <span style=color:#0aa>window</span>.dataLayer.push;
+</span></span><span style=display:flex><span>      <span style=color:#0aa>window</span>.dataLayer.push = <span style=color:#00a>function</span>() {
+</span></span><span style=display:flex><span>        <span style=color:#00a>var</span> states = [].slice.call(arguments, <span style=color:#099>0</span>);
+</span></span><span style=display:flex><span>        states.forEach(<span style=color:#00a>function</span>(arg) {
+</span></span><span style=display:flex><span>          <span style=color:#00a>var</span> message = createMessage(arg);
+</span></span><span style=display:flex><span>          <span style=color:#00a>if</span> (message) <span style=color:#0aa>window</span>.top.postMessage(message, parentOrigin);
+</span></span><span style=display:flex><span>        });
+</span></span><span style=display:flex><span>        <span style=color:#00a>return</span> oldPush.apply(<span style=color:#0aa>window</span>.dataLayer, states);
+</span></span><span style=display:flex><span>      };
+</span></span><span style=display:flex><span>    };
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#aaa;font-style:italic>// Start polling the parent page with &#34;childReady&#34; message
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>    <span style=color:#00a>var</span> poll = <span style=color:#0aa>window</span>.setInterval(pollCallback, pollInterval);
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#aaa;font-style:italic>// Start listening for messages from the parent page
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>    <span style=color:#0aa>window</span>.addEventListener(<span style=color:#a50>&#39;message&#39;</span>, postCallback);
+</span></span><span style=display:flex><span>  })();
+</span></span><span style=display:flex><span>&lt;/<span style=color:#1e90ff;font-weight:700>script</span>&gt;</span></span></code></pre></div><p>The following chapters will walk through this code. You can skip right to <a href=#google-analytics-tags>configuring the Google Analytics tags</a> if you don&rsquo;t care about the walkthrough.</p><h4 id=configuration-1>Configuration</h4><p>This is the first code block:</p><div class=highlight><pre tabindex=0 style=background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-javascript data-lang=javascript><span style=display:flex><span><span style=color:#aaa;font-style:italic>// If not in iframe, do nothing
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span><span style=color:#00a>try</span> {
+</span></span><span style=display:flex><span>  <span style=color:#00a>if</span> (<span style=color:#0aa>window</span>.top === <span style=color:#0aa>window</span>.self) <span style=color:#00a>return</span>;
+</span></span><span style=display:flex><span>} <span style=color:#00a>catch</span>(e) {}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic>// Set to false to prevent dataLayer messages from being sent to parent
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span><span style=color:#00a>var</span> sendDataLayerMessages = <span style=color:#00a>true</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic>// Set the prefix that will be used in the event name, and under which all
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic>// the dataLayer properties will be embedded
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span><span style=color:#00a>var</span> dataLayerMessagePrefix = <span style=color:#a50>&#39;iframe&#39;</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic>// Set to parent origin (&#34;https://www.domain.com&#34;)
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span><span style=color:#00a>var</span> parentOrigin = <span style=color:#a50>&#39;https://www.parent-domain.com&#39;</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic>// Maximum time in milliseconds to poll the parent frame for ready signal
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span><span style=color:#00a>var</span> maxTime = <span style=color:#099>2000</span>;</span></span></code></pre></div><p>First of all, if the page is <strong>not</strong> loaded in an <code>&lt;iframe></code>, the code does not and should not execute at all. There&rsquo;s no parent page to communicate with, so executing any of the following code would be unnecessary.</p><p>You can set <code>sendDataLayerMessages</code> to <code>false</code> if you <strong>don&rsquo;t</strong> want to forward the <code>dataLayer</code> messages from the child to the parent. This is useful if you&rsquo;re comfortable with tracking everything within the <code>&lt;iframe></code> itself, and don&rsquo;t want to bother with setting up the corresponding tags in the parent page.</p><p>The <code>dataLayerMessagePrefix</code> value is what will be used to namespace the <code>dataLayer</code> messages that are forwarded from the child to the parent (if you haven&rsquo;t disabled forwarding per the previous paragraph).</p><p>The <code>parentOrigin</code> should be set to the <strong>origin</strong> of the parent page, i.e. the page to which the messages are sent. Remember, <strong>origin</strong> is everything from the protocol to the first slash of the path component. In other words, the <strong>origin</strong> of <code>https://www.simoahava.com/some-page</code> is <code>https://www.simoahava.com</code>.</p><p>Finally, the <code>maxTime</code> is how long the <code>&lt;iframe></code> tries to send the <code>childReady</code> message to the parent before it stops.</p><h4 id=the-poller>The poller</h4><p>The child frame polls the parent page with the <code>childReady</code> message to signal it&rsquo;s ready for the bilateral communication to start.</p><div class=highlight><pre tabindex=0 style=background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-javascript data-lang=javascript><span style=display:flex><span><span style=color:#00a>var</span> pollCallback = <span style=color:#00a>function</span>() {
+</span></span><span style=display:flex><span>  <span style=color:#aaa;font-style:italic>// If maximum time is reached, stop polling
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>  maxTime -= pollInterval;
+</span></span><span style=display:flex><span>  <span style=color:#00a>if</span> (maxTime &lt;= <span style=color:#099>0</span>) <span style=color:#0aa>window</span>.clearInterval(poll);
+</span></span><span style=display:flex><span>  <span style=color:#aaa;font-style:italic>// Send message to parent that iframe is ready to retrieve Client ID
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>  <span style=color:#0aa>window</span>.top.postMessage(<span style=color:#a50>&#39;childReady&#39;</span>, parentOrigin);
+</span></span><span style=display:flex><span>};
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic>// Start polling the parent page with &#34;childReady&#34; message
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span><span style=color:#00a>var</span> poll = <span style=color:#0aa>window</span>.setInterval(pollCallback, pollInterval);</span></span></code></pre></div><p>It runs every 200 milliseconds until the maximum poll time (2000 milliseconds by default) is reached.</p><h4 id=the-listener-1>The listener</h4><p>At the same time as it starts polling, a <code>postMessage</code> listener is also initiated. This listener waits for two things:</p><ol><li>The parent to signal <code>parentReady</code>, so that the <code>&lt;iframe></code> can start forwarding its <code>dataLayer messages to the parent</code>.</li><li>The parent to return a Client ID string, so that the <code>&lt;iframe></code> can use this in Google Analytics tags.</li></ol><div class=highlight><pre tabindex=0 style=background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-javascript data-lang=javascript><span style=display:flex><span><span style=color:#00a>var</span> postCallback = <span style=color:#00a>function</span>(event) {
+</span></span><span style=display:flex><span>  <span style=color:#00a>if</span> (event.origin !== parentOrigin) <span style=color:#00a>return</span>;
+</span></span><span style=display:flex><span>  <span style=color:#00a>if</span> (event.data.event !== <span style=color:#a50>&#39;clientId&#39;</span> &amp;&amp; event.data !== <span style=color:#a50>&#39;parentReady&#39;</span>) <span style=color:#00a>return</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#00a>if</span> (event.data.event === <span style=color:#a50>&#39;clientId&#39;</span>) {
+</span></span><span style=display:flex><span>    <span style=color:#0aa>window</span>.dataLayer.push({
+</span></span><span style=display:flex><span>      event: <span style=color:#a50>&#39;clientId&#39;</span>,
+</span></span><span style=display:flex><span>      clientId: event.data.clientId
+</span></span><span style=display:flex><span>    });
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#00a>if</span> (event.data === <span style=color:#a50>&#39;parentReady&#39;</span> &amp;&amp; !parentReady) {
+</span></span><span style=display:flex><span>    <span style=color:#0aa>window</span>.clearInterval(poll);
+</span></span><span style=display:flex><span>    <span style=color:#00a>if</span> (sendDataLayerMessages) startDataLayerMessageCollection();
+</span></span><span style=display:flex><span>    parentReady = <span style=color:#00a>true</span>;
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>};
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic>// Start listening for messages from the parent page
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span><span style=color:#0aa>window</span>.addEventListener(<span style=color:#a50>&#39;message&#39;</span>, postCallback);</span></span></code></pre></div><p>If the parent sends a <code>clientId</code> message, then the page pushes this data into <code>dataLayer</code>, and Google Analytics tags firing in the <code>&lt;iframe></code> can utilize this information in their settings.</p><p>If the parent sends a <code>parentReady</code> message, the <code>&lt;iframe></code> stops sending the <code>childReady</code> message. Then, it fires up the <code>dataLayer</code> message forwarder (unless the user has chosen to prevent this).</p><h4 id=the-message-forwarder>The message forwarder</h4><p>The forwarder comprises two methods: <code>createMessage(obj)</code> and <code>startDataLayerMessageCollection()</code>.</p><p>Without going into too much detail, the basic setup is this:</p><ol><li>The <code>createMessage()</code> method is a utility that wraps the <code>dataLayer</code> message from the <code>&lt;iframe></code> page with the prefix configured in the beginning of the Custom HTML tag (<code>"iframe"</code>) by default. This prefix is used with the event name (so <code>gtm.js</code> becomes <code>iframe.gtm.js</code>) as well as with the object itself (so <code>{key: 'value'}</code> becomes <code>{iframe: {key: value}}</code>).</li><li>The <code>createMessage()</code> method also automatically adds a <code>pageData</code> object which contains the <code>url</code> and <code>title</code> of the page in the <code>&lt;iframe></code>.</li><li>The <code>startDataLayerMessageCollection()</code> method first sends everything in the <code>dataLayer</code> array collected thus far to the parent.</li><li>Then the method rewrites the <code>dataLayer.push</code> function to send everything pushed into <code>dataLayer</code> to the parent page as well.</li></ol><p>In other words, everything added to the <code>dataLayer</code> array within the <code>&lt;iframe></code> is forwarded to the parent page, so that the parent page can handle tracking of interactions and events within the <code>&lt;iframe></code> as well.</p><p>For example, here&rsquo;s how the forwarded transpiles and sends a <code>dataLayer</code> message to the parent page.</p><div class=highlight><pre tabindex=0 style=background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-javascript data-lang=javascript><span style=display:flex><span><span style=color:#aaa;font-style:italic>// This is what&#39;s pushed into dataLayer:
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>{
+</span></span><span style=display:flex><span>  event: <span style=color:#a50>&#39;userLogin&#39;</span>,
+</span></span><span style=display:flex><span>  user: {
+</span></span><span style=display:flex><span>    id: <span style=color:#a50>&#39;abcd-1234&#39;</span>,
+</span></span><span style=display:flex><span>    status: <span style=color:#a50>&#39;gold&#39;</span>
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic>// This is what&#39;s sent to the parent page
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>{
+</span></span><span style=display:flex><span>  event: <span style=color:#a50>&#39;iframe.userLogin&#39;</span>,
+</span></span><span style=display:flex><span>  iframe: {
+</span></span><span style=display:flex><span>    pageData: {
+</span></span><span style=display:flex><span>      url: <span style=color:#a50>&#39;https://www.iframe-domain.com/iframe-page/&#39;</span>,
+</span></span><span style=display:flex><span>      title: <span style=color:#a50>&#39;Iframe Page Title&#39;</span>
+</span></span><span style=display:flex><span>    },
+</span></span><span style=display:flex><span>    user: {
+</span></span><span style=display:flex><span>      id: <span style=color:#a50>&#39;abcd-1234&#39;</span>,
+</span></span><span style=display:flex><span>      status: <span style=color:#a50>&#39;gold&#39;</span>
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>}</span></span></code></pre></div><h3 id=google-analytics-tags>Google Analytics tags</h3><p>If you <strong>do</strong> want to collect data to Google Analytics from within the <code>&lt;iframe></code> page, you need to configure <strong>all</strong> your Google Analytics tags with the following settings:</p><div style=aspect-ratio:1786/1138 class="figure nocaption"><a href=/images/2020/02/iframe-google-analytics-settings.jpg title="Iframe google analytics settings"><img class=fig-img height=1138 width=1786 loading=lazy src=/images/2020/02/iframe-google-analytics-settings.jpg#ZgotmplZ alt="Iframe google analytics settings"></a></div><p>As the <code>&lt;iframe></code> will no longer use cookies to persist the Client ID, you need to set the <code>storage</code> field value to <code>none</code>.</p><p>Then, because the child frame uses the Client ID pushed into <code>dataLayer</code> by the message listener, you&rsquo;ll need to update the <code>clientId</code> field to use a Data Layer variable for <code>clientId</code>. It should look like this:</p><div style=aspect-ratio:2354/1208 class="figure nocaption"><a href=/images/2020/02/dlv-clientid.jpg title="Client ID in Data Layer"><img class=fig-img height=1208 width=2354 loading=lazy src=/images/2020/02/dlv-clientid.jpg#ZgotmplZ alt="Client ID in Data Layer"></a></div><p>None of your tags should fire if the Client ID is not yet available. You can use the <code>clientId</code> in a Custom Event trigger to fire your tags when Client ID has been pushed to <code>dataLayer</code>.</p><div style=aspect-ratio:2258/1080 class="figure nocaption"><a href=/images/2020/02/custom-event-trigger.jpg title="Custom Event trigger"><img class=fig-img height=1080 width=2258 loading=lazy src=/images/2020/02/custom-event-trigger.jpg#ZgotmplZ alt="Custom Event trigger"></a></div><p>You can also update your existing triggers to not fire until <code>clientId</code> has a valid value.</p><div style=aspect-ratio:1862/1126 class="figure nocaption"><a href=/images/2020/02/clientid-not-undefined.jpg title="Client ID not undefined"><img class=fig-img height=1126 width=1862 loading=lazy src=/images/2020/02/clientid-not-undefined.jpg#ZgotmplZ alt="Client ID not undefined"></a></div><h4 id=multi-purpose-container>Multi-purpose container</h4><p>One important caveat to note is that if you set up all your tags per the instructions in the previous chapter, then the container running in the <code>&lt;iframe></code> will not function properly if the page is visited directly as a top-level page, i.e. not as an embed.</p><p>I would generally recommend to avoid mixing too many use cases in a single container. It might be wiser to create a <em>different</em> container for scenarios where the page is visited directly, and have the developers update the site code to load the correct container, depending on whether the page is embedded in an <code>&lt;iframe></code> or not.</p><p>However, if you do want the container to cater to different use cases, then a good idea is to create a separate set of tags for when the page is accessed in the top frame vs. when the page is accessed as an embed.</p><p>You can use a simple utility variable to check if the page is accessed as an <code>&lt;iframe></code> or not. This Custom JavaScript variable returns <code>true</code> if the page <strong>is NOT in an <code>&lt;iframe></code></strong> and <code>false</code> otherwise.</p><div class=highlight><pre tabindex=0 style=background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-javascript data-lang=javascript><span style=display:flex><span><span style=color:#00a>function</span>() {
+</span></span><span style=display:flex><span>  <span style=color:#00a>try</span> {
+</span></span><span style=display:flex><span>    <span style=color:#00a>return</span> <span style=color:#0aa>window</span>.top === <span style=color:#0aa>window</span>.self;
+</span></span><span style=display:flex><span>  } <span style=color:#00a>catch</span>(e) { <span style=color:#00a>return</span> <span style=color:#00a>false</span>; }
+</span></span><span style=display:flex><span>}</span></span></code></pre></div><p>You can then check for this variable value in your tags, triggers, and variables, to make sure that tracking is configured correctly depending on how the page is accessed.</p><h2 id=summary>Summary</h2><p>This has been a difficult article to write, and I feel a bit embarrassed to leave so much work to you, my noble reader.</p><p>The thing is - working with this type of a bilateral messaging setup requires both the parent page and the <code>&lt;iframe></code> page to be in sync. The Custom HTML tags I&rsquo;ve designed have been built to naturally reject race conditions, but it&rsquo;s possible you&rsquo;ll need to modify one or the other (or both) to make things work on your site.</p><p>Over the course of my career, and especially over the time I&rsquo;ve been blogging about Google Tag Manager, trying to perfect tracking of <code>&lt;iframe></code> elements has been my personal Mount Everest. Cross-site tracking of embedded content has take over my life to such an extent that I&rsquo;m losing sleep and seriously considering hunting down Ibrahim or Isabella Frame, or whoever the person is who thought the <code>&lt;iframe></code> is a great addition to the HTML spec.</p><p>Regardless, it&rsquo;s still <em>such a common use case</em> on the SaaS- and micro service -rich web to embed cross-site content. Naturally, there&rsquo;s an incentive to know what happens in these <code>&lt;iframe></code> blocks that I consider the time I&rsquo;ve spent trying to solve this particular riddle to be almost worthwhile.</p><p>Anyway, I expect <em>and hope</em> that you have comments and/or questions about this setup. Let&rsquo;s continue the discussion in the comments of this article, thank you!</p></div></div><div id=post-footer class="post-footer main-content-wrap"><div class=post-footer-tags><span class="text-color-light text-small">TAGGED IN</span><br><a class="tag tag--primary tag--small" href=/tags/google-tag-manager/>google tag manager</a>
+<a class="tag tag--primary tag--small" href=/tags/cross-domain-tracking/>cross-domain tracking</a>
+<a class="tag tag--primary tag--small" href=/tags/iframe/>iframe</a>
+<a class="tag tag--primary tag--small" href=/tags/postmessage/>postmessage</a>
+<a class="tag tag--primary tag--small" href=/tags/cookie/>cookie</a></div><div class=post-actions-wrap><nav><ul class="post-actions post-action-nav"><li class=post-action><a class="post-action-btn btn btn--default" href=/analytics/create-slack-notification-system-google-tag-manager-changes/><i class="fa fa-angle-left"></i>
+<span class="hide-xs hide-sm text-small icon-ml">NEXT</span></a></li><li class=post-action><a class="post-action-btn btn btn--default" href=/gtm-tips/collect-isp-custom-dimension-google-analytics/><span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+<i class="fa fa-angle-right"></i></a></li></ul></nav><ul class="post-actions post-action-share"><li class="post-action hide-lg hide-md hide-sm"><a class="post-action-btn btn btn--default btn-open-shareoptions" href=#btn-open-shareoptions><i class="fa fa-share-alt"></i></a></li><li class="post-action hide-xs"><a class="post-action-btn btn btn--default" target=new href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/cookieless-tracking-cross-site-iframes/"><i class="fa fa-brands fa-facebook"></i></a></li><li class="post-action hide-xs"><a class="post-action-btn btn btn--default" target=new href="https://twitter.com/intent/tweet?text=Cookieless%20Tracking%20For%20Cross-site%20Iframes%20https://www.simoahava.com/analytics/cookieless-tracking-cross-site-iframes/%20via%20@SimoAhava"><i class="fa fa-brands fa-twitter"></i></a></li><li class="post-action hide-xs"><a class="post-action-btn btn btn--default" target=new href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/cookieless-tracking-cross-site-iframes/"><i class="fa fa-brands fa-linkedin"></i></a></li><li class=post-action><a class="post-action-btn btn btn--default" href=#commento><i class="fa-regular fa-comments"></i></a></li><li class=post-action><a class="post-action-btn btn btn--default" href=#><i class="fa fa-search"></i></a></li></ul></div><a name=commento></a><comentario-comments></comentario-comments></div></article><footer id=footer class=main-content-wrap><span class=copyrights>&copy; 2026 Simo Ahava. All Rights Reserved</span></footer></div><div id=bottom-bar class=post-bottom-bar data-behavior=4><div class=post-actions-wrap><nav><ul class="post-actions post-action-nav"><li class=post-action><a class="post-action-btn btn btn--default" href=/analytics/create-slack-notification-system-google-tag-manager-changes/><i class="fa fa-angle-left"></i>
+<span class="hide-xs hide-sm text-small icon-ml">NEXT</span></a></li><li class=post-action><a class="post-action-btn btn btn--default" href=/gtm-tips/collect-isp-custom-dimension-google-analytics/><span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+<i class="fa fa-angle-right"></i></a></li></ul></nav><ul class="post-actions post-action-share"><li class="post-action hide-lg hide-md hide-sm"><a class="post-action-btn btn btn--default btn-open-shareoptions" href=#btn-open-shareoptions><i class="fa fa-share-alt"></i></a></li><li class="post-action hide-xs"><a class="post-action-btn btn btn--default" target=new href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/cookieless-tracking-cross-site-iframes/"><i class="fa fa-brands fa-facebook"></i></a></li><li class="post-action hide-xs"><a class="post-action-btn btn btn--default" target=new href="https://twitter.com/intent/tweet?text=Cookieless%20Tracking%20For%20Cross-site%20Iframes%20https://www.simoahava.com/analytics/cookieless-tracking-cross-site-iframes/%20via%20@SimoAhava"><i class="fa fa-brands fa-twitter"></i></a></li><li class="post-action hide-xs"><a class="post-action-btn btn btn--default" target=new href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/cookieless-tracking-cross-site-iframes/"><i class="fa fa-brands fa-linkedin"></i></a></li><li class=post-action><a class="post-action-btn btn btn--default" href=#commento><i class="fa-regular fa-comments"></i></a></li><li class=post-action><a class="post-action-btn btn btn--default" href=#><i class="fa fa-search"></i></a></li></ul></div></div><div id=share-options-bar class=share-options-bar data-behavior=4><i id=btn-close-shareoptions class="fa fa-close"></i><ul class=share-options><li class=share-option><a class=share-option-btn target=new href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/cookieless-tracking-cross-site-iframes/"><i class="fa fa-brands fa-facebook"></i><span>Share on Facebook</span></a></li><li class=share-option><a class=share-option-btn target=new href="https://twitter.com/intent/tweet?text=Cookieless%20Tracking%20For%20Cross-site%20Iframes%20https://www.simoahava.com/analytics/cookieless-tracking-cross-site-iframes/%20via%20@SimoAhava"><i class="fa fa-brands fa-twitter"></i><span>Share on Twitter</span></a></li><li class=share-option><a class=share-option-btn target=new href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/cookieless-tracking-cross-site-iframes/"><i class="fa fa-brands fa-linkedin"></i><span>Share on LinkedIn</span></a></li></ul></div><div id=share-options-mask class=share-options-mask></div></div><div id=about><div id=about-card><div id=about-btn-close><i class="fa fa-remove"></i></div><img id=about-card-picture src=https://www.simoahava.com/images/simo.png alt="Author's picture"><h4 id=about-card-name>Simo Ahava</h4><div id=about-card-bio>Husband | Father | Analytics developer<br>simo (at) simoahava.com</div><div id=about-card-job><i class="fa fa-briefcase"></i><br>Senior Data Advocate at Reaktor</div><div id=about-card-location><i class="fa fa-map-marker"></i><br>Finland</div></div></div><div id=cover style=background-image:url(https://www.simoahava.com/images/maisema.jpg)></div><script defer src=https://comentario.simoahava.com/comentario.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin=anonymous referrerpolicy=no-referrer></script><script defer src=/js/script.js></script><script>!function(){var e=document.querySelector(".simmer"),t=document.querySelector(".simmer .close"),n=window.sessionStorage&&window.sessionStorage.getItem("nosimmer");e&&(n&&(e.style.display="none"),t&&t.addEventListener("click",function(){window.sessionStorage.setItem("nosimmer","true"),e.style.display="none"}))}()</script></body></html>

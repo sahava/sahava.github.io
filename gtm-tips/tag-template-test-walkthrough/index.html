@@ -1,1087 +1,289 @@
-
-
-  
-    
-  
-
-
-  
-
-
-
-
-
-  
-
-
-  
-
-<!DOCTYPE html>
-<html lang="en-us">
-  <head>
-    <meta name="google-site-verification" content="xQwWI2KUfP9LbFKhw2CVLFtrMY6Czrla7L3PD2aBolA" />
-
-
-<script type="application/ld+json">
-{
-  "@context": "http://schema.org", 
-  "@type": "BlogPosting",
-  "headline": "#GTMTips: Walkthrough Of Custom Template Tests | Simo Ahava's blog",
-  "image": "https:\/\/www.simoahava.com\/images\/2019\/11\/walkthrough-custom-template-tests.jpg",
-  "editor": "Simo Ahava",
-  "publisher": {
-    "@type": "Organization",
-    "name": "Simo Ahava's blog",
-    "logo": {
-      "@type": "ImageObject",
-      "url": "https:\/\/www.simoahava.com\/images\/simo.png",
-      "height": "393",
-      "width": "407"
-    }
-  },
-  "url": "https:\/\/www.simoahava.com\/gtm-tips\/tag-template-test-walkthrough\/",
-  "datePublished": "2019-11-20T07:00:00\u002b02:00",
-  "dateModified": "2019-11-20T07:00:00\u002b02:00",
-  "description": "Walkthrough of how to build custom template unit tests for tag templates and for variable templates in Google Tag Manager.",
-  "author": {
-    "@type": "Person",
-    "name": "Simo Ahava"
-  }
-}
-</script>
-
-
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    
-    <title>#GTMTips: Walkthrough Of Custom Template Tests | Simo Ahava's blog</title>
-    
-    <script>
-      window.dataLayer=window.dataLayer||[];window.dataLayer.push({pageType: 'article', environment:  null });
-    </script>
-    
-
-    
-    
-    
-    <script>
-      (function(S,i,m,o){
-        window[m]=window[m]||[];
-        window[m].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
-        var f=S.getElementsByTagName(i)[0],j=S.createElement(i),dl=m!='dataLayer'?'&l='+m:'';
-        j.async=true;
-        j.src='https://sgtm.simoahava.com/gtm.js?id='+o+dl;
-        f.parentNode.insertBefore(j,f);
-      })(document,'script','dataLayer','GTM-PZ7GMV9');
-    </script>
-    
-    <meta name="author" content="Simo Ahava">
-    <meta name="keywords" content="">
-
-    <link rel="icon" href="https://www.simoahava.com/images/favicon.ico">
-    
-    <link rel="amphtml" href="https://www.simoahava.com/amp/gtm-tips/tag-template-test-walkthrough/">
-    
-    <meta name="description" content="Walkthrough of how to build custom template unit tests for tag templates and for variable templates in Google Tag Manager.">
-    <meta property="og:description" content="Walkthrough of how to build custom template unit tests for tag templates and for variable templates in Google Tag Manager.">
-    <meta property="og:type" content="blog">
-    <meta property="og:title" content="#GTMTips: Walkthrough Of Custom Template Tests">
-    <meta property="og:url" content="https://www.simoahava.com/gtm-tips/tag-template-test-walkthrough/">
-    <meta property="og:site_name" content="Simo Ahava&#39;s blog">
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="#GTMTips: Walkthrough Of Custom Template Tests">
-    <meta name="twitter:description" content="Walkthrough of how to build custom template unit tests for tag templates and for variable templates in Google Tag Manager.">
-    
-      <meta name="twitter:creator" content="@SimoAhava">
-      
-    
-
-    
-    
-
-    
-      <meta name="twitter:image" content="https://www.simoahava.com/images/2019/11/walkthrough-custom-template-tests.jpg">  
-      <meta property="og:image" content="https://www.simoahava.com/images/2019/11/walkthrough-custom-template-tests.jpg">
-    
-
-
-    
-
-      
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-      
-    
-    <link rel="stylesheet" href="https://www.simoahava.com/css/style.css" />
-    
-    
-
-    
-      
-    
-    
-  </head>
-
-  <body>
-    
-    <div id="_progress"></div>
-    
-    <div id="blog">
-      <header id="header" data-behavior="4">
-  <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
-  <div class="header-title">
-    <a class="header-title-link" href="https://www.simoahava.com/">Simo Ahava&#39;s blog</a>
-  </div>
-  
-</header>
-
-      <nav id="sidebar" data-behavior="4">
-  <div class="sidebar-container">
-    
-      <div class="sidebar-profile">
-        <a href="https://www.simoahava.com/">
-          <img class="sidebar-profile-picture" loading="lazy" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
-        </a>
-        <h4 class="sidebar-profile-name">Simo Ahava</h4>
-        
-          <h5 class="sidebar-profile-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</h5>
-        
-      </div>
-    
-    <ul class="sidebar-buttons">
-      
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-home"></i>
-      
-      <span class="sidebar-button-desc">Home</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
-      
-      <span class="sidebar-button-desc">Categories</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/tags/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
-      
-      <span class="sidebar-button-desc">Tags</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/gtm-tips/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-magic"></i>
-      
-      <span class="sidebar-button-desc">GTM Tips</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/about-simo-ahava/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-question"></i>
-      
-      <span class="sidebar-button-desc">About</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
-      
-      <span class="sidebar-button-desc">RSS</span>
-    </a>
-  </li>
-
-
-    </ul>
-    <ul class="sidebar-buttons">
-      
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/tools/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-wrench"></i>
-      
-      <span class="sidebar-button-desc">Tools</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/blog-statistics/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-bar-chart"></i>
-      
-      <span class="sidebar-button-desc">Blog statistics</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://github.com/sahava" target="_blank" rel="noopener ">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-brands fa-github"></i>
-      
-      <span class="sidebar-button-desc">GitHub</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/upcoming-talks/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-bullhorn"></i>
-      
-      <span class="sidebar-button-desc">Upcoming talks</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/custom-templates/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
-      
-      <span class="sidebar-button-desc">Templates</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/newsletter/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-bell"></i>
-      
-      <span class="sidebar-button-desc">Newsletter</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://masto.measure.chat/@SimoAhava" target="_blank" rel="noopener me">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-brands fa-mastodon"></i>
-      
-      <span class="sidebar-button-desc">Mastodon</span>
-    </a>
-  </li>
-
-
-    </ul>
-    <ul class="sidebar-buttons">
-      
-
-    </ul>
-  </div>
-</nav>
-
-      
-
-      <div id="main" data-behavior="4"
-        class="
-               hasCoverMetaIn
-               ">
-        <article class="post">
-	  <form id="search" action="https://www.simoahava.com/search/">
-  <input name="q" type="text" class="form-control input--xlarge" placeholder="Search blog..." autocomplete="off">
-  </form>
-
-          <div class="post-header main-content-wrap text-left">
-  
-  
-
-    <h1>
-      #GTMTips: Walkthrough Of Custom Template Tests
-    </h1>
-  
-  
-  <div class="postShorten-meta post-meta">
-    
-      <time datetime="2019-11-20T07:00:00&#43;02:00">
-        
-  November 20, 2019
-
-      </time>
-      
-      
-  
-  
-    <span>in</span>
-    
-      <a class="category-link" href="https://www.simoahava.com/categories/gtm-tips">GTM Tips</a>
-    
-  
-
-
-      | <a href="https://www.simoahava.com/gtm-tips/tag-template-test-walkthrough/#commento"><comentario-count path="/gtm-tips/tag-template-test-walkthrough/" 
-                  placeholder="..."
-                  error-text="N/A "
-                  zero-text="0 "
-                  prefix=""
-                  suffix=" "></comentario-count>Comments</a>
-      
-  </div>
-
-
-</div>
-
-          <div class="post-content markdown">
-            <div class="main-content-wrap">
-	      
-                
-  	        <p><a href="https://tagmanager.google.com/">Google Tag Manager</a> now lets you add <strong>unit tests</strong> directly to your <a href="https://www.simoahava.com/analytics/custom-templates-guide-for-google-tag-manager/">custom templates</a>. This is useful, since it allows you to control the code stability of your templates, especially if you&rsquo;ve decided to <a href="https://www.simoahava.com/analytics/introducing-tag-manager-template-gallery/">share those templates with the public</a>.</p>
-<p>I recently shared <a href="https://www.simoahava.com/analytics/writing-tests-for-custom-templates-google-tag-manager/">a general guide</a> for how template tests work, but I wanted to expand the topic a little, and share with you two walkthroughs of custom template tests: one for a <strong>variable template</strong> and one for a <strong>tag template</strong>.</p>
-<p>There&rsquo;s a <a href="https://youtu.be/UZ8vyFbYJcY">video</a> if you prefer a more visual way to walk through these steps.</p>
-
-<div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
-  <iframe src="https://www.youtube-nocookie.com/embed/UZ8vyFbYJcY" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen title="YouTube Video"></iframe>
-</div>
-
-
-                <span class="simmer">
-  <span class="close">X</span>
-  <p>
-    <span class="fa fa-md fa-bell"></span>
-    <strong>The Simmer Newsletter</strong>
-  </p>
-  <p>
-    Subscribe to the <a href="https://www.simoahava.com/newsletter/">Simmer newsletter</a> to get the latest news and content from Simo Ahava into your email inbox!
-  </p>
-  </span>
-
-                
-                  <h2 id="tip-107-how-to-build-tag-and-variable-template-tests">Tip 107: How to build tag and variable template tests</h2>
-
-
-
-<div style="aspect-ratio: 960 / 540;" class="figure nocaption">
-  
-    <a href="https://www.simoahava.com/images/2019/11/walkthrough-custom-template-tests.jpg" title="Walkthrough of custom template tests">
-  
-    <img class="fig-img" height="540" width="960" loading="lazy" src="https://www.simoahava.com/images/2019/11/walkthrough-custom-template-tests.jpg#ZgotmplZ" alt="Walkthrough of custom template tests">
-  
-    </a>
-  
-  
-</div>
-
-
-<p>Let&rsquo;s get started. We&rsquo;ll kick things off with a <strong>variable template</strong>.</p>
-<h3 id="variable-template-string-from-array-of-objects">Variable template: String from array of objects</h3>
-<p>This walkthrough will utilize my <a href="https://tagmanager.google.com/gallery/#/owners/gtm-templates-simo-ahava/templates/string-from-array-of-objects">String from array of objects</a> template.</p>
-
-
-
-<div style="aspect-ratio: 926 / 572;" class="figure nocaption">
-  
-    <a href="https://www.simoahava.com/images/2019/11/string-from-array-objects.jpg" title="String from array of templates">
-  
-    <img class="fig-img" height="572" width="926" loading="lazy" src="https://www.simoahava.com/images/2019/11/string-from-array-objects.jpg#ZgotmplZ" alt="String from array of templates">
-  
-    </a>
-  
-  
-</div>
-
-
-<p>The template is very simple. It takes a GTM variable as an input, where the variable must return an <strong>array of objects</strong> (e.g. <code>[{id: '123'},{id: '234'}]</code>).</p>
-<p>Then, the user specifies which property from the objects they want to concatenate the values of into a string (e.g. <code>id</code>), and finally they can specify a <strong>delimiter</strong> other than <code>,</code>. The end result would be something like <code>'123,234'</code> if following the example from the previous paragraph.</p>
-<p>Here is the template code in all its simplicity:</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">const</span> callInWindow = require(<span style="color:#a50">&#39;callInWindow&#39;</span>);
-<span style="color:#00a">const</span> getType = require(<span style="color:#a50">&#39;getType&#39;</span>);
-
-<span style="color:#00a">const</span> inputArray = data.inputArray;
-<span style="color:#00a">const</span> keyToConcatenate = data.keyToConcatenate;
-<span style="color:#00a">const</span> delimiter = data.delimiter;
-
-<span style="color:#aaa;font-style:italic">// If not an array, return undefined
-</span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">if</span> (getType(inputArray) !== <span style="color:#a50">&#39;array&#39;</span>) {
-  <span style="color:#00a">return</span>;
-}
-
-<span style="color:#00a">return</span> inputArray
-  .map(obj =&gt; obj[keyToConcatenate])
-  .filter(obj =&gt; obj)
-  .join(delimiter);
-</code></pre></div>
-<p>When we deconstruct the variable code, there are <strong>four</strong> different things that can happen.</p>
-<ol>
-<li><strong>The input is not an array</strong>, in which case the <code>getType()</code> check succeeds and the variable returns <code>undefined</code>.</li>
-<li><strong>The array does not have any objects within</strong>, in which case the <code>.map()</code> and <code>.filter()</code> calls end up returning an empty array, which is then turned into an <strong>empty string</strong> by <code>.join()</code>.</li>
-<li><strong>The array has objects but none of them has the specified key</strong>, in which case the <code>.map()</code> and <code>.filter()</code> calls end up returning an empty array, which is then turned into an <strong>empty string</strong> by <code>.join()</code>.</li>
-<li><strong>The array has at least one object with the given key</strong>, in which case the variable returns a string where the key values are concatenated into a string using the delimiter.</li>
-</ol>
-<p>In other words, we need <strong>four tests</strong>.</p>
-<h4 id="test-1-return-undefined-if-not-array">Test 1: Return undefined if not array</h4>
-<p>If the variable is not an array, the variable returns <code>undefined</code>. To test this, we create a <strong>mock</strong> data object, where we pass a non-array as the input.</p>
-<p>This is what the test looks like:</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#aaa;font-style:italic">// Call runCode to run the template&#39;s code.
-</span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">const</span> mockData = {
-  inputArray: <span style="color:#a50">&#39;notAnArray&#39;</span>,
-  keyToConcatenate: <span style="color:#a50">&#39;name&#39;</span>,
-  delimiter: <span style="color:#a50">&#39;,&#39;</span>
-};
-
-<span style="color:#00a">const</span> variableResult = runCode(mockData);
-
-<span style="color:#aaa;font-style:italic">// Verify that the variable returns a result.
-</span><span style="color:#aaa;font-style:italic"></span>assertThat(variableResult).isUndefined();
-</code></pre></div>
-<p>The <code>mockData</code> object has the <code>inputArray</code> set to a <strong>string</strong>, which is not an array. This object is passed to <code>runCode()</code>, which executes the variable template <em>as if</em> the user had created the template with the non-array as the input.</p>
-<p>Finally, the result of <code>runCode()</code> is asserted by passing the test if the return value of the variable is <code>undefined</code>, by using the <code>isUndefined()</code> assertion.</p>
-<h4 id="test-2-return-empty-string-if-no-objects-in-array">Test 2: Return empty string if no objects in array</h4>
-<p>In the next test, we need to create a scenario where the user does provide an array (so the <code>getType()</code> check doesn&rsquo;t catch it), but this array will have no objects within. In that case, the variable would return an empty string.</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#aaa;font-style:italic">// Call runCode to run the template&#39;s code.
-</span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">const</span> mockData = {
-  inputArray: [<span style="color:#099">1</span>, <span style="color:#099">2</span>, <span style="color:#099">3</span>],
-  keyToConcatenate: <span style="color:#a50">&#39;name&#39;</span>,
-  delimiter: <span style="color:#a50">&#39;,&#39;</span>
-};
-
-<span style="color:#00a">const</span> expected = <span style="color:#a50">&#39;&#39;</span>;
-
-<span style="color:#00a">const</span> variableResult = runCode(mockData);
-
-<span style="color:#aaa;font-style:italic">// Verify that the variable returns a result.
-</span><span style="color:#aaa;font-style:italic"></span>assertThat(variableResult).isEqualTo(expected);
-</code></pre></div>
-<p>Here we use the <code>expected</code> constant to make it easier to manage and read the code. Again, the mock data object is passed to <code>runCode()</code>, and the variable result is then asserted with the <code>isEqualTo()</code> check, this time passing the test if the variable result is exactly an empty string.</p>
-<h4 id="test-3-return-empty-string-if-objects-in-array-do-not-have-the-key">Test 3: Return empty string if objects in array do not have the key</h4>
-<p>To be fair, this could be bundled up with the previous test, because they test the same lines of code and the end result is the same.</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#aaa;font-style:italic">// Call runCode to run the template&#39;s code.
-</span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">const</span> mockData = {
-  inputArray: [{id: <span style="color:#a50">&#39;123&#39;</span>},{category: <span style="color:#a50">&#39;shoes&#39;</span>}],
-  keyToConcatenate: <span style="color:#a50">&#39;name&#39;</span>,
-  delimiter: <span style="color:#a50">&#39;,&#39;</span>
-};
-
-<span style="color:#00a">const</span> expected = <span style="color:#a50">&#39;&#39;</span>;
-
-<span style="color:#00a">const</span> variableResult = runCode(mockData);
-
-<span style="color:#aaa;font-style:italic">// Verify that the variable returns a result.
-</span><span style="color:#aaa;font-style:italic"></span>assertThat(variableResult).isEqualTo(expected);
-</code></pre></div>
-<p>As you can see from the mock object, we are looking for the key <code>name</code> in the objects of the array. Neither one of the objects in the <code>inputArray</code> has that key.</p>
-<p>Once this mock object is passed to <code>runCode()</code>, the variable code is executed, and the variable ends up returning an empty string. This is asserted by checking the result against the <code>expected</code> value of <code>''</code>.</p>
-<h4 id="test-4-return-concatenated-string-with-delimiter-for-valid-object-keys">Test 4: Return concatenated string with delimiter for valid object keys</h4>
-<p>The last test is the only <strong>positive</strong> check we need to do.</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#aaa;font-style:italic">// Call runCode to run the template&#39;s code.
-</span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">const</span> mockData = {
-  inputArray: [{name: <span style="color:#a50">&#39;firstName&#39;</span>},{name: <span style="color:#a50">&#39;secondName&#39;</span>}],
-  keyToConcatenate: <span style="color:#a50">&#39;name&#39;</span>,
-  delimiter: <span style="color:#a50">&#39;,&#39;</span>
-};
-
-<span style="color:#00a">const</span> expected = <span style="color:#a50">&#39;firstName,secondName&#39;</span>;
-
-<span style="color:#00a">const</span> variableResult = runCode(mockData);
-
-<span style="color:#aaa;font-style:italic">// Verify that the variable returns a result.
-</span><span style="color:#aaa;font-style:italic"></span>assertThat(variableResult).isEqualTo(expected);
-</code></pre></div>
-<p>This time, the mock data array has two objects, where both have the key <code>name</code>. Thus the <code>expected</code> constant is set to <code>'firstName,secondName'</code>, because that is what we expect the variable to return.</p>
-<p>This is asserted with the <code>isEqualTo()</code> check again.</p>
-<h3 id="tag-template-user-distributor">Tag template: User distributor</h3>
-<p>The second walkthrough will utilize my <a href="https://tagmanager.google.com/gallery/#/owners/gtm-templates-simo-ahava/templates/user-distributor">user distributor</a> template. I wrote about how the template works <a href="https://www.simoahava.com/analytics/user-distributor-tag-template/">here</a>.</p>
-
-
-
-<div style="aspect-ratio: 924 / 786;" class="figure nocaption">
-  
-    <a href="https://www.simoahava.com/images/2019/11/user-distributor-template.jpg" title="User distributor template">
-  
-    <img class="fig-img" height="786" width="924" loading="lazy" src="https://www.simoahava.com/images/2019/11/user-distributor-template.jpg#ZgotmplZ" alt="User distributor template">
-  
-    </a>
-  
-  
-</div>
-
-
-<p>The tag template is quite a bit more complex than the variable template above. For one, we have <strong>branching decisions</strong>, and we also have collective <strong>catch-alls</strong> that apply to all branches.</p>
-<p>The <strong>user distributor</strong> lets you choose whether to isolate a <strong>single</strong> group or <strong>multiple</strong> groups of users. If a random number matches the distribution you set for either option, the user can be assigned to a group, which is designated by writing a cookie in the browser.</p>
-<p>In case the user is already in a group, the code is not executed, and in case the random number does not match a distribution range, the cookie is not written.</p>
-<p>So, the scenarios we need to test for are these:</p>
-<ol>
-<li>If <strong>cookie exists</strong>, i.e. the user has already been assigned to a group, <strong>do nothing</strong>.</li>
-<li>If using a <strong>single</strong> distribution, set cookie to <strong>true</strong> if the user is assigned to the group.</li>
-<li>If using a <strong>single</strong> distribution, set cookie to <strong>false</strong> if the user is not assigned to the group.</li>
-<li>Make sure the <strong>single</strong> distribution cookie is written with the <strong>correct options</strong>.</li>
-<li>If using a <strong>multi</strong> distribution, set cookie to the <strong>first group</strong> when the randomizer is within the range.</li>
-<li>If using a <strong>multi</strong> distribution, set cookie to the <strong>second group</strong> when the randomizer is within the range.</li>
-<li>If using a <strong>multi</strong> distribution, <strong>do not set cookie</strong> if the randomizer is outside all group ranges.</li>
-<li>Make sure the <strong>multi</strong> distribution cookie is written with the <strong>correct options</strong>.</li>
-</ol>
-<p>These eight tests should get 100% coverage for the tag template. And for reference, here is the full tag template code:</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">const</span> setCookie = require(<span style="color:#a50">&#39;setCookie&#39;</span>);
-<span style="color:#00a">const</span> readCookie = require(<span style="color:#a50">&#39;getCookieValues&#39;</span>);
-<span style="color:#00a">const</span> generateRandom = require(<span style="color:#a50">&#39;generateRandom&#39;</span>);
-<span style="color:#00a">const</span> makeInteger = require(<span style="color:#a50">&#39;makeInteger&#39;</span>);
-<span style="color:#00a">const</span> log = require(<span style="color:#a50">&#39;logToConsole&#39;</span>);
-
-<span style="color:#aaa;font-style:italic">// Percentage accumulation for multi
-</span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">let</span> acc = <span style="color:#099">0</span>;
-
-<span style="color:#aaa;font-style:italic">// Randomizer
-</span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">const</span> rand = generateRandom(<span style="color:#099">1</span>, <span style="color:#099">100</span>);
-
-<span style="color:#aaa;font-style:italic">// User data
-</span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">const</span> cookieName = data.cookieName;
-<span style="color:#00a">const</span> cookieDomain = data.cookieDomain;
-<span style="color:#00a">const</span> cookieMaxAge = data.cookieExpires * <span style="color:#099">24</span> * <span style="color:#099">60</span> * <span style="color:#099">60</span>;
-<span style="color:#00a">const</span> single = data.singlePercent;
-<span style="color:#00a">const</span> multi = data.multiPercent;
-
-<span style="color:#aaa;font-style:italic">// Only run if cookie is not set
-</span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">if</span> (readCookie(cookieName).length === <span style="color:#099">0</span>) {
-
-  <span style="color:#aaa;font-style:italic">// If single distribution
-</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#00a">if</span> (single) {
-    setCookie(
-      cookieName,
-      (rand &lt;= single ? <span style="color:#a50">&#39;true&#39;</span> : <span style="color:#a50">&#39;false&#39;</span>),
-      {
-        domain: cookieDomain,
-        <span style="color:#a50">&#39;max-age&#39;</span>: cookieMaxAge
-      }
-    );
-  }
-
-  <span style="color:#aaa;font-style:italic">// If multi distribution
-</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#00a">if</span> (multi) {
-    multi.some(obj =&gt; {
-      acc += makeInteger(obj.probability);
-      <span style="color:#00a">if</span> (rand &lt;= acc) {
-        setCookie(
-          cookieName,
-          obj.value,
-          {
-            domain: cookieDomain,
-            <span style="color:#a50">&#39;max-age&#39;</span>: cookieMaxAge
-          }
-        );
-        <span style="color:#00a">return</span> <span style="color:#00a">true</span>;
-      }
-    });
-  }
-
-}
-
-data.gtmOnSuccess();
-</code></pre></div>
-<p>Let&rsquo;s start with a <strong>test setup</strong>.</p>
-<h4 id="setup-initialize-the-mock-objects">Setup: initialize the mock objects</h4>
-<p>This time around, we&rsquo;ll be running multiple tests to check different aspects of the same mock data setups. Thus, instead of always initializing the mock objects for each test with (almost) identical values, we can instead create the mock objects in the <strong>Setup</strong> of the test, after which they will be in the scope of all test cases.</p>
-
-
-
-<div style="aspect-ratio: 776 / 314;" class="figure nocaption">
-  
-    <a href="https://www.simoahava.com/images/2019/11/distributor-test-setup.jpg" title="test setup">
-  
-    <img class="fig-img" height="314" width="776" loading="lazy" src="https://www.simoahava.com/images/2019/11/distributor-test-setup.jpg#ZgotmplZ" alt="test setup">
-  
-    </a>
-  
-  
-</div>
-
-
-<p>This is what the setup code looks like:</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">const</span> mockSingleData = {
-  cookieName: <span style="color:#a50">&#39;userDistributor&#39;</span>,
-  cookieDomain: <span style="color:#a50">&#39;auto&#39;</span>,
-  cookieExpires: <span style="color:#099">365</span>,
-  singlePercent: <span style="color:#099">50</span>
-};
-
-<span style="color:#00a">const</span> mockMultiData = {
-  cookieName: <span style="color:#a50">&#39;userDistributor&#39;</span>,
-  cookieDomain: <span style="color:#a50">&#39;auto&#39;</span>,
-  cookieExpires: <span style="color:#099">365</span>,
-  multiPercent: [{
-    value: <span style="color:#a50">&#39;A&#39;</span>,
-    probability: <span style="color:#099">33</span>
-  },{
-    value: <span style="color:#a50">&#39;B&#39;</span>,
-    probability: <span style="color:#099">33</span>
-  }]
-};
-</code></pre></div>
-<p>The <strong>single</strong> distribution mock sets the cookie <code>userDistributor</code> to <code>'true'</code> if the randomizer generates a number between <strong>1</strong> and <strong>50</strong>. Numbers between <strong>51</strong> and <strong>100</strong> set the cookie value to <code>'false'</code>.</p>
-<p>The <strong>multi</strong> distribution mock sets the cookie <code>userDistributor</code> to <code>'A'</code> if the randomizer generates a number between <strong>1</strong> and <strong>33</strong>, to <code>'B'</code> for values between <strong>34</strong> and <strong>66</strong>, and does not set the cookie for values between <strong>67</strong> and <strong>100</strong>.</p>
-<p>In both cases, the cookie is written with the <code>'auto'</code> domain, and the expiration is set to <strong>365 days</strong>.</p>
-<h4 id="test-1-do-nothing-if-cookie-exists">Test 1: Do nothing if cookie exists</h4>
-<p>The first scenario we&rsquo;ll test is what happens if the cookie named <code>userDistributor</code> has already been set. In this case, the template shouldn&rsquo;t really do anything - at least, it shouldn&rsquo;t reset the cookie with a new value.</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">mock(<span style="color:#a50">&#39;getCookieValues&#39;</span>, [<span style="color:#00a">true</span>]);
-
-<span style="color:#aaa;font-style:italic">// Call runCode to run the template&#39;s code.
-</span><span style="color:#aaa;font-style:italic"></span>runCode(mockSingleData);
-
-assertApi(<span style="color:#a50">&#39;generateRandom&#39;</span>).wasCalled();
-assertApi(<span style="color:#a50">&#39;getCookieValues&#39;</span>).wasCalled();
-assertApi(<span style="color:#a50">&#39;makeInteger&#39;</span>).wasNotCalled();
-assertApi(<span style="color:#a50">&#39;setCookie&#39;</span>).wasNotCalled();
-
-<span style="color:#aaa;font-style:italic">// Verify that the tag finished successfully.
-</span><span style="color:#aaa;font-style:italic"></span>assertApi(<span style="color:#a50">&#39;gtmOnSuccess&#39;</span>).wasCalled();
-</code></pre></div>
-<p>We use the <code>mock()</code> API here, which lets us fake the result of a custom template API. In this case, we&rsquo;re instructing the template to return the value <code>[true]</code> whenever the <code>getCookieValues</code> API is invoked. The value within the array is inconsequential - all it has to do is return an array with a positive length for the template to believe that the cookie has been set.</p>
-<p>Next, the <strong>single</strong> mock data object is passed to <code>runCode()</code>.</p>
-<p>After that, we simply check if the code has run by checking which custom template APIs have been called. We can see from the code that <code>generateRandom()</code> and <code>getCookieValues()</code> are called before any checks are done, but <code>makeInteger()</code> and <code>setCookie()</code> are only called if the cookie has not been set yet.</p>
-<p>Thus, we can use the <code>wasCalled()</code> and <code>wasNotCalled()</code> APIs to check which branch of the template code was executed.</p>
-<p>Finally, we ensure that <code>gtmOnSuccess()</code> was called, since otherwise the tag would stall.</p>
-<h4 id="test-2-set-single-cookie-to-true-when-in-distribution">Test 2: Set single cookie to true when in distribution</h4>
-<p>The next case we&rsquo;ll test is that the cookie is set to value <code>'true'</code> when the randomizer generates a value that is within the range of the single distribution group probability.</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">mock(<span style="color:#a50">&#39;getCookieValues&#39;</span>, []);
-mock(<span style="color:#a50">&#39;generateRandom&#39;</span>, <span style="color:#099">50</span>);
-mock(<span style="color:#a50">&#39;setCookie&#39;</span>, (name, value, options) =&gt; {
-  <span style="color:#00a">if</span> (value !== <span style="color:#a50">&#39;true&#39;</span>) {
-    fail(<span style="color:#a50">&#39;setCookie not called with &#34;true&#34;&#39;</span>);
-  }
-});
-
-<span style="color:#aaa;font-style:italic">// Call runCode to run the template&#39;s code.
-</span><span style="color:#aaa;font-style:italic"></span>runCode(mockSingleData);
-
-assertApi(<span style="color:#a50">&#39;generateRandom&#39;</span>).wasCalled();
-assertApi(<span style="color:#a50">&#39;getCookieValues&#39;</span>).wasCalled();
-assertApi(<span style="color:#a50">&#39;makeInteger&#39;</span>).wasNotCalled();
-assertApi(<span style="color:#a50">&#39;setCookie&#39;</span>).wasCalled();
-
-<span style="color:#aaa;font-style:italic">// Verify that the tag finished successfully.
-</span><span style="color:#aaa;font-style:italic"></span>assertApi(<span style="color:#a50">&#39;gtmOnSuccess&#39;</span>).wasCalled();
-</code></pre></div>
-<p>Check out the <code>mock()</code> calls. The first one is similar to the one in the previous test, except this time we have it return an empty array to signify the cookie has <strong>not</strong> been set.</p>
-<p>Then, we mock the <code>generateRandom()</code> API to have it return the value <code>50</code>, just to test the upper bound of the distribution range of <code>1...50</code> as set in the mock object within the <strong>Setup</strong> of the test.</p>
-<p>The third <code>mock()</code> is interesting! We are mocking <code>setCookie()</code> because a) we don&rsquo;t want it to actually set a cookie, and b) we can use this patch to check what <code>setCookie()</code> was called <em>with</em>. In case <code>setCookie()</code> was not called with the value <code>'true'</code>, we <strong>fail</strong> the test.</p>
-<p>You can use the <code>mock()</code> together with <code>fail()</code> to check what APIs have been called with - it&rsquo;s a nice workaround while we wait for <code>wasCalledWith()</code> for the <code>assertApi()</code> API.</p>
-<p>Then, we run the code with the mock data object again.</p>
-<p>The list of APIs we expect to be called is almost the same as in the previous test, with the exception that now we <strong>expect <code>setCookie()</code></strong> to be called, since the <code>userDistributor</code> cookie does not exist in this scenario.</p>
-<p>This test succeeds if the <code>setCookie()</code> API is called with the expected value of <code>'true'</code> for the cookie.</p>
-<h4 id="test-3-set-single-cookie-to-false-when-not-in-distribution">Test 3: Set single cookie to false when not in distribution</h4>
-<p>This test is basically a mirror of the previous one, except we set a different return value for the <code>generateRandom()</code> mock to ensure the cookie is set with the value <code>'false'</code>. We&rsquo;re using the lower bound of the range (<code>51</code>) just to test the extremes of the algorithm.</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">mock(<span style="color:#a50">&#39;getCookieValues&#39;</span>, []);
-mock(<span style="color:#a50">&#39;generateRandom&#39;</span>, <span style="color:#099">51</span>);
-mock(<span style="color:#a50">&#39;setCookie&#39;</span>, (name, value, options) =&gt; {
-  <span style="color:#00a">if</span> (value !== <span style="color:#a50">&#39;false&#39;</span>) {
-    fail(<span style="color:#a50">&#39;setCookie not called with &#34;false&#34;&#39;</span>);
-  }
-});
-
-<span style="color:#aaa;font-style:italic">// Call runCode to run the template&#39;s code.
-</span><span style="color:#aaa;font-style:italic"></span>runCode(mockSingleData);
-
-assertApi(<span style="color:#a50">&#39;generateRandom&#39;</span>).wasCalled();
-assertApi(<span style="color:#a50">&#39;getCookieValues&#39;</span>).wasCalled();
-assertApi(<span style="color:#a50">&#39;makeInteger&#39;</span>).wasNotCalled();
-assertApi(<span style="color:#a50">&#39;setCookie&#39;</span>).wasCalled();
-
-<span style="color:#aaa;font-style:italic">// Verify that the tag finished successfully.
-</span><span style="color:#aaa;font-style:italic"></span>assertApi(<span style="color:#a50">&#39;gtmOnSuccess&#39;</span>).wasCalled();
-</code></pre></div>
-<p>Other than those two changes, the test code is identical to the previous one.</p>
-<h4 id="test-4-set-single-cookie-with-correct-options">Test 4: Set single cookie with correct options</h4>
-<p>This test is a simple check to make sure that the cookie settings (name, value, domain, and expiration) correspond with those set in the template configuration. It&rsquo;s a solid test to write, because often the little configuration mistakes that don&rsquo;t really break the code are the ones that slip through the cracks when creating incremental updates.</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">mock(<span style="color:#a50">&#39;getCookieValues&#39;</span>, []);
-mock(<span style="color:#a50">&#39;generateRandom&#39;</span>, <span style="color:#099">99</span>);
-mock(<span style="color:#a50">&#39;setCookie&#39;</span>, (name, value, options) =&gt; {
-  <span style="color:#00a">if</span> (name !== mockSingleData.cookieName) fail(<span style="color:#a50">&#39;setCookie called with incorrect cookie name&#39;</span>);
-  <span style="color:#00a">if</span> (value !== <span style="color:#a50">&#39;false&#39;</span>) fail(<span style="color:#a50">&#39;setCookie not called with &#34;false&#34;&#39;</span>);
-  <span style="color:#00a">if</span> (options.domain !== mockSingleData.cookieDomain) fail(<span style="color:#a50">&#39;setCookie called with incorrect cookie domain&#39;</span>);
-  <span style="color:#00a">if</span> (options[<span style="color:#a50">&#39;max-age&#39;</span>] !== mockSingleData.cookieExpires * <span style="color:#099">24</span> * <span style="color:#099">60</span> * <span style="color:#099">60</span>) fail(<span style="color:#a50">&#39;setCookie called with incorrect max-age&#39;</span>);
-});
-
-<span style="color:#aaa;font-style:italic">// Call runCode to run the template&#39;s code.
-</span><span style="color:#aaa;font-style:italic"></span>runCode(mockSingleData);
-
-assertApi(<span style="color:#a50">&#39;generateRandom&#39;</span>).wasCalled();
-assertApi(<span style="color:#a50">&#39;getCookieValues&#39;</span>).wasCalled();
-assertApi(<span style="color:#a50">&#39;makeInteger&#39;</span>).wasNotCalled();
-assertApi(<span style="color:#a50">&#39;setCookie&#39;</span>).wasCalled();
-
-<span style="color:#aaa;font-style:italic">// Verify that the tag finished successfully.
-</span><span style="color:#aaa;font-style:italic"></span>assertApi(<span style="color:#a50">&#39;gtmOnSuccess&#39;</span>).wasCalled();
-</code></pre></div>
-<p>The magic happens in the <code>setCookie()</code> mock. Basically, we fail the test if the <code>setCookie()</code> API is called with values that do not correspond to those we set in the mock data object.</p>
-<h4 id="test-5-set-multi-cookie-to-a-when-equal-to-33">Test 5: Set multi cookie to A when equal to 33</h4>
-<p>When we start testing the <strong>multi</strong> distribution options, we are basically checking if the randomized number falls into the distributions established in the tag settings.</p>
-<p>We&rsquo;ll first test the simplest scenario: the randomizer picks the first group the user defined. We use this by setting it to the upper bound of the first group.</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">mock(<span style="color:#a50">&#39;getCookieValues&#39;</span>, []);
-mock(<span style="color:#a50">&#39;generateRandom&#39;</span>, <span style="color:#099">33</span>);
-mock(<span style="color:#a50">&#39;setCookie&#39;</span>, (name, value, options) =&gt; {
-  <span style="color:#00a">if</span> (value !== <span style="color:#a50">&#39;A&#39;</span>) {
-    fail(<span style="color:#a50">&#39;setCookie not called with &#34;A&#34;&#39;</span>);
-  }
-});
-
-<span style="color:#aaa;font-style:italic">// Call runCode to run the template&#39;s code.
-</span><span style="color:#aaa;font-style:italic"></span>runCode(mockMultiData);
-
-assertApi(<span style="color:#a50">&#39;generateRandom&#39;</span>).wasCalled();
-assertApi(<span style="color:#a50">&#39;getCookieValues&#39;</span>).wasCalled();
-assertApi(<span style="color:#a50">&#39;makeInteger&#39;</span>).wasCalled();
-assertApi(<span style="color:#a50">&#39;setCookie&#39;</span>).wasCalled();
-
-<span style="color:#aaa;font-style:italic">// Verify that the tag finished successfully.
-</span><span style="color:#aaa;font-style:italic"></span>assertApi(<span style="color:#a50">&#39;gtmOnSuccess&#39;</span>).wasCalled();
-</code></pre></div>
-<p>The setup is very similar to the previous single distribution tests, with the difference that the cookie <strong>value</strong> is now established in the mock data object, and we expect the <code>makeInteger()</code> API to be called for the template test to succeed.</p>
-<h4 id="test-6-set-multi-cookie-to-b-when-equal-to-34">Test 6: Set multi cookie to B when equal to 34</h4>
-<p>This test is practically identical to the previous one, with the exception that we set the <code>generateRandom()</code> API to return a value that sits within the lower bound of the second group of the mock object, and we modify the <code>setCookie()</code> API to check for the corresponding value (<code>'B'</code>) instead.</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">mock(<span style="color:#a50">&#39;getCookieValues&#39;</span>, []);
-mock(<span style="color:#a50">&#39;generateRandom&#39;</span>, <span style="color:#099">34</span>);
-mock(<span style="color:#a50">&#39;setCookie&#39;</span>, (name, value, options) =&gt; {
-  <span style="color:#00a">if</span> (value !== <span style="color:#a50">&#39;B&#39;</span>) {
-    fail(<span style="color:#a50">&#39;setCookie not called with &#34;B&#34;&#39;</span>);
-  }
-});
-
-<span style="color:#aaa;font-style:italic">// Call runCode to run the template&#39;s code.
-</span><span style="color:#aaa;font-style:italic"></span>runCode(mockMultiData);
-
-assertApi(<span style="color:#a50">&#39;generateRandom&#39;</span>).wasCalled();
-assertApi(<span style="color:#a50">&#39;getCookieValues&#39;</span>).wasCalled();
-assertApi(<span style="color:#a50">&#39;makeInteger&#39;</span>).wasCalled();
-assertApi(<span style="color:#a50">&#39;setCookie&#39;</span>).wasCalled();
-
-<span style="color:#aaa;font-style:italic">// Verify that the tag finished successfully.
-</span><span style="color:#aaa;font-style:italic"></span>assertApi(<span style="color:#a50">&#39;gtmOnSuccess&#39;</span>).wasCalled();
-</code></pre></div>
-<h4 id="test-7-do-not-set-multi-cookie-if-not-within-distributions">Test 7: Do not set multi cookie if not within distributions</h4>
-<p>In case the randomizer does not fall into any of the probability ranges established in the <strong>multi</strong> distribution settings, the cookie should not be set.</p>
-<p>The easiest way to check this is by making sure the <code>setCookie()</code> API was not called. You can do this with <code>assertApi('setCookie').wasNotCalled()</code>, but you can also mock the <code>setCookie()</code> API to <strong>fail</strong> if called. I&rsquo;ve opted to do both just for giggles.</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">mock(<span style="color:#a50">&#39;getCookieValues&#39;</span>, []);
-mock(<span style="color:#a50">&#39;generateRandom&#39;</span>, <span style="color:#099">67</span>);
-mock(<span style="color:#a50">&#39;setCookie&#39;</span>, (name, value, options) =&gt; {
-  fail(<span style="color:#a50">&#39;setCookie should not have been called&#39;</span>);
-});
-
-<span style="color:#aaa;font-style:italic">// Call runCode to run the template&#39;s code.
-</span><span style="color:#aaa;font-style:italic"></span>runCode(mockMultiData);
-
-assertApi(<span style="color:#a50">&#39;generateRandom&#39;</span>).wasCalled();
-assertApi(<span style="color:#a50">&#39;getCookieValues&#39;</span>).wasCalled();
-assertApi(<span style="color:#a50">&#39;makeInteger&#39;</span>).wasCalled();
-assertApi(<span style="color:#a50">&#39;setCookie&#39;</span>).wasNotCalled();
-
-<span style="color:#aaa;font-style:italic">// Verify that the tag finished successfully.
-</span><span style="color:#aaa;font-style:italic"></span>assertApi(<span style="color:#a50">&#39;gtmOnSuccess&#39;</span>).wasCalled();
-</code></pre></div>
-<p>Here, we generate a random number that is above <strong>66</strong> to make sure the number doesn&rsquo;t belong to any group. Then, we mock <code>setCookie()</code> to fail the test if ever called (regardless of what values it was called with), and we also use <code>assertApi()</code> to pass the test only if the API was not called.</p>
-<h4 id="test-8-set-multi-cookie-with-correct-options">Test 8: Set multi cookie with correct options</h4>
-<p>This is similar to <strong>Test 4</strong>, since we are just checking that the cookie is set with options that correspond with those configured in the template settings (or in the mock data object as in this case). The test will fail if there are any differences.</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">mock(<span style="color:#a50">&#39;getCookieValues&#39;</span>, []);
-mock(<span style="color:#a50">&#39;generateRandom&#39;</span>, <span style="color:#099">20</span>);
-mock(<span style="color:#a50">&#39;setCookie&#39;</span>, (name, value, options) =&gt; {
-  <span style="color:#00a">if</span> (name !== mockMultiData.cookieName) fail(<span style="color:#a50">&#39;setCookie called with incorrect cookie name&#39;</span>);
-  <span style="color:#00a">if</span> (value !== mockMultiData.multiPercent[<span style="color:#099">0</span>].value) fail(<span style="color:#a50">&#39;setCookie called with incorrect cookie value&#39;</span>);
-  <span style="color:#00a">if</span> (options.domain !== mockMultiData.cookieDomain) fail(<span style="color:#a50">&#39;setCookie called with incorrect cookie domain&#39;</span>);
-  <span style="color:#00a">if</span> (options[<span style="color:#a50">&#39;max-age&#39;</span>] !== mockMultiData.cookieExpires * <span style="color:#099">24</span> * <span style="color:#099">60</span> * <span style="color:#099">60</span>) fail(<span style="color:#a50">&#39;setCookie called with incorrect max-age&#39;</span>);
-});
-
-<span style="color:#aaa;font-style:italic">// Call runCode to run the template&#39;s code.
-</span><span style="color:#aaa;font-style:italic"></span>runCode(mockMultiData);
-
-assertApi(<span style="color:#a50">&#39;generateRandom&#39;</span>).wasCalled();
-assertApi(<span style="color:#a50">&#39;getCookieValues&#39;</span>).wasCalled();
-assertApi(<span style="color:#a50">&#39;makeInteger&#39;</span>).wasCalled();
-assertApi(<span style="color:#a50">&#39;setCookie&#39;</span>).wasCalled();
-
-<span style="color:#aaa;font-style:italic">// Verify that the tag finished successfully.
-</span><span style="color:#aaa;font-style:italic"></span>assertApi(<span style="color:#a50">&#39;gtmOnSuccess&#39;</span>).wasCalled();
-</code></pre></div>
-
-                
-                  <h2 id="summary">Summary</h2>
-<p>In this article, I showed you two walkthroughs for how to write tests for your variable and tag templates.</p>
-<p>A good way to get started is to figure out all the branches of your code, and then write tests that check for all the permutations.</p>
-<p>To reduce the number of tests you need, make sure you utilize the <a href="https://www.simoahava.com/analytics/custom-templates-guide-for-google-tag-manager/#field-configuration-reference">field configurations</a> (particularly the <a href="https://www.simoahava.com/analytics/custom-templates-guide-for-google-tag-manager/#validation-rules">validation rules</a>) efficiently. By blocking invalid input before the tag or variable can even be saved you&rsquo;re reducing the number of validation checks you need to write (and test for) in the code.</p>
-<p>Hopefully we&rsquo;ll get some <strong>test coverage</strong> details into the UI, so that you can plan your tests to cover all possible branches and features of the template code.</p>
-<p>Finally, <strong>remember to update the tests when you update the template itself</strong>. Writing and updating tests should become part and parcel of your quality assurance process when writing templates. You owe it to the users who end up installing your template into their Google Tag Manager containers!</p>
-
-                
-              
-              
-
-            </div>
-          </div>
-          <div id="post-footer" class="post-footer main-content-wrap">
-            
-              
-                
-                
-                  <div class="post-footer-tags">
-                    <span class="text-color-light text-small">TAGGED IN</span><br/>
-                    
-  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/google-tag-manager/">google tag manager</a>
-
-  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/gtmtips/">gtmtips</a>
-
-  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/custom-templates/">custom templates</a>
-
-  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/testing/">testing</a>
-
-                  </div>
-                
-              
-            
-            
-  <div class="post-actions-wrap">
-      <nav >
-        <ul class="post-actions post-action-nav">
-          
-            <li class="post-action">
-              
-                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/persist-campaign-data-landing-page/">
-              
-                  <i class="fa fa-angle-left"></i>
-                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
-                </a>
-            </li>
-            <li class="post-action">
-              
-                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/writing-tests-for-custom-templates-google-tag-manager/">
-              
-                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
-                  <i class="fa fa-angle-right"></i>
-                </a>
-            </li>
-          
-        </ul>
-      </nav>
-    <ul class="post-actions post-action-share" >
-      
-        <li class="post-action hide-lg hide-md hide-sm">
-          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
-            <i class="fa fa-share-alt"></i>
-          </a>
-        </li>
-        
-          <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/gtm-tips/tag-template-test-walkthrough/">
-              <i class="fa fa-brands fa-facebook"></i>
-            </a>
-          </li>
-        
-          <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=%23GTMTips:%20Walkthrough%20Of%20Custom%20Template%20Tests%20https://www.simoahava.com/gtm-tips/tag-template-test-walkthrough/%20via%20@SimoAhava">
-              <i class="fa fa-brands fa-twitter"></i>
-            </a>
-          </li>
-        
-          <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/gtm-tips/tag-template-test-walkthrough/">
-              <i class="fa fa-brands fa-linkedin"></i>
-            </a>
-          </li>
-        
-      
-      
-        <li class="post-action">
-          <a class="post-action-btn btn btn--default" href="#commento">
-            <i class="fa-regular fa-comments"></i>
-          </a>
-        </li>
-      
-      <li class="post-action">
-          <a class="post-action-btn btn btn--default" href="#">
-          <i class="fa fa-search"></i>
-        </a>
-      </li>
-    </ul>
-  </div>
-
-
-            
-              <a name="commento"></a>
-<comentario-comments></comentario-comments>
-
-            
-          </div>
-        </article>
-        <footer id="footer" class="main-content-wrap">
-  <span class="copyrights">
-    &copy; 2026 Simo Ahava. All Rights Reserved
-  </span>
-</footer>
-
-      </div>
-      
-      <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
-        
-  <div class="post-actions-wrap">
-      <nav >
-        <ul class="post-actions post-action-nav">
-          
-            <li class="post-action">
-              
-                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/persist-campaign-data-landing-page/">
-              
-                  <i class="fa fa-angle-left"></i>
-                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
-                </a>
-            </li>
-            <li class="post-action">
-              
-                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/writing-tests-for-custom-templates-google-tag-manager/">
-              
-                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
-                  <i class="fa fa-angle-right"></i>
-                </a>
-            </li>
-          
-        </ul>
-      </nav>
-    <ul class="post-actions post-action-share" >
-      
-        <li class="post-action hide-lg hide-md hide-sm">
-          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
-            <i class="fa fa-share-alt"></i>
-          </a>
-        </li>
-        
-          <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/gtm-tips/tag-template-test-walkthrough/">
-              <i class="fa fa-brands fa-facebook"></i>
-            </a>
-          </li>
-        
-          <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=%23GTMTips:%20Walkthrough%20Of%20Custom%20Template%20Tests%20https://www.simoahava.com/gtm-tips/tag-template-test-walkthrough/%20via%20@SimoAhava">
-              <i class="fa fa-brands fa-twitter"></i>
-            </a>
-          </li>
-        
-          <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/gtm-tips/tag-template-test-walkthrough/">
-              <i class="fa fa-brands fa-linkedin"></i>
-            </a>
-          </li>
-        
-      
-      
-        <li class="post-action">
-          <a class="post-action-btn btn btn--default" href="#commento">
-            <i class="fa-regular fa-comments"></i>
-          </a>
-        </li>
-      
-      <li class="post-action">
-          <a class="post-action-btn btn btn--default" href="#">
-          <i class="fa fa-search"></i>
-        </a>
-      </li>
-    </ul>
-  </div>
-
-
-      </div>
-      
-      <div id="share-options-bar" class="share-options-bar" data-behavior="4">
-  <i id="btn-close-shareoptions" class="fa fa-close"></i>
-  <ul class="share-options">
-    
-      <li class="share-option">
-        <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/gtm-tips/tag-template-test-walkthrough/">
-          <i class="fa fa-brands fa-facebook"></i><span>Share on Facebook</span>
-        </a>
-      </li>
-    
-      <li class="share-option">
-        <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=%23GTMTips:%20Walkthrough%20Of%20Custom%20Template%20Tests%20https://www.simoahava.com/gtm-tips/tag-template-test-walkthrough/%20via%20@SimoAhava">
-          <i class="fa fa-brands fa-twitter"></i><span>Share on Twitter</span>
-        </a>
-      </li>
-    
-      <li class="share-option">
-        <a class="share-option-btn" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/gtm-tips/tag-template-test-walkthrough/">
-          <i class="fa fa-brands fa-linkedin"></i><span>Share on LinkedIn</span>
-        </a>
-      </li>
-    
-  </ul>
-</div>
-<div id="share-options-mask" class="share-options-mask"></div>
-
-    </div>
-    
-    <div id="about">
-  <div id="about-card">
-    <div id="about-btn-close">
-      <i class="fa fa-remove"></i>
-    </div>
-    
-      <img id="about-card-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
-    
-    <h4 id="about-card-name">Simo Ahava</h4>
-    
-      <div id="about-card-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</div>
-    
-    
-      <div id="about-card-job">
-        <i class="fa fa-briefcase"></i>
-        <br/>
-        Senior Data Advocate at Reaktor
-      </div>
-    
-    
-      <div id="about-card-location">
-        <i class="fa fa-map-marker"></i>
-        <br/>
-        Finland
-      </div>
-    
-  </div>
-</div>
-
-    
-  
-    
-    <div id="cover" style="background-image:url('https://www.simoahava.com/images/maisema.jpg');"></div>
-  
-
-
-    
-<script defer src="https://comentario.simoahava.com/comentario.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
-
-
-
-
-<script src="https://www.simoahava.com/js/script.js"></script>
-
-
-
-    <script>
-      !function(){var e=document.querySelector(".simmer"),t=document.querySelector(".simmer .close"),o=window.sessionStorage&&window.sessionStorage.getItem("nosimmer");if(e){if(o){e.style.display="none"}t.addEventListener("click",function(){window.sessionStorage.setItem("nosimmer","true"),e.style.display="none"})}}();
-    </script>
-    <style>
-      .ads {
-	  width: 1px;
-      }
-      </style>
-         
-
-    
-  </body>
-</html>
-
+<!doctype html><html lang=en-us><head><meta name=google-site-verification content="xQwWI2KUfP9LbFKhw2CVLFtrMY6Czrla7L3PD2aBolA"><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"#GTMTips: Walkthrough Of Custom Template Tests | Simo Ahava's blog","image":"https:\/\/www.simoahava.com\/images\/2019\/11\/walkthrough-custom-template-tests.jpg","editor":"Simo Ahava","publisher":{"@type":"Organization","name":"Simo Ahava's blog","logo":{"@type":"ImageObject","url":"https:\/\/www.simoahava.com\/images\/simo.png","height":"393","width":"407"}},"url":"https:\/\/www.simoahava.com\/gtm-tips\/tag-template-test-walkthrough\/","datePublished":"2019-11-20T07:00:00\u002b02:00","dateModified":"2019-11-20T07:00:00\u002b02:00","description":"Walkthrough of how to build custom template unit tests for tag templates and for variable templates in Google Tag Manager.","author":{"@type":"Person","name":"Simo Ahava"}}</script><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>#GTMTips: Walkthrough Of Custom Template Tests | Simo Ahava's blog</title>
+<script>window.dataLayer=window.dataLayer||[],window.dataLayer.push({pageType:"article",environment:null})</script><script>(function(e,t,n,s){window[n]=window[n]||[],window[n].push({"gtm.start":(new Date).getTime(),event:"gtm.js"});var i=e.getElementsByTagName(t)[0],o=e.createElement(t),a=n!="dataLayer"?"&l="+n:"";o.async=!0,o.src="https://sgtm.simoahava.com/gtm.js?id="+s+a,i.parentNode.insertBefore(o,i)})(document,"script","dataLayer","GTM-PZ7GMV9")</script><meta name=author content="Simo Ahava"><meta name=keywords content><link rel=icon href=https://www.simoahava.com/images/favicon.ico><link rel=amphtml href=https://www.simoahava.com/amp/gtm-tips/tag-template-test-walkthrough/><meta name=description content="Walkthrough of how to build custom template unit tests for tag templates and for variable templates in Google Tag Manager."><meta property="og:description" content="Walkthrough of how to build custom template unit tests for tag templates and for variable templates in Google Tag Manager."><meta property="og:type" content="blog"><meta property="og:title" content="#GTMTips: Walkthrough Of Custom Template Tests"><meta property="og:url" content="https://www.simoahava.com/gtm-tips/tag-template-test-walkthrough/"><meta property="og:site_name" content="Simo Ahava's blog"><meta name=twitter:card content="summary"><meta name=twitter:title content="#GTMTips: Walkthrough Of Custom Template Tests"><meta name=twitter:description content="Walkthrough of how to build custom template unit tests for tag templates and for variable templates in Google Tag Manager."><meta name=twitter:creator content="@SimoAhava"><meta name=twitter:image content="https://www.simoahava.com/images/2019/11/walkthrough-custom-template-tests.jpg"><meta property="og:image" content="https://www.simoahava.com/images/2019/11/walkthrough-custom-template-tests.jpg"><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=/css/style.css></head><body><div id=_progress></div><div id=blog><header id=header data-behavior=4><i id=btn-open-sidebar class="fa fa-lg fa-bars"></i><div class=header-title><a class=header-title-link href=/>Simo Ahava's blog</a></div></header><nav id=sidebar data-behavior=4><div class=sidebar-container><div class=sidebar-profile><a href=/><img class=sidebar-profile-picture loading=lazy src=https://www.simoahava.com/images/simo.png alt="Author's picture"></a><h4 class=sidebar-profile-name>Simo Ahava</h4><h5 class=sidebar-profile-bio>Husband | Father | Analytics developer<br>simo (at) simoahava.com</h5></div><ul class=sidebar-buttons><li class=sidebar-button><a class=sidebar-button-link href=/><i class="sidebar-button-icon fa fa-lg fa-home"></i>
+<span class=sidebar-button-desc>Home</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/categories/><i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+<span class=sidebar-button-desc>Categories</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/tags/><i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+<span class=sidebar-button-desc>Tags</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/categories/gtm-tips/><i class="sidebar-button-icon fa fa-lg fa-magic"></i>
+<span class=sidebar-button-desc>GTM Tips</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/about-simo-ahava/><i class="sidebar-button-icon fa fa-lg fa-question"></i>
+<span class=sidebar-button-desc>About</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/index.xml><i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+<span class=sidebar-button-desc>RSS</span></a></li></ul><ul class=sidebar-buttons><li class=sidebar-button><a class=sidebar-button-link href=/tools/><i class="sidebar-button-icon fa fa-lg fa-wrench"></i>
+<span class=sidebar-button-desc>Tools</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/blog-statistics/><i class="sidebar-button-icon fa fa-lg fa-bar-chart"></i>
+<span class=sidebar-button-desc>Blog statistics</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=https://github.com/sahava target=_blank rel=noopener><i class="sidebar-button-icon fa fa-lg fa-brands fa-github"></i>
+<span class=sidebar-button-desc>GitHub</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/upcoming-talks/><i class="sidebar-button-icon fa fa-lg fa-bullhorn"></i>
+<span class=sidebar-button-desc>Upcoming talks</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/custom-templates/><i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+<span class=sidebar-button-desc>Templates</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/newsletter/><i class="sidebar-button-icon fa fa-lg fa-bell"></i>
+<span class=sidebar-button-desc>Newsletter</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=https://masto.measure.chat/@SimoAhava target=_blank rel="noopener me"><i class="sidebar-button-icon fa fa-lg fa-brands fa-mastodon"></i>
+<span class=sidebar-button-desc>Mastodon</span></a></li></ul><ul class=sidebar-buttons></ul></div></nav><div id=main data-behavior=4 class=hasCoverMetaIn><article class=post><form id=search action=/search/><input name=q type=text class="form-control input--xlarge" placeholder="Search blog..." autocomplete=off></form><div class="post-header main-content-wrap text-left"><h1>#GTMTips: Walkthrough Of Custom Template Tests</h1><div class="postShorten-meta post-meta"><time datetime=2019-11-20T07:00:00+02:00>November 20, 2019
+</time><span>in</span>
+<a class=category-link href=/categories/gtm-tips>GTM Tips</a>
+| <a href=https://www.simoahava.com/gtm-tips/tag-template-test-walkthrough/#commento><comentario-count path=/gtm-tips/tag-template-test-walkthrough/ placeholder=... error-text="N/A " zero-text="0 " prefix suffix=" "></comentario-count>Comments</a></div></div><div class="post-content markdown"><div class=main-content-wrap><p><a href=https://tagmanager.google.com/>Google Tag Manager</a> now lets you add <strong>unit tests</strong> directly to your <a href=/analytics/custom-templates-guide-for-google-tag-manager/>custom templates</a>. This is useful, since it allows you to control the code stability of your templates, especially if you&rsquo;ve decided to <a href=/analytics/introducing-tag-manager-template-gallery/>share those templates with the public</a>.</p><p>I recently shared <a href=/analytics/writing-tests-for-custom-templates-google-tag-manager/>a general guide</a> for how template tests work, but I wanted to expand the topic a little, and share with you two walkthroughs of custom template tests: one for a <strong>variable template</strong> and one for a <strong>tag template</strong>.</p><p>There&rsquo;s a <a href=https://youtu.be/UZ8vyFbYJcY>video</a> if you prefer a more visual way to walk through these steps.</p><div style=position:relative;padding-bottom:56.25%;height:0;overflow:hidden><iframe allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading=eager referrerpolicy=strict-origin-when-cross-origin src="https://www.youtube-nocookie.com/embed/UZ8vyFbYJcY?autoplay=0&amp;controls=1&amp;end=0&amp;loop=0&amp;mute=0&amp;start=0" style=position:absolute;top:0;left:0;width:100%;height:100%;border:0 title="YouTube video"></iframe></div><span class=simmer><span class=close>X</span><p><span class="fa fa-md fa-bell"></span>
+<strong>The Simmer Newsletter</strong></p><p>Subscribe to the <a href=/newsletter/>Simmer newsletter</a> to get the latest news and content from Simo Ahava into your email inbox!</p></span><h2 id=tip-107-how-to-build-tag-and-variable-template-tests>Tip 107: How to build tag and variable template tests</h2><div style=aspect-ratio:960/540 class="figure nocaption"><a href=/images/2019/11/walkthrough-custom-template-tests.jpg title="Walkthrough of custom template tests"><img class=fig-img height=540 width=960 loading=lazy src=/images/2019/11/walkthrough-custom-template-tests.jpg#ZgotmplZ alt="Walkthrough of custom template tests"></a></div><p>Let&rsquo;s get started. We&rsquo;ll kick things off with a <strong>variable template</strong>.</p><h3 id=variable-template-string-from-array-of-objects>Variable template: String from array of objects</h3><p>This walkthrough will utilize my <a href=https://tagmanager.google.com/gallery/#/owners/gtm-templates-simo-ahava/templates/string-from-array-of-objects>String from array of objects</a> template.</p><div style=aspect-ratio:926/572 class="figure nocaption"><a href=/images/2019/11/string-from-array-objects.jpg title="String from array of templates"><img class=fig-img height=572 width=926 loading=lazy src=/images/2019/11/string-from-array-objects.jpg#ZgotmplZ alt="String from array of templates"></a></div><p>The template is very simple. It takes a GTM variable as an input, where the variable must return an <strong>array of objects</strong> (e.g. <code>[{id: '123'},{id: '234'}]</code>).</p><p>Then, the user specifies which property from the objects they want to concatenate the values of into a string (e.g. <code>id</code>), and finally they can specify a <strong>delimiter</strong> other than <code>,</code>. The end result would be something like <code>'123,234'</code> if following the example from the previous paragraph.</p><p>Here is the template code in all its simplicity:</p><div class=highlight><pre tabindex=0 style=background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-javascript data-lang=javascript><span style=display:flex><span><span style=color:#00a>const</span> callInWindow = require(<span style=color:#a50>&#39;callInWindow&#39;</span>);
+</span></span><span style=display:flex><span><span style=color:#00a>const</span> getType = require(<span style=color:#a50>&#39;getType&#39;</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#00a>const</span> inputArray = data.inputArray;
+</span></span><span style=display:flex><span><span style=color:#00a>const</span> keyToConcatenate = data.keyToConcatenate;
+</span></span><span style=display:flex><span><span style=color:#00a>const</span> delimiter = data.delimiter;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic>// If not an array, return undefined
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span><span style=color:#00a>if</span> (getType(inputArray) !== <span style=color:#a50>&#39;array&#39;</span>) {
+</span></span><span style=display:flex><span>  <span style=color:#00a>return</span>;
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#00a>return</span> inputArray
+</span></span><span style=display:flex><span>  .map(obj =&gt; obj[keyToConcatenate])
+</span></span><span style=display:flex><span>  .filter(obj =&gt; obj)
+</span></span><span style=display:flex><span>  .join(delimiter);</span></span></code></pre></div><p>When we deconstruct the variable code, there are <strong>four</strong> different things that can happen.</p><ol><li><strong>The input is not an array</strong>, in which case the <code>getType()</code> check succeeds and the variable returns <code>undefined</code>.</li><li><strong>The array does not have any objects within</strong>, in which case the <code>.map()</code> and <code>.filter()</code> calls end up returning an empty array, which is then turned into an <strong>empty string</strong> by <code>.join()</code>.</li><li><strong>The array has objects but none of them has the specified key</strong>, in which case the <code>.map()</code> and <code>.filter()</code> calls end up returning an empty array, which is then turned into an <strong>empty string</strong> by <code>.join()</code>.</li><li><strong>The array has at least one object with the given key</strong>, in which case the variable returns a string where the key values are concatenated into a string using the delimiter.</li></ol><p>In other words, we need <strong>four tests</strong>.</p><h4 id=test-1-return-undefined-if-not-array>Test 1: Return undefined if not array</h4><p>If the variable is not an array, the variable returns <code>undefined</code>. To test this, we create a <strong>mock</strong> data object, where we pass a non-array as the input.</p><p>This is what the test looks like:</p><div class=highlight><pre tabindex=0 style=background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-javascript data-lang=javascript><span style=display:flex><span><span style=color:#aaa;font-style:italic>// Call runCode to run the template&#39;s code.
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span><span style=color:#00a>const</span> mockData = {
+</span></span><span style=display:flex><span>  inputArray: <span style=color:#a50>&#39;notAnArray&#39;</span>,
+</span></span><span style=display:flex><span>  keyToConcatenate: <span style=color:#a50>&#39;name&#39;</span>,
+</span></span><span style=display:flex><span>  delimiter: <span style=color:#a50>&#39;,&#39;</span>
+</span></span><span style=display:flex><span>};
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#00a>const</span> variableResult = runCode(mockData);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic>// Verify that the variable returns a result.
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>assertThat(variableResult).isUndefined();</span></span></code></pre></div><p>The <code>mockData</code> object has the <code>inputArray</code> set to a <strong>string</strong>, which is not an array. This object is passed to <code>runCode()</code>, which executes the variable template <em>as if</em> the user had created the template with the non-array as the input.</p><p>Finally, the result of <code>runCode()</code> is asserted by passing the test if the return value of the variable is <code>undefined</code>, by using the <code>isUndefined()</code> assertion.</p><h4 id=test-2-return-empty-string-if-no-objects-in-array>Test 2: Return empty string if no objects in array</h4><p>In the next test, we need to create a scenario where the user does provide an array (so the <code>getType()</code> check doesn&rsquo;t catch it), but this array will have no objects within. In that case, the variable would return an empty string.</p><div class=highlight><pre tabindex=0 style=background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-javascript data-lang=javascript><span style=display:flex><span><span style=color:#aaa;font-style:italic>// Call runCode to run the template&#39;s code.
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span><span style=color:#00a>const</span> mockData = {
+</span></span><span style=display:flex><span>  inputArray: [<span style=color:#099>1</span>, <span style=color:#099>2</span>, <span style=color:#099>3</span>],
+</span></span><span style=display:flex><span>  keyToConcatenate: <span style=color:#a50>&#39;name&#39;</span>,
+</span></span><span style=display:flex><span>  delimiter: <span style=color:#a50>&#39;,&#39;</span>
+</span></span><span style=display:flex><span>};
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#00a>const</span> expected = <span style=color:#a50>&#39;&#39;</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#00a>const</span> variableResult = runCode(mockData);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic>// Verify that the variable returns a result.
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>assertThat(variableResult).isEqualTo(expected);</span></span></code></pre></div><p>Here we use the <code>expected</code> constant to make it easier to manage and read the code. Again, the mock data object is passed to <code>runCode()</code>, and the variable result is then asserted with the <code>isEqualTo()</code> check, this time passing the test if the variable result is exactly an empty string.</p><h4 id=test-3-return-empty-string-if-objects-in-array-do-not-have-the-key>Test 3: Return empty string if objects in array do not have the key</h4><p>To be fair, this could be bundled up with the previous test, because they test the same lines of code and the end result is the same.</p><div class=highlight><pre tabindex=0 style=background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-javascript data-lang=javascript><span style=display:flex><span><span style=color:#aaa;font-style:italic>// Call runCode to run the template&#39;s code.
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span><span style=color:#00a>const</span> mockData = {
+</span></span><span style=display:flex><span>  inputArray: [{id: <span style=color:#a50>&#39;123&#39;</span>},{category: <span style=color:#a50>&#39;shoes&#39;</span>}],
+</span></span><span style=display:flex><span>  keyToConcatenate: <span style=color:#a50>&#39;name&#39;</span>,
+</span></span><span style=display:flex><span>  delimiter: <span style=color:#a50>&#39;,&#39;</span>
+</span></span><span style=display:flex><span>};
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#00a>const</span> expected = <span style=color:#a50>&#39;&#39;</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#00a>const</span> variableResult = runCode(mockData);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic>// Verify that the variable returns a result.
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>assertThat(variableResult).isEqualTo(expected);</span></span></code></pre></div><p>As you can see from the mock object, we are looking for the key <code>name</code> in the objects of the array. Neither one of the objects in the <code>inputArray</code> has that key.</p><p>Once this mock object is passed to <code>runCode()</code>, the variable code is executed, and the variable ends up returning an empty string. This is asserted by checking the result against the <code>expected</code> value of <code>''</code>.</p><h4 id=test-4-return-concatenated-string-with-delimiter-for-valid-object-keys>Test 4: Return concatenated string with delimiter for valid object keys</h4><p>The last test is the only <strong>positive</strong> check we need to do.</p><div class=highlight><pre tabindex=0 style=background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-javascript data-lang=javascript><span style=display:flex><span><span style=color:#aaa;font-style:italic>// Call runCode to run the template&#39;s code.
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span><span style=color:#00a>const</span> mockData = {
+</span></span><span style=display:flex><span>  inputArray: [{name: <span style=color:#a50>&#39;firstName&#39;</span>},{name: <span style=color:#a50>&#39;secondName&#39;</span>}],
+</span></span><span style=display:flex><span>  keyToConcatenate: <span style=color:#a50>&#39;name&#39;</span>,
+</span></span><span style=display:flex><span>  delimiter: <span style=color:#a50>&#39;,&#39;</span>
+</span></span><span style=display:flex><span>};
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#00a>const</span> expected = <span style=color:#a50>&#39;firstName,secondName&#39;</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#00a>const</span> variableResult = runCode(mockData);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic>// Verify that the variable returns a result.
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>assertThat(variableResult).isEqualTo(expected);</span></span></code></pre></div><p>This time, the mock data array has two objects, where both have the key <code>name</code>. Thus the <code>expected</code> constant is set to <code>'firstName,secondName'</code>, because that is what we expect the variable to return.</p><p>This is asserted with the <code>isEqualTo()</code> check again.</p><h3 id=tag-template-user-distributor>Tag template: User distributor</h3><p>The second walkthrough will utilize my <a href=https://tagmanager.google.com/gallery/#/owners/gtm-templates-simo-ahava/templates/user-distributor>user distributor</a> template. I wrote about how the template works <a href=/analytics/user-distributor-tag-template/>here</a>.</p><div style=aspect-ratio:924/786 class="figure nocaption"><a href=/images/2019/11/user-distributor-template.jpg title="User distributor template"><img class=fig-img height=786 width=924 loading=lazy src=/images/2019/11/user-distributor-template.jpg#ZgotmplZ alt="User distributor template"></a></div><p>The tag template is quite a bit more complex than the variable template above. For one, we have <strong>branching decisions</strong>, and we also have collective <strong>catch-alls</strong> that apply to all branches.</p><p>The <strong>user distributor</strong> lets you choose whether to isolate a <strong>single</strong> group or <strong>multiple</strong> groups of users. If a random number matches the distribution you set for either option, the user can be assigned to a group, which is designated by writing a cookie in the browser.</p><p>In case the user is already in a group, the code is not executed, and in case the random number does not match a distribution range, the cookie is not written.</p><p>So, the scenarios we need to test for are these:</p><ol><li>If <strong>cookie exists</strong>, i.e. the user has already been assigned to a group, <strong>do nothing</strong>.</li><li>If using a <strong>single</strong> distribution, set cookie to <strong>true</strong> if the user is assigned to the group.</li><li>If using a <strong>single</strong> distribution, set cookie to <strong>false</strong> if the user is not assigned to the group.</li><li>Make sure the <strong>single</strong> distribution cookie is written with the <strong>correct options</strong>.</li><li>If using a <strong>multi</strong> distribution, set cookie to the <strong>first group</strong> when the randomizer is within the range.</li><li>If using a <strong>multi</strong> distribution, set cookie to the <strong>second group</strong> when the randomizer is within the range.</li><li>If using a <strong>multi</strong> distribution, <strong>do not set cookie</strong> if the randomizer is outside all group ranges.</li><li>Make sure the <strong>multi</strong> distribution cookie is written with the <strong>correct options</strong>.</li></ol><p>These eight tests should get 100% coverage for the tag template. And for reference, here is the full tag template code:</p><div class=highlight><pre tabindex=0 style=background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-javascript data-lang=javascript><span style=display:flex><span><span style=color:#00a>const</span> setCookie = require(<span style=color:#a50>&#39;setCookie&#39;</span>);
+</span></span><span style=display:flex><span><span style=color:#00a>const</span> readCookie = require(<span style=color:#a50>&#39;getCookieValues&#39;</span>);
+</span></span><span style=display:flex><span><span style=color:#00a>const</span> generateRandom = require(<span style=color:#a50>&#39;generateRandom&#39;</span>);
+</span></span><span style=display:flex><span><span style=color:#00a>const</span> makeInteger = require(<span style=color:#a50>&#39;makeInteger&#39;</span>);
+</span></span><span style=display:flex><span><span style=color:#00a>const</span> log = require(<span style=color:#a50>&#39;logToConsole&#39;</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic>// Percentage accumulation for multi
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span><span style=color:#00a>let</span> acc = <span style=color:#099>0</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic>// Randomizer
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span><span style=color:#00a>const</span> rand = generateRandom(<span style=color:#099>1</span>, <span style=color:#099>100</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic>// User data
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span><span style=color:#00a>const</span> cookieName = data.cookieName;
+</span></span><span style=display:flex><span><span style=color:#00a>const</span> cookieDomain = data.cookieDomain;
+</span></span><span style=display:flex><span><span style=color:#00a>const</span> cookieMaxAge = data.cookieExpires * <span style=color:#099>24</span> * <span style=color:#099>60</span> * <span style=color:#099>60</span>;
+</span></span><span style=display:flex><span><span style=color:#00a>const</span> single = data.singlePercent;
+</span></span><span style=display:flex><span><span style=color:#00a>const</span> multi = data.multiPercent;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic>// Only run if cookie is not set
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span><span style=color:#00a>if</span> (readCookie(cookieName).length === <span style=color:#099>0</span>) {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#aaa;font-style:italic>// If single distribution
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>  <span style=color:#00a>if</span> (single) {
+</span></span><span style=display:flex><span>    setCookie(
+</span></span><span style=display:flex><span>      cookieName,
+</span></span><span style=display:flex><span>      (rand &lt;= single ? <span style=color:#a50>&#39;true&#39;</span> : <span style=color:#a50>&#39;false&#39;</span>),
+</span></span><span style=display:flex><span>      {
+</span></span><span style=display:flex><span>        domain: cookieDomain,
+</span></span><span style=display:flex><span>        <span style=color:#a50>&#39;max-age&#39;</span>: cookieMaxAge
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>    );
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#aaa;font-style:italic>// If multi distribution
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>  <span style=color:#00a>if</span> (multi) {
+</span></span><span style=display:flex><span>    multi.some(obj =&gt; {
+</span></span><span style=display:flex><span>      acc += makeInteger(obj.probability);
+</span></span><span style=display:flex><span>      <span style=color:#00a>if</span> (rand &lt;= acc) {
+</span></span><span style=display:flex><span>        setCookie(
+</span></span><span style=display:flex><span>          cookieName,
+</span></span><span style=display:flex><span>          obj.value,
+</span></span><span style=display:flex><span>          {
+</span></span><span style=display:flex><span>            domain: cookieDomain,
+</span></span><span style=display:flex><span>            <span style=color:#a50>&#39;max-age&#39;</span>: cookieMaxAge
+</span></span><span style=display:flex><span>          }
+</span></span><span style=display:flex><span>        );
+</span></span><span style=display:flex><span>        <span style=color:#00a>return</span> <span style=color:#00a>true</span>;
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>    });
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>data.gtmOnSuccess();</span></span></code></pre></div><p>Let&rsquo;s start with a <strong>test setup</strong>.</p><h4 id=setup-initialize-the-mock-objects>Setup: initialize the mock objects</h4><p>This time around, we&rsquo;ll be running multiple tests to check different aspects of the same mock data setups. Thus, instead of always initializing the mock objects for each test with (almost) identical values, we can instead create the mock objects in the <strong>Setup</strong> of the test, after which they will be in the scope of all test cases.</p><div style=aspect-ratio:776/314 class="figure nocaption"><a href=/images/2019/11/distributor-test-setup.jpg title="test setup"><img class=fig-img height=314 width=776 loading=lazy src=/images/2019/11/distributor-test-setup.jpg#ZgotmplZ alt="test setup"></a></div><p>This is what the setup code looks like:</p><div class=highlight><pre tabindex=0 style=background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-javascript data-lang=javascript><span style=display:flex><span><span style=color:#00a>const</span> mockSingleData = {
+</span></span><span style=display:flex><span>  cookieName: <span style=color:#a50>&#39;userDistributor&#39;</span>,
+</span></span><span style=display:flex><span>  cookieDomain: <span style=color:#a50>&#39;auto&#39;</span>,
+</span></span><span style=display:flex><span>  cookieExpires: <span style=color:#099>365</span>,
+</span></span><span style=display:flex><span>  singlePercent: <span style=color:#099>50</span>
+</span></span><span style=display:flex><span>};
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#00a>const</span> mockMultiData = {
+</span></span><span style=display:flex><span>  cookieName: <span style=color:#a50>&#39;userDistributor&#39;</span>,
+</span></span><span style=display:flex><span>  cookieDomain: <span style=color:#a50>&#39;auto&#39;</span>,
+</span></span><span style=display:flex><span>  cookieExpires: <span style=color:#099>365</span>,
+</span></span><span style=display:flex><span>  multiPercent: [{
+</span></span><span style=display:flex><span>    value: <span style=color:#a50>&#39;A&#39;</span>,
+</span></span><span style=display:flex><span>    probability: <span style=color:#099>33</span>
+</span></span><span style=display:flex><span>  },{
+</span></span><span style=display:flex><span>    value: <span style=color:#a50>&#39;B&#39;</span>,
+</span></span><span style=display:flex><span>    probability: <span style=color:#099>33</span>
+</span></span><span style=display:flex><span>  }]
+</span></span><span style=display:flex><span>};</span></span></code></pre></div><p>The <strong>single</strong> distribution mock sets the cookie <code>userDistributor</code> to <code>'true'</code> if the randomizer generates a number between <strong>1</strong> and <strong>50</strong>. Numbers between <strong>51</strong> and <strong>100</strong> set the cookie value to <code>'false'</code>.</p><p>The <strong>multi</strong> distribution mock sets the cookie <code>userDistributor</code> to <code>'A'</code> if the randomizer generates a number between <strong>1</strong> and <strong>33</strong>, to <code>'B'</code> for values between <strong>34</strong> and <strong>66</strong>, and does not set the cookie for values between <strong>67</strong> and <strong>100</strong>.</p><p>In both cases, the cookie is written with the <code>'auto'</code> domain, and the expiration is set to <strong>365 days</strong>.</p><h4 id=test-1-do-nothing-if-cookie-exists>Test 1: Do nothing if cookie exists</h4><p>The first scenario we&rsquo;ll test is what happens if the cookie named <code>userDistributor</code> has already been set. In this case, the template shouldn&rsquo;t really do anything - at least, it shouldn&rsquo;t reset the cookie with a new value.</p><div class=highlight><pre tabindex=0 style=background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-javascript data-lang=javascript><span style=display:flex><span>mock(<span style=color:#a50>&#39;getCookieValues&#39;</span>, [<span style=color:#00a>true</span>]);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic>// Call runCode to run the template&#39;s code.
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>runCode(mockSingleData);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>assertApi(<span style=color:#a50>&#39;generateRandom&#39;</span>).wasCalled();
+</span></span><span style=display:flex><span>assertApi(<span style=color:#a50>&#39;getCookieValues&#39;</span>).wasCalled();
+</span></span><span style=display:flex><span>assertApi(<span style=color:#a50>&#39;makeInteger&#39;</span>).wasNotCalled();
+</span></span><span style=display:flex><span>assertApi(<span style=color:#a50>&#39;setCookie&#39;</span>).wasNotCalled();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic>// Verify that the tag finished successfully.
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>assertApi(<span style=color:#a50>&#39;gtmOnSuccess&#39;</span>).wasCalled();</span></span></code></pre></div><p>We use the <code>mock()</code> API here, which lets us fake the result of a custom template API. In this case, we&rsquo;re instructing the template to return the value <code>[true]</code> whenever the <code>getCookieValues</code> API is invoked. The value within the array is inconsequential - all it has to do is return an array with a positive length for the template to believe that the cookie has been set.</p><p>Next, the <strong>single</strong> mock data object is passed to <code>runCode()</code>.</p><p>After that, we simply check if the code has run by checking which custom template APIs have been called. We can see from the code that <code>generateRandom()</code> and <code>getCookieValues()</code> are called before any checks are done, but <code>makeInteger()</code> and <code>setCookie()</code> are only called if the cookie has not been set yet.</p><p>Thus, we can use the <code>wasCalled()</code> and <code>wasNotCalled()</code> APIs to check which branch of the template code was executed.</p><p>Finally, we ensure that <code>gtmOnSuccess()</code> was called, since otherwise the tag would stall.</p><h4 id=test-2-set-single-cookie-to-true-when-in-distribution>Test 2: Set single cookie to true when in distribution</h4><p>The next case we&rsquo;ll test is that the cookie is set to value <code>'true'</code> when the randomizer generates a value that is within the range of the single distribution group probability.</p><div class=highlight><pre tabindex=0 style=background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-javascript data-lang=javascript><span style=display:flex><span>mock(<span style=color:#a50>&#39;getCookieValues&#39;</span>, []);
+</span></span><span style=display:flex><span>mock(<span style=color:#a50>&#39;generateRandom&#39;</span>, <span style=color:#099>50</span>);
+</span></span><span style=display:flex><span>mock(<span style=color:#a50>&#39;setCookie&#39;</span>, (name, value, options) =&gt; {
+</span></span><span style=display:flex><span>  <span style=color:#00a>if</span> (value !== <span style=color:#a50>&#39;true&#39;</span>) {
+</span></span><span style=display:flex><span>    fail(<span style=color:#a50>&#39;setCookie not called with &#34;true&#34;&#39;</span>);
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>});
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic>// Call runCode to run the template&#39;s code.
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>runCode(mockSingleData);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>assertApi(<span style=color:#a50>&#39;generateRandom&#39;</span>).wasCalled();
+</span></span><span style=display:flex><span>assertApi(<span style=color:#a50>&#39;getCookieValues&#39;</span>).wasCalled();
+</span></span><span style=display:flex><span>assertApi(<span style=color:#a50>&#39;makeInteger&#39;</span>).wasNotCalled();
+</span></span><span style=display:flex><span>assertApi(<span style=color:#a50>&#39;setCookie&#39;</span>).wasCalled();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic>// Verify that the tag finished successfully.
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>assertApi(<span style=color:#a50>&#39;gtmOnSuccess&#39;</span>).wasCalled();</span></span></code></pre></div><p>Check out the <code>mock()</code> calls. The first one is similar to the one in the previous test, except this time we have it return an empty array to signify the cookie has <strong>not</strong> been set.</p><p>Then, we mock the <code>generateRandom()</code> API to have it return the value <code>50</code>, just to test the upper bound of the distribution range of <code>1...50</code> as set in the mock object within the <strong>Setup</strong> of the test.</p><p>The third <code>mock()</code> is interesting! We are mocking <code>setCookie()</code> because a) we don&rsquo;t want it to actually set a cookie, and b) we can use this patch to check what <code>setCookie()</code> was called <em>with</em>. In case <code>setCookie()</code> was not called with the value <code>'true'</code>, we <strong>fail</strong> the test.</p><p>You can use the <code>mock()</code> together with <code>fail()</code> to check what APIs have been called with - it&rsquo;s a nice workaround while we wait for <code>wasCalledWith()</code> for the <code>assertApi()</code> API.</p><p>Then, we run the code with the mock data object again.</p><p>The list of APIs we expect to be called is almost the same as in the previous test, with the exception that now we <strong>expect <code>setCookie()</code></strong> to be called, since the <code>userDistributor</code> cookie does not exist in this scenario.</p><p>This test succeeds if the <code>setCookie()</code> API is called with the expected value of <code>'true'</code> for the cookie.</p><h4 id=test-3-set-single-cookie-to-false-when-not-in-distribution>Test 3: Set single cookie to false when not in distribution</h4><p>This test is basically a mirror of the previous one, except we set a different return value for the <code>generateRandom()</code> mock to ensure the cookie is set with the value <code>'false'</code>. We&rsquo;re using the lower bound of the range (<code>51</code>) just to test the extremes of the algorithm.</p><div class=highlight><pre tabindex=0 style=background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-javascript data-lang=javascript><span style=display:flex><span>mock(<span style=color:#a50>&#39;getCookieValues&#39;</span>, []);
+</span></span><span style=display:flex><span>mock(<span style=color:#a50>&#39;generateRandom&#39;</span>, <span style=color:#099>51</span>);
+</span></span><span style=display:flex><span>mock(<span style=color:#a50>&#39;setCookie&#39;</span>, (name, value, options) =&gt; {
+</span></span><span style=display:flex><span>  <span style=color:#00a>if</span> (value !== <span style=color:#a50>&#39;false&#39;</span>) {
+</span></span><span style=display:flex><span>    fail(<span style=color:#a50>&#39;setCookie not called with &#34;false&#34;&#39;</span>);
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>});
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic>// Call runCode to run the template&#39;s code.
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>runCode(mockSingleData);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>assertApi(<span style=color:#a50>&#39;generateRandom&#39;</span>).wasCalled();
+</span></span><span style=display:flex><span>assertApi(<span style=color:#a50>&#39;getCookieValues&#39;</span>).wasCalled();
+</span></span><span style=display:flex><span>assertApi(<span style=color:#a50>&#39;makeInteger&#39;</span>).wasNotCalled();
+</span></span><span style=display:flex><span>assertApi(<span style=color:#a50>&#39;setCookie&#39;</span>).wasCalled();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic>// Verify that the tag finished successfully.
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>assertApi(<span style=color:#a50>&#39;gtmOnSuccess&#39;</span>).wasCalled();</span></span></code></pre></div><p>Other than those two changes, the test code is identical to the previous one.</p><h4 id=test-4-set-single-cookie-with-correct-options>Test 4: Set single cookie with correct options</h4><p>This test is a simple check to make sure that the cookie settings (name, value, domain, and expiration) correspond with those set in the template configuration. It&rsquo;s a solid test to write, because often the little configuration mistakes that don&rsquo;t really break the code are the ones that slip through the cracks when creating incremental updates.</p><div class=highlight><pre tabindex=0 style=background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-javascript data-lang=javascript><span style=display:flex><span>mock(<span style=color:#a50>&#39;getCookieValues&#39;</span>, []);
+</span></span><span style=display:flex><span>mock(<span style=color:#a50>&#39;generateRandom&#39;</span>, <span style=color:#099>99</span>);
+</span></span><span style=display:flex><span>mock(<span style=color:#a50>&#39;setCookie&#39;</span>, (name, value, options) =&gt; {
+</span></span><span style=display:flex><span>  <span style=color:#00a>if</span> (name !== mockSingleData.cookieName) fail(<span style=color:#a50>&#39;setCookie called with incorrect cookie name&#39;</span>);
+</span></span><span style=display:flex><span>  <span style=color:#00a>if</span> (value !== <span style=color:#a50>&#39;false&#39;</span>) fail(<span style=color:#a50>&#39;setCookie not called with &#34;false&#34;&#39;</span>);
+</span></span><span style=display:flex><span>  <span style=color:#00a>if</span> (options.domain !== mockSingleData.cookieDomain) fail(<span style=color:#a50>&#39;setCookie called with incorrect cookie domain&#39;</span>);
+</span></span><span style=display:flex><span>  <span style=color:#00a>if</span> (options[<span style=color:#a50>&#39;max-age&#39;</span>] !== mockSingleData.cookieExpires * <span style=color:#099>24</span> * <span style=color:#099>60</span> * <span style=color:#099>60</span>) fail(<span style=color:#a50>&#39;setCookie called with incorrect max-age&#39;</span>);
+</span></span><span style=display:flex><span>});
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic>// Call runCode to run the template&#39;s code.
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>runCode(mockSingleData);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>assertApi(<span style=color:#a50>&#39;generateRandom&#39;</span>).wasCalled();
+</span></span><span style=display:flex><span>assertApi(<span style=color:#a50>&#39;getCookieValues&#39;</span>).wasCalled();
+</span></span><span style=display:flex><span>assertApi(<span style=color:#a50>&#39;makeInteger&#39;</span>).wasNotCalled();
+</span></span><span style=display:flex><span>assertApi(<span style=color:#a50>&#39;setCookie&#39;</span>).wasCalled();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic>// Verify that the tag finished successfully.
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>assertApi(<span style=color:#a50>&#39;gtmOnSuccess&#39;</span>).wasCalled();</span></span></code></pre></div><p>The magic happens in the <code>setCookie()</code> mock. Basically, we fail the test if the <code>setCookie()</code> API is called with values that do not correspond to those we set in the mock data object.</p><h4 id=test-5-set-multi-cookie-to-a-when-equal-to-33>Test 5: Set multi cookie to A when equal to 33</h4><p>When we start testing the <strong>multi</strong> distribution options, we are basically checking if the randomized number falls into the distributions established in the tag settings.</p><p>We&rsquo;ll first test the simplest scenario: the randomizer picks the first group the user defined. We use this by setting it to the upper bound of the first group.</p><div class=highlight><pre tabindex=0 style=background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-javascript data-lang=javascript><span style=display:flex><span>mock(<span style=color:#a50>&#39;getCookieValues&#39;</span>, []);
+</span></span><span style=display:flex><span>mock(<span style=color:#a50>&#39;generateRandom&#39;</span>, <span style=color:#099>33</span>);
+</span></span><span style=display:flex><span>mock(<span style=color:#a50>&#39;setCookie&#39;</span>, (name, value, options) =&gt; {
+</span></span><span style=display:flex><span>  <span style=color:#00a>if</span> (value !== <span style=color:#a50>&#39;A&#39;</span>) {
+</span></span><span style=display:flex><span>    fail(<span style=color:#a50>&#39;setCookie not called with &#34;A&#34;&#39;</span>);
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>});
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic>// Call runCode to run the template&#39;s code.
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>runCode(mockMultiData);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>assertApi(<span style=color:#a50>&#39;generateRandom&#39;</span>).wasCalled();
+</span></span><span style=display:flex><span>assertApi(<span style=color:#a50>&#39;getCookieValues&#39;</span>).wasCalled();
+</span></span><span style=display:flex><span>assertApi(<span style=color:#a50>&#39;makeInteger&#39;</span>).wasCalled();
+</span></span><span style=display:flex><span>assertApi(<span style=color:#a50>&#39;setCookie&#39;</span>).wasCalled();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic>// Verify that the tag finished successfully.
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>assertApi(<span style=color:#a50>&#39;gtmOnSuccess&#39;</span>).wasCalled();</span></span></code></pre></div><p>The setup is very similar to the previous single distribution tests, with the difference that the cookie <strong>value</strong> is now established in the mock data object, and we expect the <code>makeInteger()</code> API to be called for the template test to succeed.</p><h4 id=test-6-set-multi-cookie-to-b-when-equal-to-34>Test 6: Set multi cookie to B when equal to 34</h4><p>This test is practically identical to the previous one, with the exception that we set the <code>generateRandom()</code> API to return a value that sits within the lower bound of the second group of the mock object, and we modify the <code>setCookie()</code> API to check for the corresponding value (<code>'B'</code>) instead.</p><div class=highlight><pre tabindex=0 style=background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-javascript data-lang=javascript><span style=display:flex><span>mock(<span style=color:#a50>&#39;getCookieValues&#39;</span>, []);
+</span></span><span style=display:flex><span>mock(<span style=color:#a50>&#39;generateRandom&#39;</span>, <span style=color:#099>34</span>);
+</span></span><span style=display:flex><span>mock(<span style=color:#a50>&#39;setCookie&#39;</span>, (name, value, options) =&gt; {
+</span></span><span style=display:flex><span>  <span style=color:#00a>if</span> (value !== <span style=color:#a50>&#39;B&#39;</span>) {
+</span></span><span style=display:flex><span>    fail(<span style=color:#a50>&#39;setCookie not called with &#34;B&#34;&#39;</span>);
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>});
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic>// Call runCode to run the template&#39;s code.
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>runCode(mockMultiData);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>assertApi(<span style=color:#a50>&#39;generateRandom&#39;</span>).wasCalled();
+</span></span><span style=display:flex><span>assertApi(<span style=color:#a50>&#39;getCookieValues&#39;</span>).wasCalled();
+</span></span><span style=display:flex><span>assertApi(<span style=color:#a50>&#39;makeInteger&#39;</span>).wasCalled();
+</span></span><span style=display:flex><span>assertApi(<span style=color:#a50>&#39;setCookie&#39;</span>).wasCalled();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic>// Verify that the tag finished successfully.
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>assertApi(<span style=color:#a50>&#39;gtmOnSuccess&#39;</span>).wasCalled();</span></span></code></pre></div><h4 id=test-7-do-not-set-multi-cookie-if-not-within-distributions>Test 7: Do not set multi cookie if not within distributions</h4><p>In case the randomizer does not fall into any of the probability ranges established in the <strong>multi</strong> distribution settings, the cookie should not be set.</p><p>The easiest way to check this is by making sure the <code>setCookie()</code> API was not called. You can do this with <code>assertApi('setCookie').wasNotCalled()</code>, but you can also mock the <code>setCookie()</code> API to <strong>fail</strong> if called. I&rsquo;ve opted to do both just for giggles.</p><div class=highlight><pre tabindex=0 style=background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-javascript data-lang=javascript><span style=display:flex><span>mock(<span style=color:#a50>&#39;getCookieValues&#39;</span>, []);
+</span></span><span style=display:flex><span>mock(<span style=color:#a50>&#39;generateRandom&#39;</span>, <span style=color:#099>67</span>);
+</span></span><span style=display:flex><span>mock(<span style=color:#a50>&#39;setCookie&#39;</span>, (name, value, options) =&gt; {
+</span></span><span style=display:flex><span>  fail(<span style=color:#a50>&#39;setCookie should not have been called&#39;</span>);
+</span></span><span style=display:flex><span>});
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic>// Call runCode to run the template&#39;s code.
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>runCode(mockMultiData);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>assertApi(<span style=color:#a50>&#39;generateRandom&#39;</span>).wasCalled();
+</span></span><span style=display:flex><span>assertApi(<span style=color:#a50>&#39;getCookieValues&#39;</span>).wasCalled();
+</span></span><span style=display:flex><span>assertApi(<span style=color:#a50>&#39;makeInteger&#39;</span>).wasCalled();
+</span></span><span style=display:flex><span>assertApi(<span style=color:#a50>&#39;setCookie&#39;</span>).wasNotCalled();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic>// Verify that the tag finished successfully.
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>assertApi(<span style=color:#a50>&#39;gtmOnSuccess&#39;</span>).wasCalled();</span></span></code></pre></div><p>Here, we generate a random number that is above <strong>66</strong> to make sure the number doesn&rsquo;t belong to any group. Then, we mock <code>setCookie()</code> to fail the test if ever called (regardless of what values it was called with), and we also use <code>assertApi()</code> to pass the test only if the API was not called.</p><h4 id=test-8-set-multi-cookie-with-correct-options>Test 8: Set multi cookie with correct options</h4><p>This is similar to <strong>Test 4</strong>, since we are just checking that the cookie is set with options that correspond with those configured in the template settings (or in the mock data object as in this case). The test will fail if there are any differences.</p><div class=highlight><pre tabindex=0 style=background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-javascript data-lang=javascript><span style=display:flex><span>mock(<span style=color:#a50>&#39;getCookieValues&#39;</span>, []);
+</span></span><span style=display:flex><span>mock(<span style=color:#a50>&#39;generateRandom&#39;</span>, <span style=color:#099>20</span>);
+</span></span><span style=display:flex><span>mock(<span style=color:#a50>&#39;setCookie&#39;</span>, (name, value, options) =&gt; {
+</span></span><span style=display:flex><span>  <span style=color:#00a>if</span> (name !== mockMultiData.cookieName) fail(<span style=color:#a50>&#39;setCookie called with incorrect cookie name&#39;</span>);
+</span></span><span style=display:flex><span>  <span style=color:#00a>if</span> (value !== mockMultiData.multiPercent[<span style=color:#099>0</span>].value) fail(<span style=color:#a50>&#39;setCookie called with incorrect cookie value&#39;</span>);
+</span></span><span style=display:flex><span>  <span style=color:#00a>if</span> (options.domain !== mockMultiData.cookieDomain) fail(<span style=color:#a50>&#39;setCookie called with incorrect cookie domain&#39;</span>);
+</span></span><span style=display:flex><span>  <span style=color:#00a>if</span> (options[<span style=color:#a50>&#39;max-age&#39;</span>] !== mockMultiData.cookieExpires * <span style=color:#099>24</span> * <span style=color:#099>60</span> * <span style=color:#099>60</span>) fail(<span style=color:#a50>&#39;setCookie called with incorrect max-age&#39;</span>);
+</span></span><span style=display:flex><span>});
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic>// Call runCode to run the template&#39;s code.
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>runCode(mockMultiData);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>assertApi(<span style=color:#a50>&#39;generateRandom&#39;</span>).wasCalled();
+</span></span><span style=display:flex><span>assertApi(<span style=color:#a50>&#39;getCookieValues&#39;</span>).wasCalled();
+</span></span><span style=display:flex><span>assertApi(<span style=color:#a50>&#39;makeInteger&#39;</span>).wasCalled();
+</span></span><span style=display:flex><span>assertApi(<span style=color:#a50>&#39;setCookie&#39;</span>).wasCalled();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic>// Verify that the tag finished successfully.
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>assertApi(<span style=color:#a50>&#39;gtmOnSuccess&#39;</span>).wasCalled();</span></span></code></pre></div><h2 id=summary>Summary</h2><p>In this article, I showed you two walkthroughs for how to write tests for your variable and tag templates.</p><p>A good way to get started is to figure out all the branches of your code, and then write tests that check for all the permutations.</p><p>To reduce the number of tests you need, make sure you utilize the <a href=/analytics/custom-templates-guide-for-google-tag-manager/#field-configuration-reference>field configurations</a> (particularly the <a href=/analytics/custom-templates-guide-for-google-tag-manager/#validation-rules>validation rules</a>) efficiently. By blocking invalid input before the tag or variable can even be saved you&rsquo;re reducing the number of validation checks you need to write (and test for) in the code.</p><p>Hopefully we&rsquo;ll get some <strong>test coverage</strong> details into the UI, so that you can plan your tests to cover all possible branches and features of the template code.</p><p>Finally, <strong>remember to update the tests when you update the template itself</strong>. Writing and updating tests should become part and parcel of your quality assurance process when writing templates. You owe it to the users who end up installing your template into their Google Tag Manager containers!</p></div></div><div id=post-footer class="post-footer main-content-wrap"><div class=post-footer-tags><span class="text-color-light text-small">TAGGED IN</span><br><a class="tag tag--primary tag--small" href=/tags/google-tag-manager/>google tag manager</a>
+<a class="tag tag--primary tag--small" href=/tags/gtmtips/>gtmtips</a>
+<a class="tag tag--primary tag--small" href=/tags/custom-templates/>custom templates</a>
+<a class="tag tag--primary tag--small" href=/tags/testing/>testing</a></div><div class=post-actions-wrap><nav><ul class="post-actions post-action-nav"><li class=post-action><a class="post-action-btn btn btn--default" href=/analytics/persist-campaign-data-landing-page/><i class="fa fa-angle-left"></i>
+<span class="hide-xs hide-sm text-small icon-ml">NEXT</span></a></li><li class=post-action><a class="post-action-btn btn btn--default" href=/analytics/writing-tests-for-custom-templates-google-tag-manager/><span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+<i class="fa fa-angle-right"></i></a></li></ul></nav><ul class="post-actions post-action-share"><li class="post-action hide-lg hide-md hide-sm"><a class="post-action-btn btn btn--default btn-open-shareoptions" href=#btn-open-shareoptions><i class="fa fa-share-alt"></i></a></li><li class="post-action hide-xs"><a class="post-action-btn btn btn--default" target=new href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/gtm-tips/tag-template-test-walkthrough/"><i class="fa fa-brands fa-facebook"></i></a></li><li class="post-action hide-xs"><a class="post-action-btn btn btn--default" target=new href="https://twitter.com/intent/tweet?text=%23GTMTips:%20Walkthrough%20Of%20Custom%20Template%20Tests%20https://www.simoahava.com/gtm-tips/tag-template-test-walkthrough/%20via%20@SimoAhava"><i class="fa fa-brands fa-twitter"></i></a></li><li class="post-action hide-xs"><a class="post-action-btn btn btn--default" target=new href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/gtm-tips/tag-template-test-walkthrough/"><i class="fa fa-brands fa-linkedin"></i></a></li><li class=post-action><a class="post-action-btn btn btn--default" href=#commento><i class="fa-regular fa-comments"></i></a></li><li class=post-action><a class="post-action-btn btn btn--default" href=#><i class="fa fa-search"></i></a></li></ul></div><a name=commento></a><comentario-comments></comentario-comments></div></article><footer id=footer class=main-content-wrap><span class=copyrights>&copy; 2026 Simo Ahava. All Rights Reserved</span></footer></div><div id=bottom-bar class=post-bottom-bar data-behavior=4><div class=post-actions-wrap><nav><ul class="post-actions post-action-nav"><li class=post-action><a class="post-action-btn btn btn--default" href=/analytics/persist-campaign-data-landing-page/><i class="fa fa-angle-left"></i>
+<span class="hide-xs hide-sm text-small icon-ml">NEXT</span></a></li><li class=post-action><a class="post-action-btn btn btn--default" href=/analytics/writing-tests-for-custom-templates-google-tag-manager/><span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+<i class="fa fa-angle-right"></i></a></li></ul></nav><ul class="post-actions post-action-share"><li class="post-action hide-lg hide-md hide-sm"><a class="post-action-btn btn btn--default btn-open-shareoptions" href=#btn-open-shareoptions><i class="fa fa-share-alt"></i></a></li><li class="post-action hide-xs"><a class="post-action-btn btn btn--default" target=new href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/gtm-tips/tag-template-test-walkthrough/"><i class="fa fa-brands fa-facebook"></i></a></li><li class="post-action hide-xs"><a class="post-action-btn btn btn--default" target=new href="https://twitter.com/intent/tweet?text=%23GTMTips:%20Walkthrough%20Of%20Custom%20Template%20Tests%20https://www.simoahava.com/gtm-tips/tag-template-test-walkthrough/%20via%20@SimoAhava"><i class="fa fa-brands fa-twitter"></i></a></li><li class="post-action hide-xs"><a class="post-action-btn btn btn--default" target=new href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/gtm-tips/tag-template-test-walkthrough/"><i class="fa fa-brands fa-linkedin"></i></a></li><li class=post-action><a class="post-action-btn btn btn--default" href=#commento><i class="fa-regular fa-comments"></i></a></li><li class=post-action><a class="post-action-btn btn btn--default" href=#><i class="fa fa-search"></i></a></li></ul></div></div><div id=share-options-bar class=share-options-bar data-behavior=4><i id=btn-close-shareoptions class="fa fa-close"></i><ul class=share-options><li class=share-option><a class=share-option-btn target=new href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/gtm-tips/tag-template-test-walkthrough/"><i class="fa fa-brands fa-facebook"></i><span>Share on Facebook</span></a></li><li class=share-option><a class=share-option-btn target=new href="https://twitter.com/intent/tweet?text=%23GTMTips:%20Walkthrough%20Of%20Custom%20Template%20Tests%20https://www.simoahava.com/gtm-tips/tag-template-test-walkthrough/%20via%20@SimoAhava"><i class="fa fa-brands fa-twitter"></i><span>Share on Twitter</span></a></li><li class=share-option><a class=share-option-btn target=new href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/gtm-tips/tag-template-test-walkthrough/"><i class="fa fa-brands fa-linkedin"></i><span>Share on LinkedIn</span></a></li></ul></div><div id=share-options-mask class=share-options-mask></div></div><div id=about><div id=about-card><div id=about-btn-close><i class="fa fa-remove"></i></div><img id=about-card-picture src=https://www.simoahava.com/images/simo.png alt="Author's picture"><h4 id=about-card-name>Simo Ahava</h4><div id=about-card-bio>Husband | Father | Analytics developer<br>simo (at) simoahava.com</div><div id=about-card-job><i class="fa fa-briefcase"></i><br>Senior Data Advocate at Reaktor</div><div id=about-card-location><i class="fa fa-map-marker"></i><br>Finland</div></div></div><div id=cover style=background-image:url(https://www.simoahava.com/images/maisema.jpg)></div><script defer src=https://comentario.simoahava.com/comentario.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin=anonymous referrerpolicy=no-referrer></script><script defer src=/js/script.js></script><script>!function(){var e=document.querySelector(".simmer"),t=document.querySelector(".simmer .close"),n=window.sessionStorage&&window.sessionStorage.getItem("nosimmer");e&&(n&&(e.style.display="none"),t&&t.addEventListener("click",function(){window.sessionStorage.setItem("nosimmer","true"),e.style.display="none"}))}()</script></body></html>

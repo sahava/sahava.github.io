@@ -1,65 +1,143 @@
-(function($) {
-    
-    var endpoint = window.location.hostname === 'localhost' ? 'http://localhost:9080' : 'https://simoahava-com-search.ew.r.appspot.com';
-    
-    var header = document.querySelector('h1.searchResults');
-    var spinner = document.querySelector('#spinner');
-    var main = document.querySelector('#results');
-    var numResults = document.querySelector('#numResults');
-    
-    var getQuery = function() {
-	if (window.location.search.length === 0 || (window.location.search.indexOf('?q=') === -1 && window.location.search.indexOf('&q=') === -1)) {
-	    return undefined;
-	}
+/**
+ * Search functionality for simoahava.com
+ * Modernized to vanilla JavaScript (no jQuery dependency)
+ */
 
-	var parts = window.location.search.substring(1).split('&');
-	var query = parts.map(function(part) {
-	    var temp = part.split('=');
-	    return temp[0] === 'q' ? temp[1] : false;
-	});
-	return query[0] || undefined;
-    };
+(function() {
+  'use strict';
 
-    var buildPage = function(results) {
-        results.forEach(function(result, idx) {
-	    var article = document.createElement('article');
-	    article.className = 'postShorten';
-	    article.innerHTML = '<div class="postShorten-wrap"><div class="postShorten-header"><h2 class="postShorten-title"><a class="link-unstyled" href="' + result.uri + '">' + (idx + 1) + '. ' + result.title + '</a></h2><div class="postShorten-meta post-meta"><a href="' + result.uri + '">' + result.uri + '</a></div></div><div class="postShorten-excerpt">' + result.description + '</div><p></p></div>';
-	    main.appendChild(article);
-	});
-    };
-    
-    var printSearchResults = function(results) {
-        $(spinner).css('display', 'none');
-	if (typeof results === 'undefined') {
-	    $(header).text('No search entered');
-	    return;
-	}
-	$(header).text('Search results for: ' + decodeURIComponent(results.query));
-	$(numResults).text(results.results.length);
-	$(main).css('display', 'block');
-	if (results.results.length) {
-	    buildPage(results.results);
-	}
-    };
+  const endpoint = window.location.hostname === 'localhost' 
+    ? 'http://localhost:9080' 
+    : 'https://simoahava-com-search.ew.r.appspot.com';
 
-    var getResults = function(query) {
-	$.get(endpoint + '?q=' + query, function(data) {
-	    return data;
-	});
-    };
+  const header = document.querySelector('h1.searchResults');
+  const spinner = document.querySelector('#spinner');
+  const main = document.querySelector('#results');
+  const numResults = document.querySelector('#numResults');
 
-    $(document).ready(function() {
-	var query = getQuery();
+  /**
+   * Extract search query from URL
+   * @returns {string|undefined}
+   */
+  function getQuery() {
+    const params = new URLSearchParams(window.location.search);
+    const query = params.get('q');
+    return query || undefined;
+  }
 
-	if (typeof query === 'undefined') {
-	    printSearchResults();
-	    return;
-	} else {
-	    $.get(endpoint + '?q=' + query, function(data) {
-		printSearchResults(JSON.parse(data));
-	    });
-	}
+  /**
+   * Build search results HTML
+   * @param {Array} results - Search results array
+   */
+  function buildPage(results) {
+    const fragment = document.createDocumentFragment();
+
+    results.forEach(function(result, idx) {
+      const article = document.createElement('article');
+      article.className = 'postShorten';
+      article.innerHTML = `
+        <div class="postShorten-wrap">
+          <div class="postShorten-header">
+            <h2 class="postShorten-title">
+              <a class="link-unstyled" href="${escapeHtml(result.uri)}">
+                ${idx + 1}. ${escapeHtml(result.title)}
+              </a>
+            </h2>
+            <div class="postShorten-meta post-meta">
+              <a href="${escapeHtml(result.uri)}">${escapeHtml(result.uri)}</a>
+            </div>
+          </div>
+          <div class="postShorten-excerpt">${escapeHtml(result.description)}</div>
+          <p></p>
+        </div>
+      `;
+      fragment.appendChild(article);
     });
-	    
-})(window.jQuery);
+
+    main.appendChild(fragment);
+  }
+
+  /**
+   * Escape HTML to prevent XSS
+   * @param {string} str - String to escape
+   * @returns {string}
+   */
+  function escapeHtml(str) {
+    if (!str) return '';
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  /**
+   * Display search results
+   * @param {Object} results - Results object from API
+   */
+  function printSearchResults(results) {
+    if (spinner) {
+      spinner.style.display = 'none';
+    }
+
+    if (typeof results === 'undefined') {
+      if (header) header.textContent = 'No search entered';
+      return;
+    }
+
+    if (header) {
+      header.textContent = 'Search results for: ' + decodeURIComponent(results.query);
+    }
+
+    if (numResults) {
+      numResults.textContent = results.results.length;
+    }
+
+    if (main) {
+      main.style.display = 'block';
+      if (results.results.length) {
+        buildPage(results.results);
+      }
+    }
+  }
+
+  /**
+   * Fetch search results from API
+   * @param {string} query - Search query
+   */
+  async function fetchResults(query) {
+    try {
+      const response = await fetch(endpoint + '?q=' + encodeURIComponent(query));
+      if (!response.ok) {
+        throw new Error('Search request failed');
+      }
+      const data = await response.text();
+      printSearchResults(JSON.parse(data));
+    } catch (error) {
+      console.error('Search error:', error);
+      if (header) header.textContent = 'Search failed. Please try again.';
+      if (spinner) spinner.style.display = 'none';
+    }
+  }
+
+  /**
+   * Initialize search on page load
+   */
+  function init() {
+    // Only run on search pages
+    if (!header && !main) return;
+
+    const query = getQuery();
+
+    if (typeof query === 'undefined') {
+      printSearchResults();
+    } else {
+      fetchResults(query);
+    }
+  }
+
+  // Run when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();

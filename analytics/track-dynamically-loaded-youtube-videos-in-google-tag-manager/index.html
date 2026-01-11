@@ -1,1128 +1,451 @@
-
-
-  
-    
-  
-
-
-  
-
-
-
-
-
-  
-
-
-  
-
-<!DOCTYPE html>
-<html lang="en-us">
-  <head>
-    <meta name="google-site-verification" content="xQwWI2KUfP9LbFKhw2CVLFtrMY6Czrla7L3PD2aBolA" />
-
-
-<script type="application/ld+json">
-{
-  "@context": "http://schema.org", 
-  "@type": "BlogPosting",
-  "headline": "Track Dynamically Loaded YouTube Videos In Google Tag Manager | Simo Ahava's blog",
-  "image": "https:\/\/www.simoahava.com\/images\/2015\/12\/youtube-videos-dynamic-tracking.jpg",
-  "editor": "Simo Ahava",
-  "publisher": {
-    "@type": "Organization",
-    "name": "Simo Ahava's blog",
-    "logo": {
-      "@type": "ImageObject",
-      "url": "https:\/\/www.simoahava.com\/images\/simo.png",
-      "height": "393",
-      "width": "407"
-    }
-  },
-  "url": "https:\/\/www.simoahava.com\/analytics\/track-dynamically-loaded-youtube-videos-in-google-tag-manager\/",
-  "datePublished": "2015-12-29T05:47:30\u002b00:00",
-  "dateModified": "2015-12-29T05:47:30\u002b00:00",
-  "description": "How to track embedded YouTube videos using Google Tag Manager, when the videos are loaded dynamically after initial page load.",
-  "author": {
-    "@type": "Person",
-    "name": "Simo Ahava"
-  }
-}
-</script>
-
-
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    
-    <title>Track Dynamically Loaded YouTube Videos In Google Tag Manager | Simo Ahava's blog</title>
-    
-    <script>
-      window.dataLayer=window.dataLayer||[];window.dataLayer.push({pageType: 'article', environment:  null });
-    </script>
-    
-
-    
-    
-    
-    <script>
-      (function(S,i,m,o){
-        window[m]=window[m]||[];
-        window[m].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
-        var f=S.getElementsByTagName(i)[0],j=S.createElement(i),dl=m!='dataLayer'?'&l='+m:'';
-        j.async=true;
-        j.src='https://sgtm.simoahava.com/gtm.js?id='+o+dl;
-        f.parentNode.insertBefore(j,f);
-      })(document,'script','dataLayer','GTM-PZ7GMV9');
-    </script>
-    
-    <meta name="author" content="Simo Ahava">
-    <meta name="keywords" content="">
-
-    <link rel="icon" href="https://www.simoahava.com/images/favicon.ico">
-    
-    <link rel="amphtml" href="https://www.simoahava.com/amp/analytics/track-dynamically-loaded-youtube-videos-in-google-tag-manager/">
-    
-    <meta name="description" content="How to track embedded YouTube videos using Google Tag Manager, when the videos are loaded dynamically after initial page load.">
-    <meta property="og:description" content="How to track embedded YouTube videos using Google Tag Manager, when the videos are loaded dynamically after initial page load.">
-    <meta property="og:type" content="blog">
-    <meta property="og:title" content="Track Dynamically Loaded YouTube Videos In Google Tag Manager">
-    <meta property="og:url" content="https://www.simoahava.com/analytics/track-dynamically-loaded-youtube-videos-in-google-tag-manager/">
-    <meta property="og:site_name" content="Simo Ahava&#39;s blog">
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Track Dynamically Loaded YouTube Videos In Google Tag Manager">
-    <meta name="twitter:description" content="How to track embedded YouTube videos using Google Tag Manager, when the videos are loaded dynamically after initial page load.">
-    
-      <meta name="twitter:creator" content="@SimoAhava">
-      
-    
-
-    
-    
-
-    
-      <meta name="twitter:image" content="https://www.simoahava.com/images/2015/12/youtube-videos-dynamic-tracking.jpg">  
-      <meta property="og:image" content="https://www.simoahava.com/images/2015/12/youtube-videos-dynamic-tracking.jpg">
-    
-
-
-    
-
-      
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-      
-    
-    <link rel="stylesheet" href="https://www.simoahava.com/css/style.css" />
-    
-    
-
-    
-      
-    
-    
-  </head>
-
-  <body>
-    
-    <div id="_progress"></div>
-    
-    <div id="blog">
-      <header id="header" data-behavior="4">
-  <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
-  <div class="header-title">
-    <a class="header-title-link" href="https://www.simoahava.com/">Simo Ahava&#39;s blog</a>
-  </div>
-  
-</header>
-
-      <nav id="sidebar" data-behavior="4">
-  <div class="sidebar-container">
-    
-      <div class="sidebar-profile">
-        <a href="https://www.simoahava.com/">
-          <img class="sidebar-profile-picture" loading="lazy" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
-        </a>
-        <h4 class="sidebar-profile-name">Simo Ahava</h4>
-        
-          <h5 class="sidebar-profile-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</h5>
-        
-      </div>
-    
-    <ul class="sidebar-buttons">
-      
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-home"></i>
-      
-      <span class="sidebar-button-desc">Home</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
-      
-      <span class="sidebar-button-desc">Categories</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/tags/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
-      
-      <span class="sidebar-button-desc">Tags</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/gtm-tips/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-magic"></i>
-      
-      <span class="sidebar-button-desc">GTM Tips</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/about-simo-ahava/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-question"></i>
-      
-      <span class="sidebar-button-desc">About</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
-      
-      <span class="sidebar-button-desc">RSS</span>
-    </a>
-  </li>
-
-
-    </ul>
-    <ul class="sidebar-buttons">
-      
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/tools/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-wrench"></i>
-      
-      <span class="sidebar-button-desc">Tools</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/blog-statistics/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-bar-chart"></i>
-      
-      <span class="sidebar-button-desc">Blog statistics</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://github.com/sahava" target="_blank" rel="noopener ">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-brands fa-github"></i>
-      
-      <span class="sidebar-button-desc">GitHub</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/upcoming-talks/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-bullhorn"></i>
-      
-      <span class="sidebar-button-desc">Upcoming talks</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/custom-templates/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
-      
-      <span class="sidebar-button-desc">Templates</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/newsletter/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-bell"></i>
-      
-      <span class="sidebar-button-desc">Newsletter</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://masto.measure.chat/@SimoAhava" target="_blank" rel="noopener me">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-brands fa-mastodon"></i>
-      
-      <span class="sidebar-button-desc">Mastodon</span>
-    </a>
-  </li>
-
-
-    </ul>
-    <ul class="sidebar-buttons">
-      
-
-    </ul>
-  </div>
-</nav>
-
-      
-
-      <div id="main" data-behavior="4"
-        class="
-               hasCoverMetaIn
-               ">
-        <article class="post">
-	  <form id="search" action="https://www.simoahava.com/search/">
-  <input name="q" type="text" class="form-control input--xlarge" placeholder="Search blog..." autocomplete="off">
-  </form>
-
-          <div class="post-header main-content-wrap text-left">
-  
-  
-
-    <h1>
-      Track Dynamically Loaded YouTube Videos In Google Tag Manager
-    </h1>
-  
-  
-  <div class="postShorten-meta post-meta">
-    
-      <time datetime="2015-12-29T05:47:30Z">
-        
-  December 29, 2015
-
-      </time>
-      
-      
-  
-  
-    <span>in</span>
-    
-      <a class="category-link" href="https://www.simoahava.com/categories/analytics">Analytics</a>
-    
-  
-
-
-      | <a href="https://www.simoahava.com/analytics/track-dynamically-loaded-youtube-videos-in-google-tag-manager/#commento"><comentario-count path="/analytics/track-dynamically-loaded-youtube-videos-in-google-tag-manager/" 
-                  placeholder="..."
-                  error-text="N/A "
-                  zero-text="0 "
-                  prefix=""
-                  suffix=" "></comentario-count>Comments</a>
-      
-  </div>
-
-
-</div>
-
-          <div class="post-content markdown">
-            <div class="main-content-wrap">
-	      
-                
-  	        <p>Tracking <a href="https://www.youtube.com/">YouTube</a> videos in <a href="https://tagmanager.google.com">Google Tag Manager</a> is one of the more useful things you can do in terms of tracking. YouTube has a wonderful <a href="https://developers.google.com/youtube/js_api_reference?hl=en">API</a> that you can tap into and convert the detected events into <code>dataLayer</code> messages.</p>
-<p>There are some really good solutions out there for tracking YouTube videos in GTM:</p>
-<ul>
-<li>
-<p>The wonderful <a href="http://www.cardinalpath.com/youtube-video-tracking-with-google-tag-manager-v2-and-universal-analytics-a-step-by-step-guide/">solution by Cardinal Path</a>.</p>
-</li>
-<li>
-<p>An even more thorough treatment <a href="https://www.bounteous.com/insights/2015/05/11/updated-youtube-tracking-google-analytics-gtm/">by Bounteous</a>.</p>
-</li>
-</ul>
-<p>Both do a great job of tracking videos that have been loaded with the page. However, both have difficulties with tracking <strong>dynamically</strong> loaded videos. That means videos which are loaded lazily, or in pop-ups, or when some content link is clicked.</p>
-
-
-
-<div style="aspect-ratio: 1986 / 1290;" class="figure nocaption">
-  
-    <a href="https://www.simoahava.com/images/2015/12/youtube-videos-dynamic-tracking.jpg" title="Track youtube videos dynamically google tag manager">
-  
-    <img class="fig-img" height="1290" width="1986" loading="lazy" src="https://www.simoahava.com/images/2015/12/youtube-videos-dynamic-tracking.jpg#ZgotmplZ" alt="Track youtube videos dynamically google tag manager">
-  
-    </a>
-  
-  
-</div>
-
-
-<p>In this article, I&rsquo;m going to show how you can track dynamically loaded videos using Bounteous&rsquo; solution with slight modifications. Bounteous is my favorite group of geeks in North America, and they bribed me with their awesome book just before Christmas, which would already be reason enough to use their code. However, their solution is also all kinds of robust, and it really lends itself to tracking dynamic stuff as well.</p>
-
-                <span class="simmer">
-  <span class="close">X</span>
-  <p>
-    <span class="fa fa-md fa-bell"></span>
-    <strong>The Simmer Newsletter</strong>
-  </p>
-  <p>
-    Subscribe to the <a href="https://www.simoahava.com/newsletter/">Simmer newsletter</a> to get the latest news and content from Simo Ahava into your email inbox!
-  </p>
-  </span>
-
-                
-                  <h2 id="what-youll-need">What you&rsquo;ll need</h2>
-<p>The modifications will be done to the JavaScript code in the Custom HTML Tag. In other words, you can&rsquo;t use <a href="http://www.jsdelivr.com/projects/youtube-google-analytics">Bounteous&rsquo; CDN</a> for this. You will have to create a Custom HTML Tag, and copy-paste the code in the next chapter within.</p>
-<p>As for the rest of the stuff, just follow Bounteous&rsquo; guide. All this does is add a method you can trigger when videos have been loaded dynamically. Don&rsquo;t worry, I&rsquo;ll explain the method later on as well.</p>
-
-                
-                  <h2 id="the-modified-custom-html-tag">The modified Custom HTML Tag</h2>
-<p>So, follow the <a href="https://www.bounteous.com/insights/2015/05/11/updated-youtube-tracking-google-analytics-gtm/">Bounteous guide</a>, avoiding the CDN, and when you come to the chapter titled <strong>Google Tag Manager Installation</strong>, read the following instead.</p>
-<p>Create a new Custom HTML Tag, and give it some cool name like <strong>Utility - Video Tracking Bomb Overload Christmas Awesome</strong>.</p>
-<p>Sorry for that.</p>
-<p>Next, add the following code.</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
-<span style="color:#aaa;font-style:italic">// Respectfully copied and modified from 
-</span><span style="color:#aaa;font-style:italic">// https://github.com/lunametrics/youtube-google-analytics
-</span><span style="color:#aaa;font-style:italic">// 
-</span><span style="color:#aaa;font-style:italic">// Original implementation by Bounteous
-</span><span style="color:#aaa;font-style:italic"></span><span style="color:#00a">var</span> ytTracker = (<span style="color:#00a">function</span>( <span style="color:#0aa">document</span>, <span style="color:#0aa">window</span>, config ) {
-
-  <span style="color:#a50">&#39;use strict&#39;</span>;
-
-  <span style="color:#0aa">window</span>.onYouTubeIframeAPIReady = (<span style="color:#00a">function</span>() {
-    
-    <span style="color:#00a">var</span> cached = <span style="color:#0aa">window</span>.onYouTubeIframeAPIReady;
-
-    <span style="color:#00a">return</span> <span style="color:#00a">function</span>() {
-        
-      <span style="color:#00a">if</span>( cached ) {
-
-        cached.apply(<span style="color:#00a">this</span>, arguments);
-
-      }
-
-      <span style="color:#aaa;font-style:italic">// This script won&#39;t work on IE 6 or 7, so we bail at this point if we detect that UA
-</span><span style="color:#aaa;font-style:italic"></span>      <span style="color:#00a">if</span>( !navigator.userAgent.match( <span style="color:#099">/MSIE [67]\./gi</span> ) ) {
-
-        init(); 
-    
-      }
-
-    };
-
-  })();
-  
-  <span style="color:#00a">var</span> _config = config || {};
-  <span style="color:#00a">var</span> forceSyntax = _config.forceSyntax || <span style="color:#099">0</span>;
-  <span style="color:#00a">var</span> dataLayerName = _config.dataLayerName || <span style="color:#a50">&#39;dataLayer&#39;</span>;
-  <span style="color:#aaa;font-style:italic">// Default configuration for events
-</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#00a">var</span> eventsFired = {
-    <span style="color:#a50">&#39;Play&#39;</span>        : <span style="color:#00a">true</span>,
-    <span style="color:#a50">&#39;Pause&#39;</span>       : <span style="color:#00a">true</span>,
-    <span style="color:#a50">&#39;Watch to End&#39;</span>: <span style="color:#00a">true</span>
-  };
-  
-  <span style="color:#aaa;font-style:italic">// Overwrites defaults with customizations, if any
-</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#00a">var</span> key;
-  <span style="color:#00a">for</span>( key <span style="color:#00a">in</span> _config.events ) {
-
-    <span style="color:#00a">if</span>( _config.events.hasOwnProperty( key ) ) {
-
-      eventsFired[ key ] = _config.events[ key ];
-
-    }
-
-  }
-  
-  <span style="color:#aaa;font-style:italic">//*****//
-</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#aaa;font-style:italic">// DO NOT EDIT ANYTHING BELOW THIS LINE EXCEPT CONFIG AT THE BOTTOM
-</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#aaa;font-style:italic">//*****//
-</span><span style="color:#aaa;font-style:italic"></span>
-  <span style="color:#aaa;font-style:italic">// Invoked by the YouTube API when it&#39;s ready
-</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#00a">function</span> init() {
-
-    <span style="color:#00a">var</span> iframes = <span style="color:#0aa">document</span>.getElementsByTagName( <span style="color:#a50">&#39;iframe&#39;</span> );
-    <span style="color:#00a">var</span> embeds  = <span style="color:#0aa">document</span>.getElementsByTagName( <span style="color:#a50">&#39;embed&#39;</span> );
-
-    digestPotentialVideos( iframes );
-    digestPotentialVideos( embeds );
-
-  }
-
-  <span style="color:#00a">var</span> tag            = <span style="color:#0aa">document</span>.createElement( <span style="color:#a50">&#39;script&#39;</span> );
-  tag.src            = <span style="color:#a50">&#39;//www.youtube.com/iframe_api&#39;</span>;
-  <span style="color:#00a">var</span> firstScriptTag = <span style="color:#0aa">document</span>.getElementsByTagName( <span style="color:#a50">&#39;script&#39;</span> )[<span style="color:#099">0</span>];
-  firstScriptTag.parentNode.insertBefore( tag, firstScriptTag );
-
-  <span style="color:#aaa;font-style:italic">// Take our videos and turn them into trackable videos with events
-</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#00a">function</span> digestPotentialVideos( potentialVideos ) {
-
-    <span style="color:#00a">var</span> i;
-
-    <span style="color:#00a">for</span>( i = <span style="color:#099">0</span>; i &lt; potentialVideos.length; i++ ) {       
-      <span style="color:#00a">var</span> isYouTubeVideo = checkIfYouTubeVideo( potentialVideos[ i ] );       
-      <span style="color:#00a">if</span>( isYouTubeVideo ) {
-        <span style="color:#00a">var</span> normalizedYouTubeIframe = normalizeYouTubeIframe( potentialVideos[ i ] );
-        addYouTubeEvents( normalizedYouTubeIframe );
-      }
-    }
-
-  }   
-
-  <span style="color:#aaa;font-style:italic">// Determine if the element is a YouTube video or not   
-</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#00a">function</span> checkIfYouTubeVideo( potentialYouTubeVideo ) {
-    <span style="color:#aaa;font-style:italic">// Exclude already decorated videos     
-</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">if</span> (potentialYouTubeVideo.getAttribute(<span style="color:#a50">&#39;data-gtm-yt&#39;</span>)) {       
-      <span style="color:#00a">return</span> <span style="color:#00a">false</span>;
-    }
-
-    <span style="color:#00a">var</span> potentialYouTubeVideoSrc = potentialYouTubeVideo.src || <span style="color:#a50">&#39;&#39;</span>;     
-    <span style="color:#00a">if</span>( potentialYouTubeVideoSrc.indexOf( <span style="color:#a50">&#39;youtube.com/embed/&#39;</span> ) &gt; -<span style="color:#099">1</span> || potentialYouTubeVideoSrc.indexOf( <span style="color:#a50">&#39;youtube.com/v/&#39;</span> ) &gt; -<span style="color:#099">1</span> ) {
-
-      <span style="color:#00a">return</span> <span style="color:#00a">true</span>;
-
-    }
-
-    <span style="color:#00a">return</span> <span style="color:#00a">false</span>;
-
-  }
-
-  <span style="color:#aaa;font-style:italic">// Turn embed objects into iframe objects and ensure they have the right parameters
-</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#00a">function</span> normalizeYouTubeIframe( youTubeVideo ) {
-    
-    <span style="color:#00a">var</span> a           = <span style="color:#0aa">document</span>.createElement( <span style="color:#a50">&#39;a&#39;</span> );
-        a.href      = youTubeVideo.src;
-        a.hostname  = <span style="color:#a50">&#39;www.youtube.com&#39;</span>;
-        a.protocol  = <span style="color:#0aa">document</span>.location.protocol;
-    <span style="color:#00a">var</span> tmpPathname = a.pathname.charAt( <span style="color:#099">0</span> ) === <span style="color:#a50">&#39;/&#39;</span> ? a.pathname : <span style="color:#a50">&#39;/&#39;</span> + a.pathname;  <span style="color:#aaa;font-style:italic">// IE10 shim
-</span><span style="color:#aaa;font-style:italic"></span>    
-    <span style="color:#aaa;font-style:italic">// For security reasons, YouTube wants an origin parameter set that matches our hostname
-</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">var</span> origin = <span style="color:#0aa">window</span>.location.protocol + <span style="color:#a50">&#39;%2F%2F&#39;</span> + <span style="color:#0aa">window</span>.location.hostname + ( <span style="color:#0aa">window</span>.location.port ? <span style="color:#a50">&#39;:&#39;</span> + <span style="color:#0aa">window</span>.location.port : <span style="color:#a50">&#39;&#39;</span> );
-
-    <span style="color:#00a">if</span>( a.search.indexOf( <span style="color:#a50">&#39;enablejsapi&#39;</span> ) === -<span style="color:#099">1</span> ) {
-
-      a.search = ( a.search.length &gt; <span style="color:#099">0</span> ? a.search + <span style="color:#a50">&#39;&amp;&#39;</span> : <span style="color:#a50">&#39;&#39;</span> ) + <span style="color:#a50">&#39;enablejsapi=1&#39;</span>;
-
-    }
-
-    <span style="color:#aaa;font-style:italic">// Don&#39;t set if testing locally
-</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">if</span>( a.search.indexOf( <span style="color:#a50">&#39;origin&#39;</span> ) === -<span style="color:#099">1</span>  &amp;&amp; <span style="color:#0aa">window</span>.location.hostname.indexOf( <span style="color:#a50">&#39;localhost&#39;</span> ) === -<span style="color:#099">1</span> ) {
-
-      a.search = a.search + <span style="color:#a50">&#39;&amp;origin=&#39;</span> + origin;
-
-    }
-
-    <span style="color:#00a">if</span>( youTubeVideo.type === <span style="color:#a50">&#39;application/x-shockwave-flash&#39;</span> ) {
-
-      <span style="color:#00a">var</span> newIframe     = <span style="color:#0aa">document</span>.createElement( <span style="color:#a50">&#39;iframe&#39;</span> );
-      newIframe.height  = youTubeVideo.height;
-      newIframe.width   = youTubeVideo.width;
-      tmpPathname = tmpPathname.replace(<span style="color:#a50">&#39;/v/&#39;</span>, <span style="color:#a50">&#39;/embed/&#39;</span>);
-
-      youTubeVideo.parentNode.parentNode.replaceChild( newIframe, youTubeVideo.parentNode );
-
-      youTubeVideo = newIframe;
-
-    }
-
-    a.pathname       = tmpPathname;
-    <span style="color:#00a">if</span>(youTubeVideo.src !== a.href + a.hash) {
-    
-      youTubeVideo.src = a.href + a.hash;
-
-    }
-
-    youTubeVideo.setAttribute(<span style="color:#a50">&#39;data-gtm-yt&#39;</span>, <span style="color:#a50">&#39;true&#39;</span>);
-
-    <span style="color:#00a">return</span> youTubeVideo;
-
-  }
-
-  <span style="color:#aaa;font-style:italic">// Add event handlers for events emitted by the YouTube API
-</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#00a">function</span> addYouTubeEvents( youTubeIframe ) {
-
-    youTubeIframe.pauseFlag  = <span style="color:#00a">false</span>;
-
-    <span style="color:#00a">new</span> YT.Player( youTubeIframe, {
-
-      events: {
-
-        onStateChange: <span style="color:#00a">function</span>( evt ) {
-
-          onStateChangeHandler( evt, youTubeIframe );
-
-        }
-
-      }
-
-    } );
-
-  }
-
-  <span style="color:#aaa;font-style:italic">// Returns key/value pairs of percentages: number of seconds to achieve
-</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#00a">function</span> getMarks(duration) {
-
-    <span style="color:#00a">var</span> marks = {}; 
-
-    <span style="color:#aaa;font-style:italic">// For full support, we&#39;re handling Watch to End with percentage viewed
-</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">if</span> (_config.events[ <span style="color:#a50">&#39;Watch to End&#39;</span> ] ) {
-
-      marks[ <span style="color:#a50">&#39;Watch to End&#39;</span> ] = duration * <span style="color:#099">99</span> / <span style="color:#099">100</span>;
-
-    }
-
-    <span style="color:#00a">if</span>( _config.percentageTracking ) {
-
-      <span style="color:#00a">var</span> points = [];
-      <span style="color:#00a">var</span> i;
-
-      <span style="color:#00a">if</span>( _config.percentageTracking.each ) {
-
-        points = points.concat( _config.percentageTracking.each );
-
-      }
-
-      <span style="color:#00a">if</span>( _config.percentageTracking.every ) {
-
-        <span style="color:#00a">var</span> every = <span style="color:#0aa">parseInt</span>( _config.percentageTracking.every, <span style="color:#099">10</span> );
-        <span style="color:#00a">var</span> num = <span style="color:#099">100</span> / every;
-        
-        <span style="color:#00a">for</span>( i = <span style="color:#099">1</span>; i &lt; num; i++ ) {
-      
-          points.push(i * every);
-
-        }
-
-      }
-
-      <span style="color:#00a">for</span>(i = <span style="color:#099">0</span>; i &lt; points.length; i++) {
-
-        <span style="color:#00a">var</span> _point = points[i];
-        <span style="color:#00a">var</span> _mark = _point + <span style="color:#a50">&#39;%&#39;</span>;
-        <span style="color:#00a">var</span> _time = duration * _point / <span style="color:#099">100</span>;
-        
-        marks[_mark] = <span style="color:#0aa">Math</span>.floor( _time );
-
-      }
-
-    }
-
-    <span style="color:#00a">return</span> marks;
-
-  }
-
-  <span style="color:#00a">function</span> checkCompletion(player, marks, videoId) {
-
-    <span style="color:#00a">var</span> duration     = player.getDuration();
-    <span style="color:#00a">var</span> currentTime  = player.getCurrentTime();
-    <span style="color:#00a">var</span> playbackRate = player.getPlaybackRate();
-    player[videoId] = player[videoId] || {};
-    <span style="color:#00a">var</span> key;
-
-    <span style="color:#00a">for</span>( key <span style="color:#00a">in</span> marks ) {
-
-      <span style="color:#00a">if</span>( marks[key] &lt;= currentTime &amp;&amp; !player[videoId][key] ) {
-
-        player[videoId][key] = <span style="color:#00a">true</span>;
-        fireAnalyticsEvent( videoId, key );
-
-      }
-
-    }
-
-  }
-
-  <span style="color:#aaa;font-style:italic">// Event handler for events emitted from the YouTube API
-</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#00a">function</span> onStateChangeHandler( evt, youTubeIframe ) {
- 
-    <span style="color:#00a">var</span> stateIndex     = evt.data;
-    <span style="color:#00a">var</span> player         = evt.target;
-    <span style="color:#00a">var</span> targetVideoUrl = player.getVideoUrl();
-    <span style="color:#00a">var</span> targetVideoId  = targetVideoUrl.match( <span style="color:#099">/[?&amp;]v=([^&amp;#]*)/</span> )[ <span style="color:#099">1</span> ];  <span style="color:#aaa;font-style:italic">// Extract the ID    
-</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">var</span> playerState    = player.getPlayerState();
-    <span style="color:#00a">var</span> duration       = player.getDuration();
-    <span style="color:#00a">var</span> marks          = getMarks(duration);
-    <span style="color:#00a">var</span> playerStatesIndex = {
-      <span style="color:#a50">&#39;1&#39;</span> : <span style="color:#a50">&#39;Play&#39;</span>,
-      <span style="color:#a50">&#39;2&#39;</span> : <span style="color:#a50">&#39;Pause&#39;</span>
-    };
-    <span style="color:#00a">var</span> state = playerStatesIndex[ stateIndex ]; 
-
-    youTubeIframe.playTracker = youTubeIframe.playTracker || {};
-
-    <span style="color:#00a">if</span>( playerState === <span style="color:#099">1</span> &amp;&amp; !youTubeIframe.timer ) {
-
-      clearInterval(youTubeIframe.timer);
-
-      youTubeIframe.timer = setInterval(<span style="color:#00a">function</span>() {
-
-        <span style="color:#aaa;font-style:italic">// Check every second to see if we&#39;ve hit any of our percentage viewed marks
-</span><span style="color:#aaa;font-style:italic"></span>        checkCompletion(player, marks, youTubeIframe.videoId);
-
-      }, <span style="color:#099">1000</span>);
-
-    } <span style="color:#00a">else</span> {
-
-      clearInterval(youTubeIframe.timer);
-      youTubeIframe.timer = <span style="color:#00a">false</span>;
-
-    }
-
-    <span style="color:#aaa;font-style:italic">// Playlist edge-case handler
-</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">if</span>( stateIndex === <span style="color:#099">1</span> ) {
-
-      youTubeIframe.playTracker[ targetVideoId ] = <span style="color:#00a">true</span>;
-      youTubeIframe.videoId = targetVideoId;
-      youTubeIframe.pauseFlag = <span style="color:#00a">false</span>;
-
-    }
-
-    <span style="color:#00a">if</span>( !youTubeIframe.playTracker[ youTubeIframe.videoId ] ) {
-
-      <span style="color:#aaa;font-style:italic">// This video hasn&#39;t started yet, so this is spam
-</span><span style="color:#aaa;font-style:italic"></span>      <span style="color:#00a">return</span> <span style="color:#00a">false</span>;
-
-    }
-
-    <span style="color:#00a">if</span>( stateIndex === <span style="color:#099">2</span> ) {
-
-      <span style="color:#00a">if</span>( !youTubeIframe.pauseFlag ) { 
-      
-        youTubeIframe.pauseFlag = <span style="color:#00a">true</span>;
-
-      } <span style="color:#00a">else</span> {
-
-        <span style="color:#aaa;font-style:italic">// We don&#39;t want to fire consecutive pause events
-</span><span style="color:#aaa;font-style:italic"></span>        <span style="color:#00a">return</span> <span style="color:#00a">false</span>;
-
-      }
-
-    }
-
-    <span style="color:#aaa;font-style:italic">// If we&#39;re meant to track this event, fire it
-</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">if</span>( eventsFired[ state ] ) {
-    
-      fireAnalyticsEvent( youTubeIframe.videoId, state );
-
-    }
-
-  }
-
-  <span style="color:#aaa;font-style:italic">// Fire an event to Google Analytics or Google Tag Manager
-</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#00a">function</span> fireAnalyticsEvent( videoId, state ) {
-
-    <span style="color:#00a">var</span> videoUrl = <span style="color:#a50">&#39;https://www.youtube.com/watch?v=&#39;</span> + videoId;
-    <span style="color:#00a">var</span> _ga = <span style="color:#0aa">window</span>.GoogleAnalyticsObject;
-
-    <span style="color:#00a">if</span>( <span style="color:#00a">typeof</span> <span style="color:#0aa">window</span>[ dataLayerName ] !== <span style="color:#a50">&#39;undefined&#39;</span> &amp;&amp; !_config.forceSyntax ) { 
-      
-      <span style="color:#0aa">window</span>[ dataLayerName ].push( {
-
-        <span style="color:#a50">&#39;event&#39;</span>     : <span style="color:#a50">&#39;youTubeTrack&#39;</span>,
-        <span style="color:#a50">&#39;attributes&#39;</span>: {
-
-          <span style="color:#a50">&#39;videoUrl&#39;</span>: videoUrl,
-          <span style="color:#a50">&#39;videoAction&#39;</span>: state
-
-        }
-
-      } );
-
-    } <span style="color:#00a">else</span> <span style="color:#00a">if</span>( <span style="color:#00a">typeof</span> <span style="color:#0aa">window</span>[ _ga ] === <span style="color:#a50">&#39;function&#39;</span> &amp;&amp; 
-               <span style="color:#00a">typeof</span> <span style="color:#0aa">window</span>[ _ga ].getAll === <span style="color:#a50">&#39;function&#39;</span> &amp;&amp; 
-               _config.forceSyntax !== <span style="color:#099">2</span> ) 
-    {
-
-      <span style="color:#0aa">window</span>[ _ga ]( <span style="color:#a50">&#39;send&#39;</span>, <span style="color:#a50">&#39;event&#39;</span>, <span style="color:#a50">&#39;Videos&#39;</span>, state, videoUrl );
-
-    } <span style="color:#00a">else</span> <span style="color:#00a">if</span>( <span style="color:#00a">typeof</span> <span style="color:#0aa">window</span>._gaq !== <span style="color:#a50">&#39;undefined&#39;</span> &amp;&amp; forceSyntax !== <span style="color:#099">1</span> ) {
-
-      <span style="color:#0aa">window</span>._gaq.push( [ <span style="color:#a50">&#39;_trackEvent&#39;</span>, <span style="color:#a50">&#39;Videos&#39;</span>, state, videoUrl ] );
-
-    }
-
-  }
-  
-  <span style="color:#00a">return</span> {
-    init : init,
-    digestPotentialVideos : digestPotentialVideos
-  }
-    
-})(<span style="color:#0aa">document</span>, <span style="color:#0aa">window</span>, {
-  <span style="color:#a50">&#39;events&#39;</span>: {
-    <span style="color:#a50">&#39;Play&#39;</span>: <span style="color:#00a">true</span>,
-    <span style="color:#a50">&#39;Pause&#39;</span>: <span style="color:#00a">true</span>,
-    <span style="color:#a50">&#39;Watch to End&#39;</span>: <span style="color:#00a">true</span>
-  },
-  <span style="color:#a50">&#39;percentageTracking&#39;</span>: {
-    <span style="color:#a50">&#39;every&#39;</span>: <span style="color:#099">25</span>,
-    <span style="color:#a50">&#39;each&#39;</span>: [ <span style="color:#099">10</span>, <span style="color:#099">90</span> ]
-  }
-});
-<span style="color:#aaa;font-style:italic">/*
-</span><span style="color:#aaa;font-style:italic"> * Configuration Details
-</span><span style="color:#aaa;font-style:italic"> *
-</span><span style="color:#aaa;font-style:italic"> * @property events object
-</span><span style="color:#aaa;font-style:italic"> * Defines which events emitted by YouTube API
-</span><span style="color:#aaa;font-style:italic"> * will be turned into Google Analytics or GTM events
-</span><span style="color:#aaa;font-style:italic"> *
-</span><span style="color:#aaa;font-style:italic"> * @property percentageTracking object
-</span><span style="color:#aaa;font-style:italic"> * Object with configurations for percentage viewed events
-</span><span style="color:#aaa;font-style:italic"> *
-</span><span style="color:#aaa;font-style:italic"> *   @property each array
-</span><span style="color:#aaa;font-style:italic"> *   Fires an event once each percentage ahs been reached
-</span><span style="color:#aaa;font-style:italic"> *
-</span><span style="color:#aaa;font-style:italic"> *   @property every number
-</span><span style="color:#aaa;font-style:italic"> *   Fires an event for every n% viewed
-</span><span style="color:#aaa;font-style:italic"> *
-</span><span style="color:#aaa;font-style:italic"> * @property forceSyntax int 0, 1, or 2
-</span><span style="color:#aaa;font-style:italic"> * Forces script to use Classic (2) or Universal(1)
-</span><span style="color:#aaa;font-style:italic"> *
-</span><span style="color:#aaa;font-style:italic"> * @property dataLayerName string
-</span><span style="color:#aaa;font-style:italic"> * Tells script to use custom dataLayer name instead of default
-</span><span style="color:#aaa;font-style:italic"> */</span>
-&lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;</code></pre></div>
-<p>Yes, that is a LOT of stuff. Bear with me, though.</p>
-<p>The modifications to Bounteous&rsquo; solution are few but significant.</p>
-<p>First of all, instead of using an <strong>anonymous function</strong>, we&rsquo;re actually reserving a slot in the global namespace, and exposing the function in a variable named <code>ytTracker</code>.</p>
-<p>We do this because we want to invoke certain methods in the setup after the initial execution. If we didn&rsquo;t expose a public method for it, we&rsquo;d need to run the whole thing again and again, each time a video is dynamically loaded, and that&rsquo;s just a huge strain on performance.</p>
-<p>Next thing we&rsquo;re doing is adding a single line into the <code>normalizeYouTubeIframe()</code> method:</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span> normalizeYouTubeIframe( youTubeVideo ) {
-  ...
-  youTubeVideo.setAttribute(<span style="color:#a50">&#39;data-gtm-yt&#39;</span>, <span style="color:#a50">&#39;true&#39;</span>); <span style="color:#aaa;font-style:italic">// &lt;--- NEW
-</span><span style="color:#aaa;font-style:italic"></span>
-  <span style="color:#00a">return</span> youTubeVideo;
-}
-</code></pre></div>
-<p>The <code>youTubeVideo.setAttribute()</code> command is used to add a data attribute to all iframes which have already been treated by the script. This is because we want to avoid running the initialization methods again and again for videos which have already been configured for tracking. In my testing, if a video was tracked multiple times it led to runtime conflicts.</p>
-<p>Now that the data attribute is there, we need to check for its existence. In the <code>checkIfYouTubeVideo()</code> method, we&rsquo;ll add the check like this:</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span> checkIfYouTubeVideo( potentialYouTubeVideo ) {    
-  <span style="color:#00a">if</span> (potentialYouTubeVideo.getAttribute(<span style="color:#a50">&#39;data-gtm-yt&#39;</span>)) {
-    <span style="color:#00a">return</span> <span style="color:#00a">false</span>;
-  }
-  ...
-}
-</code></pre></div>
-<p>This check just looks for the <strong>data-gtm-yt</strong> attribute we added in the previous step, and if it&rsquo;s found, the initialization is skipped for this particular video.</p>
-<p>This way only videos which have <strong>not</strong> been treated yet will be processed.</p>
-<p>Finally, we need to expose two methods in the <code>ytTracker</code> interface. These will let us handle dynamically added videos. Lets do that in the very end of the function expression.</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">var</span> ytTracker = (<span style="color:#00a">function</span>(...) {
-  ...
-  <span style="color:#00a">return</span> {
-    init : init,
-    digestPotentialVideos : digestPotentialVideos
-  }
-})(...);
-</code></pre></div>
-<p>We <strong>return</strong> an object with two members: <code>init</code> and <code>digestPotentialVideos</code>. So, when we call <code>ytTracker.init()</code>, the script is basically run again, and all newly added, yet untreated YouTube iframe embeds will be processed and decorated with event trackers.</p>
-<p>If you want it to be a bit more robust, you can use <code>ytTracker.digestPotentialVideos(iframe)</code> instead. You pass an iframe object as its parameter, and the script will only treat the one video. This is better since it won&rsquo;t loop through all the iframes on the page, and instead just decorates the one you want.</p>
-<p>Finally, set the Custom HTML Tag to fire on a <strong>Page View / DOM Ready</strong> Trigger.</p>
-<p>That&rsquo;s the changes right there, ladies and gentlemen.</p>
-
-                
-                  <h2 id="how-to-use-it">How to use it</h2>
-<p>As said, there&rsquo;s two new methods in town:</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">ytTracker.init(); <span style="color:#aaa;font-style:italic">// &lt;-- Decorate all new videos on the page
-</span><span style="color:#aaa;font-style:italic"></span>ytTracker.digestPotentialVideos(iframe); <span style="color:#aaa;font-style:italic">// &lt;-- Only decorate the iframe that was passed as a parameter
-</span></code></pre></div>
-<p>Making the solution work will still most likely require developer help. If your developers have added some complex, dynamic content loaders, which add the videos after some awesome jQuery fade-in has finished, you&rsquo;ll need to cooperate with them to add the <code>ytTracker.init()</code> or <code>ytTracker.digestPotentialVideos()</code> command in the right place.</p>
-<p>Here&rsquo;s an example of what a modified content loader might look like:</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span> processVideoClick(ytEmbedSrc) {
-  <span style="color:#00a">var</span> video = <span style="color:#0aa">document</span>.createElement(<span style="color:#a50">&#39;iframe&#39;</span>);
-  video.src = ytEmbedSrc;
-  <span style="color:#00a">var</span> content = <span style="color:#0aa">document</span>.querySelector(<span style="color:#a50">&#39;#content&#39;</span>);
-  content.appendChild(video);
-  <span style="color:#0aa">window</span>.ytTracker.digestPotentialVideos(video);
-}
-</code></pre></div>
-<p>After the video is injected, you call <code>ytTracker.digestPotentialVideos()</code>. You could use the <code>init()</code> method without any parameters, but since you already have the iframe element at hand, it&rsquo;s better to use the more direct method.</p>
-
-                
-                  <h2 id="summary">Summary</h2>
-<p>Since loading content dynamically is notoriously standard-free, it&rsquo;s difficult to give a generic solution for managing dynamically loaded content in your analytics or tag management platform. However, Bounteous&rsquo; original solution has a very nice set of tools to tackle dynamically loaded YouTube videos as well, without having to make drastic modifications to the code.</p>
-<p>Bounteous&rsquo; solution is so flexible and useful. Poking some holes into its interface to let some light out just makes it even better, in my own, humble opinion.</p>
-<p>The optimal way of working with it is to cooperate with your developers. I hope we&rsquo;ve all matured past the notion of <a href="https://www.simoahava.com/analytics/tag-management-make-redundant/">GTM being developer-independent</a>. So, communicate with your developers, ask them to modify the JavaScript controlling the dynamic video injection, and request that they&rsquo;ll add the simple <code>ytTracker</code> methods to the handlers they create.</p>
-
-                
-              
-              
-
-            </div>
-          </div>
-          <div id="post-footer" class="post-footer main-content-wrap">
-            
-              
-                
-                
-                  <div class="post-footer-tags">
-                    <span class="text-color-light text-small">TAGGED IN</span><br/>
-                    
-  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/dynamic-content/">dynamic content</a>
-
-  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/google-tag-manager/">Google Tag Manager</a>
-
-  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/videos/">videos</a>
-
-  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/youtube/">youtube</a>
-
-                  </div>
-                
-              
-            
-            
-  <div class="post-actions-wrap">
-      <nav >
-        <ul class="post-actions post-action-nav">
-          
-            <li class="post-action">
-              
-                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/cookie-settings-and-subdomain-tracking-in-universal-analytics/">
-              
-                  <i class="fa fa-angle-left"></i>
-                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
-                </a>
-            </li>
-            <li class="post-action">
-              
-                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/gtm-tips/gtmtips-track-launch-campaigns-in-gtm-for-ios/">
-              
-                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
-                  <i class="fa fa-angle-right"></i>
-                </a>
-            </li>
-          
-        </ul>
-      </nav>
-    <ul class="post-actions post-action-share" >
-      
-        <li class="post-action hide-lg hide-md hide-sm">
-          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
-            <i class="fa fa-share-alt"></i>
-          </a>
-        </li>
-        
-          <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/track-dynamically-loaded-youtube-videos-in-google-tag-manager/">
-              <i class="fa fa-brands fa-facebook"></i>
-            </a>
-          </li>
-        
-          <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Track%20Dynamically%20Loaded%20YouTube%20Videos%20In%20Google%20Tag%20Manager%20https://www.simoahava.com/analytics/track-dynamically-loaded-youtube-videos-in-google-tag-manager/%20via%20@SimoAhava">
-              <i class="fa fa-brands fa-twitter"></i>
-            </a>
-          </li>
-        
-          <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/track-dynamically-loaded-youtube-videos-in-google-tag-manager/">
-              <i class="fa fa-brands fa-linkedin"></i>
-            </a>
-          </li>
-        
-      
-      
-        <li class="post-action">
-          <a class="post-action-btn btn btn--default" href="#commento">
-            <i class="fa-regular fa-comments"></i>
-          </a>
-        </li>
-      
-      <li class="post-action">
-          <a class="post-action-btn btn btn--default" href="#">
-          <i class="fa fa-search"></i>
-        </a>
-      </li>
-    </ul>
-  </div>
-
-
-            
-              <a name="commento"></a>
-<comentario-comments></comentario-comments>
-
-            
-          </div>
-        </article>
-        <footer id="footer" class="main-content-wrap">
-  <span class="copyrights">
-    &copy; 2026 Simo Ahava. All Rights Reserved
-  </span>
-</footer>
-
-      </div>
-      
-      <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
-        
-  <div class="post-actions-wrap">
-      <nav >
-        <ul class="post-actions post-action-nav">
-          
-            <li class="post-action">
-              
-                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/cookie-settings-and-subdomain-tracking-in-universal-analytics/">
-              
-                  <i class="fa fa-angle-left"></i>
-                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
-                </a>
-            </li>
-            <li class="post-action">
-              
-                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/gtm-tips/gtmtips-track-launch-campaigns-in-gtm-for-ios/">
-              
-                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
-                  <i class="fa fa-angle-right"></i>
-                </a>
-            </li>
-          
-        </ul>
-      </nav>
-    <ul class="post-actions post-action-share" >
-      
-        <li class="post-action hide-lg hide-md hide-sm">
-          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
-            <i class="fa fa-share-alt"></i>
-          </a>
-        </li>
-        
-          <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/track-dynamically-loaded-youtube-videos-in-google-tag-manager/">
-              <i class="fa fa-brands fa-facebook"></i>
-            </a>
-          </li>
-        
-          <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Track%20Dynamically%20Loaded%20YouTube%20Videos%20In%20Google%20Tag%20Manager%20https://www.simoahava.com/analytics/track-dynamically-loaded-youtube-videos-in-google-tag-manager/%20via%20@SimoAhava">
-              <i class="fa fa-brands fa-twitter"></i>
-            </a>
-          </li>
-        
-          <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/track-dynamically-loaded-youtube-videos-in-google-tag-manager/">
-              <i class="fa fa-brands fa-linkedin"></i>
-            </a>
-          </li>
-        
-      
-      
-        <li class="post-action">
-          <a class="post-action-btn btn btn--default" href="#commento">
-            <i class="fa-regular fa-comments"></i>
-          </a>
-        </li>
-      
-      <li class="post-action">
-          <a class="post-action-btn btn btn--default" href="#">
-          <i class="fa fa-search"></i>
-        </a>
-      </li>
-    </ul>
-  </div>
-
-
-      </div>
-      
-      <div id="share-options-bar" class="share-options-bar" data-behavior="4">
-  <i id="btn-close-shareoptions" class="fa fa-close"></i>
-  <ul class="share-options">
-    
-      <li class="share-option">
-        <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/track-dynamically-loaded-youtube-videos-in-google-tag-manager/">
-          <i class="fa fa-brands fa-facebook"></i><span>Share on Facebook</span>
-        </a>
-      </li>
-    
-      <li class="share-option">
-        <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=Track%20Dynamically%20Loaded%20YouTube%20Videos%20In%20Google%20Tag%20Manager%20https://www.simoahava.com/analytics/track-dynamically-loaded-youtube-videos-in-google-tag-manager/%20via%20@SimoAhava">
-          <i class="fa fa-brands fa-twitter"></i><span>Share on Twitter</span>
-        </a>
-      </li>
-    
-      <li class="share-option">
-        <a class="share-option-btn" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/track-dynamically-loaded-youtube-videos-in-google-tag-manager/">
-          <i class="fa fa-brands fa-linkedin"></i><span>Share on LinkedIn</span>
-        </a>
-      </li>
-    
-  </ul>
-</div>
-<div id="share-options-mask" class="share-options-mask"></div>
-
-    </div>
-    
-    <div id="about">
-  <div id="about-card">
-    <div id="about-btn-close">
-      <i class="fa fa-remove"></i>
-    </div>
-    
-      <img id="about-card-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
-    
-    <h4 id="about-card-name">Simo Ahava</h4>
-    
-      <div id="about-card-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</div>
-    
-    
-      <div id="about-card-job">
-        <i class="fa fa-briefcase"></i>
-        <br/>
-        Senior Data Advocate at Reaktor
-      </div>
-    
-    
-      <div id="about-card-location">
-        <i class="fa fa-map-marker"></i>
-        <br/>
-        Finland
-      </div>
-    
-  </div>
-</div>
-
-    
-  
-    
-    <div id="cover" style="background-image:url('https://www.simoahava.com/images/maisema.jpg');"></div>
-  
-
-
-    
-<script defer src="https://comentario.simoahava.com/comentario.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
-
-
-
-
-<script src="https://www.simoahava.com/js/script.js"></script>
-
-
-
-    <script>
-      !function(){var e=document.querySelector(".simmer"),t=document.querySelector(".simmer .close"),o=window.sessionStorage&&window.sessionStorage.getItem("nosimmer");if(e){if(o){e.style.display="none"}t.addEventListener("click",function(){window.sessionStorage.setItem("nosimmer","true"),e.style.display="none"})}}();
-    </script>
-    <style>
-      .ads {
-	  width: 1px;
-      }
-      </style>
-         
-
-    
-  </body>
-</html>
-
+<!doctype html><html lang=en-us><head><meta name=google-site-verification content="xQwWI2KUfP9LbFKhw2CVLFtrMY6Czrla7L3PD2aBolA"><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"Track Dynamically Loaded YouTube Videos In Google Tag Manager | Simo Ahava's blog","image":"https:\/\/www.simoahava.com\/images\/2015\/12\/youtube-videos-dynamic-tracking.jpg","editor":"Simo Ahava","publisher":{"@type":"Organization","name":"Simo Ahava's blog","logo":{"@type":"ImageObject","url":"https:\/\/www.simoahava.com\/images\/simo.png","height":"393","width":"407"}},"url":"https:\/\/www.simoahava.com\/analytics\/track-dynamically-loaded-youtube-videos-in-google-tag-manager\/","datePublished":"2015-12-29T05:47:30\u002b00:00","dateModified":"2015-12-29T05:47:30\u002b00:00","description":"How to track embedded YouTube videos using Google Tag Manager, when the videos are loaded dynamically after initial page load.","author":{"@type":"Person","name":"Simo Ahava"}}</script><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Track Dynamically Loaded YouTube Videos In Google Tag Manager | Simo Ahava's blog</title>
+<script>window.dataLayer=window.dataLayer||[],window.dataLayer.push({pageType:"article",environment:null})</script><script>(function(e,t,n,s){window[n]=window[n]||[],window[n].push({"gtm.start":(new Date).getTime(),event:"gtm.js"});var i=e.getElementsByTagName(t)[0],o=e.createElement(t),a=n!="dataLayer"?"&l="+n:"";o.async=!0,o.src="https://sgtm.simoahava.com/gtm.js?id="+s+a,i.parentNode.insertBefore(o,i)})(document,"script","dataLayer","GTM-PZ7GMV9")</script><meta name=author content="Simo Ahava"><meta name=keywords content><link rel=icon href=https://www.simoahava.com/images/favicon.ico><link rel=amphtml href=https://www.simoahava.com/amp/analytics/track-dynamically-loaded-youtube-videos-in-google-tag-manager/><meta name=description content="How to track embedded YouTube videos using Google Tag Manager, when the videos are loaded dynamically after initial page load."><meta property="og:description" content="How to track embedded YouTube videos using Google Tag Manager, when the videos are loaded dynamically after initial page load."><meta property="og:type" content="blog"><meta property="og:title" content="Track Dynamically Loaded YouTube Videos In Google Tag Manager"><meta property="og:url" content="https://www.simoahava.com/analytics/track-dynamically-loaded-youtube-videos-in-google-tag-manager/"><meta property="og:site_name" content="Simo Ahava's blog"><meta name=twitter:card content="summary"><meta name=twitter:title content="Track Dynamically Loaded YouTube Videos In Google Tag Manager"><meta name=twitter:description content="How to track embedded YouTube videos using Google Tag Manager, when the videos are loaded dynamically after initial page load."><meta name=twitter:creator content="@SimoAhava"><meta name=twitter:image content="https://www.simoahava.com/images/2015/12/youtube-videos-dynamic-tracking.jpg"><meta property="og:image" content="https://www.simoahava.com/images/2015/12/youtube-videos-dynamic-tracking.jpg"><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=/css/style.css></head><body><div id=_progress></div><div id=blog><header id=header data-behavior=4><i id=btn-open-sidebar class="fa fa-lg fa-bars"></i><div class=header-title><a class=header-title-link href=/>Simo Ahava's blog</a></div></header><nav id=sidebar data-behavior=4><div class=sidebar-container><div class=sidebar-profile><a href=/><img class=sidebar-profile-picture loading=lazy src=https://www.simoahava.com/images/simo.png alt="Author's picture"></a><h4 class=sidebar-profile-name>Simo Ahava</h4><h5 class=sidebar-profile-bio>Husband | Father | Analytics developer<br>simo (at) simoahava.com</h5></div><ul class=sidebar-buttons><li class=sidebar-button><a class=sidebar-button-link href=/><i class="sidebar-button-icon fa fa-lg fa-home"></i>
+<span class=sidebar-button-desc>Home</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/categories/><i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+<span class=sidebar-button-desc>Categories</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/tags/><i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+<span class=sidebar-button-desc>Tags</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/categories/gtm-tips/><i class="sidebar-button-icon fa fa-lg fa-magic"></i>
+<span class=sidebar-button-desc>GTM Tips</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/about-simo-ahava/><i class="sidebar-button-icon fa fa-lg fa-question"></i>
+<span class=sidebar-button-desc>About</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/index.xml><i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+<span class=sidebar-button-desc>RSS</span></a></li></ul><ul class=sidebar-buttons><li class=sidebar-button><a class=sidebar-button-link href=/tools/><i class="sidebar-button-icon fa fa-lg fa-wrench"></i>
+<span class=sidebar-button-desc>Tools</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/blog-statistics/><i class="sidebar-button-icon fa fa-lg fa-bar-chart"></i>
+<span class=sidebar-button-desc>Blog statistics</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=https://github.com/sahava target=_blank rel=noopener><i class="sidebar-button-icon fa fa-lg fa-brands fa-github"></i>
+<span class=sidebar-button-desc>GitHub</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/upcoming-talks/><i class="sidebar-button-icon fa fa-lg fa-bullhorn"></i>
+<span class=sidebar-button-desc>Upcoming talks</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/custom-templates/><i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+<span class=sidebar-button-desc>Templates</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/newsletter/><i class="sidebar-button-icon fa fa-lg fa-bell"></i>
+<span class=sidebar-button-desc>Newsletter</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=https://masto.measure.chat/@SimoAhava target=_blank rel="noopener me"><i class="sidebar-button-icon fa fa-lg fa-brands fa-mastodon"></i>
+<span class=sidebar-button-desc>Mastodon</span></a></li></ul><ul class=sidebar-buttons></ul></div></nav><div id=main data-behavior=4 class=hasCoverMetaIn><article class=post><form id=search action=/search/><input name=q type=text class="form-control input--xlarge" placeholder="Search blog..." autocomplete=off></form><div class="post-header main-content-wrap text-left"><h1>Track Dynamically Loaded YouTube Videos In Google Tag Manager</h1><div class="postShorten-meta post-meta"><time datetime=2015-12-29T05:47:30Z>December 29, 2015
+</time><span>in</span>
+<a class=category-link href=/categories/analytics>Analytics</a>
+| <a href=https://www.simoahava.com/analytics/track-dynamically-loaded-youtube-videos-in-google-tag-manager/#commento><comentario-count path=/analytics/track-dynamically-loaded-youtube-videos-in-google-tag-manager/ placeholder=... error-text="N/A " zero-text="0 " prefix suffix=" "></comentario-count>Comments</a></div></div><div class="post-content markdown"><div class=main-content-wrap><p>Tracking <a href=https://www.youtube.com/>YouTube</a> videos in <a href=https://tagmanager.google.com>Google Tag Manager</a> is one of the more useful things you can do in terms of tracking. YouTube has a wonderful <a href="https://developers.google.com/youtube/js_api_reference?hl=en">API</a> that you can tap into and convert the detected events into <code>dataLayer</code> messages.</p><p>There are some really good solutions out there for tracking YouTube videos in GTM:</p><ul><li><p>The wonderful <a href=http://www.cardinalpath.com/youtube-video-tracking-with-google-tag-manager-v2-and-universal-analytics-a-step-by-step-guide/>solution by Cardinal Path</a>.</p></li><li><p>An even more thorough treatment <a href=https://www.bounteous.com/insights/2015/05/11/updated-youtube-tracking-google-analytics-gtm/>by Bounteous</a>.</p></li></ul><p>Both do a great job of tracking videos that have been loaded with the page. However, both have difficulties with tracking <strong>dynamically</strong> loaded videos. That means videos which are loaded lazily, or in pop-ups, or when some content link is clicked.</p><div style=aspect-ratio:1986/1290 class="figure nocaption"><a href=/images/2015/12/youtube-videos-dynamic-tracking.jpg title="Track youtube videos dynamically google tag manager"><img class=fig-img height=1290 width=1986 loading=lazy src=/images/2015/12/youtube-videos-dynamic-tracking.jpg#ZgotmplZ alt="Track youtube videos dynamically google tag manager"></a></div><p>In this article, I&rsquo;m going to show how you can track dynamically loaded videos using Bounteous&rsquo; solution with slight modifications. Bounteous is my favorite group of geeks in North America, and they bribed me with their awesome book just before Christmas, which would already be reason enough to use their code. However, their solution is also all kinds of robust, and it really lends itself to tracking dynamic stuff as well.</p><span class=simmer><span class=close>X</span><p><span class="fa fa-md fa-bell"></span>
+<strong>The Simmer Newsletter</strong></p><p>Subscribe to the <a href=/newsletter/>Simmer newsletter</a> to get the latest news and content from Simo Ahava into your email inbox!</p></span><h2 id=what-youll-need>What you&rsquo;ll need</h2><p>The modifications will be done to the JavaScript code in the Custom HTML Tag. In other words, you can&rsquo;t use <a href=http://www.jsdelivr.com/projects/youtube-google-analytics>Bounteous&rsquo; CDN</a> for this. You will have to create a Custom HTML Tag, and copy-paste the code in the next chapter within.</p><p>As for the rest of the stuff, just follow Bounteous&rsquo; guide. All this does is add a method you can trigger when videos have been loaded dynamically. Don&rsquo;t worry, I&rsquo;ll explain the method later on as well.</p><h2 id=the-modified-custom-html-tag>The modified Custom HTML Tag</h2><p>So, follow the <a href=https://www.bounteous.com/insights/2015/05/11/updated-youtube-tracking-google-analytics-gtm/>Bounteous guide</a>, avoiding the CDN, and when you come to the chapter titled <strong>Google Tag Manager Installation</strong>, read the following instead.</p><p>Create a new Custom HTML Tag, and give it some cool name like <strong>Utility - Video Tracking Bomb Overload Christmas Awesome</strong>.</p><p>Sorry for that.</p><p>Next, add the following code.</p><div class=highlight><pre tabindex=0 style=background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-html data-lang=html><span style=display:flex><span>&lt;<span style=color:#1e90ff;font-weight:700>script</span>&gt;
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic>// Respectfully copied and modified from 
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic>// https://github.com/lunametrics/youtube-google-analytics
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic>// 
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic>// Original implementation by Bounteous
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span><span style=color:#00a>var</span> ytTracker = (<span style=color:#00a>function</span>( <span style=color:#0aa>document</span>, <span style=color:#0aa>window</span>, config ) {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#a50>&#39;use strict&#39;</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#0aa>window</span>.onYouTubeIframeAPIReady = (<span style=color:#00a>function</span>() {
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#00a>var</span> cached = <span style=color:#0aa>window</span>.onYouTubeIframeAPIReady;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#00a>return</span> <span style=color:#00a>function</span>() {
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>      <span style=color:#00a>if</span>( cached ) {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        cached.apply(<span style=color:#00a>this</span>, arguments);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      <span style=color:#aaa;font-style:italic>// This script won&#39;t work on IE 6 or 7, so we bail at this point if we detect that UA
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>      <span style=color:#00a>if</span>( !navigator.userAgent.match( <span style=color:#099>/MSIE [67]\./gi</span> ) ) {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        init(); 
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    };
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  })();
+</span></span><span style=display:flex><span>  
+</span></span><span style=display:flex><span>  <span style=color:#00a>var</span> _config = config || {};
+</span></span><span style=display:flex><span>  <span style=color:#00a>var</span> forceSyntax = _config.forceSyntax || <span style=color:#099>0</span>;
+</span></span><span style=display:flex><span>  <span style=color:#00a>var</span> dataLayerName = _config.dataLayerName || <span style=color:#a50>&#39;dataLayer&#39;</span>;
+</span></span><span style=display:flex><span>  <span style=color:#aaa;font-style:italic>// Default configuration for events
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>  <span style=color:#00a>var</span> eventsFired = {
+</span></span><span style=display:flex><span>    <span style=color:#a50>&#39;Play&#39;</span>        : <span style=color:#00a>true</span>,
+</span></span><span style=display:flex><span>    <span style=color:#a50>&#39;Pause&#39;</span>       : <span style=color:#00a>true</span>,
+</span></span><span style=display:flex><span>    <span style=color:#a50>&#39;Watch to End&#39;</span>: <span style=color:#00a>true</span>
+</span></span><span style=display:flex><span>  };
+</span></span><span style=display:flex><span>  
+</span></span><span style=display:flex><span>  <span style=color:#aaa;font-style:italic>// Overwrites defaults with customizations, if any
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>  <span style=color:#00a>var</span> key;
+</span></span><span style=display:flex><span>  <span style=color:#00a>for</span>( key <span style=color:#00a>in</span> _config.events ) {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#00a>if</span>( _config.events.hasOwnProperty( key ) ) {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      eventsFired[ key ] = _config.events[ key ];
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>  
+</span></span><span style=display:flex><span>  <span style=color:#aaa;font-style:italic>//*****//
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>  <span style=color:#aaa;font-style:italic>// DO NOT EDIT ANYTHING BELOW THIS LINE EXCEPT CONFIG AT THE BOTTOM
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>  <span style=color:#aaa;font-style:italic>//*****//
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>
+</span></span><span style=display:flex><span>  <span style=color:#aaa;font-style:italic>// Invoked by the YouTube API when it&#39;s ready
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>  <span style=color:#00a>function</span> init() {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#00a>var</span> iframes = <span style=color:#0aa>document</span>.getElementsByTagName( <span style=color:#a50>&#39;iframe&#39;</span> );
+</span></span><span style=display:flex><span>    <span style=color:#00a>var</span> embeds  = <span style=color:#0aa>document</span>.getElementsByTagName( <span style=color:#a50>&#39;embed&#39;</span> );
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    digestPotentialVideos( iframes );
+</span></span><span style=display:flex><span>    digestPotentialVideos( embeds );
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#00a>var</span> tag            = <span style=color:#0aa>document</span>.createElement( <span style=color:#a50>&#39;script&#39;</span> );
+</span></span><span style=display:flex><span>  tag.src            = <span style=color:#a50>&#39;//www.youtube.com/iframe_api&#39;</span>;
+</span></span><span style=display:flex><span>  <span style=color:#00a>var</span> firstScriptTag = <span style=color:#0aa>document</span>.getElementsByTagName( <span style=color:#a50>&#39;script&#39;</span> )[<span style=color:#099>0</span>];
+</span></span><span style=display:flex><span>  firstScriptTag.parentNode.insertBefore( tag, firstScriptTag );
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#aaa;font-style:italic>// Take our videos and turn them into trackable videos with events
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>  <span style=color:#00a>function</span> digestPotentialVideos( potentialVideos ) {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#00a>var</span> i;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#00a>for</span>( i = <span style=color:#099>0</span>; i &lt; potentialVideos.length; i++ ) {       
+</span></span><span style=display:flex><span>      <span style=color:#00a>var</span> isYouTubeVideo = checkIfYouTubeVideo( potentialVideos[ i ] );       
+</span></span><span style=display:flex><span>      <span style=color:#00a>if</span>( isYouTubeVideo ) {
+</span></span><span style=display:flex><span>        <span style=color:#00a>var</span> normalizedYouTubeIframe = normalizeYouTubeIframe( potentialVideos[ i ] );
+</span></span><span style=display:flex><span>        addYouTubeEvents( normalizedYouTubeIframe );
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  }   
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#aaa;font-style:italic>// Determine if the element is a YouTube video or not   
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>  <span style=color:#00a>function</span> checkIfYouTubeVideo( potentialYouTubeVideo ) {
+</span></span><span style=display:flex><span>    <span style=color:#aaa;font-style:italic>// Exclude already decorated videos     
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>    <span style=color:#00a>if</span> (potentialYouTubeVideo.getAttribute(<span style=color:#a50>&#39;data-gtm-yt&#39;</span>)) {       
+</span></span><span style=display:flex><span>      <span style=color:#00a>return</span> <span style=color:#00a>false</span>;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#00a>var</span> potentialYouTubeVideoSrc = potentialYouTubeVideo.src || <span style=color:#a50>&#39;&#39;</span>;     
+</span></span><span style=display:flex><span>    <span style=color:#00a>if</span>( potentialYouTubeVideoSrc.indexOf( <span style=color:#a50>&#39;youtube.com/embed/&#39;</span> ) &gt; -<span style=color:#099>1</span> || potentialYouTubeVideoSrc.indexOf( <span style=color:#a50>&#39;youtube.com/v/&#39;</span> ) &gt; -<span style=color:#099>1</span> ) {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      <span style=color:#00a>return</span> <span style=color:#00a>true</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#00a>return</span> <span style=color:#00a>false</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#aaa;font-style:italic>// Turn embed objects into iframe objects and ensure they have the right parameters
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>  <span style=color:#00a>function</span> normalizeYouTubeIframe( youTubeVideo ) {
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#00a>var</span> a           = <span style=color:#0aa>document</span>.createElement( <span style=color:#a50>&#39;a&#39;</span> );
+</span></span><span style=display:flex><span>        a.href      = youTubeVideo.src;
+</span></span><span style=display:flex><span>        a.hostname  = <span style=color:#a50>&#39;www.youtube.com&#39;</span>;
+</span></span><span style=display:flex><span>        a.protocol  = <span style=color:#0aa>document</span>.location.protocol;
+</span></span><span style=display:flex><span>    <span style=color:#00a>var</span> tmpPathname = a.pathname.charAt( <span style=color:#099>0</span> ) === <span style=color:#a50>&#39;/&#39;</span> ? a.pathname : <span style=color:#a50>&#39;/&#39;</span> + a.pathname;  <span style=color:#aaa;font-style:italic>// IE10 shim
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>    
+</span></span><span style=display:flex><span>    <span style=color:#aaa;font-style:italic>// For security reasons, YouTube wants an origin parameter set that matches our hostname
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>    <span style=color:#00a>var</span> origin = <span style=color:#0aa>window</span>.location.protocol + <span style=color:#a50>&#39;%2F%2F&#39;</span> + <span style=color:#0aa>window</span>.location.hostname + ( <span style=color:#0aa>window</span>.location.port ? <span style=color:#a50>&#39;:&#39;</span> + <span style=color:#0aa>window</span>.location.port : <span style=color:#a50>&#39;&#39;</span> );
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#00a>if</span>( a.search.indexOf( <span style=color:#a50>&#39;enablejsapi&#39;</span> ) === -<span style=color:#099>1</span> ) {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      a.search = ( a.search.length &gt; <span style=color:#099>0</span> ? a.search + <span style=color:#a50>&#39;&amp;&#39;</span> : <span style=color:#a50>&#39;&#39;</span> ) + <span style=color:#a50>&#39;enablejsapi=1&#39;</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#aaa;font-style:italic>// Don&#39;t set if testing locally
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>    <span style=color:#00a>if</span>( a.search.indexOf( <span style=color:#a50>&#39;origin&#39;</span> ) === -<span style=color:#099>1</span>  &amp;&amp; <span style=color:#0aa>window</span>.location.hostname.indexOf( <span style=color:#a50>&#39;localhost&#39;</span> ) === -<span style=color:#099>1</span> ) {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      a.search = a.search + <span style=color:#a50>&#39;&amp;origin=&#39;</span> + origin;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#00a>if</span>( youTubeVideo.type === <span style=color:#a50>&#39;application/x-shockwave-flash&#39;</span> ) {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      <span style=color:#00a>var</span> newIframe     = <span style=color:#0aa>document</span>.createElement( <span style=color:#a50>&#39;iframe&#39;</span> );
+</span></span><span style=display:flex><span>      newIframe.height  = youTubeVideo.height;
+</span></span><span style=display:flex><span>      newIframe.width   = youTubeVideo.width;
+</span></span><span style=display:flex><span>      tmpPathname = tmpPathname.replace(<span style=color:#a50>&#39;/v/&#39;</span>, <span style=color:#a50>&#39;/embed/&#39;</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      youTubeVideo.parentNode.parentNode.replaceChild( newIframe, youTubeVideo.parentNode );
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      youTubeVideo = newIframe;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    a.pathname       = tmpPathname;
+</span></span><span style=display:flex><span>    <span style=color:#00a>if</span>(youTubeVideo.src !== a.href + a.hash) {
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>      youTubeVideo.src = a.href + a.hash;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    youTubeVideo.setAttribute(<span style=color:#a50>&#39;data-gtm-yt&#39;</span>, <span style=color:#a50>&#39;true&#39;</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#00a>return</span> youTubeVideo;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#aaa;font-style:italic>// Add event handlers for events emitted by the YouTube API
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>  <span style=color:#00a>function</span> addYouTubeEvents( youTubeIframe ) {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    youTubeIframe.pauseFlag  = <span style=color:#00a>false</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#00a>new</span> YT.Player( youTubeIframe, {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      events: {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        onStateChange: <span style=color:#00a>function</span>( evt ) {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>          onStateChangeHandler( evt, youTubeIframe );
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    } );
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#aaa;font-style:italic>// Returns key/value pairs of percentages: number of seconds to achieve
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>  <span style=color:#00a>function</span> getMarks(duration) {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#00a>var</span> marks = {}; 
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#aaa;font-style:italic>// For full support, we&#39;re handling Watch to End with percentage viewed
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>    <span style=color:#00a>if</span> (_config.events[ <span style=color:#a50>&#39;Watch to End&#39;</span> ] ) {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      marks[ <span style=color:#a50>&#39;Watch to End&#39;</span> ] = duration * <span style=color:#099>99</span> / <span style=color:#099>100</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#00a>if</span>( _config.percentageTracking ) {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      <span style=color:#00a>var</span> points = [];
+</span></span><span style=display:flex><span>      <span style=color:#00a>var</span> i;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      <span style=color:#00a>if</span>( _config.percentageTracking.each ) {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        points = points.concat( _config.percentageTracking.each );
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      <span style=color:#00a>if</span>( _config.percentageTracking.every ) {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#00a>var</span> every = <span style=color:#0aa>parseInt</span>( _config.percentageTracking.every, <span style=color:#099>10</span> );
+</span></span><span style=display:flex><span>        <span style=color:#00a>var</span> num = <span style=color:#099>100</span> / every;
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#00a>for</span>( i = <span style=color:#099>1</span>; i &lt; num; i++ ) {
+</span></span><span style=display:flex><span>      
+</span></span><span style=display:flex><span>          points.push(i * every);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      <span style=color:#00a>for</span>(i = <span style=color:#099>0</span>; i &lt; points.length; i++) {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#00a>var</span> _point = points[i];
+</span></span><span style=display:flex><span>        <span style=color:#00a>var</span> _mark = _point + <span style=color:#a50>&#39;%&#39;</span>;
+</span></span><span style=display:flex><span>        <span style=color:#00a>var</span> _time = duration * _point / <span style=color:#099>100</span>;
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        marks[_mark] = <span style=color:#0aa>Math</span>.floor( _time );
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#00a>return</span> marks;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#00a>function</span> checkCompletion(player, marks, videoId) {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#00a>var</span> duration     = player.getDuration();
+</span></span><span style=display:flex><span>    <span style=color:#00a>var</span> currentTime  = player.getCurrentTime();
+</span></span><span style=display:flex><span>    <span style=color:#00a>var</span> playbackRate = player.getPlaybackRate();
+</span></span><span style=display:flex><span>    player[videoId] = player[videoId] || {};
+</span></span><span style=display:flex><span>    <span style=color:#00a>var</span> key;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#00a>for</span>( key <span style=color:#00a>in</span> marks ) {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      <span style=color:#00a>if</span>( marks[key] &lt;= currentTime &amp;&amp; !player[videoId][key] ) {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        player[videoId][key] = <span style=color:#00a>true</span>;
+</span></span><span style=display:flex><span>        fireAnalyticsEvent( videoId, key );
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#aaa;font-style:italic>// Event handler for events emitted from the YouTube API
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>  <span style=color:#00a>function</span> onStateChangeHandler( evt, youTubeIframe ) {
+</span></span><span style=display:flex><span> 
+</span></span><span style=display:flex><span>    <span style=color:#00a>var</span> stateIndex     = evt.data;
+</span></span><span style=display:flex><span>    <span style=color:#00a>var</span> player         = evt.target;
+</span></span><span style=display:flex><span>    <span style=color:#00a>var</span> targetVideoUrl = player.getVideoUrl();
+</span></span><span style=display:flex><span>    <span style=color:#00a>var</span> targetVideoId  = targetVideoUrl.match( <span style=color:#099>/[?&amp;]v=([^&amp;#]*)/</span> )[ <span style=color:#099>1</span> ];  <span style=color:#aaa;font-style:italic>// Extract the ID    
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>    <span style=color:#00a>var</span> playerState    = player.getPlayerState();
+</span></span><span style=display:flex><span>    <span style=color:#00a>var</span> duration       = player.getDuration();
+</span></span><span style=display:flex><span>    <span style=color:#00a>var</span> marks          = getMarks(duration);
+</span></span><span style=display:flex><span>    <span style=color:#00a>var</span> playerStatesIndex = {
+</span></span><span style=display:flex><span>      <span style=color:#a50>&#39;1&#39;</span> : <span style=color:#a50>&#39;Play&#39;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#a50>&#39;2&#39;</span> : <span style=color:#a50>&#39;Pause&#39;</span>
+</span></span><span style=display:flex><span>    };
+</span></span><span style=display:flex><span>    <span style=color:#00a>var</span> state = playerStatesIndex[ stateIndex ]; 
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    youTubeIframe.playTracker = youTubeIframe.playTracker || {};
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#00a>if</span>( playerState === <span style=color:#099>1</span> &amp;&amp; !youTubeIframe.timer ) {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      clearInterval(youTubeIframe.timer);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      youTubeIframe.timer = setInterval(<span style=color:#00a>function</span>() {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#aaa;font-style:italic>// Check every second to see if we&#39;ve hit any of our percentage viewed marks
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>        checkCompletion(player, marks, youTubeIframe.videoId);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      }, <span style=color:#099>1000</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    } <span style=color:#00a>else</span> {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      clearInterval(youTubeIframe.timer);
+</span></span><span style=display:flex><span>      youTubeIframe.timer = <span style=color:#00a>false</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#aaa;font-style:italic>// Playlist edge-case handler
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>    <span style=color:#00a>if</span>( stateIndex === <span style=color:#099>1</span> ) {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      youTubeIframe.playTracker[ targetVideoId ] = <span style=color:#00a>true</span>;
+</span></span><span style=display:flex><span>      youTubeIframe.videoId = targetVideoId;
+</span></span><span style=display:flex><span>      youTubeIframe.pauseFlag = <span style=color:#00a>false</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#00a>if</span>( !youTubeIframe.playTracker[ youTubeIframe.videoId ] ) {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      <span style=color:#aaa;font-style:italic>// This video hasn&#39;t started yet, so this is spam
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>      <span style=color:#00a>return</span> <span style=color:#00a>false</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#00a>if</span>( stateIndex === <span style=color:#099>2</span> ) {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      <span style=color:#00a>if</span>( !youTubeIframe.pauseFlag ) { 
+</span></span><span style=display:flex><span>      
+</span></span><span style=display:flex><span>        youTubeIframe.pauseFlag = <span style=color:#00a>true</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      } <span style=color:#00a>else</span> {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#aaa;font-style:italic>// We don&#39;t want to fire consecutive pause events
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>        <span style=color:#00a>return</span> <span style=color:#00a>false</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#aaa;font-style:italic>// If we&#39;re meant to track this event, fire it
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>    <span style=color:#00a>if</span>( eventsFired[ state ] ) {
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>      fireAnalyticsEvent( youTubeIframe.videoId, state );
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#aaa;font-style:italic>// Fire an event to Google Analytics or Google Tag Manager
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>  <span style=color:#00a>function</span> fireAnalyticsEvent( videoId, state ) {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#00a>var</span> videoUrl = <span style=color:#a50>&#39;https://www.youtube.com/watch?v=&#39;</span> + videoId;
+</span></span><span style=display:flex><span>    <span style=color:#00a>var</span> _ga = <span style=color:#0aa>window</span>.GoogleAnalyticsObject;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#00a>if</span>( <span style=color:#00a>typeof</span> <span style=color:#0aa>window</span>[ dataLayerName ] !== <span style=color:#a50>&#39;undefined&#39;</span> &amp;&amp; !_config.forceSyntax ) { 
+</span></span><span style=display:flex><span>      
+</span></span><span style=display:flex><span>      <span style=color:#0aa>window</span>[ dataLayerName ].push( {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#a50>&#39;event&#39;</span>     : <span style=color:#a50>&#39;youTubeTrack&#39;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#a50>&#39;attributes&#39;</span>: {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>          <span style=color:#a50>&#39;videoUrl&#39;</span>: videoUrl,
+</span></span><span style=display:flex><span>          <span style=color:#a50>&#39;videoAction&#39;</span>: state
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      } );
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    } <span style=color:#00a>else</span> <span style=color:#00a>if</span>( <span style=color:#00a>typeof</span> <span style=color:#0aa>window</span>[ _ga ] === <span style=color:#a50>&#39;function&#39;</span> &amp;&amp; 
+</span></span><span style=display:flex><span>               <span style=color:#00a>typeof</span> <span style=color:#0aa>window</span>[ _ga ].getAll === <span style=color:#a50>&#39;function&#39;</span> &amp;&amp; 
+</span></span><span style=display:flex><span>               _config.forceSyntax !== <span style=color:#099>2</span> ) 
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      <span style=color:#0aa>window</span>[ _ga ]( <span style=color:#a50>&#39;send&#39;</span>, <span style=color:#a50>&#39;event&#39;</span>, <span style=color:#a50>&#39;Videos&#39;</span>, state, videoUrl );
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    } <span style=color:#00a>else</span> <span style=color:#00a>if</span>( <span style=color:#00a>typeof</span> <span style=color:#0aa>window</span>._gaq !== <span style=color:#a50>&#39;undefined&#39;</span> &amp;&amp; forceSyntax !== <span style=color:#099>1</span> ) {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      <span style=color:#0aa>window</span>._gaq.push( [ <span style=color:#a50>&#39;_trackEvent&#39;</span>, <span style=color:#a50>&#39;Videos&#39;</span>, state, videoUrl ] );
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>  
+</span></span><span style=display:flex><span>  <span style=color:#00a>return</span> {
+</span></span><span style=display:flex><span>    init : init,
+</span></span><span style=display:flex><span>    digestPotentialVideos : digestPotentialVideos
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>})(<span style=color:#0aa>document</span>, <span style=color:#0aa>window</span>, {
+</span></span><span style=display:flex><span>  <span style=color:#a50>&#39;events&#39;</span>: {
+</span></span><span style=display:flex><span>    <span style=color:#a50>&#39;Play&#39;</span>: <span style=color:#00a>true</span>,
+</span></span><span style=display:flex><span>    <span style=color:#a50>&#39;Pause&#39;</span>: <span style=color:#00a>true</span>,
+</span></span><span style=display:flex><span>    <span style=color:#a50>&#39;Watch to End&#39;</span>: <span style=color:#00a>true</span>
+</span></span><span style=display:flex><span>  },
+</span></span><span style=display:flex><span>  <span style=color:#a50>&#39;percentageTracking&#39;</span>: {
+</span></span><span style=display:flex><span>    <span style=color:#a50>&#39;every&#39;</span>: <span style=color:#099>25</span>,
+</span></span><span style=display:flex><span>    <span style=color:#a50>&#39;each&#39;</span>: [ <span style=color:#099>10</span>, <span style=color:#099>90</span> ]
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>});
+</span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic>/*
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic> * Configuration Details
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic> *
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic> * @property events object
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic> * Defines which events emitted by YouTube API
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic> * will be turned into Google Analytics or GTM events
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic> *
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic> * @property percentageTracking object
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic> * Object with configurations for percentage viewed events
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic> *
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic> *   @property each array
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic> *   Fires an event once each percentage ahs been reached
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic> *
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic> *   @property every number
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic> *   Fires an event for every n% viewed
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic> *
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic> * @property forceSyntax int 0, 1, or 2
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic> * Forces script to use Classic (2) or Universal(1)
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic> *
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic> * @property dataLayerName string
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic> * Tells script to use custom dataLayer name instead of default
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic> */</span>
+</span></span><span style=display:flex><span>&lt;/<span style=color:#1e90ff;font-weight:700>script</span>&gt;</span></span></code></pre></div><p>Yes, that is a LOT of stuff. Bear with me, though.</p><p>The modifications to Bounteous&rsquo; solution are few but significant.</p><p>First of all, instead of using an <strong>anonymous function</strong>, we&rsquo;re actually reserving a slot in the global namespace, and exposing the function in a variable named <code>ytTracker</code>.</p><p>We do this because we want to invoke certain methods in the setup after the initial execution. If we didn&rsquo;t expose a public method for it, we&rsquo;d need to run the whole thing again and again, each time a video is dynamically loaded, and that&rsquo;s just a huge strain on performance.</p><p>Next thing we&rsquo;re doing is adding a single line into the <code>normalizeYouTubeIframe()</code> method:</p><div class=highlight><pre tabindex=0 style=background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-javascript data-lang=javascript><span style=display:flex><span><span style=color:#00a>function</span> normalizeYouTubeIframe( youTubeVideo ) {
+</span></span><span style=display:flex><span>  ...
+</span></span><span style=display:flex><span>  youTubeVideo.setAttribute(<span style=color:#a50>&#39;data-gtm-yt&#39;</span>, <span style=color:#a50>&#39;true&#39;</span>); <span style=color:#aaa;font-style:italic>// &lt;--- NEW
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>
+</span></span><span style=display:flex><span>  <span style=color:#00a>return</span> youTubeVideo;
+</span></span><span style=display:flex><span>}</span></span></code></pre></div><p>The <code>youTubeVideo.setAttribute()</code> command is used to add a data attribute to all iframes which have already been treated by the script. This is because we want to avoid running the initialization methods again and again for videos which have already been configured for tracking. In my testing, if a video was tracked multiple times it led to runtime conflicts.</p><p>Now that the data attribute is there, we need to check for its existence. In the <code>checkIfYouTubeVideo()</code> method, we&rsquo;ll add the check like this:</p><div class=highlight><pre tabindex=0 style=background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-javascript data-lang=javascript><span style=display:flex><span><span style=color:#00a>function</span> checkIfYouTubeVideo( potentialYouTubeVideo ) {    
+</span></span><span style=display:flex><span>  <span style=color:#00a>if</span> (potentialYouTubeVideo.getAttribute(<span style=color:#a50>&#39;data-gtm-yt&#39;</span>)) {
+</span></span><span style=display:flex><span>    <span style=color:#00a>return</span> <span style=color:#00a>false</span>;
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>  ...
+</span></span><span style=display:flex><span>}</span></span></code></pre></div><p>This check just looks for the <strong>data-gtm-yt</strong> attribute we added in the previous step, and if it&rsquo;s found, the initialization is skipped for this particular video.</p><p>This way only videos which have <strong>not</strong> been treated yet will be processed.</p><p>Finally, we need to expose two methods in the <code>ytTracker</code> interface. These will let us handle dynamically added videos. Lets do that in the very end of the function expression.</p><div class=highlight><pre tabindex=0 style=background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-javascript data-lang=javascript><span style=display:flex><span><span style=color:#00a>var</span> ytTracker = (<span style=color:#00a>function</span>(...) {
+</span></span><span style=display:flex><span>  ...
+</span></span><span style=display:flex><span>  <span style=color:#00a>return</span> {
+</span></span><span style=display:flex><span>    init : init,
+</span></span><span style=display:flex><span>    digestPotentialVideos : digestPotentialVideos
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>})(...);</span></span></code></pre></div><p>We <strong>return</strong> an object with two members: <code>init</code> and <code>digestPotentialVideos</code>. So, when we call <code>ytTracker.init()</code>, the script is basically run again, and all newly added, yet untreated YouTube iframe embeds will be processed and decorated with event trackers.</p><p>If you want it to be a bit more robust, you can use <code>ytTracker.digestPotentialVideos(iframe)</code> instead. You pass an iframe object as its parameter, and the script will only treat the one video. This is better since it won&rsquo;t loop through all the iframes on the page, and instead just decorates the one you want.</p><p>Finally, set the Custom HTML Tag to fire on a <strong>Page View / DOM Ready</strong> Trigger.</p><p>That&rsquo;s the changes right there, ladies and gentlemen.</p><h2 id=how-to-use-it>How to use it</h2><p>As said, there&rsquo;s two new methods in town:</p><div class=highlight><pre tabindex=0 style=background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-javascript data-lang=javascript><span style=display:flex><span>ytTracker.init(); <span style=color:#aaa;font-style:italic>// &lt;-- Decorate all new videos on the page
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>ytTracker.digestPotentialVideos(iframe); <span style=color:#aaa;font-style:italic>// &lt;-- Only decorate the iframe that was passed as a parameter
+</span></span></span></code></pre></div><p>Making the solution work will still most likely require developer help. If your developers have added some complex, dynamic content loaders, which add the videos after some awesome jQuery fade-in has finished, you&rsquo;ll need to cooperate with them to add the <code>ytTracker.init()</code> or <code>ytTracker.digestPotentialVideos()</code> command in the right place.</p><p>Here&rsquo;s an example of what a modified content loader might look like:</p><div class=highlight><pre tabindex=0 style=background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-javascript data-lang=javascript><span style=display:flex><span><span style=color:#00a>function</span> processVideoClick(ytEmbedSrc) {
+</span></span><span style=display:flex><span>  <span style=color:#00a>var</span> video = <span style=color:#0aa>document</span>.createElement(<span style=color:#a50>&#39;iframe&#39;</span>);
+</span></span><span style=display:flex><span>  video.src = ytEmbedSrc;
+</span></span><span style=display:flex><span>  <span style=color:#00a>var</span> content = <span style=color:#0aa>document</span>.querySelector(<span style=color:#a50>&#39;#content&#39;</span>);
+</span></span><span style=display:flex><span>  content.appendChild(video);
+</span></span><span style=display:flex><span>  <span style=color:#0aa>window</span>.ytTracker.digestPotentialVideos(video);
+</span></span><span style=display:flex><span>}</span></span></code></pre></div><p>After the video is injected, you call <code>ytTracker.digestPotentialVideos()</code>. You could use the <code>init()</code> method without any parameters, but since you already have the iframe element at hand, it&rsquo;s better to use the more direct method.</p><h2 id=summary>Summary</h2><p>Since loading content dynamically is notoriously standard-free, it&rsquo;s difficult to give a generic solution for managing dynamically loaded content in your analytics or tag management platform. However, Bounteous&rsquo; original solution has a very nice set of tools to tackle dynamically loaded YouTube videos as well, without having to make drastic modifications to the code.</p><p>Bounteous&rsquo; solution is so flexible and useful. Poking some holes into its interface to let some light out just makes it even better, in my own, humble opinion.</p><p>The optimal way of working with it is to cooperate with your developers. I hope we&rsquo;ve all matured past the notion of <a href=/analytics/tag-management-make-redundant/>GTM being developer-independent</a>. So, communicate with your developers, ask them to modify the JavaScript controlling the dynamic video injection, and request that they&rsquo;ll add the simple <code>ytTracker</code> methods to the handlers they create.</p></div></div><div id=post-footer class="post-footer main-content-wrap"><div class=post-footer-tags><span class="text-color-light text-small">TAGGED IN</span><br><a class="tag tag--primary tag--small" href=/tags/dynamic-content/>dynamic content</a>
+<a class="tag tag--primary tag--small" href=/tags/google-tag-manager/>Google Tag Manager</a>
+<a class="tag tag--primary tag--small" href=/tags/videos/>videos</a>
+<a class="tag tag--primary tag--small" href=/tags/youtube/>youtube</a></div><div class=post-actions-wrap><nav><ul class="post-actions post-action-nav"><li class=post-action><a class="post-action-btn btn btn--default" href=/analytics/cookie-settings-and-subdomain-tracking-in-universal-analytics/><i class="fa fa-angle-left"></i>
+<span class="hide-xs hide-sm text-small icon-ml">NEXT</span></a></li><li class=post-action><a class="post-action-btn btn btn--default" href=/gtm-tips/gtmtips-track-launch-campaigns-in-gtm-for-ios/><span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+<i class="fa fa-angle-right"></i></a></li></ul></nav><ul class="post-actions post-action-share"><li class="post-action hide-lg hide-md hide-sm"><a class="post-action-btn btn btn--default btn-open-shareoptions" href=#btn-open-shareoptions><i class="fa fa-share-alt"></i></a></li><li class="post-action hide-xs"><a class="post-action-btn btn btn--default" target=new href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/track-dynamically-loaded-youtube-videos-in-google-tag-manager/"><i class="fa fa-brands fa-facebook"></i></a></li><li class="post-action hide-xs"><a class="post-action-btn btn btn--default" target=new href="https://twitter.com/intent/tweet?text=Track%20Dynamically%20Loaded%20YouTube%20Videos%20In%20Google%20Tag%20Manager%20https://www.simoahava.com/analytics/track-dynamically-loaded-youtube-videos-in-google-tag-manager/%20via%20@SimoAhava"><i class="fa fa-brands fa-twitter"></i></a></li><li class="post-action hide-xs"><a class="post-action-btn btn btn--default" target=new href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/track-dynamically-loaded-youtube-videos-in-google-tag-manager/"><i class="fa fa-brands fa-linkedin"></i></a></li><li class=post-action><a class="post-action-btn btn btn--default" href=#commento><i class="fa-regular fa-comments"></i></a></li><li class=post-action><a class="post-action-btn btn btn--default" href=#><i class="fa fa-search"></i></a></li></ul></div><a name=commento></a><comentario-comments></comentario-comments></div></article><footer id=footer class=main-content-wrap><span class=copyrights>&copy; 2026 Simo Ahava. All Rights Reserved</span></footer></div><div id=bottom-bar class=post-bottom-bar data-behavior=4><div class=post-actions-wrap><nav><ul class="post-actions post-action-nav"><li class=post-action><a class="post-action-btn btn btn--default" href=/analytics/cookie-settings-and-subdomain-tracking-in-universal-analytics/><i class="fa fa-angle-left"></i>
+<span class="hide-xs hide-sm text-small icon-ml">NEXT</span></a></li><li class=post-action><a class="post-action-btn btn btn--default" href=/gtm-tips/gtmtips-track-launch-campaigns-in-gtm-for-ios/><span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+<i class="fa fa-angle-right"></i></a></li></ul></nav><ul class="post-actions post-action-share"><li class="post-action hide-lg hide-md hide-sm"><a class="post-action-btn btn btn--default btn-open-shareoptions" href=#btn-open-shareoptions><i class="fa fa-share-alt"></i></a></li><li class="post-action hide-xs"><a class="post-action-btn btn btn--default" target=new href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/track-dynamically-loaded-youtube-videos-in-google-tag-manager/"><i class="fa fa-brands fa-facebook"></i></a></li><li class="post-action hide-xs"><a class="post-action-btn btn btn--default" target=new href="https://twitter.com/intent/tweet?text=Track%20Dynamically%20Loaded%20YouTube%20Videos%20In%20Google%20Tag%20Manager%20https://www.simoahava.com/analytics/track-dynamically-loaded-youtube-videos-in-google-tag-manager/%20via%20@SimoAhava"><i class="fa fa-brands fa-twitter"></i></a></li><li class="post-action hide-xs"><a class="post-action-btn btn btn--default" target=new href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/track-dynamically-loaded-youtube-videos-in-google-tag-manager/"><i class="fa fa-brands fa-linkedin"></i></a></li><li class=post-action><a class="post-action-btn btn btn--default" href=#commento><i class="fa-regular fa-comments"></i></a></li><li class=post-action><a class="post-action-btn btn btn--default" href=#><i class="fa fa-search"></i></a></li></ul></div></div><div id=share-options-bar class=share-options-bar data-behavior=4><i id=btn-close-shareoptions class="fa fa-close"></i><ul class=share-options><li class=share-option><a class=share-option-btn target=new href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/track-dynamically-loaded-youtube-videos-in-google-tag-manager/"><i class="fa fa-brands fa-facebook"></i><span>Share on Facebook</span></a></li><li class=share-option><a class=share-option-btn target=new href="https://twitter.com/intent/tweet?text=Track%20Dynamically%20Loaded%20YouTube%20Videos%20In%20Google%20Tag%20Manager%20https://www.simoahava.com/analytics/track-dynamically-loaded-youtube-videos-in-google-tag-manager/%20via%20@SimoAhava"><i class="fa fa-brands fa-twitter"></i><span>Share on Twitter</span></a></li><li class=share-option><a class=share-option-btn target=new href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/track-dynamically-loaded-youtube-videos-in-google-tag-manager/"><i class="fa fa-brands fa-linkedin"></i><span>Share on LinkedIn</span></a></li></ul></div><div id=share-options-mask class=share-options-mask></div></div><div id=about><div id=about-card><div id=about-btn-close><i class="fa fa-remove"></i></div><img id=about-card-picture src=https://www.simoahava.com/images/simo.png alt="Author's picture"><h4 id=about-card-name>Simo Ahava</h4><div id=about-card-bio>Husband | Father | Analytics developer<br>simo (at) simoahava.com</div><div id=about-card-job><i class="fa fa-briefcase"></i><br>Senior Data Advocate at Reaktor</div><div id=about-card-location><i class="fa fa-map-marker"></i><br>Finland</div></div></div><div id=cover style=background-image:url(https://www.simoahava.com/images/maisema.jpg)></div><script defer src=https://comentario.simoahava.com/comentario.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin=anonymous referrerpolicy=no-referrer></script><script defer src=/js/script.js></script><script>!function(){var e=document.querySelector(".simmer"),t=document.querySelector(".simmer .close"),n=window.sessionStorage&&window.sessionStorage.getItem("nosimmer");e&&(n&&(e.style.display="none"),t&&t.addEventListener("click",function(){window.sessionStorage.setItem("nosimmer","true"),e.style.display="none"}))}()</script></body></html>

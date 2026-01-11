@@ -1,1347 +1,233 @@
-
-
-  
-    
-  
-
-
-  
-
-
-
-
-
-  
-
-
-  
-
-<!DOCTYPE html>
-<html lang="en-us">
-  <head>
-    <meta name="google-site-verification" content="xQwWI2KUfP9LbFKhw2CVLFtrMY6Czrla7L3PD2aBolA" />
-
-
-<script type="application/ld+json">
-{
-  "@context": "http://schema.org", 
-  "@type": "BlogPosting",
-  "headline": "Track Browsing Behavior In Google Analytics | Simo Ahava's blog",
-  "image": "https:\/\/www.simoahava.com\/images\/2018\/04\/new-browsing-behavior-dimensions.jpg",
-  "editor": "Simo Ahava",
-  "publisher": {
-    "@type": "Organization",
-    "name": "Simo Ahava's blog",
-    "logo": {
-      "@type": "ImageObject",
-      "url": "https:\/\/www.simoahava.com\/images\/simo.png",
-      "height": "393",
-      "width": "407"
-    }
-  },
-  "url": "https:\/\/www.simoahava.com\/analytics\/track-browsing-behavior-in-google-analytics\/",
-  "datePublished": "2018-04-24T11:00:00\u002b03:00",
-  "dateModified": "2018-04-24T11:00:00\u002b03:00",
-  "description": "Add Custom Dimensions for browsing behavior (tabbed browsing, how the user navigated to the current page) in Google Analytics. This guide is for Google Tag Manager users mainly, but can be adapted for other implementation methods, too.",
-  "author": {
-    "@type": "Person",
-    "name": "Simo Ahava"
-  }
-}
-</script>
-
-
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    
-    <title>Track Browsing Behavior In Google Analytics | Simo Ahava's blog</title>
-    
-    <script>
-      window.dataLayer=window.dataLayer||[];window.dataLayer.push({pageType: 'article', environment:  null });
-    </script>
-    
-
-    
-    
-    
-    <script>
-      (function(S,i,m,o){
-        window[m]=window[m]||[];
-        window[m].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
-        var f=S.getElementsByTagName(i)[0],j=S.createElement(i),dl=m!='dataLayer'?'&l='+m:'';
-        j.async=true;
-        j.src='https://sgtm.simoahava.com/gtm.js?id='+o+dl;
-        f.parentNode.insertBefore(j,f);
-      })(document,'script','dataLayer','GTM-PZ7GMV9');
-    </script>
-    
-    <meta name="author" content="Simo Ahava">
-    <meta name="keywords" content="">
-
-    <link rel="icon" href="https://www.simoahava.com/images/favicon.ico">
-    
-    <link rel="amphtml" href="https://www.simoahava.com/amp/analytics/track-browsing-behavior-in-google-analytics/">
-    
-    <meta name="description" content="Add Custom Dimensions for browsing behavior (tabbed browsing, how the user navigated to the current page) in Google Analytics. This guide is for Google Tag Manager users mainly, but can be adapted for other implementation methods, too.">
-    <meta property="og:description" content="Add Custom Dimensions for browsing behavior (tabbed browsing, how the user navigated to the current page) in Google Analytics. This guide is for Google Tag Manager users mainly, but can be adapted for other implementation methods, too.">
-    <meta property="og:type" content="blog">
-    <meta property="og:title" content="Track Browsing Behavior In Google Analytics">
-    <meta property="og:url" content="https://www.simoahava.com/analytics/track-browsing-behavior-in-google-analytics/">
-    <meta property="og:site_name" content="Simo Ahava&#39;s blog">
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Track Browsing Behavior In Google Analytics">
-    <meta name="twitter:description" content="Add Custom Dimensions for browsing behavior (tabbed browsing, how the user navigated to the current page) in Google Analytics. This guide is for Google Tag Manager users mainly, but can be adapted for other implementation methods, too.">
-    
-      <meta name="twitter:creator" content="@SimoAhava">
-      
-    
-
-    
-    
-
-    
-      <meta name="twitter:image" content="https://www.simoahava.com/images/2018/04/new-browsing-behavior-dimensions.jpg">  
-      <meta property="og:image" content="https://www.simoahava.com/images/2018/04/new-browsing-behavior-dimensions.jpg">
-    
-
-
-    
-
-      
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-      
-    
-    <link rel="stylesheet" href="https://www.simoahava.com/css/style.css" />
-    
-    
-
-    
-      
-    
-    
-  </head>
-
-  <body>
-    
-    <div id="_progress"></div>
-    
-    <div id="blog">
-      <header id="header" data-behavior="4">
-  <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
-  <div class="header-title">
-    <a class="header-title-link" href="https://www.simoahava.com/">Simo Ahava&#39;s blog</a>
-  </div>
-  
-</header>
-
-      <nav id="sidebar" data-behavior="4">
-  <div class="sidebar-container">
-    
-      <div class="sidebar-profile">
-        <a href="https://www.simoahava.com/">
-          <img class="sidebar-profile-picture" loading="lazy" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
-        </a>
-        <h4 class="sidebar-profile-name">Simo Ahava</h4>
-        
-          <h5 class="sidebar-profile-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</h5>
-        
-      </div>
-    
-    <ul class="sidebar-buttons">
-      
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-home"></i>
-      
-      <span class="sidebar-button-desc">Home</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
-      
-      <span class="sidebar-button-desc">Categories</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/tags/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
-      
-      <span class="sidebar-button-desc">Tags</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/gtm-tips/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-magic"></i>
-      
-      <span class="sidebar-button-desc">GTM Tips</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/about-simo-ahava/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-question"></i>
-      
-      <span class="sidebar-button-desc">About</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
-      
-      <span class="sidebar-button-desc">RSS</span>
-    </a>
-  </li>
-
-
-    </ul>
-    <ul class="sidebar-buttons">
-      
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/tools/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-wrench"></i>
-      
-      <span class="sidebar-button-desc">Tools</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/blog-statistics/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-bar-chart"></i>
-      
-      <span class="sidebar-button-desc">Blog statistics</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://github.com/sahava" target="_blank" rel="noopener ">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-brands fa-github"></i>
-      
-      <span class="sidebar-button-desc">GitHub</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/upcoming-talks/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-bullhorn"></i>
-      
-      <span class="sidebar-button-desc">Upcoming talks</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/custom-templates/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
-      
-      <span class="sidebar-button-desc">Templates</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/newsletter/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-bell"></i>
-      
-      <span class="sidebar-button-desc">Newsletter</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://masto.measure.chat/@SimoAhava" target="_blank" rel="noopener me">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-brands fa-mastodon"></i>
-      
-      <span class="sidebar-button-desc">Mastodon</span>
-    </a>
-  </li>
-
-
-    </ul>
-    <ul class="sidebar-buttons">
-      
-
-    </ul>
-  </div>
-</nav>
-
-      
-
-      <div id="main" data-behavior="4"
-        class="
-               hasCoverMetaIn
-               ">
-        <article class="post">
-	  <form id="search" action="https://www.simoahava.com/search/">
-  <input name="q" type="text" class="form-control input--xlarge" placeholder="Search blog..." autocomplete="off">
-  </form>
-
-          <div class="post-header main-content-wrap text-left">
-  
-  
-
-    <h1>
-      Track Browsing Behavior In Google Analytics
-    </h1>
-  
-  
-  <div class="postShorten-meta post-meta">
-    
-      <time datetime="2018-04-24T11:00:00&#43;03:00">
-        
-  April 24, 2018
-
-      </time>
-      
-      
-  
-  
-    <span>in</span>
-    
-      <a class="category-link" href="https://www.simoahava.com/categories/analytics">Analytics</a>
-    
-  
-
-
-      | <a href="https://www.simoahava.com/analytics/track-browsing-behavior-in-google-analytics/#commento"><comentario-count path="/analytics/track-browsing-behavior-in-google-analytics/" 
-                  placeholder="..."
-                  error-text="N/A "
-                  zero-text="0 "
-                  prefix=""
-                  suffix=" "></comentario-count>Comments</a>
-      
-  </div>
-
-
-</div>
-
-          <div class="post-content markdown">
-            <div class="main-content-wrap">
-	      
-                
-  	        <blockquote>
-<p><strong>Last updated 22 May 2019</strong>: Added expiration of currently open tabs.</p>
-</blockquote>
-<p>In this article, <a href="https://github.com/jethron">Jethro Nederhof</a> of <a href="https://www.snowflake-analytics.com/about/">Snowflake Analytics</a> fame and I will introduce you to some pretty neat web browser APIs. The purpose of these APIs is to find out more about <strong>how the user navigated to the current page</strong>, and <strong>what&rsquo;s going on with their browser tabs</strong>.</p>
-
-
-
-<div style="aspect-ratio: 1319 / 478;" class="figure nocaption">
-  
-    <a href="https://www.simoahava.com/images/2018/04/new-browsing-behavior-dimensions.jpg" title="New custom dimensions for browsing behavior">
-  
-    <img class="fig-img" height="478" width="1319" loading="lazy" src="https://www.simoahava.com/images/2018/04/new-browsing-behavior-dimensions.jpg#ZgotmplZ" alt="New custom dimensions for browsing behavior">
-  
-    </a>
-  
-  
-</div>
-
-
-<p>There are so many things you can do with this new information. You can build <em>proper</em> navigational path reports, rather than rely on the fuzzy and often incoherent flow reports in Google Analytics. You can identify how visitors interact with your content using browser tabs - a crucial bit of information if you want to make heads or tails of Google Analytics&rsquo; <a href="https://www.branded3.com/blog/understanding-google-analytics-time-page-session-duration/">time on page</a> metrics, for example. You can see how many redirects were involved in the current navigation action.</p>
-<p>The origins of this article are in a number of places, including an impromptu challenge thrown by <a href="http://www.analytics-ninja.com/">Yehoshua Coren</a> in Twitter (with great contributions from Marek Lecián, too):</p>
-<p>However, the main source of inspiration came from <a href="https://www.measure.chat/">Measure Slack</a>, where a similar discussion around tabbed browser was being had:</p>
-
-
-
-<div style="aspect-ratio: 485 / 287;" class="figure nocaption">
-  
-    <a href="https://www.simoahava.com/images/2018/04/measure-slack.jpg" title="Measure Slack">
-  
-    <img class="fig-img" height="287" width="485" loading="lazy" src="https://www.simoahava.com/images/2018/04/measure-slack.jpg#ZgotmplZ" alt="Measure Slack">
-  
-    </a>
-  
-  
-</div>
-
-
-<p>Jethro&rsquo;s idea got the ball rolling in my mind, so I contacted him immediately and asked if he wanted to co-author this article. As it turns out, he&rsquo;d been mulling around lots of different ideas for navigation behavior tracking, so we quickly sketched the outline of this article, and what you are reading now is the final product.</p>
-<p>I consider the enhancements introduced in this article just as necessary as those I introduced way back when in my article <a href="https://www.simoahava.com/analytics/improve-data-collection-with-four-custom-dimensions/">Improve Data Collection With Four Custom Dimensions</a>. Once you&rsquo;re done implementing these scripts, I&rsquo;m sure you&rsquo;ll agree.</p>
-<p>As said, this article is co-authored by Jethro and me. Since I am the editor, all mistakes and errors are entirely my fault, and any snarky comments should be directed at me and not my generous partner in crime (naturally, all snarky comments will be deleted, but I will read them and promise to be insulted).</p>
-<div id="toc-container"><h1 id="table-of-contents">Table of Contents</h1> <input type="checkbox" id="show"><label for="show" id="showbtn"><h1 id="table-of-contents-mobile">Table of Contents</h1><span class="show">&nbsp;[+show]</span><span class="hide">&nbsp;[–hide]</span></label><nav id="TableOfContents">
-  <ul>
-    <li><a href="#1-the-why-and-how-theory">1. The why and how (theory)</a>
-      <ul>
-        <li><a href="#11-the-performancenavigation-api">1.1. The PerformanceNavigation API</a></li>
-        <li><a href="#12-browser-storage">1.2. Browser storage</a></li>
-      </ul>
-    </li>
-    <li><a href="#2-caveats">2. Caveats</a>
-      <ul>
-        <li><a href="#21-cross-domain-browsing">2.1. Cross-domain browsing</a></li>
-        <li><a href="#22-firefox-and-chrome-go-rogue">2.2. Firefox and Chrome go rogue</a></li>
-        <li><a href="#23-firefox-and-its-client-side-refresh-dilemma">2.3. Firefox and its client-side refresh dilemma</a></li>
-        <li><a href="#24-browser-support">2.4. Browser support</a></li>
-        <li><a href="#25-single-page-apps">2.5. Single-page apps</a></li>
-      </ul>
-    </li>
-    <li><a href="#3-solutions">3. Solutions</a>
-      <ul>
-        <li><a href="#31-the-custom-html-tag">3.1. The Custom HTML tag</a></li>
-        <li><a href="#32-create-the-custom-dimensions-in-google-analyitcs">3.2. Create the Custom Dimensions in Google Analyitcs</a></li>
-        <li><a href="#33-create-the-data-layer-variables-in-google-tag-manager">3.3. Create the Data Layer variables in Google Tag Manager</a></li>
-        <li><a href="#34-add-the-data-layer-variables-to-your-page-view-tag">3.4. Add the Data Layer variables to your Page View tag</a></li>
-        <li><a href="#35-test-it">3.5. Test it!</a></li>
-        <li><a href="#36-custom-report-in-google-analytics">3.6. Custom Report in Google Analytics</a></li>
-        <li><a href="#37-other-data-stores">3.7. Other data stores</a></li>
-      </ul>
-    </li>
-    <li><a href="#4-summary">4. Summary</a></li>
-  </ul>
-</nav></div>
-<p>You can skip directly to the Solutions chapter, but I do recommend reading the Theory first. At the very least, make sure you read the Caveats chapter, because there are a couple of gotchas you need to be aware of if implementing this solution.</p>
-<p>Ah, damn it. Just read the whole thing, will you?</p>
-
-                <span class="simmer">
-  <span class="close">X</span>
-  <p>
-    <span class="fa fa-md fa-bell"></span>
-    <strong>The Simmer Newsletter</strong>
-  </p>
-  <p>
-    Subscribe to the <a href="https://www.simoahava.com/newsletter/">Simmer newsletter</a> to get the latest news and content from Simo Ahava into your email inbox!
-  </p>
-  </span>
-
-                
-                  <h2 id="1-the-why-and-how-theory">1. The why and how (theory)</h2>
-<p>The web, by default, is <strong>stateless</strong>. Your browsing behavior is confined to the current page only, and it&rsquo;s difficult to programmatically peer into the past (never mind into the future).</p>
-<p>Tools like <a href="https://analytics.google.com/">Google Analytics</a> try to make sense of this stateless mess by collecting information in a chronological order. You send a <strong>pageview</strong>, then you send another <strong>pageview</strong>. Google Analytics interprets this as navigational behavior where you first viewed the first page and then the second page. Makes sense, right?</p>
-<p>But what about if you opened the second page <strong>in a tab</strong> and never even glanced at it? GA still interprets it as a page being viewed.</p>
-<p>What about if you <strong>reloaded</strong> the current page? GA still interprets it as a navigational step.</p>
-<p>What about if you pressed the <strong>back button</strong> of the browser to return to the previous page? Google Analytics makes no distinction - it doesn&rsquo;t know if you clicked a link, typed the URL in the address bar, or used the back button. It&rsquo;s all the same.</p>
-
-
-
-<div style="aspect-ratio: 1560 / 661;" class="figure nocaption">
-  
-    <a href="https://www.simoahava.com/images/2018/04/behavior-flow.jpg" title="Google Analytics&#39; Behavior Flow report">
-  
-    <img class="fig-img" height="661" width="1560" loading="lazy" src="https://www.simoahava.com/images/2018/04/behavior-flow.jpg#ZgotmplZ" alt="Google Analytics&#39; Behavior Flow report">
-  
-    </a>
-  
-  
-</div>
-
-
-<p>The <a href="https://support.google.com/analytics/answer/2785577?hl=en">flow reports</a> try to make sense of this mess by aligning everything into a navigational pattern (the &ldquo;flow&rdquo;). But the reports are quite difficult to interpret, as they sometimes show sequences that you are certain shouldn&rsquo;t be possible, lack necessary detail, and they don&rsquo;t really give you a robust way to query the information or to build a proper flow report yourself.</p>
-<p>And tabbed browsing is <strong>still</strong> a problem. Each tab initiates a new &ldquo;session&rdquo; in the browser (not to be confused with a Google Analytics session). Thus when GA tries to explain to you that everything is part of a linear navigational flow, the truth is actually more complex: each tab initiates a new <strong>branch</strong> of navigation!</p>
-
-
-
-<div style="aspect-ratio: 1319 / 578;" class="figure nocaption">
-  
-    <a href="https://www.simoahava.com/images/2018/04/linear-tabbed-flow.jpg" title="Linear vs. branching flow">
-  
-    <img class="fig-img" height="578" width="1319" loading="lazy" src="https://www.simoahava.com/images/2018/04/linear-tabbed-flow.jpg#ZgotmplZ" alt="Linear vs. branching flow">
-  
-    </a>
-  
-  
-</div>
-
-
-<p>Add to this the fact that in Google Analytics, &ldquo;Referral&rdquo; is a reserved term for campaign attribution. Thus when you are navigating around the site, the referring page is not sent when navigating in-site. This would be really helpful when deciphering navigational paths, since the <strong>Previous Page Path</strong> dimension does <strong>not</strong> necessarily represent the previous page viewed (just the previous page for which a pageview was sent). To make some sense out of the mess, sending the referral string in a Custom Dimension is a good practice.</p>
-
-
-
-<div style="aspect-ratio: 687 / 553;" class="figure nocaption">
-  
-    <a href="https://www.simoahava.com/images/2018/04/referral-report.jpg" title="Referral report">
-  
-    <img class="fig-img" height="553" width="687" loading="lazy" src="https://www.simoahava.com/images/2018/04/referral-report.jpg#ZgotmplZ" alt="Referral report">
-  
-    </a>
-  
-  
-</div>
-
-
-<p>There are other, more granular tracking solutions out there, of course. <a href="https://www.simoahava.com/analytics/snowplow-full-setup-with-google-analytics-tracking/">Snowplow</a>, for example, lets you track hit-level data in any way you like. You can include referral information, if you wish. However, since you&rsquo;re approaching Snowplow with the limitations of SQL queries, as soon as the navigation journey starts looping or has multiple pages, the joins you&rsquo;d need to make become frustratingly complex and, as a result, quite unwieldy over large amounts of data.</p>
-<p>So, we&rsquo;ve had this problem of analytics tools imposing a linear sequence on a non-linear navigational pattern for a couple of decades, ever since tabbed browsing was introduced around the turn of the millennium.</p>
-<p>What we&rsquo;re proposing in this article is to add another layer to the taxonomy of Google Analytics&rsquo; rather rigid schema for browsing behavior.</p>
-<p><strong>FROM:</strong> <code>Users</code> &gt; <code>Sessions</code> &gt; <code>Hits</code><br>
-<strong>TO:</strong> <code>Users</code> &gt; <code>Sessions</code> &gt; <code>Tabs</code> &gt; <code>Hits</code></p>
-<p>This browsing behavior would be encoded directly into <strong>Custom Dimensions</strong>, so you don&rsquo;t have to infer behavior from GA&rsquo;s pageview model - rather, you can query the navigational information directly!</p>
-<h3 id="11-the-performancenavigation-api">1.1. The PerformanceNavigation API</h3>
-<p>The API we&rsquo;re going to use to identify browsing behavior is called <code>PerformanceNavigation</code>. It comes with two read-only properties: <code>performance.navigation.type</code> and <code>performance.navigation.redirectCount</code>.</p>
-<p>The origin story of this API is firmly rooted in the difficulty of measuring performance of any given web page load. Redirects, network lag, and cached resources (locally, server-side, in CDNs) all contribute to the complexity of what the aggregate <strong>performance</strong> of any given page load is.</p>
-
-
-
-<div style="aspect-ratio: 801 / 536;" class="figure nocaption">
-  
-    <a href="https://www.simoahava.com/images/2018/04/performance-timing.jpg" title="PerformanceTiming events">
-  
-    <img class="fig-img" height="536" width="801" loading="lazy" src="https://www.simoahava.com/images/2018/04/performance-timing.jpg#ZgotmplZ" alt="PerformanceTiming events">
-  
-    </a>
-  
-  
-</div>
-
-
-<p>To help understand this complexity, web browsers implement the <code>PerformanceNavigation</code> API. The two properties exposed by the API can be found under the global <code>window.performance.navigation</code> interface, and they contain the following information:</p>
-<table>
-<thead>
-<tr>
-<th>Parameter</th>
-<th>Detail</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>redirectCount</code></td>
-<td>-</td>
-<td>The number of <code>3XX</code> HTTP redirects the browser went through when loading the page.</td>
-</tr>
-<tr>
-<td><code>type</code></td>
-<td>-</td>
-<td>An integer representing how the page was loaded.</td>
-</tr>
-<tr>
-<td> </td>
-<td>0</td>
-<td>Normal navigation, typing the URL, clicking a link, opening a bookmark, entering via an app link, etc.</td>
-</tr>
-<tr>
-<td> </td>
-<td>1</td>
-<td>Page was refreshed / reloaded while already open in the browser tab.</td>
-</tr>
-<tr>
-<td> </td>
-<td>2</td>
-<td>The page was retrieved from the browser history by using the Back or Forward button.</td>
-</tr>
-<tr>
-<td> </td>
-<td>255</td>
-<td>Any other way to navigate to the page.</td>
-</tr>
-</tbody>
-</table>
-<p>The <strong>255</strong> value is interesting, because it is quite undocumented. In tests, it seems to only emerge with the Firefox browser, when the page goes through a <strong>client-side</strong> refresh, either using <code>window.location.replace()</code> or <code>&lt;meta name=&quot;refresh&quot;&gt;</code>. Note that this goes against the W3C specification, which <a href="https://www.w3.org/TR/navigation-timing/#dom-performancenavigation-type">clearly states</a> that client-side redirects <em>should</em> be contained within one of the regular navigation types.</p>
-<p>Now, even though we mention how this API was probably conceived to give more information about the performance timing metrics, where it <strong>really</strong> shines is uncovering the navigational paths the users take through your site.</p>
-<h3 id="12-browser-storage">1.2. Browser storage</h3>
-<p>Ever since browser tabs were introduced to the delight of site visitors and web browser users, they&rsquo;ve been a source of annoyance for web analysts.</p>
-<p>In Google Analytics, for example, we simply don&rsquo;t know (by default) what the tab situation is of any given page. We don&rsquo;t know if the page was opened in a new tab, for one, since you can&rsquo;t attach listeners to the right-click context menu, and tracking just middle mouse button clicks doesn&rsquo;t give a comprehensive idea of the scope of the phenomenon.</p>
-
-
-
-<div style="aspect-ratio: 619 / 443;" class="figure nocaption">
-  
-    <a href="https://www.simoahava.com/images/2018/04/context-menu.jpg" title="Context menu">
-  
-    <img class="fig-img" height="443" width="619" loading="lazy" src="https://www.simoahava.com/images/2018/04/context-menu.jpg#ZgotmplZ" alt="Context menu">
-  
-    </a>
-  
-  
-</div>
-
-
-<p>The beauty of web analytics is that when we can&rsquo;t track things <em>directly</em> (whether a user submitted a form, for example), we can track them <em>indirectly</em> (page load of a &ldquo;thank you&rdquo; page). So maybe we can use this same indirect approach with browser tabs, too?</p>
-<p>If we can assign an identifier to every tab the user opens in the current website, we can identify individual navigation sequences! This can be achieved by checking against a common data store whether the given tab ID exists already, in which case the page load happened in a tab that was already open, and vice versa.</p>
-<p>However, thanks again to the statelessness of the web, there is the problem of persistence. We can&rsquo;t simply use a global JavaScript property to store the tab ID, because that gets demolished when the user unloads the page by reloading or navigating to another page.</p>
-<p>Cookies and <code>localStorage</code> are &ldquo;too&rdquo; persistent, because they are only reset when they are manually cleared (<code>localStorage</code>) or when they expire (cookies). We only want to store the ID of a tab for as long as that tab exists.</p>
-
-
-
-<div style="aspect-ratio: 841 / 242;" class="figure nocaption">
-  
-    <a href="https://www.simoahava.com/images/2018/04/sessionstorage.jpg" title="Session storage">
-  
-    <img class="fig-img" height="242" width="841" loading="lazy" src="https://www.simoahava.com/images/2018/04/sessionstorage.jpg#ZgotmplZ" alt="Session storage">
-  
-    </a>
-  
-  
-</div>
-
-
-<p>Enter <code>sessionStorage</code>! It&rsquo;s a browser storage API that is unique to each tab in your web browser. By storing the tab ID in <code>sessionStorage</code>, we can always check if the tab already has an ID (existing tab), or if we need to generate a new one (new tab).</p>
-<p>Combine this with some <code>localStorage</code> logic, where we keep a running tally of how many tab IDs have been generated, remembering to remove any tab ID once that tab is closed, and we can also get a fairly reliable count of tabs open on your website at any given time.</p>
-<p>So, now we are getting close to having all the bits and pieces at hand. Once we combine the tabbed browsing metadata with that provided by the <code>PerformanceNavigation</code> API, we can get a nice set of Custom Dimensions that expose a great deal of interesting information about how your visitors navigate your site.</p>
-
-                
-                  <h2 id="2-caveats">2. Caveats</h2>
-<p>Oh, there are <strong>plenty</strong> of caveats. The solutions below rely on a number of fragile components, which can get easily messed up due to how browsers act differently in certain circumstances.</p>
-<h3 id="21-cross-domain-browsing">2.1. Cross-domain browsing</h3>
-<p>If your tracking crosses multiple domains, then each domain will get their own tab ID. That&rsquo;s because <code>sessionStorage</code> and <code>localStorage</code> are confined to the current domain only. And if your current domain sails between HTTP and HTTPS protocols, then <em>those</em> will get their own storages, too. You could fix this by using URL parameters on the domain boundaries to pass the metadata from one domain to the next, but this is something you&rsquo;ll need to figure out by yourself.</p>
-<h3 id="22-firefox-and-chrome-go-rogue">2.2. Firefox and Chrome go rogue</h3>
-<p>An additional point of concern is that Firefox and Chrome do not respect the specification that session cookies and <code>sessionStorage</code> should only exist for as long as the tab is alive. Once the browser is closed, these session stores should be purged.</p>
-<p>On Chrome and Firefox, however, if you open the browser and you have the <strong>Show your windows and tabs from last time</strong> (Firefox) or <strong>Continue where you left off</strong> (Chrome) settings turned on, the session stores are restored, too! So even though the tab <em>did</em> close, by restoring the tab it&rsquo;s as if the tab was never closed.</p>
-
-
-
-<div style="aspect-ratio: 1155 / 786;" class="figure nocaption">
-  
-    <a href="https://www.simoahava.com/images/2018/04/firefox-chrome-settings.jpg" title="Firefox and Chrome settings">
-  
-    <img class="fig-img" height="786" width="1155" loading="lazy" src="https://www.simoahava.com/images/2018/04/firefox-chrome-settings.jpg#ZgotmplZ" alt="Firefox and Chrome settings">
-  
-    </a>
-  
-  
-</div>
-
-
-<p>That sucks. Not much we can do about that.</p>
-<p>Also, and this is interesting, when you do restore tabs or continue where you left off, the browser claims that the navigation type was <code>BACK/FORWARD</code>, meaning it equates restoring tabs with using the back or forward button of the browser.</p>
-<p>This sucks, too. And there&rsquo;s not much we can do about this, either.</p>
-<h3 id="23-firefox-and-its-client-side-refresh-dilemma">2.3. Firefox and its client-side refresh dilemma</h3>
-<p>Then there&rsquo;s the problem with Firefox implementing <code>OTHER</code> as the navigation type if a client-side refresh is done. This is unfortunate, but doesn&rsquo;t luckily mess things up too bad, because this behavior is contained within this particular navigation type alone.</p>
-<p>In addition to all of these, because the whole granularity of distinguishing between <code>BACK</code> and <code>FORWARD</code> needs to be coded using a programmatically maintained path of pages the user has visited, all it takes is for them to manually clear the <code>sessionStorage</code> to break the whole setup (at least, for as long as the tab is open).</p>
-
-
-
-<div style="aspect-ratio: 897 / 203;" class="figure nocaption">
-  
-    <a href="https://www.simoahava.com/images/2018/04/clear-all-dev-tools.jpg" title="Clear all dev tools">
-  
-    <img class="fig-img" height="203" width="897" loading="lazy" src="https://www.simoahava.com/images/2018/04/clear-all-dev-tools.jpg#ZgotmplZ" alt="Clear all dev tools">
-  
-    </a>
-  
-  
-</div>
-
-
-<p>That&rsquo;s why in the beginning of the solution you have the option of NOT tracking the back and forward button presses with detail. In this case, the string <code>BACK/FORWARD</code> is sent to Google Analytics in case either button is pressed. It&rsquo;s not as detailed but it does still tell you whether the user navigated using these buttons (or, as mentioned above, if the tabs were restored after restarting the browser).</p>
-<p>Our hypothesis is that with more data the averages will converge towards a more reliable dataset. So idiosyncrasies such as tabs being restored or users clearing storage will disappear into the data as more and more page views are accumulated.</p>
-<h3 id="24-browser-support">2.4. Browser support</h3>
-<p>There&rsquo;s also the matter of browser support, but unlike some <a href="https://developer.mozilla.org/en-US/docs/Web/API/PerformanceNavigation">online resources</a> claim, support for <code>PerformanceNavigation</code> is pretty well supported in <a href="https://developer.mozilla.org/en-US/docs/Web/API/Performance/navigation">Chrome and Safari</a>.</p>
-<h3 id="25-single-page-apps">2.5. Single-page apps</h3>
-<p>You could implement this solution for single-page apps, but in that case you should add an additional, custom navigation type called <code>VIRTUAL</code>, or something similar, if the navigation was a single-page transition and not a proper page load.</p>
-<p>Do note that <code>window.performance.navigation.type</code> does <strong>not</strong> update when the user uses the browser&rsquo;s Back / Forward buttons and the transition is from one single-page app state to another. So you&rsquo;d need to code the logic for Back / Forward use when no page load is recorded.</p>
-
-                
-                  <h2 id="3-solutions">3. Solutions</h2>
-<p>OK, let&rsquo;s get to the good stuff! In this chapter, we&rsquo;ll introduce the technical solution in <a href="https://tagmanager.google.com">Google Tag Manager</a> (Custom HTML tag) that orchestrates the whole thing. In addition to that, each sub-section will detail how to send the respective piece of information to Google Analytics as a Custom Dimension. Basically, all you&rsquo;ll need to edit is your main Page View tag, since that&rsquo;s the only one that will be sending this data to Google Analytics.</p>
-<h3 id="31-the-custom-html-tag">3.1. The Custom HTML tag</h3>
-<p>First, <strong>create a new Custom HTML tag</strong>, and add the following code within.</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">&lt;script&gt;
-  (<span style="color:#00a">function</span>() {
-    
-    <span style="color:#aaa;font-style:italic">// Set to false if you only want to register &#34;BACK/FORWARD&#34;
-</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#aaa;font-style:italic">// if either button was pressed.
-</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">var</span> detailedBackForward = <span style="color:#00a">true</span>;
-    
-    <span style="color:#aaa;font-style:italic">// Set expiration of tab count in milliseconds. The recommended default is
-</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#aaa;font-style:italic">// 72 hours (259200000 ms). Set to 0 if you don&#39;t want to expire the tab count.
-</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">var</span> expireTabs = <span style="color:#099">259200000</span>;
-    
-    <span style="color:#00a">if</span> (!!<span style="color:#0aa">window</span>.Storage) {
-
-      <span style="color:#00a">var</span> openTabs  = JSON.parse(localStorage.getItem(<span style="color:#a50">&#39;_tab_ids&#39;</span>)) || [],
-          tabId     = sessionStorage.getItem(<span style="color:#a50">&#39;_tab_id&#39;</span>),
-          navPath   = JSON.parse(sessionStorage.getItem(<span style="color:#a50">&#39;_nav_path&#39;</span>)),
-          curPage   = <span style="color:#0aa">document</span>.location.href,
-          newTab    = <span style="color:#00a">false</span>,
-          origin	= <span style="color:#0aa">document</span>.location.origin;
-
-      <span style="color:#00a">var</span> tabCount,
-          redirectCount,
-          navigationType,
-          prevInStack,
-          lastInStack,
-          payload,
-          expiration,
-          newTabId;
-
-      <span style="color:#00a">var</span> clearExpired = <span style="color:#00a">function</span>(tabs) {
-        
-        <span style="color:#00a">if</span> (expireTabs === <span style="color:#099">0</span>) { <span style="color:#00a">return</span> tabs; }
-        <span style="color:#00a">return</span> tabs.filter(<span style="color:#00a">function</span>(tab) {
-          <span style="color:#00a">try</span> {
-	        expiration = <span style="color:#0aa">parseInt</span>(tab.split(<span style="color:#a50">&#39;_&#39;</span>)[<span style="color:#099">1</span>], <span style="color:#099">10</span>);
-    	    <span style="color:#00a">return</span> expiration &gt; (<span style="color:#00a">new</span> <span style="color:#0aa">Date</span>().getTime());
-          } <span style="color:#00a">catch</span>(e) {
-            <span style="color:#00a">return</span> <span style="color:#00a">false</span>;
-          }
-        });
-        
-      };
-      
-      <span style="color:#00a">var</span> updateTabExpiration = <span style="color:#00a">function</span>(tabId) {
-        
-        <span style="color:#00a">if</span> (expireTabs === <span style="color:#099">0</span>) { <span style="color:#00a">return</span> tabId; }
-        <span style="color:#00a">try</span> {
-          newTabId = tabId.split(<span style="color:#a50">&#39;_&#39;</span>);
-          expiration = <span style="color:#0aa">parseInt</span>(newTabId[<span style="color:#099">1</span>], <span style="color:#099">10</span>);
-          <span style="color:#00a">if</span> (expiration &gt; <span style="color:#00a">new</span> <span style="color:#0aa">Date</span>().getTime()) {
-            <span style="color:#00a">return</span> tabId;
-          } <span style="color:#00a">else</span> {
-            newTabId = newTabId[<span style="color:#099">0</span>] + <span style="color:#a50">&#39;_&#39;</span> + (<span style="color:#00a">new</span> <span style="color:#0aa">Date</span>().getTime() + expireTabs);
-            sessionStorage.setItem(<span style="color:#a50">&#39;_tab_id&#39;</span>, newTabId);
-            <span style="color:#00a">return</span> newTabId;
-          }
-        } <span style="color:#00a">catch</span>(e) {
-          <span style="color:#00a">return</span> tabId;
-        }
-      
-      };
-      
-      <span style="color:#00a">var</span> getBackForwardNavigation = <span style="color:#00a">function</span>() {
-        
-        <span style="color:#00a">if</span> (detailedBackForward === <span style="color:#00a">false</span>) {
-          <span style="color:#00a">return</span> <span style="color:#a50">&#39;BACK/FORWARD&#39;</span>;
-        }
-
-        <span style="color:#00a">if</span> (navPath.length &lt; <span style="color:#099">2</span>) {
-          <span style="color:#00a">return</span> <span style="color:#a50">&#39;FORWARD&#39;</span>;
-        }
-
-        prevInStack = navPath[navPath.length-<span style="color:#099">2</span>];
-        lastInStack = navPath[navPath.length-<span style="color:#099">1</span>];
-
-        <span style="color:#00a">if</span> (prevInStack === curPage || lastInStack === curPage) {
-          <span style="color:#00a">return</span> <span style="color:#a50">&#39;BACK&#39;</span>;
-        } <span style="color:#00a">else</span> {
-          <span style="color:#00a">return</span> <span style="color:#a50">&#39;FORWARD&#39;</span>;
-        }
-
-      };
-
-      <span style="color:#00a">var</span> removeTabOnUnload = <span style="color:#00a">function</span>() {
-
-        <span style="color:#00a">var</span> index;
-
-        <span style="color:#aaa;font-style:italic">// Get the most recent values from storage
-</span><span style="color:#aaa;font-style:italic"></span>        openTabs = JSON.parse(localStorage.getItem(<span style="color:#a50">&#39;_tab_ids&#39;</span>)) || [];
-        tabId    = sessionStorage.getItem(<span style="color:#a50">&#39;_tab_id&#39;</span>);
-
-        openTabs = clearExpired(openTabs);
-        
-        <span style="color:#00a">if</span> (openTabs.length &amp;&amp; tabId !== <span style="color:#00a">null</span>) {
-          index = openTabs.indexOf(tabId);
-          <span style="color:#00a">if</span> (index &gt; -<span style="color:#099">1</span>) {
-            openTabs.splice(index, <span style="color:#099">1</span>);
-          }
-          localStorage.setItem(<span style="color:#a50">&#39;_tab_ids&#39;</span>, JSON.stringify(openTabs));
-        }
-
-      };
-
-      <span style="color:#00a">var</span> generateTabId = <span style="color:#00a">function</span>() {
-
-        <span style="color:#aaa;font-style:italic">// From https://stackoverflow.com/a/8809472/2367037
-</span><span style="color:#aaa;font-style:italic"></span>        <span style="color:#00a">var</span> d = <span style="color:#00a">new</span> <span style="color:#0aa">Date</span>().getTime();
-        <span style="color:#00a">if</span> (<span style="color:#00a">typeof</span> performance !== <span style="color:#a50">&#39;undefined&#39;</span> &amp;&amp; <span style="color:#00a">typeof</span> performance.now === <span style="color:#a50">&#39;function&#39;</span>){
-          d += performance.now(); <span style="color:#aaa;font-style:italic">//use high-precision timer if available
-</span><span style="color:#aaa;font-style:italic"></span>        }
-        <span style="color:#00a">return</span> <span style="color:#a50">&#39;xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx&#39;</span>.replace(<span style="color:#099">/[xy]/g</span>, <span style="color:#00a">function</span> (c) {
-          <span style="color:#00a">var</span> r = (d + <span style="color:#0aa">Math</span>.random() * <span style="color:#099">16</span>) % <span style="color:#099">16</span> | <span style="color:#099">0</span>;
-          d = <span style="color:#0aa">Math</span>.floor(d / <span style="color:#099">16</span>);
-          <span style="color:#00a">return</span> (c === <span style="color:#a50">&#39;x&#39;</span> ? r : (r &amp; <span style="color:#099">0x3</span> | <span style="color:#099">0x8</span>)).toString(<span style="color:#099">16</span>);
-        }) + (expireTabs &gt; <span style="color:#099">0</span> ? <span style="color:#a50">&#39;_&#39;</span> + (<span style="color:#00a">new</span> <span style="color:#0aa">Date</span>().getTime() + expireTabs) : <span style="color:#a50">&#39;&#39;</span>);
-
-      };
-      
-      <span style="color:#00a">var</span> validNavigation = <span style="color:#00a">function</span>(type, newTab) {
-        
-        <span style="color:#aaa;font-style:italic">// Return false if new tab and any other navigation type than
-</span><span style="color:#aaa;font-style:italic"></span>        <span style="color:#aaa;font-style:italic">// NAVIGATE or OTHER. Otherwise return true.
-</span><span style="color:#aaa;font-style:italic"></span>        <span style="color:#00a">return</span> !(newTab === <span style="color:#00a">true</span> &amp;&amp; (type !== <span style="color:#099">0</span> &amp;&amp; type !== <span style="color:#099">255</span>));
-      
-      };
-
-      <span style="color:#00a">if</span> (tabId === <span style="color:#00a">null</span>) {
-        tabId = generateTabId();
-        newTab = <span style="color:#00a">true</span>;
-        sessionStorage.setItem(<span style="color:#a50">&#39;_tab_id&#39;</span>, tabId);
-      } <span style="color:#00a">else</span> {
-        tabId = updateTabExpiration(tabId);
-      }   
-          
-      openTabs = clearExpired(openTabs); 
-
-      <span style="color:#00a">if</span> (openTabs.indexOf(tabId) === -<span style="color:#099">1</span>) {
-        openTabs.push(tabId);
-        localStorage.setItem(<span style="color:#a50">&#39;_tab_ids&#39;</span>, JSON.stringify(openTabs));
-      }
-
-      tabCount = openTabs.length;
-
-      <span style="color:#00a">if</span> (!!<span style="color:#0aa">window</span>.PerformanceNavigation) {
-        navPath = navPath || [];
-        redirectCount = <span style="color:#0aa">window</span>.performance.navigation.redirectCount;
-        <span style="color:#aaa;font-style:italic">// Only track new tabs if type is NAVIGATE or OTHER
-</span><span style="color:#aaa;font-style:italic"></span>        <span style="color:#00a">if</span> (validNavigation(<span style="color:#0aa">window</span>.performance.navigation.type, newTab)) {
-          <span style="color:#00a">switch</span> (<span style="color:#0aa">window</span>.performance.navigation.type) {
-            <span style="color:#00a">case</span> <span style="color:#099">0</span>:
-              navigationType = <span style="color:#a50">&#39;NAVIGATE&#39;</span>;
-              navPath.push(curPage);
-              <span style="color:#00a">break</span>;
-            <span style="color:#00a">case</span> <span style="color:#099">1</span>:
-              navigationType = <span style="color:#a50">&#39;RELOAD&#39;</span>;
-              <span style="color:#00a">if</span> (navPath.length === <span style="color:#099">0</span> || navPath[navPath.length-<span style="color:#099">1</span>] !== curPage) {
-                navPath.push(curPage);
-              }
-              <span style="color:#00a">break</span>;
-            <span style="color:#00a">case</span> <span style="color:#099">2</span>:
-              navigationType = getBackForwardNavigation();
-              <span style="color:#00a">if</span> (navigationType === <span style="color:#a50">&#39;FORWARD&#39;</span>) {
-                <span style="color:#aaa;font-style:italic">// Only add to navigation if not coming from external domain
-</span><span style="color:#aaa;font-style:italic"></span>                <span style="color:#00a">if</span> (<span style="color:#0aa">document</span>.referrer.indexOf(origin) &gt; -<span style="color:#099">1</span>) {
-                  navPath.push(curPage);
-                }
-              } <span style="color:#00a">else</span> <span style="color:#00a">if</span> (navigationType === <span style="color:#a50">&#39;BACK&#39;</span>) {
-                <span style="color:#aaa;font-style:italic">// Only clear from navigation if not returning from external domain
-</span><span style="color:#aaa;font-style:italic"></span>                <span style="color:#00a">if</span> (lastInStack !== curPage) {
-                  navPath.pop();
-                }
-              } <span style="color:#00a">else</span> {
-                navPath.push(curPage);
-              }
-              <span style="color:#00a">break</span>;
-            <span style="color:#00a">default</span>:
-              navigationType = <span style="color:#a50">&#39;OTHER&#39;</span>;
-              navPath.push(curPage);
-          }
-        } <span style="color:#00a">else</span> {
-          navPath.push(curPage);
-        }
-        sessionStorage.setItem(<span style="color:#a50">&#39;_nav_path&#39;</span>, JSON.stringify(navPath));
-      }
-
-      <span style="color:#0aa">window</span>.addEventListener(<span style="color:#a50">&#39;beforeunload&#39;</span>, removeTabOnUnload);
-      
-      payload = {
-        tabCount: tabCount,
-        redirectCount: redirectCount,
-        navigationType: navigationType,
-        newTab: newTab === <span style="color:#00a">true</span> ? <span style="color:#a50">&#39;New&#39;</span> : <span style="color:#a50">&#39;Existing&#39;</span>,
-        tabId: tabId.replace(<span style="color:#099">/_.+/</span>, <span style="color:#a50">&#39;&#39;</span>)
-      };
-
-      <span style="color:#aaa;font-style:italic">// Set the data model keys directly so they can be used in the Page View tag
-</span><span style="color:#aaa;font-style:italic"></span>      <span style="color:#0aa">window</span>.google_tag_manager[{{Container ID}}].dataLayer.set(<span style="color:#a50">&#39;browsingBehavior&#39;</span>, payload);
-      
-      <span style="color:#aaa;font-style:italic">// Also push to dataLayer
-</span><span style="color:#aaa;font-style:italic"></span>      <span style="color:#0aa">window</span>.dataLayer.push({
-        event: <span style="color:#a50">&#39;custom.navigation&#39;</span>,
-        browsingBehavior: payload
-      });
-    
-    }
-  
-  })();
-&lt;<span style="color:#f00;background-color:#faa">/script&gt;</span>
-</code></pre></div>
-<p>Do not add any triggers to this tag. Instead, open your <strong>Page View</strong> tag, and add this Custom HTML tag into its <a href="https://www.simoahava.com/analytics/understanding-tag-sequencing-in-google-tag-manager/">tag sequence</a> by making the Custom HTML tag fire <strong>before</strong> the Page View tag.</p>
-<p>Accessing GTM&rsquo;s data model directly with <code>dataLayer.set</code> is necessary if you want to modify Data Layer keys within a tag sequence. However, for the sake of transparency, we&rsquo;ll also push a <code>dataLayer</code> object with a custom event (<code>custom.navigation</code>) and the browsing behavior payload.</p>
-
-
-
-<div style="aspect-ratio: 853 / 464;" class="figure nocaption">
-  
-    <a href="https://www.simoahava.com/images/2018/04/tag-sequencing-settings.jpg" title="Tag Sequencing Settings">
-  
-    <img class="fig-img" height="464" width="853" loading="lazy" src="https://www.simoahava.com/images/2018/04/tag-sequencing-settings.jpg#ZgotmplZ" alt="Tag Sequencing Settings">
-  
-    </a>
-  
-  
-</div>
-
-
-<p>The code in the Custom HTML tag does a number of things.</p>
-<ol>
-<li>
-<p>It generates a <strong>tab ID</strong> for the page, which is stored in <code>sessionStorage</code>. If a new tab ID is thus generated, the page is marked as being in a new browser tab. If a tab ID was already in storage, then the page is flagged as being in an existing tab.</p>
-</li>
-<li>
-<p>This tab ID is also stored in an array within <code>localStorage</code>, where all tab IDs generated on the site are stored. The length of this array is the count of currently open tabs on the domain.</p>
-</li>
-<li>
-<p>If the user leaves the page, or closes the browser tab, or closes the browser, the tab ID is removed from the array in <code>localStorage</code> (thus keeping the count of open tabs accurate).</p>
-</li>
-<li>
-<p>If the page was loaded by navigating to the URL, navigation type is set to <code>NAVIGATE</code>, and the current page is pushed into an array representing the navigation path, stored in <code>sessionStorage</code>.</p>
-</li>
-<li>
-<p>If the page was reloaded, navigation type is set to <code>RELOAD</code>, and the navigation path is kept as it is.</p>
-</li>
-<li>
-<p>If the Back or Forward button was pressed, the script checks if the current page is the penultimate page in the navigation path, in which case navigation type is set to <code>BACK</code>. In other cases, navigation type is set to <code>FORWARD</code>.</p>
-</li>
-<li>
-<p>Count of tabs, count of redirects, navigation type, tab ID, and whether the tab was new or existing are all added to Google Tag Manager&rsquo;s data model, so that the Page View tag can grab these values with Data Layer variables.</p>
-</li>
-</ol>
-<blockquote>
-<p><strong>UPDATE 22 May 2019</strong>: I added some extra code to handle expiration. By default, the expiration is 72 hours, so if the storage isn&rsquo;t interacted with in 72 hours, the current count of open tabs is cleared.</p>
-</blockquote>
-<p>There are some nuances to the steps listed above, mainly to account for edge cases, such as when navigating <code>BACK</code> or <code>FORWARD</code> from an external domain. Even with these precautions, there are situations where the solution will fail (see the <a href="https://www.simoahava.com/analytics/track-browsing-behavior-in-google-analytics/#2-caveats">Caveats</a> chapter).</p>
-<p>And now that we are adding all this information into Data Layer, it&rsquo;s time to pick up the metadata and send it to Google Analytics!</p>
-<h3 id="32-create-the-custom-dimensions-in-google-analyitcs">3.2. Create the Custom Dimensions in Google Analyitcs</h3>
-<p>First, you&rsquo;ll need to create some Custom Dimensions in Google Analytics.</p>
-<p>Create the following Custom Dimensions in Google Analytics&rsquo; Property Settings, all in <strong>hit scope</strong>, and make note of the index numbers assigned to them.</p>
-<ul>
-<li><strong>Redirect count</strong></li>
-<li><strong>Navigation type</strong></li>
-<li><strong>Tab type</strong></li>
-<li><strong>Tabs open</strong></li>
-<li><strong>Tab ID</strong></li>
-</ul>
-
-
-
-<div style="aspect-ratio: 1544 / 755;" class="figure nocaption">
-  
-    <a href="https://www.simoahava.com/images/2018/04/custom-dimensions-google-analytics.jpg" title="Custom Dimensions generated in Google Analytics">
-  
-    <img class="fig-img" height="755" width="1544" loading="lazy" src="https://www.simoahava.com/images/2018/04/custom-dimensions-google-analytics.jpg#ZgotmplZ" alt="Custom Dimensions generated in Google Analytics">
-  
-    </a>
-  
-  
-</div>
-
-
-<h3 id="33-create-the-data-layer-variables-in-google-tag-manager">3.3. Create the Data Layer variables in Google Tag Manager</h3>
-<p>Next, create the corresponding Data Layer variables in Google Tag Manager. Here&rsquo;s my setup:</p>
-<table>
-<thead>
-<tr>
-<th>Variable name</th>
-<th>Value for <strong>Data Layer Variable name</strong> field</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>{{DLV - browsingBehavior.redirectCount}}</td>
-<td><code>browsingBehavior.redirectCount</code></td>
-</tr>
-<tr>
-<td>{{DLV - browsingBehavior.navigationType}}</td>
-<td><code>browsingBehavior.navigationType</code></td>
-</tr>
-<tr>
-<td>{{DLV - browsingBehavior.newTab}}</td>
-<td><code>browsingBehavior.newTab</code></td>
-</tr>
-<tr>
-<td>{{DLV - browsingBehavior.tabCount}}</td>
-<td><code>browsingBehavior.tabCount</code></td>
-</tr>
-<tr>
-<td>{{DLV - browsingBehavior.tabId }}</td>
-<td><code>browsingBehavior.tabId</code></td>
-</tr>
-</tbody>
-</table>
-<p>Here&rsquo;s an example of what one of the variables would look like:</p>
-
-
-
-<div style="aspect-ratio: 645 / 405;" class="figure nocaption">
-  
-    <a href="https://www.simoahava.com/images/2018/04/data-layer-variable.jpg" title="Data Layer Variable">
-  
-    <img class="fig-img" height="405" width="645" loading="lazy" src="https://www.simoahava.com/images/2018/04/data-layer-variable.jpg#ZgotmplZ" alt="Data Layer Variable">
-  
-    </a>
-  
-  
-</div>
-
-
-<h3 id="34-add-the-data-layer-variables-to-your-page-view-tag">3.4. Add the Data Layer variables to your Page View tag</h3>
-<p>Now, open the Page View tag which you have already edited for the Tag Sequence stuff in the beginning of this chapter. Either in a <a href="https://www.simoahava.com/analytics/google-analytics-settings-variable-in-gtm/">Google Analytics Settings variable</a> or by directly editing the tag fields, add the Data Layer variables to their respective indices in the Custom Dimensions list. This is what my setup looks like:</p>
-
-
-
-<div style="aspect-ratio: 851 / 454;" class="figure nocaption">
-  
-    <a href="https://www.simoahava.com/images/2018/04/google-analytics-tag.jpg" title="Google Analytics tag">
-  
-    <img class="fig-img" height="454" width="851" loading="lazy" src="https://www.simoahava.com/images/2018/04/google-analytics-tag.jpg#ZgotmplZ" alt="Google Analytics tag">
-  
-    </a>
-  
-  
-</div>
-
-
-<h3 id="35-test-it">3.5. Test it!</h3>
-<p>Now, save the tag, go to Preview mode, and enter your site.</p>
-<p><strong>Note!</strong> You can&rsquo;t really use Preview mode to test if the Data Layer variables are populating correctly. Because you are updating the data model in a tag sequence, the method used does not expose the dynamic changes to the Preview mode user interface.</p>
-<p>You&rsquo;ll need to either look at the Network requests directly, or use a tool such as <a href="https://support.google.com/analytics/answer/6277302?hl=en">Google Tag Assistant recordings</a> or <a href="https://chrome.google.com/webstore/detail/google-analytics-debugger/jnkmfdileelhofjcijamephohjechhna?hl=en">Google Analytics Debugger</a> to check if the data is being sent correctly.</p>
-<p>In any case, <strong>if</strong> everything is working, then with your Page View tag you should see the Custom Dimensions being populated with the relevant information.</p>
-
-
-
-<div style="aspect-ratio: 1195 / 476;" class="figure nocaption">
-  
-    <a href="https://www.simoahava.com/images/2018/04/google-tag-assistant-recordings.jpg" title="Google Tag Assistant Recordings">
-  
-    <img class="fig-img" height="476" width="1195" loading="lazy" src="https://www.simoahava.com/images/2018/04/google-tag-assistant-recordings.jpg#ZgotmplZ" alt="Google Tag Assistant Recordings">
-  
-    </a>
-  
-  
-</div>
-
-
-<h3 id="36-custom-report-in-google-analytics">3.6. Custom Report in Google Analytics</h3>
-<p>A handy way to pull it all together is to create a Custom Report in Google Analytics with these settings, for example:</p>
-
-
-
-<div style="aspect-ratio: 1378 / 613;" class="figure nocaption">
-  
-    <a href="https://www.simoahava.com/images/2018/04/google-analytics-custom-report.jpg" title="Google Analytics Custom Report">
-  
-    <img class="fig-img" height="613" width="1378" loading="lazy" src="https://www.simoahava.com/images/2018/04/google-analytics-custom-report.jpg#ZgotmplZ" alt="Google Analytics Custom Report">
-  
-    </a>
-  
-  
-</div>
-
-
-<p>This report will contain interesting information about how users navigated to the different pages on your site.</p>
-
-
-
-<div style="aspect-ratio: 1243 / 508;" class="figure nocaption">
-  
-    <a href="https://www.simoahava.com/images/2018/04/custom-report-ga.jpg" title="Custom Report in GA UI">
-  
-    <img class="fig-img" height="508" width="1243" loading="lazy" src="https://www.simoahava.com/images/2018/04/custom-report-ga.jpg#ZgotmplZ" alt="Custom Report in GA UI">
-  
-    </a>
-  
-  
-</div>
-
-
-<p>Couple this with things like <a href="https://www.simoahava.com/analytics/improve-data-collection-with-four-custom-dimensions/#3-session-id">Session ID</a> and <a href="https://www.simoahava.com/analytics/improve-data-collection-with-four-custom-dimensions/#4-hit-timestamp">Hit Timestamp</a>, and you can really start digging into how users move from one page to the other on your site.</p>
-<h3 id="37-other-data-stores">3.7. Other data stores</h3>
-<p>If you&rsquo;ve taken the time to <a href="https://www.simoahava.com/analytics/snowplow-full-setup-with-google-analytics-tracking/">duplicate your Google Analytics data to Snowplow</a>, you&rsquo;ll naturally have access to a far more granular, raw hit stream resource for querying against. For example, here&rsquo;s a simple SQL query output with all the relevant dimensions included:</p>
-
-
-
-<div style="aspect-ratio: 737 / 344;" class="figure nocaption">
-  
-    <a href="https://www.simoahava.com/images/2018/04/sql-query-from-snowplow.jpg" title="Snowplow query in SQL">
-  
-    <img class="fig-img" height="344" width="737" loading="lazy" src="https://www.simoahava.com/images/2018/04/sql-query-from-snowplow.jpg#ZgotmplZ" alt="Snowplow query in SQL">
-  
-    </a>
-  
-  
-</div>
-
-
-<p>Do note that Snowplow doesn&rsquo;t differentiate between different <em>scopes</em> of Custom Dimensions, since scope is a concept applied in Google Analytics processing. So if you are sending an identifier into a session-scoped Custom Dimension (e.g. Session ID), the hit stream to Snowplow will interpret this as hit-scoped data, and thus the identifier is pretty useless.</p>
-
-                
-                  <h2 id="4-summary">4. Summary</h2>
-<p>First of all, I&rsquo;m hugely indebted to Jethro Nederhof for agreeing to draft this solution with me. I really love the community of analytics developers - seems like everyone is giddy with excitement when figuring out new solutions to age-old questions, and the amount of knowledge being shared across blogs, Slack channels, and social media is a testament to the selflessness of these good men and women.</p>
-<p>In my humble opinion, anyone interested in proper page navigation analysis should try out this solution. Understanding things like browser tab usage and Back / Forward browsing can help you figure out where the information architecture blind spots of your site are or whether you need to fix the navigation options you offer your visitors, for example.</p>
-<p>But, as always on this particular blog, this is a technical solution first and foremost. Jethro and I wanted to highlight some cool tricks you can do with the web browser, and we fully expect others to refine these methods even further.</p>
-<p>It would be cool if the APIs were developed even further, such as by automatically distinguishing between Back and Forward of the browser. Right now, they&rsquo;re bunched together which is why we need the workaround of managing the navigation path in <code>sessionStorage</code>, and that&rsquo;s a fragile solution indeed.</p>
-<p>Let us know in the comments what you think of this trick, and whether you have suggestions on how to improve it!</p>
-
-                
-              
-              
-
-            </div>
-          </div>
-          <div id="post-footer" class="post-footer main-content-wrap">
-            
-              
-                
-                
-                  <div class="post-footer-tags">
-                    <span class="text-color-light text-small">TAGGED IN</span><br/>
-                    
-  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/google-tag-manager/">google tag manager</a>
-
-  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/custom-dimensions/">custom dimensions</a>
-
-  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/google-analytics/">google analytics</a>
-
-  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/navigation/">navigation</a>
-
-                  </div>
-                
-              
-            
-            
-  <div class="post-actions-wrap">
-      <nav >
-        <ul class="post-actions post-action-nav">
-          
-            <li class="post-action">
-              
-                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/delay-the-history-change-trigger/">
-              
-                  <i class="fa fa-angle-left"></i>
-                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
-                </a>
-            </li>
-            <li class="post-action">
-              
-                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/notify-page-google-tag-manager-loaded/">
-              
-                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
-                  <i class="fa fa-angle-right"></i>
-                </a>
-            </li>
-          
-        </ul>
-      </nav>
-    <ul class="post-actions post-action-share" >
-      
-        <li class="post-action hide-lg hide-md hide-sm">
-          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
-            <i class="fa fa-share-alt"></i>
-          </a>
-        </li>
-        
-          <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/track-browsing-behavior-in-google-analytics/">
-              <i class="fa fa-brands fa-facebook"></i>
-            </a>
-          </li>
-        
-          <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Track%20Browsing%20Behavior%20In%20Google%20Analytics%20https://www.simoahava.com/analytics/track-browsing-behavior-in-google-analytics/%20via%20@SimoAhava">
-              <i class="fa fa-brands fa-twitter"></i>
-            </a>
-          </li>
-        
-          <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/track-browsing-behavior-in-google-analytics/">
-              <i class="fa fa-brands fa-linkedin"></i>
-            </a>
-          </li>
-        
-      
-      
-        <li class="post-action">
-          <a class="post-action-btn btn btn--default" href="#commento">
-            <i class="fa-regular fa-comments"></i>
-          </a>
-        </li>
-      
-      <li class="post-action">
-          <a class="post-action-btn btn btn--default" href="#">
-          <i class="fa fa-search"></i>
-        </a>
-      </li>
-    </ul>
-  </div>
-
-
-            
-              <a name="commento"></a>
-<comentario-comments></comentario-comments>
-
-            
-          </div>
-        </article>
-        <footer id="footer" class="main-content-wrap">
-  <span class="copyrights">
-    &copy; 2026 Simo Ahava. All Rights Reserved
-  </span>
-</footer>
-
-      </div>
-      
-      <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
-        
-  <div class="post-actions-wrap">
-      <nav >
-        <ul class="post-actions post-action-nav">
-          
-            <li class="post-action">
-              
-                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/delay-the-history-change-trigger/">
-              
-                  <i class="fa fa-angle-left"></i>
-                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
-                </a>
-            </li>
-            <li class="post-action">
-              
-                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/analytics/notify-page-google-tag-manager-loaded/">
-              
-                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
-                  <i class="fa fa-angle-right"></i>
-                </a>
-            </li>
-          
-        </ul>
-      </nav>
-    <ul class="post-actions post-action-share" >
-      
-        <li class="post-action hide-lg hide-md hide-sm">
-          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
-            <i class="fa fa-share-alt"></i>
-          </a>
-        </li>
-        
-          <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/track-browsing-behavior-in-google-analytics/">
-              <i class="fa fa-brands fa-facebook"></i>
-            </a>
-          </li>
-        
-          <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Track%20Browsing%20Behavior%20In%20Google%20Analytics%20https://www.simoahava.com/analytics/track-browsing-behavior-in-google-analytics/%20via%20@SimoAhava">
-              <i class="fa fa-brands fa-twitter"></i>
-            </a>
-          </li>
-        
-          <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/track-browsing-behavior-in-google-analytics/">
-              <i class="fa fa-brands fa-linkedin"></i>
-            </a>
-          </li>
-        
-      
-      
-        <li class="post-action">
-          <a class="post-action-btn btn btn--default" href="#commento">
-            <i class="fa-regular fa-comments"></i>
-          </a>
-        </li>
-      
-      <li class="post-action">
-          <a class="post-action-btn btn btn--default" href="#">
-          <i class="fa fa-search"></i>
-        </a>
-      </li>
-    </ul>
-  </div>
-
-
-      </div>
-      
-      <div id="share-options-bar" class="share-options-bar" data-behavior="4">
-  <i id="btn-close-shareoptions" class="fa fa-close"></i>
-  <ul class="share-options">
-    
-      <li class="share-option">
-        <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/track-browsing-behavior-in-google-analytics/">
-          <i class="fa fa-brands fa-facebook"></i><span>Share on Facebook</span>
-        </a>
-      </li>
-    
-      <li class="share-option">
-        <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=Track%20Browsing%20Behavior%20In%20Google%20Analytics%20https://www.simoahava.com/analytics/track-browsing-behavior-in-google-analytics/%20via%20@SimoAhava">
-          <i class="fa fa-brands fa-twitter"></i><span>Share on Twitter</span>
-        </a>
-      </li>
-    
-      <li class="share-option">
-        <a class="share-option-btn" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/track-browsing-behavior-in-google-analytics/">
-          <i class="fa fa-brands fa-linkedin"></i><span>Share on LinkedIn</span>
-        </a>
-      </li>
-    
-  </ul>
-</div>
-<div id="share-options-mask" class="share-options-mask"></div>
-
-    </div>
-    
-    <div id="about">
-  <div id="about-card">
-    <div id="about-btn-close">
-      <i class="fa fa-remove"></i>
-    </div>
-    
-      <img id="about-card-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
-    
-    <h4 id="about-card-name">Simo Ahava</h4>
-    
-      <div id="about-card-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</div>
-    
-    
-      <div id="about-card-job">
-        <i class="fa fa-briefcase"></i>
-        <br/>
-        Senior Data Advocate at Reaktor
-      </div>
-    
-    
-      <div id="about-card-location">
-        <i class="fa fa-map-marker"></i>
-        <br/>
-        Finland
-      </div>
-    
-  </div>
-</div>
-
-    
-  
-    
-    <div id="cover" style="background-image:url('https://www.simoahava.com/images/maisema.jpg');"></div>
-  
-
-
-    
-<script defer src="https://comentario.simoahava.com/comentario.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
-
-
-
-
-<script src="https://www.simoahava.com/js/script.js"></script>
-
-
-
-    <script>
-      !function(){var e=document.querySelector(".simmer"),t=document.querySelector(".simmer .close"),o=window.sessionStorage&&window.sessionStorage.getItem("nosimmer");if(e){if(o){e.style.display="none"}t.addEventListener("click",function(){window.sessionStorage.setItem("nosimmer","true"),e.style.display="none"})}}();
-    </script>
-    <style>
-      .ads {
-	  width: 1px;
-      }
-      </style>
-         
-
-    
-  </body>
-</html>
-
+<!doctype html><html lang=en-us><head><meta name=google-site-verification content="xQwWI2KUfP9LbFKhw2CVLFtrMY6Czrla7L3PD2aBolA"><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"Track Browsing Behavior In Google Analytics | Simo Ahava's blog","image":"https:\/\/www.simoahava.com\/images\/2018\/04\/new-browsing-behavior-dimensions.jpg","editor":"Simo Ahava","publisher":{"@type":"Organization","name":"Simo Ahava's blog","logo":{"@type":"ImageObject","url":"https:\/\/www.simoahava.com\/images\/simo.png","height":"393","width":"407"}},"url":"https:\/\/www.simoahava.com\/analytics\/track-browsing-behavior-in-google-analytics\/","datePublished":"2018-04-24T11:00:00\u002b03:00","dateModified":"2018-04-24T11:00:00\u002b03:00","description":"Add Custom Dimensions for browsing behavior (tabbed browsing, how the user navigated to the current page) in Google Analytics. This guide is for Google Tag Manager users mainly, but can be adapted for other implementation methods, too.","author":{"@type":"Person","name":"Simo Ahava"}}</script><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Track Browsing Behavior In Google Analytics | Simo Ahava's blog</title>
+<script>window.dataLayer=window.dataLayer||[],window.dataLayer.push({pageType:"article",environment:null})</script><script>(function(e,t,n,s){window[n]=window[n]||[],window[n].push({"gtm.start":(new Date).getTime(),event:"gtm.js"});var i=e.getElementsByTagName(t)[0],o=e.createElement(t),a=n!="dataLayer"?"&l="+n:"";o.async=!0,o.src="https://sgtm.simoahava.com/gtm.js?id="+s+a,i.parentNode.insertBefore(o,i)})(document,"script","dataLayer","GTM-PZ7GMV9")</script><meta name=author content="Simo Ahava"><meta name=keywords content><link rel=icon href=https://www.simoahava.com/images/favicon.ico><link rel=amphtml href=https://www.simoahava.com/amp/analytics/track-browsing-behavior-in-google-analytics/><meta name=description content="Add Custom Dimensions for browsing behavior (tabbed browsing, how the user navigated to the current page) in Google Analytics. This guide is for Google Tag Manager users mainly, but can be adapted for other implementation methods, too."><meta property="og:description" content="Add Custom Dimensions for browsing behavior (tabbed browsing, how the user navigated to the current page) in Google Analytics. This guide is for Google Tag Manager users mainly, but can be adapted for other implementation methods, too."><meta property="og:type" content="blog"><meta property="og:title" content="Track Browsing Behavior In Google Analytics"><meta property="og:url" content="https://www.simoahava.com/analytics/track-browsing-behavior-in-google-analytics/"><meta property="og:site_name" content="Simo Ahava's blog"><meta name=twitter:card content="summary"><meta name=twitter:title content="Track Browsing Behavior In Google Analytics"><meta name=twitter:description content="Add Custom Dimensions for browsing behavior (tabbed browsing, how the user navigated to the current page) in Google Analytics. This guide is for Google Tag Manager users mainly, but can be adapted for other implementation methods, too."><meta name=twitter:creator content="@SimoAhava"><meta name=twitter:image content="https://www.simoahava.com/images/2018/04/new-browsing-behavior-dimensions.jpg"><meta property="og:image" content="https://www.simoahava.com/images/2018/04/new-browsing-behavior-dimensions.jpg"><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=/css/style.css></head><body><div id=_progress></div><div id=blog><header id=header data-behavior=4><i id=btn-open-sidebar class="fa fa-lg fa-bars"></i><div class=header-title><a class=header-title-link href=/>Simo Ahava's blog</a></div></header><nav id=sidebar data-behavior=4><div class=sidebar-container><div class=sidebar-profile><a href=/><img class=sidebar-profile-picture loading=lazy src=https://www.simoahava.com/images/simo.png alt="Author's picture"></a><h4 class=sidebar-profile-name>Simo Ahava</h4><h5 class=sidebar-profile-bio>Husband | Father | Analytics developer<br>simo (at) simoahava.com</h5></div><ul class=sidebar-buttons><li class=sidebar-button><a class=sidebar-button-link href=/><i class="sidebar-button-icon fa fa-lg fa-home"></i>
+<span class=sidebar-button-desc>Home</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/categories/><i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+<span class=sidebar-button-desc>Categories</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/tags/><i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+<span class=sidebar-button-desc>Tags</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/categories/gtm-tips/><i class="sidebar-button-icon fa fa-lg fa-magic"></i>
+<span class=sidebar-button-desc>GTM Tips</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/about-simo-ahava/><i class="sidebar-button-icon fa fa-lg fa-question"></i>
+<span class=sidebar-button-desc>About</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/index.xml><i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+<span class=sidebar-button-desc>RSS</span></a></li></ul><ul class=sidebar-buttons><li class=sidebar-button><a class=sidebar-button-link href=/tools/><i class="sidebar-button-icon fa fa-lg fa-wrench"></i>
+<span class=sidebar-button-desc>Tools</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/blog-statistics/><i class="sidebar-button-icon fa fa-lg fa-bar-chart"></i>
+<span class=sidebar-button-desc>Blog statistics</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=https://github.com/sahava target=_blank rel=noopener><i class="sidebar-button-icon fa fa-lg fa-brands fa-github"></i>
+<span class=sidebar-button-desc>GitHub</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/upcoming-talks/><i class="sidebar-button-icon fa fa-lg fa-bullhorn"></i>
+<span class=sidebar-button-desc>Upcoming talks</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/custom-templates/><i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+<span class=sidebar-button-desc>Templates</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/newsletter/><i class="sidebar-button-icon fa fa-lg fa-bell"></i>
+<span class=sidebar-button-desc>Newsletter</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=https://masto.measure.chat/@SimoAhava target=_blank rel="noopener me"><i class="sidebar-button-icon fa fa-lg fa-brands fa-mastodon"></i>
+<span class=sidebar-button-desc>Mastodon</span></a></li></ul><ul class=sidebar-buttons></ul></div></nav><div id=main data-behavior=4 class=hasCoverMetaIn><article class=post><form id=search action=/search/><input name=q type=text class="form-control input--xlarge" placeholder="Search blog..." autocomplete=off></form><div class="post-header main-content-wrap text-left"><h1>Track Browsing Behavior In Google Analytics</h1><div class="postShorten-meta post-meta"><time datetime=2018-04-24T11:00:00+03:00>April 24, 2018
+</time><span>in</span>
+<a class=category-link href=/categories/analytics>Analytics</a>
+| <a href=https://www.simoahava.com/analytics/track-browsing-behavior-in-google-analytics/#commento><comentario-count path=/analytics/track-browsing-behavior-in-google-analytics/ placeholder=... error-text="N/A " zero-text="0 " prefix suffix=" "></comentario-count>Comments</a></div></div><div class="post-content markdown"><div class=main-content-wrap><blockquote><p><strong>Last updated 22 May 2019</strong>: Added expiration of currently open tabs.</p></blockquote><p>In this article, <a href=https://github.com/jethron>Jethro Nederhof</a> of <a href=https://www.snowflake-analytics.com/about/>Snowflake Analytics</a> fame and I will introduce you to some pretty neat web browser APIs. The purpose of these APIs is to find out more about <strong>how the user navigated to the current page</strong>, and <strong>what&rsquo;s going on with their browser tabs</strong>.</p><div style=aspect-ratio:1319/478 class="figure nocaption"><a href=/images/2018/04/new-browsing-behavior-dimensions.jpg title="New custom dimensions for browsing behavior"><img class=fig-img height=478 width=1319 loading=lazy src=/images/2018/04/new-browsing-behavior-dimensions.jpg#ZgotmplZ alt="New custom dimensions for browsing behavior"></a></div><p>There are so many things you can do with this new information. You can build <em>proper</em> navigational path reports, rather than rely on the fuzzy and often incoherent flow reports in Google Analytics. You can identify how visitors interact with your content using browser tabs - a crucial bit of information if you want to make heads or tails of Google Analytics&rsquo; <a href=https://www.branded3.com/blog/understanding-google-analytics-time-page-session-duration/>time on page</a> metrics, for example. You can see how many redirects were involved in the current navigation action.</p><p>The origins of this article are in a number of places, including an impromptu challenge thrown by <a href=http://www.analytics-ninja.com/>Yehoshua Coren</a> in Twitter (with great contributions from Marek Lecián, too):</p><p>However, the main source of inspiration came from <a href=https://www.measure.chat/>Measure Slack</a>, where a similar discussion around tabbed browser was being had:</p><div style=aspect-ratio:485/287 class="figure nocaption"><a href=/images/2018/04/measure-slack.jpg title="Measure Slack"><img class=fig-img height=287 width=485 loading=lazy src=/images/2018/04/measure-slack.jpg#ZgotmplZ alt="Measure Slack"></a></div><p>Jethro&rsquo;s idea got the ball rolling in my mind, so I contacted him immediately and asked if he wanted to co-author this article. As it turns out, he&rsquo;d been mulling around lots of different ideas for navigation behavior tracking, so we quickly sketched the outline of this article, and what you are reading now is the final product.</p><p>I consider the enhancements introduced in this article just as necessary as those I introduced way back when in my article <a href=/analytics/improve-data-collection-with-four-custom-dimensions/>Improve Data Collection With Four Custom Dimensions</a>. Once you&rsquo;re done implementing these scripts, I&rsquo;m sure you&rsquo;ll agree.</p><p>As said, this article is co-authored by Jethro and me. Since I am the editor, all mistakes and errors are entirely my fault, and any snarky comments should be directed at me and not my generous partner in crime (naturally, all snarky comments will be deleted, but I will read them and promise to be insulted).</p><div id=toc-container><h1 id=table-of-contents>Table of Contents</h1><input type=checkbox id=show><label for=show id=showbtn><h1 id=table-of-contents-mobile>Table of Contents</h1><span class=show>&nbsp;[+show]</span><span class=hide>&nbsp;[–hide]</span></label><nav id=TableOfContents><ul><li><a href=#1-the-why-and-how-theory>1. The why and how (theory)</a><ul><li><a href=#11-the-performancenavigation-api>1.1. The PerformanceNavigation API</a></li><li><a href=#12-browser-storage>1.2. Browser storage</a></li></ul></li><li><a href=#2-caveats>2. Caveats</a><ul><li><a href=#21-cross-domain-browsing>2.1. Cross-domain browsing</a></li><li><a href=#22-firefox-and-chrome-go-rogue>2.2. Firefox and Chrome go rogue</a></li><li><a href=#23-firefox-and-its-client-side-refresh-dilemma>2.3. Firefox and its client-side refresh dilemma</a></li><li><a href=#24-browser-support>2.4. Browser support</a></li><li><a href=#25-single-page-apps>2.5. Single-page apps</a></li></ul></li><li><a href=#3-solutions>3. Solutions</a><ul><li><a href=#31-the-custom-html-tag>3.1. The Custom HTML tag</a></li><li><a href=#32-create-the-custom-dimensions-in-google-analyitcs>3.2. Create the Custom Dimensions in Google Analyitcs</a></li><li><a href=#33-create-the-data-layer-variables-in-google-tag-manager>3.3. Create the Data Layer variables in Google Tag Manager</a></li><li><a href=#34-add-the-data-layer-variables-to-your-page-view-tag>3.4. Add the Data Layer variables to your Page View tag</a></li><li><a href=#35-test-it>3.5. Test it!</a></li><li><a href=#36-custom-report-in-google-analytics>3.6. Custom Report in Google Analytics</a></li><li><a href=#37-other-data-stores>3.7. Other data stores</a></li></ul></li><li><a href=#4-summary>4. Summary</a></li></ul></nav></div><p>You can skip directly to the Solutions chapter, but I do recommend reading the Theory first. At the very least, make sure you read the Caveats chapter, because there are a couple of gotchas you need to be aware of if implementing this solution.</p><p>Ah, damn it. Just read the whole thing, will you?</p><span class=simmer><span class=close>X</span><p><span class="fa fa-md fa-bell"></span>
+<strong>The Simmer Newsletter</strong></p><p>Subscribe to the <a href=/newsletter/>Simmer newsletter</a> to get the latest news and content from Simo Ahava into your email inbox!</p></span><h2 id=1-the-why-and-how-theory>1. The why and how (theory)</h2><p>The web, by default, is <strong>stateless</strong>. Your browsing behavior is confined to the current page only, and it&rsquo;s difficult to programmatically peer into the past (never mind into the future).</p><p>Tools like <a href=https://analytics.google.com/>Google Analytics</a> try to make sense of this stateless mess by collecting information in a chronological order. You send a <strong>pageview</strong>, then you send another <strong>pageview</strong>. Google Analytics interprets this as navigational behavior where you first viewed the first page and then the second page. Makes sense, right?</p><p>But what about if you opened the second page <strong>in a tab</strong> and never even glanced at it? GA still interprets it as a page being viewed.</p><p>What about if you <strong>reloaded</strong> the current page? GA still interprets it as a navigational step.</p><p>What about if you pressed the <strong>back button</strong> of the browser to return to the previous page? Google Analytics makes no distinction - it doesn&rsquo;t know if you clicked a link, typed the URL in the address bar, or used the back button. It&rsquo;s all the same.</p><div style=aspect-ratio:1560/661 class="figure nocaption"><a href=/images/2018/04/behavior-flow.jpg title="Google Analytics' Behavior Flow report"><img class=fig-img height=661 width=1560 loading=lazy src=/images/2018/04/behavior-flow.jpg#ZgotmplZ alt="Google Analytics' Behavior Flow report"></a></div><p>The <a href="https://support.google.com/analytics/answer/2785577?hl=en">flow reports</a> try to make sense of this mess by aligning everything into a navigational pattern (the &ldquo;flow&rdquo;). But the reports are quite difficult to interpret, as they sometimes show sequences that you are certain shouldn&rsquo;t be possible, lack necessary detail, and they don&rsquo;t really give you a robust way to query the information or to build a proper flow report yourself.</p><p>And tabbed browsing is <strong>still</strong> a problem. Each tab initiates a new &ldquo;session&rdquo; in the browser (not to be confused with a Google Analytics session). Thus when GA tries to explain to you that everything is part of a linear navigational flow, the truth is actually more complex: each tab initiates a new <strong>branch</strong> of navigation!</p><div style=aspect-ratio:1319/578 class="figure nocaption"><a href=/images/2018/04/linear-tabbed-flow.jpg title="Linear vs. branching flow"><img class=fig-img height=578 width=1319 loading=lazy src=/images/2018/04/linear-tabbed-flow.jpg#ZgotmplZ alt="Linear vs. branching flow"></a></div><p>Add to this the fact that in Google Analytics, &ldquo;Referral&rdquo; is a reserved term for campaign attribution. Thus when you are navigating around the site, the referring page is not sent when navigating in-site. This would be really helpful when deciphering navigational paths, since the <strong>Previous Page Path</strong> dimension does <strong>not</strong> necessarily represent the previous page viewed (just the previous page for which a pageview was sent). To make some sense out of the mess, sending the referral string in a Custom Dimension is a good practice.</p><div style=aspect-ratio:687/553 class="figure nocaption"><a href=/images/2018/04/referral-report.jpg title="Referral report"><img class=fig-img height=553 width=687 loading=lazy src=/images/2018/04/referral-report.jpg#ZgotmplZ alt="Referral report"></a></div><p>There are other, more granular tracking solutions out there, of course. <a href=https://www.simoahava.com/analytics/snowplow-full-setup-with-google-analytics-tracking/>Snowplow</a>, for example, lets you track hit-level data in any way you like. You can include referral information, if you wish. However, since you&rsquo;re approaching Snowplow with the limitations of SQL queries, as soon as the navigation journey starts looping or has multiple pages, the joins you&rsquo;d need to make become frustratingly complex and, as a result, quite unwieldy over large amounts of data.</p><p>So, we&rsquo;ve had this problem of analytics tools imposing a linear sequence on a non-linear navigational pattern for a couple of decades, ever since tabbed browsing was introduced around the turn of the millennium.</p><p>What we&rsquo;re proposing in this article is to add another layer to the taxonomy of Google Analytics&rsquo; rather rigid schema for browsing behavior.</p><p><strong>FROM:</strong> <code>Users</code> > <code>Sessions</code> > <code>Hits</code><br><strong>TO:</strong> <code>Users</code> > <code>Sessions</code> > <code>Tabs</code> > <code>Hits</code></p><p>This browsing behavior would be encoded directly into <strong>Custom Dimensions</strong>, so you don&rsquo;t have to infer behavior from GA&rsquo;s pageview model - rather, you can query the navigational information directly!</p><h3 id=11-the-performancenavigation-api>1.1. The PerformanceNavigation API</h3><p>The API we&rsquo;re going to use to identify browsing behavior is called <code>PerformanceNavigation</code>. It comes with two read-only properties: <code>performance.navigation.type</code> and <code>performance.navigation.redirectCount</code>.</p><p>The origin story of this API is firmly rooted in the difficulty of measuring performance of any given web page load. Redirects, network lag, and cached resources (locally, server-side, in CDNs) all contribute to the complexity of what the aggregate <strong>performance</strong> of any given page load is.</p><div style=aspect-ratio:801/536 class="figure nocaption"><a href=/images/2018/04/performance-timing.jpg title="PerformanceTiming events"><img class=fig-img height=536 width=801 loading=lazy src=/images/2018/04/performance-timing.jpg#ZgotmplZ alt="PerformanceTiming events"></a></div><p>To help understand this complexity, web browsers implement the <code>PerformanceNavigation</code> API. The two properties exposed by the API can be found under the global <code>window.performance.navigation</code> interface, and they contain the following information:</p><table><thead><tr><th>Parameter</th><th>Detail</th><th>Description</th></tr></thead><tbody><tr><td><code>redirectCount</code></td><td>-</td><td>The number of <code>3XX</code> HTTP redirects the browser went through when loading the page.</td></tr><tr><td><code>type</code></td><td>-</td><td>An integer representing how the page was loaded.</td></tr><tr><td> </td><td>0</td><td>Normal navigation, typing the URL, clicking a link, opening a bookmark, entering via an app link, etc.</td></tr><tr><td> </td><td>1</td><td>Page was refreshed / reloaded while already open in the browser tab.</td></tr><tr><td> </td><td>2</td><td>The page was retrieved from the browser history by using the Back or Forward button.</td></tr><tr><td> </td><td>255</td><td>Any other way to navigate to the page.</td></tr></tbody></table><p>The <strong>255</strong> value is interesting, because it is quite undocumented. In tests, it seems to only emerge with the Firefox browser, when the page goes through a <strong>client-side</strong> refresh, either using <code>window.location.replace()</code> or <code>&lt;meta name="refresh"></code>. Note that this goes against the W3C specification, which <a href=https://www.w3.org/TR/navigation-timing/#dom-performancenavigation-type>clearly states</a> that client-side redirects <em>should</em> be contained within one of the regular navigation types.</p><p>Now, even though we mention how this API was probably conceived to give more information about the performance timing metrics, where it <strong>really</strong> shines is uncovering the navigational paths the users take through your site.</p><h3 id=12-browser-storage>1.2. Browser storage</h3><p>Ever since browser tabs were introduced to the delight of site visitors and web browser users, they&rsquo;ve been a source of annoyance for web analysts.</p><p>In Google Analytics, for example, we simply don&rsquo;t know (by default) what the tab situation is of any given page. We don&rsquo;t know if the page was opened in a new tab, for one, since you can&rsquo;t attach listeners to the right-click context menu, and tracking just middle mouse button clicks doesn&rsquo;t give a comprehensive idea of the scope of the phenomenon.</p><div style=aspect-ratio:619/443 class="figure nocaption"><a href=/images/2018/04/context-menu.jpg title="Context menu"><img class=fig-img height=443 width=619 loading=lazy src=/images/2018/04/context-menu.jpg#ZgotmplZ alt="Context menu"></a></div><p>The beauty of web analytics is that when we can&rsquo;t track things <em>directly</em> (whether a user submitted a form, for example), we can track them <em>indirectly</em> (page load of a &ldquo;thank you&rdquo; page). So maybe we can use this same indirect approach with browser tabs, too?</p><p>If we can assign an identifier to every tab the user opens in the current website, we can identify individual navigation sequences! This can be achieved by checking against a common data store whether the given tab ID exists already, in which case the page load happened in a tab that was already open, and vice versa.</p><p>However, thanks again to the statelessness of the web, there is the problem of persistence. We can&rsquo;t simply use a global JavaScript property to store the tab ID, because that gets demolished when the user unloads the page by reloading or navigating to another page.</p><p>Cookies and <code>localStorage</code> are &ldquo;too&rdquo; persistent, because they are only reset when they are manually cleared (<code>localStorage</code>) or when they expire (cookies). We only want to store the ID of a tab for as long as that tab exists.</p><div style=aspect-ratio:841/242 class="figure nocaption"><a href=/images/2018/04/sessionstorage.jpg title="Session storage"><img class=fig-img height=242 width=841 loading=lazy src=/images/2018/04/sessionstorage.jpg#ZgotmplZ alt="Session storage"></a></div><p>Enter <code>sessionStorage</code>! It&rsquo;s a browser storage API that is unique to each tab in your web browser. By storing the tab ID in <code>sessionStorage</code>, we can always check if the tab already has an ID (existing tab), or if we need to generate a new one (new tab).</p><p>Combine this with some <code>localStorage</code> logic, where we keep a running tally of how many tab IDs have been generated, remembering to remove any tab ID once that tab is closed, and we can also get a fairly reliable count of tabs open on your website at any given time.</p><p>So, now we are getting close to having all the bits and pieces at hand. Once we combine the tabbed browsing metadata with that provided by the <code>PerformanceNavigation</code> API, we can get a nice set of Custom Dimensions that expose a great deal of interesting information about how your visitors navigate your site.</p><h2 id=2-caveats>2. Caveats</h2><p>Oh, there are <strong>plenty</strong> of caveats. The solutions below rely on a number of fragile components, which can get easily messed up due to how browsers act differently in certain circumstances.</p><h3 id=21-cross-domain-browsing>2.1. Cross-domain browsing</h3><p>If your tracking crosses multiple domains, then each domain will get their own tab ID. That&rsquo;s because <code>sessionStorage</code> and <code>localStorage</code> are confined to the current domain only. And if your current domain sails between HTTP and HTTPS protocols, then <em>those</em> will get their own storages, too. You could fix this by using URL parameters on the domain boundaries to pass the metadata from one domain to the next, but this is something you&rsquo;ll need to figure out by yourself.</p><h3 id=22-firefox-and-chrome-go-rogue>2.2. Firefox and Chrome go rogue</h3><p>An additional point of concern is that Firefox and Chrome do not respect the specification that session cookies and <code>sessionStorage</code> should only exist for as long as the tab is alive. Once the browser is closed, these session stores should be purged.</p><p>On Chrome and Firefox, however, if you open the browser and you have the <strong>Show your windows and tabs from last time</strong> (Firefox) or <strong>Continue where you left off</strong> (Chrome) settings turned on, the session stores are restored, too! So even though the tab <em>did</em> close, by restoring the tab it&rsquo;s as if the tab was never closed.</p><div style=aspect-ratio:1155/786 class="figure nocaption"><a href=/images/2018/04/firefox-chrome-settings.jpg title="Firefox and Chrome settings"><img class=fig-img height=786 width=1155 loading=lazy src=/images/2018/04/firefox-chrome-settings.jpg#ZgotmplZ alt="Firefox and Chrome settings"></a></div><p>That sucks. Not much we can do about that.</p><p>Also, and this is interesting, when you do restore tabs or continue where you left off, the browser claims that the navigation type was <code>BACK/FORWARD</code>, meaning it equates restoring tabs with using the back or forward button of the browser.</p><p>This sucks, too. And there&rsquo;s not much we can do about this, either.</p><h3 id=23-firefox-and-its-client-side-refresh-dilemma>2.3. Firefox and its client-side refresh dilemma</h3><p>Then there&rsquo;s the problem with Firefox implementing <code>OTHER</code> as the navigation type if a client-side refresh is done. This is unfortunate, but doesn&rsquo;t luckily mess things up too bad, because this behavior is contained within this particular navigation type alone.</p><p>In addition to all of these, because the whole granularity of distinguishing between <code>BACK</code> and <code>FORWARD</code> needs to be coded using a programmatically maintained path of pages the user has visited, all it takes is for them to manually clear the <code>sessionStorage</code> to break the whole setup (at least, for as long as the tab is open).</p><div style=aspect-ratio:897/203 class="figure nocaption"><a href=/images/2018/04/clear-all-dev-tools.jpg title="Clear all dev tools"><img class=fig-img height=203 width=897 loading=lazy src=/images/2018/04/clear-all-dev-tools.jpg#ZgotmplZ alt="Clear all dev tools"></a></div><p>That&rsquo;s why in the beginning of the solution you have the option of NOT tracking the back and forward button presses with detail. In this case, the string <code>BACK/FORWARD</code> is sent to Google Analytics in case either button is pressed. It&rsquo;s not as detailed but it does still tell you whether the user navigated using these buttons (or, as mentioned above, if the tabs were restored after restarting the browser).</p><p>Our hypothesis is that with more data the averages will converge towards a more reliable dataset. So idiosyncrasies such as tabs being restored or users clearing storage will disappear into the data as more and more page views are accumulated.</p><h3 id=24-browser-support>2.4. Browser support</h3><p>There&rsquo;s also the matter of browser support, but unlike some <a href=https://developer.mozilla.org/en-US/docs/Web/API/PerformanceNavigation>online resources</a> claim, support for <code>PerformanceNavigation</code> is pretty well supported in <a href=https://developer.mozilla.org/en-US/docs/Web/API/Performance/navigation>Chrome and Safari</a>.</p><h3 id=25-single-page-apps>2.5. Single-page apps</h3><p>You could implement this solution for single-page apps, but in that case you should add an additional, custom navigation type called <code>VIRTUAL</code>, or something similar, if the navigation was a single-page transition and not a proper page load.</p><p>Do note that <code>window.performance.navigation.type</code> does <strong>not</strong> update when the user uses the browser&rsquo;s Back / Forward buttons and the transition is from one single-page app state to another. So you&rsquo;d need to code the logic for Back / Forward use when no page load is recorded.</p><h2 id=3-solutions>3. Solutions</h2><p>OK, let&rsquo;s get to the good stuff! In this chapter, we&rsquo;ll introduce the technical solution in <a href=https://tagmanager.google.com>Google Tag Manager</a> (Custom HTML tag) that orchestrates the whole thing. In addition to that, each sub-section will detail how to send the respective piece of information to Google Analytics as a Custom Dimension. Basically, all you&rsquo;ll need to edit is your main Page View tag, since that&rsquo;s the only one that will be sending this data to Google Analytics.</p><h3 id=31-the-custom-html-tag>3.1. The Custom HTML tag</h3><p>First, <strong>create a new Custom HTML tag</strong>, and add the following code within.</p><div class=highlight><pre tabindex=0 style=background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-javascript data-lang=javascript><span style=display:flex><span>&lt;script&gt;
+</span></span><span style=display:flex><span>  (<span style=color:#00a>function</span>() {
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#aaa;font-style:italic>// Set to false if you only want to register &#34;BACK/FORWARD&#34;
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>    <span style=color:#aaa;font-style:italic>// if either button was pressed.
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>    <span style=color:#00a>var</span> detailedBackForward = <span style=color:#00a>true</span>;
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#aaa;font-style:italic>// Set expiration of tab count in milliseconds. The recommended default is
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>    <span style=color:#aaa;font-style:italic>// 72 hours (259200000 ms). Set to 0 if you don&#39;t want to expire the tab count.
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>    <span style=color:#00a>var</span> expireTabs = <span style=color:#099>259200000</span>;
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#00a>if</span> (!!<span style=color:#0aa>window</span>.Storage) {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      <span style=color:#00a>var</span> openTabs  = JSON.parse(localStorage.getItem(<span style=color:#a50>&#39;_tab_ids&#39;</span>)) || [],
+</span></span><span style=display:flex><span>          tabId     = sessionStorage.getItem(<span style=color:#a50>&#39;_tab_id&#39;</span>),
+</span></span><span style=display:flex><span>          navPath   = JSON.parse(sessionStorage.getItem(<span style=color:#a50>&#39;_nav_path&#39;</span>)),
+</span></span><span style=display:flex><span>          curPage   = <span style=color:#0aa>document</span>.location.href,
+</span></span><span style=display:flex><span>          newTab    = <span style=color:#00a>false</span>,
+</span></span><span style=display:flex><span>          origin	= <span style=color:#0aa>document</span>.location.origin;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      <span style=color:#00a>var</span> tabCount,
+</span></span><span style=display:flex><span>          redirectCount,
+</span></span><span style=display:flex><span>          navigationType,
+</span></span><span style=display:flex><span>          prevInStack,
+</span></span><span style=display:flex><span>          lastInStack,
+</span></span><span style=display:flex><span>          payload,
+</span></span><span style=display:flex><span>          expiration,
+</span></span><span style=display:flex><span>          newTabId;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      <span style=color:#00a>var</span> clearExpired = <span style=color:#00a>function</span>(tabs) {
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#00a>if</span> (expireTabs === <span style=color:#099>0</span>) { <span style=color:#00a>return</span> tabs; }
+</span></span><span style=display:flex><span>        <span style=color:#00a>return</span> tabs.filter(<span style=color:#00a>function</span>(tab) {
+</span></span><span style=display:flex><span>          <span style=color:#00a>try</span> {
+</span></span><span style=display:flex><span>	        expiration = <span style=color:#0aa>parseInt</span>(tab.split(<span style=color:#a50>&#39;_&#39;</span>)[<span style=color:#099>1</span>], <span style=color:#099>10</span>);
+</span></span><span style=display:flex><span>    	    <span style=color:#00a>return</span> expiration &gt; (<span style=color:#00a>new</span> <span style=color:#0aa>Date</span>().getTime());
+</span></span><span style=display:flex><span>          } <span style=color:#00a>catch</span>(e) {
+</span></span><span style=display:flex><span>            <span style=color:#00a>return</span> <span style=color:#00a>false</span>;
+</span></span><span style=display:flex><span>          }
+</span></span><span style=display:flex><span>        });
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>      };
+</span></span><span style=display:flex><span>      
+</span></span><span style=display:flex><span>      <span style=color:#00a>var</span> updateTabExpiration = <span style=color:#00a>function</span>(tabId) {
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#00a>if</span> (expireTabs === <span style=color:#099>0</span>) { <span style=color:#00a>return</span> tabId; }
+</span></span><span style=display:flex><span>        <span style=color:#00a>try</span> {
+</span></span><span style=display:flex><span>          newTabId = tabId.split(<span style=color:#a50>&#39;_&#39;</span>);
+</span></span><span style=display:flex><span>          expiration = <span style=color:#0aa>parseInt</span>(newTabId[<span style=color:#099>1</span>], <span style=color:#099>10</span>);
+</span></span><span style=display:flex><span>          <span style=color:#00a>if</span> (expiration &gt; <span style=color:#00a>new</span> <span style=color:#0aa>Date</span>().getTime()) {
+</span></span><span style=display:flex><span>            <span style=color:#00a>return</span> tabId;
+</span></span><span style=display:flex><span>          } <span style=color:#00a>else</span> {
+</span></span><span style=display:flex><span>            newTabId = newTabId[<span style=color:#099>0</span>] + <span style=color:#a50>&#39;_&#39;</span> + (<span style=color:#00a>new</span> <span style=color:#0aa>Date</span>().getTime() + expireTabs);
+</span></span><span style=display:flex><span>            sessionStorage.setItem(<span style=color:#a50>&#39;_tab_id&#39;</span>, newTabId);
+</span></span><span style=display:flex><span>            <span style=color:#00a>return</span> newTabId;
+</span></span><span style=display:flex><span>          }
+</span></span><span style=display:flex><span>        } <span style=color:#00a>catch</span>(e) {
+</span></span><span style=display:flex><span>          <span style=color:#00a>return</span> tabId;
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>      
+</span></span><span style=display:flex><span>      };
+</span></span><span style=display:flex><span>      
+</span></span><span style=display:flex><span>      <span style=color:#00a>var</span> getBackForwardNavigation = <span style=color:#00a>function</span>() {
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#00a>if</span> (detailedBackForward === <span style=color:#00a>false</span>) {
+</span></span><span style=display:flex><span>          <span style=color:#00a>return</span> <span style=color:#a50>&#39;BACK/FORWARD&#39;</span>;
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#00a>if</span> (navPath.length &lt; <span style=color:#099>2</span>) {
+</span></span><span style=display:flex><span>          <span style=color:#00a>return</span> <span style=color:#a50>&#39;FORWARD&#39;</span>;
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        prevInStack = navPath[navPath.length-<span style=color:#099>2</span>];
+</span></span><span style=display:flex><span>        lastInStack = navPath[navPath.length-<span style=color:#099>1</span>];
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#00a>if</span> (prevInStack === curPage || lastInStack === curPage) {
+</span></span><span style=display:flex><span>          <span style=color:#00a>return</span> <span style=color:#a50>&#39;BACK&#39;</span>;
+</span></span><span style=display:flex><span>        } <span style=color:#00a>else</span> {
+</span></span><span style=display:flex><span>          <span style=color:#00a>return</span> <span style=color:#a50>&#39;FORWARD&#39;</span>;
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      };
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      <span style=color:#00a>var</span> removeTabOnUnload = <span style=color:#00a>function</span>() {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#00a>var</span> index;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#aaa;font-style:italic>// Get the most recent values from storage
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>        openTabs = JSON.parse(localStorage.getItem(<span style=color:#a50>&#39;_tab_ids&#39;</span>)) || [];
+</span></span><span style=display:flex><span>        tabId    = sessionStorage.getItem(<span style=color:#a50>&#39;_tab_id&#39;</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        openTabs = clearExpired(openTabs);
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#00a>if</span> (openTabs.length &amp;&amp; tabId !== <span style=color:#00a>null</span>) {
+</span></span><span style=display:flex><span>          index = openTabs.indexOf(tabId);
+</span></span><span style=display:flex><span>          <span style=color:#00a>if</span> (index &gt; -<span style=color:#099>1</span>) {
+</span></span><span style=display:flex><span>            openTabs.splice(index, <span style=color:#099>1</span>);
+</span></span><span style=display:flex><span>          }
+</span></span><span style=display:flex><span>          localStorage.setItem(<span style=color:#a50>&#39;_tab_ids&#39;</span>, JSON.stringify(openTabs));
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      };
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      <span style=color:#00a>var</span> generateTabId = <span style=color:#00a>function</span>() {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#aaa;font-style:italic>// From https://stackoverflow.com/a/8809472/2367037
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>        <span style=color:#00a>var</span> d = <span style=color:#00a>new</span> <span style=color:#0aa>Date</span>().getTime();
+</span></span><span style=display:flex><span>        <span style=color:#00a>if</span> (<span style=color:#00a>typeof</span> performance !== <span style=color:#a50>&#39;undefined&#39;</span> &amp;&amp; <span style=color:#00a>typeof</span> performance.now === <span style=color:#a50>&#39;function&#39;</span>){
+</span></span><span style=display:flex><span>          d += performance.now(); <span style=color:#aaa;font-style:italic>//use high-precision timer if available
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>        }
+</span></span><span style=display:flex><span>        <span style=color:#00a>return</span> <span style=color:#a50>&#39;xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx&#39;</span>.replace(<span style=color:#099>/[xy]/g</span>, <span style=color:#00a>function</span> (c) {
+</span></span><span style=display:flex><span>          <span style=color:#00a>var</span> r = (d + <span style=color:#0aa>Math</span>.random() * <span style=color:#099>16</span>) % <span style=color:#099>16</span> | <span style=color:#099>0</span>;
+</span></span><span style=display:flex><span>          d = <span style=color:#0aa>Math</span>.floor(d / <span style=color:#099>16</span>);
+</span></span><span style=display:flex><span>          <span style=color:#00a>return</span> (c === <span style=color:#a50>&#39;x&#39;</span> ? r : (r &amp; <span style=color:#099>0x3</span> | <span style=color:#099>0x8</span>)).toString(<span style=color:#099>16</span>);
+</span></span><span style=display:flex><span>        }) + (expireTabs &gt; <span style=color:#099>0</span> ? <span style=color:#a50>&#39;_&#39;</span> + (<span style=color:#00a>new</span> <span style=color:#0aa>Date</span>().getTime() + expireTabs) : <span style=color:#a50>&#39;&#39;</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      };
+</span></span><span style=display:flex><span>      
+</span></span><span style=display:flex><span>      <span style=color:#00a>var</span> validNavigation = <span style=color:#00a>function</span>(type, newTab) {
+</span></span><span style=display:flex><span>        
+</span></span><span style=display:flex><span>        <span style=color:#aaa;font-style:italic>// Return false if new tab and any other navigation type than
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>        <span style=color:#aaa;font-style:italic>// NAVIGATE or OTHER. Otherwise return true.
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>        <span style=color:#00a>return</span> !(newTab === <span style=color:#00a>true</span> &amp;&amp; (type !== <span style=color:#099>0</span> &amp;&amp; type !== <span style=color:#099>255</span>));
+</span></span><span style=display:flex><span>      
+</span></span><span style=display:flex><span>      };
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      <span style=color:#00a>if</span> (tabId === <span style=color:#00a>null</span>) {
+</span></span><span style=display:flex><span>        tabId = generateTabId();
+</span></span><span style=display:flex><span>        newTab = <span style=color:#00a>true</span>;
+</span></span><span style=display:flex><span>        sessionStorage.setItem(<span style=color:#a50>&#39;_tab_id&#39;</span>, tabId);
+</span></span><span style=display:flex><span>      } <span style=color:#00a>else</span> {
+</span></span><span style=display:flex><span>        tabId = updateTabExpiration(tabId);
+</span></span><span style=display:flex><span>      }   
+</span></span><span style=display:flex><span>          
+</span></span><span style=display:flex><span>      openTabs = clearExpired(openTabs); 
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      <span style=color:#00a>if</span> (openTabs.indexOf(tabId) === -<span style=color:#099>1</span>) {
+</span></span><span style=display:flex><span>        openTabs.push(tabId);
+</span></span><span style=display:flex><span>        localStorage.setItem(<span style=color:#a50>&#39;_tab_ids&#39;</span>, JSON.stringify(openTabs));
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      tabCount = openTabs.length;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      <span style=color:#00a>if</span> (!!<span style=color:#0aa>window</span>.PerformanceNavigation) {
+</span></span><span style=display:flex><span>        navPath = navPath || [];
+</span></span><span style=display:flex><span>        redirectCount = <span style=color:#0aa>window</span>.performance.navigation.redirectCount;
+</span></span><span style=display:flex><span>        <span style=color:#aaa;font-style:italic>// Only track new tabs if type is NAVIGATE or OTHER
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>        <span style=color:#00a>if</span> (validNavigation(<span style=color:#0aa>window</span>.performance.navigation.type, newTab)) {
+</span></span><span style=display:flex><span>          <span style=color:#00a>switch</span> (<span style=color:#0aa>window</span>.performance.navigation.type) {
+</span></span><span style=display:flex><span>            <span style=color:#00a>case</span> <span style=color:#099>0</span>:
+</span></span><span style=display:flex><span>              navigationType = <span style=color:#a50>&#39;NAVIGATE&#39;</span>;
+</span></span><span style=display:flex><span>              navPath.push(curPage);
+</span></span><span style=display:flex><span>              <span style=color:#00a>break</span>;
+</span></span><span style=display:flex><span>            <span style=color:#00a>case</span> <span style=color:#099>1</span>:
+</span></span><span style=display:flex><span>              navigationType = <span style=color:#a50>&#39;RELOAD&#39;</span>;
+</span></span><span style=display:flex><span>              <span style=color:#00a>if</span> (navPath.length === <span style=color:#099>0</span> || navPath[navPath.length-<span style=color:#099>1</span>] !== curPage) {
+</span></span><span style=display:flex><span>                navPath.push(curPage);
+</span></span><span style=display:flex><span>              }
+</span></span><span style=display:flex><span>              <span style=color:#00a>break</span>;
+</span></span><span style=display:flex><span>            <span style=color:#00a>case</span> <span style=color:#099>2</span>:
+</span></span><span style=display:flex><span>              navigationType = getBackForwardNavigation();
+</span></span><span style=display:flex><span>              <span style=color:#00a>if</span> (navigationType === <span style=color:#a50>&#39;FORWARD&#39;</span>) {
+</span></span><span style=display:flex><span>                <span style=color:#aaa;font-style:italic>// Only add to navigation if not coming from external domain
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>                <span style=color:#00a>if</span> (<span style=color:#0aa>document</span>.referrer.indexOf(origin) &gt; -<span style=color:#099>1</span>) {
+</span></span><span style=display:flex><span>                  navPath.push(curPage);
+</span></span><span style=display:flex><span>                }
+</span></span><span style=display:flex><span>              } <span style=color:#00a>else</span> <span style=color:#00a>if</span> (navigationType === <span style=color:#a50>&#39;BACK&#39;</span>) {
+</span></span><span style=display:flex><span>                <span style=color:#aaa;font-style:italic>// Only clear from navigation if not returning from external domain
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>                <span style=color:#00a>if</span> (lastInStack !== curPage) {
+</span></span><span style=display:flex><span>                  navPath.pop();
+</span></span><span style=display:flex><span>                }
+</span></span><span style=display:flex><span>              } <span style=color:#00a>else</span> {
+</span></span><span style=display:flex><span>                navPath.push(curPage);
+</span></span><span style=display:flex><span>              }
+</span></span><span style=display:flex><span>              <span style=color:#00a>break</span>;
+</span></span><span style=display:flex><span>            <span style=color:#00a>default</span>:
+</span></span><span style=display:flex><span>              navigationType = <span style=color:#a50>&#39;OTHER&#39;</span>;
+</span></span><span style=display:flex><span>              navPath.push(curPage);
+</span></span><span style=display:flex><span>          }
+</span></span><span style=display:flex><span>        } <span style=color:#00a>else</span> {
+</span></span><span style=display:flex><span>          navPath.push(curPage);
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>        sessionStorage.setItem(<span style=color:#a50>&#39;_nav_path&#39;</span>, JSON.stringify(navPath));
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      <span style=color:#0aa>window</span>.addEventListener(<span style=color:#a50>&#39;beforeunload&#39;</span>, removeTabOnUnload);
+</span></span><span style=display:flex><span>      
+</span></span><span style=display:flex><span>      payload = {
+</span></span><span style=display:flex><span>        tabCount: tabCount,
+</span></span><span style=display:flex><span>        redirectCount: redirectCount,
+</span></span><span style=display:flex><span>        navigationType: navigationType,
+</span></span><span style=display:flex><span>        newTab: newTab === <span style=color:#00a>true</span> ? <span style=color:#a50>&#39;New&#39;</span> : <span style=color:#a50>&#39;Existing&#39;</span>,
+</span></span><span style=display:flex><span>        tabId: tabId.replace(<span style=color:#099>/_.+/</span>, <span style=color:#a50>&#39;&#39;</span>)
+</span></span><span style=display:flex><span>      };
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      <span style=color:#aaa;font-style:italic>// Set the data model keys directly so they can be used in the Page View tag
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>      <span style=color:#0aa>window</span>.google_tag_manager[{{Container ID}}].dataLayer.set(<span style=color:#a50>&#39;browsingBehavior&#39;</span>, payload);
+</span></span><span style=display:flex><span>      
+</span></span><span style=display:flex><span>      <span style=color:#aaa;font-style:italic>// Also push to dataLayer
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>      <span style=color:#0aa>window</span>.dataLayer.push({
+</span></span><span style=display:flex><span>        event: <span style=color:#a50>&#39;custom.navigation&#39;</span>,
+</span></span><span style=display:flex><span>        browsingBehavior: payload
+</span></span><span style=display:flex><span>      });
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>  
+</span></span><span style=display:flex><span>  })();
+</span></span><span style=display:flex><span>&lt;<span style=color:red;background-color:#faa>/script&gt;</span></span></span></code></pre></div><p>Do not add any triggers to this tag. Instead, open your <strong>Page View</strong> tag, and add this Custom HTML tag into its <a href=/analytics/understanding-tag-sequencing-in-google-tag-manager/>tag sequence</a> by making the Custom HTML tag fire <strong>before</strong> the Page View tag.</p><p>Accessing GTM&rsquo;s data model directly with <code>dataLayer.set</code> is necessary if you want to modify Data Layer keys within a tag sequence. However, for the sake of transparency, we&rsquo;ll also push a <code>dataLayer</code> object with a custom event (<code>custom.navigation</code>) and the browsing behavior payload.</p><div style=aspect-ratio:853/464 class="figure nocaption"><a href=/images/2018/04/tag-sequencing-settings.jpg title="Tag Sequencing Settings"><img class=fig-img height=464 width=853 loading=lazy src=/images/2018/04/tag-sequencing-settings.jpg#ZgotmplZ alt="Tag Sequencing Settings"></a></div><p>The code in the Custom HTML tag does a number of things.</p><ol><li><p>It generates a <strong>tab ID</strong> for the page, which is stored in <code>sessionStorage</code>. If a new tab ID is thus generated, the page is marked as being in a new browser tab. If a tab ID was already in storage, then the page is flagged as being in an existing tab.</p></li><li><p>This tab ID is also stored in an array within <code>localStorage</code>, where all tab IDs generated on the site are stored. The length of this array is the count of currently open tabs on the domain.</p></li><li><p>If the user leaves the page, or closes the browser tab, or closes the browser, the tab ID is removed from the array in <code>localStorage</code> (thus keeping the count of open tabs accurate).</p></li><li><p>If the page was loaded by navigating to the URL, navigation type is set to <code>NAVIGATE</code>, and the current page is pushed into an array representing the navigation path, stored in <code>sessionStorage</code>.</p></li><li><p>If the page was reloaded, navigation type is set to <code>RELOAD</code>, and the navigation path is kept as it is.</p></li><li><p>If the Back or Forward button was pressed, the script checks if the current page is the penultimate page in the navigation path, in which case navigation type is set to <code>BACK</code>. In other cases, navigation type is set to <code>FORWARD</code>.</p></li><li><p>Count of tabs, count of redirects, navigation type, tab ID, and whether the tab was new or existing are all added to Google Tag Manager&rsquo;s data model, so that the Page View tag can grab these values with Data Layer variables.</p></li></ol><blockquote><p><strong>UPDATE 22 May 2019</strong>: I added some extra code to handle expiration. By default, the expiration is 72 hours, so if the storage isn&rsquo;t interacted with in 72 hours, the current count of open tabs is cleared.</p></blockquote><p>There are some nuances to the steps listed above, mainly to account for edge cases, such as when navigating <code>BACK</code> or <code>FORWARD</code> from an external domain. Even with these precautions, there are situations where the solution will fail (see the <a href=/analytics/track-browsing-behavior-in-google-analytics/#2-caveats>Caveats</a> chapter).</p><p>And now that we are adding all this information into Data Layer, it&rsquo;s time to pick up the metadata and send it to Google Analytics!</p><h3 id=32-create-the-custom-dimensions-in-google-analyitcs>3.2. Create the Custom Dimensions in Google Analyitcs</h3><p>First, you&rsquo;ll need to create some Custom Dimensions in Google Analytics.</p><p>Create the following Custom Dimensions in Google Analytics&rsquo; Property Settings, all in <strong>hit scope</strong>, and make note of the index numbers assigned to them.</p><ul><li><strong>Redirect count</strong></li><li><strong>Navigation type</strong></li><li><strong>Tab type</strong></li><li><strong>Tabs open</strong></li><li><strong>Tab ID</strong></li></ul><div style=aspect-ratio:1544/755 class="figure nocaption"><a href=/images/2018/04/custom-dimensions-google-analytics.jpg title="Custom Dimensions generated in Google Analytics"><img class=fig-img height=755 width=1544 loading=lazy src=/images/2018/04/custom-dimensions-google-analytics.jpg#ZgotmplZ alt="Custom Dimensions generated in Google Analytics"></a></div><h3 id=33-create-the-data-layer-variables-in-google-tag-manager>3.3. Create the Data Layer variables in Google Tag Manager</h3><p>Next, create the corresponding Data Layer variables in Google Tag Manager. Here&rsquo;s my setup:</p><table><thead><tr><th>Variable name</th><th>Value for <strong>Data Layer Variable name</strong> field</th></tr></thead><tbody><tr><td>{{DLV - browsingBehavior.redirectCount}}</td><td><code>browsingBehavior.redirectCount</code></td></tr><tr><td>{{DLV - browsingBehavior.navigationType}}</td><td><code>browsingBehavior.navigationType</code></td></tr><tr><td>{{DLV - browsingBehavior.newTab}}</td><td><code>browsingBehavior.newTab</code></td></tr><tr><td>{{DLV - browsingBehavior.tabCount}}</td><td><code>browsingBehavior.tabCount</code></td></tr><tr><td>{{DLV - browsingBehavior.tabId }}</td><td><code>browsingBehavior.tabId</code></td></tr></tbody></table><p>Here&rsquo;s an example of what one of the variables would look like:</p><div style=aspect-ratio:645/405 class="figure nocaption"><a href=/images/2018/04/data-layer-variable.jpg title="Data Layer Variable"><img class=fig-img height=405 width=645 loading=lazy src=/images/2018/04/data-layer-variable.jpg#ZgotmplZ alt="Data Layer Variable"></a></div><h3 id=34-add-the-data-layer-variables-to-your-page-view-tag>3.4. Add the Data Layer variables to your Page View tag</h3><p>Now, open the Page View tag which you have already edited for the Tag Sequence stuff in the beginning of this chapter. Either in a <a href=/analytics/google-analytics-settings-variable-in-gtm/>Google Analytics Settings variable</a> or by directly editing the tag fields, add the Data Layer variables to their respective indices in the Custom Dimensions list. This is what my setup looks like:</p><div style=aspect-ratio:851/454 class="figure nocaption"><a href=/images/2018/04/google-analytics-tag.jpg title="Google Analytics tag"><img class=fig-img height=454 width=851 loading=lazy src=/images/2018/04/google-analytics-tag.jpg#ZgotmplZ alt="Google Analytics tag"></a></div><h3 id=35-test-it>3.5. Test it!</h3><p>Now, save the tag, go to Preview mode, and enter your site.</p><p><strong>Note!</strong> You can&rsquo;t really use Preview mode to test if the Data Layer variables are populating correctly. Because you are updating the data model in a tag sequence, the method used does not expose the dynamic changes to the Preview mode user interface.</p><p>You&rsquo;ll need to either look at the Network requests directly, or use a tool such as <a href="https://support.google.com/analytics/answer/6277302?hl=en">Google Tag Assistant recordings</a> or <a href="https://chrome.google.com/webstore/detail/google-analytics-debugger/jnkmfdileelhofjcijamephohjechhna?hl=en">Google Analytics Debugger</a> to check if the data is being sent correctly.</p><p>In any case, <strong>if</strong> everything is working, then with your Page View tag you should see the Custom Dimensions being populated with the relevant information.</p><div style=aspect-ratio:1195/476 class="figure nocaption"><a href=/images/2018/04/google-tag-assistant-recordings.jpg title="Google Tag Assistant Recordings"><img class=fig-img height=476 width=1195 loading=lazy src=/images/2018/04/google-tag-assistant-recordings.jpg#ZgotmplZ alt="Google Tag Assistant Recordings"></a></div><h3 id=36-custom-report-in-google-analytics>3.6. Custom Report in Google Analytics</h3><p>A handy way to pull it all together is to create a Custom Report in Google Analytics with these settings, for example:</p><div style=aspect-ratio:1378/613 class="figure nocaption"><a href=/images/2018/04/google-analytics-custom-report.jpg title="Google Analytics Custom Report"><img class=fig-img height=613 width=1378 loading=lazy src=/images/2018/04/google-analytics-custom-report.jpg#ZgotmplZ alt="Google Analytics Custom Report"></a></div><p>This report will contain interesting information about how users navigated to the different pages on your site.</p><div style=aspect-ratio:1243/508 class="figure nocaption"><a href=/images/2018/04/custom-report-ga.jpg title="Custom Report in GA UI"><img class=fig-img height=508 width=1243 loading=lazy src=/images/2018/04/custom-report-ga.jpg#ZgotmplZ alt="Custom Report in GA UI"></a></div><p>Couple this with things like <a href=/analytics/improve-data-collection-with-four-custom-dimensions/#3-session-id>Session ID</a> and <a href=/analytics/improve-data-collection-with-four-custom-dimensions/#4-hit-timestamp>Hit Timestamp</a>, and you can really start digging into how users move from one page to the other on your site.</p><h3 id=37-other-data-stores>3.7. Other data stores</h3><p>If you&rsquo;ve taken the time to <a href=/analytics/snowplow-full-setup-with-google-analytics-tracking/>duplicate your Google Analytics data to Snowplow</a>, you&rsquo;ll naturally have access to a far more granular, raw hit stream resource for querying against. For example, here&rsquo;s a simple SQL query output with all the relevant dimensions included:</p><div style=aspect-ratio:737/344 class="figure nocaption"><a href=/images/2018/04/sql-query-from-snowplow.jpg title="Snowplow query in SQL"><img class=fig-img height=344 width=737 loading=lazy src=/images/2018/04/sql-query-from-snowplow.jpg#ZgotmplZ alt="Snowplow query in SQL"></a></div><p>Do note that Snowplow doesn&rsquo;t differentiate between different <em>scopes</em> of Custom Dimensions, since scope is a concept applied in Google Analytics processing. So if you are sending an identifier into a session-scoped Custom Dimension (e.g. Session ID), the hit stream to Snowplow will interpret this as hit-scoped data, and thus the identifier is pretty useless.</p><h2 id=4-summary>4. Summary</h2><p>First of all, I&rsquo;m hugely indebted to Jethro Nederhof for agreeing to draft this solution with me. I really love the community of analytics developers - seems like everyone is giddy with excitement when figuring out new solutions to age-old questions, and the amount of knowledge being shared across blogs, Slack channels, and social media is a testament to the selflessness of these good men and women.</p><p>In my humble opinion, anyone interested in proper page navigation analysis should try out this solution. Understanding things like browser tab usage and Back / Forward browsing can help you figure out where the information architecture blind spots of your site are or whether you need to fix the navigation options you offer your visitors, for example.</p><p>But, as always on this particular blog, this is a technical solution first and foremost. Jethro and I wanted to highlight some cool tricks you can do with the web browser, and we fully expect others to refine these methods even further.</p><p>It would be cool if the APIs were developed even further, such as by automatically distinguishing between Back and Forward of the browser. Right now, they&rsquo;re bunched together which is why we need the workaround of managing the navigation path in <code>sessionStorage</code>, and that&rsquo;s a fragile solution indeed.</p><p>Let us know in the comments what you think of this trick, and whether you have suggestions on how to improve it!</p></div></div><div id=post-footer class="post-footer main-content-wrap"><div class=post-footer-tags><span class="text-color-light text-small">TAGGED IN</span><br><a class="tag tag--primary tag--small" href=/tags/google-tag-manager/>google tag manager</a>
+<a class="tag tag--primary tag--small" href=/tags/custom-dimensions/>custom dimensions</a>
+<a class="tag tag--primary tag--small" href=/tags/google-analytics/>google analytics</a>
+<a class="tag tag--primary tag--small" href=/tags/navigation/>navigation</a></div><div class=post-actions-wrap><nav><ul class="post-actions post-action-nav"><li class=post-action><a class="post-action-btn btn btn--default" href=/analytics/delay-the-history-change-trigger/><i class="fa fa-angle-left"></i>
+<span class="hide-xs hide-sm text-small icon-ml">NEXT</span></a></li><li class=post-action><a class="post-action-btn btn btn--default" href=/analytics/notify-page-google-tag-manager-loaded/><span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+<i class="fa fa-angle-right"></i></a></li></ul></nav><ul class="post-actions post-action-share"><li class="post-action hide-lg hide-md hide-sm"><a class="post-action-btn btn btn--default btn-open-shareoptions" href=#btn-open-shareoptions><i class="fa fa-share-alt"></i></a></li><li class="post-action hide-xs"><a class="post-action-btn btn btn--default" target=new href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/track-browsing-behavior-in-google-analytics/"><i class="fa fa-brands fa-facebook"></i></a></li><li class="post-action hide-xs"><a class="post-action-btn btn btn--default" target=new href="https://twitter.com/intent/tweet?text=Track%20Browsing%20Behavior%20In%20Google%20Analytics%20https://www.simoahava.com/analytics/track-browsing-behavior-in-google-analytics/%20via%20@SimoAhava"><i class="fa fa-brands fa-twitter"></i></a></li><li class="post-action hide-xs"><a class="post-action-btn btn btn--default" target=new href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/track-browsing-behavior-in-google-analytics/"><i class="fa fa-brands fa-linkedin"></i></a></li><li class=post-action><a class="post-action-btn btn btn--default" href=#commento><i class="fa-regular fa-comments"></i></a></li><li class=post-action><a class="post-action-btn btn btn--default" href=#><i class="fa fa-search"></i></a></li></ul></div><a name=commento></a><comentario-comments></comentario-comments></div></article><footer id=footer class=main-content-wrap><span class=copyrights>&copy; 2026 Simo Ahava. All Rights Reserved</span></footer></div><div id=bottom-bar class=post-bottom-bar data-behavior=4><div class=post-actions-wrap><nav><ul class="post-actions post-action-nav"><li class=post-action><a class="post-action-btn btn btn--default" href=/analytics/delay-the-history-change-trigger/><i class="fa fa-angle-left"></i>
+<span class="hide-xs hide-sm text-small icon-ml">NEXT</span></a></li><li class=post-action><a class="post-action-btn btn btn--default" href=/analytics/notify-page-google-tag-manager-loaded/><span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+<i class="fa fa-angle-right"></i></a></li></ul></nav><ul class="post-actions post-action-share"><li class="post-action hide-lg hide-md hide-sm"><a class="post-action-btn btn btn--default btn-open-shareoptions" href=#btn-open-shareoptions><i class="fa fa-share-alt"></i></a></li><li class="post-action hide-xs"><a class="post-action-btn btn btn--default" target=new href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/track-browsing-behavior-in-google-analytics/"><i class="fa fa-brands fa-facebook"></i></a></li><li class="post-action hide-xs"><a class="post-action-btn btn btn--default" target=new href="https://twitter.com/intent/tweet?text=Track%20Browsing%20Behavior%20In%20Google%20Analytics%20https://www.simoahava.com/analytics/track-browsing-behavior-in-google-analytics/%20via%20@SimoAhava"><i class="fa fa-brands fa-twitter"></i></a></li><li class="post-action hide-xs"><a class="post-action-btn btn btn--default" target=new href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/track-browsing-behavior-in-google-analytics/"><i class="fa fa-brands fa-linkedin"></i></a></li><li class=post-action><a class="post-action-btn btn btn--default" href=#commento><i class="fa-regular fa-comments"></i></a></li><li class=post-action><a class="post-action-btn btn btn--default" href=#><i class="fa fa-search"></i></a></li></ul></div></div><div id=share-options-bar class=share-options-bar data-behavior=4><i id=btn-close-shareoptions class="fa fa-close"></i><ul class=share-options><li class=share-option><a class=share-option-btn target=new href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/track-browsing-behavior-in-google-analytics/"><i class="fa fa-brands fa-facebook"></i><span>Share on Facebook</span></a></li><li class=share-option><a class=share-option-btn target=new href="https://twitter.com/intent/tweet?text=Track%20Browsing%20Behavior%20In%20Google%20Analytics%20https://www.simoahava.com/analytics/track-browsing-behavior-in-google-analytics/%20via%20@SimoAhava"><i class="fa fa-brands fa-twitter"></i><span>Share on Twitter</span></a></li><li class=share-option><a class=share-option-btn target=new href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/track-browsing-behavior-in-google-analytics/"><i class="fa fa-brands fa-linkedin"></i><span>Share on LinkedIn</span></a></li></ul></div><div id=share-options-mask class=share-options-mask></div></div><div id=about><div id=about-card><div id=about-btn-close><i class="fa fa-remove"></i></div><img id=about-card-picture src=https://www.simoahava.com/images/simo.png alt="Author's picture"><h4 id=about-card-name>Simo Ahava</h4><div id=about-card-bio>Husband | Father | Analytics developer<br>simo (at) simoahava.com</div><div id=about-card-job><i class="fa fa-briefcase"></i><br>Senior Data Advocate at Reaktor</div><div id=about-card-location><i class="fa fa-map-marker"></i><br>Finland</div></div></div><div id=cover style=background-image:url(https://www.simoahava.com/images/maisema.jpg)></div><script defer src=https://comentario.simoahava.com/comentario.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin=anonymous referrerpolicy=no-referrer></script><script defer src=/js/script.js></script><script>!function(){var e=document.querySelector(".simmer"),t=document.querySelector(".simmer .close"),n=window.sessionStorage&&window.sessionStorage.getItem("nosimmer");e&&(n&&(e.style.display="none"),t&&t.addEventListener("click",function(){window.sessionStorage.setItem("nosimmer","true"),e.style.display="none"}))}()</script></body></html>

@@ -1,955 +1,148 @@
-
-
-  
-    
-  
-
-
-  
-
-
-
-
-
-  
-
-
-  
-
-<!DOCTYPE html>
-<html lang="en-us">
-  <head>
-    <meta name="google-site-verification" content="xQwWI2KUfP9LbFKhw2CVLFtrMY6Czrla7L3PD2aBolA" />
-
-
-<script type="application/ld+json">
-{
-  "@context": "http://schema.org", 
-  "@type": "BlogPosting",
-  "headline": "Track Users Who Are Offline In Google Analytics | Simo Ahava's blog",
-  "image": "https:\/\/www.simoahava.com\/images\/2017\/08\/track-offline-hits.jpg",
-  "editor": "Simo Ahava",
-  "publisher": {
-    "@type": "Organization",
-    "name": "Simo Ahava's blog",
-    "logo": {
-      "@type": "ImageObject",
-      "url": "https:\/\/www.simoahava.com\/images\/simo.png",
-      "height": "393",
-      "width": "407"
-    }
-  },
-  "url": "https:\/\/www.simoahava.com\/analytics\/track-users-who-are-offline-in-google-analytics\/",
-  "datePublished": "2017-08-28T08:19:25\u002b00:00",
-  "dateModified": "2017-08-28T08:19:25\u002b00:00",
-  "description": "Use this solution to automatically collect data from users who are offline, and send the data to Google Analytics once they are back online.",
-  "author": {
-    "@type": "Person",
-    "name": "Simo Ahava"
-  }
-}
-</script>
-
-
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    
-    <title>Track Users Who Are Offline In Google Analytics | Simo Ahava's blog</title>
-    
-    <script>
-      window.dataLayer=window.dataLayer||[];window.dataLayer.push({pageType: 'article', environment:  null });
-    </script>
-    
-
-    
-    
-    
-    <script>
-      (function(S,i,m,o){
-        window[m]=window[m]||[];
-        window[m].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
-        var f=S.getElementsByTagName(i)[0],j=S.createElement(i),dl=m!='dataLayer'?'&l='+m:'';
-        j.async=true;
-        j.src='https://sgtm.simoahava.com/gtm.js?id='+o+dl;
-        f.parentNode.insertBefore(j,f);
-      })(document,'script','dataLayer','GTM-PZ7GMV9');
-    </script>
-    
-    <meta name="author" content="Simo Ahava">
-    <meta name="keywords" content="">
-
-    <link rel="icon" href="https://www.simoahava.com/images/favicon.ico">
-    
-    <link rel="amphtml" href="https://www.simoahava.com/amp/analytics/track-users-who-are-offline-in-google-analytics/">
-    
-    <meta name="description" content="Use this solution to automatically collect data from users who are offline, and send the data to Google Analytics once they are back online.">
-    <meta property="og:description" content="Use this solution to automatically collect data from users who are offline, and send the data to Google Analytics once they are back online.">
-    <meta property="og:type" content="blog">
-    <meta property="og:title" content="Track Users Who Are Offline In Google Analytics">
-    <meta property="og:url" content="https://www.simoahava.com/analytics/track-users-who-are-offline-in-google-analytics/">
-    <meta property="og:site_name" content="Simo Ahava&#39;s blog">
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Track Users Who Are Offline In Google Analytics">
-    <meta name="twitter:description" content="Use this solution to automatically collect data from users who are offline, and send the data to Google Analytics once they are back online.">
-    
-      <meta name="twitter:creator" content="@SimoAhava">
-      
-    
-
-    
-    
-
-    
-      <meta name="twitter:image" content="https://www.simoahava.com/images/2017/08/track-offline-hits.jpg">  
-      <meta property="og:image" content="https://www.simoahava.com/images/2017/08/track-offline-hits.jpg">
-    
-
-
-    
-
-      
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-      
-    
-    <link rel="stylesheet" href="https://www.simoahava.com/css/style.css" />
-    
-    
-
-    
-      
-    
-    
-  </head>
-
-  <body>
-    
-    <div id="_progress"></div>
-    
-    <div id="blog">
-      <header id="header" data-behavior="4">
-  <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
-  <div class="header-title">
-    <a class="header-title-link" href="https://www.simoahava.com/">Simo Ahava&#39;s blog</a>
-  </div>
-  
-</header>
-
-      <nav id="sidebar" data-behavior="4">
-  <div class="sidebar-container">
-    
-      <div class="sidebar-profile">
-        <a href="https://www.simoahava.com/">
-          <img class="sidebar-profile-picture" loading="lazy" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
-        </a>
-        <h4 class="sidebar-profile-name">Simo Ahava</h4>
-        
-          <h5 class="sidebar-profile-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</h5>
-        
-      </div>
-    
-    <ul class="sidebar-buttons">
-      
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-home"></i>
-      
-      <span class="sidebar-button-desc">Home</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
-      
-      <span class="sidebar-button-desc">Categories</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/tags/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
-      
-      <span class="sidebar-button-desc">Tags</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/categories/gtm-tips/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-magic"></i>
-      
-      <span class="sidebar-button-desc">GTM Tips</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/about-simo-ahava/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-question"></i>
-      
-      <span class="sidebar-button-desc">About</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/index.xml">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
-      
-      <span class="sidebar-button-desc">RSS</span>
-    </a>
-  </li>
-
-
-    </ul>
-    <ul class="sidebar-buttons">
-      
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/tools/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-wrench"></i>
-      
-      <span class="sidebar-button-desc">Tools</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/blog-statistics/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-bar-chart"></i>
-      
-      <span class="sidebar-button-desc">Blog statistics</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://github.com/sahava" target="_blank" rel="noopener ">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-brands fa-github"></i>
-      
-      <span class="sidebar-button-desc">GitHub</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/upcoming-talks/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-bullhorn"></i>
-      
-      <span class="sidebar-button-desc">Upcoming talks</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/custom-templates/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
-      
-      <span class="sidebar-button-desc">Templates</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://www.simoahava.com/newsletter/">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-bell"></i>
-      
-      <span class="sidebar-button-desc">Newsletter</span>
-    </a>
-  </li>
-
-  <li class="sidebar-button">
-    
-      <a class="sidebar-button-link " href="https://masto.measure.chat/@SimoAhava" target="_blank" rel="noopener me">
-    
-      <i class="sidebar-button-icon fa fa-lg fa-brands fa-mastodon"></i>
-      
-      <span class="sidebar-button-desc">Mastodon</span>
-    </a>
-  </li>
-
-
-    </ul>
-    <ul class="sidebar-buttons">
-      
-
-    </ul>
-  </div>
-</nav>
-
-      
-
-      <div id="main" data-behavior="4"
-        class="
-               hasCoverMetaIn
-               ">
-        <article class="post">
-	  <form id="search" action="https://www.simoahava.com/search/">
-  <input name="q" type="text" class="form-control input--xlarge" placeholder="Search blog..." autocomplete="off">
-  </form>
-
-          <div class="post-header main-content-wrap text-left">
-  
-  
-
-    <h1>
-      Track Users Who Are Offline In Google Analytics
-    </h1>
-  
-  
-  <div class="postShorten-meta post-meta">
-    
-      <time datetime="2017-08-28T08:19:25Z">
-        
-  August 28, 2017
-
-      </time>
-      
-      
-  
-  
-    <span>in</span>
-    
-      <a class="category-link" href="https://www.simoahava.com/categories/analytics">Analytics</a>
-    
-  
-
-
-      | <a href="https://www.simoahava.com/analytics/track-users-who-are-offline-in-google-analytics/#commento"><comentario-count path="/analytics/track-users-who-are-offline-in-google-analytics/" 
-                  placeholder="..."
-                  error-text="N/A "
-                  zero-text="0 "
-                  prefix=""
-                  suffix=" "></comentario-count>Comments</a>
-      
-  </div>
-
-
-</div>
-
-          <div class="post-content markdown">
-            <div class="main-content-wrap">
-	      
-                
-  	        <p>The steady increase in mobile use over the last years has introduced some new challenges for web analytics. It&rsquo;s not just about mismatches in the tracking model (the concept of <a href="https://www.simoahava.com/analytics/the-schema-conspiracy/"><em>sessions</em></a> is even more absurd for apps than it is for desktop browsing), but about something more fundamental, more basic. Think about it: if a visitor visits the website using a mobile device, there&rsquo;s a significant chance of them losing internet connectivity and going unintentionally offline.</p>
-<p>Actually, it&rsquo;s enough for them to simply traverse an area with poor coverage - if the HTTP requests sent by the browser don&rsquo;t complete in time, they timeout, and the hits are lost.</p>
-<p>For <a href="https://analytics.google.com">Google Analytics</a> pageviews it&rsquo;s not such a big deal, because if the user sees the web page, it&rsquo;s very likely the first pageview has completed. However, what about all the other interactions that we want to track, and the user doesn&rsquo;t have an internet connection to boot? That&rsquo;s right - we&rsquo;ll lose these interactions, since the requests are dropped by the browser and never picked up, even when the user gets their connection back.</p>
-<p>In this article, the brilliant <a href="http://www.thyngster.com/">David Vallejo</a> and I will offer a solution for retrieving these hits initially dropped by the browser due to the internet connection being offline. OK, who am I kidding, this is all David. I&rsquo;m just a glorified editor at this point.</p>
-
-
-
-<div style="aspect-ratio: 1023 / 156;" class="figure nocaption">
-  
-    <a href="https://www.simoahava.com/images/2017/08/track-offline-hits.jpg" title="track offline hits in universal analytics">
-  
-    <img class="fig-img" height="156" width="1023" loading="lazy" src="https://www.simoahava.com/images/2017/08/track-offline-hits.jpg#ZgotmplZ" alt="track offline hits in universal analytics">
-  
-    </a>
-  
-  
-</div>
-
-
-<p>Anyway, let&rsquo;s frame it like this: the visitor is viewing our contact page, and we have an event queued up for when they click on our email contact information. However, the visitor is also on the subway, and the moment they click the email, they enter a tunnel. Oh noes! They lose their internet connection (damn subways without WiFi), and we miss our vital conversion tracking.</p>
-<p>That&rsquo;s the premise. Here&rsquo;s the execution.</p>
-<p>In this article, we&rsquo;ll touch upon a number of fairly technical concepts, but we&rsquo;ll try to frame them so that they make sense in the big picture.</p>
-<ol>
-<li>
-<p>Universal Analytics <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/tasks?hl=en">Tasks API</a></p>
-</li>
-<li>
-<p>The browser&rsquo;s <a href="https://www.w3schools.com/html/html5_webstorage.asp">Storage API</a></p>
-</li>
-<li>
-<p>Sending Google Analytics hits with a delay (the <code>&amp;qt</code> parameter)</p>
-</li>
-<li>
-<p>Sending custom POST and HEAD requests (HTTP protocol)</p>
-</li>
-<li>
-<p><a href="https://developers.google.com/analytics/devguides/collection/protocol/v1/devguide#batch">Batching</a> Universal Analytics Hits</p>
-</li>
-</ol>
-<p>All of these concepts are very useful to know if you want to know more about the mechanisms that the web browser employs to compile and dispatch requests to Universal Analytics.</p>
-<div id="toc-container"><h1 id="table-of-contents">Table of Contents</h1> <input type="checkbox" id="show"><label for="show" id="showbtn"><h1 id="table-of-contents-mobile">Table of Contents</h1><span class="show">&nbsp;[+show]</span><span class="hide">&nbsp;[–hide]</span></label><nav id="TableOfContents">
-  <ul>
-    <li><a href="#1-universal-analytics-tasks-api">1. Universal Analytics Tasks API</a></li>
-    <li><a href="#2-the-offline-tracker">2. The offline tracker</a>
-      <ul>
-        <li><a href="#21-the-qt-parameter">2.1. The &amp;qt parameter</a></li>
-      </ul>
-    </li>
-    <li><a href="#3-the-http-head-request">3. The HTTP HEAD request</a></li>
-    <li><a href="#4-the-javascript-code">4. The JavaScript code</a>
-      <ul>
-        <li><a href="#41-lockr-download">4.1. Lockr download</a></li>
-        <li><a href="#42-offline-hit-tracker-for-on-page-universal-analytics">4.2. Offline hit tracker for on-page Universal Analytics</a></li>
-        <li><a href="#43-offline-hit-tracker-for-google-tag-manager">4.3. Offline hit tracker for Google Tag Manager</a></li>
-        <li><a href="#44-about-batching">4.4. About batching</a></li>
-      </ul>
-    </li>
-    <li><a href="#5-improvements">5. Improvements</a></li>
-    <li><a href="#6-summary">6. Summary</a></li>
-  </ul>
-</nav></div>
-<p>Let&rsquo;s go!</p>
-
-                <span class="simmer">
-  <span class="close">X</span>
-  <p>
-    <span class="fa fa-md fa-bell"></span>
-    <strong>The Simmer Newsletter</strong>
-  </p>
-  <p>
-    Subscribe to the <a href="https://www.simoahava.com/newsletter/">Simmer newsletter</a> to get the latest news and content from Simo Ahava into your email inbox!
-  </p>
-  </span>
-
-                
-                  <h2 id="1-universal-analytics-tasks-api">1. Universal Analytics Tasks API</h2>
-<p>Each time a <code>send</code> command is dispatched to the <code>ga()</code> global method, a series of <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/tasks"><em>tasks</em></a> are run in sequence by the analytics.js library. These tasks do a number of things, such as construct the payload, validate it, sample the requests, and finally dispatch the requests to the Universal Analytics endpoint.</p>
-<p>The neat thing about these tasks is that we can intercept them and modify them using the API provided by analytics.js.</p>
-<p>You can find a list of all available tasks in the API <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/tasks">here</a>. However, in this article we will focus on just a very special, very significant task: <code>customTask</code>. It&rsquo;s a new task introduced very recently (here&rsquo;s a <a href="https://www.simoahava.com/gtm-tips/use-customtask-access-tracker-values-google-tag-manager/">guide by Simo</a>).</p>
-<p>This task is true to its name - it&rsquo;s entirely customizable. It runs first in the task queue, so you can use it to configure the tracker object or even to set other tasks up for customization.</p>
-<p>In this guide, we&rsquo;ll use <code>customTask</code> to modify the <code>sendHitTask</code>. This way we can check if the user has internet connectivity when <code>sendHitTask</code> is run, and we can do a number of things if the user has dropped their connection. We use <code>customTask</code> instead of directly accessing <code>sendHitTask</code> simply because this way is much more <a href="https://tagmanager.google.com/">Google Tag Manager</a>-friendly.</p>
-<p>In short, here&rsquo;s the process:</p>
-<p><code>customTask</code> <strong>modifies</strong> <code>sendHitTask</code> with <code>OUR CODE</code> before <strong>hit is sent</strong>.</p>
-<p>In order to detect if the user has internet connectivity, we could simply poll our own web server endpoint. However, that wouldn&rsquo;t be a good litmus test since it could be just Google&rsquo;s servers that are not responding. That&rsquo;s why we&rsquo;ll actually poll Google&rsquo;s endpoint to check if the user has the connectivity required for Google Analytics tracking.</p>
-
-                
-                  <h2 id="2-the-offline-tracker">2. The offline tracker</h2>
-<p>The solution is that with every single request to Universal Analytics, we&rsquo;ll send an HTTP HEAD request to the Universal Analytics endpoint. If the endpoint isn&rsquo;t responding, we can infer that the user does not have connectivity for communicating with Google Analytics, and so we&rsquo;ll store the hit into browser storage until such a time that internet coverage is restored.</p>
-
-
-
-<div style="aspect-ratio: 2370 / 1282;" class="figure nocaption">
-  
-    <a href="https://www.simoahava.com/images/2017/04/offline-hits-in-universal-analytics.jpg" title="Track offline hits in Universal Analytics">
-  
-    <img class="fig-img" height="1282" width="2370" loading="lazy" src="https://www.simoahava.com/images/2017/04/offline-hits-in-universal-analytics.jpg#ZgotmplZ" alt="Track offline hits in Universal Analytics">
-  
-    </a>
-  
-  
-</div>
-
-
-<p>We&rsquo;ll use <code>localStorage</code> for the queue, but we&rsquo;ll need to cheat a little. <code>localStorage</code> itself doesn&rsquo;t introduce any structure or a deeper data model - it just processes key-value pairs. So, to give us some additional flexibility, we&rsquo;ll use the <a href="https://github.com/tsironis/lockr"><strong>Lockr</strong></a> open-source database layer. It&rsquo;s a simple and efficient framework, and it has pretty solid browser support.</p>
-<p>This solution picks up the Universal Analytics hit payload from <code>sendHitTask</code>, and if there is no internet connection, this hit is stored in <code>localStorage</code> with the timestamp of the request. Thus, when we later do manage to send the stored hit, we can send it <em>at its original timestamp</em> to Universal Analytics.</p>
-<h3 id="21-the-qt-parameter">2.1. The &amp;qt parameter</h3>
-<p>The <code>&amp;qt</code> Measurement Protocol stands for <strong>queue time</strong>. Basically, you can set a number in milliseconds in that parameter, and the hit will be sent with a timestamp that many milliseconds in the past. For example, if I know that the hit I want to send actually happened 45 minutes ago, I can set the parameter to:</p>
-<p><code>&amp;qt=2700000</code></p>
-<p>There&rsquo;s just an odd little quirk you need to know about <code>&amp;qt</code>. The latest you can send the displaced hit is at 03:59:59 the following day (in the timezone of the Google Analytics view the hit is being sent to). Thus, the maximum value for <code>&amp;qt</code> is 27 hours, 59 minutes, and 59 seconds (in milliseconds), if the hit occurred at exactly midnight, and you then send it the following morning, just before 4 AM.</p>
-<p>Yes, it might be difficult to grasp, so we&rsquo;ll go with the official recommendation: <strong>avoid sending hits more than 4 hours in the past</strong>, since there&rsquo;s no guarantee they will get sent.</p>
-
-                
-                  <h2 id="3-the-http-head-request">3. The HTTP HEAD request</h2>
-<p>So what is this <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/HEAD">HEAD request</a> and why are we using it? Well, it&rsquo;s identical to GET, except it only returns the HTTP headers (and associated metadata), never any content.</p>
-<p>It&rsquo;s thus a great method to use if we only want to test an endpoint, and not get into the expensive process of actually retrieving data from it.</p>
-<p>Since we are only interested in knowing if the Universal Analytics endpoint responds, the HTTP HEAD request is perfect for this purpose. Also, see how efficient it is compared to POST and GET:</p>
-
-
-
-<div style="aspect-ratio: 2430 / 796;" class="figure nocaption">
-  
-    <a href="https://www.simoahava.com/images/2017/04/http-head-request.jpg" title="HTTP HEAD request">
-  
-    <img class="fig-img" height="796" width="2430" loading="lazy" src="https://www.simoahava.com/images/2017/04/http-head-request.jpg#ZgotmplZ" alt="HTTP HEAD request">
-  
-    </a>
-  
-  
-</div>
-
-
-
-                
-                  <h2 id="4-the-javascript-code">4. The JavaScript code</h2>
-<p>The code comes in three parts. First is the library for extending the database: <strong>Lockr</strong>. Next we have the <code>customTask</code> execution, and finally we&rsquo;ll chain the HTTP HEAD and batch requests together to make the whole thing click.</p>
-<h3 id="41-lockr-download">4.1. Lockr download</h3>
-<p>To get started, go ahead and <a href="https://raw.githubusercontent.com/tsironis/lockr/master/lockr.js">load <strong>Lockr</strong></a> on your site in any way you want. If you&rsquo;re using Google Tag Manager, we recommend loading the following code in a <strong>Custom HTML Tag</strong> that fires on <strong>All Pages</strong> with the highest possible <strong>Tag Priority</strong>. Alternatively, if you accept some overhead and redundancy, you can just add the library to the top of the Custom JavaScript Variable itself, as in the example in the next chapter.</p>
-<p>Here&rsquo;s the minified JavaScript code  - it should be executed by the browser before the offline tracking solution is run:</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">!<span style="color:#00a">function</span>(e,t){<span style="color:#a50">&#34;undefined&#34;</span>!=<span style="color:#00a">typeof</span> exports?<span style="color:#a50">&#34;undefined&#34;</span>!=<span style="color:#00a">typeof</span> module&amp;&amp;module.exports&amp;&amp;(exports=module.exports=t(e,exports)):<span style="color:#a50">&#34;function&#34;</span>==<span style="color:#00a">typeof</span> define&amp;&amp;define.amd?define([<span style="color:#a50">&#34;exports&#34;</span>],<span style="color:#00a">function</span>(r){e.Lockr=t(e,r)}):e.Lockr=t(e,{})}(<span style="color:#00a">this</span>,<span style="color:#00a">function</span>(e,t){<span style="color:#a50">&#34;use strict&#34;</span>;<span style="color:#00a">return</span> <span style="color:#0aa">Array</span>.prototype.indexOf||(<span style="color:#0aa">Array</span>.prototype.indexOf=<span style="color:#00a">function</span>(e){<span style="color:#00a">var</span> t=<span style="color:#00a">this</span>.length&gt;&gt;&gt;<span style="color:#099">0</span>,r=<span style="color:#0aa">Number</span>(arguments[<span style="color:#099">1</span>])||<span style="color:#099">0</span>;<span style="color:#00a">for</span>((r=r&lt;<span style="color:#099">0</span>?<span style="color:#0aa">Math</span>.ceil(r):<span style="color:#0aa">Math</span>.floor(r))&lt;<span style="color:#099">0</span>&amp;&amp;(r+=t);r&lt;t;r++)<span style="color:#00a">if</span>(r <span style="color:#00a">in</span> <span style="color:#00a">this</span>&amp;&amp;<span style="color:#00a">this</span>[r]===e)<span style="color:#00a">return</span> r;<span style="color:#00a">return</span>-<span style="color:#099">1</span>}),t.prefix=<span style="color:#a50">&#34;&#34;</span>,t._getPrefixedKey=<span style="color:#00a">function</span>(e,t){<span style="color:#00a">return</span>(t=t||{}).noPrefix?e:<span style="color:#00a">this</span>.prefix+e},t.set=<span style="color:#00a">function</span>(e,t,r){<span style="color:#00a">var</span> o=<span style="color:#00a">this</span>._getPrefixedKey(e,r);<span style="color:#00a">try</span>{localStorage.setItem(o,JSON.stringify({data:t}))}<span style="color:#00a">catch</span>(r){console&amp;&amp;console.warn(<span style="color:#a50">&#34;Lockr didn&#39;t successfully save the &#39;{&#34;</span>+e+<span style="color:#a50">&#34;: &#34;</span>+t+<span style="color:#a50">&#34;}&#39; pair, because the localStorage is full.&#34;</span>)}},t.get=<span style="color:#00a">function</span>(e,t,r){<span style="color:#00a">var</span> o,n=<span style="color:#00a">this</span>._getPrefixedKey(e,r);<span style="color:#00a">try</span>{o=JSON.parse(localStorage.getItem(n))}<span style="color:#00a">catch</span>(e){o=localStorage[n]?{data:localStorage.getItem(n)}:<span style="color:#00a">null</span>}<span style="color:#00a">return</span> o?<span style="color:#a50">&#34;object&#34;</span>==<span style="color:#00a">typeof</span> o&amp;&amp;<span style="color:#00a">void</span> <span style="color:#099">0</span>!==o.data?o.data:<span style="color:#00a">void</span> <span style="color:#099">0</span>:t},t.sadd=<span style="color:#00a">function</span>(e,r,o){<span style="color:#00a">var</span> n,a=<span style="color:#00a">this</span>._getPrefixedKey(e,o),i=t.smembers(e);<span style="color:#00a">if</span>(i.indexOf(r)&gt;-<span style="color:#099">1</span>)<span style="color:#00a">return</span> <span style="color:#00a">null</span>;<span style="color:#00a">try</span>{i.push(r),n=JSON.stringify({data:i}),localStorage.setItem(a,n)}<span style="color:#00a">catch</span>(t){console.log(t),console&amp;&amp;console.warn(<span style="color:#a50">&#34;Lockr didn&#39;t successfully add the &#34;</span>+r+<span style="color:#a50">&#34; to &#34;</span>+e+<span style="color:#a50">&#34; set, because the localStorage is full.&#34;</span>)}},t.smembers=<span style="color:#00a">function</span>(e,t){<span style="color:#00a">var</span> r,o=<span style="color:#00a">this</span>._getPrefixedKey(e,t);<span style="color:#00a">try</span>{r=JSON.parse(localStorage.getItem(o))}<span style="color:#00a">catch</span>(e){r=<span style="color:#00a">null</span>}<span style="color:#00a">return</span> r&amp;&amp;r.data?r.data:[]},t.sismember=<span style="color:#00a">function</span>(e,r,o){<span style="color:#00a">return</span> t.smembers(e).indexOf(r)&gt;-<span style="color:#099">1</span>},t.keys=<span style="color:#00a">function</span>(){<span style="color:#00a">var</span> e=[],r=<span style="color:#0aa">Object</span>.keys(localStorage);<span style="color:#00a">return</span> <span style="color:#099">0</span>===t.prefix.length?r:(r.forEach(<span style="color:#00a">function</span>(r){-<span style="color:#099">1</span>!==r.indexOf(t.prefix)&amp;&amp;e.push(r.replace(t.prefix,<span style="color:#a50">&#34;&#34;</span>))}),e)},t.getAll=<span style="color:#00a">function</span>(e){<span style="color:#00a">var</span> r=t.keys();<span style="color:#00a">return</span> e?r.reduce(<span style="color:#00a">function</span>(e,r){<span style="color:#00a">var</span> o={};<span style="color:#00a">return</span> o[r]=t.get(r),e.push(o),e},[]):r.map(<span style="color:#00a">function</span>(e){<span style="color:#00a">return</span> t.get(e)})},t.srem=<span style="color:#00a">function</span>(e,r,o){<span style="color:#00a">var</span> n,a,i=<span style="color:#00a">this</span>._getPrefixedKey(e,o),c=t.smembers(e,r);(a=c.indexOf(r))&gt;-<span style="color:#099">1</span>&amp;&amp;c.splice(a,<span style="color:#099">1</span>),n=JSON.stringify({data:c});<span style="color:#00a">try</span>{localStorage.setItem(i,n)}<span style="color:#00a">catch</span>(t){console&amp;&amp;console.warn(<span style="color:#a50">&#34;Lockr couldn&#39;t remove the &#34;</span>+r+<span style="color:#a50">&#34; from the set &#34;</span>+e)}},t.rm=<span style="color:#00a">function</span>(e){<span style="color:#00a">var</span> t=<span style="color:#00a">this</span>._getPrefixedKey(e);localStorage.removeItem(t)},t.flush=<span style="color:#00a">function</span>(){t.prefix.length?t.keys().forEach(<span style="color:#00a">function</span>(e){localStorage.removeItem(t._getPrefixedKey(e))}):localStorage.clear()},t});
-</code></pre></div>
-<p>After this code puke, we&rsquo;re ready to jump in the deep end with some offline hit tracking!</p>
-<h3 id="42-offline-hit-tracker-for-on-page-universal-analytics">4.2. Offline hit tracker for on-page Universal Analytics</h3>
-<p>The following JavaScript runs with the default <strong>Universal Analytics tracker</strong>, and thus any hits sent with the <code>ga('send', '...');</code> will be included in the process.</p>
-<p>To make the whole thing work, you should setup your code in the following order:</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#1e90ff;font-weight:bold">head</span>&gt;
-  ...
-  &lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
-    <span style="color:#aaa;font-style:italic">// Put the Lockr code here first
-</span><span style="color:#aaa;font-style:italic"></span>  &lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
-  &lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
-    <span style="color:#00a">var</span> _offlineTracker = <span style="color:#00a">function</span>(customTaskModel) {
-      <span style="color:#aaa;font-style:italic">// _offlineTracker (see below) here
-</span><span style="color:#aaa;font-style:italic"></span>    };
-  &lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
-  &lt;<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
-    <span style="color:#aaa;font-style:italic">// Universal Analytics snippet here
-</span><span style="color:#aaa;font-style:italic"></span>    ga(<span style="color:#a50">&#39;create&#39;</span>, <span style="color:#a50">&#39;UA-12345-1&#39;</span>);
-    <span style="color:#aaa;font-style:italic">// Add the following line AFTER the &#39;create&#39; command and BEFORE the first &#39;send&#39; command
-</span><span style="color:#aaa;font-style:italic"></span>    ga(<span style="color:#a50">&#39;set&#39;</span>, <span style="color:#a50">&#39;customTask&#39;</span>, _offlineTracker);
-    ga(<span style="color:#a50">&#39;send&#39;</span>, <span style="color:#a50">&#39;pageview&#39;</span>);
-  &lt;/<span style="color:#1e90ff;font-weight:bold">script</span>&gt;
-  ...
-&lt;/<span style="color:#1e90ff;font-weight:bold">head</span>&gt;</code></pre></div>
-<p>And here&rsquo;s the code for the <code>_offlineTracker</code> callback function.</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">var</span> _offlineTracker = <span style="color:#00a">function</span>(customTaskModel) {
-
-  Lockr.prefix = <span style="color:#a50">&#39;ga_&#39;</span>;
-  <span style="color:#aaa;font-style:italic">// Grab the original sentHitTask Function from the first tracker. to kept the original hit sending function.
-</span><span style="color:#aaa;font-style:italic"></span>  <span style="color:#00a">var</span> originalSendHitTask = customTaskModel.get(<span style="color:#a50">&#39;sendHitTask&#39;</span>);
-  customTaskModel.set(<span style="color:#a50">&#39;sendHitTask&#39;</span>, <span style="color:#00a">function</span>(model) {
-    <span style="color:#aaa;font-style:italic">// Let&#39;s send the original hit using the native functionality
-</span><span style="color:#aaa;font-style:italic"></span>    originalSendHitTask(model);
-    <span style="color:#aaa;font-style:italic">// Grab the hit Payload
-</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">var</span> payload_lz = model.get(<span style="color:#a50">&#39;hitPayload&#39;</span>);
-    <span style="color:#aaa;font-style:italic">// Check if GA Endpoint is Ready
-</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">var</span> http = <span style="color:#00a">new</span> XMLHttpRequest();
-    http.open(<span style="color:#a50">&#39;HEAD&#39;</span>, <span style="color:#a50">&#39;https://www.google-analytics.com/collect&#39;</span>);
-    http.onreadystatechange = <span style="color:#00a">function</span>() {
-      <span style="color:#aaa;font-style:italic">// Google Analytics endpoint is not reachable, let&#39;s save the hit                
-</span><span style="color:#aaa;font-style:italic"></span>      <span style="color:#00a">if</span> (<span style="color:#00a">this</span>.readyState === <span style="color:#00a">this</span>.DONE &amp;&amp; <span style="color:#00a">this</span>.status !== <span style="color:#099">200</span>) {
-        Lockr.sadd(<span style="color:#a50">&#39;hits&#39;</span>, payload_lz + <span style="color:#a50">&#34;&amp;qt=&#34;</span> + (<span style="color:#00a">new</span> <span style="color:#0aa">Date</span>() * <span style="color:#099">1</span>));
-      } <span style="color:#00a">else</span> {
-        <span style="color:#aaa;font-style:italic">// Google Analytics endpoint is available, let&#39;s check if there are any unsent hits
-</span><span style="color:#aaa;font-style:italic"></span>        <span style="color:#00a">if</span> (Lockr.smembers(<span style="color:#a50">&#34;hits&#34;</span>).length &gt; <span style="color:#099">0</span>) {                        
-          <span style="color:#aaa;font-style:italic">// Process hits in queue
-</span><span style="color:#aaa;font-style:italic"></span>          <span style="color:#00a">var</span> current_ts = <span style="color:#00a">new</span> <span style="color:#0aa">Date</span>() * <span style="color:#099">1</span> / <span style="color:#099">1000</span>;
-          <span style="color:#00a">var</span> hits = Lockr.smembers(<span style="color:#a50">&#34;hits&#34;</span>);
-
-          <span style="color:#aaa;font-style:italic">// ./batch endpoint only allows 20 hits per batch, let&#39;s chunk the hits array. 
-</span><span style="color:#aaa;font-style:italic"></span>          <span style="color:#00a">var</span> chunk_size = <span style="color:#099">20</span>;
-          <span style="color:#00a">var</span> chunked_hits = Lockr.smembers(<span style="color:#a50">&#34;hits&#34;</span>).map(<span style="color:#00a">function</span>(e, i) {
-            <span style="color:#00a">return</span> i % chunk_size === <span style="color:#099">0</span> ? hits.slice(i, i + chunk_size) : <span style="color:#00a">null</span>;
-          }).filter(<span style="color:#00a">function</span>(e) {
-            <span style="color:#00a">return</span> e;
-          });
-          <span style="color:#aaa;font-style:italic">// Let&#39;s loop thru the chunks array and send the hits to GA
-</span><span style="color:#aaa;font-style:italic"></span>          <span style="color:#00a">for</span> (<span style="color:#00a">var</span> i = <span style="color:#099">0</span>; i &lt; chunked_hits.length; i++) {
-            <span style="color:#00a">var</span> xhr = <span style="color:#00a">new</span> XMLHttpRequest();
-            xhr.open(<span style="color:#a50">&#39;POST&#39;</span>, <span style="color:#a50">&#39;https://www.google-analytics.com/batch&#39;</span>, <span style="color:#00a">true</span>);
-            <span style="color:#aaa;font-style:italic">// Build the Batch Payload and Take care of calculating the Queue Time 
-</span><span style="color:#aaa;font-style:italic"></span>            xhr.send(chunked_hits[i].map(<span style="color:#00a">function</span>(x) {
-              <span style="color:#00a">if</span> (x.indexOf(<span style="color:#a50">&#34;&amp;qt=&#34;</span>) &gt; -<span style="color:#099">1</span>) {
-                <span style="color:#00a">return</span> x.replace(<span style="color:#099">/qt=([^&amp;]*)/</span>, <span style="color:#a50">&#34;qt=&#34;</span> + <span style="color:#0aa">Math</span>.round(current_ts - x.match(<span style="color:#099">/qt=([^&amp;]*)/</span>)[<span style="color:#099">1</span>] / <span style="color:#099">1000</span>) * <span style="color:#099">1000</span>);
-              } <span style="color:#00a">else</span> <span style="color:#00a">return</span> x;
-            }).join(<span style="color:#a50">&#34;\n&#34;</span>));
-          }
-          <span style="color:#aaa;font-style:italic">//Hits sent, flush the Storage
-</span><span style="color:#aaa;font-style:italic"></span>          Lockr.flush();
-        }
-      }
-    };
-    http.send();
-  });
-};
-</code></pre></div>
-<p>Once you create this <code>_offlineTracker</code> and invoke it in the <code>ga('set', 'customTask', _offlineTracker)</code> command, every single hit that uses this tracker will be stored in the queue if there is no internet connectivity. Once a hit is sent with a solid connection, all hits in the queue are sent as well.</p>
-<h3 id="43-offline-hit-tracker-for-google-tag-manager">4.3. Offline hit tracker for Google Tag Manager</h3>
-<p>With Google Tag Manager, you can get by with a single Custom JavaScript variable. This variable can be configured to include the Lockr code as well, so it&rsquo;s completely self-contained. Give the variable a descriptive name, e.g. <strong>{{JS - customTask Offline Hit Tracker}}</strong> and put the following code within:</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#00a">function</span>() {
-  <span style="color:#00a">return</span> <span style="color:#00a">function</span>(customTaskModel) {
-    <span style="color:#aaa;font-style:italic">// Load Lockr if it hasn&#39;t already been loaded
-</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">if</span> (!<span style="color:#0aa">window</span>.Lockr) {
-      !<span style="color:#00a">function</span>(e,t){<span style="color:#a50">&#34;undefined&#34;</span>!=<span style="color:#00a">typeof</span> exports?<span style="color:#a50">&#34;undefined&#34;</span>!=<span style="color:#00a">typeof</span> module&amp;&amp;module.exports&amp;&amp;(exports=module.exports=t(e,exports)):<span style="color:#a50">&#34;function&#34;</span>==<span style="color:#00a">typeof</span> define&amp;&amp;define.amd?define([<span style="color:#a50">&#34;exports&#34;</span>],<span style="color:#00a">function</span>(r){e.Lockr=t(e,r)}):e.Lockr=t(e,{})}(<span style="color:#00a">this</span>,<span style="color:#00a">function</span>(e,t){<span style="color:#a50">&#34;use strict&#34;</span>;<span style="color:#00a">return</span> <span style="color:#0aa">Array</span>.prototype.indexOf||(<span style="color:#0aa">Array</span>.prototype.indexOf=<span style="color:#00a">function</span>(e){<span style="color:#00a">var</span> t=<span style="color:#00a">this</span>.length&gt;&gt;&gt;<span style="color:#099">0</span>,r=<span style="color:#0aa">Number</span>(arguments[<span style="color:#099">1</span>])||<span style="color:#099">0</span>;<span style="color:#00a">for</span>((r=r&lt;<span style="color:#099">0</span>?<span style="color:#0aa">Math</span>.ceil(r):<span style="color:#0aa">Math</span>.floor(r))&lt;<span style="color:#099">0</span>&amp;&amp;(r+=t);r&lt;t;r++)<span style="color:#00a">if</span>(r <span style="color:#00a">in</span> <span style="color:#00a">this</span>&amp;&amp;<span style="color:#00a">this</span>[r]===e)<span style="color:#00a">return</span> r;<span style="color:#00a">return</span>-<span style="color:#099">1</span>}),t.prefix=<span style="color:#a50">&#34;&#34;</span>,t._getPrefixedKey=<span style="color:#00a">function</span>(e,t){<span style="color:#00a">return</span>(t=t||{}).noPrefix?e:<span style="color:#00a">this</span>.prefix+e},t.set=<span style="color:#00a">function</span>(e,t,r){<span style="color:#00a">var</span> o=<span style="color:#00a">this</span>._getPrefixedKey(e,r);<span style="color:#00a">try</span>{localStorage.setItem(o,JSON.stringify({data:t}))}<span style="color:#00a">catch</span>(r){console&amp;&amp;console.warn(<span style="color:#a50">&#34;Lockr didn&#39;t successfully save the &#39;{&#34;</span>+e+<span style="color:#a50">&#34;: &#34;</span>+t+<span style="color:#a50">&#34;}&#39; pair, because the localStorage is full.&#34;</span>)}},t.get=<span style="color:#00a">function</span>(e,t,r){<span style="color:#00a">var</span> o,n=<span style="color:#00a">this</span>._getPrefixedKey(e,r);<span style="color:#00a">try</span>{o=JSON.parse(localStorage.getItem(n))}<span style="color:#00a">catch</span>(e){o=localStorage[n]?{data:localStorage.getItem(n)}:<span style="color:#00a">null</span>}<span style="color:#00a">return</span> o?<span style="color:#a50">&#34;object&#34;</span>==<span style="color:#00a">typeof</span> o&amp;&amp;<span style="color:#00a">void</span> <span style="color:#099">0</span>!==o.data?o.data:<span style="color:#00a">void</span> <span style="color:#099">0</span>:t},t.sadd=<span style="color:#00a">function</span>(e,r,o){<span style="color:#00a">var</span> n,a=<span style="color:#00a">this</span>._getPrefixedKey(e,o),i=t.smembers(e);<span style="color:#00a">if</span>(i.indexOf(r)&gt;-<span style="color:#099">1</span>)<span style="color:#00a">return</span> <span style="color:#00a">null</span>;<span style="color:#00a">try</span>{i.push(r),n=JSON.stringify({data:i}),localStorage.setItem(a,n)}<span style="color:#00a">catch</span>(t){console.log(t),console&amp;&amp;console.warn(<span style="color:#a50">&#34;Lockr didn&#39;t successfully add the &#34;</span>+r+<span style="color:#a50">&#34; to &#34;</span>+e+<span style="color:#a50">&#34; set, because the localStorage is full.&#34;</span>)}},t.smembers=<span style="color:#00a">function</span>(e,t){<span style="color:#00a">var</span> r,o=<span style="color:#00a">this</span>._getPrefixedKey(e,t);<span style="color:#00a">try</span>{r=JSON.parse(localStorage.getItem(o))}<span style="color:#00a">catch</span>(e){r=<span style="color:#00a">null</span>}<span style="color:#00a">return</span> r&amp;&amp;r.data?r.data:[]},t.sismember=<span style="color:#00a">function</span>(e,r,o){<span style="color:#00a">return</span> t.smembers(e).indexOf(r)&gt;-<span style="color:#099">1</span>},t.keys=<span style="color:#00a">function</span>(){<span style="color:#00a">var</span> e=[],r=<span style="color:#0aa">Object</span>.keys(localStorage);<span style="color:#00a">return</span> <span style="color:#099">0</span>===t.prefix.length?r:(r.forEach(<span style="color:#00a">function</span>(r){-<span style="color:#099">1</span>!==r.indexOf(t.prefix)&amp;&amp;e.push(r.replace(t.prefix,<span style="color:#a50">&#34;&#34;</span>))}),e)},t.getAll=<span style="color:#00a">function</span>(e){<span style="color:#00a">var</span> r=t.keys();<span style="color:#00a">return</span> e?r.reduce(<span style="color:#00a">function</span>(e,r){<span style="color:#00a">var</span> o={};<span style="color:#00a">return</span> o[r]=t.get(r),e.push(o),e},[]):r.map(<span style="color:#00a">function</span>(e){<span style="color:#00a">return</span> t.get(e)})},t.srem=<span style="color:#00a">function</span>(e,r,o){<span style="color:#00a">var</span> n,a,i=<span style="color:#00a">this</span>._getPrefixedKey(e,o),c=t.smembers(e,r);(a=c.indexOf(r))&gt;-<span style="color:#099">1</span>&amp;&amp;c.splice(a,<span style="color:#099">1</span>),n=JSON.stringify({data:c});<span style="color:#00a">try</span>{localStorage.setItem(i,n)}<span style="color:#00a">catch</span>(t){console&amp;&amp;console.warn(<span style="color:#a50">&#34;Lockr couldn&#39;t remove the &#34;</span>+r+<span style="color:#a50">&#34; from the set &#34;</span>+e)}},t.rm=<span style="color:#00a">function</span>(e){<span style="color:#00a">var</span> t=<span style="color:#00a">this</span>._getPrefixedKey(e);localStorage.removeItem(t)},t.flush=<span style="color:#00a">function</span>(){t.prefix.length?t.keys().forEach(<span style="color:#00a">function</span>(e){localStorage.removeItem(t._getPrefixedKey(e))}):localStorage.clear()},t});
-    }
-    Lockr.prefix = <span style="color:#a50">&#39;ga_&#39;</span>;
-    <span style="color:#aaa;font-style:italic">// Grab the original sentHitTask Function from the first tracker. to kept the original hit sending function.
-</span><span style="color:#aaa;font-style:italic"></span>    <span style="color:#00a">var</span> originalSendHitTask = customTaskModel.get(<span style="color:#a50">&#39;sendHitTask&#39;</span>);
-    customTaskModel.set(<span style="color:#a50">&#39;sendHitTask&#39;</span>, <span style="color:#00a">function</span>(model) {
-      <span style="color:#aaa;font-style:italic">// Let&#39;s send the original hit using the native functionality
-</span><span style="color:#aaa;font-style:italic"></span>      originalSendHitTask(model);
-      <span style="color:#aaa;font-style:italic">// Grab the hit Payload
-</span><span style="color:#aaa;font-style:italic"></span>      <span style="color:#00a">var</span> payload_lz = model.get(<span style="color:#a50">&#39;hitPayload&#39;</span>);
-      <span style="color:#aaa;font-style:italic">// Check if GA Endpoint is Ready
-</span><span style="color:#aaa;font-style:italic"></span>      <span style="color:#00a">var</span> http = <span style="color:#00a">new</span> XMLHttpRequest();
-      http.open(<span style="color:#a50">&#39;HEAD&#39;</span>, <span style="color:#a50">&#39;https://www.google-analytics.com/collect&#39;</span>);
-      http.onreadystatechange = <span style="color:#00a">function</span>() {
-        <span style="color:#aaa;font-style:italic">// Google Analytics endpoint is not reachable, let&#39;s save the hit                
-</span><span style="color:#aaa;font-style:italic"></span>        <span style="color:#00a">if</span> (<span style="color:#00a">this</span>.readyState === <span style="color:#00a">this</span>.DONE &amp;&amp; <span style="color:#00a">this</span>.status !== <span style="color:#099">200</span>) {
-          Lockr.sadd(<span style="color:#a50">&#39;hits&#39;</span>, payload_lz + <span style="color:#a50">&#34;&amp;qt=&#34;</span> + (<span style="color:#00a">new</span> <span style="color:#0aa">Date</span>() * <span style="color:#099">1</span>));
-        } <span style="color:#00a">else</span> {
-          <span style="color:#aaa;font-style:italic">// Google Analytics endpoint is available, let&#39;s check if there are any unsent hits
-</span><span style="color:#aaa;font-style:italic"></span>          <span style="color:#00a">if</span> (Lockr.smembers(<span style="color:#a50">&#34;hits&#34;</span>).length &gt; <span style="color:#099">0</span>) {                        
-            <span style="color:#aaa;font-style:italic">// Process hits in queue
-</span><span style="color:#aaa;font-style:italic"></span>            <span style="color:#00a">var</span> current_ts = <span style="color:#00a">new</span> <span style="color:#0aa">Date</span>() * <span style="color:#099">1</span> / <span style="color:#099">1000</span>;
-            <span style="color:#00a">var</span> hits = Lockr.smembers(<span style="color:#a50">&#34;hits&#34;</span>);
-
-            <span style="color:#aaa;font-style:italic">// ./batch endpoint only allows 20 hits per batch, let&#39;s chunk the hits array. 
-</span><span style="color:#aaa;font-style:italic"></span>            <span style="color:#00a">var</span> chunk_size = <span style="color:#099">20</span>;
-            <span style="color:#00a">var</span> chunked_hits = Lockr.smembers(<span style="color:#a50">&#34;hits&#34;</span>).map(<span style="color:#00a">function</span>(e, i) {
-              <span style="color:#00a">return</span> i % chunk_size === <span style="color:#099">0</span> ? hits.slice(i, i + chunk_size) : <span style="color:#00a">null</span>;
-            }).filter(<span style="color:#00a">function</span>(e) {
-              <span style="color:#00a">return</span> e;
-            });
-            <span style="color:#aaa;font-style:italic">// Let&#39;s loop thru the chunks array and send the hits to GA
-</span><span style="color:#aaa;font-style:italic"></span>            <span style="color:#00a">for</span> (<span style="color:#00a">var</span> i = <span style="color:#099">0</span>; i &lt; chunked_hits.length; i++) {
-              <span style="color:#00a">var</span> xhr = <span style="color:#00a">new</span> XMLHttpRequest();
-              xhr.open(<span style="color:#a50">&#39;POST&#39;</span>, <span style="color:#a50">&#39;https://www.google-analytics.com/batch&#39;</span>, <span style="color:#00a">true</span>);
-              <span style="color:#aaa;font-style:italic">// Build the Batch Payload and Take care of calculating the Queue Time 
-</span><span style="color:#aaa;font-style:italic"></span>              xhr.send(chunked_hits[i].map(<span style="color:#00a">function</span>(x) {
-                <span style="color:#00a">if</span> (x.indexOf(<span style="color:#a50">&#34;&amp;qt=&#34;</span>) &gt; -<span style="color:#099">1</span>) {
-                  <span style="color:#00a">return</span> x.replace(<span style="color:#099">/qt=([^&amp;]*)/</span>, <span style="color:#a50">&#34;qt=&#34;</span> + <span style="color:#0aa">Math</span>.round(current_ts - x.match(<span style="color:#099">/qt=([^&amp;]*)/</span>)[<span style="color:#099">1</span>] / <span style="color:#099">1000</span>) * <span style="color:#099">1000</span>);
-                } <span style="color:#00a">else</span> <span style="color:#00a">return</span> x;
-              }).join(<span style="color:#a50">&#34;\n&#34;</span>));
-            }
-            <span style="color:#aaa;font-style:italic">//Hits sent, flush the Storage
-</span><span style="color:#aaa;font-style:italic"></span>            Lockr.flush();
-          }
-        }
-      };
-      http.send();
-    });
-  };
-}
-</code></pre></div>
-<p>Add this code to <strong>all your Universal Analytics tags</strong> by scrolling to <strong>More settings</strong> -&gt; <strong>Fields to set</strong>. Here you add a new field with:</p>
-<p><strong>Field name:</strong> customTask<br>
-<strong>Value:</strong> {{JS - customTask Offline Hit Tracker}}</p>
-
-
-
-<div style="aspect-ratio: 1772 / 774;" class="figure nocaption">
-  
-    <a href="https://www.simoahava.com/images/2017/08/fields-to-set.jpg" title="Universal Analytics Fields to Set">
-  
-    <img class="fig-img" height="774" width="1772" loading="lazy" src="https://www.simoahava.com/images/2017/08/fields-to-set.jpg#ZgotmplZ" alt="Universal Analytics Fields to Set">
-  
-    </a>
-  
-  
-</div>
-
-
-<p>Once you&rsquo;ve done this, then all your tags with this <strong>customTask</strong> setting are protected against poor connectivity, and whenever the connection is restored, the batch queue is processed.</p>
-<h3 id="44-about-batching">4.4. About batching</h3>
-<p>Universal Analytics lets you send hits to its endpoint in <a href="https://developers.google.com/analytics/devguides/collection/protocol/v1/devguide#batch">batches</a>. This is used mostly by the iOS and Android SDKs. The main point in using the batch endpoint (<code>/batch</code>) is to have as few HTTP requests dispatched as possible. Here, batching means that we can send multiple Universal Analytics payloads in a single HTTP request.</p>
-<p>Batching does have some limitations we&rsquo;ll need to consider:</p>
-<ul>
-<li>
-<p>A maximum of 20 hits can be specified per request.</p>
-</li>
-<li>
-<p>The combined size of all hit payloads cannot be greater than 16K bytes.</p>
-</li>
-<li>
-<p>No single hit payload can be greater than 8K bytes.</p>
-</li>
-<li>
-<p>The request needs to be done using POST</p>
-</li>
-</ul>
-<p>For our solution, each time the number of stored hits is more than 1, we send the payloads using the batch endpoint. In case there are too many hits stored in the queue, we&rsquo;re chunking them so that multiple batch requests are sent in succession until the entire queue is processed.</p>
-
-                
-                  <h2 id="5-improvements">5. Improvements</h2>
-<p>Keep in mind that this current post is meant to show how to track the hits that may happen while the user is offline (due to a connectivity gap). At the same time, we&rsquo;ve taken the opportunity to showcase some cool and relatively little-known Google Analytics JavaScript API functionalities.</p>
-<p>A solid improvement would be to skip the <code>originalSendTask</code> part, and just overwrite the <code>sendHitTask</code> task entirely. This way you can skip the HTTP HEAD request, because you can just check if the initial hit to Google Analytics is dispatched successfully.</p>
-<p>The one thing you need to keep in mind if you want to overwrite the <code>sendHitTask</code> is that you&rsquo;ll need to replicate the <code>transport</code> logic for the request. The analytics.js library supports three different ways to dispatch the requests:</p>
-<ol>
-<li>
-<p><code>'image'</code> - max 2K payload size sent with a GET request to a pixel endpoint</p>
-</li>
-<li>
-<p><code>'xhr'</code> - max 8K payload size sent as an HTTP POST request</p>
-</li>
-<li>
-<p><code>'beacon'</code> - POST request that uses the <code>navigator.sendBeacon()</code> to make sure your requests are sent even if the user has already navigated away from the page</p>
-</li>
-</ol>
-<p>So you&rsquo;ll need to replicate this logic in your custom <code>sendHitTask</code> method. It&rsquo;s not exactly trivial to do, but an able developer should be able to do it, especially once the constraints (see previous paragraph) are known.</p>
-<p>Another thing you might want to do is add a <strong>Custom Dimension</strong> to all the payloads that are stored in the queue. This Custom Dimension could be named something like <strong>Offline hit</strong>, and you should set the value to <code>true</code> if the hit was sent from the offline queue. Thus you can monitor how many hits in your data were initially aborted due to poor internet connectivity.</p>
-
-                
-                  <h2 id="6-summary">6. Summary</h2>
-<p>I&rsquo;m really glad to have David guest star on this blog - it&rsquo;s been a long time coming! This solution is great for two reasons. First, it&rsquo;s actually very usable, especially if your site caters to mobile visitors. Second, it showcases a number of features of the web browser and the analytics.js library that can be extended to other purposes, too.</p>
-<p>The Tasks API is really interesting, as it allows you to manipulate the payloads dispatched by the website. And with the introduction of <a href="https://www.simoahava.com/gtm-tips/use-customtask-access-tracker-values-google-tag-manager/">customTask</a>, we finally have a very handy way of accessing tasks with Google Tag Manager.</p>
-<p>Note that if you have a web application with offline capabilities, and you are using service workers to manage this functionality, Google has released a <a href="https://www.npmjs.com/package/sw-offline-google-analytics">useful library</a> for employing service workers to do precisely the same thing we&rsquo;re doing in this article.</p>
-<p>We hope you enjoyed this solution! Let us know in the comments</p>
-
-                
-              
-              
-
-            </div>
-          </div>
-          <div id="post-footer" class="post-footer main-content-wrap">
-            
-              
-                
-                
-                  <div class="post-footer-tags">
-                    <span class="text-color-light text-small">TAGGED IN</span><br/>
-                    
-  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/customtask/">customtask</a>
-
-  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/google-analytics/">google analytics</a>
-
-  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/google-tag-manager/">Google Tag Manager</a>
-
-  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/javascript/">JavaScript</a>
-
-  <a class="tag tag--primary tag--small" href="https://www.simoahava.com/tags/guest-post/">guest post</a>
-
-                  </div>
-                
-              
-            
-            
-  <div class="post-actions-wrap">
-      <nav >
-        <ul class="post-actions post-action-nav">
-          
-            <li class="post-action">
-              
-                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/gtm-tips/remove-pii-google-analytics-hits/">
-              
-                  <i class="fa fa-angle-left"></i>
-                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
-                </a>
-            </li>
-            <li class="post-action">
-              
-                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/gtm-tips/pagination-and-quick-search/">
-              
-                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
-                  <i class="fa fa-angle-right"></i>
-                </a>
-            </li>
-          
-        </ul>
-      </nav>
-    <ul class="post-actions post-action-share" >
-      
-        <li class="post-action hide-lg hide-md hide-sm">
-          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
-            <i class="fa fa-share-alt"></i>
-          </a>
-        </li>
-        
-          <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/track-users-who-are-offline-in-google-analytics/">
-              <i class="fa fa-brands fa-facebook"></i>
-            </a>
-          </li>
-        
-          <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Track%20Users%20Who%20Are%20Offline%20In%20Google%20Analytics%20https://www.simoahava.com/analytics/track-users-who-are-offline-in-google-analytics/%20via%20@SimoAhava">
-              <i class="fa fa-brands fa-twitter"></i>
-            </a>
-          </li>
-        
-          <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/track-users-who-are-offline-in-google-analytics/">
-              <i class="fa fa-brands fa-linkedin"></i>
-            </a>
-          </li>
-        
-      
-      
-        <li class="post-action">
-          <a class="post-action-btn btn btn--default" href="#commento">
-            <i class="fa-regular fa-comments"></i>
-          </a>
-        </li>
-      
-      <li class="post-action">
-          <a class="post-action-btn btn btn--default" href="#">
-          <i class="fa fa-search"></i>
-        </a>
-      </li>
-    </ul>
-  </div>
-
-
-            
-              <a name="commento"></a>
-<comentario-comments></comentario-comments>
-
-            
-          </div>
-        </article>
-        <footer id="footer" class="main-content-wrap">
-  <span class="copyrights">
-    &copy; 2026 Simo Ahava. All Rights Reserved
-  </span>
-</footer>
-
-      </div>
-      
-      <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
-        
-  <div class="post-actions-wrap">
-      <nav >
-        <ul class="post-actions post-action-nav">
-          
-            <li class="post-action">
-              
-                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/gtm-tips/remove-pii-google-analytics-hits/">
-              
-                  <i class="fa fa-angle-left"></i>
-                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
-                </a>
-            </li>
-            <li class="post-action">
-              
-                <a class="post-action-btn btn btn--default" href="https://www.simoahava.com/gtm-tips/pagination-and-quick-search/">
-              
-                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
-                  <i class="fa fa-angle-right"></i>
-                </a>
-            </li>
-          
-        </ul>
-      </nav>
-    <ul class="post-actions post-action-share" >
-      
-        <li class="post-action hide-lg hide-md hide-sm">
-          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
-            <i class="fa fa-share-alt"></i>
-          </a>
-        </li>
-        
-          <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/track-users-who-are-offline-in-google-analytics/">
-              <i class="fa fa-brands fa-facebook"></i>
-            </a>
-          </li>
-        
-          <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=Track%20Users%20Who%20Are%20Offline%20In%20Google%20Analytics%20https://www.simoahava.com/analytics/track-users-who-are-offline-in-google-analytics/%20via%20@SimoAhava">
-              <i class="fa fa-brands fa-twitter"></i>
-            </a>
-          </li>
-        
-          <li class="post-action hide-xs">
-            <a class="post-action-btn btn btn--default" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/track-users-who-are-offline-in-google-analytics/">
-              <i class="fa fa-brands fa-linkedin"></i>
-            </a>
-          </li>
-        
-      
-      
-        <li class="post-action">
-          <a class="post-action-btn btn btn--default" href="#commento">
-            <i class="fa-regular fa-comments"></i>
-          </a>
-        </li>
-      
-      <li class="post-action">
-          <a class="post-action-btn btn btn--default" href="#">
-          <i class="fa fa-search"></i>
-        </a>
-      </li>
-    </ul>
-  </div>
-
-
-      </div>
-      
-      <div id="share-options-bar" class="share-options-bar" data-behavior="4">
-  <i id="btn-close-shareoptions" class="fa fa-close"></i>
-  <ul class="share-options">
-    
-      <li class="share-option">
-        <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/track-users-who-are-offline-in-google-analytics/">
-          <i class="fa fa-brands fa-facebook"></i><span>Share on Facebook</span>
-        </a>
-      </li>
-    
-      <li class="share-option">
-        <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=Track%20Users%20Who%20Are%20Offline%20In%20Google%20Analytics%20https://www.simoahava.com/analytics/track-users-who-are-offline-in-google-analytics/%20via%20@SimoAhava">
-          <i class="fa fa-brands fa-twitter"></i><span>Share on Twitter</span>
-        </a>
-      </li>
-    
-      <li class="share-option">
-        <a class="share-option-btn" target="new" href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/track-users-who-are-offline-in-google-analytics/">
-          <i class="fa fa-brands fa-linkedin"></i><span>Share on LinkedIn</span>
-        </a>
-      </li>
-    
-  </ul>
-</div>
-<div id="share-options-mask" class="share-options-mask"></div>
-
-    </div>
-    
-    <div id="about">
-  <div id="about-card">
-    <div id="about-btn-close">
-      <i class="fa fa-remove"></i>
-    </div>
-    
-      <img id="about-card-picture" src="https://www.simoahava.com/images/simo.png" alt="Author&#39;s picture" />
-    
-    <h4 id="about-card-name">Simo Ahava</h4>
-    
-      <div id="about-card-bio">Husband | Father | Analytics developer<br>simo (at) simoahava.com</div>
-    
-    
-      <div id="about-card-job">
-        <i class="fa fa-briefcase"></i>
-        <br/>
-        Senior Data Advocate at Reaktor
-      </div>
-    
-    
-      <div id="about-card-location">
-        <i class="fa fa-map-marker"></i>
-        <br/>
-        Finland
-      </div>
-    
-  </div>
-</div>
-
-    
-  
-    
-    <div id="cover" style="background-image:url('https://www.simoahava.com/images/maisema.jpg');"></div>
-  
-
-
-    
-<script defer src="https://comentario.simoahava.com/comentario.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
-
-
-
-
-<script src="https://www.simoahava.com/js/script.js"></script>
-
-
-
-    <script>
-      !function(){var e=document.querySelector(".simmer"),t=document.querySelector(".simmer .close"),o=window.sessionStorage&&window.sessionStorage.getItem("nosimmer");if(e){if(o){e.style.display="none"}t.addEventListener("click",function(){window.sessionStorage.setItem("nosimmer","true"),e.style.display="none"})}}();
-    </script>
-    <style>
-      .ads {
-	  width: 1px;
-      }
-      </style>
-         
-
-    
-  </body>
-</html>
-
+<!doctype html><html lang=en-us><head><meta name=google-site-verification content="xQwWI2KUfP9LbFKhw2CVLFtrMY6Czrla7L3PD2aBolA"><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"Track Users Who Are Offline In Google Analytics | Simo Ahava's blog","image":"https:\/\/www.simoahava.com\/images\/2017\/08\/track-offline-hits.jpg","editor":"Simo Ahava","publisher":{"@type":"Organization","name":"Simo Ahava's blog","logo":{"@type":"ImageObject","url":"https:\/\/www.simoahava.com\/images\/simo.png","height":"393","width":"407"}},"url":"https:\/\/www.simoahava.com\/analytics\/track-users-who-are-offline-in-google-analytics\/","datePublished":"2017-08-28T08:19:25\u002b00:00","dateModified":"2017-08-28T08:19:25\u002b00:00","description":"Use this solution to automatically collect data from users who are offline, and send the data to Google Analytics once they are back online.","author":{"@type":"Person","name":"Simo Ahava"}}</script><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Track Users Who Are Offline In Google Analytics | Simo Ahava's blog</title>
+<script>window.dataLayer=window.dataLayer||[],window.dataLayer.push({pageType:"article",environment:null})</script><script>(function(e,t,n,s){window[n]=window[n]||[],window[n].push({"gtm.start":(new Date).getTime(),event:"gtm.js"});var i=e.getElementsByTagName(t)[0],o=e.createElement(t),a=n!="dataLayer"?"&l="+n:"";o.async=!0,o.src="https://sgtm.simoahava.com/gtm.js?id="+s+a,i.parentNode.insertBefore(o,i)})(document,"script","dataLayer","GTM-PZ7GMV9")</script><meta name=author content="Simo Ahava"><meta name=keywords content><link rel=icon href=https://www.simoahava.com/images/favicon.ico><link rel=amphtml href=https://www.simoahava.com/amp/analytics/track-users-who-are-offline-in-google-analytics/><meta name=description content="Use this solution to automatically collect data from users who are offline, and send the data to Google Analytics once they are back online."><meta property="og:description" content="Use this solution to automatically collect data from users who are offline, and send the data to Google Analytics once they are back online."><meta property="og:type" content="blog"><meta property="og:title" content="Track Users Who Are Offline In Google Analytics"><meta property="og:url" content="https://www.simoahava.com/analytics/track-users-who-are-offline-in-google-analytics/"><meta property="og:site_name" content="Simo Ahava's blog"><meta name=twitter:card content="summary"><meta name=twitter:title content="Track Users Who Are Offline In Google Analytics"><meta name=twitter:description content="Use this solution to automatically collect data from users who are offline, and send the data to Google Analytics once they are back online."><meta name=twitter:creator content="@SimoAhava"><meta name=twitter:image content="https://www.simoahava.com/images/2017/08/track-offline-hits.jpg"><meta property="og:image" content="https://www.simoahava.com/images/2017/08/track-offline-hits.jpg"><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=/css/style.css></head><body><div id=_progress></div><div id=blog><header id=header data-behavior=4><i id=btn-open-sidebar class="fa fa-lg fa-bars"></i><div class=header-title><a class=header-title-link href=/>Simo Ahava's blog</a></div></header><nav id=sidebar data-behavior=4><div class=sidebar-container><div class=sidebar-profile><a href=/><img class=sidebar-profile-picture loading=lazy src=https://www.simoahava.com/images/simo.png alt="Author's picture"></a><h4 class=sidebar-profile-name>Simo Ahava</h4><h5 class=sidebar-profile-bio>Husband | Father | Analytics developer<br>simo (at) simoahava.com</h5></div><ul class=sidebar-buttons><li class=sidebar-button><a class=sidebar-button-link href=/><i class="sidebar-button-icon fa fa-lg fa-home"></i>
+<span class=sidebar-button-desc>Home</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/categories/><i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+<span class=sidebar-button-desc>Categories</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/tags/><i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+<span class=sidebar-button-desc>Tags</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/categories/gtm-tips/><i class="sidebar-button-icon fa fa-lg fa-magic"></i>
+<span class=sidebar-button-desc>GTM Tips</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/about-simo-ahava/><i class="sidebar-button-icon fa fa-lg fa-question"></i>
+<span class=sidebar-button-desc>About</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/index.xml><i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+<span class=sidebar-button-desc>RSS</span></a></li></ul><ul class=sidebar-buttons><li class=sidebar-button><a class=sidebar-button-link href=/tools/><i class="sidebar-button-icon fa fa-lg fa-wrench"></i>
+<span class=sidebar-button-desc>Tools</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/blog-statistics/><i class="sidebar-button-icon fa fa-lg fa-bar-chart"></i>
+<span class=sidebar-button-desc>Blog statistics</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=https://github.com/sahava target=_blank rel=noopener><i class="sidebar-button-icon fa fa-lg fa-brands fa-github"></i>
+<span class=sidebar-button-desc>GitHub</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/upcoming-talks/><i class="sidebar-button-icon fa fa-lg fa-bullhorn"></i>
+<span class=sidebar-button-desc>Upcoming talks</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/custom-templates/><i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+<span class=sidebar-button-desc>Templates</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=/newsletter/><i class="sidebar-button-icon fa fa-lg fa-bell"></i>
+<span class=sidebar-button-desc>Newsletter</span></a></li><li class=sidebar-button><a class=sidebar-button-link href=https://masto.measure.chat/@SimoAhava target=_blank rel="noopener me"><i class="sidebar-button-icon fa fa-lg fa-brands fa-mastodon"></i>
+<span class=sidebar-button-desc>Mastodon</span></a></li></ul><ul class=sidebar-buttons></ul></div></nav><div id=main data-behavior=4 class=hasCoverMetaIn><article class=post><form id=search action=/search/><input name=q type=text class="form-control input--xlarge" placeholder="Search blog..." autocomplete=off></form><div class="post-header main-content-wrap text-left"><h1>Track Users Who Are Offline In Google Analytics</h1><div class="postShorten-meta post-meta"><time datetime=2017-08-28T08:19:25Z>August 28, 2017
+</time><span>in</span>
+<a class=category-link href=/categories/analytics>Analytics</a>
+| <a href=https://www.simoahava.com/analytics/track-users-who-are-offline-in-google-analytics/#commento><comentario-count path=/analytics/track-users-who-are-offline-in-google-analytics/ placeholder=... error-text="N/A " zero-text="0 " prefix suffix=" "></comentario-count>Comments</a></div></div><div class="post-content markdown"><div class=main-content-wrap><p>The steady increase in mobile use over the last years has introduced some new challenges for web analytics. It&rsquo;s not just about mismatches in the tracking model (the concept of <a href=/analytics/the-schema-conspiracy/><em>sessions</em></a> is even more absurd for apps than it is for desktop browsing), but about something more fundamental, more basic. Think about it: if a visitor visits the website using a mobile device, there&rsquo;s a significant chance of them losing internet connectivity and going unintentionally offline.</p><p>Actually, it&rsquo;s enough for them to simply traverse an area with poor coverage - if the HTTP requests sent by the browser don&rsquo;t complete in time, they timeout, and the hits are lost.</p><p>For <a href=https://analytics.google.com>Google Analytics</a> pageviews it&rsquo;s not such a big deal, because if the user sees the web page, it&rsquo;s very likely the first pageview has completed. However, what about all the other interactions that we want to track, and the user doesn&rsquo;t have an internet connection to boot? That&rsquo;s right - we&rsquo;ll lose these interactions, since the requests are dropped by the browser and never picked up, even when the user gets their connection back.</p><p>In this article, the brilliant <a href=http://www.thyngster.com/>David Vallejo</a> and I will offer a solution for retrieving these hits initially dropped by the browser due to the internet connection being offline. OK, who am I kidding, this is all David. I&rsquo;m just a glorified editor at this point.</p><div style=aspect-ratio:1023/156 class="figure nocaption"><a href=/images/2017/08/track-offline-hits.jpg title="track offline hits in universal analytics"><img class=fig-img height=156 width=1023 loading=lazy src=/images/2017/08/track-offline-hits.jpg#ZgotmplZ alt="track offline hits in universal analytics"></a></div><p>Anyway, let&rsquo;s frame it like this: the visitor is viewing our contact page, and we have an event queued up for when they click on our email contact information. However, the visitor is also on the subway, and the moment they click the email, they enter a tunnel. Oh noes! They lose their internet connection (damn subways without WiFi), and we miss our vital conversion tracking.</p><p>That&rsquo;s the premise. Here&rsquo;s the execution.</p><p>In this article, we&rsquo;ll touch upon a number of fairly technical concepts, but we&rsquo;ll try to frame them so that they make sense in the big picture.</p><ol><li><p>Universal Analytics <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/tasks?hl=en">Tasks API</a></p></li><li><p>The browser&rsquo;s <a href=https://www.w3schools.com/html/html5_webstorage.asp>Storage API</a></p></li><li><p>Sending Google Analytics hits with a delay (the <code>&amp;qt</code> parameter)</p></li><li><p>Sending custom POST and HEAD requests (HTTP protocol)</p></li><li><p><a href=https://developers.google.com/analytics/devguides/collection/protocol/v1/devguide#batch>Batching</a> Universal Analytics Hits</p></li></ol><p>All of these concepts are very useful to know if you want to know more about the mechanisms that the web browser employs to compile and dispatch requests to Universal Analytics.</p><div id=toc-container><h1 id=table-of-contents>Table of Contents</h1><input type=checkbox id=show><label for=show id=showbtn><h1 id=table-of-contents-mobile>Table of Contents</h1><span class=show>&nbsp;[+show]</span><span class=hide>&nbsp;[–hide]</span></label><nav id=TableOfContents><ul><li><a href=#1-universal-analytics-tasks-api>1. Universal Analytics Tasks API</a></li><li><a href=#2-the-offline-tracker>2. The offline tracker</a><ul><li><a href=#21-the-qt-parameter>2.1. The &amp;qt parameter</a></li></ul></li><li><a href=#3-the-http-head-request>3. The HTTP HEAD request</a></li><li><a href=#4-the-javascript-code>4. The JavaScript code</a><ul><li><a href=#41-lockr-download>4.1. Lockr download</a></li><li><a href=#42-offline-hit-tracker-for-on-page-universal-analytics>4.2. Offline hit tracker for on-page Universal Analytics</a></li><li><a href=#43-offline-hit-tracker-for-google-tag-manager>4.3. Offline hit tracker for Google Tag Manager</a></li><li><a href=#44-about-batching>4.4. About batching</a></li></ul></li><li><a href=#5-improvements>5. Improvements</a></li><li><a href=#6-summary>6. Summary</a></li></ul></nav></div><p>Let&rsquo;s go!</p><span class=simmer><span class=close>X</span><p><span class="fa fa-md fa-bell"></span>
+<strong>The Simmer Newsletter</strong></p><p>Subscribe to the <a href=/newsletter/>Simmer newsletter</a> to get the latest news and content from Simo Ahava into your email inbox!</p></span><h2 id=1-universal-analytics-tasks-api>1. Universal Analytics Tasks API</h2><p>Each time a <code>send</code> command is dispatched to the <code>ga()</code> global method, a series of <a href=https://developers.google.com/analytics/devguides/collection/analyticsjs/tasks><em>tasks</em></a> are run in sequence by the analytics.js library. These tasks do a number of things, such as construct the payload, validate it, sample the requests, and finally dispatch the requests to the Universal Analytics endpoint.</p><p>The neat thing about these tasks is that we can intercept them and modify them using the API provided by analytics.js.</p><p>You can find a list of all available tasks in the API <a href=https://developers.google.com/analytics/devguides/collection/analyticsjs/tasks>here</a>. However, in this article we will focus on just a very special, very significant task: <code>customTask</code>. It&rsquo;s a new task introduced very recently (here&rsquo;s a <a href=/gtm-tips/use-customtask-access-tracker-values-google-tag-manager/>guide by Simo</a>).</p><p>This task is true to its name - it&rsquo;s entirely customizable. It runs first in the task queue, so you can use it to configure the tracker object or even to set other tasks up for customization.</p><p>In this guide, we&rsquo;ll use <code>customTask</code> to modify the <code>sendHitTask</code>. This way we can check if the user has internet connectivity when <code>sendHitTask</code> is run, and we can do a number of things if the user has dropped their connection. We use <code>customTask</code> instead of directly accessing <code>sendHitTask</code> simply because this way is much more <a href=https://tagmanager.google.com/>Google Tag Manager</a>-friendly.</p><p>In short, here&rsquo;s the process:</p><p><code>customTask</code> <strong>modifies</strong> <code>sendHitTask</code> with <code>OUR CODE</code> before <strong>hit is sent</strong>.</p><p>In order to detect if the user has internet connectivity, we could simply poll our own web server endpoint. However, that wouldn&rsquo;t be a good litmus test since it could be just Google&rsquo;s servers that are not responding. That&rsquo;s why we&rsquo;ll actually poll Google&rsquo;s endpoint to check if the user has the connectivity required for Google Analytics tracking.</p><h2 id=2-the-offline-tracker>2. The offline tracker</h2><p>The solution is that with every single request to Universal Analytics, we&rsquo;ll send an HTTP HEAD request to the Universal Analytics endpoint. If the endpoint isn&rsquo;t responding, we can infer that the user does not have connectivity for communicating with Google Analytics, and so we&rsquo;ll store the hit into browser storage until such a time that internet coverage is restored.</p><div style=aspect-ratio:2370/1282 class="figure nocaption"><a href=/images/2017/04/offline-hits-in-universal-analytics.jpg title="Track offline hits in Universal Analytics"><img class=fig-img height=1282 width=2370 loading=lazy src=/images/2017/04/offline-hits-in-universal-analytics.jpg#ZgotmplZ alt="Track offline hits in Universal Analytics"></a></div><p>We&rsquo;ll use <code>localStorage</code> for the queue, but we&rsquo;ll need to cheat a little. <code>localStorage</code> itself doesn&rsquo;t introduce any structure or a deeper data model - it just processes key-value pairs. So, to give us some additional flexibility, we&rsquo;ll use the <a href=https://github.com/tsironis/lockr><strong>Lockr</strong></a> open-source database layer. It&rsquo;s a simple and efficient framework, and it has pretty solid browser support.</p><p>This solution picks up the Universal Analytics hit payload from <code>sendHitTask</code>, and if there is no internet connection, this hit is stored in <code>localStorage</code> with the timestamp of the request. Thus, when we later do manage to send the stored hit, we can send it <em>at its original timestamp</em> to Universal Analytics.</p><h3 id=21-the-qt-parameter>2.1. The &amp;qt parameter</h3><p>The <code>&amp;qt</code> Measurement Protocol stands for <strong>queue time</strong>. Basically, you can set a number in milliseconds in that parameter, and the hit will be sent with a timestamp that many milliseconds in the past. For example, if I know that the hit I want to send actually happened 45 minutes ago, I can set the parameter to:</p><p><code>&amp;qt=2700000</code></p><p>There&rsquo;s just an odd little quirk you need to know about <code>&amp;qt</code>. The latest you can send the displaced hit is at 03:59:59 the following day (in the timezone of the Google Analytics view the hit is being sent to). Thus, the maximum value for <code>&amp;qt</code> is 27 hours, 59 minutes, and 59 seconds (in milliseconds), if the hit occurred at exactly midnight, and you then send it the following morning, just before 4 AM.</p><p>Yes, it might be difficult to grasp, so we&rsquo;ll go with the official recommendation: <strong>avoid sending hits more than 4 hours in the past</strong>, since there&rsquo;s no guarantee they will get sent.</p><h2 id=3-the-http-head-request>3. The HTTP HEAD request</h2><p>So what is this <a href=https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/HEAD>HEAD request</a> and why are we using it? Well, it&rsquo;s identical to GET, except it only returns the HTTP headers (and associated metadata), never any content.</p><p>It&rsquo;s thus a great method to use if we only want to test an endpoint, and not get into the expensive process of actually retrieving data from it.</p><p>Since we are only interested in knowing if the Universal Analytics endpoint responds, the HTTP HEAD request is perfect for this purpose. Also, see how efficient it is compared to POST and GET:</p><div style=aspect-ratio:2430/796 class="figure nocaption"><a href=/images/2017/04/http-head-request.jpg title="HTTP HEAD request"><img class=fig-img height=796 width=2430 loading=lazy src=/images/2017/04/http-head-request.jpg#ZgotmplZ alt="HTTP HEAD request"></a></div><h2 id=4-the-javascript-code>4. The JavaScript code</h2><p>The code comes in three parts. First is the library for extending the database: <strong>Lockr</strong>. Next we have the <code>customTask</code> execution, and finally we&rsquo;ll chain the HTTP HEAD and batch requests together to make the whole thing click.</p><h3 id=41-lockr-download>4.1. Lockr download</h3><p>To get started, go ahead and <a href=https://raw.githubusercontent.com/tsironis/lockr/master/lockr.js>load <strong>Lockr</strong></a> on your site in any way you want. If you&rsquo;re using Google Tag Manager, we recommend loading the following code in a <strong>Custom HTML Tag</strong> that fires on <strong>All Pages</strong> with the highest possible <strong>Tag Priority</strong>. Alternatively, if you accept some overhead and redundancy, you can just add the library to the top of the Custom JavaScript Variable itself, as in the example in the next chapter.</p><p>Here&rsquo;s the minified JavaScript code  - it should be executed by the browser before the offline tracking solution is run:</p><div class=highlight><pre tabindex=0 style=background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-javascript data-lang=javascript><span style=display:flex><span>!<span style=color:#00a>function</span>(e,t){<span style=color:#a50>&#34;undefined&#34;</span>!=<span style=color:#00a>typeof</span> exports?<span style=color:#a50>&#34;undefined&#34;</span>!=<span style=color:#00a>typeof</span> module&amp;&amp;module.exports&amp;&amp;(exports=module.exports=t(e,exports)):<span style=color:#a50>&#34;function&#34;</span>==<span style=color:#00a>typeof</span> define&amp;&amp;define.amd?define([<span style=color:#a50>&#34;exports&#34;</span>],<span style=color:#00a>function</span>(r){e.Lockr=t(e,r)}):e.Lockr=t(e,{})}(<span style=color:#00a>this</span>,<span style=color:#00a>function</span>(e,t){<span style=color:#a50>&#34;use strict&#34;</span>;<span style=color:#00a>return</span> <span style=color:#0aa>Array</span>.prototype.indexOf||(<span style=color:#0aa>Array</span>.prototype.indexOf=<span style=color:#00a>function</span>(e){<span style=color:#00a>var</span> t=<span style=color:#00a>this</span>.length&gt;&gt;&gt;<span style=color:#099>0</span>,r=<span style=color:#0aa>Number</span>(arguments[<span style=color:#099>1</span>])||<span style=color:#099>0</span>;<span style=color:#00a>for</span>((r=r&lt;<span style=color:#099>0</span>?<span style=color:#0aa>Math</span>.ceil(r):<span style=color:#0aa>Math</span>.floor(r))&lt;<span style=color:#099>0</span>&amp;&amp;(r+=t);r&lt;t;r++)<span style=color:#00a>if</span>(r <span style=color:#00a>in</span> <span style=color:#00a>this</span>&amp;&amp;<span style=color:#00a>this</span>[r]===e)<span style=color:#00a>return</span> r;<span style=color:#00a>return</span>-<span style=color:#099>1</span>}),t.prefix=<span style=color:#a50>&#34;&#34;</span>,t._getPrefixedKey=<span style=color:#00a>function</span>(e,t){<span style=color:#00a>return</span>(t=t||{}).noPrefix?e:<span style=color:#00a>this</span>.prefix+e},t.set=<span style=color:#00a>function</span>(e,t,r){<span style=color:#00a>var</span> o=<span style=color:#00a>this</span>._getPrefixedKey(e,r);<span style=color:#00a>try</span>{localStorage.setItem(o,JSON.stringify({data:t}))}<span style=color:#00a>catch</span>(r){console&amp;&amp;console.warn(<span style=color:#a50>&#34;Lockr didn&#39;t successfully save the &#39;{&#34;</span>+e+<span style=color:#a50>&#34;: &#34;</span>+t+<span style=color:#a50>&#34;}&#39; pair, because the localStorage is full.&#34;</span>)}},t.get=<span style=color:#00a>function</span>(e,t,r){<span style=color:#00a>var</span> o,n=<span style=color:#00a>this</span>._getPrefixedKey(e,r);<span style=color:#00a>try</span>{o=JSON.parse(localStorage.getItem(n))}<span style=color:#00a>catch</span>(e){o=localStorage[n]?{data:localStorage.getItem(n)}:<span style=color:#00a>null</span>}<span style=color:#00a>return</span> o?<span style=color:#a50>&#34;object&#34;</span>==<span style=color:#00a>typeof</span> o&amp;&amp;<span style=color:#00a>void</span> <span style=color:#099>0</span>!==o.data?o.data:<span style=color:#00a>void</span> <span style=color:#099>0</span>:t},t.sadd=<span style=color:#00a>function</span>(e,r,o){<span style=color:#00a>var</span> n,a=<span style=color:#00a>this</span>._getPrefixedKey(e,o),i=t.smembers(e);<span style=color:#00a>if</span>(i.indexOf(r)&gt;-<span style=color:#099>1</span>)<span style=color:#00a>return</span> <span style=color:#00a>null</span>;<span style=color:#00a>try</span>{i.push(r),n=JSON.stringify({data:i}),localStorage.setItem(a,n)}<span style=color:#00a>catch</span>(t){console.log(t),console&amp;&amp;console.warn(<span style=color:#a50>&#34;Lockr didn&#39;t successfully add the &#34;</span>+r+<span style=color:#a50>&#34; to &#34;</span>+e+<span style=color:#a50>&#34; set, because the localStorage is full.&#34;</span>)}},t.smembers=<span style=color:#00a>function</span>(e,t){<span style=color:#00a>var</span> r,o=<span style=color:#00a>this</span>._getPrefixedKey(e,t);<span style=color:#00a>try</span>{r=JSON.parse(localStorage.getItem(o))}<span style=color:#00a>catch</span>(e){r=<span style=color:#00a>null</span>}<span style=color:#00a>return</span> r&amp;&amp;r.data?r.data:[]},t.sismember=<span style=color:#00a>function</span>(e,r,o){<span style=color:#00a>return</span> t.smembers(e).indexOf(r)&gt;-<span style=color:#099>1</span>},t.keys=<span style=color:#00a>function</span>(){<span style=color:#00a>var</span> e=[],r=<span style=color:#0aa>Object</span>.keys(localStorage);<span style=color:#00a>return</span> <span style=color:#099>0</span>===t.prefix.length?r:(r.forEach(<span style=color:#00a>function</span>(r){-<span style=color:#099>1</span>!==r.indexOf(t.prefix)&amp;&amp;e.push(r.replace(t.prefix,<span style=color:#a50>&#34;&#34;</span>))}),e)},t.getAll=<span style=color:#00a>function</span>(e){<span style=color:#00a>var</span> r=t.keys();<span style=color:#00a>return</span> e?r.reduce(<span style=color:#00a>function</span>(e,r){<span style=color:#00a>var</span> o={};<span style=color:#00a>return</span> o[r]=t.get(r),e.push(o),e},[]):r.map(<span style=color:#00a>function</span>(e){<span style=color:#00a>return</span> t.get(e)})},t.srem=<span style=color:#00a>function</span>(e,r,o){<span style=color:#00a>var</span> n,a,i=<span style=color:#00a>this</span>._getPrefixedKey(e,o),c=t.smembers(e,r);(a=c.indexOf(r))&gt;-<span style=color:#099>1</span>&amp;&amp;c.splice(a,<span style=color:#099>1</span>),n=JSON.stringify({data:c});<span style=color:#00a>try</span>{localStorage.setItem(i,n)}<span style=color:#00a>catch</span>(t){console&amp;&amp;console.warn(<span style=color:#a50>&#34;Lockr couldn&#39;t remove the &#34;</span>+r+<span style=color:#a50>&#34; from the set &#34;</span>+e)}},t.rm=<span style=color:#00a>function</span>(e){<span style=color:#00a>var</span> t=<span style=color:#00a>this</span>._getPrefixedKey(e);localStorage.removeItem(t)},t.flush=<span style=color:#00a>function</span>(){t.prefix.length?t.keys().forEach(<span style=color:#00a>function</span>(e){localStorage.removeItem(t._getPrefixedKey(e))}):localStorage.clear()},t});</span></span></code></pre></div><p>After this code puke, we&rsquo;re ready to jump in the deep end with some offline hit tracking!</p><h3 id=42-offline-hit-tracker-for-on-page-universal-analytics>4.2. Offline hit tracker for on-page Universal Analytics</h3><p>The following JavaScript runs with the default <strong>Universal Analytics tracker</strong>, and thus any hits sent with the <code>ga('send', '...');</code> will be included in the process.</p><p>To make the whole thing work, you should setup your code in the following order:</p><div class=highlight><pre tabindex=0 style=background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-html data-lang=html><span style=display:flex><span>&lt;<span style=color:#1e90ff;font-weight:700>head</span>&gt;
+</span></span><span style=display:flex><span>  ...
+</span></span><span style=display:flex><span>  &lt;<span style=color:#1e90ff;font-weight:700>script</span>&gt;
+</span></span><span style=display:flex><span>    <span style=color:#aaa;font-style:italic>// Put the Lockr code here first
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>  &lt;/<span style=color:#1e90ff;font-weight:700>script</span>&gt;
+</span></span><span style=display:flex><span>  &lt;<span style=color:#1e90ff;font-weight:700>script</span>&gt;
+</span></span><span style=display:flex><span>    <span style=color:#00a>var</span> _offlineTracker = <span style=color:#00a>function</span>(customTaskModel) {
+</span></span><span style=display:flex><span>      <span style=color:#aaa;font-style:italic>// _offlineTracker (see below) here
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>    };
+</span></span><span style=display:flex><span>  &lt;/<span style=color:#1e90ff;font-weight:700>script</span>&gt;
+</span></span><span style=display:flex><span>  &lt;<span style=color:#1e90ff;font-weight:700>script</span>&gt;
+</span></span><span style=display:flex><span>    <span style=color:#aaa;font-style:italic>// Universal Analytics snippet here
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>    ga(<span style=color:#a50>&#39;create&#39;</span>, <span style=color:#a50>&#39;UA-12345-1&#39;</span>);
+</span></span><span style=display:flex><span>    <span style=color:#aaa;font-style:italic>// Add the following line AFTER the &#39;create&#39; command and BEFORE the first &#39;send&#39; command
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>    ga(<span style=color:#a50>&#39;set&#39;</span>, <span style=color:#a50>&#39;customTask&#39;</span>, _offlineTracker);
+</span></span><span style=display:flex><span>    ga(<span style=color:#a50>&#39;send&#39;</span>, <span style=color:#a50>&#39;pageview&#39;</span>);
+</span></span><span style=display:flex><span>  &lt;/<span style=color:#1e90ff;font-weight:700>script</span>&gt;
+</span></span><span style=display:flex><span>  ...
+</span></span><span style=display:flex><span>&lt;/<span style=color:#1e90ff;font-weight:700>head</span>&gt;</span></span></code></pre></div><p>And here&rsquo;s the code for the <code>_offlineTracker</code> callback function.</p><div class=highlight><pre tabindex=0 style=background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-javascript data-lang=javascript><span style=display:flex><span><span style=color:#00a>var</span> _offlineTracker = <span style=color:#00a>function</span>(customTaskModel) {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  Lockr.prefix = <span style=color:#a50>&#39;ga_&#39;</span>;
+</span></span><span style=display:flex><span>  <span style=color:#aaa;font-style:italic>// Grab the original sentHitTask Function from the first tracker. to kept the original hit sending function.
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>  <span style=color:#00a>var</span> originalSendHitTask = customTaskModel.get(<span style=color:#a50>&#39;sendHitTask&#39;</span>);
+</span></span><span style=display:flex><span>  customTaskModel.set(<span style=color:#a50>&#39;sendHitTask&#39;</span>, <span style=color:#00a>function</span>(model) {
+</span></span><span style=display:flex><span>    <span style=color:#aaa;font-style:italic>// Let&#39;s send the original hit using the native functionality
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>    originalSendHitTask(model);
+</span></span><span style=display:flex><span>    <span style=color:#aaa;font-style:italic>// Grab the hit Payload
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>    <span style=color:#00a>var</span> payload_lz = model.get(<span style=color:#a50>&#39;hitPayload&#39;</span>);
+</span></span><span style=display:flex><span>    <span style=color:#aaa;font-style:italic>// Check if GA Endpoint is Ready
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>    <span style=color:#00a>var</span> http = <span style=color:#00a>new</span> XMLHttpRequest();
+</span></span><span style=display:flex><span>    http.open(<span style=color:#a50>&#39;HEAD&#39;</span>, <span style=color:#a50>&#39;https://www.google-analytics.com/collect&#39;</span>);
+</span></span><span style=display:flex><span>    http.onreadystatechange = <span style=color:#00a>function</span>() {
+</span></span><span style=display:flex><span>      <span style=color:#aaa;font-style:italic>// Google Analytics endpoint is not reachable, let&#39;s save the hit                
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>      <span style=color:#00a>if</span> (<span style=color:#00a>this</span>.readyState === <span style=color:#00a>this</span>.DONE &amp;&amp; <span style=color:#00a>this</span>.status !== <span style=color:#099>200</span>) {
+</span></span><span style=display:flex><span>        Lockr.sadd(<span style=color:#a50>&#39;hits&#39;</span>, payload_lz + <span style=color:#a50>&#34;&amp;qt=&#34;</span> + (<span style=color:#00a>new</span> <span style=color:#0aa>Date</span>() * <span style=color:#099>1</span>));
+</span></span><span style=display:flex><span>      } <span style=color:#00a>else</span> {
+</span></span><span style=display:flex><span>        <span style=color:#aaa;font-style:italic>// Google Analytics endpoint is available, let&#39;s check if there are any unsent hits
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>        <span style=color:#00a>if</span> (Lockr.smembers(<span style=color:#a50>&#34;hits&#34;</span>).length &gt; <span style=color:#099>0</span>) {                        
+</span></span><span style=display:flex><span>          <span style=color:#aaa;font-style:italic>// Process hits in queue
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>          <span style=color:#00a>var</span> current_ts = <span style=color:#00a>new</span> <span style=color:#0aa>Date</span>() * <span style=color:#099>1</span> / <span style=color:#099>1000</span>;
+</span></span><span style=display:flex><span>          <span style=color:#00a>var</span> hits = Lockr.smembers(<span style=color:#a50>&#34;hits&#34;</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>          <span style=color:#aaa;font-style:italic>// ./batch endpoint only allows 20 hits per batch, let&#39;s chunk the hits array. 
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>          <span style=color:#00a>var</span> chunk_size = <span style=color:#099>20</span>;
+</span></span><span style=display:flex><span>          <span style=color:#00a>var</span> chunked_hits = Lockr.smembers(<span style=color:#a50>&#34;hits&#34;</span>).map(<span style=color:#00a>function</span>(e, i) {
+</span></span><span style=display:flex><span>            <span style=color:#00a>return</span> i % chunk_size === <span style=color:#099>0</span> ? hits.slice(i, i + chunk_size) : <span style=color:#00a>null</span>;
+</span></span><span style=display:flex><span>          }).filter(<span style=color:#00a>function</span>(e) {
+</span></span><span style=display:flex><span>            <span style=color:#00a>return</span> e;
+</span></span><span style=display:flex><span>          });
+</span></span><span style=display:flex><span>          <span style=color:#aaa;font-style:italic>// Let&#39;s loop thru the chunks array and send the hits to GA
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>          <span style=color:#00a>for</span> (<span style=color:#00a>var</span> i = <span style=color:#099>0</span>; i &lt; chunked_hits.length; i++) {
+</span></span><span style=display:flex><span>            <span style=color:#00a>var</span> xhr = <span style=color:#00a>new</span> XMLHttpRequest();
+</span></span><span style=display:flex><span>            xhr.open(<span style=color:#a50>&#39;POST&#39;</span>, <span style=color:#a50>&#39;https://www.google-analytics.com/batch&#39;</span>, <span style=color:#00a>true</span>);
+</span></span><span style=display:flex><span>            <span style=color:#aaa;font-style:italic>// Build the Batch Payload and Take care of calculating the Queue Time 
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>            xhr.send(chunked_hits[i].map(<span style=color:#00a>function</span>(x) {
+</span></span><span style=display:flex><span>              <span style=color:#00a>if</span> (x.indexOf(<span style=color:#a50>&#34;&amp;qt=&#34;</span>) &gt; -<span style=color:#099>1</span>) {
+</span></span><span style=display:flex><span>                <span style=color:#00a>return</span> x.replace(<span style=color:#099>/qt=([^&amp;]*)/</span>, <span style=color:#a50>&#34;qt=&#34;</span> + <span style=color:#0aa>Math</span>.round(current_ts - x.match(<span style=color:#099>/qt=([^&amp;]*)/</span>)[<span style=color:#099>1</span>] / <span style=color:#099>1000</span>) * <span style=color:#099>1000</span>);
+</span></span><span style=display:flex><span>              } <span style=color:#00a>else</span> <span style=color:#00a>return</span> x;
+</span></span><span style=display:flex><span>            }).join(<span style=color:#a50>&#34;\n&#34;</span>));
+</span></span><span style=display:flex><span>          }
+</span></span><span style=display:flex><span>          <span style=color:#aaa;font-style:italic>//Hits sent, flush the Storage
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>          Lockr.flush();
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>    };
+</span></span><span style=display:flex><span>    http.send();
+</span></span><span style=display:flex><span>  });
+</span></span><span style=display:flex><span>};</span></span></code></pre></div><p>Once you create this <code>_offlineTracker</code> and invoke it in the <code>ga('set', 'customTask', _offlineTracker)</code> command, every single hit that uses this tracker will be stored in the queue if there is no internet connectivity. Once a hit is sent with a solid connection, all hits in the queue are sent as well.</p><h3 id=43-offline-hit-tracker-for-google-tag-manager>4.3. Offline hit tracker for Google Tag Manager</h3><p>With Google Tag Manager, you can get by with a single Custom JavaScript variable. This variable can be configured to include the Lockr code as well, so it&rsquo;s completely self-contained. Give the variable a descriptive name, e.g. <strong>{{JS - customTask Offline Hit Tracker}}</strong> and put the following code within:</p><div class=highlight><pre tabindex=0 style=background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-javascript data-lang=javascript><span style=display:flex><span><span style=color:#00a>function</span>() {
+</span></span><span style=display:flex><span>  <span style=color:#00a>return</span> <span style=color:#00a>function</span>(customTaskModel) {
+</span></span><span style=display:flex><span>    <span style=color:#aaa;font-style:italic>// Load Lockr if it hasn&#39;t already been loaded
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>    <span style=color:#00a>if</span> (!<span style=color:#0aa>window</span>.Lockr) {
+</span></span><span style=display:flex><span>      !<span style=color:#00a>function</span>(e,t){<span style=color:#a50>&#34;undefined&#34;</span>!=<span style=color:#00a>typeof</span> exports?<span style=color:#a50>&#34;undefined&#34;</span>!=<span style=color:#00a>typeof</span> module&amp;&amp;module.exports&amp;&amp;(exports=module.exports=t(e,exports)):<span style=color:#a50>&#34;function&#34;</span>==<span style=color:#00a>typeof</span> define&amp;&amp;define.amd?define([<span style=color:#a50>&#34;exports&#34;</span>],<span style=color:#00a>function</span>(r){e.Lockr=t(e,r)}):e.Lockr=t(e,{})}(<span style=color:#00a>this</span>,<span style=color:#00a>function</span>(e,t){<span style=color:#a50>&#34;use strict&#34;</span>;<span style=color:#00a>return</span> <span style=color:#0aa>Array</span>.prototype.indexOf||(<span style=color:#0aa>Array</span>.prototype.indexOf=<span style=color:#00a>function</span>(e){<span style=color:#00a>var</span> t=<span style=color:#00a>this</span>.length&gt;&gt;&gt;<span style=color:#099>0</span>,r=<span style=color:#0aa>Number</span>(arguments[<span style=color:#099>1</span>])||<span style=color:#099>0</span>;<span style=color:#00a>for</span>((r=r&lt;<span style=color:#099>0</span>?<span style=color:#0aa>Math</span>.ceil(r):<span style=color:#0aa>Math</span>.floor(r))&lt;<span style=color:#099>0</span>&amp;&amp;(r+=t);r&lt;t;r++)<span style=color:#00a>if</span>(r <span style=color:#00a>in</span> <span style=color:#00a>this</span>&amp;&amp;<span style=color:#00a>this</span>[r]===e)<span style=color:#00a>return</span> r;<span style=color:#00a>return</span>-<span style=color:#099>1</span>}),t.prefix=<span style=color:#a50>&#34;&#34;</span>,t._getPrefixedKey=<span style=color:#00a>function</span>(e,t){<span style=color:#00a>return</span>(t=t||{}).noPrefix?e:<span style=color:#00a>this</span>.prefix+e},t.set=<span style=color:#00a>function</span>(e,t,r){<span style=color:#00a>var</span> o=<span style=color:#00a>this</span>._getPrefixedKey(e,r);<span style=color:#00a>try</span>{localStorage.setItem(o,JSON.stringify({data:t}))}<span style=color:#00a>catch</span>(r){console&amp;&amp;console.warn(<span style=color:#a50>&#34;Lockr didn&#39;t successfully save the &#39;{&#34;</span>+e+<span style=color:#a50>&#34;: &#34;</span>+t+<span style=color:#a50>&#34;}&#39; pair, because the localStorage is full.&#34;</span>)}},t.get=<span style=color:#00a>function</span>(e,t,r){<span style=color:#00a>var</span> o,n=<span style=color:#00a>this</span>._getPrefixedKey(e,r);<span style=color:#00a>try</span>{o=JSON.parse(localStorage.getItem(n))}<span style=color:#00a>catch</span>(e){o=localStorage[n]?{data:localStorage.getItem(n)}:<span style=color:#00a>null</span>}<span style=color:#00a>return</span> o?<span style=color:#a50>&#34;object&#34;</span>==<span style=color:#00a>typeof</span> o&amp;&amp;<span style=color:#00a>void</span> <span style=color:#099>0</span>!==o.data?o.data:<span style=color:#00a>void</span> <span style=color:#099>0</span>:t},t.sadd=<span style=color:#00a>function</span>(e,r,o){<span style=color:#00a>var</span> n,a=<span style=color:#00a>this</span>._getPrefixedKey(e,o),i=t.smembers(e);<span style=color:#00a>if</span>(i.indexOf(r)&gt;-<span style=color:#099>1</span>)<span style=color:#00a>return</span> <span style=color:#00a>null</span>;<span style=color:#00a>try</span>{i.push(r),n=JSON.stringify({data:i}),localStorage.setItem(a,n)}<span style=color:#00a>catch</span>(t){console.log(t),console&amp;&amp;console.warn(<span style=color:#a50>&#34;Lockr didn&#39;t successfully add the &#34;</span>+r+<span style=color:#a50>&#34; to &#34;</span>+e+<span style=color:#a50>&#34; set, because the localStorage is full.&#34;</span>)}},t.smembers=<span style=color:#00a>function</span>(e,t){<span style=color:#00a>var</span> r,o=<span style=color:#00a>this</span>._getPrefixedKey(e,t);<span style=color:#00a>try</span>{r=JSON.parse(localStorage.getItem(o))}<span style=color:#00a>catch</span>(e){r=<span style=color:#00a>null</span>}<span style=color:#00a>return</span> r&amp;&amp;r.data?r.data:[]},t.sismember=<span style=color:#00a>function</span>(e,r,o){<span style=color:#00a>return</span> t.smembers(e).indexOf(r)&gt;-<span style=color:#099>1</span>},t.keys=<span style=color:#00a>function</span>(){<span style=color:#00a>var</span> e=[],r=<span style=color:#0aa>Object</span>.keys(localStorage);<span style=color:#00a>return</span> <span style=color:#099>0</span>===t.prefix.length?r:(r.forEach(<span style=color:#00a>function</span>(r){-<span style=color:#099>1</span>!==r.indexOf(t.prefix)&amp;&amp;e.push(r.replace(t.prefix,<span style=color:#a50>&#34;&#34;</span>))}),e)},t.getAll=<span style=color:#00a>function</span>(e){<span style=color:#00a>var</span> r=t.keys();<span style=color:#00a>return</span> e?r.reduce(<span style=color:#00a>function</span>(e,r){<span style=color:#00a>var</span> o={};<span style=color:#00a>return</span> o[r]=t.get(r),e.push(o),e},[]):r.map(<span style=color:#00a>function</span>(e){<span style=color:#00a>return</span> t.get(e)})},t.srem=<span style=color:#00a>function</span>(e,r,o){<span style=color:#00a>var</span> n,a,i=<span style=color:#00a>this</span>._getPrefixedKey(e,o),c=t.smembers(e,r);(a=c.indexOf(r))&gt;-<span style=color:#099>1</span>&amp;&amp;c.splice(a,<span style=color:#099>1</span>),n=JSON.stringify({data:c});<span style=color:#00a>try</span>{localStorage.setItem(i,n)}<span style=color:#00a>catch</span>(t){console&amp;&amp;console.warn(<span style=color:#a50>&#34;Lockr couldn&#39;t remove the &#34;</span>+r+<span style=color:#a50>&#34; from the set &#34;</span>+e)}},t.rm=<span style=color:#00a>function</span>(e){<span style=color:#00a>var</span> t=<span style=color:#00a>this</span>._getPrefixedKey(e);localStorage.removeItem(t)},t.flush=<span style=color:#00a>function</span>(){t.prefix.length?t.keys().forEach(<span style=color:#00a>function</span>(e){localStorage.removeItem(t._getPrefixedKey(e))}):localStorage.clear()},t});
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>    Lockr.prefix = <span style=color:#a50>&#39;ga_&#39;</span>;
+</span></span><span style=display:flex><span>    <span style=color:#aaa;font-style:italic>// Grab the original sentHitTask Function from the first tracker. to kept the original hit sending function.
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>    <span style=color:#00a>var</span> originalSendHitTask = customTaskModel.get(<span style=color:#a50>&#39;sendHitTask&#39;</span>);
+</span></span><span style=display:flex><span>    customTaskModel.set(<span style=color:#a50>&#39;sendHitTask&#39;</span>, <span style=color:#00a>function</span>(model) {
+</span></span><span style=display:flex><span>      <span style=color:#aaa;font-style:italic>// Let&#39;s send the original hit using the native functionality
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>      originalSendHitTask(model);
+</span></span><span style=display:flex><span>      <span style=color:#aaa;font-style:italic>// Grab the hit Payload
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>      <span style=color:#00a>var</span> payload_lz = model.get(<span style=color:#a50>&#39;hitPayload&#39;</span>);
+</span></span><span style=display:flex><span>      <span style=color:#aaa;font-style:italic>// Check if GA Endpoint is Ready
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>      <span style=color:#00a>var</span> http = <span style=color:#00a>new</span> XMLHttpRequest();
+</span></span><span style=display:flex><span>      http.open(<span style=color:#a50>&#39;HEAD&#39;</span>, <span style=color:#a50>&#39;https://www.google-analytics.com/collect&#39;</span>);
+</span></span><span style=display:flex><span>      http.onreadystatechange = <span style=color:#00a>function</span>() {
+</span></span><span style=display:flex><span>        <span style=color:#aaa;font-style:italic>// Google Analytics endpoint is not reachable, let&#39;s save the hit                
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>        <span style=color:#00a>if</span> (<span style=color:#00a>this</span>.readyState === <span style=color:#00a>this</span>.DONE &amp;&amp; <span style=color:#00a>this</span>.status !== <span style=color:#099>200</span>) {
+</span></span><span style=display:flex><span>          Lockr.sadd(<span style=color:#a50>&#39;hits&#39;</span>, payload_lz + <span style=color:#a50>&#34;&amp;qt=&#34;</span> + (<span style=color:#00a>new</span> <span style=color:#0aa>Date</span>() * <span style=color:#099>1</span>));
+</span></span><span style=display:flex><span>        } <span style=color:#00a>else</span> {
+</span></span><span style=display:flex><span>          <span style=color:#aaa;font-style:italic>// Google Analytics endpoint is available, let&#39;s check if there are any unsent hits
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>          <span style=color:#00a>if</span> (Lockr.smembers(<span style=color:#a50>&#34;hits&#34;</span>).length &gt; <span style=color:#099>0</span>) {                        
+</span></span><span style=display:flex><span>            <span style=color:#aaa;font-style:italic>// Process hits in queue
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>            <span style=color:#00a>var</span> current_ts = <span style=color:#00a>new</span> <span style=color:#0aa>Date</span>() * <span style=color:#099>1</span> / <span style=color:#099>1000</span>;
+</span></span><span style=display:flex><span>            <span style=color:#00a>var</span> hits = Lockr.smembers(<span style=color:#a50>&#34;hits&#34;</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>            <span style=color:#aaa;font-style:italic>// ./batch endpoint only allows 20 hits per batch, let&#39;s chunk the hits array. 
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>            <span style=color:#00a>var</span> chunk_size = <span style=color:#099>20</span>;
+</span></span><span style=display:flex><span>            <span style=color:#00a>var</span> chunked_hits = Lockr.smembers(<span style=color:#a50>&#34;hits&#34;</span>).map(<span style=color:#00a>function</span>(e, i) {
+</span></span><span style=display:flex><span>              <span style=color:#00a>return</span> i % chunk_size === <span style=color:#099>0</span> ? hits.slice(i, i + chunk_size) : <span style=color:#00a>null</span>;
+</span></span><span style=display:flex><span>            }).filter(<span style=color:#00a>function</span>(e) {
+</span></span><span style=display:flex><span>              <span style=color:#00a>return</span> e;
+</span></span><span style=display:flex><span>            });
+</span></span><span style=display:flex><span>            <span style=color:#aaa;font-style:italic>// Let&#39;s loop thru the chunks array and send the hits to GA
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>            <span style=color:#00a>for</span> (<span style=color:#00a>var</span> i = <span style=color:#099>0</span>; i &lt; chunked_hits.length; i++) {
+</span></span><span style=display:flex><span>              <span style=color:#00a>var</span> xhr = <span style=color:#00a>new</span> XMLHttpRequest();
+</span></span><span style=display:flex><span>              xhr.open(<span style=color:#a50>&#39;POST&#39;</span>, <span style=color:#a50>&#39;https://www.google-analytics.com/batch&#39;</span>, <span style=color:#00a>true</span>);
+</span></span><span style=display:flex><span>              <span style=color:#aaa;font-style:italic>// Build the Batch Payload and Take care of calculating the Queue Time 
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>              xhr.send(chunked_hits[i].map(<span style=color:#00a>function</span>(x) {
+</span></span><span style=display:flex><span>                <span style=color:#00a>if</span> (x.indexOf(<span style=color:#a50>&#34;&amp;qt=&#34;</span>) &gt; -<span style=color:#099>1</span>) {
+</span></span><span style=display:flex><span>                  <span style=color:#00a>return</span> x.replace(<span style=color:#099>/qt=([^&amp;]*)/</span>, <span style=color:#a50>&#34;qt=&#34;</span> + <span style=color:#0aa>Math</span>.round(current_ts - x.match(<span style=color:#099>/qt=([^&amp;]*)/</span>)[<span style=color:#099>1</span>] / <span style=color:#099>1000</span>) * <span style=color:#099>1000</span>);
+</span></span><span style=display:flex><span>                } <span style=color:#00a>else</span> <span style=color:#00a>return</span> x;
+</span></span><span style=display:flex><span>              }).join(<span style=color:#a50>&#34;\n&#34;</span>));
+</span></span><span style=display:flex><span>            }
+</span></span><span style=display:flex><span>            <span style=color:#aaa;font-style:italic>//Hits sent, flush the Storage
+</span></span></span><span style=display:flex><span><span style=color:#aaa;font-style:italic></span>            Lockr.flush();
+</span></span><span style=display:flex><span>          }
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>      };
+</span></span><span style=display:flex><span>      http.send();
+</span></span><span style=display:flex><span>    });
+</span></span><span style=display:flex><span>  };
+</span></span><span style=display:flex><span>}</span></span></code></pre></div><p>Add this code to <strong>all your Universal Analytics tags</strong> by scrolling to <strong>More settings</strong> -> <strong>Fields to set</strong>. Here you add a new field with:</p><p><strong>Field name:</strong> customTask<br><strong>Value:</strong> {{JS - customTask Offline Hit Tracker}}</p><div style=aspect-ratio:1772/774 class="figure nocaption"><a href=/images/2017/08/fields-to-set.jpg title="Universal Analytics Fields to Set"><img class=fig-img height=774 width=1772 loading=lazy src=/images/2017/08/fields-to-set.jpg#ZgotmplZ alt="Universal Analytics Fields to Set"></a></div><p>Once you&rsquo;ve done this, then all your tags with this <strong>customTask</strong> setting are protected against poor connectivity, and whenever the connection is restored, the batch queue is processed.</p><h3 id=44-about-batching>4.4. About batching</h3><p>Universal Analytics lets you send hits to its endpoint in <a href=https://developers.google.com/analytics/devguides/collection/protocol/v1/devguide#batch>batches</a>. This is used mostly by the iOS and Android SDKs. The main point in using the batch endpoint (<code>/batch</code>) is to have as few HTTP requests dispatched as possible. Here, batching means that we can send multiple Universal Analytics payloads in a single HTTP request.</p><p>Batching does have some limitations we&rsquo;ll need to consider:</p><ul><li><p>A maximum of 20 hits can be specified per request.</p></li><li><p>The combined size of all hit payloads cannot be greater than 16K bytes.</p></li><li><p>No single hit payload can be greater than 8K bytes.</p></li><li><p>The request needs to be done using POST</p></li></ul><p>For our solution, each time the number of stored hits is more than 1, we send the payloads using the batch endpoint. In case there are too many hits stored in the queue, we&rsquo;re chunking them so that multiple batch requests are sent in succession until the entire queue is processed.</p><h2 id=5-improvements>5. Improvements</h2><p>Keep in mind that this current post is meant to show how to track the hits that may happen while the user is offline (due to a connectivity gap). At the same time, we&rsquo;ve taken the opportunity to showcase some cool and relatively little-known Google Analytics JavaScript API functionalities.</p><p>A solid improvement would be to skip the <code>originalSendTask</code> part, and just overwrite the <code>sendHitTask</code> task entirely. This way you can skip the HTTP HEAD request, because you can just check if the initial hit to Google Analytics is dispatched successfully.</p><p>The one thing you need to keep in mind if you want to overwrite the <code>sendHitTask</code> is that you&rsquo;ll need to replicate the <code>transport</code> logic for the request. The analytics.js library supports three different ways to dispatch the requests:</p><ol><li><p><code>'image'</code> - max 2K payload size sent with a GET request to a pixel endpoint</p></li><li><p><code>'xhr'</code> - max 8K payload size sent as an HTTP POST request</p></li><li><p><code>'beacon'</code> - POST request that uses the <code>navigator.sendBeacon()</code> to make sure your requests are sent even if the user has already navigated away from the page</p></li></ol><p>So you&rsquo;ll need to replicate this logic in your custom <code>sendHitTask</code> method. It&rsquo;s not exactly trivial to do, but an able developer should be able to do it, especially once the constraints (see previous paragraph) are known.</p><p>Another thing you might want to do is add a <strong>Custom Dimension</strong> to all the payloads that are stored in the queue. This Custom Dimension could be named something like <strong>Offline hit</strong>, and you should set the value to <code>true</code> if the hit was sent from the offline queue. Thus you can monitor how many hits in your data were initially aborted due to poor internet connectivity.</p><h2 id=6-summary>6. Summary</h2><p>I&rsquo;m really glad to have David guest star on this blog - it&rsquo;s been a long time coming! This solution is great for two reasons. First, it&rsquo;s actually very usable, especially if your site caters to mobile visitors. Second, it showcases a number of features of the web browser and the analytics.js library that can be extended to other purposes, too.</p><p>The Tasks API is really interesting, as it allows you to manipulate the payloads dispatched by the website. And with the introduction of <a href=/gtm-tips/use-customtask-access-tracker-values-google-tag-manager/>customTask</a>, we finally have a very handy way of accessing tasks with Google Tag Manager.</p><p>Note that if you have a web application with offline capabilities, and you are using service workers to manage this functionality, Google has released a <a href=https://www.npmjs.com/package/sw-offline-google-analytics>useful library</a> for employing service workers to do precisely the same thing we&rsquo;re doing in this article.</p><p>We hope you enjoyed this solution! Let us know in the comments</p></div></div><div id=post-footer class="post-footer main-content-wrap"><div class=post-footer-tags><span class="text-color-light text-small">TAGGED IN</span><br><a class="tag tag--primary tag--small" href=/tags/customtask/>customtask</a>
+<a class="tag tag--primary tag--small" href=/tags/google-analytics/>google analytics</a>
+<a class="tag tag--primary tag--small" href=/tags/google-tag-manager/>Google Tag Manager</a>
+<a class="tag tag--primary tag--small" href=/tags/javascript/>JavaScript</a>
+<a class="tag tag--primary tag--small" href=/tags/guest-post/>guest post</a></div><div class=post-actions-wrap><nav><ul class="post-actions post-action-nav"><li class=post-action><a class="post-action-btn btn btn--default" href=/gtm-tips/remove-pii-google-analytics-hits/><i class="fa fa-angle-left"></i>
+<span class="hide-xs hide-sm text-small icon-ml">NEXT</span></a></li><li class=post-action><a class="post-action-btn btn btn--default" href=/gtm-tips/pagination-and-quick-search/><span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+<i class="fa fa-angle-right"></i></a></li></ul></nav><ul class="post-actions post-action-share"><li class="post-action hide-lg hide-md hide-sm"><a class="post-action-btn btn btn--default btn-open-shareoptions" href=#btn-open-shareoptions><i class="fa fa-share-alt"></i></a></li><li class="post-action hide-xs"><a class="post-action-btn btn btn--default" target=new href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/track-users-who-are-offline-in-google-analytics/"><i class="fa fa-brands fa-facebook"></i></a></li><li class="post-action hide-xs"><a class="post-action-btn btn btn--default" target=new href="https://twitter.com/intent/tweet?text=Track%20Users%20Who%20Are%20Offline%20In%20Google%20Analytics%20https://www.simoahava.com/analytics/track-users-who-are-offline-in-google-analytics/%20via%20@SimoAhava"><i class="fa fa-brands fa-twitter"></i></a></li><li class="post-action hide-xs"><a class="post-action-btn btn btn--default" target=new href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/track-users-who-are-offline-in-google-analytics/"><i class="fa fa-brands fa-linkedin"></i></a></li><li class=post-action><a class="post-action-btn btn btn--default" href=#commento><i class="fa-regular fa-comments"></i></a></li><li class=post-action><a class="post-action-btn btn btn--default" href=#><i class="fa fa-search"></i></a></li></ul></div><a name=commento></a><comentario-comments></comentario-comments></div></article><footer id=footer class=main-content-wrap><span class=copyrights>&copy; 2026 Simo Ahava. All Rights Reserved</span></footer></div><div id=bottom-bar class=post-bottom-bar data-behavior=4><div class=post-actions-wrap><nav><ul class="post-actions post-action-nav"><li class=post-action><a class="post-action-btn btn btn--default" href=/gtm-tips/remove-pii-google-analytics-hits/><i class="fa fa-angle-left"></i>
+<span class="hide-xs hide-sm text-small icon-ml">NEXT</span></a></li><li class=post-action><a class="post-action-btn btn btn--default" href=/gtm-tips/pagination-and-quick-search/><span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+<i class="fa fa-angle-right"></i></a></li></ul></nav><ul class="post-actions post-action-share"><li class="post-action hide-lg hide-md hide-sm"><a class="post-action-btn btn btn--default btn-open-shareoptions" href=#btn-open-shareoptions><i class="fa fa-share-alt"></i></a></li><li class="post-action hide-xs"><a class="post-action-btn btn btn--default" target=new href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/track-users-who-are-offline-in-google-analytics/"><i class="fa fa-brands fa-facebook"></i></a></li><li class="post-action hide-xs"><a class="post-action-btn btn btn--default" target=new href="https://twitter.com/intent/tweet?text=Track%20Users%20Who%20Are%20Offline%20In%20Google%20Analytics%20https://www.simoahava.com/analytics/track-users-who-are-offline-in-google-analytics/%20via%20@SimoAhava"><i class="fa fa-brands fa-twitter"></i></a></li><li class="post-action hide-xs"><a class="post-action-btn btn btn--default" target=new href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/track-users-who-are-offline-in-google-analytics/"><i class="fa fa-brands fa-linkedin"></i></a></li><li class=post-action><a class="post-action-btn btn btn--default" href=#commento><i class="fa-regular fa-comments"></i></a></li><li class=post-action><a class="post-action-btn btn btn--default" href=#><i class="fa fa-search"></i></a></li></ul></div></div><div id=share-options-bar class=share-options-bar data-behavior=4><i id=btn-close-shareoptions class="fa fa-close"></i><ul class=share-options><li class=share-option><a class=share-option-btn target=new href="https://www.facebook.com/sharer/sharer.php?u=https://www.simoahava.com/analytics/track-users-who-are-offline-in-google-analytics/"><i class="fa fa-brands fa-facebook"></i><span>Share on Facebook</span></a></li><li class=share-option><a class=share-option-btn target=new href="https://twitter.com/intent/tweet?text=Track%20Users%20Who%20Are%20Offline%20In%20Google%20Analytics%20https://www.simoahava.com/analytics/track-users-who-are-offline-in-google-analytics/%20via%20@SimoAhava"><i class="fa fa-brands fa-twitter"></i><span>Share on Twitter</span></a></li><li class=share-option><a class=share-option-btn target=new href="https://www.linkedin.com/cws/share?url=https://www.simoahava.com/analytics/track-users-who-are-offline-in-google-analytics/"><i class="fa fa-brands fa-linkedin"></i><span>Share on LinkedIn</span></a></li></ul></div><div id=share-options-mask class=share-options-mask></div></div><div id=about><div id=about-card><div id=about-btn-close><i class="fa fa-remove"></i></div><img id=about-card-picture src=https://www.simoahava.com/images/simo.png alt="Author's picture"><h4 id=about-card-name>Simo Ahava</h4><div id=about-card-bio>Husband | Father | Analytics developer<br>simo (at) simoahava.com</div><div id=about-card-job><i class="fa fa-briefcase"></i><br>Senior Data Advocate at Reaktor</div><div id=about-card-location><i class="fa fa-map-marker"></i><br>Finland</div></div></div><div id=cover style=background-image:url(https://www.simoahava.com/images/maisema.jpg)></div><script defer src=https://comentario.simoahava.com/comentario.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin=anonymous referrerpolicy=no-referrer></script><script defer src=/js/script.js></script><script>!function(){var e=document.querySelector(".simmer"),t=document.querySelector(".simmer .close"),n=window.sessionStorage&&window.sessionStorage.getItem("nosimmer");e&&(n&&(e.style.display="none"),t&&t.addEventListener("click",function(){window.sessionStorage.setItem("nosimmer","true"),e.style.display="none"}))}()</script></body></html>
