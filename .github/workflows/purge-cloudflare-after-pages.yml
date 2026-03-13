@@ -1,0 +1,21 @@
+name: Purge Cloudflare after Pages deploy
+
+on:
+  workflow_run:
+    workflows: ["pages-build-deployment"]
+    types:
+      - completed
+
+jobs:
+  purge-cache:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Purge Cloudflare cache
+        run: |
+          curl --fail-with-body --request POST \
+            --url "https://api.cloudflare.com/client/v4/zones/${{ secrets.CLOUDFLARE_ZONE_ID }}/purge_cache" \
+            --header "Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}" \
+            --header "Content-Type: application/json" \
+            --data '{"purge_everything":true}'
